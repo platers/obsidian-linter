@@ -43,9 +43,21 @@ export const rules: { [name: string] : (text: string, params?: any) => string } 
 		}
 		return lines.join("\n");
 	},
+	"multiple_consecutive_blank_lines" : (text: string) => {
+		return text.replace(/\n{2,}/g, "\n\n");
+	}
 };
 
 // Helper functions
+function ignoreCodeBlocks(text: string, func: (text: string) => string) {
+	const fencedBlockRegex = "```\n(.*)\n```";
+	const indentedBlockRegex = "\n((\t|( {4})).*\n)+\n";
+	const codeBlockRegex = `^(${fencedBlockRegex})|(${indentedBlockRegex})$`;
+	const notCodeBlockRegex = `^(?!${codeBlockRegex})`;
+	return text.replace(new RegExp(notCodeBlockRegex, "gm"), (match, code) => {
+		return func(code);
+	});
+}
 
 function initYAML(text: string) {
 	if (text.match(/^---\s*\n.*\n---\s*\n/s) === null) {
