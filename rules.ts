@@ -21,6 +21,26 @@ export const rules: { [name: string] : (text: string, params?: any) => string } 
 		text = text.replace(/^---\n+/, "---\n");
 		return text.replace(/\n+---/, "\n---");
 	},
+	"header_increment" : (text: string) => {
+		const lines = text.split("\n");
+		let lastLevel = 0;
+		for (let i = 0; i < lines.length; i++) {
+			const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
+			const match = lines[i].match(headerRegex);
+			if (!match) {
+				continue;
+			}
+			const level = match[2].length;
+			if (level == 0) {
+				continue;
+			}
+			if (level > lastLevel + 1) {
+				lines[i] = lines[i].replace(headerRegex, `$1${"#".repeat(lastLevel + 1)}$3$4`);
+			}
+			lastLevel = level;
+		}
+		return lines.join("\n");
+	},
 };
 
 // Helper functions
