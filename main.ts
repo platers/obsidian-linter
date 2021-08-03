@@ -1,11 +1,12 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { Rule, rules } from './rules';
 
 interface MyPluginSettings {
-	mySetting: string;
+	enabledRules: string[];
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+	enabledRules: ['trailing_spaces']
 }
 
 export default class MyPlugin extends Plugin {
@@ -15,12 +16,6 @@ export default class MyPlugin extends Plugin {
 		console.log('loading plugin');
 
 		await this.loadSettings();
-
-		this.addRibbonIcon('dice', 'Sample Plugin', () => {
-			new Notice('This is a notice!');
-		});
-
-		this.addStatusBarItem().setText('Status Bar Text');
 
 		this.addCommand({
 			id: 'run-linter',
@@ -45,7 +40,23 @@ export default class MyPlugin extends Plugin {
 
 	runLinter() {
 		console.log('running linter');
-		
+
+		const view = this.app.workspace.activeLeaf.view;
+		if (view instanceof MarkdownView) {
+			const editor = view.editor;
+			const cursor = editor.getCursor();
+			let text = editor.getValue();
+			console.log(text);
+			for (const rule of this.settings.enabledRules) {
+				if (rule in rules) {
+					text = rules[rule](text);
+				} else {
+					new Notice(`Rule ${rule} not found`);
+				}
+			}
+			editor.setValue(text);
+			editor.setCursor(cursor);
+		}
 	}
 }
 
@@ -62,18 +73,20 @@ class SampleSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
+		containerEl.createEl('h2', {text: 'Settings for Linter.'});
 
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue('')
-				.onChange(async (value) => {
-					console.log('Secret: ' + value);
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
+			.setName('Rules to apply')
+			.setDesc('List the rules to apply to the markdown file')
+			.addTextArea(text => {
+				text
+					.setValue(this.plugin.settings.enabledRules.join('\n'))
+					.onChange(async (value) => {
+						console.log('Rules: ' + value);
+						this.plugin.settings.enabledRules = value.split('\n');
+						await this.plugin.saveSettings()});
+				text.inputEl.rows = 8;
+				text.inputEl.cols = 40;
+			});
 	}
 }
