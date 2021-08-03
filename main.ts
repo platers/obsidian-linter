@@ -13,7 +13,7 @@ export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
-		console.log('loading plugin');
+		console.log('loading linter plugin');
 
 		await this.loadSettings();
 
@@ -27,7 +27,7 @@ export default class MyPlugin extends Plugin {
 	}
 
 	onunload() {
-		console.log('unloading plugin');
+		console.log('unloading linter plugin');
 	}
 
 	async loadSettings() {
@@ -46,7 +46,6 @@ export default class MyPlugin extends Plugin {
 			const editor = view.editor;
 			const cursor = editor.getCursor();
 			let text = editor.getValue();
-			console.log(text);
 			for (const rule of this.settings.enabledRules) {
 				if (rule in rules) {
 					text = rules[rule](text);
