@@ -1,5 +1,5 @@
 import { App, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { Rule, rules } from './rules';
+import { rules } from './rules';
 
 interface MyPluginSettings {
 	enabledRules: string[];
