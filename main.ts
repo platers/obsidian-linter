@@ -82,7 +82,6 @@ class SampleSettingTab extends PluginSettingTab {
 				text
 					.setValue(this.plugin.settings.enabledRules.join('\n'))
 					.onChange(async (value) => {
-						console.log('Rules: ' + value);
 						this.plugin.settings.enabledRules = value.split('\n');
 						await this.plugin.saveSettings()});
 				text.inputEl.rows = 8;
