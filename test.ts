@@ -31,4 +31,20 @@ line`;
 	expect(rules['newlines_around_headings'](text)).toBe(expected);
 });
 
+test("newlines_around_headings ignore codeblocks", () => {
+	const text = `
+# H1
+\`\`\`
+# comment not header
+a = b
+\`\`\``;
+	const expected = `
 
+# H1
+
+\`\`\`
+# comment not header
+a = b
+\`\`\``;
+	expect(rules['newlines_around_headings'](text)).toBe(expected);
+});

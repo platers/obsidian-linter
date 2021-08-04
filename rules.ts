@@ -4,8 +4,10 @@ export const rules: { [name: string] : (text: string, params?: any) => string } 
 		return text.replace(/[ \t]+$/gm, "");
 	},
 	"newlines_around_headings" : (text: string) => {
-		text = text.replace(/\n*(#+ .*)\n+/g, "\n\n$1\n\n");
-		return text.replace(/\n*(#+ .*)/g, "\n\n$1");
+		return ignoreCodeBlocks(text, (text) => {
+			text = text.replace(/\n*(#+ .*)\n+/g, "\n\n$1\n\n");
+			return text.replace(/\n*(#+ .*)/g, "\n\n$1");
+		});
 	},
 	"spaces_after_list_markers" : (text: string) => {
 		// Space after marker
@@ -51,13 +53,22 @@ export const rules: { [name: string] : (text: string, params?: any) => string } 
 
 // Helper functions
 function ignoreCodeBlocks(text: string, func: (text: string) => string) {
-	const fencedBlockRegex = "```\n(.*)\n```";
-	const indentedBlockRegex = "\n((\t|( {4})).*\n)+\n";
-	const codeBlockRegex = `^(${fencedBlockRegex})|(${indentedBlockRegex})$`;
-	const notCodeBlockRegex = `^(?!${codeBlockRegex})`;
-	return text.replace(new RegExp(notCodeBlockRegex, "gm"), (match, code) => {
-		return func(code);
-	});
+	const fencedBlockRegex = "```\n((.|\n)*)```";
+	const indentedBlockRegex = "((\t|( {4})).*\n)+";
+	const codeBlockRegex = new RegExp(`${fencedBlockRegex}|${indentedBlockRegex}`, "g");
+	const placeholder = "PLACEHOLDER FOR CODE BLOCK 1038295"
+	const matches = text.match(codeBlockRegex);
+
+	text = text.replace(codeBlockRegex, placeholder);
+	text = func(text);
+
+	if (matches) {
+		for (const match of matches) {
+			text = text.replace(placeholder, match);
+		}
+	}
+
+	return text;
 }
 
 function initYAML(text: string) {
