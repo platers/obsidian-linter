@@ -6,7 +6,11 @@ interface MyPluginSettings {
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	enabledRules: ['trailing_spaces']
+	enabledRules: [
+		'trailing-spaces',
+		'headings-should-be-surrounded-by-blank-lines',
+		'space-after-list-markers',
+	]
 }
 
 export default class MyPlugin extends Plugin {
@@ -18,12 +22,18 @@ export default class MyPlugin extends Plugin {
 
 		await this.loadSettings();
 
-		this.rulesDict = rules.reduce((dict, rule) => (dict[rule.name] = rule, dict), {} as Record<string, Rule>);
+		this.rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);
 
 		this.addCommand({
-			id: 'run-linter',
-			name: 'Run Linter',
-			callback: () => this.runLinter()
+			id: 'lint-file',
+			name: 'Lint the current file',
+			callback: () => this.runLinter(),
+			hotkeys: [
+				{
+				  modifiers: ["Mod", "Alt"],
+				  key: "l",
+				},
+			  ],
 		});
 
 		this.addSettingTab(new SampleSettingTab(this.app, this));
@@ -50,10 +60,10 @@ export default class MyPlugin extends Plugin {
 			const cursor = editor.getCursor();
 			let text = editor.getValue();
 			for (const rule of this.settings.enabledRules) {
-				if (rule in rules) {
+				if (rule in this.rulesDict) {
 					text = this.rulesDict[rule].apply(text);
 				} else {
-					new Notice(`Rule ${rule} not found`);
+					new Notice(`Rule ${rule} not recognized`);
 				}
 			}
 			editor.setValue(text);

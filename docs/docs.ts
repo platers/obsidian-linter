@@ -8,11 +8,7 @@ import { Rule, rules } from "../rules";
 
 const readme_template = readFileSync("./docs/readme_template.md", "utf8");
 
-function url(rule: Rule): string {
-	return rule.name.replace(/ /g, '-').toLowerCase();
-}
-
-const rules_list = rules.map(rule => `- [${rule.name}](docs/rules.md#${url(rule)})`).join("\n");
+const rules_list = rules.map(rule => `- [${rule.name}](docs/rules.md#${rule.alias()})`).join("\n");
 
 const readme = dedent`
 				${readme_template}
@@ -48,6 +44,8 @@ const rules_docs = rules.map(rule => {
 
 	return dedent`
 	## ${rule.name}
+
+	Alias: ${rule.alias()}
 
 	${rule.description}
 

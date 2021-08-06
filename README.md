@@ -1,6 +1,14 @@
 # Obsidian Linter
 
-This Obsidian plugin lints markdown files.
+This Obsidian plugin applies consistent styling to your markdown files.
+
+## Usage
+
+To lint the current file, run `Lint the current file` (`Ctrl+Alt+L` by default).
+
+### Settings
+
+Rules 
 
 ## Rules
 

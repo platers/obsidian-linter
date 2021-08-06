@@ -13,6 +13,10 @@ export class Rule {
 		this.apply = apply;
 		this.tests = tests;
 	}
+
+	public alias(): string {
+		return this.name.replace(/ /g, '-').toLowerCase();
+	}
 }
 
 export class Test {
