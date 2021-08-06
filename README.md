@@ -8,11 +8,11 @@ To lint the current file, run `Lint the current file` (`Ctrl+Alt+L` by default).
 
 ### Settings
 
-Rules 
+Add a rule by adding its alias in the settings. The listed rules are applied in order.
 
 ## Rules
 
-Documentation for the rules can be found in the [rules docs](docs/rules.md).
+Documentation for all rules can be found in the [rules docs](docs/rules.md).
 
 - [Trailing spaces](docs/rules.md#trailing-spaces)
 - [Headings should be surrounded by blank lines](docs/rules.md#headings-should-be-surrounded-by-blank-lines)
