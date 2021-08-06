@@ -27,12 +27,15 @@ const rules_docs = rules.map(rule => {
 	const tests = rule.tests.filter(test => test.includeInDocs);
 	const examples = tests.map(test => dedent`
 		Example: ${test.description}
-		
+
 		Before:
+
 		\`\`\`markdown
 		${test.before}
 		\`\`\`
+
 		After:
+		
 		\`\`\`markdown
 		${test.after}
 		\`\`\`

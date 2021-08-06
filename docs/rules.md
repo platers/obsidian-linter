@@ -7,11 +7,14 @@ Removes extra spaces after every line.
 Example: Removes trailing spaces and tabs
 
 Before:
+
 ```markdown
 # H1   
 line with trailing spaces and tabs    				
 ```
+
 After:
+
 ```markdown
 # H1
 line with trailing spaces and tabs
@@ -24,6 +27,7 @@ All headings have a blank line both before and after (except where the heading i
 Example: Headings should be surrounded by blank lines
 
 Before:
+
 ```markdown
 # H1
 ## H2
@@ -34,7 +38,9 @@ line
 ## H2
 
 ```
+
 After:
+
 ```markdown
 # H1
 
@@ -45,4 +51,30 @@ After:
 line
 
 ## H2
+```
+
+## Space after list markers
+
+There should be a single space after list markers and checkboxes.
+
+Example: 
+
+Before:
+
+```markdown
+1.      Item 1
+2.  Item 2
+
+-   [ ] Item 1
+- [x]    Item 2
+```
+
+After:
+
+```markdown
+1. Item 1
+2. Item 2
+
+- [ ] Item 1
+- [x] Item 2
 ```

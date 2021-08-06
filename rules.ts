@@ -86,15 +86,55 @@ export const rules: Rule[] = [
 				## H2
 				`
 			),
+			new Test(
+				"Ignores codeblocks",
+				dedent`
+				# H1
+				\`\`\`
+				# comment not header
+				a = b
+				\`\`\``,
+				dedent`
+				# H1
+
+				\`\`\`
+				# comment not header
+				a = b
+				\`\`\``,
+				false
+			),
 		]
 	),
+	new Rule(
+		`Space after list markers`,
+		'There should be a single space after list markers and checkboxes.',
+		(text: string) => {
+			// Space after marker
+			text = text.replace(/^(\s*\d+\.|[-+*])\s+/gm, "$1 ");
+			// Space after checkbox
+			return text.replace(/^(\s*\d+\.|[-+*]\s+\[[ xX]\])\s+/gm, "$1 ");
+		},
+		[
+			new Test(
+				"",
+				dedent`
+				1.      Item 1
+				2.  Item 2
+
+				-   [ ] Item 1
+				- [x]    Item 2
+				`,
+				dedent`
+				1. Item 1
+				2. Item 2
+
+				- [ ] Item 1
+				- [x] Item 2
+				`
+			),
+		]
+	),	
 ]; 
-// 	"spaces_after_list_markers" : (text: string) => {
-// 		// Space after marker
-// 		text = text.replace(/^(\s*\d+\.|[-+*])\s+/gm, "$1 ");
-// 		// Space after checkbox
-// 		return text.replace(/^(\s*\d+\.|[-+*]\s+\[[ xX]\])\s+/gm, "$1 ");
-// 	},
 // 	"yaml_timestamp" : (text: string) => {
 // 		text = initYAML(text);
 // 		text = text.replace(/\ndate updated:.*\n/, "\n");
