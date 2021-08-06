@@ -4,5 +4,5 @@ This Obsidian plugin lints markdown files.
 
 ## Rules
 
-- trailing_spaces
+- Trailing spaces
 - Headings should be surrounded by blank lines

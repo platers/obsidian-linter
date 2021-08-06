@@ -32,7 +32,7 @@ export class Test {
 
 export const rules: Rule[] = [
 	new Rule(
-		"trailing_spaces", 
+		"Trailing spaces", 
 		"Removes extra spaces after every line.", 
 		(text: string) => {
 			return text.replace(/[ \t]+$/gm, "");
