@@ -4,6 +4,45 @@
 
 Removes extra spaces after every line.
 
+Example: Removes trailing spaces and tabs
+
+Before:
+```markdown
+# H1   
+line with trailing spaces and tabs    				
+```
+After:
+```markdown
+# H1
+line with trailing spaces and tabs
+```
+
 ## Headings should be surrounded by blank lines
 
 All headings have a blank line both before and after (except where the heading is at the beginning or end of the document)
+
+Example: Headings should be surrounded by blank lines
+
+Before:
+```markdown
+# H1
+## H2
+
+
+# H1
+line
+## H2
+
+```
+After:
+```markdown
+# H1
+
+## H2
+
+# H1
+
+line
+
+## H2
+```
