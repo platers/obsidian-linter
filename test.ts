@@ -1,3 +1,5 @@
+import MockDate from 'mockdate'
+MockDate.set('2020-01-01');
 import { rules, Test } from './rules';
 
 describe('Rules', () => {
@@ -8,4 +10,5 @@ describe('Rules', () => {
 			});
 		});
 	}
+	MockDate.reset();
 });

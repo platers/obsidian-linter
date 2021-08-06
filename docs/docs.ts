@@ -1,3 +1,5 @@
+import MockDate from 'mockdate'
+MockDate.set('2020-01-01');
 import { readFileSync, writeFileSync } from "fs";
 import dedent from "ts-dedent";
 import { rules } from "../rules";
@@ -18,6 +20,7 @@ const readme = dedent`
 				`;
 
 writeFileSync("README.md", readme);
+console.log("README.md updated");
 
 // Rules documentation
 
@@ -35,7 +38,7 @@ const rules_docs = rules.map(rule => {
 		\`\`\`
 
 		After:
-		
+
 		\`\`\`markdown
 		${test.after}
 		\`\`\`
@@ -58,3 +61,4 @@ const rules_documentation = dedent`
 	`;
 
 writeFileSync("./docs/rules.md", rules_documentation);
+console.log("Rules documentation updated");

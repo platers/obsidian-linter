@@ -133,7 +133,31 @@ export const rules: Rule[] = [
 				`
 			),
 		]
-	),	
+	),
+	new Rule(
+		"YAML Timestamp",
+		"Keep track of the date the file was last edited in the header YAML.",
+		(text: string) => {
+			text = initYAML(text);
+			text = text.replace(/\ndate updated:.*\n/, "\n");
+			const yaml_end = text.indexOf("\n---");
+			return insert(text, yaml_end, `\ndate updated: ${new Date().toDateString()}`);	
+		},
+		[
+			new Test(
+				'Adds a header with the date.',
+				dedent`
+				# H1
+				`,
+				dedent`
+				---
+				date updated: ${new Date().toDateString()}
+				---
+				# H1
+				`
+			),
+		]
+	),
 ]; 
 // 	"yaml_timestamp" : (text: string) => {
 // 		text = initYAML(text);

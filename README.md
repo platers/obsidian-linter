@@ -7,3 +7,4 @@ This Obsidian plugin lints markdown files.
 - Trailing spaces
 - Headings should be surrounded by blank lines
 - Space after list markers
+- YAML Timestamp

@@ -78,3 +78,24 @@ After:
 - [ ] Item 1
 - [x] Item 2
 ```
+
+## YAML Timestamp
+
+Keep track of the date the file was last edited in the header YAML.
+
+Example: Adds a header with the date.
+
+Before:
+
+```markdown
+# H1
+```
+
+After:
+
+```markdown
+---
+date updated: Tue Dec 31 2019
+---
+# H1
+```
