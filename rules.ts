@@ -42,22 +42,53 @@ export const rules: Rule[] = [
 				"Removes trailing spaces and tabs",
 				dedent`
 				# H1   
-				line with trailing spaces and tabs    	`,
+				line with trailing spaces and tabs    				`,
 				dedent`
 				# H1
 				line with trailing spaces and tabs`
 			),
 		]
 	),
+	new Rule(
+		"Headings should be surrounded by blank lines",
+		"All headings have a blank line both before and after (except where the heading is at the beginning or end of the document)",
+		(text: string) => {
+			return ignoreCodeBlocks(text, (text) => {
+				text = text.replace(/\n*(#+ .*)\n+/g, "\n\n$1\n\n");	// add blank line before and after headings
+				text = text.replace(/\n*(#+ .*)/g, "\n\n$1");	// trim blank lines before headings
+				text = text.replace(/^\n+(#+ .*)/, "$1");	// remove blank lines before first heading
+				text = text.replace(/(#+ .*)\n+$/, "$1");	// remove blank lines after last heading
+				return text;
+			});
+		},
+		[
+			new Test(
+				"Headings should be surrounded by blank lines",
+				dedent`
+				# H1
+				## H2
+
+
+				# H1
+				line
+				## H2
+
+				`,
+				dedent`
+				# H1
+
+				## H2
+
+				# H1
+
+				line
+				
+				## H2
+				`
+			),
+		]
+	),
 ]; 
-// export const rules: { [name: string] : (text: string, params?: any) => string } = 
-// {
-// 	"newlines_around_headings" : (text: string) => {
-// 		return ignoreCodeBlocks(text, (text) => {
-// 			text = text.replace(/\n*(#+ .*)\n+/g, "\n\n$1\n\n");
-// 			return text.replace(/\n*(#+ .*)/g, "\n\n$1");
-// 		});
-// 	},
 // 	"spaces_after_list_markers" : (text: string) => {
 // 		// Space after marker
 // 		text = text.replace(/^(\s*\d+\.|[-+*])\s+/gm, "$1 ");
@@ -100,34 +131,34 @@ export const rules: Rule[] = [
 // 	}
 // };
 
-// // Helper functions
-// function ignoreCodeBlocks(text: string, func: (text: string) => string) {
-// 	const fencedBlockRegex = "```\n((.|\n)*)```";
-// 	const indentedBlockRegex = "((\t|( {4})).*\n)+";
-// 	const codeBlockRegex = new RegExp(`${fencedBlockRegex}|${indentedBlockRegex}`, "g");
-// 	const placeholder = "PLACEHOLDER FOR CODE BLOCK 1038295"
-// 	const matches = text.match(codeBlockRegex);
+// Helper functions
+function ignoreCodeBlocks(text: string, func: (text: string) => string) {
+	const fencedBlockRegex = "```\n((.|\n)*)```";
+	const indentedBlockRegex = "((\t|( {4})).*\n)+";
+	const codeBlockRegex = new RegExp(`${fencedBlockRegex}|${indentedBlockRegex}`, "g");
+	const placeholder = "PLACEHOLDER FOR CODE BLOCK 1038295"
+	const matches = text.match(codeBlockRegex);
 
-// 	text = text.replace(codeBlockRegex, placeholder);
-// 	text = func(text);
+	text = text.replace(codeBlockRegex, placeholder);
+	text = func(text);
 
-// 	if (matches) {
-// 		for (const match of matches) {
-// 			text = text.replace(placeholder, match);
-// 		}
-// 	}
+	if (matches) {
+		for (const match of matches) {
+			text = text.replace(placeholder, match);
+		}
+	}
 
-// 	return text;
-// }
+	return text;
+}
 
-// function initYAML(text: string) {
-// 	if (text.match(/^---\s*\n.*\n---\s*\n/s) === null) {
-// 		text = "---\n---\n" + text;
-// 		console.log("inserted yaml");
-// 	}
-// 	return text;
-// }
+function initYAML(text: string) {
+	if (text.match(/^---\s*\n.*\n---\s*\n/s) === null) {
+		text = "---\n---\n" + text;
+		console.log("inserted yaml");
+	}
+	return text;
+}
 
-// function insert(str: string, index: number, value: string) {
-//     return str.substr(0, index) + value + str.substr(index);
-// }
+function insert(str: string, index: number, value: string) {
+    return str.substr(0, index) + value + str.substr(index);
+}

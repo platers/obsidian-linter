@@ -10,26 +10,6 @@ describe('Rules', () => {
 	}
 });
 
-// test("newlines_around_headings", () => {
-// 	const text = `
-// # H1
-// ## H2
-
-
-// # H1
-// line`;
-// 	const expected = `
-
-// # H1
-
-// ## H2
-
-// # H1
-
-// line`;
-// 	expect(rules['newlines_around_headings'](text)).toBe(expected);
-// });
-
 // test("newlines_around_headings ignore codeblocks", () => {
 // 	const text = `
 // # H1
