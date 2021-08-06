@@ -1,3 +1,5 @@
+import dedent from "ts-dedent";
+
 export class Rule {
 	public name: string;
 	public description: string;
@@ -38,13 +40,13 @@ export const rules: Rule[] = [
 		[
 			new Test(
 				"Removes trailing spaces and tabs",
-				`
-# H1   
-line with trailing spaces and tabs    	`,
-				`
-# H1
-line with trailing spaces and tabs`
-				),
+				dedent`
+				# H1   
+				line with trailing spaces and tabs    	`,
+				dedent`
+				# H1
+				line with trailing spaces and tabs`
+			),
 		]
 	),
 ]; 
