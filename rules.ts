@@ -158,44 +158,102 @@ export const rules: Rule[] = [
 			),
 		]
 	),
+	new Rule(
+		"Compact YAML",
+		'Removes leading and trailing blank lines in the header YAML.',
+		(text: string) => {
+			text = initYAML(text);
+			text = text.replace(/^---\n+/, "---\n");	
+			return text.replace(/\n+---/, "\n---");
+		},
+		[
+			new Test(
+				'',
+				dedent`
+				---
+
+				date: today
+
+				---
+				`,
+				dedent`
+				---
+				date: today
+				---
+				`
+			),
+		]
+	),
+	new Rule(
+		"Header Increment",
+		'Heading levels should only increment by one level at a time',
+		(text: string) => {
+			const lines = text.split("\n");
+			let lastLevel = 0;
+			for (let i = 0; i < lines.length; i++) {
+				const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
+				const match = lines[i].match(headerRegex);
+				if (!match) {
+					continue;
+				}
+				const level = match[2].length;
+				if (level == 0) {
+					continue;
+				}
+				if (level > lastLevel + 1) {
+					lines[i] = lines[i].replace(headerRegex, `$1${"#".repeat(lastLevel + 1)}$3$4`);
+				}
+				lastLevel = level;
+			}
+			return lines.join("\n");
+		},
+		[
+			new Test(
+				'',
+				dedent`
+				# H1
+
+				### H3
+
+				We skipped a 2nd level heading
+				`,
+				dedent`
+				# H1
+
+				## H3
+
+				We skipped a 2nd level heading
+				`
+			),
+		]
+	),
+	new Rule(
+		'Multiple consecutive blank lines',
+		'There should be at most one consecutive blank line.',
+		(text: string) => {
+			return text.replace(/\n{2,}/g, "\n\n");
+		},
+		[
+			new Test(
+				'',
+				dedent`
+				Some text
+
+
+				Some more text
+				`,
+				dedent`
+				Some text
+
+				Some more text
+				`
+			),
+		]
+	),
 ]; 
-// 	"yaml_timestamp" : (text: string) => {
-// 		text = initYAML(text);
-// 		text = text.replace(/\ndate updated:.*\n/, "\n");
-// 		const yaml_end = text.indexOf("\n---");
-// 		return insert(text, yaml_end, `\ndate updated: ${new Date().toDateString()}`);
-// 	},
-// 	"compact_yaml" : (text: string) => {
-// 		text = initYAML(text);
-// 		text = text.replace(/^---\n+/, "---\n");
-// 		return text.replace(/\n+---/, "\n---");
-// 	},
-// 	"header_increment" : (text: string) => {
-// 		const lines = text.split("\n");
-// 		let lastLevel = 0;
-// 		for (let i = 0; i < lines.length; i++) {
-// 			const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
-// 			const match = lines[i].match(headerRegex);
-// 			if (!match) {
-// 				continue;
-// 			}
-// 			const level = match[2].length;
-// 			if (level == 0) {
-// 				continue;
-// 			}
-// 			if (level > lastLevel + 1) {
-// 				lines[i] = lines[i].replace(headerRegex, `$1${"#".repeat(lastLevel + 1)}$3$4`);
-// 			}
-// 			lastLevel = level;
-// 		}
-// 		return lines.join("\n");
-// 	},
-// 	"multiple_consecutive_blank_lines" : (text: string) => {
-// 		return text.replace(/\n{2,}/g, "\n\n");
-// 	}
-// };
 
 // Helper functions
+
 function ignoreCodeBlocks(text: string, func: (text: string) => string) {
 	const fencedBlockRegex = "```\n((.|\n)*)```";
 	const indentedBlockRegex = "((\t|( {4})).*\n)+";
@@ -216,7 +274,7 @@ function ignoreCodeBlocks(text: string, func: (text: string) => string) {
 }
 
 function initYAML(text: string) {
-	if (text.match(/^---\s*\n.*\n---\s*\n/s) === null) {
+	if (text.match(/^---\s*\n.*\n---/s) === null) {
 		text = "---\n---\n" + text;
 		console.log("inserted yaml");
 	}

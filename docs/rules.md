@@ -99,3 +99,76 @@ date updated: Tue Dec 31 2019
 ---
 # H1
 ```
+
+## Compact YAML
+
+Removes leading and trailing blank lines in the header YAML.
+
+Example: 
+
+Before:
+
+```markdown
+---
+
+date: today
+
+---
+```
+
+After:
+
+```markdown
+---
+date: today
+---
+```
+
+## Header Increment
+
+Heading levels should only increment by one level at a time
+
+Example: 
+
+Before:
+
+```markdown
+# H1
+
+### H3
+
+We skipped a 2nd level heading
+```
+
+After:
+
+```markdown
+# H1
+
+## H3
+
+We skipped a 2nd level heading
+```
+
+## Multiple consecutive blank lines
+
+There should be at most one consecutive blank line.
+
+Example: 
+
+Before:
+
+```markdown
+Some text
+
+
+Some more text
+```
+
+After:
+
+```markdown
+Some text
+
+Some more text
+```

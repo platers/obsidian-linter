@@ -8,3 +8,6 @@ This Obsidian plugin lints markdown files.
 - Headings should be surrounded by blank lines
 - Space after list markers
 - YAML Timestamp
+- Compact YAML
+- Header Increment
+- Multiple consecutive blank lines

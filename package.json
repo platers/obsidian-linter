@@ -7,7 +7,8 @@
     "dev": "rollup --config rollup.config.js -w",
     "build": "rollup --config rollup.config.js --environment BUILD:production",
     "test": "jest",
-    "docs": "ts-node ./docs/docs.ts"
+    "docs": "ts-node ./docs/docs.ts",
+    "compile": "npm test & npm run docs"
   },
   "keywords": [],
   "author": "",
