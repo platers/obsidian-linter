@@ -2,13 +2,17 @@ import MockDate from 'mockdate'
 MockDate.set('2020-01-01');
 import { readFileSync, writeFileSync } from "fs";
 import dedent from "ts-dedent";
-import { rules } from "../rules";
+import { Rule, rules } from "../rules";
 
 // README
 
 const readme_template = readFileSync("./docs/readme_template.md", "utf8");
 
-const rules_list = rules.map(rule => `- ${rule.name}`).join("\n");
+function url(rule: Rule): string {
+	return rule.name.replace(/ /g, '-').toLowerCase();
+}
+
+const rules_list = rules.map(rule => `- [${rule.name}](docs/rules.md#${url(rule)})`).join("\n");
 
 const readme = dedent`
 				${readme_template}

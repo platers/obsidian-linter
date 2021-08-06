@@ -6,10 +6,10 @@ This Obsidian plugin lints markdown files.
 
 Documentation for the rules can be found in the [rules docs](docs/rules.md).
 
-- Trailing spaces
-- Headings should be surrounded by blank lines
-- Space after list markers
-- YAML Timestamp
-- Compact YAML
-- Header Increment
-- Multiple consecutive blank lines
+- [Trailing spaces](docs/rules.md#trailing-spaces)
+- [Headings should be surrounded by blank lines](docs/rules.md#headings-should-be-surrounded-by-blank-lines)
+- [Space after list markers](docs/rules.md#space-after-list-markers)
+- [YAML Timestamp](docs/rules.md#yaml-timestamp)
+- [Compact YAML](docs/rules.md#compact-yaml)
+- [Header Increment](docs/rules.md#header-increment)
+- [Multiple consecutive blank lines](docs/rules.md#multiple-consecutive-blank-lines)
