@@ -13,8 +13,6 @@ const rules_list = rules.map(rule => `- ${rule.name}`).join("\n");
 const readme = dedent`
 				${readme_template}
 
-				## Rules
-
 				${rules_list}
 
 				`;
