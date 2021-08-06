@@ -136,7 +136,7 @@ export const rules: Rule[] = [
 	),
 	new Rule(
 		"YAML Timestamp",
-		"Keep track of the date the file was last edited in the header YAML.",
+		"Keep track of the date the file was last edited in the YAML front matter.",
 		(text: string) => {
 			text = initYAML(text);
 			text = text.replace(/\ndate updated:.*\n/, "\n");
@@ -160,7 +160,7 @@ export const rules: Rule[] = [
 	),
 	new Rule(
 		"Compact YAML",
-		'Removes leading and trailing blank lines in the header YAML.',
+		'Removes leading and trailing blank lines in the YAML front matter.',
 		(text: string) => {
 			text = initYAML(text);
 			text = text.replace(/^---\n+/, "---\n");	
