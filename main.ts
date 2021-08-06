@@ -1,5 +1,5 @@
 import { App, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { rules } from './rules';
+import { rules, Rule } from './rules';
 
 interface MyPluginSettings {
 	enabledRules: string[];
@@ -11,11 +11,14 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
+	rulesDict: { [key: string]: Rule };
 
 	async onload() {
 		console.log('loading linter plugin');
 
 		await this.loadSettings();
+
+		this.rulesDict = rules.reduce((dict, rule) => (dict[rule.name] = rule, dict), {} as Record<string, Rule>);
 
 		this.addCommand({
 			id: 'run-linter',
@@ -48,7 +51,7 @@ export default class MyPlugin extends Plugin {
 			let text = editor.getValue();
 			for (const rule of this.settings.enabledRules) {
 				if (rule in rules) {
-					text = rules[rule](text);
+					text = this.rulesDict[rule].apply(text);
 				} else {
 					new Notice(`Rule ${rule} not found`);
 				}
