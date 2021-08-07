@@ -1,11 +1,11 @@
 import { App, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { rules, Rule } from './rules';
 
-interface MyPluginSettings {
+interface LinterSettings {
 	enabledRules: string[];
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: LinterSettings = {
 	enabledRules: [
 		'trailing-spaces',
 		'headings-should-be-surrounded-by-blank-lines',
@@ -13,13 +13,11 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	]
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class LinterPlugin extends Plugin {
+	settings: LinterSettings;
 	rulesDict: { [key: string]: Rule };
 
 	async onload() {
-		console.log('loading linter plugin');
-
 		await this.loadSettings();
 
 		this.rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);
@@ -36,11 +34,7 @@ export default class MyPlugin extends Plugin {
 			  ],
 		});
 
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-	}
-
-	onunload() {
-		console.log('unloading linter plugin');
+		this.addSettingTab(new SettingTab(this.app, this));
 	}
 
 	async loadSettings() {
@@ -59,6 +53,7 @@ export default class MyPlugin extends Plugin {
 			const editor = view.editor;
 			const cursor = editor.getCursor();
 			let text = editor.getValue();
+
 			for (const rule of this.settings.enabledRules) {
 				if (rule in this.rulesDict) {
 					text = this.rulesDict[rule].apply(text);
@@ -66,16 +61,17 @@ export default class MyPlugin extends Plugin {
 					new Notice(`Rule ${rule} not recognized`);
 				}
 			}
+
 			editor.setValue(text);
 			editor.setCursor(cursor);
 		}
 	}
 }
 
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+class SettingTab extends PluginSettingTab {
+	plugin: LinterPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: LinterPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}

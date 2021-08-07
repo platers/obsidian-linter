@@ -1,10 +1,10 @@
 {
-	"id": "obsidian-sample-plugin",
+	"id": "obsidian-linter",
 	"name": "Linter",
-	"version": "1.0.1",
+	"version": "1.0.0",
 	"minAppVersion": "0.9.12",
-	"description": "This plugin fixes the styling of your notes.",
+	"description": "Enforces consistent markdown styling.",
 	"author": "Victor Tao",
-	"authorUrl": "https://obsidian.md/about",
+	"authorUrl": "https://github.com/platers",
 	"isDesktopOnly": false
 }
