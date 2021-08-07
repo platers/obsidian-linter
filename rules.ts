@@ -172,7 +172,7 @@ export const rules: Rule[] = [
 		},
 		[
 			new Test(
-				'',
+				"",
 				dedent`
 				---
 
@@ -213,7 +213,7 @@ export const rules: Rule[] = [
 		},
 		[
 			new Test(
-				'',
+				"",
 				dedent`
 				# H1
 
@@ -239,7 +239,7 @@ export const rules: Rule[] = [
 		},
 		[
 			new Test(
-				'',
+				"",
 				dedent`
 				Some text
 

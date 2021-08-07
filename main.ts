@@ -1,5 +1,5 @@
-import { App, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { rules, Rule } from './rules';
+import { App, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
+import { rules, Rule } from "./rules";
 
 interface LinterSettings {
 	enabledRules: string[];
@@ -7,9 +7,9 @@ interface LinterSettings {
 
 const DEFAULT_SETTINGS: LinterSettings = {
 	enabledRules: [
-		'trailing-spaces',
-		'headings-should-be-surrounded-by-blank-lines',
-		'space-after-list-markers',
+		"trailing-spaces",
+		"headings-should-be-surrounded-by-blank-lines",
+		"space-after-list-markers",
 	]
 }
 
@@ -23,8 +23,8 @@ export default class LinterPlugin extends Plugin {
 		this.rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);
 
 		this.addCommand({
-			id: 'lint-file',
-			name: 'Lint the current file',
+			id: "lint-file",
+			name: "Lint the current file",
 			callback: () => this.runLinter(),
 			hotkeys: [
 				{
@@ -46,7 +46,7 @@ export default class LinterPlugin extends Plugin {
 	}
 
 	runLinter() {
-		console.log('running linter');
+		console.log("running linter");
 
 		const view = this.app.workspace.activeLeaf.view;
 		if (view instanceof MarkdownView) {
@@ -81,16 +81,16 @@ class SettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h2', {text: 'Settings for Linter.'});
+		containerEl.createEl("h2", {text: "Settings for Linter."});
 
 		new Setting(containerEl)
-			.setName('Rules to apply')
-			.setDesc('List the rules to apply to the markdown file')
+			.setName("Rules to apply")
+			.setDesc("List the rules to apply to the markdown file")
 			.addTextArea(text => {
 				text
-					.setValue(this.plugin.settings.enabledRules.join('\n'))
+					.setValue(this.plugin.settings.enabledRules.join("\n"))
 					.onChange(async (value) => {
-						this.plugin.settings.enabledRules = value.split('\n');
+						this.plugin.settings.enabledRules = value.split("\n");
 						await this.plugin.saveSettings()});
 				text.inputEl.rows = 8;
 				text.inputEl.cols = 40;
