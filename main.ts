@@ -55,6 +55,9 @@ export default class LinterPlugin extends Plugin {
 			let text = editor.getValue();
 
 			for (const rule of this.settings.enabledRules) {
+				if (rule.match(/\s*/) || rule.startsWith("// ")) {
+					continue;
+				}
 				if (rule in this.rulesDict) {
 					text = this.rulesDict[rule].apply(text);
 				} else {
@@ -81,7 +84,7 @@ class SettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl("h2", {text: "Settings for Linter."});
+		containerEl.createEl("h2", {text: "Settings for Linter"});
 
 		new Setting(containerEl)
 			.setName("Rules to apply")
