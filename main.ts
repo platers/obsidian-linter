@@ -55,7 +55,7 @@ export default class LinterPlugin extends Plugin {
 			let text = editor.getValue();
 
 			for (const rule of this.settings.enabledRules) {
-				if (rule.match(/\s*/) || rule.startsWith("// ")) {
+				if (rule.match(/^\s*$/) || rule.startsWith("// ")) {
 					continue;
 				}
 				if (rule in this.rulesDict) {
