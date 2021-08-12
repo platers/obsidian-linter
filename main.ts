@@ -1,4 +1,4 @@
-import { App, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
 import { rules, Rule } from "./rules";
 
 interface LinterSettings {
@@ -25,7 +25,7 @@ export default class LinterPlugin extends Plugin {
 		this.addCommand({
 			id: "lint-file",
 			name: "Lint the current file",
-			callback: () => this.runLinter(),
+			editorCallback: (editor) => this.runLinter(editor),
 			hotkeys: [
 				{
 				  modifiers: ["Mod", "Alt"],
@@ -45,29 +45,26 @@ export default class LinterPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	runLinter() {
+	runLinter(editor: Editor) {
 		console.log("running linter");
 
 		const view = this.app.workspace.activeLeaf.view;
-		if (view instanceof MarkdownView) {
-			const editor = view.editor;
-			const cursor = editor.getCursor();
-			let text = editor.getValue();
+		const cursor = editor.getCursor();
+		let text = editor.getValue();
 
-			for (const rule of this.settings.enabledRules) {
-				if (rule.match(/^\s*$/) || rule.startsWith("// ")) {
-					continue;
-				}
-				if (rule in this.rulesDict) {
-					text = this.rulesDict[rule].apply(text);
-				} else {
-					new Notice(`Rule ${rule} not recognized`);
-				}
+		for (const rule of this.settings.enabledRules) {
+			if (rule.match(/^\s*$/) || rule.startsWith("// ")) {
+				continue;
 			}
-
-			editor.setValue(text);
-			editor.setCursor(cursor);
+			if (rule in this.rulesDict) {
+				text = this.rulesDict[rule].apply(text);
+			} else {
+				new Notice(`Rule ${rule} not recognized`);
+			}
 		}
+
+		editor.setValue(text);
+		editor.setCursor(cursor);
 	}
 }
 
