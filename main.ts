@@ -95,7 +95,7 @@ class SettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.enabledRules = value.split("\n");
 						await this.plugin.saveSettings()});
-				text.inputEl.rows = 8;
+				text.inputEl.rows = 20;
 				text.inputEl.cols = 40;
 			});
 	}
