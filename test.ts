@@ -6,7 +6,7 @@ import { rules, rulesDict, Example } from "./rules";
 describe("Examples", () => {
 	for (const rule of rules) {
 		describe(rule.name, () => {
-			test.each(rule.tests)("$description", (testObject: Example) => {
+			test.each(rule.examples)("$description", (testObject: Example) => {
 				expect(rule.apply(testObject.before)).toBe(testObject.after);
 			});
 		});

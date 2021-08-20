@@ -13,6 +13,9 @@ To lint the current file, run `Lint the current file` (`Ctrl+Alt+L` by default).
 
 Add a rule by adding its alias in the settings. The listed rules are applied in order.
 
+Some rules have configurable options, which are set with the format `option=value`.
+For example ``;
+
 ## Development Instructions
 
 Pull requests are welcome, especially for new rules.

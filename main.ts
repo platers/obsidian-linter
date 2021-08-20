@@ -1,16 +1,17 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
+import dedent from "ts-dedent";
 import { rules, Rule, rulesDict } from "./rules";
 
 interface LinterSettings {
-	enabledRules: string[];
+	enabledRules: string;
 }
 
 const DEFAULT_SETTINGS: LinterSettings = {
-	enabledRules: [
-		"trailing-spaces",
-		"heading-blank-lines",
-		"space-after-list-markers",
-	]
+	enabledRules: dedent`
+		trailing-spaces
+		heading-blank-lines
+		space-after-list-markers
+		`
 }
 
 export default class LinterPlugin extends Plugin {
@@ -45,17 +46,43 @@ export default class LinterPlugin extends Plugin {
 	runLinter(editor: Editor) {
 		console.log("running linter");
 
-		const view = this.app.workspace.activeLeaf.view;
 		const cursor = editor.getCursor();
 		let text = editor.getValue();
+		const lines = this.settings.enabledRules.split("\n");
 
-		for (const rule of this.settings.enabledRules) {
-			if (rule.match(/^\s*$/) || rule.startsWith("// ")) {
+		for (const line of lines) {
+			if (line.match(/^\s*$/) || line.startsWith("// ")) {
 				continue;
 			}
+
+			const tokens = line.split(" ");
+			if (tokens.length == 0) {
+				continue;
+			}
+
+			const rule = tokens[0];
+
 			if (rule in rulesDict) {
-				text = rulesDict[rule].apply(text);
-			} else {
+				const args = tokens.slice(1);
+
+				if(args.length == 0) {
+					text = rulesDict[rule].apply(text);
+				}
+				else {
+					const options: {[id: string] : string} = {};
+
+					for (const arg of args) {
+						if (arg.indexOf("=") == -1) {
+							new Notice(`Invalid argument format in ${line}`);
+							continue;
+						}
+						const [key, value] = arg.split("=");
+						options[key] = value;
+					}
+					text = rulesDict[rule].apply(text, options);
+				}
+			}
+			else {
 				new Notice(`Rule ${rule} not recognized`);
 			}
 		}
@@ -85,9 +112,9 @@ class SettingTab extends PluginSettingTab {
 			.setDesc("List the rules to apply to the markdown file")
 			.addTextArea(text => {
 				text
-					.setValue(this.plugin.settings.enabledRules.join("\n"))
+					.setValue(this.plugin.settings.enabledRules)
 					.onChange(async (value) => {
-						this.plugin.settings.enabledRules = value.split("\n");
+						this.plugin.settings.enabledRules = value;
 						await this.plugin.saveSettings()});
 				text.inputEl.rows = 20;
 				text.inputEl.cols = 40;

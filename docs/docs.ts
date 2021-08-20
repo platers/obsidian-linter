@@ -25,8 +25,7 @@ console.log("README.md updated");
 const rules_template = readFileSync("./docs/rules_template.md", "utf8");
 
 const rules_docs = rules.map(rule => {
-	const tests = rule.tests.filter(test => test.includeInDocs);
-	const examples = tests.map(test => dedent`
+	const examples = rule.examples.map(test => dedent`
 		Example: ${test.description}
 
 		Before:
@@ -42,12 +41,23 @@ const rules_docs = rules.map(rule => {
 		\`\`\`
 	`).join("\n");
 
+	const options_list = rule.options.map(option => `- ${option}`).join("\n");
+	let options = "";
+	if (options_list.length > 0) {
+		options = dedent`
+			Options:
+			${options_list}
+		`;
+	}
+
 	return dedent`
 	## ${rule.name}
 
 	Alias: ${rule.alias()}
 
 	${rule.description}
+
+	${options}
 
 	${examples}
 

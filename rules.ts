@@ -1,17 +1,26 @@
 import dedent from "ts-dedent";
+import moment from 'moment';
 
 export class Rule {
 	public name: string;
 	public description: string;
-	public apply: (text: string) => string;
+	public options: Array<string>;
+	public apply: (text: string, options?: {[id: string] : string}) => string;
 
-	public tests: Array<Example>;
+	public examples: Array<Example>;
 
-	constructor(name: string, description: string, apply: (text: string) => string, tests: Array<Example>) {
+	constructor(
+			name: string, 
+			description: string, 
+			apply: (text: string, 
+				options?: {[id: string] : string}) => string,
+			examples: Array<Example>,
+			options: Array<string> = []) {
 		this.name = name;
 		this.description = description;
 		this.apply = apply;
-		this.tests = tests;
+		this.examples = examples;
+		this.options = options;
 	}
 
 	public alias(): string {
@@ -122,12 +131,12 @@ export const rules: Rule[] = [
 	),
 	new Rule(
 		"YAML Timestamp",
-		"Keep track of the date the file was last edited in the YAML front matter.",
-		(text: string) => {
+		"Keep track of the date the file was last edited in the YAML front matter. ",
+		(text: string, options = {"format": "dddd, MMMM Do YYYY, h:mm:ss a"}) => {
 			text = initYAML(text);
 			text = text.replace(/\ndate updated:.*\n/, "\n");
 			const yaml_end = text.indexOf("\n---");
-			return insert(text, yaml_end, `\ndate updated: ${new Date().toDateString()}`);	
+			return insert(text, yaml_end, `\ndate updated: ${moment().format(options["format"])}`);	
 		},
 		[
 			new Example(
@@ -137,11 +146,14 @@ export const rules: Rule[] = [
 				`,
 				dedent`
 				---
-				date updated: ${new Date().toDateString()}
+				date updated: ${moment().format("dddd, MMMM Do YYYY, h:mm:ss a")}
 				---
 				# H1
 				`
 			),
+		],
+		[
+			"format: [date format]([https://momentjs.com/docs/#/displaying/format/), default=dddd, MMMM Do YYYY, h:mm:ss a",
 		]
 	),
 	new Rule(
