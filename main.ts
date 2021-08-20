@@ -8,7 +8,7 @@ interface LinterSettings {
 const DEFAULT_SETTINGS: LinterSettings = {
 	enabledRules: [
 		"trailing-spaces",
-		"headings-should-be-surrounded-by-blank-lines",
+		"heading-blank-lines",
 		"space-after-list-markers",
 	]
 }
