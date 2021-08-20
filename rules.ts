@@ -146,7 +146,7 @@ export const rules: Rule[] = [
 				`,
 				dedent`
 				---
-				date updated: ${moment().format("dddd, MMMM Do YYYY, h:mm:ss a")}
+				date updated: Wednesday, January 1st 2020, 12:00:00 am
 				---
 				# H1
 				`

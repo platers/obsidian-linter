@@ -1,8 +1,9 @@
-import MockDate from 'mockdate'
-MockDate.set('2020-01-01');
+import MockDate from "mockdate"
+MockDate.set("2020-01-01");
 import { readFileSync, writeFileSync } from "fs";
 import dedent from "ts-dedent";
-import { Rule, rules } from "../rules";
+import { rules } from "../rules";
+
 
 const autogen_warning = "<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->";
 
@@ -70,7 +71,7 @@ const rules_docs = rules.map(rule => {
 
 const rules_documentation = dedent`
 	${autogen_warning}
-	
+
 	${rules_template}
 
 	${rules_docs}

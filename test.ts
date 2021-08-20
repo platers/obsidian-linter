@@ -1,6 +1,6 @@
 import MockDate from "mockdate"
+MockDate.set(new Date(2020, 0, 1));
 import dedent from "ts-dedent";
-MockDate.set("2020-01-01");
 import { rules, rulesDict, Example } from "./rules";
 
 describe("Examples", () => {
@@ -11,7 +11,6 @@ describe("Examples", () => {
 			});
 		});
 	}
-	MockDate.reset();
 });
 
 describe("Rules tests", () => {

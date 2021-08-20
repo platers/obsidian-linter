@@ -114,7 +114,7 @@ After:
 
 ```markdown
 ---
-date updated: Tuesday, December 31st 2019, 7:00:00 pm
+date updated: Wednesday, January 1st 2020, 12:00:00 am
 ---
 # H1
 ```
