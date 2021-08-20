@@ -4,6 +4,8 @@ import { readFileSync, writeFileSync } from "fs";
 import dedent from "ts-dedent";
 import { Rule, rules } from "../rules";
 
+const autogen_warning = "<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->";
+
 // README
 
 const readme_template = readFileSync("./docs/readme_template.md", "utf8");
@@ -11,6 +13,8 @@ const readme_template = readFileSync("./docs/readme_template.md", "utf8");
 const rules_list = rules.map(rule => `- [${rule.name}](docs/rules.md#${rule.alias()})`).join("\n");
 
 const readme = dedent`
+				${autogen_warning}
+
 				${readme_template}
 
 				${rules_list}
@@ -65,6 +69,8 @@ const rules_docs = rules.map(rule => {
 }).join("\n");
 
 const rules_documentation = dedent`
+	${autogen_warning}
+	
 	${rules_template}
 
 	${rules_docs}

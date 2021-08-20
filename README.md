@@ -1,3 +1,5 @@
+<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->
+
 # Obsidian Linter
 
 This Obsidian plugin applies consistent styling to your markdown files.
