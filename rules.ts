@@ -5,9 +5,9 @@ export class Rule {
 	public description: string;
 	public apply: (text: string) => string;
 
-	public tests: Array<Test>;
+	public tests: Array<Example>;
 
-	constructor(name: string, description: string, apply: (text: string) => string, tests: Array<Test>) {
+	constructor(name: string, description: string, apply: (text: string) => string, tests: Array<Example>) {
 		this.name = name;
 		this.description = description;
 		this.apply = apply;
@@ -19,18 +19,17 @@ export class Rule {
 	}
 }
 
-export class Test {
+export class Example {
 	public description: string;
 	public includeInDocs: boolean;
 
 	public before: string;
 	public after: string;
 
-	constructor(description: string, before: string, after: string, includeInDocs = true) {
+	constructor(description: string, before: string, after: string) {
 		this.description = description;
 		this.before = before;
 		this.after = after;
-		this.includeInDocs = includeInDocs;
 	}
 }
 
@@ -42,7 +41,7 @@ export const rules: Rule[] = [
 			return text.replace(/[ \t]+$/gm, "");
 		},
 		[
-			new Test(
+			new Example(
 				"Removes trailing spaces and tabs",
 				dedent`
 				# H1   
@@ -54,7 +53,7 @@ export const rules: Rule[] = [
 		]
 	),
 	new Rule(
-		"Headings should be surrounded by blank lines",
+		"Heading blank lines",
 		"All headings have a blank line both before and after (except where the heading is at the beginning or end of the document)",
 		(text: string) => {
 			return ignoreCodeBlocks(text, (text) => {
@@ -66,7 +65,7 @@ export const rules: Rule[] = [
 			});
 		},
 		[
-			new Test(
+			new Example(
 				"Headings should be surrounded by blank lines",
 				dedent`
 				# H1
@@ -90,35 +89,6 @@ export const rules: Rule[] = [
 				## H2
 				`
 			),
-			new Test(
-				"Ignores codeblocks",
-				dedent`
-				# H1
-				\`\`\`
-				# comment not header
-				a = b
-				\`\`\``,
-				dedent`
-				# H1
-
-				\`\`\`
-				# comment not header
-				a = b
-				\`\`\``,
-				false
-			),
-			new Test(
-				"Ignores # not in headings",
-				dedent`
-				Not a header # .
-				Line
-				`,
-				dedent`
-				Not a header # .
-				Line
-				`,
-				false
-			),
 		]
 	),
 	new Rule(
@@ -131,7 +101,7 @@ export const rules: Rule[] = [
 			return text.replace(/^(\s*\d+\.|[-+*]\s+\[[ xX]\])\s+/gm, "$1 ");
 		},
 		[
-			new Test(
+			new Example(
 				"",
 				dedent`
 				1.      Item 1
@@ -160,7 +130,7 @@ export const rules: Rule[] = [
 			return insert(text, yaml_end, `\ndate updated: ${new Date().toDateString()}`);	
 		},
 		[
-			new Test(
+			new Example(
 				'Adds a header with the date.',
 				dedent`
 				# H1
@@ -183,7 +153,7 @@ export const rules: Rule[] = [
 			return text.replace(/\n+---/, "\n---");
 		},
 		[
-			new Test(
+			new Example(
 				"",
 				dedent`
 				---
@@ -224,7 +194,7 @@ export const rules: Rule[] = [
 			return lines.join("\n");
 		},
 		[
-			new Test(
+			new Example(
 				"",
 				dedent`
 				# H1
@@ -250,7 +220,7 @@ export const rules: Rule[] = [
 			return text.replace(/\n{2,}/g, "\n\n");
 		},
 		[
-			new Test(
+			new Example(
 				"",
 				dedent`
 				Some text
@@ -267,6 +237,10 @@ export const rules: Rule[] = [
 		]
 	),
 ]; 
+
+export const rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);
+
+
 
 // Helper functions
 

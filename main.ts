@@ -1,5 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
-import { rules, Rule } from "./rules";
+import { rules, Rule, rulesDict } from "./rules";
 
 interface LinterSettings {
 	enabledRules: string[];
@@ -15,12 +15,9 @@ const DEFAULT_SETTINGS: LinterSettings = {
 
 export default class LinterPlugin extends Plugin {
 	settings: LinterSettings;
-	rulesDict: { [key: string]: Rule };
 
 	async onload() {
 		await this.loadSettings();
-
-		this.rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);
 
 		this.addCommand({
 			id: "lint-file",
@@ -56,8 +53,8 @@ export default class LinterPlugin extends Plugin {
 			if (rule.match(/^\s*$/) || rule.startsWith("// ")) {
 				continue;
 			}
-			if (rule in this.rulesDict) {
-				text = this.rulesDict[rule].apply(text);
+			if (rule in rulesDict) {
+				text = rulesDict[rule].apply(text);
 			} else {
 				new Notice(`Rule ${rule} not recognized`);
 			}

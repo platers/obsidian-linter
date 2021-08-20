@@ -27,7 +27,7 @@ Run `npm run docs` to generate the documentation.
 Documentation for all rules can be found in the [rules docs](docs/rules.md).
 
 - [Trailing spaces](docs/rules.md#trailing-spaces)
-- [Headings should be surrounded by blank lines](docs/rules.md#headings-should-be-surrounded-by-blank-lines)
+- [Heading blank lines](docs/rules.md#heading-blank-lines)
 - [Space after list markers](docs/rules.md#space-after-list-markers)
 - [YAML Timestamp](docs/rules.md#yaml-timestamp)
 - [Compact YAML](docs/rules.md#compact-yaml)
