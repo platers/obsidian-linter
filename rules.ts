@@ -226,7 +226,7 @@ export const rules: Rule[] = [
 		]
 	),
 	new Rule(
-		'Multiple consecutive blank lines',
+		'Consecutive blank lines',
 		'There should be at most one consecutive blank line.',
 		(text: string) => {
 			return text.replace(/\n{2,}/g, "\n\n");

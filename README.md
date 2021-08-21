@@ -39,4 +39,4 @@ Documentation for all rules can be found in the [rules docs](docs/rules.md).
 - [YAML Timestamp](docs/rules.md#yaml-timestamp)
 - [Compact YAML](docs/rules.md#compact-yaml)
 - [Header Increment](docs/rules.md#header-increment)
-- [Multiple consecutive blank lines](docs/rules.md#multiple-consecutive-blank-lines)
+- [Consecutive blank lines](docs/rules.md#consecutive-blank-lines)

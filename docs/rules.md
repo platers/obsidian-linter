@@ -177,9 +177,9 @@ After:
 We skipped a 2nd level heading
 ```
 
-## Multiple consecutive blank lines
+## Consecutive blank lines
 
-Alias: multiple-consecutive-blank-lines
+Alias: consecutive-blank-lines
 
 There should be at most one consecutive blank line.
 

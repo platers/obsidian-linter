@@ -1,9 +1,9 @@
 import MockDate from "mockdate"
 MockDate.set(new Date(2020, 0, 1));
 import dedent from "ts-dedent";
-import { rules, rulesDict, Example } from "./rules";
+import { rules, Rule, rulesDict, Example } from "./rules";
 
-describe("Examples", () => {
+describe("Examples pass", () => {
 	for (const rule of rules) {
 		describe(rule.name, () => {
 			test.each(rule.examples)("$description", (testObject: Example) => {
@@ -11,6 +11,14 @@ describe("Examples", () => {
 			});
 		});
 	}
+});
+
+describe("Check missing fields", () => {
+	test.each(rules)("$name", (rule: Rule) => {
+		expect(rule.name).toBeTruthy();
+		expect(rule.description).toBeTruthy();
+		expect(rule.examples.length).toBeGreaterThan(0);
+	});
 });
 
 describe("Rules tests", () => {
