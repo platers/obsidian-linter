@@ -153,7 +153,7 @@ export const rules: Rule[] = [
 			),
 		],
 		[
-			`format: [date format](https://momentjs.com/docs/#/displaying/format/), default="dddd, MMMM Do YYYY, h:mm:ss a"`,
+			'format: [date format](https://momentjs.com/docs/#/displaying/format/), default=`"dddd, MMMM Do YYYY, h:mm:ss a"`',
 		]
 	),
 	new Rule(

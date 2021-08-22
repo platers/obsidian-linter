@@ -11,7 +11,7 @@ To lint the current file, run `Lint the current file` (`Ctrl+Alt+L` by default).
 
 ### Settings
 
-![Settings](https://github.com/platers/obsidian-linter/blob/master/docs/settings.png)
+![Settings](https://github.com/platers/obsidian-linter/blob/master/docs/settings.png?raw=true)
 
 Add a rule by adding its alias in the settings. The listed rules are applied in order.
 
