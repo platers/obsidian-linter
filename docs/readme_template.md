@@ -11,7 +11,7 @@ To lint the current file, run `Lint the current file` (`Ctrl+Alt+L` by default).
 
 ### Settings
 
-![Settings](docs/settings.png)
+![Settings](https://github.com/platers/obsidian-linter/blob/master/docs/settings.png)
 
 Add a rule by adding its alias in the settings. The listed rules are applied in order.
 
@@ -29,4 +29,4 @@ Run `npm run docs` to generate the documentation.
 
 ## Rules
 
-Documentation for all rules can be found in the [rules docs](docs/rules.md).
+Documentation for all rules can be found in the [rules docs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md).

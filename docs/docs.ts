@@ -11,7 +11,8 @@ const autogen_warning = "<!--- This file was automatically generated. See docs.t
 
 const readme_template = readFileSync("./docs/readme_template.md", "utf8");
 
-const rules_list = rules.map(rule => `- [${rule.name}](docs/rules.md#${rule.alias()})`).join("\n");
+const url = "https://github.com/platers/obsidian-linter/blob/master/docs/rules.md"
+const rules_list = rules.map(rule => `- [${rule.name}](${url}#${rule.alias()})`).join("\n");
 
 const readme = dedent`
 				${autogen_warning}

@@ -13,7 +13,7 @@ To lint the current file, run `Lint the current file` (`Ctrl+Alt+L` by default).
 
 ### Settings
 
-![Settings](docs/settings.png)
+![Settings](https://github.com/platers/obsidian-linter/blob/master/docs/settings.png)
 
 Add a rule by adding its alias in the settings. The listed rules are applied in order.
 
@@ -31,12 +31,12 @@ Run `npm run docs` to generate the documentation.
 
 ## Rules
 
-Documentation for all rules can be found in the [rules docs](docs/rules.md).
+Documentation for all rules can be found in the [rules docs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md).
 
-- [Trailing spaces](docs/rules.md#trailing-spaces)
-- [Heading blank lines](docs/rules.md#heading-blank-lines)
-- [Space after list markers](docs/rules.md#space-after-list-markers)
-- [YAML Timestamp](docs/rules.md#yaml-timestamp)
-- [Compact YAML](docs/rules.md#compact-yaml)
-- [Header Increment](docs/rules.md#header-increment)
-- [Consecutive blank lines](docs/rules.md#consecutive-blank-lines)
+- [Trailing spaces](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#trailing-spaces)
+- [Heading blank lines](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#heading-blank-lines)
+- [Space after list markers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#space-after-list-markers)
+- [YAML Timestamp](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-timestamp)
+- [Compact YAML](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#compact-yaml)
+- [Header Increment](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#header-increment)
+- [Consecutive blank lines](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#consecutive-blank-lines)
