@@ -1,6 +1,6 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
+import { App, Editor, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
 import dedent from "ts-dedent";
-import { rules, Rule, rulesDict } from "./rules";
+import { rules, parseOptions, rulesDict } from "./rules";
 
 interface LinterSettings {
 	enabledRules: string;
@@ -48,48 +48,35 @@ export default class LinterPlugin extends Plugin {
 
 		const cursor = editor.getCursor();
 		let text = editor.getValue();
-		const lines = this.settings.enabledRules.split("\n");
+		const enabledRules = this.settings.enabledRules.split("\n");
 
-		for (const line of lines) {
+		for (const line of enabledRules) {
 			if (line.match(/^\s*$/) || line.startsWith("// ")) {
 				continue;
 			}
 
-			const tokens = line.split(" ");
-			if (tokens.length == 0) {
-				continue;
-			}
+			// Split the line into the rule name and the rule options
+			const ruleName = line.split(/\s+/)[0];
 
-			const rule = tokens[0];
+			if (ruleName in rulesDict) {
+				const options: { [id: string]: string; } = parseOptions(line);
 
-			if (rule in rulesDict) {
-				const args = tokens.slice(1);
-
-				if(args.length == 0) {
-					text = rulesDict[rule].apply(text);
+				if(options) {
+					text = rulesDict[ruleName].apply(text, options);
 				}
 				else {
-					const options: {[id: string] : string} = {};
-
-					for (const arg of args) {
-						if (arg.indexOf("=") == -1) {
-							new Notice(`Invalid argument format in ${line}`);
-							continue;
-						}
-						const [key, value] = arg.split("=");
-						options[key] = value;
-					}
-					text = rulesDict[rule].apply(text, options);
+					text = rulesDict[ruleName].apply(text);
 				}
 			}
 			else {
-				new Notice(`Rule ${rule} not recognized`);
+				new Notice(`Rule ${ruleName} not recognized`);
 			}
 		}
 
 		editor.setValue(text);
 		editor.setCursor(cursor);
 	}
+
 }
 
 class SettingTab extends PluginSettingTab {

@@ -100,7 +100,7 @@ Alias: yaml-timestamp
 Keep track of the date the file was last edited in the YAML front matter. 
 
 Options:
-- format: [date format]([https://momentjs.com/docs/#/displaying/format/), default=dddd, MMMM Do YYYY, h:mm:ss a
+- format: [date format](https://momentjs.com/docs/#/displaying/format/), default="dddd, MMMM Do YYYY, h:mm:ss a"
 
 Example: Adds a header with the date.
 

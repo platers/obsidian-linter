@@ -153,7 +153,7 @@ export const rules: Rule[] = [
 			),
 		],
 		[
-			"format: [date format]([https://momentjs.com/docs/#/displaying/format/), default=dddd, MMMM Do YYYY, h:mm:ss a",
+			`format: [date format](https://momentjs.com/docs/#/displaying/format/), default="dddd, MMMM Do YYYY, h:mm:ss a"`,
 		]
 	),
 	new Rule(
@@ -255,6 +255,26 @@ export const rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule
 
 
 // Helper functions
+
+// Export parseOptions here so it can be tested
+export function parseOptions(line: string) {
+	// Match arguments with format: optionName=value or optionName="value" or optionName='value'
+	const args = line.matchAll(/\s+(\S+)=("[^"]*"|'[^']*'|\S+)/g);
+	const options: { [id: string]: string; } = {};
+
+	for (const arg of args) {
+		let [_, option_name, option_value] = arg;
+
+		if (option_value.startsWith("'") && option_value.endsWith("'")) {
+			option_value = option_value.slice(1, -1);
+		} else if (option_value.startsWith('"') && option_value.endsWith('"')) {
+			option_value = option_value.slice(1, -1);
+		}
+
+		options[option_name] = option_value;
+	}
+	return options;
+}
 
 function ignoreCodeBlocks(text: string, func: (text: string) => string) {
 	const fencedBlockRegex = "```\n((.|\n)*)```";
