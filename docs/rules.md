@@ -4,7 +4,7 @@
 
 ## Trailing spaces
 
-Alias: trailing-spaces
+Alias: `trailing-spaces`
 
 Removes extra spaces after every line.
 
@@ -28,7 +28,7 @@ line with trailing spaces and tabs
 
 ## Heading blank lines
 
-Alias: heading-blank-lines
+Alias: `heading-blank-lines`
 
 All headings have a blank line both before and after (except where the heading is at the beginning or end of the document)
 
@@ -65,7 +65,7 @@ line
 
 ## Space after list markers
 
-Alias: space-after-list-markers
+Alias: `space-after-list-markers`
 
 There should be a single space after list markers and checkboxes.
 
@@ -95,7 +95,7 @@ After:
 
 ## YAML Timestamp
 
-Alias: yaml-timestamp
+Alias: `yaml-timestamp`
 
 Keep track of the date the file was last edited in the YAML front matter. 
 
@@ -121,7 +121,7 @@ date updated: Wednesday, January 1st 2020, 12:00:00 am
 
 ## Compact YAML
 
-Alias: compact-yaml
+Alias: `compact-yaml`
 
 Removes leading and trailing blank lines in the YAML front matter.
 
@@ -149,7 +149,7 @@ date: today
 
 ## Header Increment
 
-Alias: header-increment
+Alias: `header-increment`
 
 Heading levels should only increment by one level at a time
 
@@ -179,7 +179,7 @@ We skipped a 2nd level heading
 
 ## Consecutive blank lines
 
-Alias: consecutive-blank-lines
+Alias: `consecutive-blank-lines`
 
 There should be at most one consecutive blank line.
 

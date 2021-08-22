@@ -33,10 +33,10 @@ Run `npm run docs` to generate the documentation.
 
 Documentation for all rules can be found in the [rules docs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md).
 
-- [Trailing spaces](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#trailing-spaces)
-- [Heading blank lines](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#heading-blank-lines)
-- [Space after list markers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#space-after-list-markers)
-- [YAML Timestamp](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-timestamp)
-- [Compact YAML](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#compact-yaml)
-- [Header Increment](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#header-increment)
-- [Consecutive blank lines](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#consecutive-blank-lines)
+- [trailing-spaces](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#trailing-spaces)
+- [heading-blank-lines](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#heading-blank-lines)
+- [space-after-list-markers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#space-after-list-markers)
+- [yaml-timestamp](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-timestamp)
+- [compact-yaml](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#compact-yaml)
+- [header-increment](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#header-increment)
+- [consecutive-blank-lines](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#consecutive-blank-lines)
