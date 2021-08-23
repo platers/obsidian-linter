@@ -105,9 +105,9 @@ export const rules: Rule[] = [
 		'There should be a single space after list markers and checkboxes.',
 		(text: string) => {
 			// Space after marker
-			text = text.replace(/^(\s*\d+\.|[-+*])\s+/gm, "$1 ");
+			text = text.replace(/^(\s*\d+\.|[-+*])[^\S\r\n]+/gm, "$1 ");
 			// Space after checkbox
-			return text.replace(/^(\s*\d+\.|[-+*]\s+\[[ xX]\])\s+/gm, "$1 ");
+			return text.replace(/^(\s*\d+\.|[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm, "$1 ");
 		},
 		[
 			new Example(
