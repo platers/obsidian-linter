@@ -47,6 +47,7 @@ export default class LinterPlugin extends Plugin {
 		console.log("running linter");
 
 		const cursor = editor.getCursor();
+		const scroll = editor.getScrollInfo();
 		let text = editor.getValue();
 		const enabledRules = this.settings.enabledRules.split("\n");
 
@@ -75,8 +76,8 @@ export default class LinterPlugin extends Plugin {
 
 		editor.setValue(text);
 		editor.setCursor(cursor);
+		editor.scrollTo(scroll.left, scroll.top);
 	}
-
 }
 
 class SettingTab extends PluginSettingTab {
