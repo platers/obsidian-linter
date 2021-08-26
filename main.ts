@@ -1,9 +1,10 @@
-import { App, Editor, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
+import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
 import dedent from "ts-dedent";
 import { rules, parseOptions, rulesDict } from "./rules";
 
 interface LinterSettings {
 	enabledRules: string;
+	lintOnSave: boolean;
 }
 
 const DEFAULT_SETTINGS: LinterSettings = {
@@ -11,7 +12,8 @@ const DEFAULT_SETTINGS: LinterSettings = {
 		trailing-spaces
 		heading-blank-lines
 		space-after-list-markers
-		`
+		`,
+	lintOnSave: false,
 }
 
 export default class LinterPlugin extends Plugin {
@@ -31,6 +33,24 @@ export default class LinterPlugin extends Plugin {
 				},
 			  ],
 		});
+
+		// Source for save setting
+		// https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
+		const saveCommandDefinition = (this.app as any).commands?.commands?.[
+			"editor:save-file"
+		];
+		const save = saveCommandDefinition?.callback;
+
+		if (typeof save === "function") {
+			saveCommandDefinition.callback = () => {
+				if (this.settings.lintOnSave) {
+					const editor = this.app.workspace.getActiveViewOfType(MarkdownView).editor;
+					this.runLinter(editor);
+				}
+
+				save();
+			};
+		}
 
 		this.addSettingTab(new SettingTab(this.app, this));
 	}
@@ -106,6 +126,17 @@ class SettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings()});
 				text.inputEl.rows = 20;
 				text.inputEl.cols = 40;
+			});
+		
+		new Setting(containerEl)
+			.setName("Lint on save")
+			.setDesc("Lint the file on save")
+			.addToggle(toggle => {
+				toggle
+					.setValue(this.plugin.settings.lintOnSave)
+					.onChange(async (value) => {
+						this.plugin.settings.lintOnSave = value;
+						await this.plugin.saveSettings()});
 			});
 	}
 }

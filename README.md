@@ -11,6 +11,8 @@ Rules can be added or removed in the settings.
 
 To lint the current file, run `Lint the current file` (`Ctrl+Alt+L` by default).
 
+When `Lint on save` is toggled on, the plugin will lint the current file on save.
+
 ### Settings
 
 ![Settings](https://github.com/platers/obsidian-linter/blob/master/docs/settings.png?raw=true)
