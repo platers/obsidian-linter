@@ -50,6 +50,24 @@ describe("Rules tests", () => {
 				`;
 			expect(rulesDict["heading-blank-lines"].apply(before)).toBe(after);
 		});
+		it("Works normally", () => {
+			const before = dedent`
+				# H1
+				## H2
+				Line
+				### H3
+				`;
+			const after = dedent`
+				# H1
+
+				## H2
+
+				Line
+				
+				### H3
+				`;
+			expect(rulesDict["heading-blank-lines"].apply(before)).toBe(after);
+		});
 	});
 	describe("List spaces", () => {
 		it("Handles empty bullets", () => {
