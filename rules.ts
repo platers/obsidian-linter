@@ -195,12 +195,13 @@ export const rules: Rule[] = [
 				if (!match) {
 					continue;
 				}
-				const level = match[2].length;
+				let level = match[2].length;
 				if (level == 0) {
 					continue;
 				}
 				if (level > lastLevel + 1) {
 					lines[i] = lines[i].replace(headerRegex, `$1${"#".repeat(lastLevel + 1)}$3$4`);
+					level = lastLevel + 1;
 				}
 				lastLevel = level;
 			}

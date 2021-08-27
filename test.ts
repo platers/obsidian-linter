@@ -86,6 +86,21 @@ describe("Rules tests", () => {
 			expect(rulesDict["space-after-list-markers"].apply(before)).toBe(after);
 		});
 	});
+	describe("Header Increment", () => {
+		it("Handles large increments", () => {
+			const before = dedent`
+				# H1
+				#### H4
+				####### H7
+				`;
+			const after = dedent`
+				# H1
+				## H4
+				### H7
+				`;
+			expect(rulesDict["header-increment"].apply(before)).toBe(after);
+		});
+	});
 });
 
 describe("Option parsing", () => {
