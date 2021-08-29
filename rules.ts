@@ -30,13 +30,14 @@ export class Rule {
 
 export class Example {
 	public description: string;
-	public includeInDocs: boolean;
+	public options: {[id: string] : string};
 
 	public before: string;
 	public after: string;
 
-	constructor(description: string, before: string, after: string) {
+	constructor(description: string, before: string, after: string, options: {[id: string] : string} = {}) {
 		this.description = description;
+		this.options = options;
 		this.before = before;
 		this.after = after;
 	}
