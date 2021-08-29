@@ -7,7 +7,11 @@ describe("Examples pass", () => {
 	for (const rule of rules) {
 		describe(rule.name, () => {
 			test.each(rule.examples)("$description", (testObject: Example) => {
-				expect(rule.apply(testObject.before)).toBe(testObject.after);
+				if (testObject.options && Object.keys(testObject.options).length > 0) {
+					expect(rule.apply(testObject.before, testObject.options)).toBe(testObject.after);
+				} else {
+					expect(rule.apply(testObject.before)).toBe(testObject.after);
+				}
 			});
 		});
 	}
