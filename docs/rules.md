@@ -63,6 +63,54 @@ line
 ## H2
 ```
 
+## Heading blank lines top
+
+Alias: `heading-blank-lines-top`
+
+All headings have a blank line before it (except where the heading is at the beginning of a document)
+
+
+
+Example: Headings should should have a blank line above it
+
+Before:
+
+```markdown
+# H1
+## H2
+### H3
+
+#### H4
+
+
+# H1
+line
+## H2
+line
+### H3
+
+```
+
+After:
+
+```markdown
+# H1
+
+## H2
+
+### H3
+
+#### H4
+
+# H1
+line
+
+## H2
+line
+
+### H3
+```
+
 ## Space after list markers
 
 Alias: `space-after-list-markers`
