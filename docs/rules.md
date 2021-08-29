@@ -30,9 +30,10 @@ line with trailing spaces and tabs
 
 Alias: `heading-blank-lines`
 
-All headings have a blank line both before and after (except where the heading is at the beginning or end of the document)
+All headings have a blank line both before and after (except where the heading is at the beginning or end of the document). Set option "bottom = false" to ignore adding a line after the heading.
 
-
+Options:
+- bottom: string, default=`true`
 
 Example: Headings should be surrounded by blank lines
 
@@ -61,54 +62,6 @@ After:
 line
 
 ## H2
-```
-
-## Heading blank lines top
-
-Alias: `heading-blank-lines-top`
-
-All headings have a blank line before it (except where the heading is at the beginning of a document)
-
-
-
-Example: Headings should should have a blank line above it
-
-Before:
-
-```markdown
-# H1
-## H2
-### H3
-
-#### H4
-
-
-# H1
-line
-## H2
-line
-### H3
-
-```
-
-After:
-
-```markdown
-# H1
-
-## H2
-
-### H3
-
-#### H4
-
-# H1
-line
-
-## H2
-line
-
-### H3
 ```
 
 ## Space after list markers
