@@ -24,9 +24,12 @@ For example, `yaml-timestamp format="YYYY-MM-DD"`
 
 Pull requests are welcome, especially for new rules.
 
-To add a new rule, edit `rules.ts`.
+1. Clone the repository
+2. Run `npm ci` to install dependencies
+3. Add a new rule in `rules.ts`.
+4. Run `npm run compile` to build, generate documentation, and test the plugin. 
 
-Run `npm test` to test the plugin.
+Run `npm test` to run tests.
 Run `npm run docs` to generate the documentation.
 
 ## Rules
