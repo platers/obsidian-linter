@@ -105,10 +105,27 @@ export const rules: Rule[] = [
 				## H2
 				`
 			),
+			new Example(
+				"With `bottom=false`",
+				dedent`
+				# H1
+				line
+				## H2
+				# H1
+				line
+				`,
+				dedent`
+				# H1
+				line
+
+				## H2
+
+				# H1
+				line
+				`,
+				{bottom: "false"}
+			),
 		],
-		[
-			'bottom: string, default=`true`',
-		]
 	),
 	new Rule(
 		`Space after list markers`,

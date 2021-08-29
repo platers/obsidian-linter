@@ -32,8 +32,7 @@ Alias: `heading-blank-lines`
 
 All headings have a blank line both before and after (except where the heading is at the beginning or end of the document). Set option bottom = "false" to ignore adding a line after the heading.
 
-Options:
-- bottom: string, default=`true`
+
 
 Example: Headings should be surrounded by blank lines
 
@@ -62,6 +61,29 @@ After:
 line
 
 ## H2
+```
+Example: With `bottom=false`
+
+Before:
+
+```markdown
+# H1
+line
+## H2
+# H1
+line
+```
+
+After:
+
+```markdown
+# H1
+line
+
+## H2
+
+# H1
+line
 ```
 
 ## Space after list markers
