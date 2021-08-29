@@ -30,7 +30,7 @@ line with trailing spaces and tabs
 
 Alias: `heading-blank-lines`
 
-All headings have a blank line both before and after (except where the heading is at the beginning or end of the document). Set option "bottom = false" to ignore adding a line after the heading.
+All headings have a blank line both before and after (except where the heading is at the beginning or end of the document). Set option bottom = "false" to ignore adding a line after the heading.
 
 Options:
 - bottom: string, default=`true`

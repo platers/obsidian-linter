@@ -63,7 +63,7 @@ export const rules: Rule[] = [
 	),
 	new Rule(
 		"Heading blank lines",
-		"All headings have a blank line both before and after (except where the heading is at the beginning or end of the document). Set option \"bottom = false\" to ignore adding a line after the heading.",
+		"All headings have a blank line both before and after (except where the heading is at the beginning or end of the document). Set option bottom = \"false\" to ignore adding a line after the heading.",
 		(text: string, options = {"bottom": "true"}) => {
 			return ignoreCodeBlocks(text, (text) => {
 				if (options["bottom"] === "false") {
