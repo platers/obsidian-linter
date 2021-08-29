@@ -63,12 +63,17 @@ export const rules: Rule[] = [
 	),
 	new Rule(
 		"Heading blank lines",
-		"All headings have a blank line both before and after (except where the heading is at the beginning or end of the document)",
-		(text: string) => {
+		"All headings have a blank line both before and after (except where the heading is at the beginning or end of the document). Set option \"bottom = false\" to ignore adding a line after the heading.",
+		(text: string, options = {"bottom": "true"}) => {
 			return ignoreCodeBlocks(text, (text) => {
-				text = text.replace(/^(#+\s.*)/gm, "\n\n$1\n\n");	// add blank line before and after headings
-				text = text.replace(/\n+(#+\s.*)/g, "\n\n$1");	// trim blank lines before headings
-				text = text.replace(/(^#+\s.*)\n+/gm, "$1\n\n");	// trim blank lines after headings
+				if (options["bottom"] === "false") {
+					text = text.replace(/(^#+\s.*)\n+/gm, "$1\n");	// trim blank lines after headings
+					text = text.replace(/\n+(#+\s.*)/g, "\n\n$1");	// trim blank lines before headings
+				} else {
+					text = text.replace(/^(#+\s.*)/gm, "\n\n$1\n\n");	// add blank line before and after headings
+					text = text.replace(/\n+(#+\s.*)/g, "\n\n$1");	// trim blank lines before headings
+					text = text.replace(/(^#+\s.*)\n+/gm, "$1\n\n");	// trim blank lines after headings
+				}
 				text = text.replace(/^\n+(#+\s.*)/, "$1");	// remove blank lines before first heading
 				text = text.replace(/(#+\s.*)\n+$/, "$1");	// remove blank lines after last heading
 				return text;
@@ -89,7 +94,7 @@ export const rules: Rule[] = [
 				`,
 				dedent`
 				# H1
-
+				
 				## H2
 
 				# H1
@@ -99,56 +104,9 @@ export const rules: Rule[] = [
 				## H2
 				`
 			),
-		]
-	),
-	new Rule(
-		"Heading blank lines top",
-		"All headings have a blank line before it (except where the heading is at the beginning of a document)",
-		(text: string) => {
-			return ignoreCodeBlocks(text, (text) => {
-				text = text.replace(/(^#+\s.*)\n+/gm, "$1\n");	// trim blank lines after headings
-				text = text.replace(/\n+(#+\s.*)/g, "\n\n$1");	// trim blank lines before headings
-				text = text.replace(/^\n+(#+\s.*)/, "$1");	// remove blank lines before first heading
-				text = text.replace(/(#+\s.*)\n+$/, "$1");	// remove blank lines after last heading
-				return text;
-			});
-		},
+		],
 		[
-			new Example(
-				"Headings should should have a blank line above it",
-				dedent`
-				# H1
-				## H2
-				### H3
-
-				#### H4
-
-
-				# H1
-				line
-				## H2
-				line
-				### H3
-
-				`,
-				dedent`
-				# H1
-				
-				## H2
-
-				### H3
-
-				#### H4
-				
-				# H1
-				line
-
-				## H2
-				line
-				
-				### H3
-				`
-			),
+			'bottom: string, default=`true`',
 		]
 	),
 	new Rule(
