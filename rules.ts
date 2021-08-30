@@ -279,6 +279,82 @@ export const rules: Rule[] = [
 			),
 		]
 	),
+	new Rule(
+		"Capitalize Headings",
+		"Headings should be formatted with capitalization",
+		(text: string, options = { "titleCase": "false", "allCaps": "false" }) => {
+			
+			const lines = text.split("\n");
+			for (let i = 0; i < lines.length; i++) {
+				const headerRegex = /^(#*\s)\w.*/;
+				const match = lines[i].match(headerRegex); // match only headings
+				if (!match) {
+					continue;
+				}
+				if (options["titleCase"] == "true") {
+					const headerWords = lines[i].match(/\w+/g);
+					const ignore = ["a", "an", "the", "and", "or", "but", "for", "nor", "so", "yet", "at", "by", "in", "of", "on", "to", "up", "as", "is", "if", "it", "for", "to", "with"];
+					for (let j = 0; j < headerWords.length; j++) {
+						if (ignore.includes(headerWords[j]) && j != 0) { // ignore words that are not capitalized in titles except if they are the first word
+							continue;
+						}
+						headerWords[j] = headerWords[j].replace(/^\w/, c => c.toUpperCase());
+					}
+
+					lines[i] = lines[i].replace(headerRegex, `$1${headerWords.join(" ")}`);
+
+				} else if (options["allCaps"] == "true") {
+					lines[i] = lines[i].replace(/^#*\s\w.*/, string => string.toUpperCase()) // convert full heading to uppercase
+				} else {
+					lines[i] = lines[i].replace(/^#*\s([a-z])/, string => string.toUpperCase()) // capitalize first letter of heading
+				}
+			}
+			return lines.join("\n");
+		},
+		[
+			new Example(
+				"The first letter of a heading should be capitalized",
+				dedent`
+				# this is a heading 1
+				## this is a heading 2
+				`,
+				dedent`
+				# This is a heading 1
+				## This is a heading 2
+				`
+			),
+			new Example(
+				"With `titleCase=true`",
+				dedent`
+				# this is a heading 1
+				## this is a heading 2
+				### a heading 3
+				`,
+				dedent`
+				# This is a Heading 1
+				## This is a Heading 2
+				### A Heading 3
+				`,
+				{titleCase: "true"}
+			),
+			new Example(
+				"With `allCaps=true`",
+				dedent`
+				# this is a heading 1
+				## this is a heading 2
+				`,
+				dedent`
+				# THIS IS A HEADING 1
+				## THIS IS A HEADING 2
+				`,
+				{allCaps: "true"}
+			),
+		],
+		[
+			"titleCase: Format headings with title case capitalization, default=`false`",
+			"allCaps: Format headings with all capitals, default= `false`"
+		]
+	),
 ]; 
 
 export const rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);
@@ -329,7 +405,6 @@ function ignoreCodeBlocks(text: string, func: (text: string) => string) {
 function initYAML(text: string) {
 	if (text.match(/^---\s*\n.*\n---/s) === null) {
 		text = "---\n---\n" + text;
-		console.log("inserted yaml");
 	}
 	return text;
 }
