@@ -279,6 +279,53 @@ export const rules: Rule[] = [
 			),
 		]
 	),
+	new Rule(
+		"Capitalize Headings",
+		"Headings should be formatted with capitalization",
+		(text: string, options = { "titleCase": "false", "allCaps":"false"}) => {
+			return text.replace("", "");
+		},
+		[
+			new Example(
+				"Headings should be surrounded by blank lines",
+				dedent`
+				# this is a heading 1
+				## this is a heading 2
+				`,
+				dedent`
+				# This is a heading 1
+				## This is a heading 2
+				`
+			),
+			new Example(
+				"With `titleCase=true`",
+				dedent`
+				# this is a heading 1
+				## this is a heading 2
+				`,
+				dedent`
+				# This is a Heading 1
+				## This is a Heading 2
+				`,
+				{titleCase: "true"}
+			),
+			new Example(
+				"With `allCaps=true`",
+				dedent`
+				# this is a heading 1
+				## this is a heading 2
+				`,
+				dedent`
+				# THIS IS A HEADING 1
+				## THIS IS A HEADING 2
+				`,
+				{allCaps: "true"}
+			),
+		],
+		[
+			"titleCase: Format headings with title case capitalization, default=`false`", "allCaps: Format headings with all capitals, default= `false`"
+		]
+	),
 ]; 
 
 export const rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);
