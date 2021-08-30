@@ -292,11 +292,11 @@ export const rules: Rule[] = [
 					continue;
 				}
 				if (options["titleCase"] == "true") {
-					return match
+					return text
 				} else if (options["allCaps"] == "true") {
 					lines[i] = lines[i].replace(/^#*\s\w.*/, string => string.toUpperCase()) // convert full heading to uppercase
 				} else {
-					return text
+					lines[i] = lines[i].replace(/^#*\s([a-z])/, string => string.toUpperCase()) // capitalize first letter of heading
 				}
 			}
 			return lines.join("\n");
