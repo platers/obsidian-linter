@@ -227,3 +227,59 @@ Some text
 
 Some more text
 ```
+
+## Capitalize Headings
+
+Alias: `capitalize-headings`
+
+Headings should be formatted with capitalization
+
+Options:
+- titleCase: Format headings with title case capitalization, default=`false`
+- allCaps: Format headings with all capitals, default= `false`
+
+Example: Headings should be surrounded by blank lines
+
+Before:
+
+```markdown
+# this is a heading 1
+## this is a heading 2
+```
+
+After:
+
+```markdown
+# This is a heading 1
+## This is a heading 2
+```
+Example: With `titleCase=true`
+
+Before:
+
+```markdown
+# this is a heading 1
+## this is a heading 2
+```
+
+After:
+
+```markdown
+# This is a Heading 1
+## This is a Heading 2
+```
+Example: With `allCaps=true`
+
+Before:
+
+```markdown
+# this is a heading 1
+## this is a heading 2
+```
+
+After:
+
+```markdown
+# THIS IS A HEADING 1
+## THIS IS A HEADING 2
+```

@@ -45,3 +45,4 @@ Documentation for all rules can be found in the [rules docs](https://github.com/
 - [compact-yaml](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#compact-yaml)
 - [header-increment](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#header-increment)
 - [consecutive-blank-lines](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#consecutive-blank-lines)
+- [capitalize-headings](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#capitalize-headings)
