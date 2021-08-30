@@ -295,7 +295,7 @@ export const rules: Rule[] = [
 					const headerWords = lines[i].match(/\w+/g);
 					const ignore = ["a", "an", "the", "and", "or", "but", "for", "nor", "so", "yet", "at", "by", "in", "of", "on", "to", "up", "as", "is", "if", "it", "for", "to", "with"];
 					for (let j = 0; j < headerWords.length; j++) {
-						if (ignore.includes(headerWords[j]) && j != 0) {
+						if (ignore.includes(headerWords[j]) && j != 0) { // ignore words that are not capitalized in titles except if they are the first word
 							continue;
 						}
 						headerWords[j] = headerWords[j].replace(/^\w/, c => c.toUpperCase());
@@ -313,7 +313,7 @@ export const rules: Rule[] = [
 		},
 		[
 			new Example(
-				"Headings should be surrounded by blank lines",
+				"The first letter of a heading should be capitalized",
 				dedent`
 				# this is a heading 1
 				## this is a heading 2
@@ -351,7 +351,8 @@ export const rules: Rule[] = [
 			),
 		],
 		[
-			"titleCase: Format headings with title case capitalization, default=`false`", "allCaps: Format headings with all capitals, default= `false`"
+			"titleCase: Format headings with title case capitalization, default=`false`",
+			"allCaps: Format headings with all capitals, default= `false`"
 		]
 	),
 ]; 
