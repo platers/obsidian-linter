@@ -295,7 +295,7 @@ export const rules: Rule[] = [
 					const headerWords = lines[i].match(/\w+/g);
 					const ignore = ["a", "an", "the", "and", "or", "but", "for", "nor", "so", "yet", "at", "by", "in", "of", "on", "to", "up", "as", "is", "if", "it", "for", "to", "with"];
 					for (let j = 0; j < headerWords.length; j++) {
-						if (ignore.includes(headerWords[j])) {
+						if (ignore.includes(headerWords[j]) && j != 0) {
 							continue;
 						}
 						headerWords[j] = headerWords[j].replace(/^\w/, c => c.toUpperCase());
@@ -328,10 +328,12 @@ export const rules: Rule[] = [
 				dedent`
 				# this is a heading 1
 				## this is a heading 2
+				### a heading 3
 				`,
 				dedent`
 				# This is a Heading 1
 				## This is a Heading 2
+				### A Heading 3
 				`,
 				{titleCase: "true"}
 			),
