@@ -238,7 +238,7 @@ Options:
 - titleCase: Format headings with title case capitalization, default=`false`
 - allCaps: Format headings with all capitals, default= `false`
 
-Example: Headings should be surrounded by blank lines
+Example: The first letter of a heading should be capitalized
 
 Before:
 
@@ -260,6 +260,7 @@ Before:
 ```markdown
 # this is a heading 1
 ## this is a heading 2
+### a heading 3
 ```
 
 After:
@@ -267,6 +268,7 @@ After:
 ```markdown
 # This is a Heading 1
 ## This is a Heading 2
+### A Heading 3
 ```
 Example: With `allCaps=true`
 
