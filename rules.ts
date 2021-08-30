@@ -282,8 +282,24 @@ export const rules: Rule[] = [
 	new Rule(
 		"Capitalize Headings",
 		"Headings should be formatted with capitalization",
-		(text: string, options = { "titleCase": "false", "allCaps":"false"}) => {
-			return text.replace("", "");
+		(text: string, options = { "titleCase": "false", "allCaps": "false" }) => {
+			
+			const lines = text.split("\n");
+			for (let i = 0; i < lines.length; i++) {
+				const headerRegex = /^#*\s\w.*/;
+				const match = lines[i].match(headerRegex); // match only headings
+				if (!match) {
+					continue;
+				}
+				if (options["titleCase"] == "true") {
+					return match
+				} else if (options["allCaps"] == "true") {
+					lines[i] = lines[i].replace(/^#*\s\w.*/, string => string.toUpperCase()) // convert full heading to uppercase
+				} else {
+					return text
+				}
+			}
+			return lines.join("\n");
 		},
 		[
 			new Example(
