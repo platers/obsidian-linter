@@ -65,7 +65,9 @@ export const rules: Rule[] = [
 	new Rule(
 		"Heading blank lines",
 		"All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).",
-		(text: string, options = {"bottom": "true"}) => {
+		(text: string, options = {}) => {
+			options = Object.assign({"bottom": "true"}, options);
+
 			return ignoreCodeBlocks(text, (text) => {
 				if (options["bottom"] === "false") {
 					text = text.replace(/(^#+\s.*)\n+/gm, "$1\n");	// trim blank lines after headings
@@ -162,11 +164,24 @@ export const rules: Rule[] = [
 	new Rule(
 		"YAML Timestamp",
 		"Keep track of the date the file was last edited in the YAML front matter. ",
-		(text: string, options = {"format": "dddd, MMMM Do YYYY, h:mm:ss a"}) => {
+		(text: string, options = {}) => {
+			options = Object.assign({
+				"format": "dddd, MMMM Do YYYY, h:mm:ss a",
+				"dateCreated": "true",
+				"dateUpdated": "true",
+			}, options);
+			
 			text = initYAML(text);
-			text = text.replace(/\ndate updated:.*\n/, "\n");
-			const yaml_end = text.indexOf("\n---");
-			return insert(text, yaml_end, `\ndate updated: ${moment().format(options["format"])}`);	
+			if (options["dateCreated"] === "true" && !text.match(/\ndate created:.*\n/)) {
+				const yaml_end = text.indexOf("\n---");
+				text = insert(text, yaml_end, `\ndate created: ${moment().format(options["format"])}`);	
+			}
+			if (options["dateUpdated"] === "true") {
+				text = text.replace(/\ndate updated:.*\n/, "\n");
+				const yaml_end = text.indexOf("\n---");
+				text = insert(text, yaml_end, `\ndate updated: ${moment().format(options["format"])}`);	
+			}
+			return text;
 		},
 		[
 			new Example(
@@ -176,14 +191,30 @@ export const rules: Rule[] = [
 				`,
 				dedent`
 				---
+				date created: Wednesday, January 1st 2020, 12:00:00 am
 				date updated: Wednesday, January 1st 2020, 12:00:00 am
 				---
 				# H1
 				`
 			),
+			new Example(
+				'date-created option is false',
+				dedent`
+				# H1
+				`,
+				dedent`
+				---
+				date updated: Wednesday, January 1st 2020, 12:00:00 am
+				---
+				# H1
+				`,
+				{dateCreated: "false"}
+			),
 		],
 		[
 			'format: [date format](https://momentjs.com/docs/#/displaying/format/), default=`"dddd, MMMM Do YYYY, h:mm:ss a"`',
+			'date-created: Insert the current date if date-created is not present, default=`true`',
+			'date-updated: Update the current date, default=`true`',
 		]
 	),
 	new Rule(
@@ -282,7 +313,11 @@ export const rules: Rule[] = [
 	new Rule(
 		"Capitalize Headings",
 		"Headings should be formatted with capitalization",
-		(text: string, options = { "titleCase": "false", "allCaps": "false" }) => {
+		(text: string, options = {}) => {
+			options = Object.assign({
+				"titleCase": "false",
+				"allCaps": "false",
+			}, options);
 			
 			const lines = text.split("\n");
 			for (let i = 0; i < lines.length; i++) {
