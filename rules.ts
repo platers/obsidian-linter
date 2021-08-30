@@ -286,13 +286,23 @@ export const rules: Rule[] = [
 			
 			const lines = text.split("\n");
 			for (let i = 0; i < lines.length; i++) {
-				const headerRegex = /^#*\s\w.*/;
+				const headerRegex = /^(#*\s)\w.*/;
 				const match = lines[i].match(headerRegex); // match only headings
 				if (!match) {
 					continue;
 				}
 				if (options["titleCase"] == "true") {
-					return text
+					const headerWords = lines[i].match(/\w+/g);
+					const ignore = ["a", "an", "the", "and", "or", "but", "for", "nor", "so", "yet", "at", "by", "in", "of", "on", "to", "up", "as", "is", "if", "it", "for", "to", "with"];
+					for (let j = 0; j < headerWords.length; j++) {
+						if (ignore.includes(headerWords[j])) {
+							continue;
+						}
+						headerWords[j] = headerWords[j].replace(/^\w/, c => c.toUpperCase());
+					}
+
+					lines[i] = lines[i].replace(headerRegex, `$1${headerWords.join(" ")}`);
+
 				} else if (options["allCaps"] == "true") {
 					lines[i] = lines[i].replace(/^#*\s\w.*/, string => string.toUpperCase()) // convert full heading to uppercase
 				} else {
