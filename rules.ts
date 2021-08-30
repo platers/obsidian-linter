@@ -402,7 +402,6 @@ function ignoreCodeBlocks(text: string, func: (text: string) => string) {
 function initYAML(text: string) {
 	if (text.match(/^---\s*\n.*\n---/s) === null) {
 		text = "---\n---\n" + text;
-		console.log("inserted yaml");
 	}
 	return text;
 }
