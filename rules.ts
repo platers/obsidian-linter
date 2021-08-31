@@ -215,7 +215,7 @@ export const rules: Rule[] = [
 		],
 		[
 			'format: [date format](https://momentjs.com/docs/#/displaying/format/), default=`"dddd, MMMM Do YYYY, h:mm:ss a"`',
-			'dateCreated: Insert the current date if date-created is not present, default=`true`',
+			'dateCreated: Insert the current date if date created is not present, default=`true`',
 			'dateUpdated: Update the current date, default=`true`',
 		]
 	),
