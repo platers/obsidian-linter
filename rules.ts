@@ -172,14 +172,16 @@ export const rules: Rule[] = [
 			}, options);
 			
 			text = initYAML(text);
+			const formatted_date = moment().format(options["format"]);
+
 			if (options["dateCreated"] === "true" && !text.match(/\ndate created:.*\n/)) {
 				const yaml_end = text.indexOf("\n---");
-				text = insert(text, yaml_end, `\ndate created: ${moment().format(options["format"])}`);	
+				text = insert(text, yaml_end, `\ndate created: ${formatted_date}`);	
 			}
 			if (options["dateUpdated"] === "true") {
 				text = text.replace(/\ndate updated:.*\n/, "\n");
 				const yaml_end = text.indexOf("\n---");
-				text = insert(text, yaml_end, `\ndate updated: ${moment().format(options["format"])}`);	
+				text = insert(text, yaml_end, `\ndate updated: ${formatted_date}`);	
 			}
 			return text;
 		},
@@ -198,7 +200,7 @@ export const rules: Rule[] = [
 				`
 			),
 			new Example(
-				'date-created option is false',
+				'dateCreated option is false',
 				dedent`
 				# H1
 				`,
@@ -213,8 +215,8 @@ export const rules: Rule[] = [
 		],
 		[
 			'format: [date format](https://momentjs.com/docs/#/displaying/format/), default=`"dddd, MMMM Do YYYY, h:mm:ss a"`',
-			'date-created: Insert the current date if date-created is not present, default=`true`',
-			'date-updated: Update the current date, default=`true`',
+			'dateCreated: Insert the current date if date-created is not present, default=`true`',
+			'dateUpdated: Update the current date, default=`true`',
 		]
 	),
 	new Rule(

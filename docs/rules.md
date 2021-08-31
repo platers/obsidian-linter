@@ -125,8 +125,8 @@ Keep track of the date the file was last edited in the YAML front matter.
 
 Options:
 - format: [date format](https://momentjs.com/docs/#/displaying/format/), default=`"dddd, MMMM Do YYYY, h:mm:ss a"`
-- date-created: Insert the current date if date-created is not present, default=`true`
-- date-updated: Update the current date, default=`true`
+- dateCreated: Insert the current date if date-created is not present, default=`true`
+- dateUpdated: Update the current date, default=`true`
 
 Example: Adds a header with the date.
 
@@ -145,7 +145,7 @@ date updated: Wednesday, January 1st 2020, 12:00:00 am
 ---
 # H1
 ```
-Example: date-created option is false
+Example: dateCreated option is false
 
 Before:
 
