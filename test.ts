@@ -105,6 +105,19 @@ describe("Rules tests", () => {
 			expect(rulesDict["header-increment"].apply(before)).toBe(after);
 		});
 	});
+	describe("Capitalize Headings", () => {
+		it("Ignores not words", () => {
+			const before = dedent`
+				# h1
+				## a c++ lang
+				`;
+			const after = dedent`
+				# h1
+				## A c++ Lang
+				`;
+			expect(rulesDict["capitalize-headings"].apply(before, {titleCase: "true"})).toBe(after);
+		});
+	});
 });
 
 describe("Option parsing", () => {

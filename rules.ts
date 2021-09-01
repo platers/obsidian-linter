@@ -329,19 +329,19 @@ export const rules: Rule[] = [
 					continue;
 				}
 				if (options["titleCase"] == "true") {
-					const headerWords = lines[i].match(/\w+/g);
+					const headerWords = lines[i].match(/\S+/g);
 					const ignore = ["a", "an", "the", "and", "or", "but", "for", "nor", "so", "yet", "at", "by", "in", "of", "on", "to", "up", "as", "is", "if", "it", "for", "to", "with"];
 					for (let j = 0; j < headerWords.length; j++) {
-						if (ignore.includes(headerWords[j]) && j != 0) { // ignore words that are not capitalized in titles except if they are the first word
-							continue;
+						const ignoreWord = ignore.includes(headerWords[j]) && j != 1; // ignore words that are not capitalized in titles except if they are the first word
+						const isNotWord = headerWords[j].match(/[^A-Z^a-z]/); // ignore non-words
+						if (!ignoreWord && !isNotWord) { 
+							headerWords[j] = headerWords[j].replace(/^./, c => c.toUpperCase());
 						}
-						headerWords[j] = headerWords[j].replace(/^\w/, c => c.toUpperCase());
 					}
 
-					lines[i] = lines[i].replace(headerRegex, `$1${headerWords.join(" ")}`);
-
+					lines[i] = lines[i].replace(headerRegex, `${headerWords.join(" ")}`);
 				} else if (options["allCaps"] == "true") {
-					lines[i] = lines[i].replace(/^#*\s\w.*/, string => string.toUpperCase()) // convert full heading to uppercase
+					lines[i] = lines[i].toUpperCase() // convert full heading to uppercase
 				} else {
 					lines[i] = lines[i].replace(/^#*\s([a-z])/, string => string.toUpperCase()) // capitalize first letter of heading
 				}
