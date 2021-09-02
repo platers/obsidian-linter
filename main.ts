@@ -28,10 +28,10 @@ export default class LinterPlugin extends Plugin {
 			editorCallback: (editor) => this.runLinter(editor),
 			hotkeys: [
 				{
-				  modifiers: ["Mod", "Alt"],
-				  key: "l",
+					modifiers: ["Mod", "Alt"],
+					key: "l",
 				},
-			  ],
+			],
 		});
 
 		// Source for save setting
@@ -82,7 +82,7 @@ export default class LinterPlugin extends Plugin {
 			if (ruleName in rulesDict) {
 				const options: { [id: string]: string; } = parseOptions(line);
 
-				if(options) {
+				if (options) {
 					text = rulesDict[ruleName].apply(text, options);
 				}
 				else {
@@ -94,9 +94,13 @@ export default class LinterPlugin extends Plugin {
 			}
 		}
 
-		editor.setValue(text);
-		editor.setCursor(cursor);
-		editor.scrollTo(scroll.left, scroll.top);
+		if (text !== editor.getValue()) {
+			editor.setValue(text);
+			editor.setCursor(cursor);
+			editor.scrollTo(scroll.left, scroll.top);
+		} else {
+			console.log("No linting errors found");
+		}
 	}
 }
 
@@ -109,11 +113,11 @@ class SettingTab extends PluginSettingTab {
 	}
 
 	display(): void {
-		let {containerEl} = this;
+		let { containerEl } = this;
 
 		containerEl.empty();
 
-		containerEl.createEl("h2", {text: "Settings for Linter"});
+		containerEl.createEl("h2", { text: "Settings for Linter" });
 
 		new Setting(containerEl)
 			.setName("Rules to apply")
@@ -123,11 +127,12 @@ class SettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.enabledRules)
 					.onChange(async (value) => {
 						this.plugin.settings.enabledRules = value;
-						await this.plugin.saveSettings()});
+						await this.plugin.saveSettings()
+					});
 				text.inputEl.rows = 20;
 				text.inputEl.cols = 40;
 			});
-		
+
 		new Setting(containerEl)
 			.setName("Lint on save")
 			.setDesc("Lint the file on save")
@@ -136,7 +141,8 @@ class SettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.lintOnSave)
 					.onChange(async (value) => {
 						this.plugin.settings.lintOnSave = value;
-						await this.plugin.saveSettings()});
+						await this.plugin.saveSettings()
+					});
 			});
 	}
 }
