@@ -82,7 +82,7 @@ export default class LinterPlugin extends Plugin {
 			if (ruleName in rulesDict) {
 				const options: { [id: string]: string; } = parseOptions(line);
 
-				if(options) {
+				if (options) {
 					text = rulesDict[ruleName].apply(text, options);
 				}
 				else {
@@ -94,9 +94,13 @@ export default class LinterPlugin extends Plugin {
 			}
 		}
 
-		editor.setValue(text);
-		editor.setCursor(cursor);
-		editor.scrollTo(scroll.left, scroll.top);
+		if (text !== editor.getValue()) {
+			editor.setValue(text);
+			editor.setCursor(cursor);
+			editor.scrollTo(scroll.left, scroll.top);
+		} else {
+			console.log("No linting errors found");
+		}
 	}
 }
 
@@ -127,7 +131,7 @@ class SettingTab extends PluginSettingTab {
 				text.inputEl.rows = 20;
 				text.inputEl.cols = 40;
 			});
-		
+
 		new Setting(containerEl)
 			.setName("Lint on save")
 			.setDesc("Lint the file on save")
