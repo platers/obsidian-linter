@@ -28,10 +28,10 @@ export default class LinterPlugin extends Plugin {
 			editorCallback: (editor) => this.runLinter(editor),
 			hotkeys: [
 				{
-					modifiers: ["Mod", "Alt"],
-					key: "l",
+				  modifiers: ["Mod", "Alt"],
+				  key: "l",
 				},
-			],
+			  ],
 		});
 
 		// Source for save setting
@@ -113,11 +113,11 @@ class SettingTab extends PluginSettingTab {
 	}
 
 	display(): void {
-		let { containerEl } = this;
+		let {containerEl} = this;
 
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "Settings for Linter" });
+		containerEl.createEl("h2", {text: "Settings for Linter"});
 
 		new Setting(containerEl)
 			.setName("Rules to apply")
@@ -127,8 +127,7 @@ class SettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.enabledRules)
 					.onChange(async (value) => {
 						this.plugin.settings.enabledRules = value;
-						await this.plugin.saveSettings()
-					});
+						await this.plugin.saveSettings()});
 				text.inputEl.rows = 20;
 				text.inputEl.cols = 40;
 			});
@@ -141,8 +140,7 @@ class SettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.lintOnSave)
 					.onChange(async (value) => {
 						this.plugin.settings.lintOnSave = value;
-						await this.plugin.saveSettings()
-					});
+						await this.plugin.saveSettings()});
 			});
 	}
 }
