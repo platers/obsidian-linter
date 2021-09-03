@@ -147,7 +147,7 @@ class SettingTab extends PluginSettingTab {
 				text.inputEl.rows = 20;
 				text.inputEl.cols = 40;
 			});
-		
+
 		new Setting(containerEl)
 			.setName("Lint on save")
 			.setDesc("Lint the file on save")
