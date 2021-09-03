@@ -278,7 +278,7 @@ Before:
 
 ```markdown
 # this is a heading 1
-## this is a heading 2
+## THIS IS A HEADING 2
 ### a heading 3
 ```
 
