@@ -331,11 +331,16 @@ export const rules: Rule[] = [
 				if (options["titleCase"] == "true") {
 					const headerWords = lines[i].match(/\S+/g);
 					const ignore = ["a", "an", "the", "and", "or", "but", "for", "nor", "so", "yet", "at", "by", "in", "of", "on", "to", "up", "as", "is", "if", "it", "for", "to", "with"];
-					for (let j = 0; j < headerWords.length; j++) {
-						const ignoreWord = ignore.includes(headerWords[j]) && j != 1; // ignore words that are not capitalized in titles except if they are the first word
+					for (let j = 1; j < headerWords.length; j++) {
 						const isNotWord = headerWords[j].match(/[^A-Z^a-z]/); // ignore non-words
-						if (!ignoreWord && !isNotWord) { 
-							headerWords[j] = headerWords[j].replace(/^./, c => c.toUpperCase());
+						if (isNotWord) {
+							continue;
+						}
+
+						headerWords[j] = headerWords[j].toLowerCase();
+						const ignoreWord = ignore.includes(headerWords[j]); 
+						if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
+							headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
 						}
 					}
 
@@ -364,7 +369,7 @@ export const rules: Rule[] = [
 				"With `titleCase=true`",
 				dedent`
 				# this is a heading 1
-				## this is a heading 2
+				## THIS IS A HEADING 2
 				### a heading 3
 				`,
 				dedent`
