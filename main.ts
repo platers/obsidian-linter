@@ -1,6 +1,7 @@
 import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
 import dedent from "ts-dedent";
 import { rules, parseOptions, rulesDict } from "./rules";
+import Diff from "diff";
 
 interface LinterSettings {
 	enabledRules: string;
@@ -68,9 +69,10 @@ export default class LinterPlugin extends Plugin {
 
 		const cursor = editor.getCursor();
 		const scroll = editor.getScrollInfo();
-		let text = editor.getValue();
+		const oldText = editor.getValue();
+		let newText = oldText;
 		const enabledRules = this.settings.enabledRules.split("\n");
-
+		
 		for (const line of enabledRules) {
 			if (line.match(/^\s*$/) || line.startsWith("// ")) {
 				continue;
@@ -83,10 +85,10 @@ export default class LinterPlugin extends Plugin {
 				const options: { [id: string]: string; } = parseOptions(line);
 
 				if (options) {
-					text = rulesDict[ruleName].apply(text, options);
+					newText = rulesDict[ruleName].apply(newText, options);
 				}
 				else {
-					text = rulesDict[ruleName].apply(text);
+					newText = rulesDict[ruleName].apply(newText);
 				}
 			}
 			else {
@@ -94,13 +96,27 @@ export default class LinterPlugin extends Plugin {
 			}
 		}
 
-		if (text !== editor.getValue()) {
-			editor.setValue(text);
-			editor.setCursor(cursor);
-			editor.scrollTo(scroll.left, scroll.top);
-		} else {
-			console.log("No linting errors found");
-		}
+		// Replace changed lines
+		const changes = Diff.diffLines(oldText, newText);
+		let lineNum = 0;
+		changes.forEach(change => {
+			if (change.added) {
+				const pos = { line: lineNum, ch: 0 };
+				editor.replaceRange(change.value, pos);
+				lineNum += change.count;
+			}
+			else if (change.removed) {
+				const start = { line: lineNum, ch: 0 };
+				const end = { line: lineNum + change.count, ch: 0 };
+				editor.replaceRange("", start, end);
+			}
+			else {
+				lineNum += change.count;
+			}
+		});
+
+		editor.setCursor(cursor);
+		editor.scrollTo(scroll.left, scroll.top);
 	}
 }
 
