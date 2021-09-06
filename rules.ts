@@ -54,11 +54,11 @@ export const rules: Rule[] = [
         new Example(
             'Removes trailing spaces and tabs',
             dedent`
-                # H1   
-                line with trailing spaces and tabs    				`, // eslint-disable-line no-tabs
+        # H1   
+        line with trailing spaces and tabs    				`, // eslint-disable-line no-tabs
             dedent`
-                # H1
-                line with trailing spaces and tabs`,
+        # H1
+        line with trailing spaces and tabs`,
         ),
       ],
   ),
@@ -86,45 +86,45 @@ export const rules: Rule[] = [
         new Example(
             'Headings should be surrounded by blank lines',
             dedent`
-                # H1
-                ## H2
+        # H1
+        ## H2
 
 
-                # H1
-                line
-                ## H2
+        # H1
+        line
+        ## H2
 
-                `,
+        `,
             dedent`
-                # H1
-                
-                ## H2
+        # H1
+        
+        ## H2
 
-                # H1
+        # H1
 
-                line
-                
-                ## H2
-                `,
+        line
+        
+        ## H2
+        `,
         ),
         new Example(
             'With `bottom=false`',
             dedent`
-                # H1
-                line
-                ## H2
-                # H1
-                line
-                `,
+        # H1
+        line
+        ## H2
+        # H1
+        line
+        `,
             dedent`
-                # H1
-                line
+        # H1
+        line
 
-                ## H2
+        ## H2
 
-                # H1
-                line
-                `,
+        # H1
+        line
+        `,
             {bottom: 'false'},
         ),
       ],
@@ -145,19 +145,19 @@ export const rules: Rule[] = [
         new Example(
             '',
             dedent`
-                1.      Item 1
-                2.  Item 2
+        1.      Item 1
+        2.  Item 2
 
-                -   [ ] Item 1
-                - [x]    Item 2
-                `,
+        -   [ ] Item 1
+        - [x]    Item 2
+        `,
             dedent`
-                1. Item 1
-                2. Item 2
+        1. Item 1
+        2. Item 2
 
-                - [ ] Item 1
-                - [x] Item 2
-                `,
+        - [ ] Item 1
+        - [x] Item 2
+        `,
         ),
       ],
   ),
@@ -189,27 +189,27 @@ export const rules: Rule[] = [
         new Example(
             'Adds a header with the date.',
             dedent`
-                # H1
-                `,
+        # H1
+        `,
             dedent`
-                ---
-                date created: Wednesday, January 1st 2020, 12:00:00 am
-                date updated: Wednesday, January 1st 2020, 12:00:00 am
-                ---
-                # H1
-                `,
+        ---
+        date created: Wednesday, January 1st 2020, 12:00:00 am
+        date updated: Wednesday, January 1st 2020, 12:00:00 am
+        ---
+        # H1
+        `,
         ),
         new Example(
             'dateCreated option is false',
             dedent`
-                # H1
-                `,
+        # H1
+        `,
             dedent`
-                ---
-                date updated: Wednesday, January 1st 2020, 12:00:00 am
-                ---
-                # H1
-                `,
+        ---
+        date updated: Wednesday, January 1st 2020, 12:00:00 am
+        ---
+        # H1
+        `,
             {dateCreated: 'false'},
         ),
       ],
@@ -231,17 +231,17 @@ export const rules: Rule[] = [
         new Example(
             '',
             dedent`
-                ---
+        ---
 
-                date: today
+        date: today
 
-                ---
-                `,
+        ---
+        `,
             dedent`
-                ---
-                date: today
-                ---
-                `,
+        ---
+        date: today
+        ---
+        `,
         ),
       ],
   ),
@@ -273,19 +273,19 @@ export const rules: Rule[] = [
         new Example(
             '',
             dedent`
-                # H1
+        # H1
 
-                ### H3
+        ### H3
 
-                We skipped a 2nd level heading
-                `,
+        We skipped a 2nd level heading
+        `,
             dedent`
-                # H1
+        # H1
 
-                ## H3
+        ## H3
 
-                We skipped a 2nd level heading
-                `,
+        We skipped a 2nd level heading
+        `,
         ),
       ],
   ),
@@ -299,16 +299,16 @@ export const rules: Rule[] = [
         new Example(
             '',
             dedent`
-                Some text
+        Some text
 
 
-                Some more text
-                `,
+        Some more text
+        `,
             dedent`
-                Some text
+        Some text
 
-                Some more text
-                `,
+        Some more text
+        `,
         ),
       ],
   ),
@@ -331,11 +331,16 @@ export const rules: Rule[] = [
           if (options['titleCase'] == 'true') {
             const headerWords = lines[i].match(/\S+/g);
             const ignore = ['a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with'];
-            for (let j = 0; j < headerWords.length; j++) {
-              const ignoreWord = ignore.includes(headerWords[j]) && j != 1; // ignore words that are not capitalized in titles except if they are the first word
+            for (let j = 1; j < headerWords.length; j++) {
               const isNotWord = headerWords[j].match(/[^A-Z^a-z]/); // ignore non-words
-              if (!ignoreWord && !isNotWord) {
-                headerWords[j] = headerWords[j].replace(/^./, (c) => c.toUpperCase());
+              if (isNotWord) {
+                continue;
+              }
+
+              headerWords[j] = headerWords[j].toLowerCase();
+              const ignoreWord = ignore.includes(headerWords[j]);
+              if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
+                headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
               }
             }
 
@@ -352,38 +357,38 @@ export const rules: Rule[] = [
         new Example(
             'The first letter of a heading should be capitalized',
             dedent`
-                # this is a heading 1
-                ## this is a heading 2
-                `,
+        # this is a heading 1
+        ## this is a heading 2
+        `,
             dedent`
-                # This is a heading 1
-                ## This is a heading 2
-                `,
+        # This is a heading 1
+        ## This is a heading 2
+        `,
         ),
         new Example(
             'With `titleCase=true`',
             dedent`
-                # this is a heading 1
-                ## this is a heading 2
-                ### a heading 3
-                `,
+        # this is a heading 1
+        ## THIS IS A HEADING 2
+        ### a heading 3
+        `,
             dedent`
-                # This is a Heading 1
-                ## This is a Heading 2
-                ### A Heading 3
-                `,
+        # This is a Heading 1
+        ## This is a Heading 2
+        ### A Heading 3
+        `,
             {titleCase: 'true'},
         ),
         new Example(
             'With `allCaps=true`',
             dedent`
-                # this is a heading 1
-                ## this is a heading 2
-                `,
+        # this is a heading 1
+        ## this is a heading 2
+        `,
             dedent`
-                # THIS IS A HEADING 1
-                ## THIS IS A HEADING 2
-                `,
+        # THIS IS A HEADING 1
+        ## THIS IS A HEADING 2
+        `,
             {allCaps: 'true'},
         ),
       ],
