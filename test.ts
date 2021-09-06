@@ -109,11 +109,15 @@ describe('Rules tests', () => {
     it('Ignores not words', () => {
       const before = dedent`
         # h1
-        ## a c++ lang
+        ## a c++ lan
+        ## this is a sentence.
+        ## I can't do thisg
         `;
       const after = dedent`
         # h1
-        ## A c++ Lang
+        ## A c++ Lan
+        ## This is a Sentence.
+        ## I Can't Do Thisg
         `;
       expect(rulesDict['capitalize-headings'].apply(before, {titleCase: 'true'})).toBe(after);
     });
