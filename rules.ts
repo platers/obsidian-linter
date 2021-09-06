@@ -332,8 +332,8 @@ export const rules: Rule[] = [
             const headerWords = lines[i].match(/\S+/g);
             const ignore = ['a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with'];
             for (let j = 1; j < headerWords.length; j++) {
-              const isNotWord = headerWords[j].match(/[^A-Z^a-z]/); // ignore non-words
-              if (isNotWord) {
+              const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?\!]?$/);
+              if (!isWord) {
                 continue;
               }
 
