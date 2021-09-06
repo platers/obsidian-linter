@@ -93,19 +93,25 @@ export default class LinterPlugin extends Plugin {
       }
 
       // Replace changed lines
-      const changes = Diff.diffLines(oldText, newText);
-      let lineNum = 0;
+      const changes = Diff.diffChars(oldText, newText);
+      let curText = '';
       changes.forEach((change) => {
+        function endOfDocument(doc: string) {
+          const lines = doc.split('\n');
+          return {line: lines.length - 1, ch: lines[lines.length - 1].length};
+        }
+
         if (change.added) {
-          const pos = {line: lineNum, ch: 0};
-          editor.replaceRange(change.value, pos);
-          lineNum += change.count;
+          editor.replaceRange(change.value, endOfDocument(curText));
+          curText += change.value;
         } else if (change.removed) {
-          const start = {line: lineNum, ch: 0};
-          const end = {line: lineNum + change.count, ch: 0};
+          const start = endOfDocument(curText);
+          let tempText = curText;
+          tempText += change.value;
+          const end = endOfDocument(tempText);
           editor.replaceRange('', start, end);
         } else {
-          lineNum += change.count;
+          curText += change.value;
         }
       });
     }
