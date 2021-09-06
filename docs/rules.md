@@ -87,6 +87,34 @@ line
 line
 ```
 
+## Paragraph blank lines
+
+Alias: `paragraph-blank-lines`
+
+All paragraphs should have exactly one blank line both before and after.
+
+
+
+Example: Paragraphs should be surrounded by blank lines
+
+Before:
+
+```markdown
+# H1
+Newlines are inserted.
+A paragraph is a line that starts with a letter.
+```
+
+After:
+
+```markdown
+# H1
+
+Newlines are inserted.
+
+A paragraph is a line that starts with a letter.
+```
+
 ## Space after list markers
 
 Alias: `space-after-list-markers`

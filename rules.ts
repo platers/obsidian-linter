@@ -68,7 +68,7 @@ export const rules: Rule[] = [
       (text: string, options = {}) => {
         options = Object.assign({'bottom': 'true'}, options);
 
-        return ignoreCodeBlocks(text, (text) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
           if (options['bottom'] === 'false') {
             text = text.replace(/(^#+\s.*)\n+/gm, '$1\n'); // trim blank lines after headings
             text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
@@ -130,6 +130,35 @@ export const rules: Rule[] = [
       ],
       [
         'bottom: Insert a blank line after headings, default=`true`',
+      ],
+  ),
+  new Rule(
+      'Paragraph blank lines',
+      'All paragraphs should have exactly one blank line both before and after.',
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          text = text.replace(/\n+([a-zA-Z].*)/g, '\n\n$1'); // trim blank lines before
+          text = text.replace(/(^[a-zA-Z].*)\n+/gm, '$1\n\n'); // trim blank lines after
+          text = text.replace(/^\n+([a-zA-Z].*)/, '$1'); // remove blank lines before first line
+          return text;
+        });
+      },
+      [
+        new Example(
+            'Paragraphs should be surrounded by blank lines',
+            dedent`
+      # H1
+      Newlines are inserted.
+      A paragraph is a line that starts with a letter.
+      `,
+            dedent`
+      # H1
+      
+      Newlines are inserted.
+
+      A paragraph is a line that starts with a letter.
+      `,
+        ),
       ],
   ),
   new Rule(
@@ -423,19 +452,30 @@ export function parseOptions(line: string) {
   return options;
 }
 
-function ignoreCodeBlocks(text: string, func: (text: string) => string) {
+function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => string) {
   const fencedBlockRegex = '```\n((.|\n)*)```';
   const indentedBlockRegex = '((\t|( {4})).*\n)+';
   const codeBlockRegex = new RegExp(`${fencedBlockRegex}|${indentedBlockRegex}`, 'g');
-  const placeholder = 'PLACEHOLDER FOR CODE BLOCK 1038295';
-  const matches = text.match(codeBlockRegex);
+  const codePlaceholder = 'PLACEHOLDER FOR CODE BLOCK 1038295';
+  const codeMatches = text.match(codeBlockRegex);
 
-  text = text.replace(codeBlockRegex, placeholder);
+  const yamlRegex = /^---\s*\n(.*\n+)?---/s;
+  const yamlPlaceholder = 'PLACEHOLDER FOR YAML 1038295';
+  const yamlMatches = text.match(yamlRegex);
+
+  text = text.replace(codeBlockRegex, codePlaceholder);
+  text = text.replace(yamlRegex, yamlPlaceholder);
   text = func(text);
 
-  if (matches) {
-    for (const match of matches) {
-      text = text.replace(placeholder, match);
+  if (yamlMatches) {
+    for (const match of yamlMatches) {
+      text = text.replace(yamlPlaceholder, match);
+    }
+  }
+
+  if (codeMatches) {
+    for (const match of codeMatches) {
+      text = text.replace(codePlaceholder, match);
     }
   }
 
