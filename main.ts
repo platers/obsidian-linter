@@ -67,8 +67,6 @@ export default class LinterPlugin extends Plugin {
     runLinter(editor: Editor) {
       console.log('running linter');
 
-      const cursor = editor.getCursor();
-      const scroll = editor.getScrollInfo();
       const oldText = editor.getValue();
       let newText = oldText;
       const enabledRules = this.settings.enabledRules.split('\n');
@@ -110,9 +108,6 @@ export default class LinterPlugin extends Plugin {
           lineNum += change.count;
         }
       });
-
-      editor.setCursor(cursor);
-      editor.scrollTo(scroll.left, scroll.top);
     }
 }
 
