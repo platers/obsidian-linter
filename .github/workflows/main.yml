@@ -30,4 +30,4 @@ jobs:
       - name: Run unit tests
         run: npm test
       - name: Run ESLint
-        run: eslint . --ext .ts
+        run: npx eslint . --ext .ts
