@@ -15,5 +15,8 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "camelcase": "off",
+        "max-len": "off",
+        "require-jsdoc": "off"
     }
 }

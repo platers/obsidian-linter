@@ -1,82 +1,82 @@
-import MockDate from "mockdate"
-MockDate.set("2020-01-01");
-import { readFileSync, writeFileSync } from "fs";
-import dedent from "ts-dedent";
-import { rules } from "../rules";
+import MockDate from 'mockdate';
+MockDate.set('2020-01-01');
+import {readFileSync, writeFileSync} from 'fs';
+import dedent from 'ts-dedent';
+import {rules} from '../rules';
 
 
-const autogen_warning = "<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->";
+const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->';
 
 // README
 
-const readme_template = readFileSync("./docs/readme_template.md", "utf8");
+const readme_template = readFileSync('./docs/readme_template.md', 'utf8');
 
-const url = "https://github.com/platers/obsidian-linter/blob/master/docs/rules.md"
-const rules_list = rules.map(rule => `- [${rule.alias()}](${url}#${rule.alias()})`).join("\n");
+const url = 'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
+const rules_list = rules.map((rule) => `- [${rule.alias()}](${url}#${rule.alias()})`).join('\n');
 
 const readme = dedent`
-				${autogen_warning}
+        ${autogen_warning}
 
-				${readme_template}
+        ${readme_template}
 
-				${rules_list}
+        ${rules_list}
 
-				`;
+        `;
 
-writeFileSync("README.md", readme);
-console.log("README.md updated");
+writeFileSync('README.md', readme);
+console.log('README.md updated');
 
 // Rules documentation
 
-const rules_template = readFileSync("./docs/rules_template.md", "utf8");
+const rules_template = readFileSync('./docs/rules_template.md', 'utf8');
 
-const rules_docs = rules.map(rule => {
-	const examples = rule.examples.map(test => dedent`
-		Example: ${test.description}
+const rules_docs = rules.map((rule) => {
+  const examples = rule.examples.map((test) => dedent`
+    Example: ${test.description}
 
-		Before:
+    Before:
 
-		\`\`\`markdown
-		${test.before}
-		\`\`\`
+    \`\`\`markdown
+    ${test.before}
+    \`\`\`
 
-		After:
+    After:
 
-		\`\`\`markdown
-		${test.after}
-		\`\`\`
-	`).join("\n");
+    \`\`\`markdown
+    ${test.after}
+    \`\`\`
+  `).join('\n');
 
-	const options_list = rule.options.map(option => `- ${option}`).join("\n");
-	let options = "";
-	if (options_list.length > 0) {
-		options = dedent`
-			Options:
-			${options_list}
-		`;
-	}
+  const options_list = rule.options.map((option) => `- ${option}`).join('\n');
+  let options = '';
+  if (options_list.length > 0) {
+    options = dedent`
+      Options:
+      ${options_list}
+    `;
+  }
 
-	return dedent`
-	## ${rule.name}
+  return dedent`
+  ## ${rule.name}
 
-	Alias: \`${rule.alias()}\`
+  Alias: \`${rule.alias()}\`
 
-	${rule.description}
+  ${rule.description}
 
-	${options}
+  ${options}
 
-	${examples}
+  ${examples}
 
-	`
-}).join("\n");
+  `;
+}).join('\n');
 
 const rules_documentation = dedent`
-	${autogen_warning}
+  ${autogen_warning}
 
-	${rules_template}
+  ${rules_template}
 
-	${rules_docs}
-	`;
+  ${rules_docs}
+  `;
 
-writeFileSync("./docs/rules.md", rules_documentation);
-console.log("Rules documentation updated");
+writeFileSync('./docs/rules.md', rules_documentation);
+console.log('Rules documentation updated');
