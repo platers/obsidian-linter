@@ -223,7 +223,6 @@ export const rules: Rule[] = [
       'Compact YAML',
       'Removes leading and trailing blank lines in the YAML front matter.',
       (text: string) => {
-        text = initYAML(text);
         text = text.replace(/^---\n+/, '---\n');
         return text.replace(/\n+---/, '\n---');
       },
@@ -444,7 +443,7 @@ function ignoreCodeBlocks(text: string, func: (text: string) => string) {
 }
 
 function initYAML(text: string) {
-  if (text.match(/^---\s*\n.*\n---/s) === null) {
+  if (text.match(/^---\s*\n(.*\n+)?---/s) === null) {
     text = '---\n---\n' + text;
   }
   return text;
