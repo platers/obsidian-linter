@@ -9,7 +9,7 @@
     "test": "jest",
     "docs": "ts-node --project ./tsconfig-docs.json ./docs/docs.ts",
     "compile": "npm run build && npm run docs && npm run test",
-    "lint": "eslint --ext .ts ./"
+    "lint": "eslint . --ext .ts --fix"
   },
   "keywords": [],
   "author": "",
