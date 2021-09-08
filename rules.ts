@@ -435,6 +435,53 @@ export const rules: Rule[] = [
         'allCaps: Format headings with all capitals, default= `false`',
       ],
   ),
+  new Rule(
+      'File Name Heading',
+      'Inserts the file name as a H1 heading if no H1 heading exists.',
+      (text: string, options = {}) => {
+        // check if there is a H1 heading
+        const hasH1 = text.match(/^#\s.*/m);
+        if (hasH1) {
+          return text;
+        }
+
+        const fileName = options['metadata: file name'];
+        // insert H1 heading after front matter
+        let yaml_end = text.indexOf('\n---');
+        yaml_end = yaml_end == -1 ? 0 : yaml_end + 5;
+        return insert(text, yaml_end, `# ${fileName}\n`);
+      },
+      [
+        new Example(
+            'Inserts an H1 heading',
+            dedent`
+              This is a line of text
+            `,
+            dedent`
+              # File Name
+              This is a line of text
+            `,
+            {'metadata: file name': 'File Name'},
+        ),
+        new Example(
+            'Inserts heading after YAML front matter',
+            dedent`
+              ---
+              title: My Title
+              ---
+              This is a line of text
+            `,
+            dedent`
+              ---
+              title: My Title
+              ---
+              # File Name
+              This is a line of text
+            `,
+            {'metadata: file name': 'File Name'},
+        ),
+      ],
+  ),
 ];
 
 export const rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);

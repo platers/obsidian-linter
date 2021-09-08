@@ -86,6 +86,7 @@ export default class LinterPlugin extends Plugin {
             Object.assign({
               'metadata: file created time': moment(file.stat.ctime).format(),
               'metadata: file modified time': moment(file.stat.mtime).format(),
+              'metadata: file name': file.basename,
             }, parseOptions(line));
           newText = rulesDict[ruleName].apply(newText, options);
         } else {
