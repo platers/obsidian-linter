@@ -149,7 +149,7 @@ After:
 
 Alias: `yaml-timestamp`
 
-Keep track of the date the file was last edited in the YAML front matter. 
+Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.
 
 Options:
 - format: [date format](https://momentjs.com/docs/#/displaying/format/), default=`"dddd, MMMM Do YYYY, h:mm:ss a"`
@@ -169,7 +169,7 @@ After:
 ```markdown
 ---
 date created: Wednesday, January 1st 2020, 12:00:00 am
-date updated: Wednesday, January 1st 2020, 12:00:00 am
+date updated: Thursday, January 2nd 2020, 12:00:00 am
 ---
 # H1
 ```
