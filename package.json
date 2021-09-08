@@ -8,7 +8,7 @@
     "build": "rollup --config rollup.config.js --environment BUILD:production",
     "test": "jest",
     "docs": "ts-node --project ./tsconfig-docs.json ./docs/docs.ts",
-    "compile": "npm run lint && npm run build && npm run docs && npm run test",
+    "compile": "npm run build && npm run docs && npm run test",
     "lint": "eslint . --ext .ts --fix"
   },
   "keywords": [],
@@ -30,7 +30,6 @@
     "eslint": "^7.32.0",
     "eslint-config-google": "^0.14.0",
     "jest": "^27.0.6",
-    "mockdate": "^3.0.5",
     "obsidian": "^0.12.0",
     "rollup": "^2.32.1",
     "ts-node": "^10.1.0",

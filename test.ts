@@ -1,5 +1,3 @@
-import MockDate from 'mockdate';
-MockDate.set(new Date(2020, 0, 1));
 import dedent from 'ts-dedent';
 import {rules, Rule, rulesDict, Example, parseOptions} from './rules';
 

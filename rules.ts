@@ -192,7 +192,7 @@ export const rules: Rule[] = [
   ),
   new Rule(
       'YAML Timestamp',
-      'Keep track of the date the file was last edited in the YAML front matter. ',
+      'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.',
       (text: string, options = {}) => {
         options = Object.assign({
           'format': 'dddd, MMMM Do YYYY, h:mm:ss a',
@@ -201,15 +201,17 @@ export const rules: Rule[] = [
         }, options);
 
         text = initYAML(text);
-        const formatted_date = moment().format(options['format']);
 
-        if (options['dateCreated'] === 'true' && !text.match(/\ndate created:.*\n/)) {
+        if (options['dateCreated'] === 'true') {
+          text = text.replace(/\ndate created:.*\n/, '\n');
           const yaml_end = text.indexOf('\n---');
+          const formatted_date = moment(options['metadata: file created time']).format(options['format']);
           text = insert(text, yaml_end, `\ndate created: ${formatted_date}`);
         }
         if (options['dateUpdated'] === 'true') {
           text = text.replace(/\ndate updated:.*\n/, '\n');
           const yaml_end = text.indexOf('\n---');
+          const formatted_date = moment(options['metadata: file modified time']).format(options['format']);
           text = insert(text, yaml_end, `\ndate updated: ${formatted_date}`);
         }
         return text;
@@ -223,10 +225,14 @@ export const rules: Rule[] = [
             dedent`
         ---
         date created: Wednesday, January 1st 2020, 12:00:00 am
-        date updated: Wednesday, January 1st 2020, 12:00:00 am
+        date updated: Thursday, January 2nd 2020, 12:00:00 am
         ---
         # H1
         `,
+            {
+              'metadata: file created time': '2020-01-01T00:00:00-00:00',
+              'metadata: file modified time': '2020-01-02T00:00:00-00:00',
+            },
         ),
         new Example(
             'dateCreated option is false',
@@ -239,7 +245,11 @@ export const rules: Rule[] = [
         ---
         # H1
         `,
-            {dateCreated: 'false'},
+            {
+              'dateCreated': 'false',
+              'metadata: file created time': '2020-01-01T00:00:00-00:00',
+              'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+            },
         ),
       ],
       [

@@ -2,6 +2,7 @@ import {App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting} fr
 import dedent from 'ts-dedent';
 import {parseOptions, rulesDict} from './rules';
 import Diff from 'diff';
+import moment from 'moment';
 
 interface LinterSettings {
     enabledRules: string;
@@ -67,6 +68,7 @@ export default class LinterPlugin extends Plugin {
     runLinter(editor: Editor) {
       console.log('running linter');
 
+      const file = this.app.workspace.getActiveFile();
       const oldText = editor.getValue();
       let newText = oldText;
       const enabledRules = this.settings.enabledRules.split('\n');
@@ -80,13 +82,12 @@ export default class LinterPlugin extends Plugin {
         const ruleName = line.split(/\s+/)[0];
 
         if (ruleName in rulesDict) {
-          const options: { [id: string]: string; } = parseOptions(line);
-
-          if (options) {
-            newText = rulesDict[ruleName].apply(newText, options);
-          } else {
-            newText = rulesDict[ruleName].apply(newText);
-          }
+          const options: { [id: string]: string; } =
+            Object.assign({
+              'metadata: file created time': moment(file.stat.ctime).format(),
+              'metadata: file modified time': moment(file.stat.mtime).format(),
+            }, parseOptions(line));
+          newText = rulesDict[ruleName].apply(newText, options);
         } else {
           new Notice(`Rule ${ruleName} not recognized`);
         }
