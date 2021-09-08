@@ -332,3 +332,46 @@ After:
 # THIS IS A HEADING 1
 ## THIS IS A HEADING 2
 ```
+
+## File Name Heading
+
+Alias: `file-name-heading`
+
+Inserts the file name as a H1 heading if no H1 heading exists.
+
+
+
+Example: Inserts an H1 heading
+
+Before:
+
+```markdown
+This is a line of text
+```
+
+After:
+
+```markdown
+# File Name
+This is a line of text
+```
+Example: Inserts heading after YAML front matter
+
+Before:
+
+```markdown
+---
+title: My Title
+---
+This is a line of text
+```
+
+After:
+
+```markdown
+---
+title: My Title
+---
+# File Name
+This is a line of text
+```
