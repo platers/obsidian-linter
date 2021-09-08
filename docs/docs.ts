@@ -1,5 +1,5 @@
 import MockDate from 'mockdate';
-MockDate.set('2020-01-01');
+MockDate.set('2020-01-01T00:00:00-05:00');
 import {readFileSync, writeFileSync} from 'fs';
 import dedent from 'ts-dedent';
 import {rules} from '../rules';
