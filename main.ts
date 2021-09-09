@@ -1,4 +1,4 @@
-import {App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting} from 'obsidian';
+import {App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
 import dedent from 'ts-dedent';
 import {parseOptions, rulesDict} from './rules';
 import Diff from 'diff';
@@ -27,7 +27,7 @@ export default class LinterPlugin extends Plugin {
       this.addCommand({
         id: 'lint-file',
         name: 'Lint the current file',
-        editorCallback: (editor) => this.runLinter(editor),
+        editorCallback: (editor) => this.runLinterEditor(editor),
         hotkeys: [
           {
             modifiers: ['Mod', 'Alt'],
@@ -35,6 +35,16 @@ export default class LinterPlugin extends Plugin {
           },
         ],
       });
+
+      this.addCommand({
+        id: 'lint-all-files',
+        name: 'Lint all files in the vault',
+        callback: () => {
+          this.app.vault.getMarkdownFiles().forEach((file) => {
+            this.runLinterFile(file);
+          });
+        },
+      }); ;
 
       // Source for save setting
       // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
@@ -47,7 +57,7 @@ export default class LinterPlugin extends Plugin {
         saveCommandDefinition.callback = () => {
           if (this.settings.lintOnSave) {
             const editor = this.app.workspace.getActiveViewOfType(MarkdownView).editor;
-            this.runLinter(editor);
+            this.runLinterEditor(editor);
           }
 
           save();
@@ -65,11 +75,7 @@ export default class LinterPlugin extends Plugin {
       await this.saveData(this.settings);
     }
 
-    runLinter(editor: Editor) {
-      console.log('running linter');
-
-      const file = this.app.workspace.getActiveFile();
-      const oldText = editor.getValue();
+    lintText(oldText: string, file: TFile) {
       let newText = oldText;
       const enabledRules = this.settings.enabledRules.split('\n');
 
@@ -93,6 +99,22 @@ export default class LinterPlugin extends Plugin {
           new Notice(`Rule ${ruleName} not recognized`);
         }
       }
+
+      return newText;
+    }
+
+    async runLinterFile(file: TFile) {
+      const oldText = await this.app.vault.read(file);
+      const newText = this.lintText(oldText, file);
+      this.app.vault.modify(file, newText);
+    }
+
+    runLinterEditor(editor: Editor) {
+      console.log('running linter');
+
+      const file = this.app.workspace.getActiveFile();
+      const oldText = editor.getValue();
+      const newText = this.lintText(oldText, file);
 
       // Replace changed lines
       const changes = Diff.diffChars(oldText, newText);
