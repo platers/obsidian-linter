@@ -109,13 +109,15 @@ describe('Rules tests', () => {
         # h1
         ## a c++ lan
         ## this is a sentence.
-        ## I can't do thisg
+        ## I can't do this
+        ## comma, comma, comma
         `;
       const after = dedent`
         # h1
         ## A c++ Lan
         ## This is a Sentence.
-        ## I Can't Do Thisg
+        ## I Can't Do This
+        ## Comma, Comma, Comma
         `;
       expect(rulesDict['capitalize-headings'].apply(before, {titleCase: 'true'})).toBe(after);
     });

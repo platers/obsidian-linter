@@ -370,7 +370,7 @@ export const rules: Rule[] = [
             const headerWords = lines[i].match(/\S+/g);
             const ignore = ['a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with'];
             for (let j = 1; j < headerWords.length; j++) {
-              const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?\!]?$/);
+              const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
               if (!isWord) {
                 continue;
               }
@@ -433,6 +433,53 @@ export const rules: Rule[] = [
       [
         'titleCase: Format headings with title case capitalization, default=`false`',
         'allCaps: Format headings with all capitals, default= `false`',
+      ],
+  ),
+  new Rule(
+      'File Name Heading',
+      'Inserts the file name as a H1 heading if no H1 heading exists.',
+      (text: string, options = {}) => {
+        // check if there is a H1 heading
+        const hasH1 = text.match(/^#\s.*/m);
+        if (hasH1) {
+          return text;
+        }
+
+        const fileName = options['metadata: file name'];
+        // insert H1 heading after front matter
+        let yaml_end = text.indexOf('\n---');
+        yaml_end = yaml_end == -1 ? 0 : yaml_end + 5;
+        return insert(text, yaml_end, `# ${fileName}\n`);
+      },
+      [
+        new Example(
+            'Inserts an H1 heading',
+            dedent`
+              This is a line of text
+            `,
+            dedent`
+              # File Name
+              This is a line of text
+            `,
+            {'metadata: file name': 'File Name'},
+        ),
+        new Example(
+            'Inserts heading after YAML front matter',
+            dedent`
+              ---
+              title: My Title
+              ---
+              This is a line of text
+            `,
+            dedent`
+              ---
+              title: My Title
+              ---
+              # File Name
+              This is a line of text
+            `,
+            {'metadata: file name': 'File Name'},
+        ),
       ],
   ),
 ];
