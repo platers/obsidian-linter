@@ -14,7 +14,7 @@
       "dom",
       "es5",
       "scripthost",
-      "es2021"
+      "ESNext"
     ]
   },
   "include": [
