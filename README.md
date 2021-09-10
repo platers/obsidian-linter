@@ -31,8 +31,11 @@ Pull requests are welcome, especially for new rules.
 3. Add a new rule in `rules.ts`.
 4. Run `npm run compile` to build, generate documentation, and test the plugin. 
 
+Make sure to use Node 15.x or higher.
+
 Run `npm test` to run tests.
 Run `npm run docs` to generate the documentation.
+Run `npm run lint` to lint the code.
 
 ## Rules
 
