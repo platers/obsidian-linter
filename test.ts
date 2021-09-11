@@ -27,12 +27,20 @@ describe('Rules tests', () => {
   describe('Heading blank lines', () => {
     it('Ignores codeblocks', () => {
       const before = dedent`
+        ---
+        front matter
+        ---
+        
         # H1
         \`\`\`
         # comment not header
         a = b
         \`\`\``;
       const after = dedent`
+        ---
+        front matter
+        ---
+
         # H1
 
         \`\`\`

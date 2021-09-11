@@ -509,15 +509,19 @@ export function parseOptions(line: string) {
   return options;
 }
 
+// Useful regexes
+const fencedRegexTemplate = '^XXX\s*\n((?:.|\n)*?)\nXXX\s*?(?:\n|$)';
+const yamlRegex = new RegExp(fencedRegexTemplate.replaceAll('X', '-'));
+const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
+const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
+const indentedBlockRegex = '((\t|( {4})).*\n)+';
+const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
+
 function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => string) {
-  const fencedBlockRegex = '```\n((.|\n)*)```';
-  const indentedBlockRegex = '((\t|( {4})).*\n)+';
-  const codeBlockRegex = new RegExp(`${fencedBlockRegex}|${indentedBlockRegex}`, 'g');
-  const codePlaceholder = 'PLACEHOLDER FOR CODE BLOCK 1038295';
+  const codePlaceholder = 'PLACEHOLDER FOR CODE BLOCK 1038295\n';
   const codeMatches = text.match(codeBlockRegex);
 
-  const yamlRegex = /^---\s*\n(.*\n+)?---/s;
-  const yamlPlaceholder = 'PLACEHOLDER FOR YAML 1038295';
+  const yamlPlaceholder = 'PLACEHOLDER FOR YAML 1038295\n';
   const yamlMatches = text.match(yamlRegex);
 
   text = text.replace(codeBlockRegex, codePlaceholder);
@@ -540,7 +544,7 @@ function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => string) {
 }
 
 function initYAML(text: string) {
-  if (text.match(/^---\s*\n(.*\n+)?---/s) === null) {
+  if (text.match(yamlRegex) === null) {
     text = '---\n---\n' + text;
   }
   return text;
