@@ -368,7 +368,9 @@ export const rules: Rule[] = [
           }
           if (options['titleCase'] == 'true') {
             const headerWords = lines[i].match(/\S+/g);
-            const ignore = ['a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with'];
+            const ignoreAbbreviations = ['CSS','HTML','YAML','PDF','USA','EU','NATO'];
+            const ignoreShortWords = ['a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with'];
+            const ignore = [...ignoreAbbreviations, ...ignoreShortWords];
             for (let j = 1; j < headerWords.length; j++) {
               const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
               if (!isWord) {
@@ -479,6 +481,30 @@ export const rules: Rule[] = [
               This is a line of text
             `,
             {'metadata: file name': 'File Name'},
+        ),
+      ],
+  ),
+  new Rule(
+      'Remove Hashtags from YAML',
+      'Hashtags make the YAML-Header invalid.',
+      (text: string) => {
+         return text.replace (/^tags: ((?:#\w+(?: |$))+)$/im, function (tagsYAML){
+            return tagsYAML.replaceAll("#","").replaceAll(" ", ", ").replaceAll(",,", ",").replace("tags:,","tags:");
+         });
+      },
+      [
+        new Example(
+            'Remove Hashtags from YAML',
+            dedent`
+         ---
+         tags: #one #two #three
+         ---
+        `,
+            dedent`
+         ---
+         tags: one, two, three,
+         ---
+        `,
         ),
       ],
   ),
