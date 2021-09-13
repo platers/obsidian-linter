@@ -375,3 +375,29 @@ title: My Title
 # File Name
 This is a line of text
 ```
+
+## Format Tags in YAML
+
+Alias: `format-tags-in-yaml`
+
+Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.
+
+
+
+Example: Format Tags in YAML-Header
+
+Before:
+
+```markdown
+---
+tags: #one #two #three
+---
+```
+
+After:
+
+```markdown
+---
+tags: one, two, three
+---
+```
