@@ -494,7 +494,7 @@ export const rules: Rule[] = [
       },
       [
         new Example(
-            'Format Tags in YAML-Header',
+            'Format Tags in YAML frontmatter',
             dedent`
          ---
          tags: #one #two #three
@@ -504,6 +504,116 @@ export const rules: Rule[] = [
          ---
          tags: one, two, three
          ---
+        `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Move Footnotes to the bottom',
+      'Move all footnotes to the bottom of the document.',
+      (text: string) => {
+        const footnotes = text.match(/^\[\^\w+\]: .*$/gm); // collect footnotes
+        if (footnotes != null) {
+          text = text.replace(/^\[\^\w+\]: .*$/gm, ''); // remove the footnotes
+          text += '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
+          text = text.replace(/\n{3,}/gm, '\n\n'); // remove blank lines resulting from ft removal
+          text = text.replace(/\n*$/s, '');
+        }
+        return text;
+      },
+      [
+        new Example(
+            'Moving footnotes to the bottom',
+            dedent`
+        Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
+
+        [^1]: first footnote
+
+        Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+
+        [^2]: second footnote
+
+        Maecenas malesuada dignissim purus ac volutpat.
+        `,
+            dedent`
+        Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
+
+        Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+
+        Maecenas malesuada dignissim purus ac volutpat.
+
+        [^1]: first footnote
+        [^2]: second footnote
+        `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Re-Index Footnotes',
+      'Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)',
+      (text: string) => {
+        // re-index footnote-text
+        let ft_index = 0;
+        text = text.replace(/^\[\^\w+\]: /gm, function() {
+          ft_index++;
+          return ('[^' + String(ft_index) + ']: ');
+        });
+
+        // re-index footnote-keys
+        // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
+        ft_index = 0;
+        text = text.replace(/(?!^)\[\^\w+\]/gm, function() {
+          ft_index++;
+          return ('[^' + String(ft_index) + ']');
+        });
+        return text;
+      },
+      [
+        new Example(
+            'Re-indexing footnotes after having deleted previous footnotes',
+            dedent`
+        Lorem ipsum at aliquet felis.[^3] Donec dictum turpis quis pellentesque,[^5] et iaculis tortor condimentum.
+
+        [^3]: first footnote
+        [^5]: second footnote
+        `,
+            dedent`
+        Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
+
+        [^1]: first footnote
+        [^2]: second footnote
+        `,
+        ),
+        new Example(
+            'Re-indexing footnotes after inserting a footnote between',
+            dedent`
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^1a] Vestibulum nec blandit felis, vulputate finibus purus.[^2] Praesent quis iaculis diam.
+
+        [^1]: first footnote
+        [^1a]: third footnote, inserted later
+        [^2]: second footnotes
+        `,
+            dedent`
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^2] Vestibulum nec blandit felis, vulputate finibus purus.[^3] Praesent quis iaculis diam.
+
+        [^1]: first footnote
+        [^2]: third footnote, inserted later
+        [^3]: second footnotes
+        `,
+        ),
+        new Example(
+            'Re-indexing duplicate footnote keys',
+            dedent`
+        Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^1] et iaculis tortor condimentum.
+
+        [^1]: first footnote
+        [^1]: second footnote
+        `,
+            dedent`
+        Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
+
+        [^1]: first footnote
+        [^2]: second footnote
         `,
         ),
       ],
