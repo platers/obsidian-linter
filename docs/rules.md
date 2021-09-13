@@ -16,7 +16,7 @@ Before:
 
 ```markdown
 # H1   
-line with trailing spaces and tabs    				
+line with trailing spaces and tabs            
 ```
 
 After:
