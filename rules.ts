@@ -368,9 +368,10 @@ export const rules: Rule[] = [
           }
           if (options['titleCase'] == 'true') {
             const headerWords = lines[i].match(/\S+/g);
-            const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO'];
-            const ignoreShortWords = ['a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with'];
-            const ignore = [...ignoreAbbreviations, ...ignoreShortWords];
+            const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
+            const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
+            const ignoreShortWords = ['via','a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with','without','into','onto','per'];
+            const ignore = [...ignoreAbbreviations, ...ignoreShortWords, ...ignoreNames];
             for (let j = 1; j < headerWords.length; j++) {
               const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
               if (!isWord) {
