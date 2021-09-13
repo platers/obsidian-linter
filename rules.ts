@@ -518,7 +518,7 @@ export const rules: Rule[] = [
           text = text.replace(/^\[\^\w+\]: .*$/gm, ''); // remove the footnotes
           text += '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
           text = text.replace(/\n{3,}/gm, '\n\n'); // remove blank lines resulting from ft removal
-          text = text.replace(/\n*$/s, '');
+          text = text.replace(/\n*$/s, ''); //remove empty lines at the end
         }
         return text;
       },
@@ -526,25 +526,25 @@ export const rules: Rule[] = [
         new Example(
             'Moving footnotes to the bottom',
             dedent`
-        Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
+            Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
 
-        [^1]: first footnote
+            [^1]: first footnote
 
-        Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+            Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
 
-        [^2]: second footnote
+            [^2]: second footnote
 
-        Maecenas malesuada dignissim purus ac volutpat.
+            Maecenas malesuada dignissim purus ac volutpat.
         `,
             dedent`
-        Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
+            Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
 
-        Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+            Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
 
-        Maecenas malesuada dignissim purus ac volutpat.
+            Maecenas malesuada dignissim purus ac volutpat.
 
-        [^1]: first footnote
-        [^2]: second footnote
+            [^1]: first footnote
+            [^2]: second footnote
         `,
         ),
       ],
