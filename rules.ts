@@ -518,7 +518,7 @@ export const rules: Rule[] = [
           text = text.replace(/^\[\^\w+\]: .*$/gm, ''); // remove the footnotes
           text += '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
           text = text.replace(/\n{3,}/gm, '\n\n'); // remove blank lines resulting from ft removal
-          text = text.replace(/\n*$/s, ''); //remove empty lines at the end
+          text = text.replace(/\n*$/s, ''); // remove empty lines at the end
         }
         return text;
       },
