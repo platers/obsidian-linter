@@ -515,10 +515,16 @@ export const rules: Rule[] = [
       (text: string) => {
         const footnotes = text.match(/^\[\^\w+\]: .*$/gm); // collect footnotes
         if (footnotes != null) {
-          text = text.replace(/^\[\^\w+\]: .*$/gm, ''); // remove the footnotes
+          // remove footnotes that are their own paragraph
+          text = text.replace(/\n\n\[\^\w+\]: .*\n\n/gm, '\n\n');
+
+          // remove footnotes directly before/after a line of text
+          text = text.replace(/\n?\n\[\^\w+\]: .*\n\n?/gm, '\n');
+
+          // remove footnotes sourrounded by text
+          text = text.replace(/\n\[\^\w+\]: .*\n/gm, '');
           text += '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
-          text = text.replace(/\n{3,}/gm, '\n\n'); // remove blank lines resulting from ft removal
-          text = text.replace(/\n*$/s, ''); // remove empty lines at the end
+          text = text.replace(/\n*$/, ''); // remove blank lines at the end
         }
         return text;
       },
@@ -531,7 +537,6 @@ export const rules: Rule[] = [
             [^1]: first footnote
 
             Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
-
             [^2]: second footnote
 
             Maecenas malesuada dignissim purus ac volutpat.
@@ -540,7 +545,6 @@ export const rules: Rule[] = [
             Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
 
             Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
-
             Maecenas malesuada dignissim purus ac volutpat.
 
             [^1]: first footnote
