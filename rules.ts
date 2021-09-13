@@ -485,8 +485,8 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
-      'Remove Hashtags from YAML',
-      'Hashtags make the YAML-Header invalid.',
+      'Format Tags in YAML-Header',
+      'Remove Hashtags from tags in the YAML-Header, as they make the tags invalid there.',
       (text: string) => {
          return text.replace (/^tags: ((?:#\w+(?: |$))+)$/im, function (tagsYAML){
             return tagsYAML.replaceAll("#","").replaceAll(" ", ", ").replaceAll(",,", ",").replace("tags:,","tags:");
@@ -494,7 +494,7 @@ export const rules: Rule[] = [
       },
       [
         new Example(
-            'Remove Hashtags from YAML',
+            'Format Tags in YAML-Header',
             dedent`
          ---
          tags: #one #two #three
@@ -502,7 +502,7 @@ export const rules: Rule[] = [
         `,
             dedent`
          ---
-         tags: one, two, three,
+         tags: one, two, three
          ---
         `,
         ),
