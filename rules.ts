@@ -55,7 +55,7 @@ export const rules: Rule[] = [
             'Removes trailing spaces and tabs',
             dedent`
         # H1   
-        line with trailing spaces and tabs    				`, // eslint-disable-line no-tabs
+        line with trailing spaces and tabs            `, // eslint-disable-line no-tabs
             dedent`
         # H1
         line with trailing spaces and tabs`,
@@ -97,13 +97,13 @@ export const rules: Rule[] = [
         `,
             dedent`
         # H1
-        
+
         ## H2
 
         # H1
 
         line
-        
+
         ## H2
         `,
         ),
@@ -153,7 +153,7 @@ export const rules: Rule[] = [
       `,
             dedent`
       # H1
-      
+
       Newlines are inserted.
 
       A paragraph is a line that starts with a letter.
@@ -370,7 +370,7 @@ export const rules: Rule[] = [
             const headerWords = lines[i].match(/\S+/g);
             const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
             const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
-            const ignoreShortWords = ['via','a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with','without','into','onto','per'];
+            const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
             const ignore = [...ignoreAbbreviations, ...ignoreShortWords, ...ignoreNames];
             for (let j = 1; j < headerWords.length; j++) {
               const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
