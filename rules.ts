@@ -368,7 +368,7 @@ export const rules: Rule[] = [
           }
           if (options['titleCase'] == 'true') {
             const headerWords = lines[i].match(/\S+/g);
-            const ignoreAbbreviations = ['CSS','HTML','YAML','PDF','USA','EU','NATO'];
+            const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO'];
             const ignoreShortWords = ['a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with'];
             const ignore = [...ignoreAbbreviations, ...ignoreShortWords];
             for (let j = 1; j < headerWords.length; j++) {
@@ -488,9 +488,9 @@ export const rules: Rule[] = [
       'Format Tags in YAML',
       'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
       (text: string) => {
-         return text.replace (/^tags: ((?:#\w+(?: |$))+)$/im, function (tagsYAML){
-            return tagsYAML.replaceAll("#","").replaceAll(" ", ", ").replaceAll(",,", ",").replace("tags:,","tags:");
-         });
+        return text.replace(/^tags: ((?:#\w+(?: |$))+)$/im, function(tagsYAML) {
+          return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
+        });
       },
       [
         new Example(
