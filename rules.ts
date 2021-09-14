@@ -683,7 +683,15 @@ export function parseOptions(line: string) {
   return options;
 }
 
-function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => string) {
+/**
+ * Substitutes YAML and codeblocks in a text with a placeholder.
+ * Then applies the given function to the text.
+ * Substitutes the YAML and codeblocks back to their original form.
+ * @param {string} text - The text to process
+ * @param {function(string): string} func - The function to apply to the text
+ * @return {string} The processed text
+ */
+function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => string): string {
   const codePlaceholder = 'PLACEHOLDER FOR CODE BLOCK 1038295\n';
   const codeMatches = text.match(codeBlockRegex);
 
@@ -709,13 +717,25 @@ function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => string) {
   return text;
 }
 
-function initYAML(text: string) {
+/**
+ * Adds an empty YAML block to the text if it doesn't already have one.
+ * @param {string} text - The text to process
+ * @return {string} The processed text with an YAML block
+ */
+function initYAML(text: string): string {
   if (text.match(yamlRegex) === null) {
     text = '---\n---\n' + text;
   }
   return text;
 }
 
-function insert(str: string, index: number, value: string) {
+/**
+ * Inserts a string at the given position in a string.
+ * @param {string} str - The string to insert into
+ * @param {number} index - The position to insert at
+ * @param {string} value - The string to insert
+ * @return {string} The string with the inserted string
+ */
+function insert(str: string, index: number, value: string): string {
   return str.substr(0, index) + value + str.substr(index);
 }
