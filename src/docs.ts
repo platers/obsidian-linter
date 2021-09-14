@@ -20,8 +20,11 @@ const readme = dedent`
 
         `;
 
-writeFileSync('README.md', readme);
-console.log('README.md updated');
+const current_readme = readFileSync('./README.md', 'utf8');
+if (readme !== current_readme) {
+  writeFileSync('README.md', readme);
+  console.log('README.md updated');
+}
 
 // Rules documentation
 
@@ -75,5 +78,8 @@ const rules_documentation = dedent`
   ${rules_docs}
   `;
 
-writeFileSync('./docs/rules.md', rules_documentation);
-console.log('Rules documentation updated');
+const current_rules_documentation = readFileSync('./docs/rules.md', 'utf8');
+if (rules_documentation !== current_rules_documentation) {
+  writeFileSync('docs/rules.md', rules_documentation);
+  console.log('docs/rules.md updated');
+}

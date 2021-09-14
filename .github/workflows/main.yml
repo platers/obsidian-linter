@@ -31,3 +31,5 @@ jobs:
         run: npm test
       - name: Run ESLint
         run: npx eslint . --ext .ts
+      - name: Check docs are generated
+        run: npm run docs
