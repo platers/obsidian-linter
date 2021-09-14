@@ -1,5 +1,6 @@
 import dedent from 'ts-dedent';
-import {rules, Rule, rulesDict, Example, parseOptions} from './rules';
+import {rules, Rule, rulesDict, Example} from './rules';
+import { parseOptions } from "./utils";
 
 describe('Examples pass', () => {
   for (const rule of rules) {

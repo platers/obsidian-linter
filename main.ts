@@ -1,6 +1,7 @@
 import {App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
 import dedent from 'ts-dedent';
-import {parseOptions, rulesDict} from './rules';
+import {rulesDict} from './rules';
+import {parseOptions} from './utils';
 import Diff from 'diff';
 import moment from 'moment';
 
