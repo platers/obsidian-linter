@@ -43,6 +43,18 @@ export class Example {
     }
 }
 
+// Useful regexes
+
+const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
+const fencedRegexTemplate = '^XXX\s*\n((?:.|\n)*?)\nXXX\s*?(?:\n|$)';
+const yamlRegex = new RegExp(fencedRegexTemplate.replaceAll('X', '-'));
+const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
+const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
+const indentedBlockRegex = '((\t|( {4})).*\n)+';
+const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
+
+
+
 export const rules: Rule[] = [
   new Rule(
       'Trailing spaces',
@@ -291,7 +303,6 @@ export const rules: Rule[] = [
         let lastLevel = 0; // level of last header processed
         let decrement = 0; // number of levels to decrement following headers
         for (let i = 0; i < lines.length; i++) {
-          const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
           const match = lines[i].match(headerRegex);
           if (!match) {
             continue;
@@ -366,7 +377,6 @@ export const rules: Rule[] = [
 
         const lines = text.split('\n');
         for (let i = 0; i < lines.length; i++) {
-          const headerRegex = /^(#*\s)\w.*/;
           const match = lines[i].match(headerRegex); // match only headings
           if (!match) {
             continue;
@@ -654,14 +664,6 @@ export function parseOptions(line: string) {
   }
   return options;
 }
-
-// Useful regexes
-const fencedRegexTemplate = '^XXX\s*\n((?:.|\n)*?)\nXXX\s*?(?:\n|$)';
-const yamlRegex = new RegExp(fencedRegexTemplate.replaceAll('X', '-'));
-const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
-const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
-const indentedBlockRegex = '((\t|( {4})).*\n)+';
-const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
 
 function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => string) {
   const codePlaceholder = 'PLACEHOLDER FOR CODE BLOCK 1038295\n';
