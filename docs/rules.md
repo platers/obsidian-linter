@@ -16,7 +16,7 @@ Before:
 
 ```markdown
 # H1   
-line with trailing spaces and tabs    				
+line with trailing spaces and tabs            
 ```
 
 After:
@@ -384,7 +384,7 @@ Remove Hashtags from tags in the YAML frontmatter, as they make the tags there i
 
 
 
-Example: Format Tags in YAML-Header
+Example: Format Tags in YAML frontmatter
 
 Before:
 
@@ -400,4 +400,107 @@ After:
 ---
 tags: one, two, three
 ---
+```
+
+## Move Footnotes to the bottom
+
+Alias: `move-footnotes-to-the-bottom`
+
+Move all footnotes to the bottom of the document.
+
+
+
+Example: Moving footnotes to the bottom
+
+Before:
+
+```markdown
+Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
+
+[^1]: first footnote
+
+Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+[^2]: second footnote
+
+Maecenas malesuada dignissim purus ac volutpat.
+```
+
+After:
+
+```markdown
+Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
+
+Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+Maecenas malesuada dignissim purus ac volutpat.
+
+[^1]: first footnote
+[^2]: second footnote
+```
+
+## Re-Index Footnotes
+
+Alias: `re-index-footnotes`
+
+Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)
+
+
+
+Example: Re-indexing footnotes after having deleted previous footnotes
+
+Before:
+
+```markdown
+Lorem ipsum at aliquet felis.[^3] Donec dictum turpis quis pellentesque,[^5] et iaculis tortor condimentum.
+
+[^3]: first footnote
+[^5]: second footnote
+```
+
+After:
+
+```markdown
+Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
+
+[^1]: first footnote
+[^2]: second footnote
+```
+Example: Re-indexing footnotes after inserting a footnote between
+
+Before:
+
+```markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^1a] Vestibulum nec blandit felis, vulputate finibus purus.[^2] Praesent quis iaculis diam.
+
+[^1]: first footnote
+[^1a]: third footnote, inserted later
+[^2]: second footnotes
+```
+
+After:
+
+```markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^2] Vestibulum nec blandit felis, vulputate finibus purus.[^3] Praesent quis iaculis diam.
+
+[^1]: first footnote
+[^2]: third footnote, inserted later
+[^3]: second footnotes
+```
+Example: Re-indexing duplicate footnote keys
+
+Before:
+
+```markdown
+Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^1] et iaculis tortor condimentum.
+
+[^1]: first footnote
+[^1]: second footnote
+```
+
+After:
+
+```markdown
+Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
+
+[^1]: first footnote
+[^2]: second footnote
 ```
