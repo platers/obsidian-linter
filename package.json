@@ -7,7 +7,7 @@
     "dev": "rollup --config rollup.config.js -w",
     "build": "rollup --config rollup.config.js --environment BUILD:production",
     "test": "jest",
-    "docs": "ts-node --project ./tsconfig-docs.json ./docs/docs.ts",
+    "docs": "ts-node --project ./tsconfig-docs.json ./src/docs.ts",
     "compile": "npm run build && npm run docs && npm run test",
     "lint": "eslint . --ext .ts --fix"
   },

@@ -1,6 +1,6 @@
 import {readFileSync, writeFileSync} from 'fs';
 import dedent from 'ts-dedent';
-import {rules} from '../rules';
+import {rules} from './rules';
 
 const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->';
 
