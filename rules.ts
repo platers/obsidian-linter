@@ -288,21 +288,22 @@ export const rules: Rule[] = [
       'Heading levels should only increment by one level at a time',
       (text: string) => {
         const lines = text.split('\n');
-        let lastLevel = 0;
+        let lastLevel = 0; // level of last header processed
+        let decrement = 0; // number of levels to decrement following headers
         for (let i = 0; i < lines.length; i++) {
           const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
           const match = lines[i].match(headerRegex);
           if (!match) {
             continue;
           }
-          let level = match[2].length;
-          if (level == 0) {
-            continue;
-          }
+
+          let level = match[2].length - decrement;
           if (level > lastLevel + 1) {
-            lines[i] = lines[i].replace(headerRegex, `$1${'#'.repeat(lastLevel + 1)}$3$4`);
+            decrement += level - (lastLevel + 1);
             level = lastLevel + 1;
           }
+
+          lines[i] = lines[i].replace(headerRegex, `$1${'#'.repeat(level)}$3$4`);
           lastLevel = level;
         }
         return lines.join('\n');
@@ -312,15 +313,19 @@ export const rules: Rule[] = [
             '',
             dedent`
         # H1
-
         ### H3
+        ### H3
+        #### H4
+        ###### H6
 
         We skipped a 2nd level heading
         `,
             dedent`
         # H1
-
         ## H3
+        ## H3
+        ### H4
+        #### H6
 
         We skipped a 2nd level heading
         `,
