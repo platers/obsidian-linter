@@ -22,6 +22,18 @@ Add a rule by adding its alias in the settings. The listed rules are applied in 
 Some rules have configurable options, which are set with the format `option=value`.
 For example, `yaml-timestamp format="YYYY-MM-DD"`
 
+### Disable rules
+
+```markdown
+---
+disabled rules: [ capitalize-headings ]
+---
+```
+
+Add `disabled rules: [ ... ]` to the YAML frontmatter of a file to disable those rules when linting that file. 
+
+Add `disabled rules: [ all ]` to the YAML frontmatter of a file to disable all rules.
+
 ## Development Instructions
 
 Pull requests are welcome, especially for new rules.
