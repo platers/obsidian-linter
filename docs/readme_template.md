@@ -24,11 +24,12 @@ For example, `yaml-timestamp format="YYYY-MM-DD"`
 
 ```markdown
 ---
-disabled rules: [ "capitalize-headings" ]
+disabled rules: [ capitalize-headings ]
 ---
 ```
 
 Add `disabled rules: [ ... ]` to the YAML frontmatter of a file to disable those rules when linting that file. 
+
 Add `disabled rules: [ all ]` to the YAML frontmatter of a file to disable all rules.
 
 ## Development Instructions
