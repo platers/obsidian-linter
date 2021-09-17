@@ -1,7 +1,7 @@
 import {App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
 import dedent from 'ts-dedent';
 import {rulesDict} from './rules';
-import {parseOptions} from './utils';
+import {getDisabledRules, parseOptions} from './utils';
 import Diff from 'diff';
 import moment from 'moment';
 
@@ -79,14 +79,20 @@ export default class LinterPlugin extends Plugin {
     lintText(oldText: string, file: TFile) {
       let newText = oldText;
       const enabledRules = this.settings.enabledRules.split('\n');
+      const disabledRules = getDisabledRules(oldText);
 
       for (const line of enabledRules) {
+        // Skip empty or commented lines
         if (line.match(/^\s*$/) || line.startsWith('// ')) {
           continue;
         }
 
         // Split the line into the rule name and the rule options
         const ruleName = line.split(/\s+/)[0];
+        
+        if (disabledRules.includes(ruleName)) {
+          continue;
+        }
 
         if (ruleName in rulesDict) {
           const options: { [id: string]: string; } =

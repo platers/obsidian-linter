@@ -1,3 +1,6 @@
+import {rules} from './rules';
+import {load} from 'js-yaml';
+
 // Useful regexes
 
 export const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
@@ -29,6 +32,39 @@ export function parseOptions(line: string) {
     options[option_name] = option_value;
   }
   return options;
+}
+
+/**
+ * Returns a list of ignored rules in the YAML frontmatter of the text.
+ * @param {string} text The text to parse
+ * @return {string[]} The list of ignored rules
+ */
+export function getDisabledRules(text: string): string[] {
+  const yaml = text.match(yamlRegex);
+  if (!yaml) {
+    return [];
+  }
+
+  const yaml_text = yaml[1];
+  const parsed_yaml = load(yaml_text) as {};
+  if (!parsed_yaml.hasOwnProperty('disabled rules')) {
+    return [];
+  }
+
+  let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string; })["disabled rules"];
+  if (!disabled_rules) {
+    return [];
+  }
+
+  if (typeof disabled_rules === 'string') {
+    disabled_rules = [disabled_rules];
+  }
+
+  if (disabled_rules.includes('all')) {
+    return rules.map(rule => rule.alias());
+  }
+
+  return disabled_rules;
 }
 
 /**

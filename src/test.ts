@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
 import {rules, Rule, rulesDict, Example} from './rules';
-import {parseOptions} from './utils';
+import {getDisabledRules, parseOptions} from './utils';
 
 describe('Examples pass', () => {
   for (const rule of rules) {
@@ -189,5 +189,50 @@ describe('Option parsing', () => {
     expect(parseOptions(line)).toEqual({
       'format': 'YYYY \'-\' MM',
     });
+  });
+});
+
+describe('Ignored rules parsing', () => {
+  it('No YAML', () => {
+    const text = dedent`
+      Text
+      `;
+    expect(getDisabledRules(text)).toEqual([]);
+  });
+  it('No ignored rules', () => {
+    const text = dedent`
+      ---
+      ---
+      Text
+      `;
+    expect(getDisabledRules(text)).toEqual([]);
+  });
+  it('Ignore some rules', () => {
+    const text = dedent`
+      ---
+      random-rule: true
+      disabled rules: [ yaml-timestamp, capitalize-headings ]
+      ---
+      Text
+      `;
+    expect(getDisabledRules(text)).toEqual(['yaml-timestamp', 'capitalize-headings']);
+  });
+  it('Ignored no rules', () => {
+    const text = dedent`
+      ---
+      disabled rules:
+      ---
+      Text
+      `;
+    expect(getDisabledRules(text)).toEqual([]);
+  });
+  it('Ignored all rules', () => {
+    const text = dedent`
+      ---
+      disabled rules: all
+      ---
+      Text
+      `;
+    expect(getDisabledRules(text)).toEqual(rules.map(r => r.alias()));
   });
 });
