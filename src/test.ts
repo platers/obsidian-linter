@@ -131,6 +131,26 @@ describe('Rules tests', () => {
       expect(rulesDict['capitalize-headings'].apply(before, {titleCase: 'true'})).toBe(after);
     });
   });
+  describe('File Name Heading', () => {
+    it('Handles stray dashes', () => {
+      const before = dedent`
+      Text 1
+
+      ---
+      
+      Text 2
+        `;
+      const after = dedent`
+      # File Name
+      Text 1
+      
+      ---
+      
+      Text 2
+        `;
+      expect(rulesDict['file-name-heading'].apply(before, {'metadata: file name': 'File Name'})).toBe(after);
+    });
+  });
 });
 
 describe('Option parsing', () => {
