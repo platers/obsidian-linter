@@ -474,7 +474,7 @@ export const rules: Rule[] = [
         const fileName = options['metadata: file name'];
         // insert H1 heading after front matter
         let yaml_end = text.indexOf('\n---');
-        yaml_end = yaml_end == -1 ? 0 : yaml_end + 5;
+        yaml_end = yaml_end == -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
         return insert(text, yaml_end, `# ${fileName}\n`);
       },
       [
