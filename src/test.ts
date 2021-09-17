@@ -233,6 +233,6 @@ describe('Ignored rules parsing', () => {
       ---
       Text
       `;
-    expect(getDisabledRules(text)).toEqual(rules.map(r => r.alias()));
+    expect(getDisabledRules(text)).toEqual(rules.map((r) => r.alias()));
   });
 });

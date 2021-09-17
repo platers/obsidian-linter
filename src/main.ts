@@ -89,7 +89,7 @@ export default class LinterPlugin extends Plugin {
 
         // Split the line into the rule name and the rule options
         const ruleName = line.split(/\s+/)[0];
-        
+
         if (disabledRules.includes(ruleName)) {
           continue;
         }

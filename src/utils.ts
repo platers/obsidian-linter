@@ -51,7 +51,7 @@ export function getDisabledRules(text: string): string[] {
     return [];
   }
 
-  let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string; })["disabled rules"];
+  let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string; })['disabled rules'];
   if (!disabled_rules) {
     return [];
   }
@@ -61,7 +61,7 @@ export function getDisabledRules(text: string): string[] {
   }
 
   if (disabled_rules.includes('all')) {
-    return rules.map(rule => rule.alias());
+    return rules.map((rule) => rule.alias());
   }
 
   return disabled_rules;
