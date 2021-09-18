@@ -4,13 +4,12 @@ import {headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert} from './utils';
 import {Setting} from 'obsidian';
 import LinterPlugin from './main';
 
-type ApplyFunction = (text: string, options?: { [id: string]: string }) => string;
+export type Options = { [optionName: string]: any };
+type ApplyFunction = (text: string, options?: Options) => string;
 
 export interface LinterSettings {
   ruleConfigs: {
-    [ruleName: string]: {
-      [optionName: string]: any;
-    }
+    [ruleName: string]: Options;
   };
   lintOnSave: boolean;
 }
@@ -43,7 +42,10 @@ export class Rule {
       this.apply = apply;
       this.examples = examples;
 
-      options.unshift(new BooleanOption('Enabled', '', name, false));
+      options.unshift(new BooleanOption('Enabled', '', false));
+      for (const option of options) {
+        option.ruleName = name;
+      }
       this.options = options;
     }
 
@@ -80,11 +82,14 @@ export class Option {
      * @param {string} ruleName - The name of the rule this option belongs to
      * @param {any} defaultValue - The default value of the option
      */
-    constructor(name: string, description: string, ruleName: string, defaultValue: any) {
+    constructor(name: string, description: string, defaultValue: any, ruleName?: string | null) {
       this.name = name;
       this.description = description;
-      this.ruleName = ruleName;
       this.defaultValue = defaultValue;
+
+      if (ruleName) {
+        this.ruleName = ruleName;
+      }
     }
 
     public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
@@ -157,76 +162,75 @@ export const rules: Rule[] = [
         ),
       ],
   ),
-  // new Rule(
-  //     'Heading blank lines',
-  //     'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',
-  //     (text: string, options = {}) => {
-  //       options = Object.assign({'bottom': 'true'}, options);
+  new Rule(
+      'Heading blank lines',
+      'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',
+      (text: string, options = {}) => {
 
-  //       return ignoreCodeBlocksAndYAML(text, (text) => {
-  //         if (options['bottom'] === 'false') {
-  //           text = text.replace(/(^#+\s.*)\n+/gm, '$1\n'); // trim blank lines after headings
-  //           text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
-  //         } else {
-  //           text = text.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings
-  //           text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
-  //           text = text.replace(/(^#+\s.*)\n+/gm, '$1\n\n'); // trim blank lines after headings
-  //         }
-  //         text = text.replace(/^\n+(#+\s.*)/, '$1'); // remove blank lines before first heading
-  //         text = text.replace(/(#+\s.*)\n+$/, '$1'); // remove blank lines after last heading
-  //         return text;
-  //       });
-  //     },
-  //     [
-  //       new Example(
-  //           'Headings should be surrounded by blank lines',
-  //           dedent`
-  //       # H1
-  //       ## H2
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          if (options['bottom'] === false) {
+            text = text.replace(/(^#+\s.*)\n+/gm, '$1\n'); // trim blank lines after headings
+            text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
+          } else {
+            text = text.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings
+            text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
+            text = text.replace(/(^#+\s.*)\n+/gm, '$1\n\n'); // trim blank lines after headings
+          }
+          text = text.replace(/^\n+(#+\s.*)/, '$1'); // remove blank lines before first heading
+          text = text.replace(/(#+\s.*)\n+$/, '$1'); // remove blank lines after last heading
+          return text;
+        });
+      },
+      [
+        new Example(
+            'Headings should be surrounded by blank lines',
+            dedent`
+        # H1
+        ## H2
 
 
-  //       # H1
-  //       line
-  //       ## H2
+        # H1
+        line
+        ## H2
 
-  //       `,
-  //           dedent`
-  //       # H1
+        `,
+            dedent`
+        # H1
 
-  //       ## H2
+        ## H2
 
-  //       # H1
+        # H1
 
-  //       line
+        line
 
-  //       ## H2
-  //       `,
-  //       ),
-  //       new Example(
-  //           'With `bottom=false`',
-  //           dedent`
-  //       # H1
-  //       line
-  //       ## H2
-  //       # H1
-  //       line
-  //       `,
-  //           dedent`
-  //       # H1
-  //       line
+        ## H2
+        `,
+        ),
+        new Example(
+            'With `bottom=false`',
+            dedent`
+        # H1
+        line
+        ## H2
+        # H1
+        line
+        `,
+            dedent`
+        # H1
+        line
 
-  //       ## H2
+        ## H2
 
-  //       # H1
-  //       line
-  //       `,
-  //           {bottom: 'false'},
-  //       ),
-  //     ],
-  //     [
-  //       'bottom: Insert a blank line after headings, default=`true`',
-  //     ],
-  // ),
+        # H1
+        line
+        `,
+            {bottom: 'false'},
+        ),
+      ],
+      [
+        new BooleanOption('bottom', 'Insert a blank line after headings', true),
+      ],
+  ),
   // new Rule(
   //     'Paragraph blank lines',
   //     'All paragraphs should have exactly one blank line both before and after.',

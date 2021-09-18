@@ -1,5 +1,5 @@
 import {App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
-import {LinterSettings, rules} from './rules';
+import {LinterSettings, Options, rules} from './rules';
 import {getDisabledRules} from './utils';
 import Diff from 'diff';
 import moment from 'moment';
@@ -9,6 +9,7 @@ export default class LinterPlugin extends Plugin {
     settings: LinterSettings;
 
     async onload() {
+      console.log('Loading Linter plugin');
       await this.loadSettings();
 
       this.addCommand({
@@ -55,15 +56,22 @@ export default class LinterPlugin extends Plugin {
     }
 
     async loadSettings() {
-      const default_settings: LinterSettings = {
+      this.settings = {
         ruleConfigs: {},
         lintOnSave: false,
       };
+      const storedSettings = await this.loadData();
+
       for (const rule of rules) {
-        default_settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
+        this.settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
+        if (storedSettings.ruleConfigs[rule.name]) {
+          Object.assign(this.settings.ruleConfigs[rule.name], storedSettings.ruleConfigs[rule.name]);
+        }
       }
 
-      this.settings = Object.assign({}, default_settings, await this.loadData());
+      if (storedSettings.lintOnSave) {
+        this.settings.lintOnSave = storedSettings.lintOnSave;
+      }
     }
 
     async saveSettings() {
@@ -79,7 +87,7 @@ export default class LinterPlugin extends Plugin {
           continue;
         }
 
-        const options: { [optionName: string]: any; } =
+        const options: Options =
           Object.assign({
             'metadata: file created time': moment(file.stat.ctime).format(),
             'metadata: file modified time': moment(file.stat.mtime).format(),
@@ -141,6 +149,7 @@ class SettingTab extends PluginSettingTab {
     }
 
     display(): void {
+      console.log('displaying settings', this.plugin.settings);
       const {containerEl} = this;
 
       containerEl.empty();
