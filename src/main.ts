@@ -1,23 +1,9 @@
 import {App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
-import dedent from 'ts-dedent';
-import {rulesDict} from './rules';
-import {getDisabledRules, parseOptions} from './utils';
+import {LinterSettings, rules} from './rules';
+import {getDisabledRules} from './utils';
 import Diff from 'diff';
 import moment from 'moment';
 
-interface LinterSettings {
-    enabledRules: string;
-    lintOnSave: boolean;
-}
-
-const DEFAULT_SETTINGS: LinterSettings = {
-  enabledRules: dedent`
-        trailing-spaces
-        heading-blank-lines
-        space-after-list-markers
-        `,
-  lintOnSave: false,
-};
 
 export default class LinterPlugin extends Plugin {
     settings: LinterSettings;
@@ -69,7 +55,15 @@ export default class LinterPlugin extends Plugin {
     }
 
     async loadSettings() {
-      this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+      const default_settings: LinterSettings = {
+        ruleConfigs: {},
+        lintOnSave: false,
+      };
+      for (const rule of rules) {
+        default_settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
+      }
+
+      this.settings = Object.assign({}, default_settings, await this.loadData());
     }
 
     async saveSettings() {
@@ -78,32 +72,22 @@ export default class LinterPlugin extends Plugin {
 
     lintText(oldText: string, file: TFile) {
       let newText = oldText;
-      const enabledRules = this.settings.enabledRules.split('\n');
       const disabledRules = getDisabledRules(oldText);
 
-      for (const line of enabledRules) {
-        // Skip empty or commented lines
-        if (line.match(/^\s*$/) || line.startsWith('// ')) {
+      for (const rule of rules) {
+        if (disabledRules.includes(rule.name)) {
           continue;
         }
 
-        // Split the line into the rule name and the rule options
-        const ruleName = line.split(/\s+/)[0];
+        const options: { [optionName: string]: any; } =
+          Object.assign({
+            'metadata: file created time': moment(file.stat.ctime).format(),
+            'metadata: file modified time': moment(file.stat.mtime).format(),
+            'metadata: file name': file.basename,
+          }, rule.getOptions(this.settings));
 
-        if (disabledRules.includes(ruleName)) {
-          continue;
-        }
-
-        if (ruleName in rulesDict) {
-          const options: { [id: string]: string; } =
-            Object.assign({
-              'metadata: file created time': moment(file.stat.ctime).format(),
-              'metadata: file modified time': moment(file.stat.mtime).format(),
-              'metadata: file name': file.basename,
-            }, parseOptions(line));
-          newText = rulesDict[ruleName].apply(newText, options);
-        } else {
-          new Notice(`Rule ${ruleName} not recognized`);
+        if (options['Enabled']) {
+          newText = rule.apply(newText, options);
         }
       }
 
@@ -161,22 +145,6 @@ class SettingTab extends PluginSettingTab {
 
       containerEl.empty();
 
-      containerEl.createEl('h2', {text: 'Settings for Linter'});
-
-      new Setting(containerEl)
-          .setName('Rules to apply')
-          .setDesc('List the rules to apply to the markdown file')
-          .addTextArea((text) => {
-            text
-                .setValue(this.plugin.settings.enabledRules)
-                .onChange(async (value) => {
-                  this.plugin.settings.enabledRules = value;
-                  await this.plugin.saveSettings();
-                });
-            text.inputEl.rows = 20;
-            text.inputEl.cols = 40;
-          });
-
       new Setting(containerEl)
           .setName('Lint on save')
           .setDesc('Lint the file on save')
@@ -188,5 +156,16 @@ class SettingTab extends PluginSettingTab {
                   await this.plugin.saveSettings();
                 });
           });
+
+      containerEl.createEl('h2', {text: 'Rules'});
+
+      for (const rule of rules) {
+        containerEl.createEl('h3', {text: rule.name});
+        containerEl.createEl('p', {text: rule.description});
+
+        for (const option of rule.options) {
+          option.display(containerEl, this.plugin.settings, this.plugin);
+        }
+      }
     }
 }
