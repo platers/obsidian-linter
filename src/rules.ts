@@ -65,6 +65,11 @@ export class Rule {
     public getOptions(settings: LinterSettings) {
       return settings.ruleConfigs[this.name];
     }
+
+    public getURL(): string {
+      const url = 'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
+      return url + '#' + this.alias();
+    }
 }
 
 /** Class representing an example of a rule */
@@ -295,7 +300,7 @@ export const rules: Rule[] = [
       [
         new BooleanOption('Date Created', 'Insert the file creation date', true),
         new BooleanOption('Date Modified', 'Insert the date the file was last modified', true),
-        new MomentFormatOption('Format', 'Date format.\nFor more syntax, refer to [format reference](https://momentjs.com/docs/#/displaying/format/)', 'dddd, MMMM Do YYYY, h:mm:ss a'),
+        new MomentFormatOption('Format', 'Date format', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       ],
   ),
   new Rule(

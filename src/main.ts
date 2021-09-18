@@ -6,7 +6,6 @@ import moment from 'moment';
 import {BooleanOption, MomentFormatOption} from './option';
 import dedent from 'ts-dedent';
 
-
 export default class LinterPlugin extends Plugin {
     settings: LinterSettings;
 
@@ -177,6 +176,7 @@ class SettingTab extends PluginSettingTab {
             .setDesc(this.description)
             .addMomentFormat((format) => {
               format.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+              format.setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a');
               format.onChange((value) => {
                 this.setOption(value, settings);
                 plugin.settings = settings;
@@ -207,6 +207,7 @@ class SettingTab extends PluginSettingTab {
 
       for (const rule of rules) {
         containerEl.createEl('h3', {text: rule.name});
+        containerEl.createEl('a', {text: rule.alias(), href: rule.getURL()});
         containerEl.createEl('p', {text: rule.description});
 
         for (const option of rule.options) {
