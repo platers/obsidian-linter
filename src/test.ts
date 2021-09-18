@@ -7,7 +7,8 @@ describe('Examples pass', () => {
     describe(rule.name, () => {
       test.each(rule.examples)('$description', (testObject: Example) => {
         if (testObject.options && Object.keys(testObject.options).length > 0) {
-          expect(rule.apply(testObject.before, testObject.options)).toBe(testObject.after);
+          const options = Object.assign(rule.getDefaultOptions(), testObject.options);
+          expect(rule.apply(testObject.before, options)).toBe(testObject.after);
         } else {
           expect(rule.apply(testObject.before)).toBe(testObject.after);
         }
@@ -128,7 +129,7 @@ describe('Rules tests', () => {
         ## I Can't Do This
         ## Comma, Comma, Comma
         `;
-      expect(rulesDict['capitalize-headings'].apply(before, {titleCase: 'true'})).toBe(after);
+      expect(rulesDict['capitalize-headings'].apply(before, {'Title Case': true})).toBe(after);
     });
   });
   describe('File Name Heading', () => {

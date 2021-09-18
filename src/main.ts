@@ -3,6 +3,8 @@ import {LinterSettings, Options, rules} from './rules';
 import {getDisabledRules} from './utils';
 import Diff from 'diff';
 import moment from 'moment';
+import {BooleanOption, MomentFormatOption} from './option';
+import dedent from 'ts-dedent';
 
 
 export default class LinterPlugin extends Plugin {
@@ -137,6 +139,13 @@ export default class LinterPlugin extends Plugin {
           curText += change.value;
         }
       });
+
+      const charsAdded = changes.map((change) => change.added ? change.value.length : 0).reduce((a, b) => a + b, 0);
+      const charsRemoved = changes.map((change) => change.removed ? change.value.length : 0).reduce((a, b) => a + b, 0);
+      new Notice(dedent`
+        ${charsAdded} characters added
+        ${charsRemoved} characters removed
+      `);
     }
 }
 
@@ -146,10 +155,38 @@ class SettingTab extends PluginSettingTab {
     constructor(app: App, plugin: LinterPlugin) {
       super(app, plugin);
       this.plugin = plugin;
+
+      // Inject display functions. Necessary because the Settings object cannot be used in tests.
+      BooleanOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+        new Setting(containerEl)
+            .setName(this.name)
+            .setDesc(this.description)
+            .addToggle((toggle) => {
+              toggle.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+              toggle.onChange((value) => {
+                this.setOption(value, settings);
+                plugin.settings = settings;
+                plugin.saveData(plugin.settings);
+              });
+            });
+      };
+
+      MomentFormatOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+        new Setting(containerEl)
+            .setName(this.name)
+            .setDesc(this.description)
+            .addMomentFormat((format) => {
+              format.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+              format.onChange((value) => {
+                this.setOption(value, settings);
+                plugin.settings = settings;
+                plugin.saveData(plugin.settings);
+              });
+            });
+      };
     }
 
     display(): void {
-      console.log('displaying settings', this.plugin.settings);
       const {containerEl} = this;
 
       containerEl.empty();

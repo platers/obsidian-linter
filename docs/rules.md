@@ -8,7 +8,8 @@ Alias: `trailing-spaces`
 
 Removes extra spaces after every line.
 
-
+Options:
+- Enabled
 
 Example: Removes trailing spaces and tabs
 
@@ -33,7 +34,8 @@ Alias: `heading-blank-lines`
 All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).
 
 Options:
-- bottom: Insert a blank line after headings, default=`true`
+- Enabled
+- Bottom
 
 Example: Headings should be surrounded by blank lines
 
@@ -63,7 +65,7 @@ line
 
 ## H2
 ```
-Example: With `bottom=false`
+Example: With `Bottom=false`
 
 Before:
 
@@ -93,7 +95,8 @@ Alias: `paragraph-blank-lines`
 
 All paragraphs should have exactly one blank line both before and after.
 
-
+Options:
+- Enabled
 
 Example: Paragraphs should be surrounded by blank lines
 
@@ -121,7 +124,8 @@ Alias: `space-after-list-markers`
 
 There should be a single space after list markers and checkboxes.
 
-
+Options:
+- Enabled
 
 Example: 
 
@@ -152,9 +156,10 @@ Alias: `yaml-timestamp`
 Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.
 
 Options:
-- format: [date format](https://momentjs.com/docs/#/displaying/format/), default=`"dddd, MMMM Do YYYY, h:mm:ss a"`
-- dateCreated: Insert the current date if date created is not present, default=`true`
-- dateUpdated: Update the current date, default=`true`
+- Enabled
+- Date Created
+- Date Modified
+- Format
 
 Example: Adds a header with the date.
 
@@ -169,7 +174,7 @@ After:
 ```markdown
 ---
 date created: Wednesday, January 1st 2020, 12:00:00 am
-date updated: Thursday, January 2nd 2020, 12:00:00 am
+date modified: Thursday, January 2nd 2020, 12:00:00 am
 ---
 # H1
 ```
@@ -185,7 +190,7 @@ After:
 
 ```markdown
 ---
-date updated: Wednesday, January 1st 2020, 12:00:00 am
+date modified: Wednesday, January 1st 2020, 12:00:00 am
 ---
 # H1
 ```
@@ -196,7 +201,8 @@ Alias: `compact-yaml`
 
 Removes leading and trailing blank lines in the YAML front matter.
 
-
+Options:
+- Enabled
 
 Example: 
 
@@ -224,7 +230,8 @@ Alias: `header-increment`
 
 Heading levels should only increment by one level at a time
 
-
+Options:
+- Enabled
 
 Example: 
 
@@ -258,7 +265,8 @@ Alias: `consecutive-blank-lines`
 
 There should be at most one consecutive blank line.
 
-
+Options:
+- Enabled
 
 Example: 
 
@@ -286,8 +294,9 @@ Alias: `capitalize-headings`
 Headings should be formatted with capitalization
 
 Options:
-- titleCase: Format headings with title case capitalization, default=`false`
-- allCaps: Format headings with all capitals, default= `false`
+- Enabled
+- Title Case
+- All Caps
 
 Example: The first letter of a heading should be capitalized
 
@@ -304,7 +313,7 @@ After:
 # This is a heading 1
 ## This is a heading 2
 ```
-Example: With `titleCase=true`
+Example: With `Title Case=true`
 
 Before:
 
@@ -321,7 +330,7 @@ After:
 ## This is a Heading 2
 ### A Heading 3
 ```
-Example: With `allCaps=true`
+Example: With `All Caps=true`
 
 Before:
 
@@ -343,7 +352,8 @@ Alias: `file-name-heading`
 
 Inserts the file name as a H1 heading if no H1 heading exists.
 
-
+Options:
+- Enabled
 
 Example: Inserts an H1 heading
 
@@ -386,7 +396,8 @@ Alias: `format-tags-in-yaml`
 
 Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.
 
-
+Options:
+- Enabled
 
 Example: Format Tags in YAML frontmatter
 
@@ -412,7 +423,8 @@ Alias: `move-footnotes-to-the-bottom`
 
 Move all footnotes to the bottom of the document.
 
-
+Options:
+- Enabled
 
 Example: Moving footnotes to the bottom
 
@@ -447,7 +459,8 @@ Alias: `re-index-footnotes`
 
 Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)
 
-
+Options:
+- Enabled
 
 Example: Re-indexing footnotes after having deleted previous footnotes
 

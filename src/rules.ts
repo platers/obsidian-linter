@@ -1,7 +1,7 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
 import {headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert} from './utils';
-import { Option, BooleanOption, MomentFormatOption } from './option';
+import {Option, BooleanOption, MomentFormatOption} from './option';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -114,7 +114,6 @@ export const rules: Rule[] = [
       'Heading blank lines',
       'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',
       (text: string, options = {}) => {
-
         return ignoreCodeBlocksAndYAML(text, (text) => {
           if (options['Bottom'] === false) {
             text = text.replace(/(^#+\s.*)\n+/gm, '$1\n'); // trim blank lines after headings
@@ -155,7 +154,7 @@ export const rules: Rule[] = [
         `,
         ),
         new Example(
-            'With `bottom=false`',
+            'With `Bottom=false`',
             dedent`
         # H1
         line
@@ -172,7 +171,7 @@ export const rules: Rule[] = [
         # H1
         line
         `,
-            {bottom: false},
+            {Bottom: false},
         ),
       ],
       [
@@ -446,7 +445,7 @@ export const rules: Rule[] = [
         `,
         ),
         new Example(
-            'With `titleCase=true`',
+            'With `Title Case=true`',
             dedent`
         # this is a heading 1
         ## THIS IS A HEADING 2
@@ -457,10 +456,10 @@ export const rules: Rule[] = [
         ## This is a Heading 2
         ### A Heading 3
         `,
-            {titleCase: true},
+            {'Title Case': true},
         ),
         new Example(
-            'With `allCaps=true`',
+            'With `All Caps=true`',
             dedent`
         # this is a heading 1
         ## this is a heading 2
@@ -469,7 +468,7 @@ export const rules: Rule[] = [
         # THIS IS A HEADING 1
         ## THIS IS A HEADING 2
         `,
-            {allCaps: true},
+            {'All Caps': true, 'Title Case': false},
         ),
       ],
       [
