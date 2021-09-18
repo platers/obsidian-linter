@@ -13,10 +13,19 @@ export interface LinterSettings {
   lintOnSave: boolean;
 }
 
+enum RuleType {
+  YAML = 'YAML',
+  HEADING = 'Heading',
+  FOOTNOTE = 'Footnote',
+  SPACING = 'Spacing',
+}
+const RuleTypeOrder = Object.values(RuleType);
+
 /** Class representing a rule */
 export class Rule {
     public name: string;
     public description: string;
+    public type: RuleType;
     public options: Array<Option>;
     public apply: ApplyFunction;
 
@@ -26,6 +35,7 @@ export class Rule {
      * Create a rule
      * @param {string} name - The name of the rule
      * @param {string} description - The description of the rule
+     * @param {RuleType} type - The type of the rule
      * @param {ApplyFunction} apply - The function to apply the rule
      * @param {Array<Example>} examples - The examples to be displayed in the documentation
      * @param {Array<Option>} [options=[]] - The options of the rule to be displayed in the documentation
@@ -33,11 +43,13 @@ export class Rule {
     constructor(
         name: string,
         description: string,
+        type: RuleType,
         apply: ApplyFunction,
         examples: Array<Example>,
         options: Array<Option> = []) {
       this.name = name;
       this.description = description;
+      this.type = type;
       this.apply = apply;
       this.examples = examples;
 
@@ -100,6 +112,7 @@ export const rules: Rule[] = [
   new Rule(
       'Trailing spaces',
       'Removes extra spaces after every line.',
+      RuleType.SPACING,
       (text: string) => {
         return text.replace(/[ \t]+$/gm, '');
       },
@@ -118,6 +131,7 @@ export const rules: Rule[] = [
   new Rule(
       'Heading blank lines',
       'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',
+      RuleType.SPACING,
       (text: string, options = {}) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
           if (options['Bottom'] === false) {
@@ -186,6 +200,7 @@ export const rules: Rule[] = [
   new Rule(
       'Paragraph blank lines',
       'All paragraphs should have exactly one blank line both before and after.',
+      RuleType.SPACING,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
           text = text.replace(/\n+([a-zA-Z].*)/g, '\n\n$1'); // trim blank lines before
@@ -215,6 +230,7 @@ export const rules: Rule[] = [
   new Rule(
       `Space after list markers`,
       'There should be a single space after list markers and checkboxes.',
+      RuleType.SPACING,
       (text: string) => {
         // Space after marker
         text = text.replace(/^(\s*\d+\.|[-+*])[^\S\r\n]+/gm, '$1 ');
@@ -242,8 +258,87 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
+      'Compact YAML',
+      'Removes leading and trailing blank lines in the YAML front matter.',
+      RuleType.SPACING,
+      (text: string) => {
+        text = text.replace(/^---\n+/, '---\n');
+        return text.replace(/\n+---/, '\n---');
+      },
+      [
+        new Example(
+            '',
+            dedent`
+        ---
+
+        date: today
+
+        ---
+        `,
+            dedent`
+        ---
+        date: today
+        ---
+        `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Consecutive blank lines',
+      'There should be at most one consecutive blank line.',
+      RuleType.SPACING,
+      (text: string) => {
+        return text.replace(/\n{2,}/g, '\n\n');
+      },
+      [
+        new Example(
+            '',
+            dedent`
+        Some text
+
+
+        Some more text
+        `,
+            dedent`
+        Some text
+
+        Some more text
+        `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Format Tags in YAML',
+      'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
+      RuleType.YAML,
+      (text: string) => {
+        return text.replace(/^tags: ((?:#\w+(?: |$))+)$/im, function(tagsYAML) {
+          return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
+        });
+      },
+      [
+        new Example(
+            'Format Tags in YAML frontmatter',
+            dedent`
+         ---
+         tags: #one #two #three
+         ---
+        `,
+            dedent`
+         ---
+         tags: one, two, three
+         ---
+        `,
+        ),
+      ],
+  ),
+
+  // YAML rules
+
+  new Rule(
       'YAML Timestamp',
       'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.',
+      RuleType.YAML,
       (text: string, options = {}) => {
         text = initYAML(text);
 
@@ -304,34 +399,13 @@ export const rules: Rule[] = [
         new MomentFormatOption('Format', 'Date format', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       ],
   ),
-  new Rule(
-      'Compact YAML',
-      'Removes leading and trailing blank lines in the YAML front matter.',
-      (text: string) => {
-        text = text.replace(/^---\n+/, '---\n');
-        return text.replace(/\n+---/, '\n---');
-      },
-      [
-        new Example(
-            '',
-            dedent`
-        ---
 
-        date: today
+  // Heading rules
 
-        ---
-        `,
-            dedent`
-        ---
-        date: today
-        ---
-        `,
-        ),
-      ],
-  ),
-  new Rule(
+new Rule(
       'Header Increment',
       'Heading levels should only increment by one level at a time',
+      RuleType.HEADING,
       (text: string) => {
         const lines = text.split('\n');
         let lastLevel = 0; // level of last header processed
@@ -378,31 +452,57 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
-      'Consecutive blank lines',
-      'There should be at most one consecutive blank line.',
-      (text: string) => {
-        return text.replace(/\n{2,}/g, '\n\n');
+      'File Name Heading',
+      'Inserts the file name as a H1 heading if no H1 heading exists.',
+      RuleType.HEADING,
+      (text: string, options = {}) => {
+        // check if there is a H1 heading
+        const hasH1 = text.match(/^#\s.*/m);
+        if (hasH1) {
+          return text;
+        }
+
+        const fileName = options['metadata: file name'];
+        // insert H1 heading after front matter
+        let yaml_end = text.indexOf('\n---');
+        yaml_end = yaml_end == -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
+        return insert(text, yaml_end, `# ${fileName}\n`);
       },
       [
         new Example(
-            '',
+            'Inserts an H1 heading',
             dedent`
-        Some text
-
-
-        Some more text
-        `,
+              This is a line of text
+            `,
             dedent`
-        Some text
-
-        Some more text
-        `,
+              # File Name
+              This is a line of text
+            `,
+            {'metadata: file name': 'File Name'},
+        ),
+        new Example(
+            'Inserts heading after YAML front matter',
+            dedent`
+              ---
+              title: My Title
+              ---
+              This is a line of text
+            `,
+            dedent`
+              ---
+              title: My Title
+              ---
+              # File Name
+              This is a line of text
+            `,
+            {'metadata: file name': 'File Name'},
         ),
       ],
   ),
   new Rule(
       'Capitalize Headings',
       'Headings should be formatted with capitalization',
+      RuleType.HEADING,
       (text: string, options = {}) => {
         const lines = text.split('\n');
         for (let i = 0; i < lines.length; i++) {
@@ -482,80 +582,13 @@ export const rules: Rule[] = [
         new BooleanOption('All Caps', 'Format headings with all capitals', false),
       ],
   ),
-  new Rule(
-      'File Name Heading',
-      'Inserts the file name as a H1 heading if no H1 heading exists.',
-      (text: string, options = {}) => {
-        // check if there is a H1 heading
-        const hasH1 = text.match(/^#\s.*/m);
-        if (hasH1) {
-          return text;
-        }
 
-        const fileName = options['metadata: file name'];
-        // insert H1 heading after front matter
-        let yaml_end = text.indexOf('\n---');
-        yaml_end = yaml_end == -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
-        return insert(text, yaml_end, `# ${fileName}\n`);
-      },
-      [
-        new Example(
-            'Inserts an H1 heading',
-            dedent`
-              This is a line of text
-            `,
-            dedent`
-              # File Name
-              This is a line of text
-            `,
-            {'metadata: file name': 'File Name'},
-        ),
-        new Example(
-            'Inserts heading after YAML front matter',
-            dedent`
-              ---
-              title: My Title
-              ---
-              This is a line of text
-            `,
-            dedent`
-              ---
-              title: My Title
-              ---
-              # File Name
-              This is a line of text
-            `,
-            {'metadata: file name': 'File Name'},
-        ),
-      ],
-  ),
-  new Rule(
-      'Format Tags in YAML',
-      'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
-      (text: string) => {
-        return text.replace(/^tags: ((?:#\w+(?: |$))+)$/im, function(tagsYAML) {
-          return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
-        });
-      },
-      [
-        new Example(
-            'Format Tags in YAML frontmatter',
-            dedent`
-         ---
-         tags: #one #two #three
-         ---
-        `,
-            dedent`
-         ---
-         tags: one, two, three
-         ---
-        `,
-        ),
-      ],
-  ),
+  // Footnote rules
+  
   new Rule(
       'Move Footnotes to the bottom',
       'Move all footnotes to the bottom of the document.',
+      RuleType.FOOTNOTE,
       (text: string) => {
         const footnotes = text.match(/^\[\^\w+\]: .*$/gm); // collect footnotes
         if (footnotes != null) {
@@ -600,6 +633,7 @@ export const rules: Rule[] = [
   new Rule(
       'Re-Index Footnotes',
       'Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)',
+      RuleType.FOOTNOTE,
       (text: string) => {
         // re-index footnote-text
         let ft_index = 0;
@@ -667,6 +701,6 @@ export const rules: Rule[] = [
         ),
       ],
   ),
-];
+].sort((a, b) => RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type));
 
 export const rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);

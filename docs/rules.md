@@ -2,6 +2,322 @@
 
 # Rules
 
+## Format Tags in YAML
+
+Alias: `format-tags-in-yaml`
+
+Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.
+
+Options:
+- Enabled
+
+Example: Format Tags in YAML frontmatter
+
+Before:
+
+```markdown
+---
+tags: #one #two #three
+---
+```
+
+After:
+
+```markdown
+---
+tags: one, two, three
+---
+```
+
+## YAML Timestamp
+
+Alias: `yaml-timestamp`
+
+Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.
+
+Options:
+- Enabled
+- Date Created
+- Date Modified
+- Format
+
+Example: Adds a header with the date.
+
+Before:
+
+```markdown
+# H1
+```
+
+After:
+
+```markdown
+---
+date created: Wednesday, January 1st 2020, 12:00:00 am
+date modified: Thursday, January 2nd 2020, 12:00:00 am
+---
+# H1
+```
+Example: dateCreated option is false
+
+Before:
+
+```markdown
+# H1
+```
+
+After:
+
+```markdown
+---
+date modified: Wednesday, January 1st 2020, 12:00:00 am
+---
+# H1
+```
+
+## Header Increment
+
+Alias: `header-increment`
+
+Heading levels should only increment by one level at a time
+
+Options:
+- Enabled
+
+Example: 
+
+Before:
+
+```markdown
+# H1
+### H3
+### H3
+#### H4
+###### H6
+
+We skipped a 2nd level heading
+```
+
+After:
+
+```markdown
+# H1
+## H3
+## H3
+### H4
+#### H6
+
+We skipped a 2nd level heading
+```
+
+## File Name Heading
+
+Alias: `file-name-heading`
+
+Inserts the file name as a H1 heading if no H1 heading exists.
+
+Options:
+- Enabled
+
+Example: Inserts an H1 heading
+
+Before:
+
+```markdown
+This is a line of text
+```
+
+After:
+
+```markdown
+# File Name
+This is a line of text
+```
+Example: Inserts heading after YAML front matter
+
+Before:
+
+```markdown
+---
+title: My Title
+---
+This is a line of text
+```
+
+After:
+
+```markdown
+---
+title: My Title
+---
+# File Name
+This is a line of text
+```
+
+## Capitalize Headings
+
+Alias: `capitalize-headings`
+
+Headings should be formatted with capitalization
+
+Options:
+- Enabled
+- Title Case
+- All Caps
+
+Example: The first letter of a heading should be capitalized
+
+Before:
+
+```markdown
+# this is a heading 1
+## this is a heading 2
+```
+
+After:
+
+```markdown
+# This is a heading 1
+## This is a heading 2
+```
+Example: With `Title Case=true`
+
+Before:
+
+```markdown
+# this is a heading 1
+## THIS IS A HEADING 2
+### a heading 3
+```
+
+After:
+
+```markdown
+# This is a Heading 1
+## This is a Heading 2
+### A Heading 3
+```
+Example: With `All Caps=true`
+
+Before:
+
+```markdown
+# this is a heading 1
+## this is a heading 2
+```
+
+After:
+
+```markdown
+# THIS IS A HEADING 1
+## THIS IS A HEADING 2
+```
+
+## Move Footnotes to the bottom
+
+Alias: `move-footnotes-to-the-bottom`
+
+Move all footnotes to the bottom of the document.
+
+Options:
+- Enabled
+
+Example: Moving footnotes to the bottom
+
+Before:
+
+```markdown
+Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
+
+[^1]: first footnote
+
+Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+[^2]: second footnote
+
+Maecenas malesuada dignissim purus ac volutpat.
+```
+
+After:
+
+```markdown
+Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
+
+Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+Maecenas malesuada dignissim purus ac volutpat.
+
+[^1]: first footnote
+[^2]: second footnote
+```
+
+## Re-Index Footnotes
+
+Alias: `re-index-footnotes`
+
+Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)
+
+Options:
+- Enabled
+
+Example: Re-indexing footnotes after having deleted previous footnotes
+
+Before:
+
+```markdown
+Lorem ipsum at aliquet felis.[^3] Donec dictum turpis quis pellentesque,[^5] et iaculis tortor condimentum.
+
+[^3]: first footnote
+[^5]: second footnote
+```
+
+After:
+
+```markdown
+Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
+
+[^1]: first footnote
+[^2]: second footnote
+```
+Example: Re-indexing footnotes after inserting a footnote between
+
+Before:
+
+```markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^1a] Vestibulum nec blandit felis, vulputate finibus purus.[^2] Praesent quis iaculis diam.
+
+[^1]: first footnote
+[^1a]: third footnote, inserted later
+[^2]: second footnotes
+```
+
+After:
+
+```markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^2] Vestibulum nec blandit felis, vulputate finibus purus.[^3] Praesent quis iaculis diam.
+
+[^1]: first footnote
+[^2]: third footnote, inserted later
+[^3]: second footnotes
+```
+Example: Re-indexing duplicate footnote keys
+
+Before:
+
+```markdown
+Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^1] et iaculis tortor condimentum.
+
+[^1]: first footnote
+[^1]: second footnote
+```
+
+After:
+
+```markdown
+Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
+
+[^1]: first footnote
+[^2]: second footnote
+```
+
 ## Trailing spaces
 
 Alias: `trailing-spaces`
@@ -149,52 +465,6 @@ After:
 - [x] Item 2
 ```
 
-## YAML Timestamp
-
-Alias: `yaml-timestamp`
-
-Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.
-
-Options:
-- Enabled
-- Date Created
-- Date Modified
-- Format
-
-Example: Adds a header with the date.
-
-Before:
-
-```markdown
-# H1
-```
-
-After:
-
-```markdown
----
-date created: Wednesday, January 1st 2020, 12:00:00 am
-date modified: Thursday, January 2nd 2020, 12:00:00 am
----
-# H1
-```
-Example: dateCreated option is false
-
-Before:
-
-```markdown
-# H1
-```
-
-After:
-
-```markdown
----
-date modified: Wednesday, January 1st 2020, 12:00:00 am
----
-# H1
-```
-
 ## Compact YAML
 
 Alias: `compact-yaml`
@@ -224,41 +494,6 @@ date: today
 ---
 ```
 
-## Header Increment
-
-Alias: `header-increment`
-
-Heading levels should only increment by one level at a time
-
-Options:
-- Enabled
-
-Example: 
-
-Before:
-
-```markdown
-# H1
-### H3
-### H3
-#### H4
-###### H6
-
-We skipped a 2nd level heading
-```
-
-After:
-
-```markdown
-# H1
-## H3
-## H3
-### H4
-#### H6
-
-We skipped a 2nd level heading
-```
-
 ## Consecutive blank lines
 
 Alias: `consecutive-blank-lines`
@@ -285,239 +520,4 @@ After:
 Some text
 
 Some more text
-```
-
-## Capitalize Headings
-
-Alias: `capitalize-headings`
-
-Headings should be formatted with capitalization
-
-Options:
-- Enabled
-- Title Case
-- All Caps
-
-Example: The first letter of a heading should be capitalized
-
-Before:
-
-```markdown
-# this is a heading 1
-## this is a heading 2
-```
-
-After:
-
-```markdown
-# This is a heading 1
-## This is a heading 2
-```
-Example: With `Title Case=true`
-
-Before:
-
-```markdown
-# this is a heading 1
-## THIS IS A HEADING 2
-### a heading 3
-```
-
-After:
-
-```markdown
-# This is a Heading 1
-## This is a Heading 2
-### A Heading 3
-```
-Example: With `All Caps=true`
-
-Before:
-
-```markdown
-# this is a heading 1
-## this is a heading 2
-```
-
-After:
-
-```markdown
-# THIS IS A HEADING 1
-## THIS IS A HEADING 2
-```
-
-## File Name Heading
-
-Alias: `file-name-heading`
-
-Inserts the file name as a H1 heading if no H1 heading exists.
-
-Options:
-- Enabled
-
-Example: Inserts an H1 heading
-
-Before:
-
-```markdown
-This is a line of text
-```
-
-After:
-
-```markdown
-# File Name
-This is a line of text
-```
-Example: Inserts heading after YAML front matter
-
-Before:
-
-```markdown
----
-title: My Title
----
-This is a line of text
-```
-
-After:
-
-```markdown
----
-title: My Title
----
-# File Name
-This is a line of text
-```
-
-## Format Tags in YAML
-
-Alias: `format-tags-in-yaml`
-
-Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.
-
-Options:
-- Enabled
-
-Example: Format Tags in YAML frontmatter
-
-Before:
-
-```markdown
----
-tags: #one #two #three
----
-```
-
-After:
-
-```markdown
----
-tags: one, two, three
----
-```
-
-## Move Footnotes to the bottom
-
-Alias: `move-footnotes-to-the-bottom`
-
-Move all footnotes to the bottom of the document.
-
-Options:
-- Enabled
-
-Example: Moving footnotes to the bottom
-
-Before:
-
-```markdown
-Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
-
-[^1]: first footnote
-
-Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
-[^2]: second footnote
-
-Maecenas malesuada dignissim purus ac volutpat.
-```
-
-After:
-
-```markdown
-Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
-
-Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
-Maecenas malesuada dignissim purus ac volutpat.
-
-[^1]: first footnote
-[^2]: second footnote
-```
-
-## Re-Index Footnotes
-
-Alias: `re-index-footnotes`
-
-Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)
-
-Options:
-- Enabled
-
-Example: Re-indexing footnotes after having deleted previous footnotes
-
-Before:
-
-```markdown
-Lorem ipsum at aliquet felis.[^3] Donec dictum turpis quis pellentesque,[^5] et iaculis tortor condimentum.
-
-[^3]: first footnote
-[^5]: second footnote
-```
-
-After:
-
-```markdown
-Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
-
-[^1]: first footnote
-[^2]: second footnote
-```
-Example: Re-indexing footnotes after inserting a footnote between
-
-Before:
-
-```markdown
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^1a] Vestibulum nec blandit felis, vulputate finibus purus.[^2] Praesent quis iaculis diam.
-
-[^1]: first footnote
-[^1a]: third footnote, inserted later
-[^2]: second footnotes
-```
-
-After:
-
-```markdown
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^2] Vestibulum nec blandit felis, vulputate finibus purus.[^3] Praesent quis iaculis diam.
-
-[^1]: first footnote
-[^2]: third footnote, inserted later
-[^3]: second footnotes
-```
-Example: Re-indexing duplicate footnote keys
-
-Before:
-
-```markdown
-Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^1] et iaculis tortor condimentum.
-
-[^1]: first footnote
-[^1]: second footnote
-```
-
-After:
-
-```markdown
-Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
-
-[^1]: first footnote
-[^2]: second footnote
 ```
