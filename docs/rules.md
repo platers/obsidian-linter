@@ -405,6 +405,23 @@ After:
 tags: one, two, three
 ---
 ```
+Example: Format Tags in YAML frontmatter
+
+Before:
+
+```markdown
+---
+tags: #one, #two, #three
+---
+```
+
+After:
+
+```markdown
+---
+tags: one, two, three
+---
+```
 
 ## Move Footnotes to the bottom
 
@@ -507,4 +524,56 @@ Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et 
 
 [^1]: first footnote
 [^2]: second footnote
+```
+
+## Convert Spaces to Tabs
+
+Alias: `convert-spaces-to-tabs`
+
+Converts 4 spaces to 1 tab.
+
+Options:
+- tabsize: Number of spaces to convert to one tab, default=`4`
+
+Example: Converting spaces to tabs with `tabsize = 3`
+
+Before:
+
+```markdown
+- text with no indention
+   - text indented with 3 spaces
+- text with no indention
+      - text indented with 6 spaces
+```
+
+After:
+
+```markdown
+- text with no indention
+	- text indented with 3 spaces
+- text with no indention
+		- text indented with 6 spaces
+```
+
+## Line Break at Document End
+
+Alias: `line-break-at-document-end`
+
+Appends a line break at the end of the document, if there is none.
+
+
+
+Example: Appending a line break to the end of the document.
+
+Before:
+
+```markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+```
+
+After:
+
+```markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
 ```

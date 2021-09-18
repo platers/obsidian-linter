@@ -393,18 +393,21 @@ export const rules: Rule[] = [
             const headerWords = lines[i].match(/\S+/g);
             const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
             const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
+            const keepCasing = [...ignoreNames, ...ignoreAbbreviations];
             const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
-            const ignore = [...ignoreAbbreviations, ...ignoreShortWords, ...ignoreNames];
             for (let j = 1; j < headerWords.length; j++) {
               const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
               if (!isWord) {
                 continue;
               }
 
-              headerWords[j] = headerWords[j].toLowerCase();
-              const ignoreWord = ignore.includes(headerWords[j]);
-              if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
-                headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+              const keepWordcasing = keepCasing.includes(headerWords[j]);
+              if (!keepWordcasing) {
+                headerWords[j] = headerWords[j].toLowerCase();
+                const ignoreWord = ignoreShortWords.includes(headerWords[j]);
+                if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
+                  headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+                }
               }
             }
 
@@ -512,7 +515,7 @@ export const rules: Rule[] = [
       'Format Tags in YAML',
       'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
       (text: string) => {
-        return text.replace(/^tags: ((?:#\w+(?: |$))+)$/im, function(tagsYAML) {
+        return text.replace(/^tags: (?:#\w+(?:,? |$))+/im, function(tagsYAML) {
           return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
         });
       },
@@ -522,6 +525,19 @@ export const rules: Rule[] = [
             dedent`
          ---
          tags: #one #two #three
+         ---
+        `,
+            dedent`
+         ---
+         tags: one, two, three
+         ---
+        `,
+        ),
+        new Example(
+            'Format Tags in YAML frontmatter',
+            dedent`
+         ---
+         tags: #one, #two, #three
          ---
         `,
             dedent`
@@ -642,6 +658,64 @@ export const rules: Rule[] = [
 
         [^1]: first footnote
         [^2]: second footnote
+        `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Convert Spaces to Tabs',
+      'Converts 4 spaces to 1 tab.',
+      (text: string, options = {}) => {
+        options = Object.assign({'tabsize': '4'}, options);
+
+        const tabsize = String(options['tabsize']);
+        const tabsize_regex = new RegExp('^(\t*) {' + String(tabsize) + '}', 'gm');
+
+        while (text.match(tabsize_regex) != null) {
+          text = text.replace(tabsize_regex, '$1\t');
+        }
+        return text;
+      },
+      /* eslint-disable no-mixed-spaces-and-tabs, no-tabs */
+      [
+        new Example(
+            'Converting spaces to tabs with `tabsize = 3`',
+            dedent`
+            - text with no indention
+               - text indented with 3 spaces
+            - text with no indention
+                  - text indented with 6 spaces
+        `,
+            dedent`
+            - text with no indention
+            	- text indented with 3 spaces
+            - text with no indention
+            		- text indented with 6 spaces
+        `,
+            /* eslint-enable no-mixed-spaces-and-tabs, no-tabs */
+            {tabsize: '3'},
+        ),
+      ],
+      [
+        'tabsize: Number of spaces to convert to one tab, default=`4`',
+      ],
+  ),
+  new Rule(
+      'Line Break at Document End',
+      'Appends a line break at the end of the document, if there is none.',
+      (text: string) => {
+        if (text.slice(-1) != '\n') text += '\n';
+        return text;
+      },
+      [
+        new Example(
+            'Appending a line break to the end of the document.',
+            dedent`
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        `,
+            dedent`
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
         `,
         ),
       ],
