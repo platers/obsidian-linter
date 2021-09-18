@@ -255,6 +255,7 @@ export const rules: Rule[] = [
         }
         if (options['Date Modified'] === true) {
           text = text.replace(/\ndate modified:.*\n/, '\n');
+          text = text.replace(/\ndate updated:.*\n/, '\n'); // for backwards compatibility
           const yaml_end = text.indexOf('\n---');
           const formatted_date = moment(options['metadata: file modified time']).format(options['Format']);
           text = insert(text, yaml_end, `\ndate modified: ${formatted_date}`);
