@@ -44,7 +44,7 @@ const rules_docs = rules.map((rule) => {
     \`\`\`
   `).join('\n');
 
-  const options_list = rule.options.map((option) => `- ${option}`).join('\n');
+  const options_list = rule.options.map((option) => `- ${option.name}`).join('\n');
   let options = '';
   if (options_list.length > 0) {
     options = dedent`
