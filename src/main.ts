@@ -191,6 +191,8 @@ class SettingTab extends PluginSettingTab {
 
       containerEl.empty();
 
+      containerEl.createEl('h2', {text: 'General Settings'});
+
       new Setting(containerEl)
           .setName('Lint on save')
           .setDesc('Lint the file on save')
