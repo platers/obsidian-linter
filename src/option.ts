@@ -39,6 +39,9 @@ export class BooleanOption extends Option {
   public defaultValue: boolean;
 }
 
+export class TextOption extends Option {
+  public defaultValue: string;
+}
 
 export class MomentFormatOption extends Option {
   public defaultValue: boolean;

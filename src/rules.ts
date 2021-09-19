@@ -1,7 +1,7 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
 import {headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert} from './utils';
-import {Option, BooleanOption, MomentFormatOption} from './option';
+import {Option, BooleanOption, MomentFormatOption, TextOption} from './option';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -314,6 +314,69 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
+      'Convert Spaces to Tabs',
+      'Converts 4 spaces to 1 tab.',
+      RuleType.SPACING,
+      (text: string, options = {}) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          const tabsize = String(options['Tabsize']);
+          const tabsize_regex = new RegExp('^(\t*) {' + String(tabsize) + '}', 'gm');
+
+          while (text.match(tabsize_regex) != null) {
+            text = text.replace(tabsize_regex, '$1\t');
+          }
+          return text;
+        });
+      },
+      /* eslint-disable no-mixed-spaces-and-tabs, no-tabs */
+      [
+        new Example(
+            'Converting spaces to tabs with `tabsize = 3`',
+            dedent`
+          - text with no indention
+             - text indented with 3 spaces
+          - text with no indention
+                - text indented with 6 spaces
+      `,
+            dedent`
+          - text with no indention
+          \t- text indented with 3 spaces
+          - text with no indention
+          \t\t- text indented with 6 spaces
+      `,
+            {Tabsize: '3'},
+        ),
+      ],
+      /* eslint-enable no-mixed-spaces-and-tabs, no-tabs */
+      [
+        new TextOption('Tabsize', 'Number of Spaces that will be converted to a Tab', '4'),
+      ],
+  ),
+  new Rule(
+      'Line Break at Document End',
+      'Appends a line break at the end of the document, if there is none.',
+      RuleType.SPACING,
+      (text: string) => {
+        if (text.slice(-1) != '\n') text += '\n';
+        return text;
+      },
+      [
+        new Example(
+            'Appending a line break to the end of the document.',
+            dedent`
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      `,
+            dedent`
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+      `,
+        ),
+      ],
+  ),
+
+  // YAML rules
+
+  new Rule(
       'Format Tags in YAML',
       'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
       RuleType.YAML,
@@ -351,9 +414,6 @@ export const rules: Rule[] = [
         ),
       ],
   ),
-
-  // YAML rules
-
   new Rule(
       'YAML Timestamp',
       'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.',
@@ -729,64 +789,6 @@ export const rules: Rule[] = [
 
         [^1]: first footnote
         [^2]: second footnote
-        `,
-        ),
-      ],
-  ),
-  new Rule(
-      'Convert Spaces to Tabs',
-      'Converts 4 spaces to 1 tab.',
-      RuleType.SPACING,
-      (text: string, options = {}) => {
-        const tabsize = String(options['tabsize']);
-        const tabsize_regex = new RegExp('^(\t*) {' + String(tabsize) + '}', 'gm');
-
-        while (text.match(tabsize_regex) != null) {
-          text = text.replace(tabsize_regex, '$1\t');
-        }
-        return text;
-      },
-      /* eslint-disable no-mixed-spaces-and-tabs, no-tabs */
-      [
-        new Example(
-            'Converting spaces to tabs with `tabsize = 3`',
-            dedent`
-            - text with no indention
-               - text indented with 3 spaces
-            - text with no indention
-                  - text indented with 6 spaces
-        `,
-            dedent`
-            - text with no indention
-            	- text indented with 3 spaces
-            - text with no indention
-            		- text indented with 6 spaces
-        `,
-            /* eslint-enable no-mixed-spaces-and-tabs, no-tabs */
-            {tabsize: '3'},
-        ),
-      ],
-      [
-        new Option('Tabsize', 'Number of Spaces that will be converted to a Tab (default: 4)', '4'),
-      ],
-  ),
-  new Rule(
-      'Line Break at Document End',
-      'Appends a line break at the end of the document, if there is none.',
-      RuleType.SPACING,
-      (text: string) => {
-        if (text.slice(-1) != '\n') text += '\n';
-        return text;
-      },
-      [
-        new Example(
-            'Appending a line break to the end of the document.',
-            dedent`
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        `,
-            dedent`
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-
         `,
         ),
       ],
