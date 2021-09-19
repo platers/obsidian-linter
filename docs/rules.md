@@ -541,10 +541,10 @@ Some more text
 
 Alias: `convert-spaces-to-tabs`
 
-Converts 4 spaces to 1 tab.
+Converts leading spaces to tabs.
 
 Options:
-- Tabsize: Number of Spaces that will be converted to a Tab
+- Tabsize: Number of spaces that will be converted to a tab
   - Default: `4`
 
 Example: Converting spaces to tabs with `tabsize = 3`
