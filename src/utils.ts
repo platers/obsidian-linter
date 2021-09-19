@@ -8,7 +8,7 @@ export const fencedRegexTemplate = '^XXX\s*\n((?:.|\n)*?)\nXXX\s*?(?:\n|$)';
 export const yamlRegex = new RegExp(fencedRegexTemplate.replaceAll('X', '-'));
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
-export const indentedBlockRegex = '((\t|( {4})).*\n)+';
+export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
 
 
@@ -56,10 +56,10 @@ export function getDisabledRules(text: string): string[] {
  * @return {string} The processed text
  */
 export function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => string): string {
-  const codePlaceholder = 'PLACEHOLDER FOR CODE BLOCK 1038295\n';
+  const codePlaceholder = 'PLACEHOLDER 321417\n';
   const codeMatches = text.match(codeBlockRegex);
 
-  const yamlPlaceholder = 'PLACEHOLDER FOR YAML 1038295\n';
+  const yamlPlaceholder = '---\n---\n';
   const yamlMatches = text.match(yamlRegex);
 
   text = text.replace(codeBlockRegex, codePlaceholder);
@@ -67,9 +67,7 @@ export function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => st
   text = func(text);
 
   if (yamlMatches) {
-    for (const match of yamlMatches) {
-      text = text.replace(yamlPlaceholder, match);
-    }
+    text = text.replace(yamlPlaceholder, yamlMatches[0]);
   }
 
   if (codeMatches) {

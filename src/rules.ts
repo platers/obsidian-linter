@@ -234,10 +234,12 @@ export const rules: Rule[] = [
       'There should be a single space after list markers and checkboxes.',
       RuleType.SPACING,
       (text: string) => {
-        // Space after marker
-        text = text.replace(/^(\s*\d+\.|[-+*])[^\S\r\n]+/gm, '$1 ');
-        // Space after checkbox
-        return text.replace(/^(\s*\d+\.|[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm, '$1 ');
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          // Space after marker
+          text = text.replace(/^(\s*\d+\.|[-+*])[^\S\r\n]+/gm, '$1 ');
+          // Space after checkbox
+          return text.replace(/^(\s*\d+\.|[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm, '$1 ');
+        });
       },
       [
         new Example(
@@ -290,7 +292,9 @@ export const rules: Rule[] = [
       'There should be at most one consecutive blank line.',
       RuleType.SPACING,
       (text: string) => {
-        return text.replace(/\n{2,}/g, '\n\n');
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          return text.replace(/\n{2,}/g, '\n\n');
+        });
       },
       [
         new Example(
@@ -409,25 +413,27 @@ export const rules: Rule[] = [
       'Heading levels should only increment by one level at a time',
       RuleType.HEADING,
       (text: string) => {
-        const lines = text.split('\n');
-        let lastLevel = 0; // level of last header processed
-        let decrement = 0; // number of levels to decrement following headers
-        for (let i = 0; i < lines.length; i++) {
-          const match = lines[i].match(headerRegex);
-          if (!match) {
-            continue;
-          }
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          const lines = text.split('\n');
+          let lastLevel = 0; // level of last header processed
+          let decrement = 0; // number of levels to decrement following headers
+          for (let i = 0; i < lines.length; i++) {
+            const match = lines[i].match(headerRegex);
+            if (!match) {
+              continue;
+            }
 
-          let level = match[2].length - decrement;
-          if (level > lastLevel + 1) {
-            decrement += level - (lastLevel + 1);
-            level = lastLevel + 1;
-          }
+            let level = match[2].length - decrement;
+            if (level > lastLevel + 1) {
+              decrement += level - (lastLevel + 1);
+              level = lastLevel + 1;
+            }
 
-          lines[i] = lines[i].replace(headerRegex, `$1${'#'.repeat(level)}$3$4`);
-          lastLevel = level;
-        }
-        return lines.join('\n');
+            lines[i] = lines[i].replace(headerRegex, `$1${'#'.repeat(level)}$3$4`);
+            lastLevel = level;
+          }
+          return lines.join('\n');
+        });
       },
       [
         new Example(
@@ -458,17 +464,19 @@ export const rules: Rule[] = [
       'Inserts the file name as a H1 heading if no H1 heading exists.',
       RuleType.HEADING,
       (text: string, options = {}) => {
-        // check if there is a H1 heading
-        const hasH1 = text.match(/^#\s.*/m);
-        if (hasH1) {
-          return text;
-        }
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          // check if there is a H1 heading
+          const hasH1 = text.match(/^#\s.*/m);
+          if (hasH1) {
+            return text;
+          }
 
-        const fileName = options['metadata: file name'];
-        // insert H1 heading after front matter
-        let yaml_end = text.indexOf('\n---');
-        yaml_end = yaml_end == -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
-        return insert(text, yaml_end, `# ${fileName}\n`);
+          const fileName = options['metadata: file name'];
+          // insert H1 heading after front matter
+          let yaml_end = text.indexOf('\n---');
+          yaml_end = yaml_end == -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
+          return insert(text, yaml_end, `# ${fileName}\n`);
+        });
       },
       [
         new Example(
@@ -506,39 +514,41 @@ export const rules: Rule[] = [
       'Headings should be formatted with capitalization',
       RuleType.HEADING,
       (text: string, options = {}) => {
-        const lines = text.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-          const match = lines[i].match(headerRegex); // match only headings
-          if (!match) {
-            continue;
-          }
-          if (options['Title Case'] == true) {
-            const headerWords = lines[i].match(/\S+/g);
-            const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
-            const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
-            const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
-            const ignore = [...ignoreAbbreviations, ...ignoreShortWords, ...ignoreNames];
-            for (let j = 1; j < headerWords.length; j++) {
-              const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
-              if (!isWord) {
-                continue;
-              }
-
-              headerWords[j] = headerWords[j].toLowerCase();
-              const ignoreWord = ignore.includes(headerWords[j]);
-              if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
-                headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
-              }
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          const lines = text.split('\n');
+          for (let i = 0; i < lines.length; i++) {
+            const match = lines[i].match(headerRegex); // match only headings
+            if (!match) {
+              continue;
             }
+            if (options['Title Case'] == true) {
+              const headerWords = lines[i].match(/\S+/g);
+              const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
+              const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
+              const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
+              const ignore = [...ignoreAbbreviations, ...ignoreShortWords, ...ignoreNames];
+              for (let j = 1; j < headerWords.length; j++) {
+                const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
+                if (!isWord) {
+                  continue;
+                }
 
-            lines[i] = lines[i].replace(headerRegex, `${headerWords.join(' ')}`);
-          } else if (options['All Caps'] == true) {
-            lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
-          } else {
-            lines[i] = lines[i].replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
+                headerWords[j] = headerWords[j].toLowerCase();
+                const ignoreWord = ignore.includes(headerWords[j]);
+                if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
+                  headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+                }
+              }
+
+              lines[i] = lines[i].replace(headerRegex, `${headerWords.join(' ')}`);
+            } else if (options['All Caps'] == true) {
+              lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
+            } else {
+              lines[i] = lines[i].replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
+            }
           }
-        }
-        return lines.join('\n');
+          return lines.join('\n');
+        });
       },
       [
         new Example(
@@ -592,20 +602,22 @@ export const rules: Rule[] = [
       'Move all footnotes to the bottom of the document.',
       RuleType.FOOTNOTE,
       (text: string) => {
-        const footnotes = text.match(/^\[\^\w+\]: .*$/gm); // collect footnotes
-        if (footnotes != null) {
-          // remove footnotes that are their own paragraph
-          text = text.replace(/\n\n\[\^\w+\]: .*\n\n/gm, '\n\n');
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          const footnotes = text.match(/^\[\^\w+\]: .*$/gm); // collect footnotes
+          if (footnotes != null) {
+            // remove footnotes that are their own paragraph
+            text = text.replace(/\n\n\[\^\w+\]: .*\n\n/gm, '\n\n');
 
-          // remove footnotes directly before/after a line of text
-          text = text.replace(/\n?\n\[\^\w+\]: .*\n\n?/gm, '\n');
+            // remove footnotes directly before/after a line of text
+            text = text.replace(/\n?\n\[\^\w+\]: .*\n\n?/gm, '\n');
 
-          // remove footnotes sourrounded by text
-          text = text.replace(/\n\[\^\w+\]: .*\n/gm, '');
-          text += '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
-          text = text.replace(/\n*$/, ''); // remove blank lines at the end
-        }
-        return text;
+            // remove footnotes sourrounded by text
+            text = text.replace(/\n\[\^\w+\]: .*\n/gm, '');
+            text += '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
+            text = text.replace(/\n*$/, ''); // remove blank lines at the end
+          }
+          return text;
+        });
       },
       [
         new Example(
@@ -637,21 +649,23 @@ export const rules: Rule[] = [
       'Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)',
       RuleType.FOOTNOTE,
       (text: string) => {
-        // re-index footnote-text
-        let ft_index = 0;
-        text = text.replace(/^\[\^\w+\]: /gm, function() {
-          ft_index++;
-          return ('[^' + String(ft_index) + ']: ');
-        });
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          // re-index footnote-text
+          let ft_index = 0;
+          text = text.replace(/^\[\^\w+\]: /gm, function() {
+            ft_index++;
+            return ('[^' + String(ft_index) + ']: ');
+          });
 
-        // re-index footnote-keys
-        // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
-        ft_index = 0;
-        text = text.replace(/(?!^)\[\^\w+\]/gm, function() {
-          ft_index++;
-          return ('[^' + String(ft_index) + ']');
+          // re-index footnote-keys
+          // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
+          ft_index = 0;
+          text = text.replace(/(?!^)\[\^\w+\]/gm, function() {
+            ft_index++;
+            return ('[^' + String(ft_index) + ']');
+          });
+          return text;
         });
-        return text;
       },
       [
         new Example(

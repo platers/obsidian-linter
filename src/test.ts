@@ -55,10 +55,28 @@ describe('Rules tests', () => {
       const before = dedent`
         Not a header # .
         Line
+        \`\`\`
+        # comment not header
+        a = b
+        \`\`\`
+        ~~~
+        # comment not header
+        ~~~
+          # tabbed not header
+            # space not header
         `;
       const after = dedent`
         Not a header # .
         Line
+        \`\`\`
+        # comment not header
+        a = b
+        \`\`\`
+        ~~~
+        # comment not header
+        ~~~
+          # tabbed not header
+            # space not header
         `;
       expect(rulesDict['heading-blank-lines'].apply(before)).toBe(after);
     });
@@ -151,6 +169,30 @@ describe('Rules tests', () => {
         `;
       expect(rulesDict['file-name-heading'].apply(before, {'metadata: file name': 'File Name'})).toBe(after);
     });
+  });
+});
+describe('Consecutive blank lines', () => {
+  it('Handles ignores code blocks', () => {
+    const before = dedent`
+      Line 1
+
+
+      \`\`\`
+      
+
+
+      \`\`\`
+      `;
+    const after = dedent`
+      Line 1
+
+      \`\`\`
+
+
+
+      \`\`\`
+      `;
+    expect(rulesDict['consecutive-blank-lines'].apply(before)).toBe(after);
   });
 });
 
