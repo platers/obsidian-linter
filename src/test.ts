@@ -6,7 +6,7 @@ describe('Examples pass', () => {
   for (const rule of rules) {
     describe(rule.name, () => {
       test.each(rule.examples)('$description', (example: Example) => {
-        let options = rule.getDefaultOptions();
+        const options = rule.getDefaultOptions();
         if (example.options) {
           Object.assign(options, example.options);
         }
@@ -146,7 +146,7 @@ describe('Rules tests', () => {
         ## I Can't Do This
         ## Comma, Comma, Comma
         `;
-      expect(rulesDict['capitalize-headings'].apply(before, {'Title Case': true})).toBe(after);
+      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'Title Case'})).toBe(after);
     });
   });
   describe('File Name Heading', () => {

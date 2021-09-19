@@ -1,7 +1,7 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
 import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert} from './utils';
-import {Option, BooleanOption, MomentFormatOption, TextOption} from './option';
+import {Option, BooleanOption, MomentFormatOption, TextOption, DropdownOption, DropdownRecord} from './option';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -601,50 +601,43 @@ export const rules: Rule[] = [
             if (!match) {
               continue;
             }
-            if (options['Title Case'] == true) {
-              const headerWords = lines[i].match(/\S+/g);
-              const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
-              const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
-              const keepCasing = [...ignoreNames, ...ignoreAbbreviations];
-              const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
-              for (let j = 1; j < headerWords.length; j++) {
-                const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
-                if (!isWord) {
-                  continue;
-                }
+            switch (options['Style']) {
+              case 'Title Case':
+                const headerWords = lines[i].match(/\S+/g);
+                const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
+                const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
+                const keepCasing = [...ignoreNames, ...ignoreAbbreviations];
+                const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
+                for (let j = 1; j < headerWords.length; j++) {
+                  const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
+                  if (!isWord) {
+                    continue;
+                  }
 
-                const keepWordcasing = keepCasing.includes(headerWords[j]);
-                if (!keepWordcasing) {
-                  headerWords[j] = headerWords[j].toLowerCase();
-                  const ignoreWord = ignoreShortWords.includes(headerWords[j]);
-                  if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
-                    headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+                  const keepWordcasing = keepCasing.includes(headerWords[j]);
+                  if (!keepWordcasing) {
+                    headerWords[j] = headerWords[j].toLowerCase();
+                    const ignoreWord = ignoreShortWords.includes(headerWords[j]);
+                    if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
+                      headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+                    }
                   }
                 }
-              }
 
-              lines[i] = lines[i].replace(headerRegex, `${headerWords.join(' ')}`);
-            } else if (options['All Caps'] == true) {
-              lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
-            } else {
-              lines[i] = lines[i].replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
+                lines[i] = lines[i].replace(headerRegex, `${headerWords.join(' ')}`);
+                break;
+              case 'All Caps':
+                lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
+                break;
+              case 'First Letter':
+                lines[i] = lines[i].replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
+                break;
             }
           }
           return lines.join('\n');
         });
       },
       [
-        new Example(
-            'The first letter of a heading should be capitalized',
-            dedent`
-        # this is a heading 1
-        ## this is a heading 2
-        `,
-            dedent`
-        # This is a heading 1
-        ## This is a heading 2
-        `,
-        ),
         new Example(
             'With `Title Case=true`',
             dedent`
@@ -657,7 +650,19 @@ export const rules: Rule[] = [
         ## This is a Heading 2
         ### A Heading 3
         `,
-            {'Title Case': true},
+            {'Style': 'Title Case'},
+        ),
+        new Example(
+            'With `First Letter=true`',
+            dedent`
+        # this is a heading 1
+        ## this is a heading 2
+        `,
+            dedent`
+        # This is a heading 1
+        ## This is a heading 2
+        `,
+            {'Style': 'First Letter'},
         ),
         new Example(
             'With `All Caps=true`',
@@ -669,12 +674,17 @@ export const rules: Rule[] = [
         # THIS IS A HEADING 1
         ## THIS IS A HEADING 2
         `,
-            {'All Caps': true, 'Title Case': false},
+            {'Style': 'All Caps'},
         ),
       ],
       [
-        new BooleanOption('Title Case', 'Format headings with title case capitalization', true),
-        new BooleanOption('All Caps', 'Format headings with all capitals', false),
+        new DropdownOption('Style', 'The style of capitalization to use', 'Title Case',
+            [
+              new DropdownRecord('Title Case', 'Capitalize using title case rules'),
+              new DropdownRecord('All Caps', 'Capitalize the first letter of each word'),
+              new DropdownRecord('First Letter', 'Only capitalize the first letter'),
+            ],
+        ),
       ],
   ),
 

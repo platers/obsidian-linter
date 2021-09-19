@@ -46,3 +46,23 @@ export class TextOption extends Option {
 export class MomentFormatOption extends Option {
   public defaultValue: boolean;
 }
+
+export class DropdownRecord {
+  public value: string;
+  public description: string;
+
+  constructor(value: string, description: string) {
+    this.value = value;
+    this.description = description;
+  }
+}
+
+export class DropdownOption extends Option {
+  public defaultValue: string;
+  public options: DropdownRecord[];
+
+  constructor(name: string, description: string, defaultValue: string, options: DropdownRecord[], ruleName?: string | null) {
+    super(name, description, defaultValue, ruleName);
+    this.options = options;
+  }
+}

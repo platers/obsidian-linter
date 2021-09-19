@@ -1,5 +1,6 @@
 import {readFileSync, writeFileSync} from 'fs';
 import dedent from 'ts-dedent';
+import {DropdownOption} from './option';
 import {rules} from './rules';
 
 const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->';
@@ -46,9 +47,17 @@ for (const rule of rules) {
   `).join('\n');
 
   const options_list = rule.options.slice(1).map((option) => {
-    return dedent`
+    let text = dedent`
                   - ${option.name}: ${option.description}
-                    - Default: \`${option.defaultValue}\``;
+                  \t- Default: \`${option.defaultValue}\``;
+
+    if (option instanceof DropdownOption) {
+      for (const record of option.options) {
+        text += `\n\t- \`${record.value}\`: ${record.description}`;
+      }
+    }
+
+    return text;
   }).join('\n');
   let options = '';
   if (options_list.length > 0) {
