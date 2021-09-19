@@ -1,13 +1,14 @@
 import dedent from 'ts-dedent';
 import {rules, Rule, rulesDict, Example} from './rules';
-import {getDisabledRules, parseOptions} from './utils';
+import {getDisabledRules} from './utils';
 
 describe('Examples pass', () => {
   for (const rule of rules) {
     describe(rule.name, () => {
       test.each(rule.examples)('$description', (testObject: Example) => {
         if (testObject.options && Object.keys(testObject.options).length > 0) {
-          expect(rule.apply(testObject.before, testObject.options)).toBe(testObject.after);
+          const options = Object.assign(rule.getDefaultOptions(), testObject.options);
+          expect(rule.apply(testObject.before, options)).toBe(testObject.after);
         } else {
           expect(rule.apply(testObject.before)).toBe(testObject.after);
         }
@@ -128,7 +129,7 @@ describe('Rules tests', () => {
         ## I Can't Do This
         ## Comma, Comma, Comma
         `;
-      expect(rulesDict['capitalize-headings'].apply(before, {titleCase: 'true'})).toBe(after);
+      expect(rulesDict['capitalize-headings'].apply(before, {'Title Case': true})).toBe(after);
     });
   });
   describe('File Name Heading', () => {
@@ -149,45 +150,6 @@ describe('Rules tests', () => {
       Text 2
         `;
       expect(rulesDict['file-name-heading'].apply(before, {'metadata: file name': 'File Name'})).toBe(after);
-    });
-  });
-});
-
-describe('Option parsing', () => {
-  it('Basic case', () => {
-    const line = 'yaml-timestamp';
-    expect(parseOptions(line)).toEqual({});
-  });
-  it('No quotes', () => {
-    const line = 'yaml-timestamp format=YYYY-MM';
-    expect(parseOptions(line)).toEqual({
-      'format': 'YYYY-MM',
-    });
-  });
-  it('Single quotes', () => {
-    const line = 'yaml-timestamp format=\'YYYY-MM\'';
-    expect(parseOptions(line)).toEqual({
-      'format': 'YYYY-MM',
-    });
-  });
-  it('Double quotes', () => {
-    const line = 'yaml-timestamp format="YYYY-MM"';
-    expect(parseOptions(line)).toEqual({
-      'format': 'YYYY-MM',
-    });
-  });
-  it('Many options', () => {
-    const line = `yaml-timestamp format="YYYY - MM" time=3 arg='123' `;
-    expect(parseOptions(line)).toEqual({
-      'format': 'YYYY - MM',
-      'time': '3',
-      'arg': '123',
-    });
-  });
-  it('Nested quotes', () => {
-    const line = `yaml-timestamp format="YYYY '-' MM"`;
-    expect(parseOptions(line)).toEqual({
-      'format': 'YYYY \'-\' MM',
     });
   });
 });

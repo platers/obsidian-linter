@@ -1,28 +1,16 @@
 import {App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
-import dedent from 'ts-dedent';
-import {rulesDict} from './rules';
-import {getDisabledRules, parseOptions} from './utils';
+import {LinterSettings, Options, rules} from './rules';
+import {getDisabledRules} from './utils';
 import Diff from 'diff';
 import moment from 'moment';
-
-interface LinterSettings {
-    enabledRules: string;
-    lintOnSave: boolean;
-}
-
-const DEFAULT_SETTINGS: LinterSettings = {
-  enabledRules: dedent`
-        trailing-spaces
-        heading-blank-lines
-        space-after-list-markers
-        `,
-  lintOnSave: false,
-};
+import {BooleanOption, MomentFormatOption} from './option';
+import dedent from 'ts-dedent';
 
 export default class LinterPlugin extends Plugin {
     settings: LinterSettings;
 
     async onload() {
+      console.log('Loading Linter plugin');
       await this.loadSettings();
 
       this.addCommand({
@@ -69,7 +57,22 @@ export default class LinterPlugin extends Plugin {
     }
 
     async loadSettings() {
-      this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+      this.settings = {
+        ruleConfigs: {},
+        lintOnSave: false,
+      };
+      const storedSettings = await this.loadData();
+
+      for (const rule of rules) {
+        this.settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
+        if (storedSettings.ruleConfigs[rule.name]) {
+          Object.assign(this.settings.ruleConfigs[rule.name], storedSettings.ruleConfigs[rule.name]);
+        }
+      }
+
+      if (storedSettings.lintOnSave) {
+        this.settings.lintOnSave = storedSettings.lintOnSave;
+      }
     }
 
     async saveSettings() {
@@ -78,32 +81,22 @@ export default class LinterPlugin extends Plugin {
 
     lintText(oldText: string, file: TFile) {
       let newText = oldText;
-      const enabledRules = this.settings.enabledRules.split('\n');
       const disabledRules = getDisabledRules(oldText);
 
-      for (const line of enabledRules) {
-        // Skip empty or commented lines
-        if (line.match(/^\s*$/) || line.startsWith('// ')) {
+      for (const rule of rules) {
+        if (disabledRules.includes(rule.name)) {
           continue;
         }
 
-        // Split the line into the rule name and the rule options
-        const ruleName = line.split(/\s+/)[0];
+        const options: Options =
+          Object.assign({
+            'metadata: file created time': moment(file.stat.ctime).format(),
+            'metadata: file modified time': moment(file.stat.mtime).format(),
+            'metadata: file name': file.basename,
+          }, rule.getOptions(this.settings));
 
-        if (disabledRules.includes(ruleName)) {
-          continue;
-        }
-
-        if (ruleName in rulesDict) {
-          const options: { [id: string]: string; } =
-            Object.assign({
-              'metadata: file created time': moment(file.stat.ctime).format(),
-              'metadata: file modified time': moment(file.stat.mtime).format(),
-              'metadata: file name': file.basename,
-            }, parseOptions(line));
-          newText = rulesDict[ruleName].apply(newText, options);
-        } else {
-          new Notice(`Rule ${ruleName} not recognized`);
+        if (options['Enabled']) {
+          newText = rule.apply(newText, options);
         }
       }
 
@@ -145,6 +138,13 @@ export default class LinterPlugin extends Plugin {
           curText += change.value;
         }
       });
+
+      const charsAdded = changes.map((change) => change.added ? change.value.length : 0).reduce((a, b) => a + b, 0);
+      const charsRemoved = changes.map((change) => change.removed ? change.value.length : 0).reduce((a, b) => a + b, 0);
+      new Notice(dedent`
+        ${charsAdded} characters added
+        ${charsRemoved} characters removed
+      `);
     }
 }
 
@@ -154,6 +154,36 @@ class SettingTab extends PluginSettingTab {
     constructor(app: App, plugin: LinterPlugin) {
       super(app, plugin);
       this.plugin = plugin;
+
+      // Inject display functions. Necessary because the Settings object cannot be used in tests.
+      BooleanOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+        new Setting(containerEl)
+            .setName(this.name)
+            .setDesc(this.description)
+            .addToggle((toggle) => {
+              toggle.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+              toggle.onChange((value) => {
+                this.setOption(value, settings);
+                plugin.settings = settings;
+                plugin.saveData(plugin.settings);
+              });
+            });
+      };
+
+      MomentFormatOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+        new Setting(containerEl)
+            .setName(this.name)
+            .setDesc(this.description)
+            .addMomentFormat((format) => {
+              format.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+              format.setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a');
+              format.onChange((value) => {
+                this.setOption(value, settings);
+                plugin.settings = settings;
+                plugin.saveData(plugin.settings);
+              });
+            });
+      };
     }
 
     display(): void {
@@ -161,21 +191,7 @@ class SettingTab extends PluginSettingTab {
 
       containerEl.empty();
 
-      containerEl.createEl('h2', {text: 'Settings for Linter'});
-
-      new Setting(containerEl)
-          .setName('Rules to apply')
-          .setDesc('List the rules to apply to the markdown file')
-          .addTextArea((text) => {
-            text
-                .setValue(this.plugin.settings.enabledRules)
-                .onChange(async (value) => {
-                  this.plugin.settings.enabledRules = value;
-                  await this.plugin.saveSettings();
-                });
-            text.inputEl.rows = 20;
-            text.inputEl.cols = 40;
-          });
+      containerEl.createEl('h2', {text: 'General Settings'});
 
       new Setting(containerEl)
           .setName('Lint on save')
@@ -188,5 +204,22 @@ class SettingTab extends PluginSettingTab {
                   await this.plugin.saveSettings();
                 });
           });
+
+      let prevSection = '';
+
+      for (const rule of rules) {
+        if (rule.type !== prevSection) {
+          containerEl.createEl('h2', {text: rule.type});
+          prevSection = rule.type;
+        }
+
+        containerEl.createEl('h3', {text: rule.name});
+        containerEl.createEl('a', {text: rule.alias(), href: rule.getURL()});
+        containerEl.createEl('p', {text: rule.description});
+
+        for (const option of rule.options) {
+          option.display(containerEl, this.plugin.settings, this.plugin);
+        }
+      }
     }
 }

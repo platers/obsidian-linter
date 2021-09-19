@@ -2,159 +2,47 @@
 
 # Rules
 
-## Trailing spaces
 
-Alias: `trailing-spaces`
+## YAML
+### Format Tags in YAML
 
-Removes extra spaces after every line.
+Alias: `format-tags-in-yaml`
+
+Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.
 
 
 
-Example: Removes trailing spaces and tabs
+Example: Format Tags in YAML frontmatter
 
 Before:
 
 ```markdown
-# H1   
-line with trailing spaces and tabs            
+---
+tags: #one #two #three
+---
 ```
 
 After:
 
 ```markdown
-# H1
-line with trailing spaces and tabs
+---
+tags: one, two, three
+---
 ```
 
-## Heading blank lines
-
-Alias: `heading-blank-lines`
-
-All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).
-
-Options:
-- bottom: Insert a blank line after headings, default=`true`
-
-Example: Headings should be surrounded by blank lines
-
-Before:
-
-```markdown
-# H1
-## H2
-
-
-# H1
-line
-## H2
-
-```
-
-After:
-
-```markdown
-# H1
-
-## H2
-
-# H1
-
-line
-
-## H2
-```
-Example: With `bottom=false`
-
-Before:
-
-```markdown
-# H1
-line
-## H2
-# H1
-line
-```
-
-After:
-
-```markdown
-# H1
-line
-
-## H2
-
-# H1
-line
-```
-
-## Paragraph blank lines
-
-Alias: `paragraph-blank-lines`
-
-All paragraphs should have exactly one blank line both before and after.
-
-
-
-Example: Paragraphs should be surrounded by blank lines
-
-Before:
-
-```markdown
-# H1
-Newlines are inserted.
-A paragraph is a line that starts with a letter.
-```
-
-After:
-
-```markdown
-# H1
-
-Newlines are inserted.
-
-A paragraph is a line that starts with a letter.
-```
-
-## Space after list markers
-
-Alias: `space-after-list-markers`
-
-There should be a single space after list markers and checkboxes.
-
-
-
-Example: 
-
-Before:
-
-```markdown
-1.      Item 1
-2.  Item 2
-
--   [ ] Item 1
-- [x]    Item 2
-```
-
-After:
-
-```markdown
-1. Item 1
-2. Item 2
-
-- [ ] Item 1
-- [x] Item 2
-```
-
-## YAML Timestamp
+### YAML Timestamp
 
 Alias: `yaml-timestamp`
 
 Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.
 
 Options:
-- format: [date format](https://momentjs.com/docs/#/displaying/format/), default=`"dddd, MMMM Do YYYY, h:mm:ss a"`
-- dateCreated: Insert the current date if date created is not present, default=`true`
-- dateUpdated: Update the current date, default=`true`
+- Date Created: Insert the file creation date
+  - Default: `true`
+- Date Modified: Insert the date the file was last modified
+  - Default: `true`
+- Format: Date format
+  - Default: `dddd, MMMM Do YYYY, h:mm:ss a`
 
 Example: Adds a header with the date.
 
@@ -169,7 +57,7 @@ After:
 ```markdown
 ---
 date created: Wednesday, January 1st 2020, 12:00:00 am
-date updated: Thursday, January 2nd 2020, 12:00:00 am
+date modified: Thursday, January 2nd 2020, 12:00:00 am
 ---
 # H1
 ```
@@ -185,40 +73,13 @@ After:
 
 ```markdown
 ---
-date updated: Wednesday, January 1st 2020, 12:00:00 am
+date modified: Wednesday, January 1st 2020, 12:00:00 am
 ---
 # H1
 ```
 
-## Compact YAML
-
-Alias: `compact-yaml`
-
-Removes leading and trailing blank lines in the YAML front matter.
-
-
-
-Example: 
-
-Before:
-
-```markdown
----
-
-date: today
-
----
-```
-
-After:
-
-```markdown
----
-date: today
----
-```
-
-## Header Increment
+## Heading
+### Header Increment
 
 Alias: `header-increment`
 
@@ -252,92 +113,7 @@ After:
 We skipped a 2nd level heading
 ```
 
-## Consecutive blank lines
-
-Alias: `consecutive-blank-lines`
-
-There should be at most one consecutive blank line.
-
-
-
-Example: 
-
-Before:
-
-```markdown
-Some text
-
-
-Some more text
-```
-
-After:
-
-```markdown
-Some text
-
-Some more text
-```
-
-## Capitalize Headings
-
-Alias: `capitalize-headings`
-
-Headings should be formatted with capitalization
-
-Options:
-- titleCase: Format headings with title case capitalization, default=`false`
-- allCaps: Format headings with all capitals, default= `false`
-
-Example: The first letter of a heading should be capitalized
-
-Before:
-
-```markdown
-# this is a heading 1
-## this is a heading 2
-```
-
-After:
-
-```markdown
-# This is a heading 1
-## This is a heading 2
-```
-Example: With `titleCase=true`
-
-Before:
-
-```markdown
-# this is a heading 1
-## THIS IS A HEADING 2
-### a heading 3
-```
-
-After:
-
-```markdown
-# This is a Heading 1
-## This is a Heading 2
-### A Heading 3
-```
-Example: With `allCaps=true`
-
-Before:
-
-```markdown
-# this is a heading 1
-## this is a heading 2
-```
-
-After:
-
-```markdown
-# THIS IS A HEADING 1
-## THIS IS A HEADING 2
-```
-
-## File Name Heading
+### File Name Heading
 
 Alias: `file-name-heading`
 
@@ -380,33 +156,68 @@ title: My Title
 This is a line of text
 ```
 
-## Format Tags in YAML
+### Capitalize Headings
 
-Alias: `format-tags-in-yaml`
+Alias: `capitalize-headings`
 
-Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.
+Headings should be formatted with capitalization
 
+Options:
+- Title Case: Format headings with title case capitalization
+  - Default: `true`
+- All Caps: Format headings with all capitals
+  - Default: `false`
 
-
-Example: Format Tags in YAML frontmatter
+Example: The first letter of a heading should be capitalized
 
 Before:
 
 ```markdown
----
-tags: #one #two #three
----
+# this is a heading 1
+## this is a heading 2
 ```
 
 After:
 
 ```markdown
----
-tags: one, two, three
----
+# This is a heading 1
+## This is a heading 2
+```
+Example: With `Title Case=true`
+
+Before:
+
+```markdown
+# this is a heading 1
+## THIS IS A HEADING 2
+### a heading 3
 ```
 
-## Move Footnotes to the bottom
+After:
+
+```markdown
+# This is a Heading 1
+## This is a Heading 2
+### A Heading 3
+```
+Example: With `All Caps=true`
+
+Before:
+
+```markdown
+# this is a heading 1
+## this is a heading 2
+```
+
+After:
+
+```markdown
+# THIS IS A HEADING 1
+## THIS IS A HEADING 2
+```
+
+## Footnote
+### Move Footnotes to the bottom
 
 Alias: `move-footnotes-to-the-bottom`
 
@@ -441,7 +252,7 @@ Maecenas malesuada dignissim purus ac volutpat.
 [^2]: second footnote
 ```
 
-## Re-Index Footnotes
+### Re-Index Footnotes
 
 Alias: `re-index-footnotes`
 
@@ -507,4 +318,204 @@ Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et 
 
 [^1]: first footnote
 [^2]: second footnote
+```
+
+## Spacing
+### Trailing spaces
+
+Alias: `trailing-spaces`
+
+Removes extra spaces after every line.
+
+
+
+Example: Removes trailing spaces and tabs
+
+Before:
+
+```markdown
+# H1   
+line with trailing spaces and tabs            
+```
+
+After:
+
+```markdown
+# H1
+line with trailing spaces and tabs
+```
+
+### Heading blank lines
+
+Alias: `heading-blank-lines`
+
+All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).
+
+Options:
+- Bottom: Insert a blank line after headings
+  - Default: `true`
+
+Example: Headings should be surrounded by blank lines
+
+Before:
+
+```markdown
+# H1
+## H2
+
+
+# H1
+line
+## H2
+
+```
+
+After:
+
+```markdown
+# H1
+
+## H2
+
+# H1
+
+line
+
+## H2
+```
+Example: With `Bottom=false`
+
+Before:
+
+```markdown
+# H1
+line
+## H2
+# H1
+line
+```
+
+After:
+
+```markdown
+# H1
+line
+
+## H2
+
+# H1
+line
+```
+
+### Paragraph blank lines
+
+Alias: `paragraph-blank-lines`
+
+All paragraphs should have exactly one blank line both before and after.
+
+
+
+Example: Paragraphs should be surrounded by blank lines
+
+Before:
+
+```markdown
+# H1
+Newlines are inserted.
+A paragraph is a line that starts with a letter.
+```
+
+After:
+
+```markdown
+# H1
+
+Newlines are inserted.
+
+A paragraph is a line that starts with a letter.
+```
+
+### Space after list markers
+
+Alias: `space-after-list-markers`
+
+There should be a single space after list markers and checkboxes.
+
+
+
+Example: 
+
+Before:
+
+```markdown
+1.      Item 1
+2.  Item 2
+
+-   [ ] Item 1
+- [x]    Item 2
+```
+
+After:
+
+```markdown
+1. Item 1
+2. Item 2
+
+- [ ] Item 1
+- [x] Item 2
+```
+
+### Compact YAML
+
+Alias: `compact-yaml`
+
+Removes leading and trailing blank lines in the YAML front matter.
+
+
+
+Example: 
+
+Before:
+
+```markdown
+---
+
+date: today
+
+---
+```
+
+After:
+
+```markdown
+---
+date: today
+---
+```
+
+### Consecutive blank lines
+
+Alias: `consecutive-blank-lines`
+
+There should be at most one consecutive blank line.
+
+
+
+Example: 
+
+Before:
+
+```markdown
+Some text
+
+
+Some more text
+```
+
+After:
+
+```markdown
+Some text
+
+Some more text
 ```

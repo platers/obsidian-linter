@@ -14,26 +14,6 @@ export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeB
 
 // Helper functions
 
-// Export parseOptions here so it can be tested
-export function parseOptions(line: string) {
-  // Match arguments with format: optionName=value or optionName="value" or optionName='value'
-  const args = line.matchAll(/\s+(\S+)=("[^"]*"|'[^']*'|\S+)/g);
-  const options: { [id: string]: string; } = {};
-
-  for (const arg of args) {
-    let [, option_name, option_value] = arg;
-
-    if (option_value.startsWith('\'') && option_value.endsWith('\'')) {
-      option_value = option_value.slice(1, -1);
-    } else if (option_value.startsWith('"') && option_value.endsWith('"')) {
-      option_value = option_value.slice(1, -1);
-    }
-
-    options[option_name] = option_value;
-  }
-  return options;
-}
-
 /**
  * Returns a list of ignored rules in the YAML frontmatter of the text.
  * @param {string} text The text to parse

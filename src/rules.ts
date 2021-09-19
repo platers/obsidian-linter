@@ -1,14 +1,34 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
 import {headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert} from './utils';
+import {Option, BooleanOption, MomentFormatOption} from './option';
 
-type ApplyFunction = (text: string, options?: { [id: string]: string }) => string;
+export type Options = { [optionName: string]: any };
+type ApplyFunction = (text: string, options?: Options) => string;
+
+export interface LinterSettings {
+  ruleConfigs: {
+    [ruleName: string]: Options;
+  };
+  lintOnSave: boolean;
+}
+/* eslint-disable no-unused-vars */
+enum RuleType {
+  YAML = 'YAML',
+  HEADING = 'Heading',
+  FOOTNOTE = 'Footnote',
+  SPACING = 'Spacing',
+}
+/* eslint-enable no-unused-vars */
+
+const RuleTypeOrder = Object.values(RuleType);
 
 /** Class representing a rule */
 export class Rule {
     public name: string;
     public description: string;
-    public options: Array<string>;
+    public type: RuleType;
+    public options: Array<Option>;
     public apply: ApplyFunction;
 
     public examples: Array<Example>;
@@ -17,32 +37,59 @@ export class Rule {
      * Create a rule
      * @param {string} name - The name of the rule
      * @param {string} description - The description of the rule
+     * @param {RuleType} type - The type of the rule
      * @param {ApplyFunction} apply - The function to apply the rule
      * @param {Array<Example>} examples - The examples to be displayed in the documentation
-     * @param {Array<string>} [options=[]] - The options of the rule to be displayed in the documentation
+     * @param {Array<Option>} [options=[]] - The options of the rule to be displayed in the documentation
      */
     constructor(
         name: string,
         description: string,
+        type: RuleType,
         apply: ApplyFunction,
         examples: Array<Example>,
-        options: Array<string> = []) {
+        options: Array<Option> = []) {
       this.name = name;
       this.description = description;
+      this.type = type;
       this.apply = apply;
       this.examples = examples;
+
+      options.unshift(new BooleanOption('Enabled', '', false));
+      for (const option of options) {
+        option.ruleName = name;
+      }
       this.options = options;
     }
 
     public alias(): string {
       return this.name.replace(/ /g, '-').toLowerCase();
     }
+
+    public getDefaultOptions() {
+      const options: { [optionName: string]: any } = {};
+
+      for (const option of this.options) {
+        options[option.name] = option.defaultValue;
+      }
+
+      return options;
+    }
+
+    public getOptions(settings: LinterSettings) {
+      return settings.ruleConfigs[this.name];
+    }
+
+    public getURL(): string {
+      const url = 'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
+      return url + '#' + this.alias();
+    }
 }
 
 /** Class representing an example of a rule */
 export class Example {
     public description: string;
-    public options: { [id: string]: string };
+    public options: Options;
 
     public before: string;
     public after: string;
@@ -54,7 +101,7 @@ export class Example {
      * @param {string} after - The text after the rule is applied
      * @param {object} options - The options of the example
      */
-    constructor(description: string, before: string, after: string, options: { [id: string]: string } = {}) {
+    constructor(description: string, before: string, after: string, options: Options = {}) {
       this.description = description;
       this.options = options;
       this.before = before;
@@ -67,6 +114,7 @@ export const rules: Rule[] = [
   new Rule(
       'Trailing spaces',
       'Removes extra spaces after every line.',
+      RuleType.SPACING,
       (text: string) => {
         return text.replace(/[ \t]+$/gm, '');
       },
@@ -85,11 +133,10 @@ export const rules: Rule[] = [
   new Rule(
       'Heading blank lines',
       'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',
+      RuleType.SPACING,
       (text: string, options = {}) => {
-        options = Object.assign({'bottom': 'true'}, options);
-
         return ignoreCodeBlocksAndYAML(text, (text) => {
-          if (options['bottom'] === 'false') {
+          if (options['Bottom'] === false) {
             text = text.replace(/(^#+\s.*)\n+/gm, '$1\n'); // trim blank lines after headings
             text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
           } else {
@@ -128,7 +175,7 @@ export const rules: Rule[] = [
         `,
         ),
         new Example(
-            'With `bottom=false`',
+            'With `Bottom=false`',
             dedent`
         # H1
         line
@@ -145,16 +192,17 @@ export const rules: Rule[] = [
         # H1
         line
         `,
-            {bottom: 'false'},
+            {Bottom: false},
         ),
       ],
       [
-        'bottom: Insert a blank line after headings, default=`true`',
+        new BooleanOption('Bottom', 'Insert a blank line after headings', true),
       ],
   ),
   new Rule(
       'Paragraph blank lines',
       'All paragraphs should have exactly one blank line both before and after.',
+      RuleType.SPACING,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
           text = text.replace(/\n+([a-zA-Z].*)/g, '\n\n$1'); // trim blank lines before
@@ -184,6 +232,7 @@ export const rules: Rule[] = [
   new Rule(
       `Space after list markers`,
       'There should be a single space after list markers and checkboxes.',
+      RuleType.SPACING,
       (text: string) => {
         // Space after marker
         text = text.replace(/^(\s*\d+\.|[-+*])[^\S\r\n]+/gm, '$1 ');
@@ -211,76 +260,9 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
-      'YAML Timestamp',
-      'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.',
-      (text: string, options = {}) => {
-        options = Object.assign({
-          'format': 'dddd, MMMM Do YYYY, h:mm:ss a',
-          'dateCreated': 'true',
-          'dateUpdated': 'true',
-        }, options);
-
-        text = initYAML(text);
-
-        if (options['dateCreated'] === 'true') {
-          text = text.replace(/\ndate created:.*\n/, '\n');
-          const yaml_end = text.indexOf('\n---');
-          const formatted_date = moment(options['metadata: file created time']).format(options['format']);
-          text = insert(text, yaml_end, `\ndate created: ${formatted_date}`);
-        }
-        if (options['dateUpdated'] === 'true') {
-          text = text.replace(/\ndate updated:.*\n/, '\n');
-          const yaml_end = text.indexOf('\n---');
-          const formatted_date = moment(options['metadata: file modified time']).format(options['format']);
-          text = insert(text, yaml_end, `\ndate updated: ${formatted_date}`);
-        }
-        return text;
-      },
-      [
-        new Example(
-            'Adds a header with the date.',
-            dedent`
-        # H1
-        `,
-            dedent`
-        ---
-        date created: Wednesday, January 1st 2020, 12:00:00 am
-        date updated: Thursday, January 2nd 2020, 12:00:00 am
-        ---
-        # H1
-        `,
-            {
-              'metadata: file created time': '2020-01-01T00:00:00-00:00',
-              'metadata: file modified time': '2020-01-02T00:00:00-00:00',
-            },
-        ),
-        new Example(
-            'dateCreated option is false',
-            dedent`
-        # H1
-        `,
-            dedent`
-        ---
-        date updated: Wednesday, January 1st 2020, 12:00:00 am
-        ---
-        # H1
-        `,
-            {
-              'dateCreated': 'false',
-              'metadata: file created time': '2020-01-01T00:00:00-00:00',
-              'metadata: file modified time': '2020-01-01T00:00:00-00:00',
-            },
-        ),
-      ],
-      [
-        'format: [date format](https://momentjs.com/docs/#/displaying/format/), default=`"dddd, MMMM Do YYYY, h:mm:ss a"`',
-        'dateCreated: Insert the current date if date created is not present, default=`true`',
-        'dateUpdated: Update the current date, default=`true`',
-      ],
-  ),
-  new Rule(
       'Compact YAML',
       'Removes leading and trailing blank lines in the YAML front matter.',
+      RuleType.SPACING,
       (text: string) => {
         text = text.replace(/^---\n+/, '---\n');
         return text.replace(/\n+---/, '\n---');
@@ -304,8 +286,128 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
+      'Consecutive blank lines',
+      'There should be at most one consecutive blank line.',
+      RuleType.SPACING,
+      (text: string) => {
+        return text.replace(/\n{2,}/g, '\n\n');
+      },
+      [
+        new Example(
+            '',
+            dedent`
+        Some text
+
+
+        Some more text
+        `,
+            dedent`
+        Some text
+
+        Some more text
+        `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Format Tags in YAML',
+      'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
+      RuleType.YAML,
+      (text: string) => {
+        return text.replace(/^tags: ((?:#\w+(?: |$))+)$/im, function(tagsYAML) {
+          return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
+        });
+      },
+      [
+        new Example(
+            'Format Tags in YAML frontmatter',
+            dedent`
+         ---
+         tags: #one #two #three
+         ---
+        `,
+            dedent`
+         ---
+         tags: one, two, three
+         ---
+        `,
+        ),
+      ],
+  ),
+
+  // YAML rules
+
+  new Rule(
+      'YAML Timestamp',
+      'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.',
+      RuleType.YAML,
+      (text: string, options = {}) => {
+        text = initYAML(text);
+
+        if (options['Date Created'] === true) {
+          text = text.replace(/\ndate created:.*\n/, '\n');
+          const yaml_end = text.indexOf('\n---');
+          const formatted_date = moment(options['metadata: file created time']).format(options['Format']);
+          text = insert(text, yaml_end, `\ndate created: ${formatted_date}`);
+        }
+        if (options['Date Modified'] === true) {
+          text = text.replace(/\ndate modified:.*\n/, '\n');
+          text = text.replace(/\ndate updated:.*\n/, '\n'); // for backwards compatibility
+          const yaml_end = text.indexOf('\n---');
+          const formatted_date = moment(options['metadata: file modified time']).format(options['Format']);
+          text = insert(text, yaml_end, `\ndate modified: ${formatted_date}`);
+        }
+        return text;
+      },
+      [
+        new Example(
+            'Adds a header with the date.',
+            dedent`
+        # H1
+        `,
+            dedent`
+        ---
+        date created: Wednesday, January 1st 2020, 12:00:00 am
+        date modified: Thursday, January 2nd 2020, 12:00:00 am
+        ---
+        # H1
+        `,
+            {
+              'metadata: file created time': '2020-01-01T00:00:00-00:00',
+              'metadata: file modified time': '2020-01-02T00:00:00-00:00',
+            },
+        ),
+        new Example(
+            'dateCreated option is false',
+            dedent`
+        # H1
+        `,
+            dedent`
+        ---
+        date modified: Wednesday, January 1st 2020, 12:00:00 am
+        ---
+        # H1
+        `,
+            {
+              'Date Created': false,
+              'metadata: file created time': '2020-01-01T00:00:00-00:00',
+              'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+            },
+        ),
+      ],
+      [
+        new BooleanOption('Date Created', 'Insert the file creation date', true),
+        new BooleanOption('Date Modified', 'Insert the date the file was last modified', true),
+        new MomentFormatOption('Format', 'Date format', 'dddd, MMMM Do YYYY, h:mm:ss a'),
+      ],
+  ),
+
+  // Heading rules
+
+  new Rule(
       'Header Increment',
       'Heading levels should only increment by one level at a time',
+      RuleType.HEADING,
       (text: string) => {
         const lines = text.split('\n');
         let lastLevel = 0; // level of last header processed
@@ -352,118 +454,9 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
-      'Consecutive blank lines',
-      'There should be at most one consecutive blank line.',
-      (text: string) => {
-        return text.replace(/\n{2,}/g, '\n\n');
-      },
-      [
-        new Example(
-            '',
-            dedent`
-        Some text
-
-
-        Some more text
-        `,
-            dedent`
-        Some text
-
-        Some more text
-        `,
-        ),
-      ],
-  ),
-  new Rule(
-      'Capitalize Headings',
-      'Headings should be formatted with capitalization',
-      (text: string, options = {}) => {
-        options = Object.assign({
-          'titleCase': 'false',
-          'allCaps': 'false',
-        }, options);
-
-        const lines = text.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-          const match = lines[i].match(headerRegex); // match only headings
-          if (!match) {
-            continue;
-          }
-          if (options['titleCase'] == 'true') {
-            const headerWords = lines[i].match(/\S+/g);
-            const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
-            const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
-            const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
-            const ignore = [...ignoreAbbreviations, ...ignoreShortWords, ...ignoreNames];
-            for (let j = 1; j < headerWords.length; j++) {
-              const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
-              if (!isWord) {
-                continue;
-              }
-
-              headerWords[j] = headerWords[j].toLowerCase();
-              const ignoreWord = ignore.includes(headerWords[j]);
-              if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
-                headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
-              }
-            }
-
-            lines[i] = lines[i].replace(headerRegex, `${headerWords.join(' ')}`);
-          } else if (options['allCaps'] == 'true') {
-            lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
-          } else {
-            lines[i] = lines[i].replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
-          }
-        }
-        return lines.join('\n');
-      },
-      [
-        new Example(
-            'The first letter of a heading should be capitalized',
-            dedent`
-        # this is a heading 1
-        ## this is a heading 2
-        `,
-            dedent`
-        # This is a heading 1
-        ## This is a heading 2
-        `,
-        ),
-        new Example(
-            'With `titleCase=true`',
-            dedent`
-        # this is a heading 1
-        ## THIS IS A HEADING 2
-        ### a heading 3
-        `,
-            dedent`
-        # This is a Heading 1
-        ## This is a Heading 2
-        ### A Heading 3
-        `,
-            {titleCase: 'true'},
-        ),
-        new Example(
-            'With `allCaps=true`',
-            dedent`
-        # this is a heading 1
-        ## this is a heading 2
-        `,
-            dedent`
-        # THIS IS A HEADING 1
-        ## THIS IS A HEADING 2
-        `,
-            {allCaps: 'true'},
-        ),
-      ],
-      [
-        'titleCase: Format headings with title case capitalization, default=`false`',
-        'allCaps: Format headings with all capitals, default= `false`',
-      ],
-  ),
-  new Rule(
       'File Name Heading',
       'Inserts the file name as a H1 heading if no H1 heading exists.',
+      RuleType.HEADING,
       (text: string, options = {}) => {
         // check if there is a H1 heading
         const hasH1 = text.match(/^#\s.*/m);
@@ -509,32 +502,95 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
-      'Format Tags in YAML',
-      'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
-      (text: string) => {
-        return text.replace(/^tags: ((?:#\w+(?: |$))+)$/im, function(tagsYAML) {
-          return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
-        });
+      'Capitalize Headings',
+      'Headings should be formatted with capitalization',
+      RuleType.HEADING,
+      (text: string, options = {}) => {
+        const lines = text.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          const match = lines[i].match(headerRegex); // match only headings
+          if (!match) {
+            continue;
+          }
+          if (options['Title Case'] == true) {
+            const headerWords = lines[i].match(/\S+/g);
+            const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
+            const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
+            const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
+            const ignore = [...ignoreAbbreviations, ...ignoreShortWords, ...ignoreNames];
+            for (let j = 1; j < headerWords.length; j++) {
+              const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
+              if (!isWord) {
+                continue;
+              }
+
+              headerWords[j] = headerWords[j].toLowerCase();
+              const ignoreWord = ignore.includes(headerWords[j]);
+              if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
+                headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+              }
+            }
+
+            lines[i] = lines[i].replace(headerRegex, `${headerWords.join(' ')}`);
+          } else if (options['All Caps'] == true) {
+            lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
+          } else {
+            lines[i] = lines[i].replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
+          }
+        }
+        return lines.join('\n');
       },
       [
         new Example(
-            'Format Tags in YAML frontmatter',
+            'The first letter of a heading should be capitalized',
             dedent`
-         ---
-         tags: #one #two #three
-         ---
+        # this is a heading 1
+        ## this is a heading 2
         `,
             dedent`
-         ---
-         tags: one, two, three
-         ---
+        # This is a heading 1
+        ## This is a heading 2
         `,
         ),
+        new Example(
+            'With `Title Case=true`',
+            dedent`
+        # this is a heading 1
+        ## THIS IS A HEADING 2
+        ### a heading 3
+        `,
+            dedent`
+        # This is a Heading 1
+        ## This is a Heading 2
+        ### A Heading 3
+        `,
+            {'Title Case': true},
+        ),
+        new Example(
+            'With `All Caps=true`',
+            dedent`
+        # this is a heading 1
+        ## this is a heading 2
+        `,
+            dedent`
+        # THIS IS A HEADING 1
+        ## THIS IS A HEADING 2
+        `,
+            {'All Caps': true, 'Title Case': false},
+        ),
+      ],
+      [
+        new BooleanOption('Title Case', 'Format headings with title case capitalization', true),
+        new BooleanOption('All Caps', 'Format headings with all capitals', false),
       ],
   ),
+
+  // Footnote rules
+
   new Rule(
       'Move Footnotes to the bottom',
       'Move all footnotes to the bottom of the document.',
+      RuleType.FOOTNOTE,
       (text: string) => {
         const footnotes = text.match(/^\[\^\w+\]: .*$/gm); // collect footnotes
         if (footnotes != null) {
@@ -579,6 +635,7 @@ export const rules: Rule[] = [
   new Rule(
       'Re-Index Footnotes',
       'Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)',
+      RuleType.FOOTNOTE,
       (text: string) => {
         // re-index footnote-text
         let ft_index = 0;
@@ -646,6 +703,6 @@ export const rules: Rule[] = [
         ),
       ],
   ),
-];
+].sort((a, b) => RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type));
 
 export const rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);
