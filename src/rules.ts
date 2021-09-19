@@ -12,13 +12,15 @@ export interface LinterSettings {
   };
   lintOnSave: boolean;
 }
-
+/* eslint-disable no-unused-vars */
 enum RuleType {
   YAML = 'YAML',
   HEADING = 'Heading',
   FOOTNOTE = 'Footnote',
   SPACING = 'Spacing',
 }
+/* eslint-enable no-unused-vars */
+
 const RuleTypeOrder = Object.values(RuleType);
 
 /** Class representing a rule */
@@ -402,7 +404,7 @@ export const rules: Rule[] = [
 
   // Heading rules
 
-new Rule(
+  new Rule(
       'Header Increment',
       'Heading levels should only increment by one level at a time',
       RuleType.HEADING,
@@ -584,7 +586,7 @@ new Rule(
   ),
 
   // Footnote rules
-  
+
   new Rule(
       'Move Footnotes to the bottom',
       'Move all footnotes to the bottom of the document.',

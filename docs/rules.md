@@ -2,14 +2,15 @@
 
 # Rules
 
-## Format Tags in YAML
+
+## YAML
+### Format Tags in YAML
 
 Alias: `format-tags-in-yaml`
 
 Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.
 
-Options:
-- Enabled
+
 
 Example: Format Tags in YAML frontmatter
 
@@ -29,17 +30,19 @@ tags: one, two, three
 ---
 ```
 
-## YAML Timestamp
+### YAML Timestamp
 
 Alias: `yaml-timestamp`
 
 Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.
 
 Options:
-- Enabled
-- Date Created
-- Date Modified
-- Format
+- Date Created: Insert the file creation date
+  - Default: `true`
+- Date Modified: Insert the date the file was last modified
+  - Default: `true`
+- Format: Date format
+  - Default: `dddd, MMMM Do YYYY, h:mm:ss a`
 
 Example: Adds a header with the date.
 
@@ -75,14 +78,14 @@ date modified: Wednesday, January 1st 2020, 12:00:00 am
 # H1
 ```
 
-## Header Increment
+## Heading
+### Header Increment
 
 Alias: `header-increment`
 
 Heading levels should only increment by one level at a time
 
-Options:
-- Enabled
+
 
 Example: 
 
@@ -110,14 +113,13 @@ After:
 We skipped a 2nd level heading
 ```
 
-## File Name Heading
+### File Name Heading
 
 Alias: `file-name-heading`
 
 Inserts the file name as a H1 heading if no H1 heading exists.
 
-Options:
-- Enabled
+
 
 Example: Inserts an H1 heading
 
@@ -154,16 +156,17 @@ title: My Title
 This is a line of text
 ```
 
-## Capitalize Headings
+### Capitalize Headings
 
 Alias: `capitalize-headings`
 
 Headings should be formatted with capitalization
 
 Options:
-- Enabled
-- Title Case
-- All Caps
+- Title Case: Format headings with title case capitalization
+  - Default: `true`
+- All Caps: Format headings with all capitals
+  - Default: `false`
 
 Example: The first letter of a heading should be capitalized
 
@@ -213,14 +216,14 @@ After:
 ## THIS IS A HEADING 2
 ```
 
-## Move Footnotes to the bottom
+## Footnote
+### Move Footnotes to the bottom
 
 Alias: `move-footnotes-to-the-bottom`
 
 Move all footnotes to the bottom of the document.
 
-Options:
-- Enabled
+
 
 Example: Moving footnotes to the bottom
 
@@ -249,14 +252,13 @@ Maecenas malesuada dignissim purus ac volutpat.
 [^2]: second footnote
 ```
 
-## Re-Index Footnotes
+### Re-Index Footnotes
 
 Alias: `re-index-footnotes`
 
 Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)
 
-Options:
-- Enabled
+
 
 Example: Re-indexing footnotes after having deleted previous footnotes
 
@@ -318,14 +320,14 @@ Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et 
 [^2]: second footnote
 ```
 
-## Trailing spaces
+## Spacing
+### Trailing spaces
 
 Alias: `trailing-spaces`
 
 Removes extra spaces after every line.
 
-Options:
-- Enabled
+
 
 Example: Removes trailing spaces and tabs
 
@@ -343,15 +345,15 @@ After:
 line with trailing spaces and tabs
 ```
 
-## Heading blank lines
+### Heading blank lines
 
 Alias: `heading-blank-lines`
 
 All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).
 
 Options:
-- Enabled
-- Bottom
+- Bottom: Insert a blank line after headings
+  - Default: `true`
 
 Example: Headings should be surrounded by blank lines
 
@@ -405,14 +407,13 @@ line
 line
 ```
 
-## Paragraph blank lines
+### Paragraph blank lines
 
 Alias: `paragraph-blank-lines`
 
 All paragraphs should have exactly one blank line both before and after.
 
-Options:
-- Enabled
+
 
 Example: Paragraphs should be surrounded by blank lines
 
@@ -434,14 +435,13 @@ Newlines are inserted.
 A paragraph is a line that starts with a letter.
 ```
 
-## Space after list markers
+### Space after list markers
 
 Alias: `space-after-list-markers`
 
 There should be a single space after list markers and checkboxes.
 
-Options:
-- Enabled
+
 
 Example: 
 
@@ -465,14 +465,13 @@ After:
 - [x] Item 2
 ```
 
-## Compact YAML
+### Compact YAML
 
 Alias: `compact-yaml`
 
 Removes leading and trailing blank lines in the YAML front matter.
 
-Options:
-- Enabled
+
 
 Example: 
 
@@ -494,14 +493,13 @@ date: today
 ---
 ```
 
-## Consecutive blank lines
+### Consecutive blank lines
 
 Alias: `consecutive-blank-lines`
 
 There should be at most one consecutive blank line.
 
-Options:
-- Enabled
+
 
 Example: 
 

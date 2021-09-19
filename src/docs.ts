@@ -26,7 +26,9 @@ console.log('README.md updated');
 
 const rules_template = readFileSync('./docs/rules_template.md', 'utf8');
 
-const rules_docs = rules.map((rule) => {
+let rules_docs = '';
+let prevSection = '';
+for (const rule of rules) {
   const examples = rule.examples.map((test) => dedent`
     Example: ${test.description}
 
@@ -43,7 +45,11 @@ const rules_docs = rules.map((rule) => {
     \`\`\`
   `).join('\n');
 
-  const options_list = rule.options.map((option) => `- ${option.name}`).join('\n');
+  const options_list = rule.options.slice(1).map((option) => {
+    return dedent`
+                  - ${option.name}: ${option.description}
+                    - Default: \`${option.defaultValue}\``;
+  }).join('\n');
   let options = '';
   if (options_list.length > 0) {
     options = dedent`
@@ -52,8 +58,17 @@ const rules_docs = rules.map((rule) => {
     `;
   }
 
-  return dedent`
-  ## ${rule.name}
+  if (rule.type !== prevSection) {
+    rules_docs += dedent`
+
+      ## ${rule.type}
+    `;
+    prevSection = rule.type;
+  }
+
+  rules_docs += dedent`
+
+  ### ${rule.name}
 
   Alias: \`${rule.alias()}\`
 
@@ -64,7 +79,7 @@ const rules_docs = rules.map((rule) => {
   ${examples}
 
   `;
-}).join('\n');
+}
 
 const rules_documentation = dedent`
   ${autogen_warning}

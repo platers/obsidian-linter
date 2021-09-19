@@ -203,9 +203,14 @@ class SettingTab extends PluginSettingTab {
                 });
           });
 
-      containerEl.createEl('h2', {text: 'Rules'});
+      let prevSection = '';
 
       for (const rule of rules) {
+        if (rule.type !== prevSection) {
+          containerEl.createEl('h2', {text: rule.type});
+          prevSection = rule.type;
+        }
+
         containerEl.createEl('h3', {text: rule.name});
         containerEl.createEl('a', {text: rule.alias(), href: rule.getURL()});
         containerEl.createEl('p', {text: rule.description});
