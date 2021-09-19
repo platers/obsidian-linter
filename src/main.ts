@@ -3,7 +3,7 @@ import {LinterSettings, Options, rules} from './rules';
 import {getDisabledRules} from './utils';
 import Diff from 'diff';
 import moment from 'moment';
-import {BooleanOption, MomentFormatOption} from './option';
+import {BooleanOption, MomentFormatOption, TextOption} from './option';
 import dedent from 'ts-dedent';
 
 export default class LinterPlugin extends Plugin {
@@ -163,6 +163,20 @@ class SettingTab extends PluginSettingTab {
             .addToggle((toggle) => {
               toggle.setValue(settings.ruleConfigs[this.ruleName][this.name]);
               toggle.onChange((value) => {
+                this.setOption(value, settings);
+                plugin.settings = settings;
+                plugin.saveData(plugin.settings);
+              });
+            });
+      };
+
+      TextOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+        new Setting(containerEl)
+            .setName(this.name)
+            .setDesc(this.description)
+            .addText((textbox) => {
+              textbox.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+              textbox.onChange((value) => {
                 this.setOption(value, settings);
                 plugin.settings = settings;
                 plugin.saveData(plugin.settings);
