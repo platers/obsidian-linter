@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import {headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert} from './utils';
+import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert} from './utils';
 import {Option, BooleanOption, MomentFormatOption, TextOption} from './option';
 
 export type Options = { [optionName: string]: any };
@@ -266,8 +266,11 @@ export const rules: Rule[] = [
       'Removes leading and trailing blank lines in the YAML front matter.',
       RuleType.SPACING,
       (text: string) => {
-        text = text.replace(/^---\n+/, '---\n');
-        return text.replace(/\n+---/, '\n---');
+        return formatYAML(text, (text) => {
+          text = text.replace(/^---\n+/, '---\n');
+          text = text.replace(/\n+---/, '\n---');
+          return text;
+        });
       },
       [
         new Example(
@@ -381,8 +384,10 @@ export const rules: Rule[] = [
       'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
       RuleType.YAML,
       (text: string) => {
-        return text.replace(/^tags: (?:#\w+(?:,? |$))+/im, function(tagsYAML) {
-          return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
+        return formatYAML(text, (text) => {
+          return text.replace(/^tags: (?:#\w+(?:,? |$))+/im, function(tagsYAML) {
+            return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
+          });
         });
       },
       [
@@ -421,20 +426,22 @@ export const rules: Rule[] = [
       (text: string, options = {}) => {
         text = initYAML(text);
 
-        if (options['Date Created'] === true) {
-          text = text.replace(/\ndate created:.*\n/, '\n');
-          const yaml_end = text.indexOf('\n---');
-          const formatted_date = moment(options['metadata: file created time']).format(options['Format']);
-          text = insert(text, yaml_end, `\ndate created: ${formatted_date}`);
-        }
-        if (options['Date Modified'] === true) {
-          text = text.replace(/\ndate modified:.*\n/, '\n');
-          text = text.replace(/\ndate updated:.*\n/, '\n'); // for backwards compatibility
-          const yaml_end = text.indexOf('\n---');
-          const formatted_date = moment(options['metadata: file modified time']).format(options['Format']);
-          text = insert(text, yaml_end, `\ndate modified: ${formatted_date}`);
-        }
-        return text;
+        return formatYAML(text, (text) => {
+          if (options['Date Created'] === true) {
+            text = text.replace(/\ndate created:.*\n/, '\n');
+            const yaml_end = text.indexOf('\n---');
+            const formatted_date = moment(options['metadata: file created time']).format(options['Format']);
+            text = insert(text, yaml_end, `\ndate created: ${formatted_date}`);
+          }
+          if (options['Date Modified'] === true) {
+            text = text.replace(/\ndate modified:.*\n/, '\n');
+            text = text.replace(/\ndate updated:.*\n/, '\n'); // for backwards compatibility
+            const yaml_end = text.indexOf('\n---');
+            const formatted_date = moment(options['metadata: file modified time']).format(options['Format']);
+            text = insert(text, yaml_end, `\ndate modified: ${formatted_date}`);
+          }
+          return text;
+        });
       },
       [
         new Example(

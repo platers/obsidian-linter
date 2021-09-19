@@ -4,7 +4,7 @@ import {load} from 'js-yaml';
 // Useful regexes
 
 export const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
-export const fencedRegexTemplate = '^XXX\s*\n((?:.|\n)*?)\nXXX\s*?(?:\n|$)';
+export const fencedRegexTemplate = '^XXX\s*\n(?:((?:.|\n)*?)\n)?XXX\s*?(?:\n|$)';
 export const yamlRegex = new RegExp(fencedRegexTemplate.replaceAll('X', '-'));
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
@@ -78,6 +78,19 @@ export function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => st
 
   return text;
 }
+
+export function formatYAML(text: string, func: (text: string) => string): string {
+  if (!text.match(yamlRegex)) {
+    return text;
+  }
+
+  let yaml = text.match(yamlRegex)[0];
+  yaml = func(yaml);
+  text = text.replace(yamlRegex, yaml);
+
+  return text;
+}
+
 
 /**
  * Adds an empty YAML block to the text if it doesn't already have one.

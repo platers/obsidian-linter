@@ -5,13 +5,12 @@ import {getDisabledRules} from './utils';
 describe('Examples pass', () => {
   for (const rule of rules) {
     describe(rule.name, () => {
-      test.each(rule.examples)('$description', (testObject: Example) => {
-        if (testObject.options && Object.keys(testObject.options).length > 0) {
-          const options = Object.assign(rule.getDefaultOptions(), testObject.options);
-          expect(rule.apply(testObject.before, options)).toBe(testObject.after);
-        } else {
-          expect(rule.apply(testObject.before)).toBe(testObject.after);
+      test.each(rule.examples)('$description', (example: Example) => {
+        let options = rule.getDefaultOptions();
+        if (example.options) {
+          Object.assign(options, example.options);
         }
+        expect(rule.apply(example.before, options)).toBe(example.after);
       });
     });
   }
