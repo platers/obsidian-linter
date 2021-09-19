@@ -315,7 +315,7 @@ export const rules: Rule[] = [
   ),
   new Rule(
       'Convert Spaces to Tabs',
-      'Converts 4 spaces to 1 tab.',
+      'Converts leading spaces to tabs.',
       RuleType.SPACING,
       (text: string, options = {}) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
@@ -349,7 +349,7 @@ export const rules: Rule[] = [
       ],
       /* eslint-enable no-mixed-spaces-and-tabs, no-tabs */
       [
-        new TextOption('Tabsize', 'Number of Spaces that will be converted to a Tab', '4'),
+        new TextOption('Tabsize', 'Number of spaces that will be converted to a tab', '4'),
       ],
   ),
   new Rule(
