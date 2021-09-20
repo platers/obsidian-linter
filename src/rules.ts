@@ -385,7 +385,7 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string) => {
         return formatYAML(text, (text) => {
-          return text.replace(/^tags: (?:#\w+(?:,? |$))+/im, function(tagsYAML) {
+          return text.replace(/\ntags: [\w#\/ ,-]+(?=.*\n---)/is, function(tagsYAML) {
             return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
           });
         });
@@ -395,12 +395,12 @@ export const rules: Rule[] = [
             'Format Tags in YAML frontmatter',
             dedent`
          ---
-         tags: #one #two #three
+         tags: #one #two #three #nested/four/five
          ---
         `,
             dedent`
          ---
-         tags: one, two, three
+         tags: one, two, three, nested/four/five
          ---
         `,
         ),

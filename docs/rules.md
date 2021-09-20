@@ -18,7 +18,7 @@ Before:
 
 ```markdown
 ---
-tags: #one #two #three
+tags: #one #two #three #nested/four/five
 ---
 ```
 
@@ -26,7 +26,7 @@ After:
 
 ```markdown
 ---
-tags: one, two, three
+tags: one, two, three, nested/four/five
 ---
 ```
 Example: Format Tags in YAML frontmatter
