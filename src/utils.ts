@@ -4,7 +4,7 @@ import {load} from 'js-yaml';
 // Useful regexes
 
 export const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
-export const fencedRegexTemplate = '^XXX\s*?\n(?:((?:.|\n)*?)\n)?XXX(?=\s|$)$';
+export const fencedRegexTemplate = '^XXX\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\s|$)$';
 export const yamlRegex = new RegExp('^---\n(?:((?:.|\n)*?)\n)?---(?=\n|$)');
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');

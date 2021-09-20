@@ -194,6 +194,41 @@ describe('Rules tests', () => {
     });
   });
 });
+describe('Paragraph blank lines', () => {
+  it('Ignores codeblocks', () => {
+    const before = dedent`
+    ---
+    front matter
+    front matter
+    ---
+
+    Hello
+    World
+    \`\`\`python
+    # comment not header
+    a = b
+    c = d
+    \`\`\`
+    `;
+    const after = dedent`
+    ---
+    front matter
+    front matter
+    ---
+
+    Hello
+
+    World
+
+    \`\`\`python
+    # comment not header
+    a = b
+    c = d
+    \`\`\`
+    `;
+    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
+  });
+});
 describe('Consecutive blank lines', () => {
   it('Handles ignores code blocks', () => {
     const before = dedent`
