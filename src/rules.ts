@@ -381,7 +381,7 @@ export const rules: Rule[] = [
       'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
       RuleType.YAML,
       (text: string) => {
-        return text.replace(/^tags: (?:#\w+(?:,? |$))+/im, function(tagsYAML) {
+        return text.replace(/\ntags: [\w#\/ ,-]+(?=.*\n---)/is, function(tagsYAML) {
           return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
         });
       },
