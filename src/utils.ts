@@ -4,8 +4,8 @@ import {load} from 'js-yaml';
 // Useful regexes
 
 export const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
-export const fencedRegexTemplate = '^XXX\s*\n((?:.|\n)*?)\nXXX\s*?(?:\n|$)';
-export const yamlRegex = new RegExp(fencedRegexTemplate.replaceAll('X', '-'));
+export const fencedRegexTemplate = '^XXX\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\s|$)$';
+export const yamlRegex = new RegExp('^---\n(?:((?:.|\n)*?)\n)?---(?=\n|$)');
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
@@ -56,14 +56,21 @@ export function getDisabledRules(text: string): string[] {
  * @return {string} The processed text
  */
 export function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => string): string {
-  const codePlaceholder = 'PLACEHOLDER 321417\n';
   const codeMatches = text.match(codeBlockRegex);
+  const codePlaceholder = 'PLACEHOLDER 321417';
+  if (codeMatches) {
+    for (const match of codeMatches) {
+      text = text.replace(match, codePlaceholder);
+    }
+  }
 
-  const yamlPlaceholder = '---\n---\n';
+  const yamlPlaceholder = '---\n---';
   const yamlMatches = text.match(yamlRegex);
+  if (yamlMatches) {
+    text = text.replace(yamlMatches[0], yamlPlaceholder);
+  }
 
-  text = text.replace(codeBlockRegex, codePlaceholder);
-  text = text.replace(yamlRegex, yamlPlaceholder);
+
   text = func(text);
 
   if (yamlMatches) {
@@ -78,6 +85,19 @@ export function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => st
 
   return text;
 }
+
+export function formatYAML(text: string, func: (text: string) => string): string {
+  if (!text.match(yamlRegex)) {
+    return text;
+  }
+
+  let yaml = text.match(yamlRegex)[0];
+  yaml = func(yaml);
+  text = text.replace(yamlRegex, yaml);
+
+  return text;
+}
+
 
 /**
  * Adds an empty YAML block to the text if it doesn't already have one.
@@ -100,4 +120,9 @@ export function initYAML(text: string): string {
  */
 export function insert(str: string, index: number, value: string): string {
   return str.substr(0, index) + value + str.substr(index);
+}
+
+// https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
+export function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }

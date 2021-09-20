@@ -3,7 +3,7 @@ import {LinterSettings, Options, rules} from './rules';
 import {getDisabledRules} from './utils';
 import Diff from 'diff';
 import moment from 'moment';
-import {BooleanOption, MomentFormatOption, TextOption} from './option';
+import {BooleanOption, DropdownOption, MomentFormatOption, TextOption} from './option';
 import dedent from 'ts-dedent';
 
 export default class LinterPlugin extends Plugin {
@@ -192,6 +192,23 @@ class SettingTab extends PluginSettingTab {
               format.setValue(settings.ruleConfigs[this.ruleName][this.name]);
               format.setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a');
               format.onChange((value) => {
+                this.setOption(value, settings);
+                plugin.settings = settings;
+                plugin.saveData(plugin.settings);
+              });
+            });
+      };
+
+      DropdownOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+        new Setting(containerEl)
+            .setName(this.name)
+            .setDesc(this.description)
+            .addDropdown((dropdown) => {
+              dropdown.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+              for (const option of this.options) {
+                dropdown.addOption(option.value, option.value);
+              }
+              dropdown.onChange((value) => {
                 this.setOption(value, settings);
                 plugin.settings = settings;
                 plugin.saveData(plugin.settings);

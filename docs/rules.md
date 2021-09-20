@@ -18,7 +18,7 @@ Before:
 
 ```markdown
 ---
-tags: #one #two #three
+tags: #one #two #three #nested/four/five
 ---
 ```
 
@@ -26,7 +26,7 @@ After:
 
 ```markdown
 ---
-tags: one, two, three
+tags: one, two, three, nested/four/five
 ---
 ```
 Example: Format Tags in YAML frontmatter
@@ -55,11 +55,11 @@ Keep track of the date the file was last edited in the YAML front matter. Gets d
 
 Options:
 - Date Created: Insert the file creation date
-  - Default: `true`
+	- Default: `true`
 - Date Modified: Insert the date the file was last modified
-  - Default: `true`
+	- Default: `true`
 - Format: Date format
-  - Default: `dddd, MMMM Do YYYY, h:mm:ss a`
+	- Default: `dddd, MMMM Do YYYY, h:mm:ss a`
 
 Example: Adds a header with the date.
 
@@ -180,26 +180,12 @@ Alias: `capitalize-headings`
 Headings should be formatted with capitalization
 
 Options:
-- Title Case: Format headings with title case capitalization
-  - Default: `true`
-- All Caps: Format headings with all capitals
-  - Default: `false`
+- Style: The style of capitalization to use
+	- Default: `Title Case`
+	- `Title Case`: Capitalize using title case rules
+	- `All Caps`: Capitalize the first letter of each word
+	- `First Letter`: Only capitalize the first letter
 
-Example: The first letter of a heading should be capitalized
-
-Before:
-
-```markdown
-# this is a heading 1
-## this is a heading 2
-```
-
-After:
-
-```markdown
-# This is a heading 1
-## This is a heading 2
-```
 Example: With `Title Case=true`
 
 Before:
@@ -216,6 +202,21 @@ After:
 # This is a Heading 1
 ## This is a Heading 2
 ### A Heading 3
+```
+Example: With `First Letter=true`
+
+Before:
+
+```markdown
+# this is a heading 1
+## this is a heading 2
+```
+
+After:
+
+```markdown
+# This is a heading 1
+## This is a heading 2
 ```
 Example: With `All Caps=true`
 
@@ -370,7 +371,7 @@ All headings have a blank line both before and after (except where the heading i
 
 Options:
 - Bottom: Insert a blank line after headings
-  - Default: `true`
+	- Default: `true`
 
 Example: Headings should be surrounded by blank lines
 
@@ -545,7 +546,7 @@ Converts leading spaces to tabs.
 
 Options:
 - Tabsize: Number of spaces that will be converted to a tab
-  - Default: `4`
+	- Default: `4`
 
 Example: Converting spaces to tabs with `tabsize = 3`
 

@@ -1,16 +1,39 @@
 import dedent from 'ts-dedent';
 import {rules, Rule, rulesDict, Example} from './rules';
-import {getDisabledRules} from './utils';
+import {escapeRegExp, getDisabledRules, yamlRegex} from './utils';
 
 describe('Examples pass', () => {
   for (const rule of rules) {
     describe(rule.name, () => {
-      test.each(rule.examples)('$description', (testObject: Example) => {
-        if (testObject.options && Object.keys(testObject.options).length > 0) {
-          const options = Object.assign(rule.getDefaultOptions(), testObject.options);
-          expect(rule.apply(testObject.before, options)).toBe(testObject.after);
-        } else {
-          expect(rule.apply(testObject.before)).toBe(testObject.after);
+      test.each(rule.examples)('$description', (example: Example) => {
+        const options = rule.getDefaultOptions();
+        if (example.options) {
+          Object.assign(options, example.options);
+        }
+        expect(rule.apply(example.before, options)).toBe(example.after);
+      });
+    });
+  }
+});
+
+describe('Augmented examples pass', () => {
+  for (const rule of rules) {
+    describe(rule.name, () => {
+      test.each(rule.examples)('$description', (example: Example) => {
+        const options = rule.getDefaultOptions();
+        if (example.options) {
+          Object.assign(options, example.options);
+        }
+
+        // Add a YAML
+        if (rule.type !== 'YAML' && !example.before.match(yamlRegex)) {
+          const yaml = dedent`
+            ---
+            foo: bar
+            ---\n\n`;
+
+          const before = yaml + example.before;
+          expect(rule.apply(before, options)).toMatch(new RegExp(`${escapeRegExp(yaml)}\n?${escapeRegExp(example.after)}`));
         }
       });
     });
@@ -147,7 +170,7 @@ describe('Rules tests', () => {
         ## I Can't Do This
         ## Comma, Comma, Comma
         `;
-      expect(rulesDict['capitalize-headings'].apply(before, {'Title Case': true})).toBe(after);
+      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'Title Case'})).toBe(after);
     });
   });
   describe('File Name Heading', () => {
@@ -169,6 +192,41 @@ describe('Rules tests', () => {
         `;
       expect(rulesDict['file-name-heading'].apply(before, {'metadata: file name': 'File Name'})).toBe(after);
     });
+  });
+});
+describe('Paragraph blank lines', () => {
+  it('Ignores codeblocks', () => {
+    const before = dedent`
+    ---
+    front matter
+    front matter
+    ---
+
+    Hello
+    World
+    \`\`\`python
+    # comment not header
+    a = b
+    c = d
+    \`\`\`
+    `;
+    const after = dedent`
+    ---
+    front matter
+    front matter
+    ---
+
+    Hello
+
+    World
+
+    \`\`\`python
+    # comment not header
+    a = b
+    c = d
+    \`\`\`
+    `;
+    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
   });
 });
 describe('Consecutive blank lines', () => {
