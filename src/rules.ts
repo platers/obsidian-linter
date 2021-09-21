@@ -707,7 +707,7 @@ export const rules: Rule[] = [
             // remove footnotes sourrounded by text
             text = text.replace(/\n\[\^\w+\]: .*\n/gm, '');
             text += '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
-            text = text.replace(/\n*$/, ''); // remove blank lines at the end
+            text = text.replace(/\n*$/, '') + '\n'; // remove all but one blank lines at the end
           }
           return text;
         });
@@ -733,6 +733,7 @@ export const rules: Rule[] = [
 
             [^1]: first footnote
             [^2]: second footnote
+            
         `,
         ),
       ],
