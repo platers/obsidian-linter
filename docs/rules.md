@@ -268,6 +268,7 @@ Maecenas malesuada dignissim purus ac volutpat.
 
 [^1]: first footnote
 [^2]: second footnote
+
 ```
 
 ### Re-Index Footnotes
