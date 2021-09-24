@@ -82,7 +82,7 @@ export default class LinterPlugin extends Plugin {
       const disabledRules = getDisabledRules(oldText);
 
       for (const rule of rules) {
-        if (disabledRules.includes(rule.name)) {
+        if (disabledRules.includes(rule.alias())) {
           continue;
         }
 

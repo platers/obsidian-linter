@@ -254,7 +254,7 @@ describe('Consecutive blank lines', () => {
   });
 });
 
-describe('Ignored rules parsing', () => {
+describe('Disabled rules parsing', () => {
   it('No YAML', () => {
     const text = dedent`
       Text
@@ -268,6 +268,15 @@ describe('Ignored rules parsing', () => {
       Text
       `;
     expect(getDisabledRules(text)).toEqual([]);
+  });
+  it('Ignore one rule', () => {
+    const text = dedent`
+      ---
+      disabled rules: [ yaml-timestamp ]
+      ---
+      Text
+      `;
+    expect(getDisabledRules(text)).toEqual(['yaml-timestamp']);
   });
   it('Ignore some rules', () => {
     const text = dedent`
