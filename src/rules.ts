@@ -698,6 +698,9 @@ export const rules: Rule[] = [
         return ignoreCodeBlocksAndYAML(text, (text) => {
           const footnotes = text.match(/^\[\^\w+\]: .*$/gm); // collect footnotes
           if (footnotes != null) {
+            // ensures footnotes at the end of the document are recognized properly
+            if (text.slice(-1) != '\n') text += '\n';
+
             // remove footnotes that are their own paragraph
             text = text.replace(/\n\n\[\^\w+\]: .*\n\n/gm, '\n\n');
 
@@ -706,7 +709,8 @@ export const rules: Rule[] = [
 
             // remove footnotes sourrounded by text
             text = text.replace(/\n\[\^\w+\]: .*\n/gm, '');
-            text += '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
+
+            text = text.replace(/\n*$/, '') + '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
             text = text.replace(/\n*$/, '') + '\n'; // remove all but one blank lines at the end
           }
           return text;
