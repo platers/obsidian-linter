@@ -115,19 +115,39 @@ export const rules: Rule[] = [
       'Trailing spaces',
       'Removes extra spaces after every line.',
       RuleType.SPACING,
-      (text: string) => {
-        return text.replace(/[ \t]+$/gm, '');
+      (text: string, options = {}) => {
+        if (options['TwoSpaceLinebreak'] === false) {
+          return text.replace(/[ \t]+$/gm, '');
+        } else {
+          text = text.replace(/\b[ \t]$/gm, ''); // one whitespace
+          text = text.replace(/\b[ \t]{3,}$/gm, ''); // three or more whitespaces
+          text = text.replace(/\b( ?\t ?)$/gm, ''); // two whitespaces with at least one tab
+          return text;
+        }
       },
       [
         new Example(
             'Removes trailing spaces and tabs',
             dedent`
         # H1   
-        line with trailing spaces and tabs            `, // eslint-disable-line no-tabs
+        line with trailing spaces and tabs	        `, // eslint-disable-line no-tabs
             dedent`
         # H1
         line with trailing spaces and tabs`,
         ),
+        new Example(
+            'With `TwoSpaceLinebreak=true`',
+            dedent`
+        # H1
+        line with trailing spaces and tabs  `,
+            dedent`
+        # H1
+        line with trailing spaces and tabs  `,
+            {TwoSpaceLinebreak: true},
+        ),
+      ],
+      [
+        new BooleanOption('TwoSpaceLinebreak', 'Ignore two spaces followed by a line break ("Two Space Rule").', false),
       ],
   ),
   new Rule(
@@ -702,14 +722,12 @@ export const rules: Rule[] = [
             if (text.slice(-1) != '\n') text += '\n';
 
             // remove footnotes that are their own paragraph
-            text = text.replace(/\n\n\[\^\w+\]: .*\n\n/gm, '\n\n');
+            text = text.replace(/\n(?:\n\[\^\w+\]: .*)+\n\n/gm, '\n\n');
 
             // remove footnotes directly before/after a line of text
-            text = text.replace(/\n?\n\[\^\w+\]: .*\n\n?/gm, '\n');
+            text = text.replace(/\n?(?:\n\[\^\w+\]: .*)+\n?/gm, '\n');
 
-            // remove footnotes sourrounded by text
-            text = text.replace(/\n\[\^\w+\]: .*\n/gm, '');
-
+            // append at the bottom
             text = text.replace(/\n*$/, '') + '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
             text = text.replace(/\n*$/, '') + '\n'; // remove all but one blank lines at the end
           }
@@ -733,6 +751,7 @@ export const rules: Rule[] = [
             Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
 
             Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+
             Maecenas malesuada dignissim purus ac volutpat.
 
             [^1]: first footnote
@@ -811,6 +830,29 @@ export const rules: Rule[] = [
 
         [^1]: first footnote
         [^2]: second footnote
+        `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Footnote after Punctuation',
+      'Ensures that footnote references are placed after punctuation, not before.',
+      RuleType.FOOTNOTE,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
+          // needed to ensure that no footnote text followed by ":" is matched
+          return text.replace(/(?!^)(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
+        });
+      },
+      [
+        new Example(
+            'Placing footnotes after punctuation.',
+            dedent`
+            Lorem[^1]. Ipsum[^2], doletes.
+        `,
+            dedent`
+            Lorem.[^1] Ipsum,[^2] doletes.
         `,
         ),
       ],
