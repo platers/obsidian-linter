@@ -116,7 +116,7 @@ export const rules: Rule[] = [
       'Removes extra spaces after every line.',
       RuleType.SPACING,
       (text: string, options = {}) => {
-        if (options['TwoSpaceLinebreak'] === false) {
+        if (options['Two Space Linebreak'] === false) {
           return text.replace(/[ \t]+$/gm, '');
         } else {
           text = text.replace(/\b[ \t]$/gm, ''); // one whitespace
@@ -136,18 +136,18 @@ export const rules: Rule[] = [
         line with trailing spaces and tabs`,
         ),
         new Example(
-            'With `TwoSpaceLinebreak=true`',
+            'With `Two Space Linebreak = true`',
             dedent`
         # H1
         line with trailing spaces and tabs  `,
             dedent`
         # H1
         line with trailing spaces and tabs  `,
-            {TwoSpaceLinebreak: true},
+            {'Two Space Linebreak': true},
         ),
       ],
       [
-        new BooleanOption('TwoSpaceLinebreak', 'Ignore two spaces followed by a line break ("Two Space Rule").', false),
+        new BooleanOption('Two Space Linebreak', 'Ignore two spaces followed by a line break ("Two Space Rule").', false),
       ],
   ),
   new Rule(

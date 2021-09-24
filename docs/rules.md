@@ -370,7 +370,7 @@ Alias: `trailing-spaces`
 Removes extra spaces after every line.
 
 Options:
-- TwoSpaceLinebreak: Ignore two spaces followed by a line break ("Two Space Rule").
+- Two Space Linebreak: Ignore two spaces followed by a line break ("Two Space Rule").
 	- Default: `false`
 
 Example: Removes trailing spaces and tabs
@@ -388,7 +388,7 @@ After:
 # H1
 line with trailing spaces and tabs
 ```
-Example: With `TwoSpaceLinebreak=true`
+Example: With `Two Space Linebreak = true`
 
 Before:
 
