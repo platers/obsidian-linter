@@ -1,4 +1,4 @@
-import {App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
+import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
 import {LinterSettings, Options, rules} from './rules';
 import {getDisabledRules} from './utils';
 import Diff from 'diff';
@@ -29,9 +29,7 @@ export default class LinterPlugin extends Plugin {
         id: 'lint-all-files',
         name: 'Lint all files in the vault',
         callback: () => {
-          this.app.vault.getMarkdownFiles().forEach((file) => {
-            this.runLinterFile(file);
-          });
+          new ConfirmationModal(this.app, this).open();
         },
       }); ;
 
@@ -107,6 +105,13 @@ export default class LinterPlugin extends Plugin {
       const oldText = await this.app.vault.read(file);
       const newText = this.lintText(oldText, file);
       this.app.vault.modify(file, newText);
+    }
+
+    async runLinterAllFiles() {
+      this.app.vault.getMarkdownFiles().forEach((file) => {
+        this.runLinterFile(file);
+      });
+      new Notice('Linted all files');
     }
 
     runLinterEditor(editor: Editor) {
@@ -253,4 +258,34 @@ class SettingTab extends PluginSettingTab {
         }
       }
     }
+}
+
+class ConfirmationModal extends Modal {
+  constructor(app: App, plugin: LinterPlugin) {
+    super(app);
+    this.modalEl.addClass('confirm-modal');
+
+    this.contentEl.createEl('h3', {text: 'Warning'});
+
+    const e: HTMLParagraphElement = this.contentEl.createEl('p',
+        {text: 'This will edit all of your files and may introduce errors. Make sure you have backed up your files.'});
+    e.id = 'confirm-dialog';
+
+    this.contentEl.createDiv('modal-button-container', (buttonsEl) => {
+      buttonsEl.createEl('button', {text: 'Cancel'}).addEventListener('click', () => this.close());
+
+      const btnSumbit = buttonsEl.createEl('button', {
+        attr: {type: 'submit'},
+        cls: 'mod-cta',
+        text: 'Lint All',
+      });
+      btnSumbit.addEventListener('click', async (e) => {
+        await plugin.runLinterAllFiles();
+        this.close();
+      });
+      setTimeout(() => {
+        btnSumbit.focus();
+      }, 50);
+    });
+  }
 }
