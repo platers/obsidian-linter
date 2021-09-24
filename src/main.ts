@@ -260,6 +260,7 @@ class SettingTab extends PluginSettingTab {
     }
 }
 
+// https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/src/modal.ts#L68
 class ConfirmationModal extends Modal {
   constructor(app: App, plugin: LinterPlugin) {
     super(app);
