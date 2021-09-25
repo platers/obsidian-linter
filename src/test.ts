@@ -253,6 +253,23 @@ describe('Consecutive blank lines', () => {
     expect(rulesDict['consecutive-blank-lines'].apply(before)).toBe(after);
   });
 });
+describe('Convert spaces to tabs', () => {
+  it('Basic case', () => {
+    const before = dedent`
+      - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          - Vestibulum id tortor lobortis, tristique mi quis, pretium metus.
+      - Nunc ut arcu fermentum enim auctor accumsan ut a risus.
+              - Donec ut auctor dui.
+      `;
+    const after = dedent`
+      - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      \t- Vestibulum id tortor lobortis, tristique mi quis, pretium metus.
+      - Nunc ut arcu fermentum enim auctor accumsan ut a risus.
+      \t\t- Donec ut auctor dui.
+      `;
+    expect(rulesDict['convert-spaces-to-tabs'].apply(before)).toBe(after);
+  });
+});
 
 describe('Disabled rules parsing', () => {
   it('No YAML', () => {
