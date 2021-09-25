@@ -122,7 +122,7 @@ export const rules: Rule[] = [
         } else {
           text = text.replace(/\b[ \t]$/gm, ''); // one whitespace
           text = text.replace(/\b[ \t]{3,}$/gm, ''); // three or more whitespaces
-          text = text.replace(/\b( ?\t ?)$/gm, ''); // two whitespaces with at least one tab
+          text = text.replace(/\b( ?\t\t? ?)$/gm, ''); // two whitespaces with at least one tab
           return text;
         }
       },
@@ -717,20 +717,18 @@ export const rules: Rule[] = [
       RuleType.FOOTNOTE,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
+          // ensures footnotes at the end of the document are recognized properly
+          if (text.slice(-1) != '\n') text += '\n';
           const footnotes = text.match(/^\[\^\w+\]: .*$/gm); // collect footnotes
           if (footnotes != null) {
-            // ensures footnotes at the end of the document are recognized properly
-            if (text.slice(-1) != '\n') text += '\n';
-
             // remove footnotes that are their own paragraph
             text = text.replace(/\n(?:\n\[\^\w+\]: .*)+\n\n/gm, '\n\n');
 
             // remove footnotes directly before/after a line of text
             text = text.replace(/\n?(?:\n\[\^\w+\]: .*)+\n?/gm, '\n');
 
-            // append at the bottom
-            text = text.replace(/\n*$/, '') + '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
-            text = text.replace(/\n*$/, '') + '\n'; // remove all but one blank lines at the end
+            // append footnotes at the very end of the note
+            text = text.replace(/\n*$/, '') + '\n\n' + footnotes.join('\n') + '\n';
           }
           return text;
         });
