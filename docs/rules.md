@@ -264,6 +264,7 @@ After:
 Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
 
 Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+
 Maecenas malesuada dignissim purus ac volutpat.
 
 [^1]: first footnote
@@ -339,6 +340,28 @@ Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et 
 [^2]: second footnote
 ```
 
+### Footnote after Punctuation
+
+Alias: `footnote-after-punctuation`
+
+Ensures that footnote references are placed after punctuation, not before.
+
+
+
+Example: Placing footnotes after punctuation.
+
+Before:
+
+```markdown
+Lorem[^1]. Ipsum[^2], doletes.
+```
+
+After:
+
+```markdown
+Lorem.[^1] Ipsum,[^2] doletes.
+```
+
 ## Spacing
 ### Trailing spaces
 
@@ -346,7 +369,9 @@ Alias: `trailing-spaces`
 
 Removes extra spaces after every line.
 
-
+Options:
+- Two Space Linebreak: Ignore two spaces followed by a line break ("Two Space Rule").
+	- Default: `false`
 
 Example: Removes trailing spaces and tabs
 
@@ -354,7 +379,7 @@ Before:
 
 ```markdown
 # H1   
-line with trailing spaces and tabs            
+line with trailing spaces and tabs	        
 ```
 
 After:
@@ -362,6 +387,21 @@ After:
 ```markdown
 # H1
 line with trailing spaces and tabs
+```
+Example: With `Two Space Linebreak = true`
+
+Before:
+
+```markdown
+# H1
+line with trailing spaces and tabs  
+```
+
+After:
+
+```markdown
+# H1
+line with trailing spaces and tabs  
 ```
 
 ### Heading blank lines
