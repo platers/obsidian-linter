@@ -11,6 +11,7 @@ export interface LinterSettings {
     [ruleName: string]: Options;
   };
   lintOnSave: boolean;
+  displayChanged: boolean;
 }
 /* eslint-disable no-unused-vars */
 enum RuleType {

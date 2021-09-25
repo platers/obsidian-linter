@@ -58,18 +58,22 @@ export default class LinterPlugin extends Plugin {
       this.settings = {
         ruleConfigs: {},
         lintOnSave: false,
+        displayChanged: true,
       };
       const storedSettings = await this.loadData();
 
       for (const rule of rules) {
         this.settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
-        if (storedSettings?.ruleConfigs !== null && storedSettings?.ruleConfigs[rule.name]) {
+        if (storedSettings?.ruleConfigs !== null && storedSettings?.ruleConfigs[rule.name] !== null) {
           Object.assign(this.settings.ruleConfigs[rule.name], storedSettings.ruleConfigs[rule.name]);
         }
       }
 
       if (storedSettings?.lintOnSave) {
         this.settings.lintOnSave = storedSettings.lintOnSave;
+      }
+      if (storedSettings?.displayChanged) {
+        this.settings.displayChanged = storedSettings.displayChanged;
       }
     }
 
@@ -82,7 +86,7 @@ export default class LinterPlugin extends Plugin {
       const disabledRules = getDisabledRules(oldText);
 
       for (const rule of rules) {
-        if (disabledRules.includes(rule.name)) {
+        if (disabledRules.includes(rule.alias())) {
           continue;
         }
 
@@ -146,10 +150,17 @@ export default class LinterPlugin extends Plugin {
 
       const charsAdded = changes.map((change) => change.added ? change.value.length : 0).reduce((a, b) => a + b, 0);
       const charsRemoved = changes.map((change) => change.removed ? change.value.length : 0).reduce((a, b) => a + b, 0);
-      new Notice(dedent`
+      this.displayChangedMessage(charsAdded, charsRemoved);
+    }
+
+    private displayChangedMessage(charsAdded: number, charsRemoved: number) {
+      if (this.settings.displayChanged) {
+        const message = dedent`
         ${charsAdded} characters added
         ${charsRemoved} characters removed
-      `);
+      `;
+        new Notice(message);
+      }
     }
 }
 
@@ -237,6 +248,18 @@ class SettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.lintOnSave)
                 .onChange(async (value) => {
                   this.plugin.settings.lintOnSave = value;
+                  await this.plugin.saveSettings();
+                });
+          });
+
+      new Setting(containerEl)
+          .setName('Display message on lint')
+          .setDesc('Display the number of characters changed after linting')
+          .addToggle((toggle) => {
+            toggle
+                .setValue(this.plugin.settings.displayChanged)
+                .onChange(async (value) => {
+                  this.plugin.settings.displayChanged = value;
                   await this.plugin.saveSettings();
                 });
           });
