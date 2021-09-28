@@ -631,3 +631,25 @@ After:
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 ```
+
+### Remove Multiple Spaces
+
+Alias: `remove-multiple-spaces`
+
+Removes or multiple consecutive spaces. Ignores Spaces at the beginning and ending of the line. 
+
+
+
+Example: Removing double and triple space.
+
+Before:
+
+```markdown
+Lorem ipsum   dolor  sit amet.
+```
+
+After:
+
+```markdown
+Lorem ipsum dolor sit amet.
+```

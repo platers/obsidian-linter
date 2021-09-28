@@ -397,6 +397,27 @@ export const rules: Rule[] = [
         ),
       ],
   ),
+  new Rule(
+      'Remove Multiple Spaces',
+      'Removes or multiple consecutive spaces. Ignores Spaces at the beginning and ending of the line. ',
+      RuleType.SPACING,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          return text.replace(/\b {2,}\b/g, ' ');
+        });
+      },
+      [
+        new Example(
+            'Removing double and triple space.',
+            dedent`
+          Lorem ipsum   dolor  sit amet.
+      `,
+            dedent`
+          Lorem ipsum dolor sit amet.
+      `,
+        ),
+      ],
+  ),
 
   // YAML rules
 
