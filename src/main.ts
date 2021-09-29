@@ -64,7 +64,7 @@ export default class LinterPlugin extends Plugin {
 
       for (const rule of rules) {
         this.settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
-        if (storedSettings?.ruleConfigs !== null && storedSettings?.ruleConfigs[rule.name] !== null) {
+        if (storedSettings?.ruleConfigs && storedSettings?.ruleConfigs[rule.name]) {
           Object.assign(this.settings.ruleConfigs[rule.name], storedSettings.ruleConfigs[rule.name]);
         }
       }
