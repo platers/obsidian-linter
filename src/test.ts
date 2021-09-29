@@ -228,6 +228,23 @@ describe('Paragraph blank lines', () => {
     `;
     expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
   });
+  it('Handles lists', () => {
+    const before = dedent`
+    Hello
+    World
+    - 1
+    \t- 2
+    `;
+    const after = dedent`
+    Hello
+
+    World
+
+    - 1
+    \t- 2
+    `;
+    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
+  });
 });
 describe('Consecutive blank lines', () => {
   it('Handles ignores code blocks', () => {
@@ -267,7 +284,7 @@ describe('Convert spaces to tabs', () => {
       - Nunc ut arcu fermentum enim auctor accumsan ut a risus.
       \t\t- Donec ut auctor dui.
       `;
-    expect(rulesDict['convert-spaces-to-tabs'].apply(before)).toBe(after);
+    expect(rulesDict['convert-spaces-to-tabs'].apply(before, {Tabsize: '4'})).toBe(after);
   });
 });
 

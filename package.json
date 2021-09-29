@@ -41,6 +41,8 @@
     "diff": "^4.0.2",
     "js-yaml": "^3.14.1",
     "moment": "^2.29.1",
-    "ts-dedent": "^2.2.0"
+    "remark": "^14.0.1",
+    "ts-dedent": "^2.2.0",
+    "unified-lint-rule": "^2.1.0"
   }
 }
