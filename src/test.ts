@@ -377,6 +377,21 @@ describe('Move Footnotes to the bottom', () => {
     expect(rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
   });
 });
+describe('yaml timestamp', () => {
+  it('Doesnt add date created if already there', () => {
+    const before = dedent`
+    ---
+    date created: 2019-01-01
+    ---
+    `;
+    const after = dedent`
+    ---
+    date created: 2019-01-01
+    ---
+    `;
+    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true})).toBe(after);
+  });
+});
 
 describe('Disabled rules parsing', () => {
   it('No YAML', () => {
