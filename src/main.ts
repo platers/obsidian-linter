@@ -59,12 +59,13 @@ export default class LinterPlugin extends Plugin {
         ruleConfigs: {},
         lintOnSave: false,
         displayChanged: true,
+        foldersToIgnore: [],
       };
       const storedSettings = await this.loadData();
 
       for (const rule of rules) {
         this.settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
-        if (storedSettings?.ruleConfigs !== null && storedSettings?.ruleConfigs[rule.name] !== null) {
+        if (storedSettings?.ruleConfigs && storedSettings?.ruleConfigs[rule.name]) {
           Object.assign(this.settings.ruleConfigs[rule.name], storedSettings.ruleConfigs[rule.name]);
         }
       }
@@ -74,6 +75,9 @@ export default class LinterPlugin extends Plugin {
       }
       if (storedSettings?.displayChanged) {
         this.settings.displayChanged = storedSettings.displayChanged;
+      }
+      if (storedSettings?.foldersToIgnore) {
+        this.settings.foldersToIgnore = storedSettings.foldersToIgnore;
       }
     }
 
@@ -113,6 +117,12 @@ export default class LinterPlugin extends Plugin {
 
     async runLinterAllFiles() {
       this.app.vault.getMarkdownFiles().forEach((file) => {
+        for (const folder of this.settings.foldersToIgnore) {
+          if (file.path.startsWith(folder)) {
+            return;
+          }
+        }
+
         this.runLinterFile(file);
       });
       new Notice('Linted all files');
@@ -260,6 +270,18 @@ class SettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.displayChanged)
                 .onChange(async (value) => {
                   this.plugin.settings.displayChanged = value;
+                  await this.plugin.saveSettings();
+                });
+          });
+
+      new Setting(containerEl)
+          .setName('Folders to ignore')
+          .setDesc('Folders to ignore when linting all files. Enter folder paths separated by newlines')
+          .addTextArea((textArea) => {
+            textArea
+                .setValue(this.plugin.settings.foldersToIgnore.join('\n'))
+                .onChange(async (value) => {
+                  this.plugin.settings.foldersToIgnore = value.split('\n');
                   await this.plugin.saveSettings();
                 });
           });

@@ -12,6 +12,7 @@ export interface LinterSettings {
   };
   lintOnSave: boolean;
   displayChanged: boolean;
+  foldersToIgnore: string[];
 }
 /* eslint-disable no-unused-vars */
 enum RuleType {
@@ -469,8 +470,7 @@ export const rules: Rule[] = [
         text = initYAML(text);
 
         return formatYAML(text, (text) => {
-          if (options['Date Created'] === true) {
-            text = text.replace(/\ndate created:.*\n/, '\n');
+          if (options['Date Created'] === true && !text.match(/\ndate created:.*\n/)) {
             const yaml_end = text.indexOf('\n---');
             const formatted_date = moment(options['metadata: file created time']).format(options['Format']);
             text = insert(text, yaml_end, `\ndate created: ${formatted_date}`);
