@@ -400,7 +400,7 @@ export const rules: Rule[] = [
   ),
   new Rule(
       'Remove Multiple Spaces',
-      'Removes or multiple consecutive spaces. Ignores Spaces at the beginning and ending of the line. ',
+      'Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. ',
       RuleType.SPACING,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {

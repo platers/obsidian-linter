@@ -636,7 +636,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 Alias: `remove-multiple-spaces`
 
-Removes or multiple consecutive spaces. Ignores Spaces at the beginning and ending of the line. 
+Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. 
 
 
 
