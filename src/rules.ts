@@ -12,6 +12,7 @@ export interface LinterSettings {
   };
   lintOnSave: boolean;
   displayChanged: boolean;
+  foldersToIgnore: string[];
 }
 /* eslint-disable no-unused-vars */
 enum RuleType {
