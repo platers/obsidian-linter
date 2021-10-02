@@ -185,8 +185,10 @@ Options:
 	- `Title Case`: Capitalize using title case rules
 	- `All Caps`: Capitalize the first letter of each word
 	- `First Letter`: Only capitalize the first letter
+- Ignore Cased Words: Only apply title case style to words that are all lowercase
+	- Default: `true`
 
-Example: With `Title Case=true`
+Example: With `Title Case=true`, `Ignore Cased Words=false`
 
 Before:
 
@@ -202,6 +204,23 @@ After:
 # This is a Heading 1
 ## This is a Heading 2
 ### A Heading 3
+```
+Example: With `Title Case=true`, `Ignore Cased Words=true`
+
+Before:
+
+```markdown
+# this is a heading 1
+## THIS IS A HEADING 2
+### a hEaDiNg 3
+```
+
+After:
+
+```markdown
+# This is a Heading 1
+## THIS IS A HEADING 2
+### A hEaDiNg 3
 ```
 Example: With `First Letter=true`
 

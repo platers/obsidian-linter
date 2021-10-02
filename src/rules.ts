@@ -635,7 +635,8 @@ export const rules: Rule[] = [
                     continue;
                   }
 
-                  const keepWordcasing = keepCasing.includes(headerWords[j]);
+                  const ignoreCasedWord = options['Ignore Cased Words'] && (headerWords[j] !== headerWords[j].toLowerCase());
+                  const keepWordcasing = ignoreCasedWord || keepCasing.includes(headerWords[j]);
                   if (!keepWordcasing) {
                     headerWords[j] = headerWords[j].toLowerCase();
                     const ignoreWord = ignoreShortWords.includes(headerWords[j]);
@@ -660,7 +661,7 @@ export const rules: Rule[] = [
       },
       [
         new Example(
-            'With `Title Case=true`',
+            'With `Title Case=true`, `Ignore Cased Words=false`',
             dedent`
         # this is a heading 1
         ## THIS IS A HEADING 2
@@ -671,7 +672,21 @@ export const rules: Rule[] = [
         ## This is a Heading 2
         ### A Heading 3
         `,
-            {'Style': 'Title Case'},
+            {'Style': 'Title Case', 'Ignore Cased Words': false},
+        ),
+        new Example(
+            'With `Title Case=true`, `Ignore Cased Words=true`',
+            dedent`
+        # this is a heading 1
+        ## THIS IS A HEADING 2
+        ### a hEaDiNg 3
+        `,
+            dedent`
+        # This is a Heading 1
+        ## THIS IS A HEADING 2
+        ### A hEaDiNg 3
+        `,
+            {'Style': 'Title Case', 'Ignore Cased Words': true},
         ),
         new Example(
             'With `First Letter=true`',
@@ -706,6 +721,7 @@ export const rules: Rule[] = [
               new DropdownRecord('First Letter', 'Only capitalize the first letter'),
             ],
         ),
+        new BooleanOption('Ignore Cased Words', 'Only apply title case style to words that are all lowercase', true),
       ],
   ),
 
