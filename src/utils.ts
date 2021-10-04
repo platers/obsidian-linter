@@ -86,12 +86,12 @@ export function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => st
   return text;
 }
 
-export function formatYAML(text: string, func: (text: string) => string, includeHyphens = true): string {
+export function formatYAML(text: string, func: (text: string) => string): string {
   if (!text.match(yamlRegex)) {
     return text;
   }
 
-  const oldYaml = text.match(yamlRegex)[includeHyphens ? 0 : 1];
+  const oldYaml = text.match(yamlRegex)[0];
   const newYaml = func(oldYaml);
   text = text.replace(oldYaml, newYaml);
 

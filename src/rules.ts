@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert} from './utils';
+import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert, yamlRegex} from './utils';
 import {Option, BooleanOption, MomentFormatOption, TextOption, DropdownOption, DropdownRecord, TextAreaOption} from './option';
 import {load} from 'js-yaml';
 
@@ -468,20 +468,20 @@ export const rules: Rule[] = [
       'Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.',
       RuleType.YAML,
       (text: string, options = {}) => {
+        text = initYAML(text);
         return formatYAML(text, (text) => {
           const insert_lines = String(options['Text to insert']).split('\n').reverse();
-          const parsed_yaml = load(text) as Record<string, any>;
+          const parsed_yaml = load(text.match(yamlRegex)[1]) as Record<string, any>;
 
-          console.log(insert_lines);
           for (const line of insert_lines) {
             const key = line.split(':')[0];
             if (!parsed_yaml.hasOwnProperty(key)) {
-              text = line + '\n' + text;
+              text = text.replace(/^---\n/, `---\n${line}\n`);
             }
           }
 
           return text;
-        }, false);
+        });
       },
       [
         new Example(
