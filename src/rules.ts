@@ -1,7 +1,8 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
 import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert} from './utils';
-import {Option, BooleanOption, MomentFormatOption, TextOption, DropdownOption, DropdownRecord} from './option';
+import {Option, BooleanOption, MomentFormatOption, TextOption, DropdownOption, DropdownRecord, TextAreaOption} from './option';
+import {load} from 'js-yaml';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -462,6 +463,49 @@ export const rules: Rule[] = [
         ),
       ],
   ),
+  new Rule(
+      'Insert YAML attributes',
+      'Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.',
+      RuleType.YAML,
+      (text: string, options = {}) => {
+        return formatYAML(text, (text) => {
+          const insert_lines = String(options['Text to insert']).split('\n').reverse();
+          const parsed_yaml = load(text) as Record<string, any>;
+
+          console.log(insert_lines);
+          for (const line of insert_lines) {
+            const key = line.split(':')[0];
+            if (!parsed_yaml.hasOwnProperty(key)) {
+              text = line + '\n' + text;
+            }
+          }
+
+          return text;
+        }, false);
+      },
+      [
+        new Example(
+            'Insert static lines into YAML frontmatter. Text to insert: `aliases:\ntags: doc\nanimal: dog`',
+            dedent`
+            ---
+            animal: cat
+            ---
+            `,
+            dedent`
+            ---
+            aliases:
+            tags: doc
+            animal: cat
+            ---
+            `,
+            {'Text to insert': 'aliases:\ntags: doc\nanimal: dog'},
+        ),
+      ],
+      [
+        new TextAreaOption('Text to insert', 'Text to insert into the YAML frontmatter', 'aliases: \ntags: '),
+      ],
+  ),
+
   new Rule(
       'YAML Timestamp',
       'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.',
