@@ -91,9 +91,9 @@ export function formatYAML(text: string, func: (text: string) => string): string
     return text;
   }
 
-  let yaml = text.match(yamlRegex)[0];
-  yaml = func(yaml);
-  text = text.replace(yamlRegex, yaml);
+  const oldYaml = text.match(yamlRegex)[0];
+  const newYaml = func(oldYaml);
+  text = text.replace(oldYaml, newYaml);
 
   return text;
 }

@@ -47,6 +47,39 @@ tags: one, two, three
 ---
 ```
 
+### Insert YAML attributes
+
+Alias: `insert-yaml-attributes`
+
+Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.
+
+Options:
+- Text to insert: Text to insert into the YAML frontmatter
+	- Default: `aliases: 
+tags: `
+
+Example: Insert static lines into YAML frontmatter. Text to insert: `aliases:
+tags: doc
+animal: dog`
+
+Before:
+
+```markdown
+---
+animal: cat
+---
+```
+
+After:
+
+```markdown
+---
+aliases:
+tags: doc
+animal: cat
+---
+```
+
 ### YAML Timestamp
 
 Alias: `yaml-timestamp`

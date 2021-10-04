@@ -392,6 +392,19 @@ describe('yaml timestamp', () => {
     expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true})).toBe(after);
   });
 });
+describe('Insert yaml attributes', () => {
+  it('Inits yaml is not exist', () => {
+    const before = dedent`
+    `;
+    const after = dedent`
+    ---
+    tags:
+    ---
+    
+    `;
+    expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
+  });
+});
 
 describe('Disabled rules parsing', () => {
   it('No YAML', () => {
