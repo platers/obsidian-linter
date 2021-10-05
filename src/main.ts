@@ -70,13 +70,13 @@ export default class LinterPlugin extends Plugin {
         }
       }
 
-      if (storedSettings?.lintOnSave) {
+      if (typeof(storedSettings?.lintOnSave) === 'boolean') {
         this.settings.lintOnSave = storedSettings.lintOnSave;
       }
-      if (storedSettings?.displayChanged) {
+      if (typeof(storedSettings?.displayChanged) === 'boolean') {
         this.settings.displayChanged = storedSettings.displayChanged;
       }
-      if (storedSettings?.foldersToIgnore) {
+      if (typeof(storedSettings?.foldersToIgnore) === 'boolean') {
         this.settings.foldersToIgnore = storedSettings.foldersToIgnore;
       }
     }
