@@ -414,6 +414,51 @@ After:
 Lorem.[^1] Ipsum,[^2] doletes.
 ```
 
+## Content
+### Remove Multiple Spaces
+
+Alias: `remove-multiple-spaces`
+
+Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. 
+
+
+
+Example: Removing double and triple space.
+
+Before:
+
+```markdown
+Lorem ipsum   dolor  sit amet.
+```
+
+After:
+
+```markdown
+Lorem ipsum dolor sit amet.
+```
+
+### Remove Hyphenated Line Breaks
+
+Alias: `remove-hyphenated-line-breaks`
+
+Removes hyphenated line breaks. Useful when pasting text from textbooks.
+
+
+
+Example: Removing hyphenated line breaks.
+
+Before:
+
+```markdown
+This text has a linebr‐ eak.
+```
+
+After:
+
+```markdown
+This text has a linebreak.
+```
+
 ## Spacing
 ### Trailing spaces
 
@@ -682,26 +727,4 @@ After:
 ```markdown
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
-```
-
-### Remove Multiple Spaces
-
-Alias: `remove-multiple-spaces`
-
-Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. 
-
-
-
-Example: Removing double and triple space.
-
-Before:
-
-```markdown
-Lorem ipsum   dolor  sit amet.
-```
-
-After:
-
-```markdown
-Lorem ipsum dolor sit amet.
 ```

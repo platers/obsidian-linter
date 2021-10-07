@@ -20,6 +20,7 @@ enum RuleType {
   YAML = 'YAML',
   HEADING = 'Heading',
   FOOTNOTE = 'Footnote',
+  CONTENT = 'Content',
   SPACING = 'Spacing',
 }
 /* eslint-enable no-unused-vars */
@@ -399,10 +400,13 @@ export const rules: Rule[] = [
         ),
       ],
   ),
+
+  // Content rules
+
   new Rule(
       'Remove Multiple Spaces',
       'Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. ',
-      RuleType.SPACING,
+      RuleType.CONTENT,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
           return text.replace(/\b {2,}\b/g, ' ');
@@ -420,6 +424,28 @@ export const rules: Rule[] = [
         ),
       ],
   ),
+  new Rule(
+      'Remove Hyphenated Line Breaks',
+      'Removes hyphenated line breaks. Useful when pasting text from textbooks.',
+      RuleType.CONTENT,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          return text.replace(/\b[-‐] \b/g, '');
+        });
+      },
+      [
+        new Example(
+            'Removing hyphenated line breaks.',
+            dedent`
+            This text has a linebr‐ eak.
+            `,
+            dedent`
+            This text has a linebreak.
+            `,
+        ),
+      ],
+  ),
+
 
   // YAML rules
 
