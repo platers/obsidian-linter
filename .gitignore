@@ -6,7 +6,7 @@
 node_modules
 
 # build
-main.js
+*.js
 *.js.map
 
 # obsidian

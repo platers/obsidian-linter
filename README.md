@@ -1,9 +1,8 @@
 <!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->
 
+# Obsidian Linter
 ![Build](https://github.com/platers/obsidian-linter/actions/workflows/main.yml/badge.svg)
 ![Downloads](https://img.shields.io/github/downloads/platers/obsidian-linter/total)
-
-# Obsidian Linter
 
 This Obsidian plugin formats and styles your notes with a focus on configurability and extensibility.
 Rules can be toggled and configured in the settings.
