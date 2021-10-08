@@ -10,7 +10,7 @@ Rules can be toggled and configured in the settings.
 To lint the current file, run `Lint the current file` (`Ctrl+Alt+L` by default).
 To lint the all files, run `Lint all files in the vault`.
 
-When `Lint on save` is toggled on, the plugin will lint the current file on save.
+When `Lint on save` is toggled on, the plugin will lint the current file on manual save (when you press `Ctrl+S`).
 
 ### Disable rules
 

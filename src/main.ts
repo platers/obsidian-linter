@@ -266,7 +266,7 @@ class SettingTab extends PluginSettingTab {
 
       new Setting(containerEl)
           .setName('Lint on save')
-          .setDesc('Lint the file on save')
+          .setDesc('Lint the file on manual save (when `Ctrl + S` is pressed)')
           .addToggle((toggle) => {
             toggle
                 .setValue(this.plugin.settings.lintOnSave)
