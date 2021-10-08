@@ -1,8 +1,8 @@
-![Build](https://github.com/platers/obsidian-linter/actions/workflows/main.yml/badge.svg)
-
 # Obsidian Linter
+![Build](https://github.com/platers/obsidian-linter/actions/workflows/main.yml/badge.svg)
+![Downloads](https://img.shields.io/github/downloads/platers/obsidian-linter/total)
 
-This Obsidian plugin applies consistent styling to your markdown files.
+This Obsidian plugin formats and styles your notes with a focus on configurability and extensibility.
 Rules can be toggled and configured in the settings.
 
 ## Usage

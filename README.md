@@ -1,10 +1,10 @@
 <!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->
 
-![Build](https://github.com/platers/obsidian-linter/actions/workflows/main.yml/badge.svg)
-
 # Obsidian Linter
+![Build](https://github.com/platers/obsidian-linter/actions/workflows/main.yml/badge.svg)
+![Downloads](https://img.shields.io/github/downloads/platers/obsidian-linter/total)
 
-This Obsidian plugin applies consistent styling to your markdown files.
+This Obsidian plugin formats and styles your notes with a focus on configurability and extensibility.
 Rules can be toggled and configured in the settings.
 
 ## Usage
@@ -47,12 +47,16 @@ Make sure to use Node 15.x or higher.
 Documentation for all rules can be found in the [rules docs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md). The docs are updated before the plugin is released, so may not be completely accurate.
 
 - [format-tags-in-yaml](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#format-tags-in-yaml)
+- [insert-yaml-attributes](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#insert-yaml-attributes)
 - [yaml-timestamp](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-timestamp)
 - [header-increment](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#header-increment)
 - [file-name-heading](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#file-name-heading)
 - [capitalize-headings](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#capitalize-headings)
 - [move-footnotes-to-the-bottom](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#move-footnotes-to-the-bottom)
 - [re-index-footnotes](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#re-index-footnotes)
+- [footnote-after-punctuation](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#footnote-after-punctuation)
+- [remove-multiple-spaces](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-multiple-spaces)
+- [remove-hyphenated-line-breaks](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-hyphenated-line-breaks)
 - [trailing-spaces](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#trailing-spaces)
 - [heading-blank-lines](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#heading-blank-lines)
 - [paragraph-blank-lines](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#paragraph-blank-lines)

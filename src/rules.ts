@@ -1,7 +1,8 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert} from './utils';
-import {Option, BooleanOption, MomentFormatOption, TextOption, DropdownOption, DropdownRecord} from './option';
+import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert, yamlRegex} from './utils';
+import {Option, BooleanOption, MomentFormatOption, TextOption, DropdownOption, DropdownRecord, TextAreaOption} from './option';
+import {load} from 'js-yaml';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -12,12 +13,14 @@ export interface LinterSettings {
   };
   lintOnSave: boolean;
   displayChanged: boolean;
+  foldersToIgnore: string[];
 }
 /* eslint-disable no-unused-vars */
 enum RuleType {
   YAML = 'YAML',
   HEADING = 'Heading',
   FOOTNOTE = 'Footnote',
+  CONTENT = 'Content',
   SPACING = 'Spacing',
 }
 /* eslint-enable no-unused-vars */
@@ -116,19 +119,39 @@ export const rules: Rule[] = [
       'Trailing spaces',
       'Removes extra spaces after every line.',
       RuleType.SPACING,
-      (text: string) => {
-        return text.replace(/[ \t]+$/gm, '');
+      (text: string, options = {}) => {
+        if (options['Two Space Linebreak'] === false) {
+          return text.replace(/[ \t]+$/gm, '');
+        } else {
+          text = text.replace(/\b[ \t]$/gm, ''); // one whitespace
+          text = text.replace(/\b[ \t]{3,}$/gm, ''); // three or more whitespaces
+          text = text.replace(/\b( ?\t\t? ?)$/gm, ''); // two whitespaces with at least one tab
+          return text;
+        }
       },
       [
         new Example(
             'Removes trailing spaces and tabs',
             dedent`
         # H1   
-        line with trailing spaces and tabs            `, // eslint-disable-line no-tabs
+        line with trailing spaces and tabs	        `, // eslint-disable-line no-tabs
             dedent`
         # H1
         line with trailing spaces and tabs`,
         ),
+        new Example(
+            'With `Two Space Linebreak = true`',
+            dedent`
+        # H1
+        line with trailing spaces and tabs  `,
+            dedent`
+        # H1
+        line with trailing spaces and tabs  `,
+            {'Two Space Linebreak': true},
+        ),
+      ],
+      [
+        new BooleanOption('Two Space Linebreak', 'Ignore two spaces followed by a line break ("Two Space Rule").', false),
       ],
   ),
   new Rule(
@@ -378,6 +401,52 @@ export const rules: Rule[] = [
       ],
   ),
 
+  // Content rules
+
+  new Rule(
+      'Remove Multiple Spaces',
+      'Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. ',
+      RuleType.CONTENT,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          return text.replace(/\b {2,}\b/g, ' ');
+        });
+      },
+      [
+        new Example(
+            'Removing double and triple space.',
+            dedent`
+          Lorem ipsum   dolor  sit amet.
+      `,
+            dedent`
+          Lorem ipsum dolor sit amet.
+      `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Remove Hyphenated Line Breaks',
+      'Removes hyphenated line breaks. Useful when pasting text from textbooks.',
+      RuleType.CONTENT,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          return text.replace(/\b[-‐] \b/g, '');
+        });
+      },
+      [
+        new Example(
+            'Removing hyphenated line breaks.',
+            dedent`
+            This text has a linebr‐ eak.
+            `,
+            dedent`
+            This text has a linebreak.
+            `,
+        ),
+      ],
+  ),
+
+
   // YAML rules
 
   new Rule(
@@ -421,6 +490,49 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
+      'Insert YAML attributes',
+      'Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.',
+      RuleType.YAML,
+      (text: string, options = {}) => {
+        text = initYAML(text);
+        return formatYAML(text, (text) => {
+          const insert_lines = String(options['Text to insert']).split('\n').reverse();
+          const parsed_yaml = load(text.match(yamlRegex)[1]) as Record<string, any>;
+
+          for (const line of insert_lines) {
+            const key = line.split(':')[0];
+            if (!parsed_yaml.hasOwnProperty(key)) {
+              text = text.replace(/^---\n/, `---\n${line}\n`);
+            }
+          }
+
+          return text;
+        });
+      },
+      [
+        new Example(
+            'Insert static lines into YAML frontmatter. Text to insert: `aliases:\ntags: doc\nanimal: dog`',
+            dedent`
+            ---
+            animal: cat
+            ---
+            `,
+            dedent`
+            ---
+            aliases:
+            tags: doc
+            animal: cat
+            ---
+            `,
+            {'Text to insert': 'aliases:\ntags: doc\nanimal: dog'},
+        ),
+      ],
+      [
+        new TextAreaOption('Text to insert', 'Text to insert into the YAML frontmatter', 'aliases: \ntags: '),
+      ],
+  ),
+
+  new Rule(
       'YAML Timestamp',
       'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.',
       RuleType.YAML,
@@ -428,8 +540,7 @@ export const rules: Rule[] = [
         text = initYAML(text);
 
         return formatYAML(text, (text) => {
-          if (options['Date Created'] === true) {
-            text = text.replace(/\ndate created:.*\n/, '\n');
+          if (options['Date Created'] === true && !text.match(/\ndate created:.*\n/)) {
             const yaml_end = text.indexOf('\n---');
             const formatted_date = moment(options['metadata: file created time']).format(options['Format']);
             text = insert(text, yaml_end, `\ndate created: ${formatted_date}`);
@@ -615,7 +726,8 @@ export const rules: Rule[] = [
                     continue;
                   }
 
-                  const keepWordcasing = keepCasing.includes(headerWords[j]);
+                  const ignoreCasedWord = options['Ignore Cased Words'] && (headerWords[j] !== headerWords[j].toLowerCase());
+                  const keepWordcasing = ignoreCasedWord || keepCasing.includes(headerWords[j]);
                   if (!keepWordcasing) {
                     headerWords[j] = headerWords[j].toLowerCase();
                     const ignoreWord = ignoreShortWords.includes(headerWords[j]);
@@ -640,7 +752,7 @@ export const rules: Rule[] = [
       },
       [
         new Example(
-            'With `Title Case=true`',
+            'With `Title Case=true`, `Ignore Cased Words=false`',
             dedent`
         # this is a heading 1
         ## THIS IS A HEADING 2
@@ -651,7 +763,21 @@ export const rules: Rule[] = [
         ## This is a Heading 2
         ### A Heading 3
         `,
-            {'Style': 'Title Case'},
+            {'Style': 'Title Case', 'Ignore Cased Words': false},
+        ),
+        new Example(
+            'With `Title Case=true`, `Ignore Cased Words=true`',
+            dedent`
+        # this is a heading 1
+        ## THIS IS A HEADING 2
+        ### a hEaDiNg 3
+        `,
+            dedent`
+        # This is a Heading 1
+        ## THIS IS A HEADING 2
+        ### A hEaDiNg 3
+        `,
+            {'Style': 'Title Case', 'Ignore Cased Words': true},
         ),
         new Example(
             'With `First Letter=true`',
@@ -686,6 +812,7 @@ export const rules: Rule[] = [
               new DropdownRecord('First Letter', 'Only capitalize the first letter'),
             ],
         ),
+        new BooleanOption('Ignore Cased Words', 'Only apply title case style to words that are all lowercase', true),
       ],
   ),
 
@@ -697,18 +824,18 @@ export const rules: Rule[] = [
       RuleType.FOOTNOTE,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
+          // ensures footnotes at the end of the document are recognized properly
+          if (text.slice(-1) != '\n') text += '\n';
           const footnotes = text.match(/^\[\^\w+\]: .*$/gm); // collect footnotes
           if (footnotes != null) {
             // remove footnotes that are their own paragraph
-            text = text.replace(/\n\n\[\^\w+\]: .*\n\n/gm, '\n\n');
+            text = text.replace(/\n(?:\n\[\^\w+\]: .*)+\n\n/gm, '\n\n');
 
             // remove footnotes directly before/after a line of text
-            text = text.replace(/\n?\n\[\^\w+\]: .*\n\n?/gm, '\n');
+            text = text.replace(/\n?(?:\n\[\^\w+\]: .*)+\n?/gm, '\n');
 
-            // remove footnotes sourrounded by text
-            text = text.replace(/\n\[\^\w+\]: .*\n/gm, '');
-            text += '\n\n' + footnotes.join('\n'); // append footnotes at the very end of the note
-            text = text.replace(/\n*$/, '') + '\n'; // remove all but one blank lines at the end
+            // append footnotes at the very end of the note
+            text = text.replace(/\n*$/, '') + '\n\n' + footnotes.join('\n') + '\n';
           }
           return text;
         });
@@ -730,6 +857,7 @@ export const rules: Rule[] = [
             Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
 
             Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+
             Maecenas malesuada dignissim purus ac volutpat.
 
             [^1]: first footnote
@@ -808,6 +936,29 @@ export const rules: Rule[] = [
 
         [^1]: first footnote
         [^2]: second footnote
+        `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Footnote after Punctuation',
+      'Ensures that footnote references are placed after punctuation, not before.',
+      RuleType.FOOTNOTE,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
+          // needed to ensure that no footnote text followed by ":" is matched
+          return text.replace(/(?!^)(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
+        });
+      },
+      [
+        new Example(
+            'Placing footnotes after punctuation.',
+            dedent`
+            Lorem[^1]. Ipsum[^2], doletes.
+        `,
+            dedent`
+            Lorem.[^1] Ipsum,[^2] doletes.
         `,
         ),
       ],

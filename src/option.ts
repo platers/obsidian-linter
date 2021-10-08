@@ -43,6 +43,10 @@ export class TextOption extends Option {
   public defaultValue: string;
 }
 
+export class TextAreaOption extends Option {
+  public defaultValue: string;
+}
+
 export class MomentFormatOption extends Option {
   public defaultValue: boolean;
 }

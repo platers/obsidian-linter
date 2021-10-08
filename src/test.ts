@@ -290,6 +290,158 @@ describe('Convert spaces to tabs', () => {
   });
 });
 
+describe('Trailing spaces', () => {
+  it('One trailing space removed', () => {
+    const before = dedent`
+        # H1 
+        line with one trailing spaces 
+      `;
+    const after = dedent`
+        # H1
+        line with one trailing spaces
+      `;
+    expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
+  });
+  it('Three trailing whitespaces removed', () => {
+    const before = dedent`
+        # H1   
+        line with three trailing spaces   
+      `;
+    const after = dedent`
+        # H1
+        line with three trailing spaces
+      `;
+    expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
+  });
+  /* eslint-disable no-mixed-spaces-and-tabs, no-tabs */
+  it('Tab-Space-Linebreak removed', () => {
+    const before = dedent`
+        # H1
+        line with trailing tab and spaces    
+
+      `;
+    const after = dedent`
+        # H1
+        line with trailing tab and spaces
+        
+      `;
+    expect(rulesDict['trailing-spaces'].apply(before, {'Style': 'Two Space Linebreak'})).toBe(after);
+  });
+  /* eslint-enable no-mixed-spaces-and-tabs, no-tabs */
+  it('Two Space Linebreak not removed', () => {
+    const before = dedent`
+        # H1
+        line with one trailing spaces  
+
+      `;
+    const after = dedent`
+        # H1
+        line with one trailing spaces  
+
+      `;
+    expect(rulesDict['trailing-spaces'].apply(before, {'Style': 'Two Space Linebreak'})).toBe(after);
+  });
+});
+
+describe('Move Footnotes to the bottom', () => {
+  it('Long Document with multiple consecutive footnotes', () => {
+    const before = dedent`
+   # Part 1
+   Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in est.[^1] Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has.[^2] . In pri reque accumsan, quidam noster interpretaris in est.[^3] Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in est.[^4] Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has.[^5]
+
+   [^1]: See @JIPPChristKingPaul2015, 50.
+   [^2]: Jipp in -@JIPPChristKingPaul2015, 45, says, “Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has”.
+   [^3]: This is from Journal article --@gaventaLouisMartynGalatians2000, 99.
+   [^4]: Lorem ipsum dolor sit amet, cibo eripuit consulatu at vim. No quando animal eam, ea timeam ancillae incorrupte usu. Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in es. See @WANRomansIntroductionStudy2021, 45. 
+   [^5]: See @johnsonTransformationMindMoral2003, 215.
+
+   No hendrerit efficiendi eam. Vim ne ferri populo voluptatum, et usu laboramus scribentur, per illud inermis consetetur id.[^a]
+
+   Eu graeco blandit instructior pro, ut vidisse mediocrem qui. Ex ferri melius evertitur qui. At nec eripuit legimus.[^b] Ut meis solum recusabo eos, usu in[^c] assueverit eloquentiam, has facilis scribentur ea. No hendrerit efficiendi eam. Vim ne ferri populo voluptatum, et usu laboramus scribentur, per illud inermis consetetur id.[^d]
+
+   [^a]: Footnote 1.
+   [^b]: Footnote 2.
+   [^c]: Wright in -@wrightPaulFreshPerspective2005 says, “Modo omnes neglegentur cu vel.”
+   [^d]: Abraham in -@abrahamPostcolonialTheologies2015, says, “Ei eos deleniti electram. Prima prompta partiendo ius ne.”
+
+   # Part 3
+   In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Mel et vocent scribentur.[^11] 
+
+   > In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Te sea stet deserunt, vel tritani eligendi platonem ut, sea ea fugit iriure. Usu at elaboraret scriptorem signiferumque, cetero reprimique est cu. Ei eos deleniti electram. Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^21]
+
+   Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^31]
+
+   Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^41]
+
+   [^11]: See @JIPPMessianicTheologyNew2020
+   [^21]: See @jippDivineVisitationsHospitality2013. Dunn in @dunnRomans181988, says, “Mel et vocent scribentur.”
+   [^31]: Abraham in -@abrahamPostcolonialTheologies2015, says, “Ei eos deleniti electram. Prima prompta partiendo ius ne.”
+   [^41]: Wright in -@wrightPaulFreshPerspective2005 says, “Modo omnes neglegentur cu vel.”
+   `;
+    const after = dedent`
+   # Part 1
+   Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in est.[^1] Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has.[^2] . In pri reque accumsan, quidam noster interpretaris in est.[^3] Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in est.[^4] Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has.[^5]
+
+   No hendrerit efficiendi eam. Vim ne ferri populo voluptatum, et usu laboramus scribentur, per illud inermis consetetur id.[^a]
+
+   Eu graeco blandit instructior pro, ut vidisse mediocrem qui. Ex ferri melius evertitur qui. At nec eripuit legimus.[^b] Ut meis solum recusabo eos, usu in[^c] assueverit eloquentiam, has facilis scribentur ea. No hendrerit efficiendi eam. Vim ne ferri populo voluptatum, et usu laboramus scribentur, per illud inermis consetetur id.[^d]
+
+   # Part 3
+   In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Mel et vocent scribentur.[^11] 
+
+   > In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Te sea stet deserunt, vel tritani eligendi platonem ut, sea ea fugit iriure. Usu at elaboraret scriptorem signiferumque, cetero reprimique est cu. Ei eos deleniti electram. Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^21]
+
+   Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^31]
+
+   Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^41]
+
+   [^1]: See @JIPPChristKingPaul2015, 50.
+   [^2]: Jipp in -@JIPPChristKingPaul2015, 45, says, “Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has”.
+   [^3]: This is from Journal article --@gaventaLouisMartynGalatians2000, 99.
+   [^4]: Lorem ipsum dolor sit amet, cibo eripuit consulatu at vim. No quando animal eam, ea timeam ancillae incorrupte usu. Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in es. See @WANRomansIntroductionStudy2021, 45. 
+   [^5]: See @johnsonTransformationMindMoral2003, 215.
+   [^a]: Footnote 1.
+   [^b]: Footnote 2.
+   [^c]: Wright in -@wrightPaulFreshPerspective2005 says, “Modo omnes neglegentur cu vel.”
+   [^d]: Abraham in -@abrahamPostcolonialTheologies2015, says, “Ei eos deleniti electram. Prima prompta partiendo ius ne.”
+   [^11]: See @JIPPMessianicTheologyNew2020
+   [^21]: See @jippDivineVisitationsHospitality2013. Dunn in @dunnRomans181988, says, “Mel et vocent scribentur.”
+   [^31]: Abraham in -@abrahamPostcolonialTheologies2015, says, “Ei eos deleniti electram. Prima prompta partiendo ius ne.”
+   [^41]: Wright in -@wrightPaulFreshPerspective2005 says, “Modo omnes neglegentur cu vel.”
+
+   `;
+    expect(rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
+  });
+});
+describe('yaml timestamp', () => {
+  it('Doesnt add date created if already there', () => {
+    const before = dedent`
+    ---
+    date created: 2019-01-01
+    ---
+    `;
+    const after = dedent`
+    ---
+    date created: 2019-01-01
+    ---
+    `;
+    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true})).toBe(after);
+  });
+});
+describe('Insert yaml attributes', () => {
+  it('Inits yaml is not exist', () => {
+    const before = dedent`
+    `;
+    const after = dedent`
+    ---
+    tags:
+    ---
+    
+    `;
+    expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
+  });
+});
+
 describe('Disabled rules parsing', () => {
   it('No YAML', () => {
     const text = dedent`

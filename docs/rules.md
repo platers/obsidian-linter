@@ -47,6 +47,39 @@ tags: one, two, three
 ---
 ```
 
+### Insert YAML attributes
+
+Alias: `insert-yaml-attributes`
+
+Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.
+
+Options:
+- Text to insert: Text to insert into the YAML frontmatter
+	- Default: `aliases: 
+tags: `
+
+Example: Insert static lines into YAML frontmatter. Text to insert: `aliases:
+tags: doc
+animal: dog`
+
+Before:
+
+```markdown
+---
+animal: cat
+---
+```
+
+After:
+
+```markdown
+---
+aliases:
+tags: doc
+animal: cat
+---
+```
+
 ### YAML Timestamp
 
 Alias: `yaml-timestamp`
@@ -185,8 +218,10 @@ Options:
 	- `Title Case`: Capitalize using title case rules
 	- `All Caps`: Capitalize the first letter of each word
 	- `First Letter`: Only capitalize the first letter
+- Ignore Cased Words: Only apply title case style to words that are all lowercase
+	- Default: `true`
 
-Example: With `Title Case=true`
+Example: With `Title Case=true`, `Ignore Cased Words=false`
 
 Before:
 
@@ -202,6 +237,23 @@ After:
 # This is a Heading 1
 ## This is a Heading 2
 ### A Heading 3
+```
+Example: With `Title Case=true`, `Ignore Cased Words=true`
+
+Before:
+
+```markdown
+# this is a heading 1
+## THIS IS A HEADING 2
+### a hEaDiNg 3
+```
+
+After:
+
+```markdown
+# This is a Heading 1
+## THIS IS A HEADING 2
+### A hEaDiNg 3
 ```
 Example: With `First Letter=true`
 
@@ -264,6 +316,7 @@ After:
 Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
 
 Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+
 Maecenas malesuada dignissim purus ac volutpat.
 
 [^1]: first footnote
@@ -339,6 +392,73 @@ Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et 
 [^2]: second footnote
 ```
 
+### Footnote after Punctuation
+
+Alias: `footnote-after-punctuation`
+
+Ensures that footnote references are placed after punctuation, not before.
+
+
+
+Example: Placing footnotes after punctuation.
+
+Before:
+
+```markdown
+Lorem[^1]. Ipsum[^2], doletes.
+```
+
+After:
+
+```markdown
+Lorem.[^1] Ipsum,[^2] doletes.
+```
+
+## Content
+### Remove Multiple Spaces
+
+Alias: `remove-multiple-spaces`
+
+Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. 
+
+
+
+Example: Removing double and triple space.
+
+Before:
+
+```markdown
+Lorem ipsum   dolor  sit amet.
+```
+
+After:
+
+```markdown
+Lorem ipsum dolor sit amet.
+```
+
+### Remove Hyphenated Line Breaks
+
+Alias: `remove-hyphenated-line-breaks`
+
+Removes hyphenated line breaks. Useful when pasting text from textbooks.
+
+
+
+Example: Removing hyphenated line breaks.
+
+Before:
+
+```markdown
+This text has a linebr‐ eak.
+```
+
+After:
+
+```markdown
+This text has a linebreak.
+```
+
 ## Spacing
 ### Trailing spaces
 
@@ -346,7 +466,9 @@ Alias: `trailing-spaces`
 
 Removes extra spaces after every line.
 
-
+Options:
+- Two Space Linebreak: Ignore two spaces followed by a line break ("Two Space Rule").
+	- Default: `false`
 
 Example: Removes trailing spaces and tabs
 
@@ -354,7 +476,7 @@ Before:
 
 ```markdown
 # H1   
-line with trailing spaces and tabs            
+line with trailing spaces and tabs	        
 ```
 
 After:
@@ -362,6 +484,21 @@ After:
 ```markdown
 # H1
 line with trailing spaces and tabs
+```
+Example: With `Two Space Linebreak = true`
+
+Before:
+
+```markdown
+# H1
+line with trailing spaces and tabs  
+```
+
+After:
+
+```markdown
+# H1
+line with trailing spaces and tabs  
 ```
 
 ### Heading blank lines
