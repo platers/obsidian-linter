@@ -234,6 +234,7 @@ describe('Paragraph blank lines', () => {
     World
     - 1
     \t- 2
+        - 3
     `;
     const after = dedent`
     Hello
@@ -242,6 +243,7 @@ describe('Paragraph blank lines', () => {
 
     - 1
     \t- 2
+        - 3
     `;
     expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
   });
