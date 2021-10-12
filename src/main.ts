@@ -46,8 +46,6 @@ export default class LinterPlugin extends Plugin {
             const editor = this.app.workspace.getActiveViewOfType(MarkdownView).editor;
             this.runLinterEditor(editor);
           }
-
-          save();
         };
       }
 
