@@ -52,6 +52,11 @@ export default class LinterPlugin extends Plugin {
       this.addSettingTab(new SettingTab(this.app, this));
     }
 
+    async onunload() {
+      console.log('Unloading Linter plugin');
+
+    }
+
     async loadSettings() {
       this.settings = {
         ruleConfigs: {},
