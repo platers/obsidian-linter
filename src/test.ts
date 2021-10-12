@@ -55,7 +55,7 @@ describe('Rules tests', () => {
         ---
         front matter
         ---
-        
+
         # H1
         \`\`\`
         # comment not header
@@ -116,7 +116,7 @@ describe('Rules tests', () => {
         ## H2
 
         Line
-        
+
         ### H3
         `;
       expect(rulesDict['heading-blank-lines'].apply(before)).toBe(after);
@@ -127,13 +127,13 @@ describe('Rules tests', () => {
       const before = dedent`
         Line
         - 1
-        - 
+        -
         Line
         `;
       const after = dedent`
         Line
         - 1
-        - 
+        -
         Line
         `;
       expect(rulesDict['space-after-list-markers'].apply(before)).toBe(after);
@@ -179,15 +179,15 @@ describe('Rules tests', () => {
       Text 1
 
       ---
-      
+
       Text 2
         `;
       const after = dedent`
       # File Name
       Text 1
-      
+
       ---
-      
+
       Text 2
         `;
       expect(rulesDict['file-name-heading'].apply(before, {'metadata: file name': 'File Name'})).toBe(after);
@@ -255,7 +255,7 @@ describe('Consecutive blank lines', () => {
 
 
       \`\`\`
-      
+
 
 
       \`\`\`
@@ -293,8 +293,8 @@ describe('Convert spaces to tabs', () => {
 describe('Trailing spaces', () => {
   it('One trailing space removed', () => {
     const before = dedent`
-        # H1 
-        line with one trailing spaces 
+        # H1
+        line with one trailing spaces
       `;
     const after = dedent`
         # H1
@@ -304,8 +304,8 @@ describe('Trailing spaces', () => {
   });
   it('Three trailing whitespaces removed', () => {
     const before = dedent`
-        # H1   
-        line with three trailing spaces   
+        # H1
+        line with three trailing spaces
       `;
     const after = dedent`
         # H1
@@ -317,13 +317,13 @@ describe('Trailing spaces', () => {
   it('Tab-Space-Linebreak removed', () => {
     const before = dedent`
         # H1
-        line with trailing tab and spaces    
+        line with trailing tab and spaces
 
       `;
     const after = dedent`
         # H1
         line with trailing tab and spaces
-        
+
       `;
     expect(rulesDict['trailing-spaces'].apply(before, {'Style': 'Two Space Linebreak'})).toBe(after);
   });
@@ -331,12 +331,12 @@ describe('Trailing spaces', () => {
   it('Two Space Linebreak not removed', () => {
     const before = dedent`
         # H1
-        line with one trailing spaces  
+        line with one trailing spaces
 
       `;
     const after = dedent`
         # H1
-        line with one trailing spaces  
+        line with one trailing spaces
 
       `;
     expect(rulesDict['trailing-spaces'].apply(before, {'Style': 'Two Space Linebreak'})).toBe(after);
@@ -352,7 +352,7 @@ describe('Move Footnotes to the bottom', () => {
    [^1]: See @JIPPChristKingPaul2015, 50.
    [^2]: Jipp in -@JIPPChristKingPaul2015, 45, says, “Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has”.
    [^3]: This is from Journal article --@gaventaLouisMartynGalatians2000, 99.
-   [^4]: Lorem ipsum dolor sit amet, cibo eripuit consulatu at vim. No quando animal eam, ea timeam ancillae incorrupte usu. Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in es. See @WANRomansIntroductionStudy2021, 45. 
+   [^4]: Lorem ipsum dolor sit amet, cibo eripuit consulatu at vim. No quando animal eam, ea timeam ancillae incorrupte usu. Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in es. See @WANRomansIntroductionStudy2021, 45.
    [^5]: See @johnsonTransformationMindMoral2003, 215.
 
    No hendrerit efficiendi eam. Vim ne ferri populo voluptatum, et usu laboramus scribentur, per illud inermis consetetur id.[^a]
@@ -365,7 +365,7 @@ describe('Move Footnotes to the bottom', () => {
    [^d]: Abraham in -@abrahamPostcolonialTheologies2015, says, “Ei eos deleniti electram. Prima prompta partiendo ius ne.”
 
    # Part 3
-   In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Mel et vocent scribentur.[^11] 
+   In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Mel et vocent scribentur.[^11]
 
    > In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Te sea stet deserunt, vel tritani eligendi platonem ut, sea ea fugit iriure. Usu at elaboraret scriptorem signiferumque, cetero reprimique est cu. Ei eos deleniti electram. Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^21]
 
@@ -387,7 +387,7 @@ describe('Move Footnotes to the bottom', () => {
    Eu graeco blandit instructior pro, ut vidisse mediocrem qui. Ex ferri melius evertitur qui. At nec eripuit legimus.[^b] Ut meis solum recusabo eos, usu in[^c] assueverit eloquentiam, has facilis scribentur ea. No hendrerit efficiendi eam. Vim ne ferri populo voluptatum, et usu laboramus scribentur, per illud inermis consetetur id.[^d]
 
    # Part 3
-   In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Mel et vocent scribentur.[^11] 
+   In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Mel et vocent scribentur.[^11]
 
    > In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Te sea stet deserunt, vel tritani eligendi platonem ut, sea ea fugit iriure. Usu at elaboraret scriptorem signiferumque, cetero reprimique est cu. Ei eos deleniti electram. Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^21]
 
@@ -398,7 +398,7 @@ describe('Move Footnotes to the bottom', () => {
    [^1]: See @JIPPChristKingPaul2015, 50.
    [^2]: Jipp in -@JIPPChristKingPaul2015, 45, says, “Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has”.
    [^3]: This is from Journal article --@gaventaLouisMartynGalatians2000, 99.
-   [^4]: Lorem ipsum dolor sit amet, cibo eripuit consulatu at vim. No quando animal eam, ea timeam ancillae incorrupte usu. Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in es. See @WANRomansIntroductionStudy2021, 45. 
+   [^4]: Lorem ipsum dolor sit amet, cibo eripuit consulatu at vim. No quando animal eam, ea timeam ancillae incorrupte usu. Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in es. See @WANRomansIntroductionStudy2021, 45.
    [^5]: See @johnsonTransformationMindMoral2003, 215.
    [^a]: Footnote 1.
    [^b]: Footnote 2.
@@ -449,7 +449,7 @@ describe('Insert yaml attributes', () => {
     ---
     tags:
     ---
-    
+
     `;
     expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
   });
