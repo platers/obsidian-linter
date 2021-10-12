@@ -133,7 +133,7 @@ export const rules: Rule[] = [
         new Example(
             'Removes trailing spaces and tabs',
             dedent`
-        # H1   
+        # H1
         line with trailing spaces and tabs	        `, // eslint-disable-line no-tabs
             dedent`
         # H1
@@ -540,17 +540,24 @@ export const rules: Rule[] = [
         text = initYAML(text);
 
         return formatYAML(text, (text) => {
-          if (options['Date Created'] === true && !text.match(/\ndate created:.*\n/)) {
+          const created_match_str = `\n${options['Date Created Key']}.*\n`;
+          const created_match = new RegExp(created_match_str);
+
+          if (options['Date Created'] === true && !text.match(created_match)) {
             const yaml_end = text.indexOf('\n---');
             const formatted_date = moment(options['metadata: file created time']).format(options['Format']);
-            text = insert(text, yaml_end, `\ndate created: ${formatted_date}`);
+            text = insert(text, yaml_end, `\n${options['Date Created Key']}: ${formatted_date}`);
           }
+
+          const modified_match_str = `\n${options['Date Modified Key']}.*\n`;
+          const modified_match = new RegExp(modified_match_str);
+
           if (options['Date Modified'] === true) {
-            text = text.replace(/\ndate modified:.*\n/, '\n');
+            text = text.replace(modified_match, '\n');
             text = text.replace(/\ndate updated:.*\n/, '\n'); // for backwards compatibility
             const yaml_end = text.indexOf('\n---');
             const formatted_date = moment(options['metadata: file modified time']).format(options['Format']);
-            text = insert(text, yaml_end, `\ndate modified: ${formatted_date}`);
+            text = insert(text, yaml_end, `\n${options['Date Modified Key']}: ${formatted_date}`);
           }
           return text;
         });
@@ -593,7 +600,9 @@ export const rules: Rule[] = [
       ],
       [
         new BooleanOption('Date Created', 'Insert the file creation date', true),
+        new TextOption('Date Created Key', 'Which YAML key to use for creation date', 'date created'),
         new BooleanOption('Date Modified', 'Insert the date the file was last modified', true),
+        new TextOption('Date Modified Key', 'Which YAML key to use for modification date', 'date modified'),
         new MomentFormatOption('Format', 'Date format', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       ],
   ),
@@ -862,7 +871,7 @@ export const rules: Rule[] = [
 
             [^1]: first footnote
             [^2]: second footnote
-            
+
         `,
         ),
       ],
