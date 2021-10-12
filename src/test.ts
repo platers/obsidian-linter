@@ -425,7 +425,20 @@ describe('yaml timestamp', () => {
     date created: 2019-01-01
     ---
     `;
-    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true})).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'date created'})).toBe(after);
+  });
+  it('Respects created and modified key', () => {
+    const before = dedent`
+    ---
+    created: 2019-01-01
+    ---
+    `;
+    const after = dedent`
+    ---
+    created: 2019-01-01
+    ---
+    `;
+    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'created'})).toBe(after);
   });
 });
 describe('Insert yaml attributes', () => {
