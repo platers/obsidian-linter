@@ -29,6 +29,7 @@
     "babel-jest": "^27.0.6",
     "eslint": "^7.32.0",
     "eslint-config-google": "^0.14.0",
+    "eslint-plugin-jest": "^25.0.5",
     "jest": "^27.0.6",
     "obsidian": "^0.12.0",
     "rollup": "^2.32.1",

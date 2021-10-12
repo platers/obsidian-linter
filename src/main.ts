@@ -31,7 +31,7 @@ export default class LinterPlugin extends Plugin {
         callback: () => {
           new ConfirmationModal(this.app, this).open();
         },
-      }); ;
+      });
 
       // Source for save setting
       // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
@@ -54,7 +54,6 @@ export default class LinterPlugin extends Plugin {
 
     async onunload() {
       console.log('Unloading Linter plugin');
-
     }
 
     async loadSettings() {
@@ -211,7 +210,7 @@ class SettingTab extends PluginSettingTab {
                 plugin.saveData(plugin.settings);
               });
             });
-      }; ;
+      };
 
       TextAreaOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
         new Setting(containerEl)
