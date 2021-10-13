@@ -455,7 +455,7 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string) => {
         return formatYAML(text, (text) => {
-          return text.replace(/\ntags: [\w#\/ ,-]+(?=.*\n---)/is, function(tagsYAML) {
+          return text.replace(/\ntags: [\w#/ ,-]+(?=.*\n---)/is, function(tagsYAML) {
             return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
           });
         });
@@ -501,7 +501,7 @@ export const rules: Rule[] = [
 
           for (const line of insert_lines) {
             const key = line.split(':')[0];
-            if (!parsed_yaml.hasOwnProperty(key)) {
+            if (!Object.prototype.hasOwnProperty.call(parsed_yaml, key)) {
               text = text.replace(/^---\n/, `---\n${line}\n`);
             }
           }
@@ -594,6 +594,42 @@ export const rules: Rule[] = [
             {
               'Date Created': false,
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
+              'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+            },
+        ),
+        new Example(
+            'Date Created Key is set',
+            dedent`
+        # H1
+            `,
+            dedent`
+        ---
+        created: Wednesday, January 1st 2020, 12:00:00 am
+        ---
+        # H1
+        `,
+            {
+              'Date Created': true,
+              'Date Modified': false,
+              'Date Created Key': 'created',
+              'metadata: file created time': '2020-01-01T00:00:00-00:00',
+            },
+        ),
+        new Example(
+            'Date Modified Key is set',
+            dedent`
+        # H1
+            `,
+            dedent`
+        ---
+        modified: Wednesday, January 1st 2020, 12:00:00 am
+        ---
+        # H1
+        `,
+            {
+              'Date Created': false,
+              'Date Modified': true,
+              'Date Modified Key': 'modified',
               'metadata: file modified time': '2020-01-01T00:00:00-00:00',
             },
         ),
@@ -723,14 +759,14 @@ export const rules: Rule[] = [
               continue;
             }
             switch (options['Style']) {
-              case 'Title Case':
+              case 'Title Case': {
                 const headerWords = lines[i].match(/\S+/g);
                 const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
                 const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
                 const keepCasing = [...ignoreNames, ...ignoreAbbreviations];
                 const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
                 for (let j = 1; j < headerWords.length; j++) {
-                  const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
+                  const isWord = headerWords[j].match(/^[A-Za-z'-]+[.?!,:;]?$/);
                   if (!isWord) {
                     continue;
                   }
@@ -748,6 +784,7 @@ export const rules: Rule[] = [
 
                 lines[i] = lines[i].replace(headerRegex, `${headerWords.join(' ')}`);
                 break;
+              }
               case 'All Caps':
                 lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
                 break;
