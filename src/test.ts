@@ -55,7 +55,7 @@ describe('Rules tests', () => {
         ---
         front matter
         ---
-
+        
         # H1
         \`\`\`
         # comment not header
@@ -116,7 +116,7 @@ describe('Rules tests', () => {
         ## H2
 
         Line
-
+        
         ### H3
         `;
       expect(rulesDict['heading-blank-lines'].apply(before)).toBe(after);
@@ -127,13 +127,13 @@ describe('Rules tests', () => {
       const before = dedent`
         Line
         - 1
-        -
+        - 
         Line
         `;
       const after = dedent`
         Line
         - 1
-        -
+        - 
         Line
         `;
       expect(rulesDict['space-after-list-markers'].apply(before)).toBe(after);
@@ -179,15 +179,15 @@ describe('Rules tests', () => {
       Text 1
 
       ---
-
+      
       Text 2
         `;
       const after = dedent`
       # File Name
       Text 1
-
+      
       ---
-
+      
       Text 2
         `;
       expect(rulesDict['file-name-heading'].apply(before, {'metadata: file name': 'File Name'})).toBe(after);
@@ -255,7 +255,7 @@ describe('Consecutive blank lines', () => {
 
 
       \`\`\`
-
+      
 
 
       \`\`\`
@@ -293,8 +293,8 @@ describe('Convert spaces to tabs', () => {
 describe('Trailing spaces', () => {
   it('One trailing space removed', () => {
     const before = dedent`
-        # H1
-        line with one trailing spaces
+        # H1 
+        line with one trailing spaces 
       `;
     const after = dedent`
         # H1
@@ -304,8 +304,8 @@ describe('Trailing spaces', () => {
   });
   it('Three trailing whitespaces removed', () => {
     const before = dedent`
-        # H1
-        line with three trailing spaces
+        # H1   
+        line with three trailing spaces   
       `;
     const after = dedent`
         # H1
@@ -317,13 +317,13 @@ describe('Trailing spaces', () => {
   it('Tab-Space-Linebreak removed', () => {
     const before = dedent`
         # H1
-        line with trailing tab and spaces
+        line with trailing tab and spaces    
 
       `;
     const after = dedent`
         # H1
         line with trailing tab and spaces
-
+        
       `;
     expect(rulesDict['trailing-spaces'].apply(before, {'Style': 'Two Space Linebreak'})).toBe(after);
   });
@@ -331,12 +331,12 @@ describe('Trailing spaces', () => {
   it('Two Space Linebreak not removed', () => {
     const before = dedent`
         # H1
-        line with one trailing spaces
+        line with one trailing spaces  
 
       `;
     const after = dedent`
         # H1
-        line with one trailing spaces
+        line with one trailing spaces  
 
       `;
     expect(rulesDict['trailing-spaces'].apply(before, {'Style': 'Two Space Linebreak'})).toBe(after);
@@ -449,7 +449,7 @@ describe('Insert yaml attributes', () => {
     ---
     tags:
     ---
-
+    
     `;
     expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
   });

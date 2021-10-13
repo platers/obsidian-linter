@@ -133,7 +133,7 @@ export const rules: Rule[] = [
         new Example(
             'Removes trailing spaces and tabs',
             dedent`
-        # H1
+        # H1   
         line with trailing spaces and tabs	        `, // eslint-disable-line no-tabs
             dedent`
         # H1
@@ -455,7 +455,7 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string) => {
         return formatYAML(text, (text) => {
-          return text.replace(/\ntags: [\w#/ ,-]+(?=.*\n---)/is, function(tagsYAML) {
+          return text.replace(/\ntags: [\w#\/ ,-]+(?=.*\n---)/is, function(tagsYAML) {
             return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
           });
         });
@@ -501,7 +501,7 @@ export const rules: Rule[] = [
 
           for (const line of insert_lines) {
             const key = line.split(':')[0];
-            if (!Object.hasOwnProperty.call(parsed_yaml, key)) {
+            if (!parsed_yaml.hasOwnProperty(key)) {
               text = text.replace(/^---\n/, `---\n${line}\n`);
             }
           }
@@ -723,14 +723,14 @@ export const rules: Rule[] = [
               continue;
             }
             switch (options['Style']) {
-              case 'Title Case': {
+              case 'Title Case':
                 const headerWords = lines[i].match(/\S+/g);
                 const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
                 const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
                 const keepCasing = [...ignoreNames, ...ignoreAbbreviations];
                 const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
                 for (let j = 1; j < headerWords.length; j++) {
-                  const isWord = headerWords[j].match(/^[A-Za-z'-]+[.?!,:;]?$/);
+                  const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
                   if (!isWord) {
                     continue;
                   }
@@ -748,7 +748,6 @@ export const rules: Rule[] = [
 
                 lines[i] = lines[i].replace(headerRegex, `${headerWords.join(' ')}`);
                 break;
-              }
               case 'All Caps':
                 lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
                 break;
