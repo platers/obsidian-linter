@@ -76,17 +76,16 @@ export default class LinterPlugin extends Plugin {
         }
       }
 
-      if (typeof(storedSettings?.lintOnSave) === 'boolean') {
+      if (Object.prototype.hasOwnProperty.call(storedSettings, 'lintOnSave')) {
         this.settings.lintOnSave = storedSettings.lintOnSave;
       }
-      if (typeof(storedSettings?.displayChanged) === 'boolean') {
+      if (Object.prototype.hasOwnProperty.call(storedSettings, 'displayChanged')) {
         this.settings.displayChanged = storedSettings.displayChanged;
       }
-      if (typeof(storedSettings?.foldersToIgnore) === 'boolean') {
+      if (Object.prototype.hasOwnProperty.call(storedSettings, 'foldersToIgnore')) {
         this.settings.foldersToIgnore = storedSettings.foldersToIgnore;
       }
     }
-
     async saveSettings() {
       await this.saveData(this.settings);
     }
