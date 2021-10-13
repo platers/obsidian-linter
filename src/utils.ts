@@ -7,8 +7,8 @@ import type {Position} from 'unist';
 // Useful regexes
 
 export const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
-export const fencedRegexTemplate = '^XXX\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\s|$)$';
-export const yamlRegex = new RegExp('^---\n(?:((?:.|\n)*?)\n)?---(?=\n|$)');
+export const fencedRegexTemplate = '^XXX\\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\\s|$)$';
+export const yamlRegex = new RegExp('^---\n(?:((?:.|\n)*?)\n)?---(?=\n|$)'); // eslint-disable-line no-control-regex
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
@@ -30,7 +30,7 @@ export function getDisabledRules(text: string): string[] {
 
   const yaml_text = yaml[1];
   const parsed_yaml = load(yaml_text) as {};
-  if (!parsed_yaml.hasOwnProperty('disabled rules')) {
+  if (!Object.prototype.hasOwnProperty.call(parsed_yaml, 'disabled rules')) {
     return [];
   }
 
