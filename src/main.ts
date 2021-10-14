@@ -1,6 +1,5 @@
 import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
-import {LinterSettings, Options, rules} from './rules';
-import {getDisabledRules} from './utils';
+import {LinterSettings, Options, rules, getDisabledRules} from './rules';
 import Diff from 'diff';
 import moment from 'moment';
 import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';

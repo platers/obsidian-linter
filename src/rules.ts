@@ -27,6 +27,39 @@ enum RuleType {
 
 const RuleTypeOrder = Object.values(RuleType);
 
+/**
+ * Returns a list of ignored rules in the YAML frontmatter of the text.
+ * @param {string} text The text to parse
+ * @return {string[]} The list of ignored rules
+ */
+export function getDisabledRules(text: string): string[] {
+  const yaml = text.match(yamlRegex);
+  if (!yaml) {
+    return [];
+  }
+
+  const yaml_text = yaml[1];
+  const parsed_yaml = load(yaml_text) as {};
+  if (!Object.prototype.hasOwnProperty.call(parsed_yaml, 'disabled rules')) {
+    return [];
+  }
+
+  let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string; })['disabled rules'];
+  if (!disabled_rules) {
+    return [];
+  }
+
+  if (typeof disabled_rules === 'string') {
+    disabled_rules = [disabled_rules];
+  }
+
+  if (disabled_rules.includes('all')) {
+    return rules.map((rule) => rule.alias());
+  }
+
+  return disabled_rules;
+}
+
 /** Class representing a rule */
 export class Rule {
     public name: string;
