@@ -1,6 +1,6 @@
 {
-  "name": "obsidian-sample-plugin",
-  "version": "0.12.0",
+  "name": "obsidian-linter",
+  "version": "1.2.0",
   "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
   "main": "main.js",
   "scripts": {
