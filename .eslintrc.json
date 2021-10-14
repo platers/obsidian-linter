@@ -1,9 +1,11 @@
 {
     "env": {
         "browser": true,
-        "es2021": true
+        "es2021": true,
+        "jest/globals": true
     },
     "extends": [
+        "eslint:recommended",
         "google"
     ],
     "parser": "@typescript-eslint/parser",
@@ -12,7 +14,8 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "jest"
     ],
     "rules": {
         "camelcase": "off",

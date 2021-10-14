@@ -1,5 +1,3 @@
-import {rules} from './rules';
-import {load} from 'js-yaml';
 import {remark} from 'remark';
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
@@ -7,8 +5,8 @@ import type {Position} from 'unist';
 // Useful regexes
 
 export const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
-export const fencedRegexTemplate = '^XXX\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\s|$)$';
-export const yamlRegex = new RegExp('^---\n(?:((?:.|\n)*?)\n)?---(?=\n|$)');
+export const fencedRegexTemplate = '^XXX\\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\\s|$)$';
+export const yamlRegex = new RegExp('^---\n(?:((?:.|\n)*?)\n)?---(?=\n|$)'); // eslint-disable-line no-control-regex
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
@@ -16,40 +14,6 @@ export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeB
 
 
 // Helper functions
-
-/**
- * Returns a list of ignored rules in the YAML frontmatter of the text.
- * @param {string} text The text to parse
- * @return {string[]} The list of ignored rules
- */
-export function getDisabledRules(text: string): string[] {
-  const yaml = text.match(yamlRegex);
-  if (!yaml) {
-    return [];
-  }
-
-  const yaml_text = yaml[1];
-  const parsed_yaml = load(yaml_text) as {};
-  if (!parsed_yaml.hasOwnProperty('disabled rules')) {
-    return [];
-  }
-
-  let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string; })['disabled rules'];
-  if (!disabled_rules) {
-    return [];
-  }
-
-  if (typeof disabled_rules === 'string') {
-    disabled_rules = [disabled_rules];
-  }
-
-  if (disabled_rules.includes('all')) {
-    return rules.map((rule) => rule.alias());
-  }
-
-  return disabled_rules;
-}
-
 
 /**
  * Replaces all codeblocks in the given text with a placeholder.

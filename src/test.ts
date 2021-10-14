@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
-import {rules, Rule, rulesDict, Example} from './rules';
-import {escapeRegExp, getDisabledRules, yamlRegex} from './utils';
+import {rules, Rule, rulesDict, Example, getDisabledRules} from './rules';
+import {escapeRegExp, yamlRegex} from './utils';
 
 describe('Examples pass', () => {
   for (const rule of rules) {
@@ -352,7 +352,7 @@ describe('Move Footnotes to the bottom', () => {
    [^1]: See @JIPPChristKingPaul2015, 50.
    [^2]: Jipp in -@JIPPChristKingPaul2015, 45, says, “Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has”.
    [^3]: This is from Journal article --@gaventaLouisMartynGalatians2000, 99.
-   [^4]: Lorem ipsum dolor sit amet, cibo eripuit consulatu at vim. No quando animal eam, ea timeam ancillae incorrupte usu. Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in es. See @WANRomansIntroductionStudy2021, 45. 
+   [^4]: Lorem ipsum dolor sit amet, cibo eripuit consulatu at vim. No quando animal eam, ea timeam ancillae incorrupte usu. Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in es. See @WANRomansIntroductionStudy2021, 45.
    [^5]: See @johnsonTransformationMindMoral2003, 215.
 
    No hendrerit efficiendi eam. Vim ne ferri populo voluptatum, et usu laboramus scribentur, per illud inermis consetetur id.[^a]
@@ -365,7 +365,7 @@ describe('Move Footnotes to the bottom', () => {
    [^d]: Abraham in -@abrahamPostcolonialTheologies2015, says, “Ei eos deleniti electram. Prima prompta partiendo ius ne.”
 
    # Part 3
-   In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Mel et vocent scribentur.[^11] 
+   In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Mel et vocent scribentur.[^11]
 
    > In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Te sea stet deserunt, vel tritani eligendi platonem ut, sea ea fugit iriure. Usu at elaboraret scriptorem signiferumque, cetero reprimique est cu. Ei eos deleniti electram. Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^21]
 
@@ -387,7 +387,7 @@ describe('Move Footnotes to the bottom', () => {
    Eu graeco blandit instructior pro, ut vidisse mediocrem qui. Ex ferri melius evertitur qui. At nec eripuit legimus.[^b] Ut meis solum recusabo eos, usu in[^c] assueverit eloquentiam, has facilis scribentur ea. No hendrerit efficiendi eam. Vim ne ferri populo voluptatum, et usu laboramus scribentur, per illud inermis consetetur id.[^d]
 
    # Part 3
-   In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Mel et vocent scribentur.[^11] 
+   In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Mel et vocent scribentur.[^11]
 
    > In has assum falli habemus, timeam apeirian forensibus nam no, mutat facer antiopam in pri. Te sea stet deserunt, vel tritani eligendi platonem ut, sea ea fugit iriure. Usu at elaboraret scriptorem signiferumque, cetero reprimique est cu. Ei eos deleniti electram. Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^21]
 
@@ -398,7 +398,7 @@ describe('Move Footnotes to the bottom', () => {
    [^1]: See @JIPPChristKingPaul2015, 50.
    [^2]: Jipp in -@JIPPChristKingPaul2015, 45, says, “Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has”.
    [^3]: This is from Journal article --@gaventaLouisMartynGalatians2000, 99.
-   [^4]: Lorem ipsum dolor sit amet, cibo eripuit consulatu at vim. No quando animal eam, ea timeam ancillae incorrupte usu. Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in es. See @WANRomansIntroductionStudy2021, 45. 
+   [^4]: Lorem ipsum dolor sit amet, cibo eripuit consulatu at vim. No quando animal eam, ea timeam ancillae incorrupte usu. Graece insolens eloquentiam te mea, te novum possit eam. In pri reque accumsan, quidam noster interpretaris in es. See @WANRomansIntroductionStudy2021, 45.
    [^5]: See @johnsonTransformationMindMoral2003, 215.
    [^a]: Footnote 1.
    [^b]: Footnote 2.
@@ -425,7 +425,20 @@ describe('yaml timestamp', () => {
     date created: 2019-01-01
     ---
     `;
-    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true})).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'date created'})).toBe(after);
+  });
+  it('Respects created and modified key', () => {
+    const before = dedent`
+    ---
+    created: 2019-01-01
+    ---
+    `;
+    const after = dedent`
+    ---
+    created: 2019-01-01
+    ---
+    `;
+    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'created'})).toBe(after);
   });
 });
 describe('Insert yaml attributes', () => {

@@ -27,6 +27,39 @@ enum RuleType {
 
 const RuleTypeOrder = Object.values(RuleType);
 
+/**
+ * Returns a list of ignored rules in the YAML frontmatter of the text.
+ * @param {string} text The text to parse
+ * @return {string[]} The list of ignored rules
+ */
+export function getDisabledRules(text: string): string[] {
+  const yaml = text.match(yamlRegex);
+  if (!yaml) {
+    return [];
+  }
+
+  const yaml_text = yaml[1];
+  const parsed_yaml = load(yaml_text) as {};
+  if (!Object.prototype.hasOwnProperty.call(parsed_yaml, 'disabled rules')) {
+    return [];
+  }
+
+  let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string; })['disabled rules'];
+  if (!disabled_rules) {
+    return [];
+  }
+
+  if (typeof disabled_rules === 'string') {
+    disabled_rules = [disabled_rules];
+  }
+
+  if (disabled_rules.includes('all')) {
+    return rules.map((rule) => rule.alias());
+  }
+
+  return disabled_rules;
+}
+
 /** Class representing a rule */
 export class Rule {
     public name: string;
@@ -455,7 +488,7 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string) => {
         return formatYAML(text, (text) => {
-          return text.replace(/\ntags: [\w#\/ ,-]+(?=.*\n---)/is, function(tagsYAML) {
+          return text.replace(/\ntags: [\w#/ ,-]+(?=.*\n---)/is, function(tagsYAML) {
             return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
           });
         });
@@ -501,7 +534,7 @@ export const rules: Rule[] = [
 
           for (const line of insert_lines) {
             const key = line.split(':')[0];
-            if (!parsed_yaml.hasOwnProperty(key)) {
+            if (!Object.prototype.hasOwnProperty.call(parsed_yaml, key)) {
               text = text.replace(/^---\n/, `---\n${line}\n`);
             }
           }
@@ -540,17 +573,24 @@ export const rules: Rule[] = [
         text = initYAML(text);
 
         return formatYAML(text, (text) => {
-          if (options['Date Created'] === true && !text.match(/\ndate created:.*\n/)) {
+          const created_match_str = `\n${options['Date Created Key']}.*\n`;
+          const created_match = new RegExp(created_match_str);
+
+          if (options['Date Created'] === true && !text.match(created_match)) {
             const yaml_end = text.indexOf('\n---');
             const formatted_date = moment(options['metadata: file created time']).format(options['Format']);
-            text = insert(text, yaml_end, `\ndate created: ${formatted_date}`);
+            text = insert(text, yaml_end, `\n${options['Date Created Key']}: ${formatted_date}`);
           }
+
+          const modified_match_str = `\n${options['Date Modified Key']}.*\n`;
+          const modified_match = new RegExp(modified_match_str);
+
           if (options['Date Modified'] === true) {
-            text = text.replace(/\ndate modified:.*\n/, '\n');
+            text = text.replace(modified_match, '\n');
             text = text.replace(/\ndate updated:.*\n/, '\n'); // for backwards compatibility
             const yaml_end = text.indexOf('\n---');
             const formatted_date = moment(options['metadata: file modified time']).format(options['Format']);
-            text = insert(text, yaml_end, `\ndate modified: ${formatted_date}`);
+            text = insert(text, yaml_end, `\n${options['Date Modified Key']}: ${formatted_date}`);
           }
           return text;
         });
@@ -590,10 +630,48 @@ export const rules: Rule[] = [
               'metadata: file modified time': '2020-01-01T00:00:00-00:00',
             },
         ),
+        new Example(
+            'Date Created Key is set',
+            dedent`
+        # H1
+            `,
+            dedent`
+        ---
+        created: Wednesday, January 1st 2020, 12:00:00 am
+        ---
+        # H1
+        `,
+            {
+              'Date Created': true,
+              'Date Modified': false,
+              'Date Created Key': 'created',
+              'metadata: file created time': '2020-01-01T00:00:00-00:00',
+            },
+        ),
+        new Example(
+            'Date Modified Key is set',
+            dedent`
+        # H1
+            `,
+            dedent`
+        ---
+        modified: Wednesday, January 1st 2020, 12:00:00 am
+        ---
+        # H1
+        `,
+            {
+              'Date Created': false,
+              'Date Modified': true,
+              'Date Modified Key': 'modified',
+              'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+            },
+        ),
       ],
       [
         new BooleanOption('Date Created', 'Insert the file creation date', true),
+        new TextOption('Date Created Key', 'Which YAML key to use for creation date', 'date created'),
         new BooleanOption('Date Modified', 'Insert the date the file was last modified', true),
+        new TextOption('Date Modified Key', 'Which YAML key to use for modification date', 'date modified'),
         new MomentFormatOption('Format', 'Date format', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       ],
   ),
@@ -714,14 +792,14 @@ export const rules: Rule[] = [
               continue;
             }
             switch (options['Style']) {
-              case 'Title Case':
+              case 'Title Case': {
                 const headerWords = lines[i].match(/\S+/g);
                 const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
                 const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
                 const keepCasing = [...ignoreNames, ...ignoreAbbreviations];
                 const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
                 for (let j = 1; j < headerWords.length; j++) {
-                  const isWord = headerWords[j].match(/^[A-Za-z'-]+[\.\?!,:;]?$/);
+                  const isWord = headerWords[j].match(/^[A-Za-z'-]+[.?!,:;]?$/);
                   if (!isWord) {
                     continue;
                   }
@@ -739,6 +817,7 @@ export const rules: Rule[] = [
 
                 lines[i] = lines[i].replace(headerRegex, `${headerWords.join(' ')}`);
                 break;
+              }
               case 'All Caps':
                 lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
                 break;
@@ -862,7 +941,7 @@ export const rules: Rule[] = [
 
             [^1]: first footnote
             [^2]: second footnote
-            
+
         `,
         ),
       ],

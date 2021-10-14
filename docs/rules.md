@@ -89,8 +89,12 @@ Keep track of the date the file was last edited in the YAML front matter. Gets d
 Options:
 - Date Created: Insert the file creation date
 	- Default: `true`
+- Date Created Key: Which YAML key to use for creation date
+	- Default: `date created`
 - Date Modified: Insert the date the file was last modified
 	- Default: `true`
+- Date Modified Key: Which YAML key to use for modification date
+	- Default: `date modified`
 - Format: Date format
 	- Default: `dddd, MMMM Do YYYY, h:mm:ss a`
 
@@ -124,6 +128,38 @@ After:
 ```markdown
 ---
 date modified: Wednesday, January 1st 2020, 12:00:00 am
+---
+# H1
+```
+Example: Date Created Key is set
+
+Before:
+
+```markdown
+# H1
+```
+
+After:
+
+```markdown
+---
+created: Wednesday, January 1st 2020, 12:00:00 am
+---
+# H1
+```
+Example: Date Modified Key is set
+
+Before:
+
+```markdown
+# H1
+```
+
+After:
+
+```markdown
+---
+modified: Wednesday, January 1st 2020, 12:00:00 am
 ---
 # H1
 ```

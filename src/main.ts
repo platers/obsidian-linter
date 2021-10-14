@@ -1,6 +1,5 @@
 import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
-import {LinterSettings, Options, rules} from './rules';
-import {getDisabledRules} from './utils';
+import {LinterSettings, Options, rules, getDisabledRules} from './rules';
 import Diff from 'diff';
 import moment from 'moment';
 import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';
@@ -31,7 +30,7 @@ export default class LinterPlugin extends Plugin {
         callback: () => {
           new ConfirmationModal(this.app, this).open();
         },
-      }); ;
+      });
 
       // Source for save setting
       // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
@@ -44,14 +43,20 @@ export default class LinterPlugin extends Plugin {
         saveCommandDefinition.callback = () => {
           if (this.settings.lintOnSave) {
             const editor = this.app.workspace.getActiveViewOfType(MarkdownView).editor;
-            this.runLinterEditor(editor);
-          }
+            const file = this.app.workspace.getActiveFile();
 
-          save();
+            if (!this.shouldIgnoreFile(file)) {
+              this.runLinterEditor(editor);
+            }
+          }
         };
       }
 
       this.addSettingTab(new SettingTab(this.app, this));
+    }
+
+    async onunload() {
+      console.log('Unloading Linter plugin');
     }
 
     async loadSettings() {
@@ -70,17 +75,16 @@ export default class LinterPlugin extends Plugin {
         }
       }
 
-      if (typeof(storedSettings?.lintOnSave) === 'boolean') {
+      if (Object.prototype.hasOwnProperty.call(storedSettings, 'lintOnSave')) {
         this.settings.lintOnSave = storedSettings.lintOnSave;
       }
-      if (typeof(storedSettings?.displayChanged) === 'boolean') {
+      if (Object.prototype.hasOwnProperty.call(storedSettings, 'displayChanged')) {
         this.settings.displayChanged = storedSettings.displayChanged;
       }
-      if (typeof(storedSettings?.foldersToIgnore) === 'boolean') {
+      if (Object.prototype.hasOwnProperty.call(storedSettings, 'foldersToIgnore')) {
         this.settings.foldersToIgnore = storedSettings.foldersToIgnore;
       }
     }
-
     async saveSettings() {
       await this.saveData(this.settings);
     }
@@ -109,6 +113,15 @@ export default class LinterPlugin extends Plugin {
       return newText;
     }
 
+    shouldIgnoreFile(file: TFile) {
+      for (const folder of this.settings.foldersToIgnore) {
+        if (file.path.startsWith(folder)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     async runLinterFile(file: TFile) {
       const oldText = await this.app.vault.read(file);
       const newText = this.lintText(oldText, file);
@@ -117,13 +130,9 @@ export default class LinterPlugin extends Plugin {
 
     async runLinterAllFiles() {
       this.app.vault.getMarkdownFiles().forEach((file) => {
-        for (const folder of this.settings.foldersToIgnore) {
-          if (file.path.startsWith(folder)) {
-            return;
-          }
+        if (!this.shouldIgnoreFile(file)) {
+          this.runLinterFile(file);
         }
-
-        this.runLinterFile(file);
       });
       new Notice('Linted all files');
     }
@@ -208,7 +217,7 @@ class SettingTab extends PluginSettingTab {
                 plugin.saveData(plugin.settings);
               });
             });
-      }; ;
+      };
 
       TextAreaOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
         new Setting(containerEl)
