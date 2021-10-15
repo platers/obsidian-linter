@@ -645,6 +645,7 @@ Before:
 
 -   [ ] Item 1
 - [x]    Item 2
+	-  [ ] Item 3
 ```
 
 After:
@@ -655,6 +656,7 @@ After:
 
 - [ ] Item 1
 - [x] Item 2
+	- [ ] Item 3
 ```
 
 ### Compact YAML

@@ -293,9 +293,9 @@ export const rules: Rule[] = [
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
           // Space after marker
-          text = text.replace(/^(\s*\d+\.|[-+*])[^\S\r\n]+/gm, '$1 ');
+          text = text.replace(/^(\s*\d+\.|\s*[-+*])[^\S\r\n]+/gm, '$1 ');
           // Space after checkbox
-          return text.replace(/^(\s*\d+\.|[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm, '$1 ');
+          return text.replace(/^(\s*\d+\.|\s*[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm, '$1 ');
         });
       },
       [
@@ -307,6 +307,7 @@ export const rules: Rule[] = [
 
         -   [ ] Item 1
         - [x]    Item 2
+        \t-  [ ] Item 3
         `,
             dedent`
         1. Item 1
@@ -314,6 +315,7 @@ export const rules: Rule[] = [
 
         - [ ] Item 1
         - [x] Item 2
+        \t- [ ] Item 3
         `,
         ),
       ],
