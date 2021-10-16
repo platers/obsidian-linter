@@ -590,11 +590,11 @@ export const rules: Rule[] = [
             const modified_match = new RegExp(modified_match_str);
 
             const formatted_date = moment(options['metadata: file modified time']).format(options['Format']);
-            const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_date}\n`;
+            const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_date}`;
 
             if (modified_match.test(text)) {
-              text = text.replace(modified_match, modified_date_line);
-              text = text.replace(/\ndate updated:.*\n/, modified_date_line); // for backwards compatibility
+              text = text.replace(modified_match, modified_date_line + '\n');
+              text = text.replace(/\ndate updated:.*\n/, modified_date_line + '\n'); // for backwards compatibility
             } else {
               const yaml_end = text.indexOf('\n---');
               text = insert(text, yaml_end, modified_date_line);
