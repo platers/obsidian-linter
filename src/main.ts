@@ -299,7 +299,7 @@ class SettingTab extends PluginSettingTab {
 
       new Setting(containerEl)
           .setName('Folders to ignore')
-          .setDesc('Folders to ignore when linting all files. Enter folder paths separated by newlines')
+          .setDesc('Folders to ignore when linting all files or linting on save. Enter folder paths separated by newlines')
           .addTextArea((textArea) => {
             textArea
                 .setValue(this.plugin.settings.foldersToIgnore.join('\n'))
