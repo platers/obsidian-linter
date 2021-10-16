@@ -75,7 +75,7 @@ export default class LinterPlugin extends Plugin {
 
           // For backwards compatibility, if enabled is set, copy it to the new option and remove it
           if (storedSettings.ruleConfigs[rule.name].Enabled !== undefined) {
-            const newEnabledOptionName = rule.options[0].name;
+            const newEnabledOptionName = rule.enabledOptionName();
             this.settings.ruleConfigs[rule.name][newEnabledOptionName] = storedSettings.ruleConfigs[rule.name].Enabled;
             delete this.settings.ruleConfigs[rule.name].Enabled;
           }
@@ -112,7 +112,7 @@ export default class LinterPlugin extends Plugin {
             'metadata: file name': file.basename,
           }, rule.getOptions(this.settings));
 
-        if (options['Enabled']) {
+        if (options[rule.enabledOptionName()]) {
           newText = rule.apply(newText, options);
         }
       }

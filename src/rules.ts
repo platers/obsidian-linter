@@ -121,6 +121,10 @@ export class Rule {
       const url = 'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
       return url + '#' + this.alias();
     }
+
+    public enabledOptionName(): string {
+      return this.options[0].name;
+    }
 }
 
 /** Class representing an example of a rule */
