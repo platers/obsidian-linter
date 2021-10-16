@@ -92,7 +92,7 @@ export class Rule {
       this.apply = apply;
       this.examples = examples;
 
-      options.unshift(new BooleanOption('Enabled', '', false));
+      options.unshift(new BooleanOption(this.description, '', false));
       for (const option of options) {
         option.ruleName = name;
       }
@@ -120,6 +120,10 @@ export class Rule {
     public getURL(): string {
       const url = 'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
       return url + '#' + this.alias();
+    }
+
+    public enabledOptionName(): string {
+      return this.options[0].name;
     }
 }
 
