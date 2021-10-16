@@ -92,7 +92,7 @@ export class Rule {
       this.apply = apply;
       this.examples = examples;
 
-      options.unshift(new BooleanOption('Enabled', '', false));
+      options.unshift(new BooleanOption(this.description, '', false));
       for (const option of options) {
         option.ruleName = name;
       }

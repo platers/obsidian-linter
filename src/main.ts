@@ -319,7 +319,6 @@ class SettingTab extends PluginSettingTab {
 
         containerEl.createEl('h3', {text: rule.name});
         containerEl.createEl('a', {text: rule.alias(), href: rule.getURL()});
-        containerEl.createEl('p', {text: rule.description});
 
         for (const option of rule.options) {
           option.display(containerEl, this.plugin.settings, this.plugin);
