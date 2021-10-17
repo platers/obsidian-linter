@@ -16,3 +16,5 @@ node_modules
 data.json
 
 yarn.lock
+
+.DS_Store
