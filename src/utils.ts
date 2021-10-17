@@ -6,7 +6,7 @@ import type {Position} from 'unist';
 
 export const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
 export const fencedRegexTemplate = '^XXX\\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\\s|$)$';
-export const yamlRegex = new RegExp('^---\n(?:((?:.|\n)*?)\n)?---(?=\n|$)'); // eslint-disable-line no-control-regex
+export const yamlRegex = /^---\n(?:((?:.|\n)*?)\n)?---(?=\n|$)/;
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
@@ -117,4 +117,13 @@ export function insert(str: string, index: number, value: string): string {
 // https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
 export function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+/**
+ * Replaces \r with nothing.
+ * @param {string} text - Text to strip
+ * @return {string} Stripped text
+ */
+export function stripCr(text: string): string {
+  return text.replace(/\r/g, '');
 }

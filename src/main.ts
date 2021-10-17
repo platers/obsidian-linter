@@ -4,6 +4,7 @@ import Diff from 'diff';
 import moment from 'moment';
 import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';
 import dedent from 'ts-dedent';
+import {stripCr} from './utils';
 
 export default class LinterPlugin extends Plugin {
     settings: LinterSettings;
@@ -130,17 +131,24 @@ export default class LinterPlugin extends Plugin {
     }
 
     async runLinterFile(file: TFile) {
-      const oldText = await this.app.vault.read(file);
-      const newText = this.lintText(oldText, file);
-      this.app.vault.modify(file, newText);
+      const oldText = stripCr(await this.app.vault.read(file));
+
+      try {
+        const newText = this.lintText(oldText, file);
+        await this.app.vault.modify(file, newText);
+      } catch (error) {
+        new Notice('An error occured during linting. See console for details');
+        console.log(`Linting error in file: ${file.path}`);
+        console.error(error);
+      }
     }
 
     async runLinterAllFiles() {
-      this.app.vault.getMarkdownFiles().forEach((file) => {
+      await Promise.all(this.app.vault.getMarkdownFiles().map(async (file) => {
         if (!this.shouldIgnoreFile(file)) {
-          this.runLinterFile(file);
+          await this.runLinterFile(file);
         }
-      });
+      }));
       new Notice('Linted all files');
     }
 
@@ -306,7 +314,7 @@ class SettingTab extends PluginSettingTab {
 
       new Setting(containerEl)
           .setName('Folders to ignore')
-          .setDesc('Folders to ignore when linting all files. Enter folder paths separated by newlines')
+          .setDesc('Folders to ignore when linting all files or linting on save. Enter folder paths separated by newlines')
           .addTextArea((textArea) => {
             textArea
                 .setValue(this.plugin.settings.foldersToIgnore.join('\n'))
@@ -356,8 +364,9 @@ class ConfirmationModal extends Modal {
         text: 'Lint All',
       });
       btnSumbit.addEventListener('click', async (e) => {
-        await plugin.runLinterAllFiles();
+        new Notice('Linting all files...');
         this.close();
+        await plugin.runLinterAllFiles();
       });
       setTimeout(() => {
         btnSumbit.focus();

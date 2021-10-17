@@ -582,21 +582,27 @@ export const rules: Rule[] = [
           const created_match_str = `\n${options['Date Created Key']}.*\n`;
           const created_match = new RegExp(created_match_str);
 
-          if (options['Date Created'] === true && !text.match(created_match)) {
+          if (options['Date Created'] === true && !created_match.test(text)) {
             const yaml_end = text.indexOf('\n---');
             const formatted_date = moment(options['metadata: file created time']).format(options['Format']);
             text = insert(text, yaml_end, `\n${options['Date Created Key']}: ${formatted_date}`);
           }
 
-          const modified_match_str = `\n${options['Date Modified Key']}.*\n`;
-          const modified_match = new RegExp(modified_match_str);
 
           if (options['Date Modified'] === true) {
-            text = text.replace(modified_match, '\n');
-            text = text.replace(/\ndate updated:.*\n/, '\n'); // for backwards compatibility
-            const yaml_end = text.indexOf('\n---');
+            const modified_match_str = `\n${options['Date Modified Key']}.*\n`;
+            const modified_match = new RegExp(modified_match_str);
+
             const formatted_date = moment(options['metadata: file modified time']).format(options['Format']);
-            text = insert(text, yaml_end, `\n${options['Date Modified Key']}: ${formatted_date}`);
+            const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_date}`;
+
+            if (modified_match.test(text)) {
+              text = text.replace(modified_match, modified_date_line + '\n');
+              text = text.replace(/\ndate updated:.*\n/, modified_date_line + '\n'); // for backwards compatibility
+            } else {
+              const yaml_end = text.indexOf('\n---');
+              text = insert(text, yaml_end, modified_date_line);
+            }
           }
           return text;
         });
