@@ -67,7 +67,8 @@ export default class LinterPlugin extends Plugin {
         displayChanged: true,
         foldersToIgnore: [],
       };
-      const storedSettings = await this.loadData();
+      const data = await this.loadData();
+      const storedSettings = data || {};
 
       for (const rule of rules) {
         this.settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
