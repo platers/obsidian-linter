@@ -172,6 +172,15 @@ describe('Rules tests', () => {
         `;
       expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'Title Case'})).toBe(after);
     });
+    it('Ignores tags', () => {
+      const before = dedent`
+        #tag not line
+        `;
+      const after = dedent`
+        #tag not line
+        `;
+      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'Title Case'})).toBe(after);
+    });
   });
   describe('File Name Heading', () => {
     it('Handles stray dashes', () => {

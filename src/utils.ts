@@ -4,7 +4,7 @@ import type {Position} from 'unist';
 
 // Useful regexes
 
-export const headerRegex = /^(\s*)(#+)(\s*)(.*)$/;
+export const headerRegex = /^(\s*)(#+)(\s+)(.*)$/;
 export const fencedRegexTemplate = '^XXX\\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\\s|$)$';
 export const yamlRegex = /^---\n(?:((?:.|\n)*?)\n)?---(?=\n|$)/;
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
