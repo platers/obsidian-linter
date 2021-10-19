@@ -495,6 +495,36 @@ After:
 This text has a linebreak.
 ```
 
+### Remove Consecutive List Markers.
+
+Alias: `remove-consecutive-list-markers.`
+
+Removes consecutive list markers. Useful when copy-pasting list items.
+
+
+
+Example: Removing consecutive list markers.
+
+Before:
+
+```markdown
+- item 1
+- - copypasted item A
+- item 2
+  - indented item
+  - - copypasted item B
+```
+
+After:
+
+```markdown
+- item 1
+- copypasted item A
+- item 2
+  - indented item
+  - copypasted item B
+```
+
 ## Spacing
 ### Trailing spaces
 
