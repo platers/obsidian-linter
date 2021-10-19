@@ -495,9 +495,9 @@ After:
 This text has a linebreak.
 ```
 
-### Remove Consecutive List Markers.
+### Remove Consecutive List Markers
 
-Alias: `remove-consecutive-list-markers.`
+Alias: `remove-consecutive-list-markers`
 
 Removes consecutive list markers. Useful when copy-pasting list items.
 

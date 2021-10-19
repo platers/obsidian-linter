@@ -485,7 +485,7 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
-      'Remove Consecutive List Markers.',
+      'Remove Consecutive List Markers',
       'Removes consecutive list markers. Useful when copy-pasting list items.',
       RuleType.CONTENT,
       (text: string) => {
