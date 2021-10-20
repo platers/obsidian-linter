@@ -484,6 +484,35 @@ export const rules: Rule[] = [
         ),
       ],
   ),
+  new Rule(
+      'Remove Consecutive List Markers',
+      'Removes consecutive list markers. Useful when copy-pasting list items.',
+      RuleType.CONTENT,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          return text.replace(/^([ |\t]*)- - \b/gm, '$1- ');
+        });
+      },
+      [
+        new Example(
+            'Removing consecutive list markers.',
+            dedent`
+            - item 1
+            - - copypasted item A
+            - item 2
+              - indented item
+              - - copypasted item B
+            `,
+            dedent`
+            - item 1
+            - copypasted item A
+            - item 2
+              - indented item
+              - copypasted item B
+            `,
+        ),
+      ],
+  ),
 
 
   // YAML rules
