@@ -160,30 +160,30 @@ export const rules: Rule[] = [
         if (options['Two Space Linebreak'] === false) {
           return text.replace(/[ \t]+$/gm, '');
         } else {
-          text = text.replace(/\b[ \t]$/gm, ''); // one whitespace
-          text = text.replace(/\b[ \t]{3,}$/gm, ''); // three or more whitespaces
-          text = text.replace(/\b( ?\t\t? ?)$/gm, ''); // two whitespaces with at least one tab
+          text = text.replace(/(\S)[ \t]$/gm, '$1'); // one whitespace
+          text = text.replace(/(\S)[ \t]{3,}$/gm, '$1'); // three or more whitespaces
+          text = text.replace(/(\S)( ?\t\t? ?)$/gm, '$1'); // two whitespaces with at least one tab
           return text;
         }
       },
       [
         new Example(
-            'Removes trailing spaces and tabs',
+            'Removes trailing spaces and tabs.',
             dedent`
         # H1   
-        line with trailing spaces and tabs	        `, // eslint-disable-line no-tabs
+        Line with trailing spaces and tabs.	        `, // eslint-disable-line no-tabs
             dedent`
         # H1
-        line with trailing spaces and tabs`,
+        Line with trailing spaces and tabs.`,
         ),
         new Example(
             'With `Two Space Linebreak = true`',
             dedent`
         # H1
-        line with trailing spaces and tabs  `,
+        Line with trailing spaces and tabs.  `,
             dedent`
         # H1
-        line with trailing spaces and tabs  `,
+        Line with trailing spaces and tabs.  `,
             {'Two Space Linebreak': true},
         ),
       ],

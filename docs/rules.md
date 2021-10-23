@@ -536,20 +536,20 @@ Options:
 - Two Space Linebreak: Ignore two spaces followed by a line break ("Two Space Rule").
 	- Default: `false`
 
-Example: Removes trailing spaces and tabs
+Example: Removes trailing spaces and tabs.
 
 Before:
 
 ```markdown
 # H1   
-line with trailing spaces and tabs	        
+Line with trailing spaces and tabs.	        
 ```
 
 After:
 
 ```markdown
 # H1
-line with trailing spaces and tabs
+Line with trailing spaces and tabs.
 ```
 Example: With `Two Space Linebreak = true`
 
@@ -557,14 +557,14 @@ Before:
 
 ```markdown
 # H1
-line with trailing spaces and tabs  
+Line with trailing spaces and tabs.  
 ```
 
 After:
 
 ```markdown
 # H1
-line with trailing spaces and tabs  
+Line with trailing spaces and tabs.  
 ```
 
 ### Heading blank lines
