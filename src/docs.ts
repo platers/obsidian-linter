@@ -16,7 +16,15 @@ generateDocs();
 function generateReadme() {
   const readme_template = readFileSync('./docs/readme_template.md', 'utf8');
 
-  const rules_list = rules.map((rule) => `- [${rule.alias()}](${rule.getURL()})`).join('\n');
+  let rules_list = '';
+  let prevSection = '';
+  for (const rule of rules) {
+    if (rule.type !== prevSection) {
+      rules_list += `\n### ${rule.type} rules\n\n`;
+      prevSection = rule.type;
+    }
+    rules_list += `- [${rule.alias()}](${rule.getURL()})\n`;
+  }
 
   const readme = readme_template.replace('{{RULES PLACEHOLDER}}', rules_list);
   writeFileSync('README.md', readme);

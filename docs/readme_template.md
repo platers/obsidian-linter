@@ -12,12 +12,6 @@ To lint the all files, run `Lint all files in the vault`.
 
 When `Lint on save` is toggled on, the plugin will lint the current file on manual save (when you press `Ctrl+S`).
 
-## Rules
-
-Documentation for all rules can be found in the [rules docs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md). The docs are updated before the plugin is released, so may not be completely accurate.
-
-{{RULES PLACEHOLDER}}
-
 ### Disable rules
 
 ```markdown
@@ -29,6 +23,12 @@ disabled rules: [ capitalize-headings ]
 Add `disabled rules: [ ... ]` to the YAML frontmatter of a file to disable those rules when linting that file. 
 
 Add `disabled rules: [ all ]` to the YAML frontmatter of a file to disable all rules.
+
+## Rules
+
+Documentation for all rules can be found in the [rules docs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md). The docs are updated before the plugin is released, so may not be completely accurate.
+
+{{RULES PLACEHOLDER}}
 
 ## Development Instructions
 
