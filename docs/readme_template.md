@@ -12,6 +12,12 @@ To lint the all files, run `Lint all files in the vault`.
 
 When `Lint on save` is toggled on, the plugin will lint the current file on manual save (when you press `Ctrl+S`).
 
+## Rules
+
+Documentation for all rules can be found in the [rules docs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md). The docs are updated before the plugin is released, so may not be completely accurate.
+
+{{RULES PLACEHOLDER}}
+
 ### Disable rules
 
 ```markdown
@@ -39,7 +45,3 @@ Pull requests are welcome, especially for new rules.
 5. Run `npm run lint` to lint the plugin.
 
 Make sure to use Node 15.x or higher.
-
-## Rules
-
-Documentation for all rules can be found in the [rules docs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md). The docs are updated before the plugin is released, so may not be completely accurate.
