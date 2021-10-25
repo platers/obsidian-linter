@@ -170,7 +170,10 @@ describe('Rules tests', () => {
         ## I Can't Do This
         ## Comma, Comma, Comma
         `;
-      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'Title Case'})).toBe(after);
+      const options = Object.assign({
+        'Style': 'Title Case',
+      }, rulesDict['capitalize-headings'].getDefaultOptions());
+      expect(rulesDict['capitalize-headings'].apply(before, options)).toBe(after);
     });
     it('Ignores tags', () => {
       const before = dedent`
