@@ -256,6 +256,10 @@ Options:
 	- `First Letter`: Only capitalize the first letter
 - Ignore Cased Words: Only apply title case style to words that are all lowercase
 	- Default: `true`
+- Ignore Words: A comma separated list of words to ignore when capitalizing
+	- Default: `macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript`
+- Lowercase Words: A comma separated list of words to keep lowercase
+	- Default: `via, a, an, the, and, or, but, for, nor, so, yet, at, by, in, of, on, to, up, as, is, if, it, for, to, with, without, into, onto, per`
 
 Example: With `Title Case=true`, `Ignore Cased Words=false`
 

@@ -835,10 +835,9 @@ export const rules: Rule[] = [
             switch (options['Style']) {
               case 'Title Case': {
                 const headerWords = lines[i].match(/\S+/g);
-                const ignoreNames = ['macOS', 'iOS', 'iPhone', 'iPad', 'JavaScript', 'TypeScript', 'AppleScript'];
-                const ignoreAbbreviations = ['CSS', 'HTML', 'YAML', 'PDF', 'USA', 'EU', 'NATO', 'ASCII'];
-                const keepCasing = [...ignoreNames, ...ignoreAbbreviations];
-                const ignoreShortWords = ['via', 'a', 'an', 'the', 'and', 'or', 'but', 'for', 'nor', 'so', 'yet', 'at', 'by', 'in', 'of', 'on', 'to', 'up', 'as', 'is', 'if', 'it', 'for', 'to', 'with', 'without', 'into', 'onto', 'per'];
+                // split by comma or whitespace
+                const keepCasing = (options['Ignore Words'] as string).split(/[,\s]+/);
+                const ignoreShortWords = (options['Lowercase Words'] as string).split(/[,\s]+/);
                 for (let j = 1; j < headerWords.length; j++) {
                   const isWord = headerWords[j].match(/^[A-Za-z'-]+[.?!,:;]?$/);
                   if (!isWord) {
@@ -846,8 +845,8 @@ export const rules: Rule[] = [
                   }
 
                   const ignoreCasedWord = options['Ignore Cased Words'] && (headerWords[j] !== headerWords[j].toLowerCase());
-                  const keepWordcasing = ignoreCasedWord || keepCasing.includes(headerWords[j]);
-                  if (!keepWordcasing) {
+                  const keepWordCasing = ignoreCasedWord || keepCasing.includes(headerWords[j]);
+                  if (!keepWordCasing) {
                     headerWords[j] = headerWords[j].toLowerCase();
                     const ignoreWord = ignoreShortWords.includes(headerWords[j]);
                     if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
@@ -933,6 +932,10 @@ export const rules: Rule[] = [
             ],
         ),
         new BooleanOption('Ignore Cased Words', 'Only apply title case style to words that are all lowercase', true),
+        new TextAreaOption('Ignore Words', 'A comma separated list of words to ignore when capitalizing', dedent`
+          macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript`),
+        new TextAreaOption('Lowercase Words', 'A comma separated list of words to keep lowercase', dedent`
+          via, a, an, the, and, or, but, for, nor, so, yet, at, by, in, of, on, to, up, as, is, if, it, for, to, with, without, into, onto, per`),
       ],
   ),
 
