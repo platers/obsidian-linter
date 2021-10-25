@@ -124,7 +124,7 @@ export default class LinterPlugin extends Plugin {
 
     shouldIgnoreFile(file: TFile) {
       for (const folder of this.settings.foldersToIgnore) {
-        if (file.path.startsWith(folder)) {
+        if (folder.length > 0 && file.path.startsWith(folder)) {
           return true;
         }
       }
