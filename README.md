@@ -1,3 +1,4 @@
+<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->
 # Obsidian Linter
 ![Build](https://github.com/platers/obsidian-linter/actions/workflows/main.yml/badge.svg)
 ![Downloads](https://img.shields.io/github/downloads/platers/obsidian-linter/total)

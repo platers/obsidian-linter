@@ -3,7 +3,7 @@ import dedent from 'ts-dedent';
 import {DropdownOption} from './option';
 import {rules} from './rules';
 
-const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->';
+const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->\n';
 
 // README
 
@@ -26,7 +26,7 @@ function generateReadme() {
     rules_list += `- [${rule.alias()}](${rule.getURL()})\n`;
   }
 
-  const readme = readme_template.replace('{{RULES PLACEHOLDER}}', rules_list);
+  const readme = autogen_warning + readme_template.replace('{{RULES PLACEHOLDER}}', rules_list);
   writeFileSync('README.md', readme);
   console.log('README.md updated');
 }
