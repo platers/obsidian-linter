@@ -24,6 +24,12 @@ Add `disabled rules: [ ... ]` to the YAML frontmatter of a file to disable those
 
 Add `disabled rules: [ all ]` to the YAML frontmatter of a file to disable all rules.
 
+## Rules
+
+Documentation for all rules can be found in the [rules docs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md). The docs are updated before the plugin is released, so may not be completely accurate.
+
+{{RULES PLACEHOLDER}}
+
 ## Development Instructions
 
 Pull requests are welcome, especially for new rules.
@@ -39,7 +45,3 @@ Pull requests are welcome, especially for new rules.
 5. Run `npm run lint` to lint the plugin.
 
 Make sure to use Node 15.x or higher.
-
-## Rules
-
-Documentation for all rules can be found in the [rules docs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md). The docs are updated before the plugin is released, so may not be completely accurate.

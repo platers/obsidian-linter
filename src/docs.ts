@@ -3,34 +3,41 @@ import dedent from 'ts-dedent';
 import {DropdownOption} from './option';
 import {rules} from './rules';
 
-const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->';
+const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->\n';
 
 // README
 
-const readme_template = readFileSync('./docs/readme_template.md', 'utf8');
-
-const rules_list = rules.map((rule) => `- [${rule.alias()}](${rule.getURL()})`).join('\n');
-
-const readme = dedent`
-        ${autogen_warning}
-
-        ${readme_template}
-
-        ${rules_list}
-
-        `;
-
-writeFileSync('README.md', readme);
-console.log('README.md updated');
+generateReadme();
 
 // Rules documentation
 
-const rules_template = readFileSync('./docs/rules_template.md', 'utf8');
+generateDocs();
 
-let rules_docs = '';
-let prevSection = '';
-for (const rule of rules) {
-  const examples = rule.examples.map((test) => dedent`
+function generateReadme() {
+  const readme_template = readFileSync('./docs/readme_template.md', 'utf8');
+
+  let rules_list = '';
+  let prevSection = '';
+  for (const rule of rules) {
+    if (rule.type !== prevSection) {
+      rules_list += `\n### ${rule.type} rules\n\n`;
+      prevSection = rule.type;
+    }
+    rules_list += `- [${rule.alias()}](${rule.getURL()})\n`;
+  }
+
+  const readme = autogen_warning + readme_template.replace('{{RULES PLACEHOLDER}}', rules_list);
+  writeFileSync('README.md', readme);
+  console.log('README.md updated');
+}
+
+function generateDocs() {
+  const rules_template = readFileSync('./docs/rules_template.md', 'utf8');
+
+  let rules_docs = '';
+  let prevSection = '';
+  for (const rule of rules) {
+    const examples = rule.examples.map((test) => dedent`
     Example: ${test.description}
 
     Before:
@@ -46,36 +53,36 @@ for (const rule of rules) {
     \`\`\`
   `).join('\n');
 
-  const options_list = rule.options.slice(1).map((option) => {
-    let text = dedent`
+    const options_list = rule.options.slice(1).map((option) => {
+      let text = dedent`
                   - ${option.name}: ${option.description}
                   \t- Default: \`${option.defaultValue}\``;
 
-    if (option instanceof DropdownOption) {
-      for (const record of option.options) {
-        text += `\n\t- \`${record.value}\`: ${record.description}`;
+      if (option instanceof DropdownOption) {
+        for (const record of option.options) {
+          text += `\n\t- \`${record.value}\`: ${record.description}`;
+        }
       }
-    }
 
-    return text;
-  }).join('\n');
-  let options = '';
-  if (options_list.length > 0) {
-    options = dedent`
+      return text;
+    }).join('\n');
+    let options = '';
+    if (options_list.length > 0) {
+      options = dedent`
       Options:
       ${options_list}
     `;
-  }
+    }
 
-  if (rule.type !== prevSection) {
-    rules_docs += dedent`
+    if (rule.type !== prevSection) {
+      rules_docs += dedent`
 
       ## ${rule.type}
     `;
-    prevSection = rule.type;
-  }
+      prevSection = rule.type;
+    }
 
-  rules_docs += dedent`
+    rules_docs += dedent`
 
   ### ${rule.name}
 
@@ -88,9 +95,9 @@ for (const rule of rules) {
   ${examples}
 
   `;
-}
+  }
 
-const rules_documentation = dedent`
+  const rules_documentation = dedent`
   ${autogen_warning}
 
   ${rules_template}
@@ -98,5 +105,7 @@ const rules_documentation = dedent`
   ${rules_docs}
   `;
 
-writeFileSync('./docs/rules.md', rules_documentation);
-console.log('Rules documentation updated');
+  writeFileSync('./docs/rules.md', rules_documentation);
+  console.log('Rules documentation updated');
+}
+
