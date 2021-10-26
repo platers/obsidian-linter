@@ -513,7 +513,27 @@ export const rules: Rule[] = [
         ),
       ],
   ),
-
+  new Rule(
+      'Proper Ellipsis',
+      'Replaces three consecutive dots with an ellipsis.',
+      RuleType.CONTENT,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          return text.replaceAll('...', '…');
+        });
+      },
+      [
+        new Example(
+            'Replacing three consecutive dots with an ellipsis.',
+            dedent`
+            Lorem (...) Impsum.
+            `,
+            dedent`
+            Lorem (…) Impsum.
+            `,
+        ),
+      ],
+  ),
 
   // YAML rules
 

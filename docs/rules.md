@@ -530,6 +530,28 @@ After:
   - copypasted item B
 ```
 
+### Proper Ellipsis
+
+Alias: `proper-ellipsis`
+
+Replaces three consecutive dots with an ellipsis.
+
+
+
+Example: Replacing three consecutive dots with an ellipsis.
+
+Before:
+
+```markdown
+Lorem (...) Impsum.
+```
+
+After:
+
+```markdown
+Lorem (…) Impsum.
+```
+
 ## Spacing
 ### Trailing spaces
 
