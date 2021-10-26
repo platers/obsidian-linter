@@ -420,10 +420,11 @@ export const rules: Rule[] = [
   ),
   new Rule(
       'Line Break at Document End',
-      'Appends a line break at the end of the document, if there is none.',
+      'Ensures that there is exactly one line break at the end of a document.',
       RuleType.SPACING,
       (text: string) => {
-        if (text.slice(-1) != '\n') text += '\n';
+        text = text.replace(/\n+$/g, '');
+        text += '\n';
         return text;
       },
       [
@@ -431,6 +432,19 @@ export const rules: Rule[] = [
             'Appending a line break to the end of the document.',
             dedent`
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      `,
+            dedent`
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+      `,
+        ),
+        new Example(
+            'Removing trailing line breaks to the end of the document, except one.',
+            dedent`
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+
+          
       `,
             dedent`
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -513,7 +527,27 @@ export const rules: Rule[] = [
         ),
       ],
   ),
-
+  new Rule(
+      'Proper Ellipsis',
+      'Replaces three consecutive dots with an ellipsis.',
+      RuleType.CONTENT,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          return text.replaceAll('...', '…');
+        });
+      },
+      [
+        new Example(
+            'Replacing three consecutive dots with an ellipsis.',
+            dedent`
+            Lorem (...) Impsum.
+            `,
+            dedent`
+            Lorem (…) Impsum.
+            `,
+        ),
+      ],
+  ),
 
   // YAML rules
 

@@ -530,6 +530,28 @@ After:
   - copypasted item B
 ```
 
+### Proper Ellipsis
+
+Alias: `proper-ellipsis`
+
+Replaces three consecutive dots with an ellipsis.
+
+
+
+Example: Replacing three consecutive dots with an ellipsis.
+
+Before:
+
+```markdown
+Lorem (...) Impsum.
+```
+
+After:
+
+```markdown
+Lorem (…) Impsum.
+```
+
 ## Spacing
 ### Trailing spaces
 
@@ -783,7 +805,7 @@ After:
 
 Alias: `line-break-at-document-end`
 
-Appends a line break at the end of the document, if there is none.
+Ensures that there is exactly one line break at the end of a document.
 
 
 
@@ -793,6 +815,23 @@ Before:
 
 ```markdown
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+```
+
+After:
+
+```markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+```
+Example: Removing trailing line breaks to the end of the document, except one.
+
+Before:
+
+```markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+
+
 ```
 
 After:
