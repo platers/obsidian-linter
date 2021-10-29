@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert, loadYAML, yamlRegex} from './utils';
+import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert, loadYAML, moveFootnotesToEnd, yamlRegex} from './utils';
 import {Option, BooleanOption, MomentFormatOption, TextOption, DropdownOption, DropdownRecord, TextAreaOption} from './option';
 
 export type Options = { [optionName: string]: any };
@@ -980,20 +980,7 @@ export const rules: Rule[] = [
       RuleType.FOOTNOTE,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
-          // ensures footnotes at the end of the document are recognized properly
-          if (text.slice(-1) != '\n') text += '\n';
-          const footnotes = text.match(/^\[\^\w+\]: .*$/gm); // collect footnotes
-          if (footnotes != null) {
-            // remove footnotes that are their own paragraph
-            text = text.replace(/\n(?:\n\[\^\w+\]: .*)+\n\n/gm, '\n\n');
-
-            // remove footnotes directly before/after a line of text
-            text = text.replace(/\n?(?:\n\[\^\w+\]: .*)+\n?/gm, '\n');
-
-            // append footnotes at the very end of the note
-            text = text.replace(/\n*$/, '') + '\n\n' + footnotes.join('\n') + '\n';
-          }
-          return text;
+          return moveFootnotesToEnd(text);
         });
       },
       [
@@ -1013,12 +1000,10 @@ export const rules: Rule[] = [
             Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
 
             Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
-
             Maecenas malesuada dignissim purus ac volutpat.
 
             [^1]: first footnote
             [^2]: second footnote
-
         `,
         ),
       ],

@@ -356,6 +356,50 @@ describe('Trailing spaces', () => {
 });
 
 describe('Move Footnotes to the bottom', () => {
+  it('Simple case', () => {
+    const before = dedent`
+    [^alpha]: bravo and charlie.
+
+    Line
+    `;
+    const after = dedent`
+    Line
+
+    [^alpha]: bravo and charlie.
+    `;
+    expect(rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
+  });
+  it('Multiline footnotes', () => {
+    const before = dedent`
+    lora ipsala [^note] dolores.
+
+    [^note]: This is not right
+
+        - because the footnote takes more than one paragraph.
+        - and linter does only move the first line.
+
+        but not the rest of it
+
+        it will mess up every multiline note instantly
+
+    this is not cool
+    `;
+    const after = dedent`
+    lora ipsala [^note] dolores.
+
+    this is not cool
+
+    [^note]: This is not right
+
+        - because the footnote takes more than one paragraph.
+        - and linter does only move the first line.
+
+        but not the rest of it
+
+        it will mess up every multiline note instantly
+    `;
+    expect(rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
+  });
   it('Long Document with multiple consecutive footnotes', () => {
     const before = dedent`
    # Part 1
@@ -407,6 +451,8 @@ describe('Move Footnotes to the bottom', () => {
 
    Prima prompta partiendo ius ne. Modo omnes neglegentur cu vel, nisl illum vel ex. Mel et vocent scribentur.[^41]
 
+
+
    [^1]: See @JIPPChristKingPaul2015, 50.
    [^2]: Jipp in -@JIPPChristKingPaul2015, 45, says, “Sale populo petentium vel eu, eam in alii novum voluptatum, te lorem postulant has”.
    [^3]: This is from Journal article --@gaventaLouisMartynGalatians2000, 99.
@@ -420,7 +466,6 @@ describe('Move Footnotes to the bottom', () => {
    [^21]: See @jippDivineVisitationsHospitality2013. Dunn in @dunnRomans181988, says, “Mel et vocent scribentur.”
    [^31]: Abraham in -@abrahamPostcolonialTheologies2015, says, “Ei eos deleniti electram. Prima prompta partiendo ius ne.”
    [^41]: Wright in -@wrightPaulFreshPerspective2005 says, “Modo omnes neglegentur cu vel.”
-
    `;
     expect(rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
   });
