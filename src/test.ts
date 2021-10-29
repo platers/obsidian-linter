@@ -519,4 +519,14 @@ describe('Disabled rules parsing', () => {
       `;
     expect(getDisabledRules(text)).toEqual(rules.map((r) => r.alias()));
   });
+  it('Works with misformatted yamls', () => {
+    const text = dedent`
+      ---
+      tfratfrat
+
+      
+      ---
+      `;
+    expect(getDisabledRules(text)).toEqual([]);
+  });
 });

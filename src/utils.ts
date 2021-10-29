@@ -1,6 +1,7 @@
 import {remark} from 'remark';
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
+import {load} from 'js-yaml';
 
 // Useful regexes
 
@@ -126,4 +127,12 @@ export function escapeRegExp(string: string): string {
  */
 export function stripCr(text: string): string {
   return text.replace(/\r/g, '');
+}
+
+export function loadYAML(yaml_text: string): any {
+  const parsed_yaml = load(yaml_text) as {};
+  if (!parsed_yaml) {
+    return {};
+  }
+  return parsed_yaml;
 }

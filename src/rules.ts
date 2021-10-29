@@ -1,8 +1,7 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert, yamlRegex} from './utils';
+import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert, loadYAML, yamlRegex} from './utils';
 import {Option, BooleanOption, MomentFormatOption, TextOption, DropdownOption, DropdownRecord, TextAreaOption} from './option';
-import {load} from 'js-yaml';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -39,7 +38,7 @@ export function getDisabledRules(text: string): string[] {
   }
 
   const yaml_text = yaml[1];
-  const parsed_yaml = load(yaml_text) as {};
+  const parsed_yaml = loadYAML(yaml_text);
   if (!Object.prototype.hasOwnProperty.call(parsed_yaml, 'disabled rules')) {
     return [];
   }
@@ -599,7 +598,7 @@ export const rules: Rule[] = [
         text = initYAML(text);
         return formatYAML(text, (text) => {
           const insert_lines = String(options['Text to insert']).split('\n').reverse();
-          const parsed_yaml = load(text.match(yamlRegex)[1]) as Record<string, any>;
+          const parsed_yaml = loadYAML(text.match(yamlRegex)[1]);
 
           for (const line of insert_lines) {
             const key = line.split(':')[0];
