@@ -2,6 +2,7 @@ import {remark} from 'remark';
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import {load} from 'js-yaml';
+import remarkGfm from 'remark-gfm';
 
 // Useful regexes
 
@@ -17,6 +18,24 @@ export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeB
 // Helper functions
 
 /**
+ * Gets the positions of the given element type in the given text.
+ * @param {string} type The element type to get positions for
+ * @param {string} text The markdown text
+ * @return {Position[]} The positions of the given element type in the given text
+ */
+function getPositions(type: string, text: string) {
+  const ast = remark().use(remarkGfm).parse(text);
+  const positions: Position[] = [];
+  visit(ast, type, (node) => {
+    positions.push(node.position);
+  });
+
+  // Sort positions by start position in reverse order
+  positions.sort((a, b) => b.start.offset - a.start.offset);
+  return positions;
+}
+
+/**
  * Replaces all codeblocks in the given text with a placeholder.
  * @param {string} text The text to replace codeblocks in
  * @param {string} placeholder The placeholder to use
@@ -24,15 +43,8 @@ export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeB
  * @return {string[]} The codeblocks replaced
  */
 function replaceCodeblocks(text: string, placeholder: string): {text: string, replacedCodeBlocks: string[]} {
-  const ast = remark().parse(text);
+  const positions: Position[] = getPositions('code', text);
   const replacedCodeBlocks: string[] = [];
-  const positions: Position[] = [];
-  visit(ast, 'code', (node) => {
-    positions.push(node.position);
-  });
-
-  // Sort positions by start position in reverse order
-  positions.sort((a, b) => b.start.offset - a.start.offset);
 
   for (const position of positions) {
     const codeblock = text.substring(position.start.offset, position.end.offset);
@@ -44,6 +56,43 @@ function replaceCodeblocks(text: string, placeholder: string): {text: string, re
   replacedCodeBlocks.reverse();
 
   return {text, replacedCodeBlocks};
+}
+
+/**
+ * Moves footnote declarations to the end of the document.
+ * @param {string} text The text to move footnotes in
+ * @return {string} The text with footnote declarations moved to the end
+ */
+export function moveFootnotesToEnd(text: string) {
+  const positions: Position[] = getPositions('footnoteDefinition', text);
+  const footnotes: string[] = [];
+
+  for (const position of positions) {
+    const footnote = text.substring(position.start.offset, position.end.offset);
+    footnotes.push(footnote);
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
+  }
+
+  // Reverse the footnotes so that they are in the same order as the original text
+  footnotes.reverse();
+
+  // Add the footnotes to the end of the document
+  if (footnotes.length > 0) {
+    text += '\n';
+  }
+  for (const footnote of footnotes) {
+    text += '\n' + footnote;
+  }
+
+  return text;
 }
 
 /**
