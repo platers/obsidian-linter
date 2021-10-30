@@ -59,7 +59,9 @@ describe('Rules tests', () => {
         # H1
         \`\`\`
         # comment not header
+        $$
         a = b
+        $$
         \`\`\``;
       const after = dedent`
         ---
@@ -70,7 +72,9 @@ describe('Rules tests', () => {
 
         \`\`\`
         # comment not header
+        $$
         a = b
+        $$
         \`\`\``;
       expect(rulesDict['heading-blank-lines'].apply(before)).toBe(after);
     });

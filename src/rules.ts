@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import {formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert, loadYAML, moveFootnotesToEnd, yamlRegex} from './utils';
+import {escapeDollarSigns, formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert, loadYAML, moveFootnotesToEnd, yamlRegex} from './utils';
 import {Option, BooleanOption, MomentFormatOption, TextOption, DropdownOption, DropdownRecord, TextAreaOption} from './option';
 
 export type Options = { [optionName: string]: any };
@@ -603,7 +603,7 @@ export const rules: Rule[] = [
           for (const line of insert_lines) {
             const key = line.split(':')[0];
             if (!Object.prototype.hasOwnProperty.call(parsed_yaml, key)) {
-              text = text.replace(/^---\n/, `---\n${line}\n`);
+              text = text.replace(/^---\n/, escapeDollarSigns(`---\n${line}\n`));
             }
           }
 
@@ -659,8 +659,8 @@ export const rules: Rule[] = [
             const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_date}`;
 
             if (modified_match.test(text)) {
-              text = text.replace(modified_match, modified_date_line + '\n');
-              text = text.replace(/\ndate updated:.*\n/, modified_date_line + '\n'); // for backwards compatibility
+              text = text.replace(modified_match, escapeDollarSigns(modified_date_line) + '\n');
+              text = text.replace(/\ndate updated:.*\n/, escapeDollarSigns(modified_date_line) + '\n'); // for backwards compatibility
             } else {
               const yaml_end = text.indexOf('\n---');
               text = insert(text, yaml_end, modified_date_line);
@@ -888,7 +888,7 @@ export const rules: Rule[] = [
                   }
                 }
 
-                lines[i] = lines[i].replace(headerRegex, `${headerWords.join(' ')}`);
+                lines[i] = lines[i].replace(headerRegex, escapeDollarSigns(`${headerWords.join(' ')}`));
                 break;
               }
               case 'All Caps':
