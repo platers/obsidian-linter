@@ -112,17 +112,17 @@ export function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => st
   const yamlPlaceholder = '---\n---';
   const yamlMatches = text.match(yamlRegex);
   if (yamlMatches) {
-    text = text.replace(yamlMatches[0], yamlPlaceholder);
+    text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
   }
 
   text = func(text);
 
   if (yamlMatches) {
-    text = text.replace(yamlPlaceholder, yamlMatches[0]);
+    text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
   }
 
   for (const codeblock of replacedCodeBlocks) {
-    text = text.replace(codePlaceholder, codeblock);
+    text = text.replace(codePlaceholder, escapeDollarSigns(codeblock));
   }
 
   return text;
@@ -135,7 +135,7 @@ export function formatYAML(text: string, func: (text: string) => string): string
 
   const oldYaml = text.match(yamlRegex)[0];
   const newYaml = func(oldYaml);
-  text = text.replace(oldYaml, newYaml);
+  text = text.replace(oldYaml, escapeDollarSigns(newYaml));
 
   return text;
 }
@@ -162,6 +162,13 @@ export function initYAML(text: string): string {
  */
 export function insert(str: string, index: number, value: string): string {
   return str.substr(0, index) + value + str.substr(index);
+}
+
+// https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
+// Important to use this for any regex replacements where the replacement string
+// could have user constructed dollar signs in it
+export function escapeDollarSigns(str: string): string {
+  return str.replace(/\$/g, '$$$$');
 }
 
 // https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
