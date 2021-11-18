@@ -156,14 +156,16 @@ export const rules: Rule[] = [
       'Removes extra spaces after every line.',
       RuleType.SPACING,
       (text: string, options = {}) => {
-        if (options['Two Space Linebreak'] === false) {
-          return text.replace(/[ \t]+$/gm, '');
-        } else {
-          text = text.replace(/(\S)[ \t]$/gm, '$1'); // one whitespace
-          text = text.replace(/(\S)[ \t]{3,}$/gm, '$1'); // three or more whitespaces
-          text = text.replace(/(\S)( ?\t\t? ?)$/gm, '$1'); // two whitespaces with at least one tab
-          return text;
-        }
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          if (options['Two Space Linebreak'] === false) {
+            return text.replace(/[ \t]+$/gm, '');
+          } else {
+            text = text.replace(/(\S)[ \t]$/gm, '$1'); // one whitespace
+            text = text.replace(/(\S)[ \t]{3,}$/gm, '$1'); // three or more whitespaces
+            text = text.replace(/(\S)( ?\t\t? ?)$/gm, '$1'); // two whitespaces with at least one tab
+            return text;
+          }
+        });
       },
       [
         new Example(
