@@ -897,7 +897,8 @@ export const rules: Rule[] = [
                 lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
                 break;
               case 'First Letter':
-                lines[i] = lines[i].replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
+                lines[i] = lines[i].toLowerCase()
+                    .replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
                 break;
             }
           }
