@@ -1,4 +1,4 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile} from 'obsidian';
 import {LinterSettings, Options, rules, getDisabledRules} from './rules';
 import Diff from 'diff';
 import moment from 'moment';
@@ -8,6 +8,7 @@ import {stripCr} from './utils';
 
 export default class LinterPlugin extends Plugin {
     settings: LinterSettings;
+    private eventRef: EventRef;
 
     async onload() {
       console.log('Loading Linter plugin');
@@ -32,6 +33,10 @@ export default class LinterPlugin extends Plugin {
           new ConfirmationModal(this.app, this).open();
         },
       });
+
+      this.eventRef = this.app.workspace.on('file-menu',
+        (menu, file, source) => this.onMenuOpenCallback(menu, file, source));
+      this.registerEvent(this.eventRef);
 
       // Source for save setting
       // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
@@ -58,6 +63,7 @@ export default class LinterPlugin extends Plugin {
 
     async onunload() {
       console.log('Unloading Linter plugin');
+      this.app.workspace.offref(this.eventRef);
     }
 
     async loadSettings() {
@@ -97,6 +103,18 @@ export default class LinterPlugin extends Plugin {
     async saveSettings() {
       await this.saveData(this.settings);
     }
+
+    onMenuOpenCallback(menu: Menu, file: TAbstractFile, source: string) {
+      if (file instanceof TFile && file.extension === 'md') {
+        menu.addItem(item => {
+          item.setIcon('wrench-screwdriver-glyph');
+          item.setTitle('Lint file');
+          item.onClick(async evt => {
+            this.runLinterFile(file);
+          });
+        });
+      }
+    } 
 
     lintText(oldText: string, file: TFile) {
       let newText = oldText;
