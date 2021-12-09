@@ -35,7 +35,7 @@ export default class LinterPlugin extends Plugin {
       });
 
       this.eventRef = this.app.workspace.on('file-menu',
-        (menu, file, source) => this.onMenuOpenCallback(menu, file, source));
+          (menu, file, source) => this.onMenuOpenCallback(menu, file, source));
       this.registerEvent(this.eventRef);
 
       // Source for save setting
@@ -106,15 +106,15 @@ export default class LinterPlugin extends Plugin {
 
     onMenuOpenCallback(menu: Menu, file: TAbstractFile, source: string) {
       if (file instanceof TFile && file.extension === 'md') {
-        menu.addItem(item => {
+        menu.addItem((item) => {
           item.setIcon('wrench-screwdriver-glyph');
           item.setTitle('Lint file');
-          item.onClick(async evt => {
+          item.onClick(async (evt) => {
             this.runLinterFile(file);
           });
         });
       }
-    } 
+    }
 
     lintText(oldText: string, file: TFile) {
       let newText = oldText;
