@@ -27,16 +27,16 @@ After:
 
 ```markdown
 ---
-tags: one, two, three, nested/four/five
+tags: one two three nested/four/five
 ---
 ```
-Example: Format Tags in YAML frontmatter
+Example: Format tags in array
 
 Before:
 
 ```markdown
 ---
-tags: #one, #two, #three
+tags: [#one #two #three]
 ---
 ```
 
@@ -44,7 +44,28 @@ After:
 
 ```markdown
 ---
-tags: one, two, three
+tags: [one two three]
+---
+```
+Example: Format tags in list
+
+Before:
+
+```markdown
+---
+tags:
+- #tag1
+- #tag2
+---
+```
+
+After:
+
+```markdown
+---
+tags:
+- tag1
+- tag2
 ---
 ```
 
