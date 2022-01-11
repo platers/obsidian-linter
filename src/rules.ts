@@ -558,8 +558,8 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string) => {
         return formatYAML(text, (text) => {
-          return text.replace(/\ntags: [\w\u2E80-\u9FFF#/ ,-]+(?=.*\n---)/is, function(tagsYAML) {
-            return tagsYAML.replaceAll('#', '').replaceAll(' ', ', ').replaceAll(',,', ',').replace('tags:,', 'tags:');
+          return text.replace(/\ntags:(.*?)(?=\n(?:---|\w+:))/s, function(tagsYAML) {
+            return tagsYAML.replaceAll('#', '');
           });
         });
       },
@@ -573,21 +573,38 @@ export const rules: Rule[] = [
         `,
             dedent`
          ---
-         tags: one, two, three, nested/four/five
+         tags: one two three nested/four/five
          ---
         `,
         ),
         new Example(
-            'Format Tags in YAML frontmatter',
+            'Format tags in array',
             dedent`
          ---
-         tags: #one, #two, #three
+         tags: [#one #two #three]
          ---
         `,
             dedent`
          ---
-         tags: one, two, three
+         tags: [one two three]
          ---
+        `,
+        ),
+        new Example(
+            'Format tags in list',
+            dedent`
+          ---
+          tags:
+          - #tag1
+          - #tag2
+          ---
+        `,
+            dedent`
+          ---
+          tags:
+          - tag1
+          - tag2
+          ---
         `,
         ),
       ],
@@ -897,7 +914,8 @@ export const rules: Rule[] = [
                 lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
                 break;
               case 'First Letter':
-                lines[i] = lines[i].replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
+                lines[i] = lines[i].toLowerCase()
+                    .replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
                 break;
             }
           }

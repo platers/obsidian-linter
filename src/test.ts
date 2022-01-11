@@ -188,6 +188,24 @@ describe('Rules tests', () => {
         `;
       expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'Title Case'})).toBe(after);
     });
+    it('Can capitalize only first letter', () => {
+      const before = dedent`
+        # this Is A Heading
+        `;
+      const after = dedent`
+        # This is a heading
+        `;
+      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First Letter'})).toBe(after);
+    });
+    it('Can capitalize to all caps', () => {
+      const before = dedent`
+        # this Is A Heading
+        `;
+      const after = dedent`
+        # THIS IS A HEADING
+        `;
+      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'All Caps'})).toBe(after);
+    });
   });
   describe('File Name Heading', () => {
     it('Handles stray dashes', () => {
