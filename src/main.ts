@@ -1,6 +1,6 @@
 import {App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile} from 'obsidian';
 import {LinterSettings, Options, rules, getDisabledRules} from './rules';
-import Diff from 'diff';
+import DiffMatchPatch from 'diff-match-patch';
 import moment from 'moment';
 import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';
 import dedent from 'ts-dedent';
@@ -179,7 +179,8 @@ export default class LinterPlugin extends Plugin {
       const newText = this.lintText(oldText, file);
 
       // Replace changed lines
-      const changes = Diff.diffChars(oldText, newText);
+      const dmp = new DiffMatchPatch.diff_match_patch();
+      const changes = dmp.diff_main(oldText, newText);
       let curText = '';
       changes.forEach((change) => {
         function endOfDocument(doc: string) {
@@ -187,22 +188,24 @@ export default class LinterPlugin extends Plugin {
           return {line: lines.length - 1, ch: lines[lines.length - 1].length};
         }
 
-        if (change.added) {
-          editor.replaceRange(change.value, endOfDocument(curText));
-          curText += change.value;
-        } else if (change.removed) {
+        const [type, value] = change;
+
+        if (type == DiffMatchPatch.DIFF_INSERT) {
+          editor.replaceRange(value, endOfDocument(curText));
+          curText += value;
+        } else if (type == DiffMatchPatch.DIFF_DELETE) {
           const start = endOfDocument(curText);
           let tempText = curText;
-          tempText += change.value;
+          tempText += value;
           const end = endOfDocument(tempText);
           editor.replaceRange('', start, end);
         } else {
-          curText += change.value;
+          curText += value;
         }
       });
 
-      const charsAdded = changes.map((change) => change.added ? change.value.length : 0).reduce((a, b) => a + b, 0);
-      const charsRemoved = changes.map((change) => change.removed ? change.value.length : 0).reduce((a, b) => a + b, 0);
+      const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
+      const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
       this.displayChangedMessage(charsAdded, charsRemoved);
     }
 
