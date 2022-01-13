@@ -179,7 +179,7 @@ export default class LinterPlugin extends Plugin {
       const newText = this.lintText(oldText, file);
 
       // Replace changed lines
-      const dmp = new DiffMatchPatch.diff_match_patch();
+      const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
       const changes = dmp.diff_main(oldText, newText);
       let curText = '';
       changes.forEach((change) => {
