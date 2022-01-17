@@ -529,6 +529,30 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
+      'Remove Empty List Markers',
+      'Removes empty list markers, i.e. list items without content.',
+      RuleType.CONTENT,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          return text.replace(/^\s*-\s*\n/gm, '');
+        });
+      },
+      [
+        new Example(
+            'Removes empty list markers.',
+            dedent`
+            - item 1
+            -
+            - item 2
+            `,
+            dedent`
+            - item 1
+            - item 2
+            `,
+        ),
+      ],
+  ),
+  new Rule(
       'Proper Ellipsis',
       'Replaces three consecutive dots with an ellipsis.',
       RuleType.CONTENT,
@@ -558,7 +582,7 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string) => {
         return formatYAML(text, (text) => {
-          return text.replace(/\ntags:(.*?)(?=\n(?:[A-Za-z\-]+?:|---))/s, function(tagsYAML) {
+          return text.replace(/\ntags:(.*?)(?=\n(?:[A-Za-z-]+?:|---))/s, function(tagsYAML) {
             return tagsYAML.replaceAll('#', '');
           });
         });
