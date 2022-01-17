@@ -558,7 +558,7 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string) => {
         return formatYAML(text, (text) => {
-          return text.replace(/\ntags:(.*?)(?=\n(?:---|\w+:))/s, function(tagsYAML) {
+          return text.replace(/\ntags:(.*?)(?=\n(?:[A-Za-z\-]+?:|---))/s, function(tagsYAML) {
             return tagsYAML.replaceAll('#', '');
           });
         });
