@@ -549,6 +549,31 @@ After:
   - copypasted item B
 ```
 
+### Remove Empty List Markers
+
+Alias: `remove-empty-list-markers`
+
+Removes empty list markers, i.e. list items without content.
+
+
+
+Example: Removes empty list markers.
+
+Before:
+
+```markdown
+- item 1
+-
+- item 2
+```
+
+After:
+
+```markdown
+- item 1
+- item 2
+```
+
 ### Proper Ellipsis
 
 Alias: `proper-ellipsis`
