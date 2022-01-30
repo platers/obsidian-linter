@@ -118,7 +118,15 @@ export default class LinterPlugin extends Plugin {
 
     lintText(oldText: string, file: TFile) {
       let newText = oldText;
-      const disabledRules = getDisabledRules(oldText);
+
+      // remove hashtags from tags before parsing yaml
+      const tag_rule = rules.find((rule) => rule.name === 'Format Tags in YAML');
+      const options = tag_rule.getOptions(this.settings);
+      if (options[tag_rule.enabledOptionName()]) {
+        newText = tag_rule.apply(newText, options);
+      }
+
+      const disabledRules = getDisabledRules(newText);
 
       for (const rule of rules) {
         if (disabledRules.includes(rule.alias())) {
@@ -133,6 +141,7 @@ export default class LinterPlugin extends Plugin {
           }, rule.getOptions(this.settings));
 
         if (options[rule.enabledOptionName()]) {
+          // console.log(`Running ${rule.name}`);
           newText = rule.apply(newText, options);
         }
       }
