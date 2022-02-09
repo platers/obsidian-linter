@@ -61,92 +61,92 @@ export function getDisabledRules(text: string): string[] {
 
 /** Class representing a rule */
 export class Rule {
-    public name: string;
-    public description: string;
-    public type: RuleType;
-    public options: Array<Option>;
-    public apply: ApplyFunction;
+  public name: string;
+  public description: string;
+  public type: RuleType;
+  public options: Array<Option>;
+  public apply: ApplyFunction;
 
-    public examples: Array<Example>;
+  public examples: Array<Example>;
 
-    /**
-     * Create a rule
-     * @param {string} name - The name of the rule
-     * @param {string} description - The description of the rule
-     * @param {RuleType} type - The type of the rule
-     * @param {ApplyFunction} apply - The function to apply the rule
-     * @param {Array<Example>} examples - The examples to be displayed in the documentation
-     * @param {Array<Option>} [options=[]] - The options of the rule to be displayed in the documentation
-     */
-    constructor(
-        name: string,
-        description: string,
-        type: RuleType,
-        apply: ApplyFunction,
-        examples: Array<Example>,
-        options: Array<Option> = []) {
-      this.name = name;
-      this.description = description;
-      this.type = type;
-      this.apply = apply;
-      this.examples = examples;
+  /**
+   * Create a rule
+   * @param {string} name - The name of the rule
+   * @param {string} description - The description of the rule
+   * @param {RuleType} type - The type of the rule
+   * @param {ApplyFunction} apply - The function to apply the rule
+   * @param {Array<Example>} examples - The examples to be displayed in the documentation
+   * @param {Array<Option>} [options=[]] - The options of the rule to be displayed in the documentation
+   */
+  constructor(
+      name: string,
+      description: string,
+      type: RuleType,
+      apply: ApplyFunction,
+      examples: Array<Example>,
+      options: Array<Option> = []) {
+    this.name = name;
+    this.description = description;
+    this.type = type;
+    this.apply = apply;
+    this.examples = examples;
 
-      options.unshift(new BooleanOption(this.description, '', false));
-      for (const option of options) {
-        option.ruleName = name;
-      }
-      this.options = options;
+    options.unshift(new BooleanOption(this.description, '', false));
+    for (const option of options) {
+      option.ruleName = name;
+    }
+    this.options = options;
+  }
+
+  public alias(): string {
+    return this.name.replace(/ /g, '-').toLowerCase();
+  }
+
+  public getDefaultOptions() {
+    const options: { [optionName: string]: any } = {};
+
+    for (const option of this.options) {
+      options[option.name] = option.defaultValue;
     }
 
-    public alias(): string {
-      return this.name.replace(/ /g, '-').toLowerCase();
-    }
+    return options;
+  }
 
-    public getDefaultOptions() {
-      const options: { [optionName: string]: any } = {};
+  public getOptions(settings: LinterSettings) {
+    return settings.ruleConfigs[this.name];
+  }
 
-      for (const option of this.options) {
-        options[option.name] = option.defaultValue;
-      }
+  public getURL(): string {
+    const url = 'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
+    return url + '#' + this.alias();
+  }
 
-      return options;
-    }
-
-    public getOptions(settings: LinterSettings) {
-      return settings.ruleConfigs[this.name];
-    }
-
-    public getURL(): string {
-      const url = 'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
-      return url + '#' + this.alias();
-    }
-
-    public enabledOptionName(): string {
-      return this.options[0].name;
-    }
+  public enabledOptionName(): string {
+    return this.options[0].name;
+  }
 }
 
 /** Class representing an example of a rule */
 export class Example {
-    public description: string;
-    public options: Options;
+  public description: string;
+  public options: Options;
 
-    public before: string;
-    public after: string;
+  public before: string;
+  public after: string;
 
-    /**
-     * Create an example
-     * @param {string} description - The description of the example
-     * @param {string} before - The text before the rule is applied
-     * @param {string} after - The text after the rule is applied
-     * @param {object} options - The options of the example
-     */
-    constructor(description: string, before: string, after: string, options: Options = {}) {
-      this.description = description;
-      this.options = options;
-      this.before = before;
-      this.after = after;
-    }
+  /**
+   * Create an example
+   * @param {string} description - The description of the example
+   * @param {string} before - The text before the rule is applied
+   * @param {string} after - The text after the rule is applied
+   * @param {object} options - The options of the example
+   */
+  constructor(description: string, before: string, after: string, options: Options = {}) {
+    this.description = description;
+    this.options = options;
+    this.before = before;
+    this.after = after;
+  }
 }
 
 
@@ -297,7 +297,7 @@ export const rules: Rule[] = [
       RuleType.SPACING,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
-          // Space after marker
+        // Space after marker
           text = text.replace(/^(\s*\d+\.|\s*[-+*])[^\S\r\n]+/gm, '$1 ');
           // Space after checkbox
           return text.replace(/^(\s*\d+\.|\s*[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm, '$1 ');
@@ -793,6 +793,73 @@ export const rules: Rule[] = [
       ],
   ),
 
+  new Rule(
+      'YAML Title',
+      'Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename.',
+      RuleType.YAML,
+      (text: string, options = {}) => {
+        text = initYAML(text);
+
+        // find first H1
+        const h1_match = /^#\s(.*)$/gm;
+        const h1_match_str = h1_match.exec(text);
+        let title = '';
+        if (h1_match_str) {
+          title = h1_match_str[1];
+        } else {
+          title = options['metadata: file name'];
+        }
+
+        return formatYAML(text, (text) => {
+          const title_match_str = `\n${options['Title Key']}.*\n`;
+          const title_match = new RegExp(title_match_str);
+          if (title_match.test(text)) {
+            text = text.replace(title_match, escapeDollarSigns(`\n${options['Title Key']}: ${title}\n`));
+          } else {
+            const yaml_end = text.indexOf('\n---');
+            text = insert(text, yaml_end, `\n${options['Title Key']}: ${title}`);
+          }
+
+          return text;
+        },
+        );
+      },
+      [
+        new Example(
+            'Adds a header with the title from heading.',
+            dedent`
+        # Obsidian
+        `,
+            dedent`
+        ---
+        title: Obsidian
+        ---
+        # Obsidian
+        `,
+            {
+              'metadata: file name': 'Filename',
+            },
+        ),
+        new Example(
+            'Adds a header with the title.',
+            dedent`
+        `,
+            dedent`
+        ---
+        title: Filename
+        ---
+
+        `,
+            {
+              'metadata: file name': 'Filename',
+            },
+        ),
+      ],
+      [
+        new TextOption('Title Key', 'Which YAML key to use for title', 'title'),
+      ],
+  ),
+
   // Heading rules
 
   new Rule(
@@ -852,7 +919,7 @@ export const rules: Rule[] = [
       RuleType.HEADING,
       (text: string, options = {}) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
-          // check if there is a H1 heading
+        // check if there is a H1 heading
           const hasH1 = text.match(/^#\s.*/m);
           if (hasH1) {
             return text;
@@ -1058,7 +1125,7 @@ export const rules: Rule[] = [
       RuleType.FOOTNOTE,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
-          // re-index footnote-text
+        // re-index footnote-text
           let ft_index = 0;
           text = text.replace(/^\[\^\w+\]: /gm, function() {
             ft_index++;
@@ -1131,8 +1198,8 @@ export const rules: Rule[] = [
       RuleType.FOOTNOTE,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
-          // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
-          // needed to ensure that no footnote text followed by ":" is matched
+        // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
+        // needed to ensure that no footnote text followed by ":" is matched
           return text.replace(/(?!^)(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
         });
       },

@@ -186,6 +186,49 @@ modified: Wednesday, January 1st 2020, 12:00:00 am
 # H1
 ```
 
+### YAML Title
+
+Alias: `yaml-title`
+
+Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename.
+
+Options:
+- Title Key: Which YAML key to use for title
+	- Default: `title`
+
+Example: Adds a header with the title from heading.
+
+Before:
+
+```markdown
+# Obsidian
+```
+
+After:
+
+```markdown
+---
+title: Obsidian
+---
+# Obsidian
+```
+Example: Adds a header with the title.
+
+Before:
+
+```markdown
+
+```
+
+After:
+
+```markdown
+---
+title: Filename
+---
+
+```
+
 ## Heading
 ### Header Increment
 
