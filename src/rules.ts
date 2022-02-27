@@ -1215,6 +1215,28 @@ export const rules: Rule[] = [
         ),
       ],
   ),
+  new Rule(
+      'Space between Chinese and English or numbers',
+      'Ensures that Chinese and English or numbers are separated by a single space. Follow this [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)',
+      RuleType.SPACING,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          return text.replace(/([\w]+)([\s]*)([\u4e00-\u9fa5])/gm, '$1 $3')
+              .replace(/([\u4e00-\u9fa5])([\s]*)([\w]+)/gm, '$1 $3');
+        });
+      },
+      [
+        new Example(
+            'Space between Chinese and English',
+            dedent`
+        中文字符串english中文字符串。
+        `,
+            dedent`
+        中文字符串 english 中文字符串。
+        `,
+        ),
+      ],
+  ),
 ].sort((a, b) => RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type));
 
 export const rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);
