@@ -1221,8 +1221,8 @@ export const rules: Rule[] = [
       RuleType.SPACING,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
-          return text.replace(/(\w+)( *)([\u4e00-\u9fa5])/gm, '$1 $3')
-              .replace(/([\u4e00-\u9fa5])( *)(\w+)/gm, '$1 $3');
+          return text.replace(/(\[[^[]*\]\(.*\)|\w+|°|%|`.*`)( *)([\u4e00-\u9fa5])/gm, '$1 $3')
+              .replace(/([\u4e00-\u9fa5])( *)(\[[^[]*\]\(.*\)|\w+|`.*`)/gm, '$1 $3');
         });
       },
       [
@@ -1233,6 +1233,24 @@ export const rules: Rule[] = [
         `,
             dedent`
         中文字符串 english 中文字符串。
+        `,
+        ),
+        new Example(
+            'Space between Chinese and link',
+            dedent`
+        中文字符串[english](http://example.com)中文字符串。
+        `,
+            dedent`
+        中文字符串 [english](http://example.com) 中文字符串。
+        `,
+        ),
+        new Example(
+            'Space between Chinese and inline code block',
+            dedent`
+        中文字符串\`code\`中文字符串。
+        `,
+            dedent`
+        中文字符串 \`code\` 中文字符串。
         `,
         ),
       ],
