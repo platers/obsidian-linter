@@ -1221,8 +1221,9 @@ export const rules: Rule[] = [
       RuleType.SPACING,
       (text: string) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
-          return text.replace(/(\[[^[]*\]\(.*\)|\w+|°|%|`[^`]*`)( *)([\u4e00-\u9fa5])/gm, '$1 $3')
-              .replace(/([\u4e00-\u9fa5])( *)(\[[^[]*\]\(.*\)|\w+|`[^`]*`)/gm, '$1 $3');
+          const head = /([\u4e00-\u9fa5])( *)(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+'"([{¥$]|\*[^*])/gm;
+          const tail = /(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+;:'"°%)\]}]|[^*]\*)( *)([\u4e00-\u9fa5])/gm;
+          return text.replace(head, '$1 $3').replace(tail, '$1 $3');
         });
       },
       [
