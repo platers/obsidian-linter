@@ -13,7 +13,6 @@ To lint the all files, run `Lint all files in the vault`.
 
 When `Lint on save` is toggled on, the plugin will lint the current file on manual save (when you press `Ctrl+S`).
 
-
 ![Demo](images/demo.gif)
 
 ### Disable rules
