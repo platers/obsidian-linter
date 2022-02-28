@@ -927,3 +927,51 @@ After:
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 ```
+
+### Space between Chinese and English or numbers
+
+Alias: `space-between-chinese-and-english-or-numbers`
+
+Ensures that Chinese and English or numbers are separated by a single space. Follow this [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)
+
+
+
+Example: Space between Chinese and English
+
+Before:
+
+```markdown
+中文字符串english中文字符串。
+```
+
+After:
+
+```markdown
+中文字符串 english 中文字符串。
+```
+Example: Space between Chinese and link
+
+Before:
+
+```markdown
+中文字符串[english](http://example.com)中文字符串。
+```
+
+After:
+
+```markdown
+中文字符串 [english](http://example.com) 中文字符串。
+```
+Example: Space between Chinese and inline code block
+
+Before:
+
+```markdown
+中文字符串`code`中文字符串。
+```
+
+After:
+
+```markdown
+中文字符串 `code` 中文字符串。
+```
