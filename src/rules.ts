@@ -799,16 +799,14 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string, options = {}) => {
         text = initYAML(text);
-
-        // find first H1
-        const h1_match = /^#\s(.*)$/gm;
-        const h1_match_str = h1_match.exec(text);
-        let title = '';
-        if (h1_match_str) {
-          title = h1_match_str[1];
-        } else {
-          title = options['metadata: file name'];
-        }
+        let title = ignoreCodeBlocksAndYAML(text, (text) => {
+          const result = text.match(/^#\s+(.*)/m);
+          if (result) {
+            return result[1];
+          }
+          return '';
+        });
+        title = title || options['metadata: file name'];
 
         return formatYAML(text, (text) => {
           const title_match_str = `\n${options['Title Key']}.*\n`;
