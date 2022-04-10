@@ -42,7 +42,7 @@
     "@types/js-yaml": "^4.0.3",
     "diff-match-patch": "^1.0.5",
     "js-yaml": "^3.14.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "remark": "^14.0.1",
     "remark-gfm": "^3.0.0",
     "ts-dedent": "^2.2.0",
