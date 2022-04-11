@@ -617,6 +617,47 @@ After:
 - item 2
 ```
 
+### Convert Bullet List Markers
+
+Alias: `convert-bullet-list-markers`
+
+Converts common bullet list marker symbols to markdown list markers.
+
+
+
+Example: Converts •
+
+Before:
+
+```markdown
+• item 1
+• item 2
+```
+
+After:
+
+```markdown
+- item 1
+- item 2
+```
+Example: Converts §
+
+Before:
+
+```markdown
+• item 1
+  § item 2
+  § item 3
+```
+
+After:
+
+```markdown
+- item 1
+  - item 2
+  - item 3
+```
+
 ### Proper Ellipsis
 
 Alias: `proper-ellipsis`

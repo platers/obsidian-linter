@@ -1,7 +1,25 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import {escapeDollarSigns, formatYAML, headerRegex, ignoreCodeBlocksAndYAML, initYAML, insert, loadYAML, moveFootnotesToEnd, yamlRegex} from './utils';
-import {Option, BooleanOption, MomentFormatOption, TextOption, DropdownOption, DropdownRecord, TextAreaOption} from './option';
+import {
+  escapeDollarSigns,
+  formatYAML,
+  headerRegex,
+  ignoreCodeBlocksAndYAML,
+  initYAML,
+  insert,
+  loadYAML,
+  moveFootnotesToEnd,
+  yamlRegex,
+} from './utils';
+import {
+  Option,
+  BooleanOption,
+  MomentFormatOption,
+  TextOption,
+  DropdownOption,
+  DropdownRecord,
+  TextAreaOption,
+} from './option';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -43,7 +61,9 @@ export function getDisabledRules(text: string): string[] {
     return [];
   }
 
-  let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string; })['disabled rules'];
+  let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string })[
+      'disabled rules'
+  ];
   if (!disabled_rules) {
     return [];
   }
@@ -84,7 +104,8 @@ export class Rule {
       type: RuleType,
       apply: ApplyFunction,
       examples: Array<Example>,
-      options: Array<Option> = []) {
+      options: Array<Option> = [],
+  ) {
     this.name = name;
     this.description = description;
     this.type = type;
@@ -117,7 +138,8 @@ export class Rule {
   }
 
   public getURL(): string {
-    const url = 'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
+    const url =
+      'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
     return url + '#' + this.alias();
   }
 
@@ -141,14 +163,18 @@ export class Example {
    * @param {string} after - The text after the rule is applied
    * @param {object} options - The options of the example
    */
-  constructor(description: string, before: string, after: string, options: Options = {}) {
+  constructor(
+      description: string,
+      before: string,
+      after: string,
+      options: Options = {},
+  ) {
     this.description = description;
     this.options = options;
     this.before = before;
     this.after = after;
   }
 }
-
 
 export const rules: Rule[] = [
   new Rule(
@@ -189,7 +215,11 @@ export const rules: Rule[] = [
         ),
       ],
       [
-        new BooleanOption('Two Space Linebreak', 'Ignore two spaces followed by a line break ("Two Space Rule").', false),
+        new BooleanOption(
+            'Two Space Linebreak',
+            'Ignore two spaces followed by a line break ("Two Space Rule").',
+            false,
+        ),
       ],
   ),
   new Rule(
@@ -257,9 +287,7 @@ export const rules: Rule[] = [
             {Bottom: false},
         ),
       ],
-      [
-        new BooleanOption('Bottom', 'Insert a blank line after headings', true),
-      ],
+      [new BooleanOption('Bottom', 'Insert a blank line after headings', true)],
   ),
   new Rule(
       'Paragraph blank lines',
@@ -300,7 +328,10 @@ export const rules: Rule[] = [
         // Space after marker
           text = text.replace(/^(\s*\d+\.|\s*[-+*])[^\S\r\n]+/gm, '$1 ');
           // Space after checkbox
-          return text.replace(/^(\s*\d+\.|\s*[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm, '$1 ');
+          return text.replace(
+              /^(\s*\d+\.|\s*[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm,
+              '$1 ',
+          );
         });
       },
       [
@@ -387,7 +418,10 @@ export const rules: Rule[] = [
       (text: string, options = {}) => {
         return ignoreCodeBlocksAndYAML(text, (text) => {
           const tabsize = String(options['Tabsize']);
-          const tabsize_regex = new RegExp('^(\t*) {' + String(tabsize) + '}', 'gm');
+          const tabsize_regex = new RegExp(
+              '^(\t*) {' + String(tabsize) + '}',
+              'gm',
+          );
 
           while (text.match(tabsize_regex) != null) {
             text = text.replace(tabsize_regex, '$1\t');
@@ -416,7 +450,11 @@ export const rules: Rule[] = [
       ],
       /* eslint-enable no-mixed-spaces-and-tabs, no-tabs */
       [
-        new TextOption('Tabsize', 'Number of spaces that will be converted to a tab', '4'),
+        new TextOption(
+            'Tabsize',
+            'Number of spaces that will be converted to a tab',
+            '4',
+        ),
       ],
   ),
   new Rule(
@@ -553,6 +591,43 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
+      'Convert Bullet List Markers',
+      'Converts common bullet list marker symbols to markdown list markers.',
+      RuleType.CONTENT,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+        // Convert [•, §] to - if it's the first non space character on the line
+          return text.replace(/^([^\S\n]*)([•§])([^\S\n]*)/gm, '$1-$3');
+        });
+      },
+      [
+        new Example(
+            'Converts •',
+            dedent`
+            • item 1
+            • item 2
+            `,
+            dedent`
+            - item 1
+            - item 2
+            `,
+        ),
+        new Example(
+            'Converts §',
+            dedent`
+            • item 1
+              § item 2
+              § item 3
+              `,
+            dedent`
+            - item 1
+              - item 2
+              - item 3
+              `,
+        ),
+      ],
+  ),
+  new Rule(
       'Proper Ellipsis',
       'Replaces three consecutive dots with an ellipsis.',
       RuleType.CONTENT,
@@ -582,9 +657,12 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string) => {
         return formatYAML(text, (text) => {
-          return text.replace(/\ntags:(.*?)(?=\n(?:[A-Za-z-]+?:|---))/s, function(tagsYAML) {
-            return tagsYAML.replaceAll('#', '');
-          });
+          return text.replace(
+              /\ntags:(.*?)(?=\n(?:[A-Za-z-]+?:|---))/s,
+              function(tagsYAML) {
+                return tagsYAML.replaceAll('#', '');
+              },
+          );
         });
       },
       [
@@ -640,7 +718,9 @@ export const rules: Rule[] = [
       (text: string, options = {}) => {
         text = initYAML(text);
         return formatYAML(text, (text) => {
-          const insert_lines = String(options['Text to insert']).split('\n').reverse();
+          const insert_lines = String(options['Text to insert'])
+              .split('\n')
+              .reverse();
           const parsed_yaml = loadYAML(text.match(yamlRegex)[1]);
 
           for (const line of insert_lines) {
@@ -672,7 +752,11 @@ export const rules: Rule[] = [
         ),
       ],
       [
-        new TextAreaOption('Text to insert', 'Text to insert into the YAML frontmatter', 'aliases: \ntags: '),
+        new TextAreaOption(
+            'Text to insert',
+            'Text to insert into the YAML frontmatter',
+            'aliases: \ntags: ',
+        ),
       ],
   ),
 
@@ -689,21 +773,34 @@ export const rules: Rule[] = [
 
           if (options['Date Created'] === true && !created_match.test(text)) {
             const yaml_end = text.indexOf('\n---');
-            const formatted_date = moment(options['metadata: file created time']).format(options['Format']);
-            text = insert(text, yaml_end, `\n${options['Date Created Key']}: ${formatted_date}`);
+            const formatted_date = moment(
+                options['metadata: file created time'],
+            ).format(options['Format']);
+            text = insert(
+                text,
+                yaml_end,
+                `\n${options['Date Created Key']}: ${formatted_date}`,
+            );
           }
-
 
           if (options['Date Modified'] === true) {
             const modified_match_str = `\n${options['Date Modified Key']}.*\n`;
             const modified_match = new RegExp(modified_match_str);
 
-            const formatted_date = moment(options['metadata: file modified time']).format(options['Format']);
+            const formatted_date = moment(
+                options['metadata: file modified time'],
+            ).format(options['Format']);
             const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_date}`;
 
             if (modified_match.test(text)) {
-              text = text.replace(modified_match, escapeDollarSigns(modified_date_line) + '\n');
-              text = text.replace(/\ndate updated:.*\n/, escapeDollarSigns(modified_date_line) + '\n'); // for backwards compatibility
+              text = text.replace(
+                  modified_match,
+                  escapeDollarSigns(modified_date_line) + '\n',
+              );
+              text = text.replace(
+                  /\ndate updated:.*\n/,
+                  escapeDollarSigns(modified_date_line) + '\n',
+              ); // for backwards compatibility
             } else {
               const yaml_end = text.indexOf('\n---');
               text = insert(text, yaml_end, modified_date_line);
@@ -786,10 +883,26 @@ export const rules: Rule[] = [
       ],
       [
         new BooleanOption('Date Created', 'Insert the file creation date', true),
-        new TextOption('Date Created Key', 'Which YAML key to use for creation date', 'date created'),
-        new BooleanOption('Date Modified', 'Insert the date the file was last modified', true),
-        new TextOption('Date Modified Key', 'Which YAML key to use for modification date', 'date modified'),
-        new MomentFormatOption('Format', 'Date format', 'dddd, MMMM Do YYYY, h:mm:ss a'),
+        new TextOption(
+            'Date Created Key',
+            'Which YAML key to use for creation date',
+            'date created',
+        ),
+        new BooleanOption(
+            'Date Modified',
+            'Insert the date the file was last modified',
+            true,
+        ),
+        new TextOption(
+            'Date Modified Key',
+            'Which YAML key to use for modification date',
+            'date modified',
+        ),
+        new MomentFormatOption(
+            'Format',
+            'Date format',
+            'dddd, MMMM Do YYYY, h:mm:ss a',
+        ),
       ],
   ),
 
@@ -814,15 +927,17 @@ export const rules: Rule[] = [
           const title_match_str = `\n${options['Title Key']}.*\n`;
           const title_match = new RegExp(title_match_str);
           if (title_match.test(text)) {
-            text = text.replace(title_match, escapeDollarSigns(`\n${options['Title Key']}: ${title}\n`));
+            text = text.replace(
+                title_match,
+                escapeDollarSigns(`\n${options['Title Key']}: ${title}\n`),
+            );
           } else {
             const yaml_end = text.indexOf('\n---');
             text = insert(text, yaml_end, `\n${options['Title Key']}: ${title}`);
           }
 
           return text;
-        },
-        );
+        });
       },
       [
         new Example(
@@ -855,9 +970,7 @@ export const rules: Rule[] = [
             },
         ),
       ],
-      [
-        new TextOption('Title Key', 'Which YAML key to use for title', 'title'),
-      ],
+      [new TextOption('Title Key', 'Which YAML key to use for title', 'title')],
   ),
 
   // Heading rules
@@ -883,7 +996,10 @@ export const rules: Rule[] = [
               level = lastLevel + 1;
             }
 
-            lines[i] = lines[i].replace(headerRegex, `$1${'#'.repeat(level)}$3$4`);
+            lines[i] = lines[i].replace(
+                headerRegex,
+                `$1${'#'.repeat(level)}$3$4`,
+            );
             lastLevel = level;
           }
           return lines.join('\n');
@@ -928,7 +1044,8 @@ export const rules: Rule[] = [
           const fileName = options['metadata: file name'];
           // insert H1 heading after front matter
           let yaml_end = text.indexOf('\n---');
-          yaml_end = yaml_end == -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
+          yaml_end =
+          yaml_end == -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
           return insert(text, yaml_end, `# ${fileName}\n`);
         });
       },
@@ -979,33 +1096,46 @@ export const rules: Rule[] = [
               case 'Title Case': {
                 const headerWords = lines[i].match(/\S+/g);
                 // split by comma or whitespace
-                const keepCasing = (options['Ignore Words'] as string).split(/[,\s]+/);
-                const ignoreShortWords = (options['Lowercase Words'] as string).split(/[,\s]+/);
+                const keepCasing = (options['Ignore Words'] as string).split(
+                    /[,\s]+/,
+                );
+                const ignoreShortWords = (
+                options['Lowercase Words'] as string
+                ).split(/[,\s]+/);
                 for (let j = 1; j < headerWords.length; j++) {
                   const isWord = headerWords[j].match(/^[A-Za-z'-]+[.?!,:;]?$/);
                   if (!isWord) {
                     continue;
                   }
 
-                  const ignoreCasedWord = options['Ignore Cased Words'] && (headerWords[j] !== headerWords[j].toLowerCase());
-                  const keepWordCasing = ignoreCasedWord || keepCasing.includes(headerWords[j]);
+                  const ignoreCasedWord =
+                  options['Ignore Cased Words'] &&
+                  headerWords[j] !== headerWords[j].toLowerCase();
+                  const keepWordCasing =
+                  ignoreCasedWord || keepCasing.includes(headerWords[j]);
                   if (!keepWordCasing) {
                     headerWords[j] = headerWords[j].toLowerCase();
                     const ignoreWord = ignoreShortWords.includes(headerWords[j]);
-                    if (!ignoreWord || j == 1) { // ignore words that are not capitalized in titles except if they are the first word
-                      headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+                    if (!ignoreWord || j == 1) {
+                    // ignore words that are not capitalized in titles except if they are the first word
+                      headerWords[j] =
+                      headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
                     }
                   }
                 }
 
-                lines[i] = lines[i].replace(headerRegex, escapeDollarSigns(`${headerWords.join(' ')}`));
+                lines[i] = lines[i].replace(
+                    headerRegex,
+                    escapeDollarSigns(`${headerWords.join(' ')}`),
+                );
                 break;
               }
               case 'All Caps':
                 lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
                 break;
               case 'First Letter':
-                lines[i] = lines[i].toLowerCase()
+                lines[i] = lines[i]
+                    .toLowerCase()
                     .replace(/^#*\s([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
                 break;
             }
@@ -1052,7 +1182,7 @@ export const rules: Rule[] = [
         # This is a heading 1
         ## This is a heading 2
         `,
-            {'Style': 'First Letter'},
+            {Style: 'First Letter'},
         ),
         new Example(
             'With `All Caps=true`',
@@ -1064,22 +1194,43 @@ export const rules: Rule[] = [
         # THIS IS A HEADING 1
         ## THIS IS A HEADING 2
         `,
-            {'Style': 'All Caps'},
+            {Style: 'All Caps'},
         ),
       ],
       [
-        new DropdownOption('Style', 'The style of capitalization to use', 'Title Case',
+        new DropdownOption(
+            'Style',
+            'The style of capitalization to use',
+            'Title Case',
             [
               new DropdownRecord('Title Case', 'Capitalize using title case rules'),
-              new DropdownRecord('All Caps', 'Capitalize the first letter of each word'),
-              new DropdownRecord('First Letter', 'Only capitalize the first letter'),
+              new DropdownRecord(
+                  'All Caps',
+                  'Capitalize the first letter of each word',
+              ),
+              new DropdownRecord(
+                  'First Letter',
+                  'Only capitalize the first letter',
+              ),
             ],
         ),
-        new BooleanOption('Ignore Cased Words', 'Only apply title case style to words that are all lowercase', true),
-        new TextAreaOption('Ignore Words', 'A comma separated list of words to ignore when capitalizing', dedent`
-          macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript`),
-        new TextAreaOption('Lowercase Words', 'A comma separated list of words to keep lowercase', dedent`
-          via, a, an, the, and, or, but, for, nor, so, yet, at, by, in, of, on, to, up, as, is, if, it, for, to, with, without, into, onto, per`),
+        new BooleanOption(
+            'Ignore Cased Words',
+            'Only apply title case style to words that are all lowercase',
+            true,
+        ),
+        new TextAreaOption(
+            'Ignore Words',
+            'A comma separated list of words to ignore when capitalizing',
+            dedent`
+          macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript`,
+        ),
+        new TextAreaOption(
+            'Lowercase Words',
+            'A comma separated list of words to keep lowercase',
+            dedent`
+          via, a, an, the, and, or, but, for, nor, so, yet, at, by, in, of, on, to, up, as, is, if, it, for, to, with, without, into, onto, per`,
+        ),
       ],
   ),
 
@@ -1129,7 +1280,7 @@ export const rules: Rule[] = [
           let ft_index = 0;
           text = text.replace(/^\[\^\w+\]: /gm, function() {
             ft_index++;
-            return ('[^' + String(ft_index) + ']: ');
+            return '[^' + String(ft_index) + ']: ';
           });
 
           // re-index footnote-keys
@@ -1137,7 +1288,7 @@ export const rules: Rule[] = [
           ft_index = 0;
           text = text.replace(/(?!^)\[\^\w+\]/gm, function() {
             ft_index++;
-            return ('[^' + String(ft_index) + ']');
+            return '[^' + String(ft_index) + ']';
           });
           return text;
         });
@@ -1217,4 +1368,7 @@ export const rules: Rule[] = [
   ),
 ].sort((a, b) => RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type));
 
-export const rulesDict = rules.reduce((dict, rule) => (dict[rule.alias()] = rule, dict), {} as Record<string, Rule>);
+export const rulesDict = rules.reduce(
+    (dict, rule) => ((dict[rule.alias()] = rule), dict),
+  {} as Record<string, Rule>,
+);
