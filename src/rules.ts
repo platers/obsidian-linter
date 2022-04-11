@@ -912,16 +912,14 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string, options = {}) => {
         text = initYAML(text);
-
-        // find first H1
-        const h1_match = /^#\s(.*)$/gm;
-        const h1_match_str = h1_match.exec(text);
-        let title = '';
-        if (h1_match_str) {
-          title = h1_match_str[1];
-        } else {
-          title = options['metadata: file name'];
-        }
+        let title = ignoreCodeBlocksAndYAML(text, (text) => {
+          const result = text.match(/^#\s+(.*)/m);
+          if (result) {
+            return result[1];
+          }
+          return '';
+        });
+        title = title || options['metadata: file name'];
 
         return formatYAML(text, (text) => {
           const title_match_str = `\n${options['Title Key']}.*\n`;
@@ -1362,6 +1360,47 @@ export const rules: Rule[] = [
         `,
             dedent`
             Lorem.[^1] Ipsum,[^2] doletes.
+        `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Space between Chinese and English or numbers',
+      'Ensures that Chinese and English or numbers are separated by a single space. Follow this [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)',
+      RuleType.SPACING,
+      (text: string) => {
+        return ignoreCodeBlocksAndYAML(text, (text) => {
+          const head = /([\u4e00-\u9fa5])( *)(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+'"([{¥$]|\*[^*])/gm;
+          const tail = /(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+;:'"°%)\]}]|[^*]\*)( *)([\u4e00-\u9fa5])/gm;
+          return text.replace(head, '$1 $3').replace(tail, '$1 $3');
+        });
+      },
+      [
+        new Example(
+            'Space between Chinese and English',
+            dedent`
+        中文字符串english中文字符串。
+        `,
+            dedent`
+        中文字符串 english 中文字符串。
+        `,
+        ),
+        new Example(
+            'Space between Chinese and link',
+            dedent`
+        中文字符串[english](http://example.com)中文字符串。
+        `,
+            dedent`
+        中文字符串 [english](http://example.com) 中文字符串。
+        `,
+        ),
+        new Example(
+            'Space between Chinese and inline code block',
+            dedent`
+        中文字符串\`code\`中文字符串。
+        `,
+            dedent`
+        中文字符串 \`code\` 中文字符串。
         `,
         ),
       ],

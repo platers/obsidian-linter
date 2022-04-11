@@ -13,8 +13,6 @@ To lint the all files, run `Lint all files in the vault`.
 
 When `Lint on save` is toggled on, the plugin will lint the current file on manual save (when you press `Ctrl+S`).
 
-![Demo](images/demo.gif)
-
 ### Disable rules
 
 ```markdown
@@ -70,6 +68,7 @@ Documentation for all rules can be found in the [rules docs](https://github.com/
 - [consecutive-blank-lines](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#consecutive-blank-lines)
 - [convert-spaces-to-tabs](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#convert-spaces-to-tabs)
 - [line-break-at-document-end](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#line-break-at-document-end)
+- [space-between-chinese-and-english-or-numbers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#space-between-chinese-and-english-or-numbers)
 
 
 ## Development Instructions
