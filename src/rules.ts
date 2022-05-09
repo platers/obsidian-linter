@@ -10,7 +10,7 @@ import {
   loadYAML,
   moveFootnotesToEnd,
   yamlRegex,
-  escapeYamlString
+  escapeYamlString,
 } from './utils';
 import {
   Option,
