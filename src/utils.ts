@@ -1,7 +1,7 @@
 import {remark} from 'remark';
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
-import {load} from 'js-yaml';
+import {load, dump} from 'js-yaml';
 import remarkGfm from 'remark-gfm';
 
 // Useful regexes
@@ -191,4 +191,8 @@ export function loadYAML(yaml_text: string): any {
     return {};
   }
   return parsed_yaml;
+}
+
+export function escapeYamlString(str: string): string {
+  return dump(str).slice(0, -1);
 }
