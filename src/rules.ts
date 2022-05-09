@@ -10,6 +10,7 @@ import {
   loadYAML,
   moveFootnotesToEnd,
   yamlRegex,
+  escapeYamlString,
 } from './utils';
 import {
   Option,
@@ -920,6 +921,8 @@ export const rules: Rule[] = [
           return '';
         });
         title = title || options['metadata: file name'];
+
+        title = escapeYamlString(title);
 
         return formatYAML(text, (text) => {
           const title_match_str = `\n${options['Title Key']}.*\n`;

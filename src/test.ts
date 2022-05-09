@@ -597,3 +597,65 @@ describe('Disabled rules parsing', () => {
     expect(getDisabledRules(text)).toEqual([]);
   });
 });
+
+describe('YAML Title', () => {
+  it('Keeps unescaped title if possible', () => {
+    const before = dedent`
+    # Hello world
+    `;
+
+    const after = dedent`
+    ---
+    title: Hello world
+    ---
+    # Hello world
+    `;
+
+    expect(rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
+  });
+
+  it('Escapes title if it contains colon', () => {
+    const before = dedent`
+    # Hello: world
+    `;
+
+    const after = dedent`
+    ---
+    title: 'Hello: world'
+    ---
+    # Hello: world
+    `;
+
+    expect(rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
+  });
+
+  it('Escapes title if it starts with single quote', () => {
+    const before = dedent`
+    # 'Hello world
+    `;
+
+    const after = dedent`
+    ---
+    title: '''Hello world'
+    ---
+    # 'Hello world
+    `;
+
+    expect(rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
+  });
+
+  it('Escapes title if it starts with double quote', () => {
+    const before = dedent`
+    # "Hello world
+    `;
+
+    const after = dedent`
+    ---
+    title: '"Hello world'
+    ---
+    # "Hello world
+    `;
+
+    expect(rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
+  });
+});
