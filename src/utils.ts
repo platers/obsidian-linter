@@ -194,5 +194,5 @@ export function loadYAML(yaml_text: string): any {
 }
 
 export function escapeYamlString(str: string): string {
-  return dump(str).slice(0, -1);
+  return dump(str, { lineWidth: -1 }).slice(0, -1);
 }
