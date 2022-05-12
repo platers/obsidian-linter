@@ -36,17 +36,17 @@ export default class LinterPlugin extends Plugin {
 
       // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L239-L251
       this.registerEvent(
-        this.app.workspace.on('file-menu', (menu, file: TFile) => {
-          // Add a menu item to the folder context menu to create a board
-          if (file instanceof TFolder) {
-            menu.addItem((item) => {
-              item
-                  .setTitle('Lint folder')
-                  .setIcon('wrench-screwdriver-glyph')
-                  .onClick(() => new LintFolderConfirmationModal(this.app, this, file).open());
-            });
-          }
-        }),
+          this.app.workspace.on('file-menu', (menu, file: TFile) => {
+            // Add a menu item to the folder context menu to create a board
+            if (file instanceof TFolder) {
+              menu.addItem((item) => {
+                item
+                    .setTitle('Lint folder')
+                    .setIcon('wrench-screwdriver-glyph')
+                    .onClick(() => new LintFolderConfirmationModal(this.app, this, file).open());
+              });
+            }
+          }),
       );
 
       this.eventRef = this.app.workspace.on('file-menu',
