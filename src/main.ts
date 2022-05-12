@@ -458,3 +458,35 @@ class LintConfirmationModal extends Modal {
     });
   }
 }
+
+class LintFolderConfirmationModal extends Modal {
+  constructor(app: App, plugin: LinterPlugin, folder: TFolder) {
+    super(app);
+    this.modalEl.addClass('confirm-modal');
+
+    this.contentEl.createEl('h3', {text: 'Warning'});
+    const folderName = folder.name;
+
+    const e: HTMLParagraphElement = this.contentEl.createEl('p',
+        {text: 'This will edit all of your files in ' + folderName + ' including files in its subfolders which may introduce errors. Make sure you have backed up your files.'});
+    e.id = 'confirm-dialog';
+
+    this.contentEl.createDiv('modal-button-container', (buttonsEl) => {
+      buttonsEl.createEl('button', {text: 'Cancel'}).addEventListener('click', () => this.close());
+
+      const btnSumbit = buttonsEl.createEl('button', {
+        attr: {type: 'submit'},
+        cls: 'mod-cta',
+        text: 'Lint All Files in ' + folderName,
+      });
+      btnSumbit.addEventListener('click', async (e) => {
+        new Notice('Linting all files in ' + folderName + '...');
+        this.close();
+        await plugin.runLinterAllFileInFolder(folder);
+      });
+      setTimeout(() => {
+        btnSumbit.focus();
+      }, 50);
+    });
+  }
+}
