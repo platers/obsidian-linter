@@ -45,6 +45,15 @@ export default class LinterPlugin extends Plugin {
         },
       });
 
+      this.addCommand({
+        id: 'lint-all-files-in-folder',
+        name: 'Lint all files in the current folder',
+        editorCallback: (editor) => {
+          const file = this.app.workspace.getActiveFile();
+          new LintFolderConfirmationModal(this.app, this, file.parent).open();
+        },
+      });
+
       // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L239-L251
       this.registerEvent(
           this.app.workspace.on('file-menu', (menu, file: TFile) => {
