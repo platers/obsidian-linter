@@ -13,7 +13,7 @@ export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
-
+export const linkRegex = /((!?)\[.*\]\(.*\))|(\[{2}.*\]{2})/g;
 
 // Helper functions
 
@@ -96,14 +96,14 @@ export function moveFootnotesToEnd(text: string) {
 }
 
 /**
- * Substitutes YAML and codeblocks in a text with a placeholder.
+ * Substitutes YAML, links, and codeblocks in a text with a placeholder.
  * Then applies the given function to the text.
  * Substitutes the YAML and codeblocks back to their original form.
  * @param {string} text - The text to process
  * @param {function(string): string} func - The function to apply to the text
  * @return {string} The processed text
  */
-export function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => string): string {
+export function ignoreCodeBlocksYAMLAndLinks(text: string, func: (text: string) => string): string {
   const codePlaceholder = 'PLACEHOLDER 321417';
   const ret = replaceCodeblocks(text, codePlaceholder);
   text = ret.text;
@@ -115,7 +115,17 @@ export function ignoreCodeBlocksAndYAML(text: string, func: (text: string) => st
     text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
   }
 
+  const linkPlaceHolder = 'PLACEHOLDER_LINK 57849';
+  const linkMatches = text.match(linkRegex);
+  text = text.replaceAll(linkRegex, linkPlaceHolder);
+
   text = func(text);
+
+  if (linkMatches) {
+    for (const link of linkMatches) {
+      text = text.replace(linkPlaceHolder, link);
+    }
+  }
 
   if (yamlMatches) {
     text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));

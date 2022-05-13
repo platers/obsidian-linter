@@ -674,3 +674,51 @@ describe('YAML Title', () => {
     expect(rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
   });
 });
+
+describe('Links', () => {
+  it('Regular link with spaces stays the same', () => {
+    const before = dedent`
+    # Hello world
+
+    [This has  spaces in it](File with  spaces.md)
+    `;
+
+    const after = dedent`
+    # Hello world
+
+    [This has  spaces in it](File with  spaces.md)
+    `;
+
+    expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
+  });
+  it('Image link with spaces stays the same', () => {
+    const before = dedent`
+    # Hello world
+
+    ![This has  spaces in it](File with  spaces.png)
+    `;
+
+    const after = dedent`
+    # Hello world
+
+    ![This has  spaces in it](File with  spaces.png)
+    `;
+
+    expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
+  });
+  it('Wiki link with spaces stays the same', () => {
+    const before = dedent`
+    # Hello world
+
+    [[File with  spaces]]
+    `;
+
+    const after = dedent`
+    # Hello world
+
+    [[File with  spaces]]
+    `;
+
+    expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
+  });
+});
