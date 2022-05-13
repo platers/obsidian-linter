@@ -54,7 +54,7 @@ export default class LinterPlugin extends Plugin {
                 item
                     .setTitle('Lint folder')
                     .setIcon('wrench-screwdriver-glyph')
-                    .onClick(() => this.createFolderLintModal(file.parent));
+                    .onClick(() => this.createFolderLintModal(file));
               });
             }
           }),
@@ -206,7 +206,7 @@ export default class LinterPlugin extends Plugin {
       new Notice('Linted all files');
     }
 
-    async runLinterAllFileInFolder(folder: TFolder) {
+    async runLinterAllFilesInFolder(folder: TFolder) {
       console.log('Linting folder ' + folder.name);
 
       let lintedFiles = 0;
@@ -229,7 +229,7 @@ export default class LinterPlugin extends Plugin {
       const startMessage = 'This will edit all of your files in ' + folder.name + ' including files in its subfolders which may introduce errors.';
       const submitBtnText = 'Lint All Files in ' + folder.name;
       const submitBtnNoticeText = 'Linting all files in ' + folder.name + '...';
-      new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, this.runLinterAllFileInFolder, folder).open();
+      new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder)).open();
     }
 
     runLinterEditor(editor: Editor) {
@@ -429,7 +429,7 @@ class SettingTab extends PluginSettingTab {
 // https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/src/modal.ts#L68
 class LintConfirmationModal extends Modal {
   constructor(app: App, startModalMessageText: string, submitBtnText: string,
-      submitBtnNoticeText: string, btnSubmitAction: (folder? :TFolder) => Promise<void>, folder? :TFolder) {
+      submitBtnNoticeText: string, btnSubmitAction: () => Promise<void>) {
     super(app);
     this.modalEl.addClass('confirm-modal');
 
@@ -450,7 +450,7 @@ class LintConfirmationModal extends Modal {
       btnSumbit.addEventListener('click', async (e) => {
         new Notice(submitBtnNoticeText);
         this.close();
-        await btnSubmitAction(folder);
+        await btnSubmitAction();
       });
       setTimeout(() => {
         btnSumbit.focus();
