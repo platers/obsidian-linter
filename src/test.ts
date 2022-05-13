@@ -710,13 +710,13 @@ describe('Links', () => {
     const before = dedent`
     # Hello world
 
-    [This has  spaces in it](File with  spaces.md)
+    [[File with  spaces]]
     `;
 
     const after = dedent`
     # Hello world
 
-    [This has  spaces in it](File with  spaces.md)
+    [[File with  spaces]]
     `;
 
     expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);

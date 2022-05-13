@@ -109,26 +109,26 @@ export function ignoreCodeBlocksYAMLAndLinks(text: string, func: (text: string) 
   text = ret.text;
   const replacedCodeBlocks = ret.replacedCodeBlocks;
 
-  const linkPlaceHolder = 'PLACEHOLDER_LINK 57849';
-  const linkMatches = text.match(linkRegex);
-  text = text.replaceAll(linkRegex, linkPlaceHolder);
-
   const yamlPlaceholder = '---\n---';
   const yamlMatches = text.match(yamlRegex);
   if (yamlMatches) {
     text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
   }
 
-  text = func(text);
+  const linkPlaceHolder = 'PLACEHOLDER_LINK 57849';
+  const linkMatches = text.match(linkRegex);
+  text = text.replaceAll(linkRegex, linkPlaceHolder);
 
-  if (yamlMatches) {
-    text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
-  }
+  text = func(text);
 
   if (linkMatches) {
     for (const link of linkMatches) {
       text = text.replace(linkPlaceHolder, link);
     }
+  }
+
+  if (yamlMatches) {
+    text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
   }
 
   for (const codeblock of replacedCodeBlocks) {
