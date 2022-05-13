@@ -1,4 +1,4 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
 import {LinterSettings, Options, rules, getDisabledRules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import moment from 'moment';
@@ -30,9 +30,35 @@ export default class LinterPlugin extends Plugin {
         id: 'lint-all-files',
         name: 'Lint all files in the vault',
         callback: () => {
-          new ConfirmationModal(this.app, this).open();
+          const startMessage = 'This will edit all of your files and may introduce errors.';
+          const submitBtnText = 'Lint All';
+          const submitBtnNoticeText = 'Linting all files...';
+          new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, this.runLinterAllFiles).open();
         },
       });
+
+      this.addCommand({
+        id: 'lint-all-files-in-folder',
+        name: 'Lint all files in the current folder',
+        editorCallback: (_) => {
+          this.createFolderLintModal(this.app.workspace.getActiveFile().parent);
+        },
+      });
+
+      // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L239-L251
+      this.registerEvent(
+          this.app.workspace.on('file-menu', (menu, file: TFile) => {
+            // Add a menu item to the folder context menu to create a board
+            if (file instanceof TFolder) {
+              menu.addItem((item) => {
+                item
+                    .setTitle('Lint folder')
+                    .setIcon('wrench-screwdriver-glyph')
+                    .onClick(() => this.createFolderLintModal(file));
+              });
+            }
+          }),
+      );
 
       this.eventRef = this.app.workspace.on('file-menu',
           (menu, file, source) => this.onMenuOpenCallback(menu, file, source));
@@ -178,6 +204,32 @@ export default class LinterPlugin extends Plugin {
         }
       }));
       new Notice('Linted all files');
+    }
+
+    async runLinterAllFilesInFolder(folder: TFolder) {
+      console.log('Linting folder ' + folder.name);
+
+      let lintedFiles = 0;
+      await Promise.all(this.app.vault.getMarkdownFiles().map(async (file) => {
+        if (this.convertPathToNormalizedString(file.path).startsWith(this.convertPathToNormalizedString(folder.path) + '|') && !this.shouldIgnoreFile(file)) {
+          await this.runLinterFile(file);
+          lintedFiles++;
+        }
+      }));
+      new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name);
+    }
+
+    // convert the path separators to | in order to "normalize" the path for better comparisons
+    convertPathToNormalizedString(path: string): string {
+      return path.replace('\\', '|').replace('/', '|');
+    }
+
+    // handles the creation of the folder linting modal since this happens in multiple places and it should be consistent
+    createFolderLintModal(folder: TFolder) {
+      const startMessage = 'This will edit all of your files in ' + folder.name + ' including files in its subfolders which may introduce errors.';
+      const submitBtnText = 'Lint All Files in ' + folder.name;
+      const submitBtnNoticeText = 'Linting all files in ' + folder.name + '...';
+      new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder)).open();
     }
 
     runLinterEditor(editor: Editor) {
@@ -375,15 +427,16 @@ class SettingTab extends PluginSettingTab {
 }
 
 // https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/src/modal.ts#L68
-class ConfirmationModal extends Modal {
-  constructor(app: App, plugin: LinterPlugin) {
+class LintConfirmationModal extends Modal {
+  constructor(app: App, startModalMessageText: string, submitBtnText: string,
+      submitBtnNoticeText: string, btnSubmitAction: () => Promise<void>) {
     super(app);
     this.modalEl.addClass('confirm-modal');
 
     this.contentEl.createEl('h3', {text: 'Warning'});
 
     const e: HTMLParagraphElement = this.contentEl.createEl('p',
-        {text: 'This will edit all of your files and may introduce errors. Make sure you have backed up your files.'});
+        {text: startModalMessageText + ' Make sure you have backed up your files.'});
     e.id = 'confirm-dialog';
 
     this.contentEl.createDiv('modal-button-container', (buttonsEl) => {
@@ -392,12 +445,12 @@ class ConfirmationModal extends Modal {
       const btnSumbit = buttonsEl.createEl('button', {
         attr: {type: 'submit'},
         cls: 'mod-cta',
-        text: 'Lint All',
+        text: submitBtnText,
       });
       btnSumbit.addEventListener('click', async (e) => {
-        new Notice('Linting all files...');
+        new Notice(submitBtnNoticeText);
         this.close();
-        await plugin.runLinterAllFiles();
+        await btnSubmitAction();
       });
       setTimeout(() => {
         btnSumbit.focus();
