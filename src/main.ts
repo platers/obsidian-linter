@@ -30,16 +30,18 @@ export default class LinterPlugin extends Plugin {
         id: 'lint-all-files',
         name: 'Lint all files in the vault',
         callback: () => {
-          new LintAllConfirmationModal(this.app, this).open();
+          const startMessage = 'This will edit all of your files and may introduce errors.';
+          const submitBtnText = 'Lint All';
+          const submitBtnNoticeText = 'Linting all files...';
+          new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, this.runLinterAllFiles).open();
         },
       });
 
       this.addCommand({
         id: 'lint-all-files-in-folder',
         name: 'Lint all files in the current folder',
-        editorCallback: (editor) => {
-          const file = this.app.workspace.getActiveFile();
-          new LintFolderConfirmationModal(this.app, this, file.parent).open();
+        editorCallback: (_) => {
+          this.createFolderLintModal(this.app.workspace.getActiveFile().parent);
         },
       });
 
@@ -52,7 +54,7 @@ export default class LinterPlugin extends Plugin {
                 item
                     .setTitle('Lint folder')
                     .setIcon('wrench-screwdriver-glyph')
-                    .onClick(() => new LintFolderConfirmationModal(this.app, this, file).open());
+                    .onClick(() => this.createFolderLintModal(file.parent));
               });
             }
           }),
@@ -206,14 +208,28 @@ export default class LinterPlugin extends Plugin {
 
     async runLinterAllFileInFolder(folder: TFolder) {
       console.log('Linting folder ' + folder.name);
+
       let lintedFiles = 0;
       await Promise.all(this.app.vault.getMarkdownFiles().map(async (file) => {
-        if (file.path.startsWith(folder.path) && !this.shouldIgnoreFile(file)) {
+        if (this.convertPathToNormalizedString(file.path).startsWith(this.convertPathToNormalizedString(folder.path) + '|') && !this.shouldIgnoreFile(file)) {
           await this.runLinterFile(file);
           lintedFiles++;
         }
       }));
       new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name);
+    }
+
+    // convert the path separators to | in order to "normalize" the path for better comparisons
+    convertPathToNormalizedString(path: string): string {
+      return path.replace('\\', '|').replace('/', '|');
+    }
+
+    // handles the creation of the folder linting modal since this happens in multiple places and it should be consistent
+    createFolderLintModal(folder: TFolder) {
+      const startMessage = 'This will edit all of your files in ' + folder.name + ' including files in its subfolders which may introduce errors.';
+      const submitBtnText = 'Lint All Files in ' + folder.name;
+      const submitBtnNoticeText = 'Linting all files in ' + folder.name + '...';
+      new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, this.runLinterAllFileInFolder, folder).open();
     }
 
     runLinterEditor(editor: Editor) {
@@ -411,15 +427,16 @@ class SettingTab extends PluginSettingTab {
 }
 
 // https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/src/modal.ts#L68
-class LintAllConfirmationModal extends Modal {
-  constructor(app: App, plugin: LinterPlugin) {
+class LintConfirmationModal extends Modal {
+  constructor(app: App, startModalMessageText: string, submitBtnText: string,
+      submitBtnNoticeText: string, btnSubmitAction: (folder? :TFolder) => Promise<void>, folder? :TFolder) {
     super(app);
     this.modalEl.addClass('confirm-modal');
 
     this.contentEl.createEl('h3', {text: 'Warning'});
 
     const e: HTMLParagraphElement = this.contentEl.createEl('p',
-        {text: 'This will edit all of your files and may introduce errors. Make sure you have backed up your files.'});
+        {text: startModalMessageText + ' Make sure you have backed up your files.'});
     e.id = 'confirm-dialog';
 
     this.contentEl.createDiv('modal-button-container', (buttonsEl) => {
@@ -428,44 +445,12 @@ class LintAllConfirmationModal extends Modal {
       const btnSumbit = buttonsEl.createEl('button', {
         attr: {type: 'submit'},
         cls: 'mod-cta',
-        text: 'Lint All',
+        text: submitBtnText,
       });
       btnSumbit.addEventListener('click', async (e) => {
-        new Notice('Linting all files...');
+        new Notice(submitBtnNoticeText);
         this.close();
-        await plugin.runLinterAllFiles();
-      });
-      setTimeout(() => {
-        btnSumbit.focus();
-      }, 50);
-    });
-  }
-}
-
-class LintFolderConfirmationModal extends Modal {
-  constructor(app: App, plugin: LinterPlugin, folder: TFolder) {
-    super(app);
-    this.modalEl.addClass('confirm-modal');
-
-    this.contentEl.createEl('h3', {text: 'Warning'});
-    const folderName = folder.name;
-
-    const e: HTMLParagraphElement = this.contentEl.createEl('p',
-        {text: 'This will edit all of your files in ' + folderName + ' including files in its subfolders which may introduce errors. Make sure you have backed up your files.'});
-    e.id = 'confirm-dialog';
-
-    this.contentEl.createDiv('modal-button-container', (buttonsEl) => {
-      buttonsEl.createEl('button', {text: 'Cancel'}).addEventListener('click', () => this.close());
-
-      const btnSumbit = buttonsEl.createEl('button', {
-        attr: {type: 'submit'},
-        cls: 'mod-cta',
-        text: 'Lint All Files in ' + folderName,
-      });
-      btnSumbit.addEventListener('click', async (e) => {
-        new Notice('Linting all files in ' + folderName + '...');
-        this.close();
-        await plugin.runLinterAllFileInFolder(folder);
+        await btnSubmitAction(folder);
       });
       setTimeout(() => {
         btnSumbit.focus();
