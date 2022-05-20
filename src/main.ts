@@ -45,15 +45,6 @@ export default class LinterPlugin extends Plugin {
         },
       });
 
-      this.addCommand({
-        id: 'lint-all-files-in-folder',
-        name: 'Lint all files in the current folder',
-        editorCallback: (editor) => {
-          const file = this.app.workspace.getActiveFile();
-          new LintFolderConfirmationModal(this.app, this, file.parent).open();
-        },
-      });
-
       // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L239-L251
       this.registerEvent(
           this.app.workspace.on('file-menu', (menu, file: TFile) => {
@@ -460,38 +451,6 @@ class LintConfirmationModal extends Modal {
         new Notice(submitBtnNoticeText);
         this.close();
         await btnSubmitAction();
-      });
-      setTimeout(() => {
-        btnSumbit.focus();
-      }, 50);
-    });
-  }
-}
-
-class LintFolderConfirmationModal extends Modal {
-  constructor(app: App, plugin: LinterPlugin, folder: TFolder) {
-    super(app);
-    this.modalEl.addClass('confirm-modal');
-
-    this.contentEl.createEl('h3', {text: 'Warning'});
-    const folderName = folder.name;
-
-    const e: HTMLParagraphElement = this.contentEl.createEl('p',
-        {text: 'This will edit all of your files in ' + folderName + ' including files in its subfolders which may introduce errors. Make sure you have backed up your files.'});
-    e.id = 'confirm-dialog';
-
-    this.contentEl.createDiv('modal-button-container', (buttonsEl) => {
-      buttonsEl.createEl('button', {text: 'Cancel'}).addEventListener('click', () => this.close());
-
-      const btnSumbit = buttonsEl.createEl('button', {
-        attr: {type: 'submit'},
-        cls: 'mod-cta',
-        text: 'Lint All Files in ' + folderName,
-      });
-      btnSumbit.addEventListener('click', async (e) => {
-        new Notice('Linting all files in ' + folderName + '...');
-        this.close();
-        await plugin.runLinterAllFileInFolder(folder);
       });
       setTimeout(() => {
         btnSumbit.focus();
