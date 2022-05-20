@@ -532,7 +532,7 @@ describe('yaml timestamp', () => {
   });
 });
 describe('Insert yaml attributes', () => {
-  it('Inits yaml is not exist', () => {
+  it('Inits yaml if it does not exist', () => {
     const before = dedent`
     `;
     const after = dedent`
@@ -540,6 +540,33 @@ describe('Insert yaml attributes', () => {
     tags:
     ---
     
+    `;
+    expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
+  });
+  // accounts for https://github.com/platers/obsidian-linter/issues/176
+  it('Inits yaml when the file has --- in it and no frontmatter', () => {
+    const before = dedent`
+    # Heading
+    Text
+
+    # Heading
+    - Text
+     - Text
+    ---
+
+    `;
+    const after = dedent`
+    ---
+    tags:
+    ---
+    # Heading
+    Text
+
+    # Heading
+    - Text
+     - Text
+    ---
+
     `;
     expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
   });
