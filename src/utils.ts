@@ -86,7 +86,7 @@ export function moveFootnotesToEnd(text: string) {
 
   // Add the footnotes to the end of the document
   if (footnotes.length > 0) {
-    text += '\n';
+    text = text.trimEnd() + '\n';
   }
   for (const footnote of footnotes) {
     text += '\n' + footnote;
