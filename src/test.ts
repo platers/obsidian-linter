@@ -721,4 +721,19 @@ describe('Links', () => {
 
     expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
   });
+  it('Link in heading is still present with first letter capitalization rules on', () => {
+    const before = dedent`
+    # Heading [[docker]]
+    # Heading [docker](docker)
+    # Heading ![docker](docker)
+    `;
+
+    const after = dedent`
+    # Heading [[docker]]
+    # Heading [docker](docker)
+    # Heading ![docker](docker)
+    `;
+
+    expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First Letter'})).toBe(after);
+  });
 });

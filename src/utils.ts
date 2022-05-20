@@ -123,7 +123,9 @@ export function ignoreCodeBlocksYAMLAndLinks(text: string, func: (text: string) 
 
   if (linkMatches) {
     for (const link of linkMatches) {
-      text = text.replace(linkPlaceHolder, link);
+      // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
+      // see https://github.com/platers/obsidian-linter/issues/201
+      text = text.replace(new RegExp(linkPlaceHolder, 'i'), link);
     }
   }
 
