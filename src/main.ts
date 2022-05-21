@@ -33,7 +33,9 @@ export default class LinterPlugin extends Plugin {
           const startMessage = 'This will edit all of your files and may introduce errors.';
           const submitBtnText = 'Lint All';
           const submitBtnNoticeText = 'Linting all files...';
-          new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, this.runLinterAllFiles).open();
+          new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () =>{
+            return this.runLinterAllFiles(this.app);
+          }).open();
         },
       });
 
@@ -197,8 +199,8 @@ export default class LinterPlugin extends Plugin {
       }
     }
 
-    async runLinterAllFiles() {
-      await Promise.all(this.app.vault.getMarkdownFiles().map(async (file) => {
+    async runLinterAllFiles(app: App) {
+      await Promise.all(app.vault.getMarkdownFiles().map(async (file) => {
         if (!this.shouldIgnoreFile(file)) {
           await this.runLinterFile(file);
         }
