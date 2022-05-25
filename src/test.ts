@@ -197,6 +197,17 @@ describe('Rules tests', () => {
         `;
       expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First Letter'})).toBe(after);
     });
+    it('Can capitalize only first letter that is a - Z', () => {
+      const before = dedent`
+        # 1. heading attempt
+        # 1 John
+        `;
+      const after = dedent`
+        # 1. Heading attempt
+        # 1 John
+        `;
+      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First Letter'})).toBe(after);
+    });
     it('Can capitalize to all caps', () => {
       const before = dedent`
         # this Is A Heading
