@@ -198,7 +198,9 @@ export function stripCr(text: string): string {
 }
 
 export function loadYAML(yaml_text: string): any {
-  const parsed_yaml = load(yaml_text) as {};
+  // replacing tabs at the beginning of new lines with 2 spaces fixes loading yaml that has tabs at the start of a line
+  // https://github.com/platers/obsidian-linter/issues/157
+  const parsed_yaml = load(yaml_text.replace(/\n(\t)+/g, '\n  ')) as {};
   if (!parsed_yaml) {
     return {};
   }
