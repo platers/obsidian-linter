@@ -166,6 +166,7 @@ describe('Rules tests', () => {
         ## this is a sentence.
         ## I can't do this
         ## comma, comma, comma
+        ## 1.1 the Header
         `;
       const after = dedent`
         # h1
@@ -173,6 +174,7 @@ describe('Rules tests', () => {
         ## This is a Sentence.
         ## I Can't Do This
         ## Comma, Comma, Comma
+        ## 1.1 The Header
         `;
       const options = Object.assign({
         'Style': 'Title Case',

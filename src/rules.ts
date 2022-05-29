@@ -1103,6 +1103,7 @@ export const rules: Rule[] = [
                 const ignoreShortWords = (
                 options['Lowercase Words'] as string
                 ).split(/[,\s]+/);
+                let firstWord = true;
                 for (let j = 1; j < headerWords.length; j++) {
                   const isWord = headerWords[j].match(/^[A-Za-z'-]+[.?!,:;]?$/);
                   if (!isWord) {
@@ -1117,12 +1118,14 @@ export const rules: Rule[] = [
                   if (!keepWordCasing) {
                     headerWords[j] = headerWords[j].toLowerCase();
                     const ignoreWord = ignoreShortWords.includes(headerWords[j]);
-                    if (!ignoreWord || j == 1) {
+                    if (!ignoreWord || firstWord === true) {
                     // ignore words that are not capitalized in titles except if they are the first word
                       headerWords[j] =
                       headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
                     }
                   }
+
+                  firstWord = false;
                 }
 
                 lines[i] = lines[i].replace(
