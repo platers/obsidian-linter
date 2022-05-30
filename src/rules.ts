@@ -358,6 +358,103 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
+      `Remove Empty Lines Between List Markers and Checklists`,
+      'There should not be any empty lines between list markers and checklists.',
+      RuleType.SPACING,
+      (text: string) => {
+        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+          const replaceEmptyLinesBetweenList = function(text: string, listRegex: RegExp, replaceWith: string): string {
+            let match;
+            let newText = text;
+
+            do {
+              match = newText.match(listRegex);
+              newText = newText.replaceAll(listRegex, replaceWith);
+            } while (match);
+
+            // console.log(newText);
+            return newText;
+          };
+
+          /* eslint-disable no-useless-escape */
+          // account for '- [x]' and  '- [ ]' checkbox markers
+          const checkboxMarker = new RegExp(/^(( |\t)*- \[( |x)\].+)\n\n(( |\t)*- \[( |x)\].+)$/gm);
+          text = replaceEmptyLinesBetweenList(text, checkboxMarker, '$1\n$4');
+
+          // account for ordered list marker
+          const orderedMarker = new RegExp(/^(( |\t)*\d+\..+)\n\n(( |\t)*\d+\..+)$/gm);
+          text = replaceEmptyLinesBetweenList(text, orderedMarker, '$1\n$3');
+
+          // account for '+' list marker
+          const plusMarker = new RegExp(/^(( |\t)*\+.+)\n\n(( |\t)*\+.+)$/gm);
+          text = replaceEmptyLinesBetweenList(text, plusMarker, '$1\n$3');
+
+          // account for '-' list marker
+          const dashMarker = new RegExp(/^(( |\t)*-(?! \[( |x)\]).+)\n\n(( |\t)*-(?! \[( |x)\]).+)$/gm);
+          text = replaceEmptyLinesBetweenList(text, dashMarker, '$1\n$4');
+
+          // account for '*' list marker
+          const splatMarker = new RegExp(/^(( |\t)*\*.+)\n\n(( |\t)*\*.+)$/gm);
+          return replaceEmptyLinesBetweenList(text, splatMarker, '$1\n$3');
+          /* eslint-enable no-useless-escape */
+        });
+      },
+      [
+        new Example(
+            '',
+            dedent`
+      1. Item 1
+
+      2. Item 2
+
+      - Item 1
+
+      \t- Subitem 1
+
+      - Item 2
+
+      - [x] Item 1
+
+      \t- [ ] Subitem 1
+
+      - [ ] Item 2
+
+      + Item 1
+      
+      \t+ Subitem 1
+
+      + Item 2
+
+      * Item 1
+
+      \t* Subitem 1
+
+      * Item 2
+      `,
+            dedent`
+      1. Item 1
+      2. Item 2
+
+      - Item 1
+      \t- Subitem 1
+      - Item 2
+
+      - [x] Item 1
+      \t- [ ] Subitem 1
+      - [ ] Item 2
+
+      + Item 1
+      \t+ Subitem 1
+      + Item 2
+
+      * Item 1
+      \t* Subitem 1
+      * Item 2
+      `,
+        ),
+      ],
+  ),
+  new Rule(
       'Compact YAML',
       'Removes leading and trailing blank lines in the YAML front matter.',
       RuleType.SPACING,

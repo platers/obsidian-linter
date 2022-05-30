@@ -844,6 +844,71 @@ After:
 	- [ ] Item 3
 ```
 
+### Remove Empty Lines Between List Markers and Checklists
+
+Alias: `remove-empty-lines-between-list-markers-and-checklists`
+
+There should not be any empty lines between list markers and checklists.
+
+
+
+Example: 
+
+Before:
+
+```markdown
+1. Item 1
+
+2. Item 2
+
+- Item 1
+
+	- Subitem 1
+
+- Item 2
+
+- [x] Item 1
+
+	- [ ] Subitem 1
+
+- [ ] Item 2
+
++ Item 1
+
+	+ Subitem 1
+
++ Item 2
+
+* Item 1
+
+	* Subitem 1
+
+* Item 2
+```
+
+After:
+
+```markdown
+1. Item 1
+2. Item 2
+
+- Item 1
+	- Subitem 1
+- Item 2
+
+- [x] Item 1
+	- [ ] Subitem 1
+- [ ] Item 2
+
++ Item 1
+	+ Subitem 1
++ Item 2
+
+* Item 1
+	* Subitem 1
+* Item 2
+```
+
 ### Compact YAML
 
 Alias: `compact-yaml`
