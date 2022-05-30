@@ -378,23 +378,23 @@ export const rules: Rule[] = [
 
           /* eslint-disable no-useless-escape */
           // account for '- [x]' and  '- [ ]' checkbox markers
-          const checkboxMarker = new RegExp(/^(( |\t)*- \[( |x)\].+)\n\n(( |\t)*- \[( |x)\].+)$/gm);
+          const checkboxMarker = new RegExp(/^(( |\t)*- \[( |x)\].+)\n{2,}(( |\t)*- \[( |x)\].+)$/gm);
           text = replaceEmptyLinesBetweenList(text, checkboxMarker, '$1\n$4');
 
           // account for ordered list marker
-          const orderedMarker = new RegExp(/^(( |\t)*\d+\..+)\n\n(( |\t)*\d+\..+)$/gm);
+          const orderedMarker = new RegExp(/^(( |\t)*\d+\..+)\n{2,}(( |\t)*\d+\..+)$/gm);
           text = replaceEmptyLinesBetweenList(text, orderedMarker, '$1\n$3');
 
           // account for '+' list marker
-          const plusMarker = new RegExp(/^(( |\t)*\+.+)\n\n(( |\t)*\+.+)$/gm);
+          const plusMarker = new RegExp(/^(( |\t)*\+.+)\n{2,}(( |\t)*\+.+)$/gm);
           text = replaceEmptyLinesBetweenList(text, plusMarker, '$1\n$3');
 
           // account for '-' list marker
-          const dashMarker = new RegExp(/^(( |\t)*-(?! \[( |x)\]).+)\n\n(( |\t)*-(?! \[( |x)\]).+)$/gm);
+          const dashMarker = new RegExp(/^(( |\t)*-(?! \[( |x)\]).+)\n{2,}(( |\t)*-(?! \[( |x)\]).+)$/gm);
           text = replaceEmptyLinesBetweenList(text, dashMarker, '$1\n$4');
 
           // account for '*' list marker
-          const splatMarker = new RegExp(/^(( |\t)*\*.+)\n\n(( |\t)*\*.+)$/gm);
+          const splatMarker = new RegExp(/^(( |\t)*\*.+)\n{2,}(( |\t)*\*.+)$/gm);
           return replaceEmptyLinesBetweenList(text, splatMarker, '$1\n$3');
           /* eslint-enable no-useless-escape */
         });
