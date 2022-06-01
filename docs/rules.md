@@ -915,9 +915,11 @@ Alias: `compact-yaml`
 
 Removes leading and trailing blank lines in the YAML front matter.
 
+Options:
+- Inner Spaces: Remove spaces that are not at the start or the end of the YAML
+	- Default: `false`
 
-
-Example: 
+Example: Remove blank lines at the start and end of the YAML
 
 Before:
 
@@ -925,6 +927,8 @@ Before:
 ---
 
 date: today
+
+title: unchanged without inner spaces turned on
 
 ---
 ```
@@ -934,7 +938,42 @@ After:
 ```markdown
 ---
 date: today
+
+title: unchanged without inner spaces turned on
 ---
+```
+Example: Remove blank lines anywhere in YAML with inner spaces set.
+
+Before:
+
+```markdown
+---
+
+date: today
+
+
+title: remove inner spaces
+
+---
+
+# Header 1
+
+
+Body content here.
+```
+
+After:
+
+```markdown
+---
+date: today
+title: remove inner spaces
+---
+
+# Header 1
+
+
+Body content here.
 ```
 
 ### Consecutive blank lines
