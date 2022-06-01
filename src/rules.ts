@@ -458,28 +458,73 @@ export const rules: Rule[] = [
       'Compact YAML',
       'Removes leading and trailing blank lines in the YAML front matter.',
       RuleType.SPACING,
-      (text: string) => {
+      (text: string, options = {}) => {
         return formatYAML(text, (text) => {
           text = text.replace(/^---\n+/, '---\n');
           text = text.replace(/\n+---/, '\n---');
+          if (options['Inner New Lines']) {
+            text = text.replaceAll(/\n{2,}/g, '\n');
+          }
+
           return text;
         });
       },
       [
         new Example(
-            '',
+            'Remove blank lines at the start and end of the YAML',
             dedent`
         ---
 
         date: today
+
+        title: unchanged without inner new lines turned on
 
         ---
         `,
             dedent`
         ---
         date: today
+
+        title: unchanged without inner new lines turned on
         ---
         `,
+        ),
+        new Example(
+            'Remove blank lines anywhere in YAML with inner new lines set to true',
+            dedent`
+      ---
+
+      date: today
+
+
+      title: remove inner new lines
+
+      ---
+
+      # Header 1
+
+
+      Body content here.
+      `,
+            dedent`
+      ---
+      date: today
+      title: remove inner new lines
+      ---
+
+      # Header 1
+
+
+      Body content here.
+      `,
+            {'Inner New Lines': true},
+        ),
+      ],
+      [
+        new BooleanOption(
+            'Inner New Lines',
+            'Remove new lines that are not at the start or the end of the YAML',
+            false,
         ),
       ],
   ),
