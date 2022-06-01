@@ -462,7 +462,7 @@ export const rules: Rule[] = [
         return formatYAML(text, (text) => {
           text = text.replace(/^---\n+/, '---\n');
           text = text.replace(/\n+---/, '\n---');
-          if (options['Inner Spaces']) {
+          if (options['Inner New Lines']) {
             text = text.replaceAll(/\n{2,}/g, '\n');
           }
 
@@ -477,7 +477,7 @@ export const rules: Rule[] = [
 
         date: today
 
-        title: unchanged without inner spaces turned on
+        title: unchanged without inner new lines turned on
 
         ---
         `,
@@ -485,19 +485,19 @@ export const rules: Rule[] = [
         ---
         date: today
 
-        title: unchanged without inner spaces turned on
+        title: unchanged without inner new lines turned on
         ---
         `,
         ),
         new Example(
-            'Remove blank lines anywhere in YAML with inner spaces set.',
+            'Remove blank lines anywhere in YAML with inner new lines set to true',
             dedent`
       ---
 
       date: today
 
 
-      title: remove inner spaces
+      title: remove inner new lines
 
       ---
 
@@ -509,7 +509,7 @@ export const rules: Rule[] = [
             dedent`
       ---
       date: today
-      title: remove inner spaces
+      title: remove inner new lines
       ---
 
       # Header 1
@@ -517,13 +517,13 @@ export const rules: Rule[] = [
 
       Body content here.
       `,
-            {'Inner Spaces': true},
+            {'Inner New Lines': true},
         ),
       ],
       [
         new BooleanOption(
-            'Inner Spaces',
-            'Remove spaces that are not at the start or the end of the YAML',
+            'Inner New Lines',
+            'Remove new lines that are not at the start or the end of the YAML',
             false,
         ),
       ],
