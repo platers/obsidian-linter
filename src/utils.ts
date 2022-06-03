@@ -59,6 +59,41 @@ function replaceCodeblocks(text: string, placeholder: string): {text: string, re
 }
 
 /**
+ * Makes sure that the style of either strong or emphasis is consistent.
+ * @param {string} text The text to move footnotes in
+ * @param {string} style The style to use for the emphasis indicator (i.e. underscore, asterisk, or consistent)
+ * @param {string} type The type of element to make consistent and the value should be either strong or emphasis
+ * @return {string} The text with footnote declarations moved to the end
+ */
+export function makeEmphasisOrBoldConsistent(text: string, style: string, type: string): string {
+  const positions: Position[] = getPositions(type, text);
+  if (positions.length === 0) {
+    return text;
+  }
+
+  let indicator = '';
+  if (style === 'underscore') {
+    indicator = '_';
+  } else if (style === 'asterisk') {
+    indicator = '*';
+  } else {
+    const firstPosition = positions[positions.length-1];
+    indicator = text.substring(firstPosition.start.offset, firstPosition.start.offset+1);
+  }
+
+  // make the size two for the indicator when the type is strong
+  if (type === 'strong') {
+    indicator += indicator;
+  }
+
+  for (const position of positions) {
+    text = text.substring(0, position.start.offset) + indicator + text.substring(position.start.offset + indicator.length, position.end.offset - indicator.length) + indicator + text.substring(position.end.offset);
+  }
+
+  return text;
+}
+
+/**
  * Moves footnote declarations to the end of the document.
  * @param {string} text The text to move footnotes in
  * @return {string} The text with footnote declarations moved to the end

@@ -680,6 +680,302 @@ After:
 Lorem (…) Impsum.
 ```
 
+### Emphasis Style
+
+Alias: `emphasis-style`
+
+Makes sure the emphasis style is consistent.
+
+Options:
+- Style: The style used to denote emphasized content
+	- Default: `consistent`
+	- `consistent`: Makes sure the first instance of emphasis is the style that will be used throughout the document
+	- `asterisk`: Makes sure * is the emphasis indicator
+	- `underscore`: Makes sure _ is the emphasis indicator
+
+Example: Emphasis indicators should use underscores when style is set to 'underscore'
+
+Before:
+
+```markdown
+# Emphasis Cases
+
+*Test emphasis*
+* Test not emphasized *
+This is *emphasized* mid sentence
+This is *emphasized* mid sentence with a second *emphasis* on the same line
+This is ***bold and emphasized***
+This is ***nested bold** and ending emphasized*
+This is ***nested emphasis* and ending bold**
+
+**Test bold**
+
+* List Item1 with *emphasized text*
+* List Item2
+```
+
+After:
+
+```markdown
+# Emphasis Cases
+
+_Test emphasis_
+* Test not emphasized *
+This is _emphasized_ mid sentence
+This is _emphasized_ mid sentence with a second _emphasis_ on the same line
+This is _**bold and emphasized**_
+This is _**nested bold** and ending emphasized_
+This is **_nested emphasis_ and ending bold**
+
+**Test bold**
+
+* List Item1 with _emphasized text_
+* List Item2
+```
+Example: Emphasis indicators should use asterisks when style is set to 'asterisks'
+
+Before:
+
+```markdown
+# Emphasis Cases
+
+_Test emphasis_
+_ Test not emphasized _
+This is _emphasized_ mid sentence
+This is _emphasized_ mid sentence with a second _emphasis_ on the same line
+This is ___bold and emphasized___
+This is ___nested bold__ and ending emphasized_
+This is ___nested emphasis_ and ending bold__
+
+__Test bold__
+```
+
+After:
+
+```markdown
+# Emphasis Cases
+
+*Test emphasis*
+_ Test not emphasized _
+This is *emphasized* mid sentence
+This is *emphasized* mid sentence with a second *emphasis* on the same line
+This is *__bold and emphasized__*
+This is *__nested bold__ and ending emphasized*
+This is __*nested emphasis* and ending bold__
+
+__Test bold__
+```
+Example: Emphasis indicators should use consistent style based on first emphasis indicator in a file when style is set to 'consistent'
+
+Before:
+
+```markdown
+# Emphasis First Emphasis Is an Asterisk
+
+*First emphasis*
+This is _emphasized_ mid sentence
+This is *emphasized* mid sentence with a second _emphasis_ on the same line
+This is *__bold and emphasized__*
+This is *__nested bold__ and ending emphasized*
+This is **_nested emphasis_ and ending bold**
+
+__Test bold__
+```
+
+After:
+
+```markdown
+# Emphasis First Emphasis Is an Asterisk
+
+*First emphasis*
+This is *emphasized* mid sentence
+This is *emphasized* mid sentence with a second *emphasis* on the same line
+This is *__bold and emphasized__*
+This is *__nested bold__ and ending emphasized*
+This is ***nested emphasis* and ending bold**
+
+__Test bold__
+```
+Example: Emphasis indicators should use consistent style based on first emphasis indicator in a file when style is set to 'consistent'
+
+Before:
+
+```markdown
+# Emphasis First Emphasis Is an Underscore
+
+**_First emphasis_**
+This is _emphasized_ mid sentence
+This is *emphasized* mid sentence with a second _emphasis_ on the same line
+This is *__bold and emphasized__*
+This is _**nested bold** and ending emphasized_
+This is __*nested emphasis* and ending bold__
+
+__Test bold__
+```
+
+After:
+
+```markdown
+# Emphasis First Emphasis Is an Underscore
+
+**_First emphasis_**
+This is _emphasized_ mid sentence
+This is _emphasized_ mid sentence with a second _emphasis_ on the same line
+This is ___bold and emphasized___
+This is _**nested bold** and ending emphasized_
+This is ___nested emphasis_ and ending bold__
+
+__Test bold__
+```
+
+### Strong Style
+
+Alias: `strong-style`
+
+Makes sure the strong style is consistent.
+
+Options:
+- Style: The style used to denote strong/bolded content
+	- Default: `consistent`
+	- `consistent`: Makes sure the first instance of strong is the style that will be used throughout the document
+	- `asterisk`: Makes sure ** is the strong indicator
+	- `underscore`: Makes sure __ is the strong indicator
+
+Example: Strong indicators should use underscores when style is set to 'underscore'
+
+Before:
+
+```markdown
+# Strong/Bold Cases
+
+**Test bold**
+** Test not bold **
+This is **bold** mid sentence
+This is **bold** mid sentence with a second **bold** on the same line
+This is ***bold and emphasized***
+This is ***nested bold** and ending emphasized*
+This is ***nested emphasis* and ending bold**
+
+*Test emphasis*
+
+* List Item1 with **bold text**
+* List Item2
+```
+
+After:
+
+```markdown
+# Strong/Bold Cases
+
+__Test bold__
+** Test not bold **
+This is __bold__ mid sentence
+This is __bold__ mid sentence with a second __bold__ on the same line
+This is *__bold and emphasized__*
+This is *__nested bold__ and ending emphasized*
+This is __*nested emphasis* and ending bold__
+
+*Test emphasis*
+
+* List Item1 with __bold text__
+* List Item2
+```
+Example: Strong indicators should use asterisks when style is set to 'asterisk'
+
+Before:
+
+```markdown
+# Strong/Bold Cases
+
+__Test bold__
+__ Test not bold __
+This is __bold__ mid sentence
+This is __bold__ mid sentence with a second __bold__ on the same line
+This is ___bold and emphasized___
+This is ___nested bold__ and ending emphasized_
+This is ___nested emphasis_ and ending bold__
+
+_Test emphasis_
+```
+
+After:
+
+```markdown
+# Strong/Bold Cases
+
+**Test bold**
+__ Test not bold __
+This is **bold** mid sentence
+This is **bold** mid sentence with a second **bold** on the same line
+This is _**bold and emphasized**_
+This is _**nested bold** and ending emphasized_
+This is **_nested emphasis_ and ending bold**
+
+_Test emphasis_
+```
+Example: Strong indicators should use consistent style based on first emphasis indicator in a file when style is set to 'consistent'
+
+Before:
+
+```markdown
+# Strong First Strong Is an Asterisk
+
+**First bold**
+This is __bold__ mid sentence
+This is __bold__ mid sentence with a second **bold** on the same line
+This is ___bold and emphasized___
+This is *__nested bold__ and ending emphasized*
+This is **_nested emphasis_ and ending bold**
+
+__Test bold__
+```
+
+After:
+
+```markdown
+# Strong First Strong Is an Asterisk
+
+**First bold**
+This is **bold** mid sentence
+This is **bold** mid sentence with a second **bold** on the same line
+This is _**bold and emphasized**_
+This is ***nested bold** and ending emphasized*
+This is **_nested emphasis_ and ending bold**
+
+**Test bold**
+```
+Example: Strong indicators should use consistent style based on first emphasis indicator in a file when style is set to 'consistent'
+
+Before:
+
+```markdown
+# Strong First Strong Is an Underscore
+
+__First bold__
+This is **bold** mid sentence
+This is **bold** mid sentence with a second __bold__ on the same line
+This is **_bold and emphasized_**
+This is ***nested bold** and ending emphasized*
+This is ___nested emphasis_ and ending bold__
+
+**Test bold**
+```
+
+After:
+
+```markdown
+# Strong First Strong Is an Underscore
+
+__First bold__
+This is __bold__ mid sentence
+This is __bold__ mid sentence with a second __bold__ on the same line
+This is ___bold and emphasized___
+This is *__nested bold__ and ending emphasized*
+This is ___nested emphasis_ and ending bold__
+
+__Test bold__
+```
+
 ## Spacing
 ### Trailing spaces
 

@@ -64,6 +64,8 @@ Documentation for all rules can be found in the [rules docs](https://github.com/
 - [remove-empty-list-markers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-empty-list-markers)
 - [convert-bullet-list-markers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#convert-bullet-list-markers)
 - [proper-ellipsis](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#proper-ellipsis)
+- [emphasis-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#emphasis-style)
+- [strong-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#strong-style)
 
 ### Spacing rules
 

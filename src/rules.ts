@@ -11,6 +11,7 @@ import {
   moveFootnotesToEnd,
   yamlRegex,
   escapeYamlString,
+  makeEmphasisOrBoldConsistent,
 } from './utils';
 import {
   Option,
@@ -788,6 +789,316 @@ export const rules: Rule[] = [
             dedent`
             Lorem (…) Impsum.
             `,
+        ),
+      ],
+  ),
+  new Rule(
+      'Emphasis Style',
+      'Makes sure the emphasis style is consistent.',
+      RuleType.CONTENT,
+      (text: string, options = {}) => {
+        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+          return makeEmphasisOrBoldConsistent(text, options['Style'], 'emphasis');
+        });
+      },
+      [
+        new Example(
+            'Emphasis indicators should use underscores when style is set to \'underscore\'',
+            dedent`
+          # Emphasis Cases
+          
+          *Test emphasis*
+          * Test not emphasized *
+          This is *emphasized* mid sentence
+          This is *emphasized* mid sentence with a second *emphasis* on the same line
+          This is ***bold and emphasized***
+          This is ***nested bold** and ending emphasized*
+          This is ***nested emphasis* and ending bold**
+          
+          **Test bold**
+
+          * List Item1 with *emphasized text*
+          * List Item2
+    `,
+            dedent`
+          # Emphasis Cases
+          
+          _Test emphasis_
+          * Test not emphasized *
+          This is _emphasized_ mid sentence
+          This is _emphasized_ mid sentence with a second _emphasis_ on the same line
+          This is _**bold and emphasized**_
+          This is _**nested bold** and ending emphasized_
+          This is **_nested emphasis_ and ending bold**
+          
+          **Test bold**
+
+          * List Item1 with _emphasized text_
+          * List Item2
+    `,
+            {'Style': 'underscore'},
+        ),
+        new Example(
+            'Emphasis indicators should use asterisks when style is set to \'asterisks\'',
+            dedent`
+          # Emphasis Cases
+          
+          _Test emphasis_
+          _ Test not emphasized _
+          This is _emphasized_ mid sentence
+          This is _emphasized_ mid sentence with a second _emphasis_ on the same line
+          This is ___bold and emphasized___
+          This is ___nested bold__ and ending emphasized_
+          This is ___nested emphasis_ and ending bold__
+          
+          __Test bold__
+  `,
+            dedent`
+          # Emphasis Cases
+
+          *Test emphasis*
+          _ Test not emphasized _
+          This is *emphasized* mid sentence
+          This is *emphasized* mid sentence with a second *emphasis* on the same line
+          This is *__bold and emphasized__*
+          This is *__nested bold__ and ending emphasized*
+          This is __*nested emphasis* and ending bold__
+          
+          __Test bold__
+  `,
+            {'Style': 'asterisk'},
+        ),
+        new Example(
+            'Emphasis indicators should use consistent style based on first emphasis indicator in a file when style is set to \'consistent\'',
+            dedent`
+        # Emphasis First Emphasis Is an Asterisk
+
+        *First emphasis*
+        This is _emphasized_ mid sentence
+        This is *emphasized* mid sentence with a second _emphasis_ on the same line
+        This is *__bold and emphasized__*
+        This is *__nested bold__ and ending emphasized*
+        This is **_nested emphasis_ and ending bold**
+        
+        __Test bold__
+`,
+            dedent`
+        # Emphasis First Emphasis Is an Asterisk
+
+        *First emphasis*
+        This is *emphasized* mid sentence
+        This is *emphasized* mid sentence with a second *emphasis* on the same line
+        This is *__bold and emphasized__*
+        This is *__nested bold__ and ending emphasized*
+        This is ***nested emphasis* and ending bold**
+        
+        __Test bold__
+`,
+            {'Style': 'consistent'},
+        ),
+        new Example(
+            'Emphasis indicators should use consistent style based on first emphasis indicator in a file when style is set to \'consistent\'',
+            dedent`
+      # Emphasis First Emphasis Is an Underscore
+
+      **_First emphasis_**
+      This is _emphasized_ mid sentence
+      This is *emphasized* mid sentence with a second _emphasis_ on the same line
+      This is *__bold and emphasized__*
+      This is _**nested bold** and ending emphasized_
+      This is __*nested emphasis* and ending bold__
+      
+      __Test bold__
+`,
+            dedent`
+      # Emphasis First Emphasis Is an Underscore
+
+      **_First emphasis_**
+      This is _emphasized_ mid sentence
+      This is _emphasized_ mid sentence with a second _emphasis_ on the same line
+      This is ___bold and emphasized___
+      This is _**nested bold** and ending emphasized_
+      This is ___nested emphasis_ and ending bold__
+      
+      __Test bold__
+`,
+            {'Style': 'consistent'},
+        ),
+      ],
+      [
+        new DropdownOption(
+            'Style',
+            'The style used to denote emphasized content',
+            'consistent',
+            [
+              new DropdownRecord(
+                  'consistent',
+                  'Makes sure the first instance of emphasis is the style that will be used throughout the document',
+              ),
+              new DropdownRecord(
+                  'asterisk',
+                  'Makes sure * is the emphasis indicator',
+              ),
+              new DropdownRecord(
+                  'underscore',
+                  'Makes sure _ is the emphasis indicator',
+              ),
+            ],
+        ),
+      ],
+  ),
+  new Rule(
+      'Strong Style',
+      'Makes sure the strong style is consistent.',
+      RuleType.CONTENT,
+      (text: string, options = {}) => {
+        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+          return makeEmphasisOrBoldConsistent(text, options['Style'], 'strong');
+        });
+      },
+      [
+        new Example(
+            'Strong indicators should use underscores when style is set to \'underscore\'',
+            dedent`
+          # Strong/Bold Cases
+          
+          **Test bold**
+          ** Test not bold **
+          This is **bold** mid sentence
+          This is **bold** mid sentence with a second **bold** on the same line
+          This is ***bold and emphasized***
+          This is ***nested bold** and ending emphasized*
+          This is ***nested emphasis* and ending bold**
+          
+          *Test emphasis*
+
+          * List Item1 with **bold text**
+          * List Item2
+          `,
+            dedent`
+          # Strong/Bold Cases
+          
+          __Test bold__
+          ** Test not bold **
+          This is __bold__ mid sentence
+          This is __bold__ mid sentence with a second __bold__ on the same line
+          This is *__bold and emphasized__*
+          This is *__nested bold__ and ending emphasized*
+          This is __*nested emphasis* and ending bold__
+          
+          *Test emphasis*
+
+          * List Item1 with __bold text__
+          * List Item2
+          `,
+            {'Style': 'underscore'},
+        ),
+        new Example(
+            'Strong indicators should use asterisks when style is set to \'asterisk\'',
+            dedent`
+          # Strong/Bold Cases
+          
+          __Test bold__
+          __ Test not bold __
+          This is __bold__ mid sentence
+          This is __bold__ mid sentence with a second __bold__ on the same line
+          This is ___bold and emphasized___
+          This is ___nested bold__ and ending emphasized_
+          This is ___nested emphasis_ and ending bold__
+          
+          _Test emphasis_
+          `,
+            dedent`
+          # Strong/Bold Cases
+          
+          **Test bold**
+          __ Test not bold __
+          This is **bold** mid sentence
+          This is **bold** mid sentence with a second **bold** on the same line
+          This is _**bold and emphasized**_
+          This is _**nested bold** and ending emphasized_
+          This is **_nested emphasis_ and ending bold**
+
+          _Test emphasis_
+          `,
+            {'Style': 'asterisk'},
+        ),
+        new Example(
+            'Strong indicators should use consistent style based on first emphasis indicator in a file when style is set to \'consistent\'',
+            dedent`
+          # Strong First Strong Is an Asterisk
+
+          **First bold**
+          This is __bold__ mid sentence
+          This is __bold__ mid sentence with a second **bold** on the same line
+          This is ___bold and emphasized___
+          This is *__nested bold__ and ending emphasized*
+          This is **_nested emphasis_ and ending bold**
+
+          __Test bold__
+          `,
+            dedent`
+          # Strong First Strong Is an Asterisk
+
+          **First bold**
+          This is **bold** mid sentence
+          This is **bold** mid sentence with a second **bold** on the same line
+          This is _**bold and emphasized**_
+          This is ***nested bold** and ending emphasized*
+          This is **_nested emphasis_ and ending bold**
+
+          **Test bold**
+          `,
+            {'Style': 'consistent'},
+        ),
+        new Example(
+            'Strong indicators should use consistent style based on first emphasis indicator in a file when style is set to \'consistent\'',
+            dedent`
+          # Strong First Strong Is an Underscore
+
+          __First bold__
+          This is **bold** mid sentence
+          This is **bold** mid sentence with a second __bold__ on the same line
+          This is **_bold and emphasized_**
+          This is ***nested bold** and ending emphasized*
+          This is ___nested emphasis_ and ending bold__
+
+          **Test bold**
+          `,
+            dedent`
+          # Strong First Strong Is an Underscore
+
+          __First bold__
+          This is __bold__ mid sentence
+          This is __bold__ mid sentence with a second __bold__ on the same line
+          This is ___bold and emphasized___
+          This is *__nested bold__ and ending emphasized*
+          This is ___nested emphasis_ and ending bold__
+
+          __Test bold__
+            `,
+            {'Style': 'consistent'},
+        ),
+      ],
+      [
+        new DropdownOption(
+            'Style',
+            'The style used to denote strong/bolded content',
+            'consistent',
+            [
+              new DropdownRecord(
+                  'consistent',
+                  'Makes sure the first instance of strong is the style that will be used throughout the document',
+              ),
+              new DropdownRecord(
+                  'asterisk',
+                  'Makes sure ** is the strong indicator',
+              ),
+              new DropdownRecord(
+                  'underscore',
+                  'Makes sure __ is the strong indicator',
+              ),
+            ],
         ),
       ],
   ),
