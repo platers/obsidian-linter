@@ -732,7 +732,7 @@ This is **_nested emphasis_ and ending bold**
 * List Item1 with _emphasized text_
 * List Item2
 ```
-Example: Emphasis indicators should use asterisks when style is set to 'asterisks'
+Example: Emphasis indicators should use asterisks when style is set to 'asterisk'
 
 Before:
 
@@ -913,7 +913,7 @@ This is **_nested emphasis_ and ending bold**
 
 _Test emphasis_
 ```
-Example: Strong indicators should use consistent style based on first emphasis indicator in a file when style is set to 'consistent'
+Example: Strong indicators should use consistent style based on first strong indicator in a file when style is set to 'consistent'
 
 Before:
 
@@ -944,7 +944,7 @@ This is **_nested emphasis_ and ending bold**
 
 **Test bold**
 ```
-Example: Strong indicators should use consistent style based on first emphasis indicator in a file when style is set to 'consistent'
+Example: Strong indicators should use consistent style based on first strong indicator in a file when style is set to 'consistent'
 
 Before:
 

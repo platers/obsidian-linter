@@ -839,7 +839,7 @@ export const rules: Rule[] = [
             {'Style': 'underscore'},
         ),
         new Example(
-            'Emphasis indicators should use asterisks when style is set to \'asterisks\'',
+            'Emphasis indicators should use asterisks when style is set to \'asterisk\'',
             dedent`
           # Emphasis Cases
           
@@ -1024,7 +1024,7 @@ export const rules: Rule[] = [
             {'Style': 'asterisk'},
         ),
         new Example(
-            'Strong indicators should use consistent style based on first emphasis indicator in a file when style is set to \'consistent\'',
+            'Strong indicators should use consistent style based on first strong indicator in a file when style is set to \'consistent\'',
             dedent`
           # Strong First Strong Is an Asterisk
 
@@ -1052,7 +1052,7 @@ export const rules: Rule[] = [
             {'Style': 'consistent'},
         ),
         new Example(
-            'Strong indicators should use consistent style based on first emphasis indicator in a file when style is set to \'consistent\'',
+            'Strong indicators should use consistent style based on first strong indicator in a file when style is set to \'consistent\'',
             dedent`
           # Strong First Strong Is an Underscore
 

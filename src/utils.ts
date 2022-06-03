@@ -60,10 +60,10 @@ function replaceCodeblocks(text: string, placeholder: string): {text: string, re
 
 /**
  * Makes sure that the style of either strong or emphasis is consistent.
- * @param {string} text The text to move footnotes in
+ * @param {string} text The text to style either the strong or emphasis in a consistent manner
  * @param {string} style The style to use for the emphasis indicator (i.e. underscore, asterisk, or consistent)
  * @param {string} type The type of element to make consistent and the value should be either strong or emphasis
- * @return {string} The text with footnote declarations moved to the end
+ * @return {string} The text with either strong or emphasis styles made consistent
  */
 export function makeEmphasisOrBoldConsistent(text: string, style: string, type: string): string {
   const positions: Position[] = getPositions(type, text);
