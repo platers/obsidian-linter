@@ -353,10 +353,14 @@ class SettingTab extends PluginSettingTab {
             .setName(this.name)
             .setDesc(this.description)
             .addDropdown((dropdown) => {
-              dropdown.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+              // First, add all the available options
               for (const option of this.options) {
                 dropdown.addOption(option.value, option.value);
               }
+
+              // Set currently selected value from existing settings
+              dropdown.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+
               dropdown.onChange((value) => {
                 this.setOption(value, settings);
                 plugin.settings = settings;
