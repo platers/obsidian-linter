@@ -1587,10 +1587,10 @@ export const rules: Rule[] = [
                 );
                 break;
               }
-              case 'All Caps':
+              case 'ALL CAPS':
                 lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
                 break;
-              case 'First Letter':
+              case 'First letter':
                 lines[i] = lines[i]
                     .toLowerCase()
                     .replace(/^#*\s+([^a-z])*([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
@@ -1630,7 +1630,7 @@ export const rules: Rule[] = [
             {'Style': 'Title Case', 'Ignore Cased Words': true},
         ),
         new Example(
-            'With `First Letter=true`',
+            'With `First letter=true`',
             dedent`
         # this is a heading 1
         ## this is a heading 2
@@ -1639,10 +1639,10 @@ export const rules: Rule[] = [
         # This is a heading 1
         ## This is a heading 2
         `,
-            {Style: 'First Letter'},
+            {Style: 'First letter'},
         ),
         new Example(
-            'With `All Caps=true`',
+            'With `ALL CAPS=true`',
             dedent`
         # this is a heading 1
         ## this is a heading 2
@@ -1651,7 +1651,7 @@ export const rules: Rule[] = [
         # THIS IS A HEADING 1
         ## THIS IS A HEADING 2
         `,
-            {Style: 'All Caps'},
+            {Style: 'ALL CAPS'},
         ),
       ],
       [
@@ -1660,13 +1660,13 @@ export const rules: Rule[] = [
             'The style of capitalization to use',
             'Title Case',
             [
-              new DropdownRecord('Title Case', 'Capitalize using title case rules'),
+              new DropdownRecord('Title Case', 'Capitalize Using Title Case Rules'),
               new DropdownRecord(
-                  'All Caps',
-                  'Capitalize the first letter of each word',
+                  'ALL CAPS',
+                  'CAPITALIZE THE WHOLE TITLE',
               ),
               new DropdownRecord(
-                  'First Letter',
+                  'First letter',
                   'Only capitalize the first letter',
               ),
             ],
