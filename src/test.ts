@@ -197,7 +197,7 @@ describe('Rules tests', () => {
       const after = dedent`
         # This is a heading
         `;
-      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First Letter'})).toBe(after);
+      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First letter'})).toBe(after);
     });
     it('Can capitalize only first letter that is a - Z', () => {
       const before = dedent`
@@ -208,7 +208,7 @@ describe('Rules tests', () => {
         # 1. Heading attempt
         # 1 John
         `;
-      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First Letter'})).toBe(after);
+      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First letter'})).toBe(after);
     });
     it('Can capitalize to all caps', () => {
       const before = dedent`
@@ -217,7 +217,7 @@ describe('Rules tests', () => {
       const after = dedent`
         # THIS IS A HEADING
         `;
-      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'All Caps'})).toBe(after);
+      expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'ALL CAPS'})).toBe(after);
     });
   });
   describe('File Name Heading', () => {
@@ -806,6 +806,6 @@ describe('Links', () => {
     # Heading ![docker](docker)
     `;
 
-    expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First Letter'})).toBe(after);
+    expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First letter'})).toBe(after);
   });
 });
