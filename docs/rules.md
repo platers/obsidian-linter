@@ -1416,3 +1416,58 @@ After:
 ```markdown
 中文字符串 `code` 中文字符串。
 ```
+
+### Remove link spacing
+
+Alias: `remove-link-spacing`
+
+Removes spacing around link text.
+
+
+
+Example: Space in regular markdown link text
+
+Before:
+
+```markdown
+[ here is link text1 ](link_here)
+[ here is link text2](link_here)
+[here is link text3 ](link_here)
+[here is link text4](link_here)
+[	here is link text5	](link_here)
+[](link_here)
+```
+
+After:
+
+```markdown
+[here is link text1](link_here)
+[here is link text2](link_here)
+[here is link text3](link_here)
+[here is link text4](link_here)
+[here is link text5](link_here)
+[](link_here)
+```
+Example: Space in wiki link text
+
+Before:
+
+```markdown
+[[link_here| here is link text1 ]]
+[[link_here|here is link text2 ]]
+[[link_here| here is link text3]]
+[[link_here|here is link text4]]
+[[link_here|	here is link text5	]]
+[[link_here]]
+```
+
+After:
+
+```markdown
+[[link_here|here is link text1]]
+[[link_here|here is link text2]]
+[[link_here|here is link text3]]
+[[link_here|here is link text4]]
+[[link_here|here is link text5]]
+[[link_here]]
+```
