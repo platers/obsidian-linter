@@ -193,7 +193,7 @@ export default class LinterPlugin extends Plugin {
         const newText = this.lintText(oldText, file);
         await this.app.vault.modify(file, newText);
       } catch (error) {
-        new Notice('An error occured during linting. See console for details');
+        new Notice('An error occurred during linting. See console for details');
         console.log(`Linting error in file: ${file.path}`);
         console.error(error);
       }

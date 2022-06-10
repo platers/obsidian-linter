@@ -316,9 +316,9 @@ Headings should be formatted with capitalization
 Options:
 - Style: The style of capitalization to use
 	- Default: `Title Case`
-	- `Title Case`: Capitalize using title case rules
-	- `All Caps`: Capitalize the first letter of each word
-	- `First Letter`: Only capitalize the first letter
+	- `Title Case`: Capitalize Using Title Case Rules
+	- `ALL CAPS`: CAPITALIZE THE WHOLE TITLE
+	- `First letter`: Only capitalize the first letter
 - Ignore Cased Words: Only apply title case style to words that are all lowercase
 	- Default: `true`
 - Ignore Words: A comma separated list of words to ignore when capitalizing
@@ -360,7 +360,7 @@ After:
 ## THIS IS A HEADING 2
 ### A hEaDiNg 3
 ```
-Example: With `First Letter=true`
+Example: With `First letter=true`
 
 Before:
 
@@ -375,7 +375,7 @@ After:
 # This is a heading 1
 ## This is a heading 2
 ```
-Example: With `All Caps=true`
+Example: With `ALL CAPS=true`
 
 Before:
 
@@ -974,6 +974,61 @@ This is *__nested bold__ and ending emphasized*
 This is ___nested emphasis_ and ending bold__
 
 __Test bold__
+```
+
+### No Bare URLs
+
+Alias: `no-bare-urls`
+
+Encloses bare URLs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.
+
+
+
+Example: Make sure that links are inside of angle brackets when not in single quotes('), double quotes("), or backticks(`)
+
+Before:
+
+```markdown
+https://github.com
+braces around url should stay the same: [https://github.com]
+backticks around url should stay the same: `https://github.com`
+Links mid-sentence should be updated like https://google.com will be.
+'https://github.com'
+"https://github.com"
+links should stay the same: [](https://github.com)
+https://gitlab.com
+```
+
+After:
+
+```markdown
+<https://github.com>
+braces around url should stay the same: [https://github.com]
+backticks around url should stay the same: `https://github.com`
+Links mid-sentence should be updated like <https://google.com> will be.
+'https://github.com'
+"https://github.com"
+links should stay the same: [](https://github.com)
+<https://gitlab.com>
+```
+Example: Angle brackets are added if the url is not the only text in the single quotes('), double quotes("), or backticks(`)
+
+Before:
+
+```markdown
+[https://github.com some text here]
+backticks around a url should stay the same, but only if the only contents of the backticks: `https://github.com some text here`
+single quotes around a url should stay the same, but only if the contents of the single quotes is the url: 'https://github.com some text here'
+double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "https://github.com some text here"
+```
+
+After:
+
+```markdown
+[<https://github.com> some text here]
+backticks around a url should stay the same, but only if the only contents of the backticks: `<https://github.com> some text here`
+single quotes around a url should stay the same, but only if the contents of the single quotes is the url: '<https://github.com> some text here'
+double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "<https://github.com> some text here"
 ```
 
 ## Spacing

@@ -66,6 +66,7 @@ Documentation for all rules can be found in the [rules docs](https://github.com/
 - [proper-ellipsis](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#proper-ellipsis)
 - [emphasis-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#emphasis-style)
 - [strong-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#strong-style)
+- [no-bare-urls](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#no-bare-urls)
 
 ### Spacing rules
 
