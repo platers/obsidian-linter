@@ -517,7 +517,7 @@ describe('Move Footnotes to the bottom', () => {
   });
 });
 describe('yaml timestamp', () => {
-  it('Doesnt add date created if already there', () => {
+  it('Doesn\'t add date created if already there', () => {
     const before = dedent`
     ---
     date created: 2019-01-01
@@ -530,7 +530,7 @@ describe('yaml timestamp', () => {
     `;
     expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'date created'})).toBe(after);
   });
-  it('Respects created and modified key', () => {
+  it('Respects created key', () => {
     const before = dedent`
     ---
     created: 2019-01-01
@@ -542,6 +542,126 @@ describe('yaml timestamp', () => {
     ---
     `;
     expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'created'})).toBe(after);
+  });
+  it('Respects modified key when nothing has changed', () => {
+    const before = dedent`
+    ---
+    modified: Wednesday, January 1st 2020, 12:00:00 am
+    ---
+    `;
+    const after = dedent`
+    ---
+    modified: Wednesday, January 1st 2020, 12:00:00 am
+    ---
+    `;
+
+    const options = {
+      'Date Created': false,
+      'Date Modified': true,
+      'Date Modified Key': 'modified',
+      'metadata: file modified time': '2020-02-01T00:00:00-00:00',
+      'Already Modified': false,
+    };
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+  });
+  it('Updates modified key when something has changed outside of the YAML timestamp rule', () => {
+    const before = dedent`
+    ---
+    modified: Wednesday, January 1st 2020, 12:00:00 am
+    ---
+    `;
+    const after = dedent`
+    ---
+    modified: Saturday, February 1st 2020, 12:00:00 am
+    ---
+    `;
+
+    const options = {
+      'Date Created': false,
+      'Date Modified': true,
+      'Date Modified Key': 'modified',
+      'metadata: file modified time': '2020-02-01T00:00:00-00:00',
+      'Already Modified': true,
+      'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
+    };
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+  });
+  it('Updates modified key when something has changed inside of the YAML timestamp rule', () => {
+    const before = dedent`
+    ---
+    modified: Thursday, January 2nd 2020, 12:00:00 am
+    ---
+    `;
+    const after = dedent`
+    ---
+    modified: Thursday, January 2nd 2020, 12:00:00 am
+    created: Wednesday, January 1st 2020, 12:00:00 am
+    ---
+    `;
+
+    const options = {
+      'Date Created': true,
+      'Date Modified': true,
+      'Date Created Key': 'created',
+      'Date Modified Key': 'modified',
+      'metadata: file created time': '2020-01-01T00:00:00-00:00',
+      'metadata: file modified time': '2020-01-02T00:00:00-00:00',
+      'Already Modified': false,
+      'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
+    };
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+  });
+  it('Updates modified key when present, but lacks a value', () => {
+    const before = dedent`
+    ---
+    tag: tag1
+    modified: 
+    location: "path"
+    ---
+    `;
+    const after = dedent`
+    ---
+    tag: tag1
+    modified: Saturday, February 1st 2020, 12:00:00 am
+    location: "path"
+    ---
+    `;
+
+    const options = {
+      'Date Created': false,
+      'Date Modified': true,
+      'Date Modified Key': 'modified',
+      'metadata: file modified time': '2020-02-01T00:00:00-00:00',
+      'Already Modified': false,
+      'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
+    };
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+  });
+  it('Updates created key when present, but lacks a value', () => {
+    const before = dedent`
+    ---
+    tag: tag1
+    created: 
+    location: "path"
+    ---
+    `;
+    const after = dedent`
+    ---
+    tag: tag1
+    created: Saturday, February 1st 2020, 12:00:00 am
+    location: "path"
+    ---
+    `;
+
+    const options = {
+      'Date Created': true,
+      'Date Modified': false,
+      'Date Created Key': 'created',
+      'metadata: file created time': '2020-02-01T00:00:00-00:00',
+      'Already Modified': false,
+      'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
+    };
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
 });
 describe('Insert yaml attributes', () => {
