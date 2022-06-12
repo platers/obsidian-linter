@@ -1314,19 +1314,13 @@ export const rules: Rule[] = [
 
             const keyWithValueFound = created_match.test(text);
             if (!keyWithValueFound && created_key_match.test(text)) {
-              console.log('created key found!');
               text = text.replace(
                   created_key_match,
                   escapeDollarSigns(created_date_line) + '\n',
               );
-              text = text.replace(
-                  /\ndate created:[ \t]*\n/,
-                  escapeDollarSigns(created_date_line) + '\n',
-              ); // for backwards compatibility
 
               textModified = true;
             } else if (!keyWithValueFound) {
-              console.log('created key not found!');
               const yaml_end = text.indexOf('\n---');
               text = insert(
                   text,
@@ -1355,24 +1349,17 @@ export const rules: Rule[] = [
                   modified_match,
                   escapeDollarSigns(modified_date_line) + '\n',
               );
-              text = text.replace(
-                  /\ndate updated: [^\n]+\n/,
-                  escapeDollarSigns(modified_date_line) + '\n',
-              ); // for backwards compatibility
             } else if (modified_key_match.test(text)) {
               text = text.replace(
                   modified_key_match,
                   escapeDollarSigns(modified_date_line) + '\n',
               );
-              text = text.replace(
-                  /\ndate updated:[ \t]*\n/,
-                  escapeDollarSigns(modified_date_line) + '\n',
-              ); // for backwards compatibility
             } else if (!keyWithValueFound) {
               const yaml_end = text.indexOf('\n---');
               text = insert(text, yaml_end, modified_date_line);
             }
           }
+
           return text;
         });
       },
