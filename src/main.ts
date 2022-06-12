@@ -149,15 +149,16 @@ export default class LinterPlugin extends Plugin {
 
       // remove hashtags from tags before parsing yaml
       const tag_rule = rules.find((rule) => rule.name === 'Format Tags in YAML');
-      const options = tag_rule.getOptions(this.settings);
-      if (options[tag_rule.enabledOptionName()]) {
-        newText = tag_rule.apply(newText, options);
+      const tag_options = tag_rule.getOptions(this.settings);
+      if (tag_options[tag_rule.enabledOptionName()]) {
+        newText = tag_rule.apply(newText, tag_options);
       }
 
       const disabledRules = getDisabledRules(newText);
 
       for (const rule of rules) {
-        if (disabledRules.includes(rule.alias())) {
+        // if you are yaml timestamp or a disabled rule, skip running them
+        if (disabledRules.includes(rule.alias()) || rule.alias() === 'yaml-timestamp') {
           continue;
         }
 
@@ -172,6 +173,19 @@ export default class LinterPlugin extends Plugin {
           // console.log(`Running ${rule.name}`);
           newText = rule.apply(newText, options);
         }
+      }
+
+      // run yaml timestamp at the end to help determine if something has changed
+      const yaml_timestamp_rule = rules.find((rule) => rule.alias() === 'yaml-timestamp');
+      const yaml_timestamp_options: Options =
+      Object.assign({
+        'metadata: file created time': moment(file.stat.ctime).format(),
+        'metadata: file modified time': moment(file.stat.mtime).format(),
+        'metadata: file name': file.basename,
+        'Already Modified': oldText != newText,
+      }, yaml_timestamp_rule.getOptions(this.settings));
+      if (yaml_timestamp_options[yaml_timestamp_rule.enabledOptionName()]) {
+        newText = yaml_timestamp_rule.apply(newText, yaml_timestamp_options);
       }
 
       return newText;

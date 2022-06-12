@@ -1296,26 +1296,46 @@ export const rules: Rule[] = [
       'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.',
       RuleType.YAML,
       (text: string, options = {}) => {
-        text = initYAML(text);
+        let textModified = options['Already Modified'] === true;
+        const newText = initYAML(text);
+        textModified = textModified || newText !== text;
 
-        return formatYAML(text, (text) => {
-          const created_match_str = `\n${options['Date Created Key']}.*\n`;
+        return formatYAML(newText, (text) => {
+          const created_match_str = `\n${options['Date Created Key']}: [^\n]+\n`;
+          const created_key_match_str = `\n${options['Date Created Key']}:[ \t]*\n`;
+          const created_key_match = new RegExp(created_key_match_str);
           const created_match = new RegExp(created_match_str);
 
-          if (options['Date Created'] === true && !created_match.test(text)) {
-            const yaml_end = text.indexOf('\n---');
+          if (options['Date Created'] === true) {
             const formatted_date = moment(
                 options['metadata: file created time'],
             ).format(options['Format']);
-            text = insert(
-                text,
-                yaml_end,
-                `\n${options['Date Created Key']}: ${formatted_date}`,
-            );
+            const created_date_line = `\n${options['Date Created Key']}: ${formatted_date}`;
+
+            const keyWithValueFound = created_match.test(text);
+            if (!keyWithValueFound && created_key_match.test(text)) {
+              text = text.replace(
+                  created_key_match,
+                  escapeDollarSigns(created_date_line) + '\n',
+              );
+
+              textModified = true;
+            } else if (!keyWithValueFound) {
+              const yaml_end = text.indexOf('\n---');
+              text = insert(
+                  text,
+                  yaml_end,
+                  `\n${options['Date Created Key']}: ${formatted_date}`,
+              );
+
+              textModified = true;
+            }
           }
 
           if (options['Date Modified'] === true) {
-            const modified_match_str = `\n${options['Date Modified Key']}.*\n`;
+            const modified_match_str = `\n${options['Date Modified Key']}: [^\n]+\n`;
+            const modified_key_match_str = `\n${options['Date Modified Key']}:[ \t]*\n`;
+            const modified_key_match = new RegExp(modified_key_match_str);
             const modified_match = new RegExp(modified_match_str);
 
             const formatted_date = moment(
@@ -1323,20 +1343,23 @@ export const rules: Rule[] = [
             ).format(options['Format']);
             const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_date}`;
 
-            if (modified_match.test(text)) {
+            const keyWithValueFound = modified_match.test(text);
+            if (keyWithValueFound && textModified) {
               text = text.replace(
                   modified_match,
                   escapeDollarSigns(modified_date_line) + '\n',
               );
+            } else if (modified_key_match.test(text)) {
               text = text.replace(
-                  /\ndate updated:.*\n/,
+                  modified_key_match,
                   escapeDollarSigns(modified_date_line) + '\n',
-              ); // for backwards compatibility
-            } else {
+              );
+            } else if (!keyWithValueFound) {
               const yaml_end = text.indexOf('\n---');
               text = insert(text, yaml_end, modified_date_line);
             }
           }
+
           return text;
         });
       },
@@ -1356,6 +1379,7 @@ export const rules: Rule[] = [
             {
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
               'metadata: file modified time': '2020-01-02T00:00:00-00:00',
+              'Already Modified': false,
             },
         ),
         new Example(
@@ -1373,6 +1397,7 @@ export const rules: Rule[] = [
               'Date Created': false,
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
               'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+              'Already Modified': false,
             },
         ),
         new Example(
@@ -1391,6 +1416,7 @@ export const rules: Rule[] = [
               'Date Modified': false,
               'Date Created Key': 'created',
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
+              'Already Modified': false,
             },
         ),
         new Example(
@@ -1409,6 +1435,7 @@ export const rules: Rule[] = [
               'Date Modified': true,
               'Date Modified Key': 'modified',
               'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+              'Already Modified': false,
             },
         ),
       ],
