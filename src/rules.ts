@@ -646,7 +646,7 @@ export const rules: Rule[] = [
       RuleType.CONTENT,
       (text: string) => {
         return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
-          return text.replace(/\b {2,}\b/g, ' ');
+          return text.replace(/([^\s])( ){2,}([^\s])/g, '$1 $3');
         });
       },
       [
