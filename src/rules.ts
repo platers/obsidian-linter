@@ -1109,7 +1109,7 @@ export const rules: Rule[] = [
       RuleType.CONTENT,
       (text: string) => {
         return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
-          const URLMatches = text.match(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'"]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'"]{2,})/gi);
+          const URLMatches = text.match(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'">]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'">]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'">]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'">]{2,})/gi);
 
           if (!URLMatches) {
             return text;
@@ -1149,6 +1149,7 @@ export const rules: Rule[] = [
           'https://github.com'
           "https://github.com"
           links should stay the same: [](https://github.com)
+          <https://github.com>
           https://gitlab.com
           `,
             dedent`
@@ -1158,6 +1159,7 @@ export const rules: Rule[] = [
           Links mid-sentence should be updated like <https://google.com> will be.
           'https://github.com'
           "https://github.com"
+          <https://github.com>
           links should stay the same: [](https://github.com)
           <https://gitlab.com>
           `,
