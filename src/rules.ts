@@ -1125,8 +1125,8 @@ export const rules: Rule[] = [
 
             const previousChar = urlStart === 0 ? undefined : text.charAt(urlStart - 1);
             const nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
-            if (previousChar != undefined && (previousChar === '`' || previousChar === '"' || previousChar === '\'' || previousChar === '[') &&
-              nextChar != undefined && (nextChar === '`' || nextChar === '"' || nextChar === '\'' || nextChar === ']')) {
+            if (previousChar != undefined && (previousChar === '`' || previousChar === '"' || previousChar === '\'' || previousChar === '[' || previousChar === '<') &&
+              nextChar != undefined && (nextChar === '`' || nextChar === '"' || nextChar === '\'' || nextChar === ']' || nextChar === '>')) {
               startSearch = urlStart + urlMatch.length;
               continue;
             }
