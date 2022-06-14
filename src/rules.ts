@@ -1148,8 +1148,8 @@ export const rules: Rule[] = [
           Links mid-sentence should be updated like https://google.com will be.
           'https://github.com'
           "https://github.com"
-          links should stay the same: [](https://github.com)
           <https://github.com>
+          links should stay the same: [](https://github.com)
           https://gitlab.com
           `,
             dedent`
