@@ -263,6 +263,53 @@ After:
 
 We skipped a 2nd level heading
 ```
+Example: Skipped headings in sections that would be decremented will result in those headings not having the same meaning
+
+Before:
+
+```markdown
+# H1
+### H3
+
+We skip from 1 to 3
+
+####### H7
+
+We skip from 3 to 7 leaving out 4, 5, and 6. Thus headings level 4, 5, and 6 will be treated like H3 above until another H2 or H1 is encountered
+
+###### H6
+
+We skipped 6 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
+
+## H2
+
+This resets the decrement section so the H6 below is decremented to an H3
+
+###### H6
+```
+
+After:
+
+```markdown
+# H1
+## H3
+
+We skip from 1 to 3
+
+### H7
+
+We skip from 3 to 7 leaving out 4, 5, and 6. Thus headings level 4, 5, and 6 will be treated like H3 above until another H2 or H1 is encountered
+
+## H6
+
+We skipped 6 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
+
+## H2
+
+This resets the decrement section so the H6 below is decremented to an H3
+
+### H6
+```
 
 ### File Name Heading
 
@@ -995,6 +1042,7 @@ backticks around url should stay the same: `https://github.com`
 Links mid-sentence should be updated like https://google.com will be.
 'https://github.com'
 "https://github.com"
+<https://github.com>
 links should stay the same: [](https://github.com)
 https://gitlab.com
 ```
@@ -1008,6 +1056,7 @@ backticks around url should stay the same: `https://github.com`
 Links mid-sentence should be updated like <https://google.com> will be.
 'https://github.com'
 "https://github.com"
+<https://github.com>
 links should stay the same: [](https://github.com)
 <https://gitlab.com>
 ```
