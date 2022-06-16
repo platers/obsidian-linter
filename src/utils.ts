@@ -94,6 +94,41 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
 }
 
 /**
+ * Makes sure that blockquotes, paragraphs, and list items have two spaces at the end of them if the following line continues its content.
+ * @param {string} text The text to make sure that the two spaces are added to if there are consecutive lines of content
+ * @return {string} The text with two spaces at the end of lines of paragraphs, list items, and blockquotes where there were consecutive lines of content.
+ */
+export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text: string): string {
+  const positions: Position[] = getPositions('paragraph', text);
+  if (positions.length === 0) {
+    return text;
+  }
+
+  for (const position of positions) {
+    const paragraphLines = text.substring(position.start.offset, position.end.offset).split('\n');
+    const lastLineIndex = paragraphLines.length - 1;
+    // only update paragraph if there is more than 1 line present
+    if (lastLineIndex < 1) {
+      continue;
+    }
+
+    for (let i = 0; i < lastLineIndex; i++) {
+      const paragraphLine = paragraphLines[i].trimEnd();
+
+      // skip lines that end in <br> or <br/> as it is the same as two spaces in Markdown
+      if (paragraphLine.endsWith('<br>') || paragraphLine.endsWith('<br/>')) {
+        continue;
+      }
+      paragraphLines[i] = paragraphLine + '  ';
+    }
+
+    text = text.substring(0, position.start.offset) + paragraphLines.join('\n') + text.substring(position.end.offset);
+  }
+
+  return text;
+}
+
+/**
  * Moves footnote declarations to the end of the document.
  * @param {string} text The text to move footnotes in
  * @return {string} The text with footnote declarations moved to the end

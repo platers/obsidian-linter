@@ -1080,6 +1080,102 @@ single quotes around a url should stay the same, but only if the contents of the
 double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "<https://github.com> some text here"
 ```
 
+### Two Spaces Between Lines with Content
+
+Alias: `two-spaces-between-lines-with-content`
+
+Makes sure that two spaces are added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items
+
+
+
+Example: Make sure two spaces are added to the ends of lines that have content on it and the next line for lists, blockquotes, and paragraphs
+
+Before:
+
+```markdown
+# Heading 1
+First paragraph stays as the first paragraph
+
+- list item 1
+- list item 2
+Continuation of list item 2
+- list item 3
+
+1. Item 1
+2. Item 2
+Continuation of item 3
+3. Item 3
+
+Paragraph for with link [[other file name]].
+Continuation *of* the paragraph has `inline code block` __in it__.
+Even more continuation
+
+Paragraph lines that end in <br/>
+Or lines that end in <br>
+Are left alone
+Since they mean the same thing
+
+``` text
+Code blocks are ignored
+Even with multiple lines
+```
+Another paragraph here
+
+> Blockquotes are affected
+> More content here
+Content here
+
+<div>
+html content
+should be ignored
+</div>
+Even more content here
+
+```
+
+After:
+
+```markdown
+# Heading 1
+First paragraph stays as the first paragraph
+
+- list item 1
+- list item 2  
+Continuation of list item 2
+- list item 3
+
+1. Item 1
+2. Item 2  
+Continuation of item 3
+3. Item 3
+
+Paragraph for with link [[other file name]].  
+Continuation *of* the paragraph has `inline code block` __in it__.  
+Even more continuation
+
+Paragraph lines that end in <br/>
+Or lines that end in <br>
+Are left alone  
+Since they mean the same thing
+
+``` text
+Code blocks are ignored
+Even with multiple lines
+```
+Another paragraph here
+
+> Blockquotes are affected  
+> More content here  
+Content here
+
+<div>
+html content
+should be ignored
+</div>
+Even more content here
+
+```
+
 ## Spacing
 ### Trailing spaces
 
