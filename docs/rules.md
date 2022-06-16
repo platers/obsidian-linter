@@ -1084,7 +1084,7 @@ double quotes around a url should stay the same, but only if the contents of the
 
 Alias: `two-spaces-between-lines-with-content`
 
-Makes sure that two spaces are added to the ends of lines that have content next to each other
+Makes sure that two spaces are added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items
 
 
 
