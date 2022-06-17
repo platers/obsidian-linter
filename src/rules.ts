@@ -37,7 +37,7 @@ export interface LinterSettings {
   foldersToIgnore: string[];
 }
 /* eslint-disable no-unused-vars */
-export enum RuleType {
+enum RuleType {
   YAML = 'YAML',
   HEADING = 'Heading',
   FOOTNOTE = 'Footnote',
