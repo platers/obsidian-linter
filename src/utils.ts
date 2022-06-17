@@ -274,6 +274,7 @@ export function loadYAML(yaml_text: string): any {
   if (!parsed_yaml) {
     return {};
   }
+
   return parsed_yaml;
 }
 

@@ -42,7 +42,11 @@ export default class LinterPlugin extends Plugin {
       this.addCommand({
         id: 'lint-all-files-in-folder',
         name: 'Lint all files in the current folder',
-        editorCallback: (_) => {
+        editorCheckCallback: (checking: Boolean, _) => {
+          if (checking) {
+            return !this.app.workspace.getActiveFile().parent.isRoot();
+          }
+
           this.createFolderLintModal(this.app.workspace.getActiveFile().parent);
         },
       });
@@ -202,37 +206,68 @@ export default class LinterPlugin extends Plugin {
 
     async runLinterFile(file: TFile) {
       const oldText = stripCr(await this.app.vault.read(file));
+      const newText = this.lintText(oldText, file);
 
-      try {
-        const newText = this.lintText(oldText, file);
-        await this.app.vault.modify(file, newText);
-      } catch (error) {
-        new Notice('An error occurred during linting. See console for details');
-        console.log(`Linting error in file: ${file.path}`);
-        console.error(error);
-      }
+      await this.app.vault.modify(file, newText);
     }
 
     async runLinterAllFiles(app: App) {
+      let numberOfErrors = 0;
       await Promise.all(app.vault.getMarkdownFiles().map(async (file) => {
         if (!this.shouldIgnoreFile(file)) {
-          await this.runLinterFile(file);
+          try {
+            await this.runLinterFile(file);
+          } catch (error) {
+            if (error.name === 'YAMLException') {
+              new Notice(`There is an error in file "${file.path}" in the YAML ` + error.mark);
+            } else {
+              new Notice('An error occurred during linting. See console for details');
+            }
+            console.log(`Linting error in file: ${file.path}`);
+            console.error(error);
+
+            numberOfErrors+=1;
+          }
         }
       }));
-      new Notice('Linted all files');
+      if (numberOfErrors === 0) {
+        new Notice('Linted all files');
+      } else {
+        const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error': 'were ' + numberOfErrors + ' errors';
+        new Notice('Linted all files and there ' + amountOfErrorsMessage + '.');
+      }
     }
 
     async runLinterAllFilesInFolder(folder: TFolder) {
       console.log('Linting folder ' + folder.name);
 
+      let numberOfErrors = 0;
       let lintedFiles = 0;
       await Promise.all(this.app.vault.getMarkdownFiles().map(async (file) => {
         if (this.convertPathToNormalizedString(file.path).startsWith(this.convertPathToNormalizedString(folder.path) + '|') && !this.shouldIgnoreFile(file)) {
-          await this.runLinterFile(file);
+          try {
+            await this.runLinterFile(file);
+          } catch (error) {
+            if (error.name === 'YAMLException') {
+              new Notice(`There is an error in file "${file.path}" in the YAML ` + error.mark);
+            } else {
+              new Notice('An error occurred during linting. See console for details');
+            }
+            console.log(`Linting error in file: ${file.path}`);
+            console.error(error);
+
+            numberOfErrors+=1;
+          }
+
           lintedFiles++;
         }
       }));
-      new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name);
+      if (numberOfErrors === 0) {
+        new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + '.');
+      } else {
+        const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error': 'were ' + numberOfErrors + ' errors';
+        new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + ' and there ' + amountOfErrorsMessage + '.');
+      }
     }
 
     // convert the path separators to | in order to "normalize" the path for better comparisons
@@ -253,7 +288,17 @@ export default class LinterPlugin extends Plugin {
 
       const file = this.app.workspace.getActiveFile();
       const oldText = editor.getValue();
-      const newText = this.lintText(oldText, file);
+      let newText: string;
+      try {
+        newText = this.lintText(oldText, file);
+      } catch (error) {
+        if (error.name === 'YAMLException') {
+          new Notice('There is an error in the YAML ' + error.mark);
+        } else {
+          new Notice('An error occurred during linting. See console for details');
+          console.error(error);
+        }
+      }
 
       // Replace changed lines
       const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
