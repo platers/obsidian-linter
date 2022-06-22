@@ -4,7 +4,7 @@ import {
   escapeDollarSigns,
   formatYAML,
   headerRegex,
-  ignoreCodeBlocksYAMLAndLinks,
+  ignoreCodeBlocksYAMLTagsAndLinks,
   initYAML,
   insert,
   loadYAML,
@@ -186,7 +186,7 @@ export const rules: Rule[] = [
       'Removes extra spaces after every line.',
       RuleType.SPACING,
       (text: string, options = {}) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           if (options['Two Space Linebreak'] === false) {
             return text.replace(/[ \t]+$/gm, '');
           } else {
@@ -231,7 +231,7 @@ export const rules: Rule[] = [
       'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',
       RuleType.SPACING,
       (text: string, options = {}) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           if (options['Bottom'] === false) {
             text = text.replace(/(^#+\s.*)\n+/gm, '$1\n'); // trim blank lines after headings
             text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
@@ -298,7 +298,7 @@ export const rules: Rule[] = [
       'All paragraphs should have exactly one blank line both before and after.',
       RuleType.SPACING,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           text = text.replace(/\n+([a-zA-Z].*)/g, '\n\n$1'); // trim blank lines before
           text = text.replace(/(^[a-zA-Z].*)\n+/gm, '$1\n\n'); // trim blank lines after
           text = text.replace(/^\n+([a-zA-Z].*)/, '$1'); // remove blank lines before first line
@@ -328,7 +328,7 @@ export const rules: Rule[] = [
       'There should be a single space after list markers and checkboxes.',
       RuleType.SPACING,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
         // Space after marker
           text = text.replace(/^(\s*\d+\.|\s*[-+*])[^\S\r\n]+/gm, '$1 ');
           // Space after checkbox
@@ -365,7 +365,7 @@ export const rules: Rule[] = [
       'There should not be any empty lines between list markers and checklists.',
       RuleType.SPACING,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           const replaceEmptyLinesBetweenList = function(text: string, listRegex: RegExp, replaceWith: string): string {
             let match;
             let newText = text;
@@ -536,7 +536,7 @@ export const rules: Rule[] = [
       'There should be at most one consecutive blank line.',
       RuleType.SPACING,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           return text.replace(/\n{2,}/g, '\n\n');
         });
       },
@@ -562,7 +562,7 @@ export const rules: Rule[] = [
       'Converts leading spaces to tabs.',
       RuleType.SPACING,
       (text: string, options = {}) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           const tabsize = String(options['Tabsize']);
           const tabsize_regex = new RegExp(
               '^(\t*) {' + String(tabsize) + '}',
@@ -646,7 +646,7 @@ export const rules: Rule[] = [
       'Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. ',
       RuleType.CONTENT,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           return text.replace(/([^\s])( ){2,}([^\s])/g, '$1 $3');
         });
       },
@@ -667,7 +667,7 @@ export const rules: Rule[] = [
       'Removes hyphenated line breaks. Useful when pasting text from textbooks.',
       RuleType.CONTENT,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           return text.replace(/\b[-‐] \b/g, '');
         });
       },
@@ -688,7 +688,7 @@ export const rules: Rule[] = [
       'Removes consecutive list markers. Useful when copy-pasting list items.',
       RuleType.CONTENT,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           return text.replace(/^([ |\t]*)- - \b/gm, '$1- ');
         });
       },
@@ -717,7 +717,7 @@ export const rules: Rule[] = [
       'Removes empty list markers, i.e. list items without content.',
       RuleType.CONTENT,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           return text.replace(/^\s*-\s*\n/gm, '');
         });
       },
@@ -741,7 +741,7 @@ export const rules: Rule[] = [
       'Converts common bullet list marker symbols to markdown list markers.',
       RuleType.CONTENT,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
         // Convert [•, §] to - if it's the first non space character on the line
           return text.replace(/^([^\S\n]*)([•§])([^\S\n]*)/gm, '$1-$3');
         });
@@ -778,7 +778,7 @@ export const rules: Rule[] = [
       'Replaces three consecutive dots with an ellipsis.',
       RuleType.CONTENT,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           return text.replaceAll('...', '…');
         });
       },
@@ -799,7 +799,7 @@ export const rules: Rule[] = [
       'Makes sure the emphasis style is consistent.',
       RuleType.CONTENT,
       (text: string, options = {}) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           return makeEmphasisOrBoldConsistent(text, options['Style'], 'emphasis');
         });
       },
@@ -954,7 +954,7 @@ export const rules: Rule[] = [
       'Makes sure the strong style is consistent.',
       RuleType.CONTENT,
       (text: string, options = {}) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           return makeEmphasisOrBoldConsistent(text, options['Style'], 'strong');
         });
       },
@@ -1109,7 +1109,7 @@ export const rules: Rule[] = [
       'Encloses bare URLs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.',
       RuleType.CONTENT,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           const URLMatches = text.match(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'">]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'">]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'">]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'">]{2,})/gi);
 
           if (!URLMatches) {
@@ -1566,7 +1566,7 @@ export const rules: Rule[] = [
       RuleType.YAML,
       (text: string, options = {}) => {
         text = initYAML(text);
-        let title = ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        let title = ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           const result = text.match(/^#\s+(.*)/m);
           if (result) {
             return result[1];
@@ -1634,7 +1634,7 @@ export const rules: Rule[] = [
       'Heading levels should only increment by one level at a time',
       RuleType.HEADING,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           const lines = text.split('\n');
           let lastLevel = 0; // level of last header processed
           let decrement = 0; // number of levels to decrement following headers
@@ -1738,7 +1738,7 @@ export const rules: Rule[] = [
       'Inserts the file name as a H1 heading if no H1 heading exists.',
       RuleType.HEADING,
       (text: string, options = {}) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
         // check if there is a H1 heading
           const hasH1 = text.match(/^#\s.*/m);
           if (hasH1) {
@@ -1789,7 +1789,7 @@ export const rules: Rule[] = [
       'Headings should be formatted with capitalization',
       RuleType.HEADING,
       (text: string, options = {}) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           const lines = text.split('\n');
           for (let i = 0; i < lines.length; i++) {
             const match = lines[i].match(headerRegex); // match only headings
@@ -1948,7 +1948,7 @@ export const rules: Rule[] = [
       'Move all footnotes to the bottom of the document.',
       RuleType.FOOTNOTE,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           return moveFootnotesToEnd(text);
         });
       },
@@ -1982,7 +1982,7 @@ export const rules: Rule[] = [
       'Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)',
       RuleType.FOOTNOTE,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
         // re-index footnote-text
           let ft_index = 0;
           text = text.replace(/^\[\^\w+\]: /gm, function() {
@@ -2055,7 +2055,7 @@ export const rules: Rule[] = [
       'Ensures that footnote references are placed after punctuation, not before.',
       RuleType.FOOTNOTE,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
         // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
         // needed to ensure that no footnote text followed by ":" is matched
           return text.replace(/(?!^)(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
@@ -2078,7 +2078,7 @@ export const rules: Rule[] = [
       'Ensures that Chinese and English or numbers are separated by a single space. Follow this [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)',
       RuleType.SPACING,
       (text: string) => {
-        return ignoreCodeBlocksYAMLAndLinks(text, (text) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           const head = /([\u4e00-\u9fa5])( *)(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+'"([{¥$]|\*[^*])/gm;
           const tail = /(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+;:'"°%)\]}]|[^*]\*)( *)([\u4e00-\u9fa5])/gm;
           return text.replace(head, '$1 $3').replace(tail, '$1 $3');
@@ -2111,6 +2111,16 @@ export const rules: Rule[] = [
             dedent`
         中文字符串 \`code\` 中文字符串。
         `,
+        ),
+        // accounts for https://github.com/platers/obsidian-linter/issues/234
+        new Example(
+            'No space between Chinese and English in tag',
+            dedent`
+          #标签A #标签2标签
+      `,
+            dedent`
+          #标签A #标签2标签
+      `,
         ),
       ],
   ),
