@@ -1616,6 +1616,19 @@ After:
 ```markdown
 中文字符串 `code` 中文字符串。
 ```
+Example: No space between Chinese and English in tag
+
+Before:
+
+```markdown
+#标签A #标签2标签
+```
+
+After:
+
+```markdown
+#标签A #标签2标签
+```
 
 ### Remove link spacing
 

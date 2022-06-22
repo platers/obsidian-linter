@@ -14,6 +14,7 @@ export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
 export const linkRegex = /((!?)\[.*\]\(.*\))|(\[{2}.*\]{2})/g;
+export const tagRegex = /#[^\s#]{1,}/g;
 
 // Helper functions
 
@@ -166,14 +167,14 @@ export function moveFootnotesToEnd(text: string) {
 }
 
 /**
- * Substitutes YAML, links, and codeblocks in a text with a placeholder.
+ * Substitutes YAML, links, tags, and codeblocks in a text with a placeholder.
  * Then applies the given function to the text.
- * Substitutes the YAML and codeblocks back to their original form.
+ * Substitutes the YAML, links, tags, and codeblocks back to their original form.
  * @param {string} text - The text to process
  * @param {function(string): string} func - The function to apply to the text
  * @return {string} The processed text
  */
-export function ignoreCodeBlocksYAMLAndLinks(text: string, func: (text: string) => string): string {
+export function ignoreCodeBlocksYAMLTagsAndLinks(text: string, func: (text: string) => string): string {
   const codePlaceholder = 'PLACEHOLDER 321417';
   const ret = replaceCodeblocks(text, codePlaceholder);
   text = ret.text;
@@ -189,7 +190,17 @@ export function ignoreCodeBlocksYAMLAndLinks(text: string, func: (text: string) 
   const linkMatches = text.match(linkRegex);
   text = text.replaceAll(linkRegex, linkPlaceHolder);
 
+  const tagMatches = text.match(tagRegex);
+  const tagPlaceholder = '#tag-placeholder';
+  text = text.replaceAll(tagRegex, tagPlaceholder);
+
   text = func(text);
+
+  if (tagMatches) {
+    for (const tag of tagMatches) {
+      text = text.replace(tagPlaceholder, tag);
+    }
+  }
 
   if (linkMatches) {
     for (const link of linkMatches) {
