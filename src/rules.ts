@@ -1627,6 +1627,123 @@ export const rules: Rule[] = [
       [new TextOption('Title Key', 'Which YAML key to use for title', 'title')],
   ),
 
+  new Rule(
+      'Escape Special Special Characters',
+      'Escapes colons (:), single quotes (\'), and double quotes (") in YAML.',
+      RuleType.YAML,
+      (text: string, options = {}) => {
+        return formatYAML(text, (text) => {
+          const yamlLines = text.split('\n');
+
+          const yamlLineCount = yamlLines.length;
+          if (yamlLineCount < 1) {
+            return text;
+          }
+
+          for (let i = 0; i < yamlLineCount; i++) {
+            const line = yamlLines[i];
+
+            const firstColonIndex = line.indexOf(':');
+            if (firstColonIndex < 0 || firstColonIndex + 1 === line.length) {
+              continue;
+            }
+
+            const value = line.substring(firstColonIndex+1).trim();
+            // if the value in the yaml is already escaped using single or double quotes, ignore the value
+            if (((value.startsWith('\'') && value.endsWith('\'')) ||
+              (value.startsWith('"') && value.endsWith('"'))
+            ) && value.length > 1) {
+              continue;
+            }
+
+            // if there is no single quote, double quote, or colon to escape, skip this line
+            const valueHasSingleQuote = value.includes('\'');
+            const valueHasDoubleQuote = value.includes('"');
+            const valueHasColon = value.includes(':');
+            if (!valueHasSingleQuote && !valueHasDoubleQuote && !valueHasColon) {
+              continue;
+            }
+
+            if (value.startsWith('[')) {
+            // TODO: implement this rather than ignoring it
+              continue;
+            }
+
+            if (value.startsWith('-')) {
+              // TODO: implement this rather than ignoring it
+                continue;
+              }
+
+            // if the value already has a single quote and a double quote, there is nothing that can be done to escape the values
+            if (valueHasSingleQuote && valueHasDoubleQuote) {
+              continue;
+            }
+
+            if (valueHasSingleQuote) {
+              yamlLines[i] = line.replace(value, `"${value}"`);
+            } else if (valueHasDoubleQuote) {
+              yamlLines[i] = line.replace(value, `'${value}'`);
+            } else { // the line must have a colon
+              yamlLines[i] = line.replace(value, `${options['Default Escape Character']}${value}${options['Default Escape Character']}`);
+            }
+          }
+
+          return yamlLines.join('\n');
+        });
+      },
+      [
+        new Example(
+            'YAML without anything to escape',
+            dedent`
+       ---
+       key: value
+       otherKey: []
+       ---
+      `,
+            dedent`
+        ---
+        key: value
+        otherKey: []
+        ---
+      `,
+        ),
+        new Example(
+            'YAML with unescaped values',
+            dedent`
+          ---
+          key: value: with colon in the middle
+          secondKey: value with ' a single quote present
+          thirdKey: "already escaped: value"
+          fourthKey: value with " a double quote present
+          fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
+          otherKey: []
+          ---
+      `,
+            dedent`
+          ---
+          key: "value: with colon in the middle"
+          secondKey: "value with ' a single quote present"
+          thirdKey: "already escaped: value"
+          fourthKey: 'value with " a double quote present'
+          fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
+          otherKey: []
+          ---
+      `,
+        ),
+      ],
+      [new DropdownOption(
+          'Default Escape Character',
+          'The default character to use to escape YAML values when a single quote and double quote are not present.',
+          '"',
+          [
+            new DropdownRecord(
+                '"', 'Use a double quote to escape if no single or double quote is present',
+            ),
+            new DropdownRecord('\'', 'Use a single quote to escape if no single or double quote is present'),
+          ],
+      )],
+  ),
+
   // Heading rules
 
   new Rule(

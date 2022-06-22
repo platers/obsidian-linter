@@ -229,6 +229,65 @@ title: Filename
 
 ```
 
+### Escape Special Special Characters
+
+Alias: `escape-special-special-characters`
+
+Escapes colons (:), single quotes ('), and double quotes (") in YAML.
+
+Options:
+- Default Escape Character: The default character to use to escape YAML values when a single quote and double quote are not present.
+	- Default: `"`
+	- `"`: Use a double quote to escape if no single or double quote is present
+	- `'`: Use a single quote to escape if no single or double quote is present
+
+Example: YAML without anything to escape
+
+Before:
+
+```markdown
+---
+key: value
+otherKey: []
+---
+```
+
+After:
+
+```markdown
+---
+key: value
+otherKey: []
+---
+```
+Example: YAML with unescaped values
+
+Before:
+
+```markdown
+---
+key: value: with colon in the middle
+secondKey: value with ' a single quote present
+thirdKey: "already escaped: value"
+fourthKey: value with " a double quote present
+fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
+otherKey: []
+---
+```
+
+After:
+
+```markdown
+---
+key: "value: with colon in the middle"
+secondKey: "value with ' a single quote present"
+thirdKey: "already escaped: value"
+fourthKey: 'value with " a double quote present'
+fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
+otherKey: []
+---
+```
+
 ## Heading
 ### Header Increment
 
