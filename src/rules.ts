@@ -375,7 +375,6 @@ export const rules: Rule[] = [
               newText = newText.replaceAll(listRegex, replaceWith);
             } while (match);
 
-            // console.log(newText);
             return newText;
           };
 
@@ -1625,6 +1624,219 @@ export const rules: Rule[] = [
         ),
       ],
       [new TextOption('Title Key', 'Which YAML key to use for title', 'title')],
+  ),
+
+  new Rule(
+      'Escape YAML Special Characters',
+      'Escapes colons with a space after them (: ), single quotes (\'), and double quotes (") in YAML.',
+      RuleType.YAML,
+      (text: string, options = {}) => {
+        return formatYAML(text, (text) => {
+          const yamlLines = text.split('\n');
+
+          const yamlLineCount = yamlLines.length;
+          if (yamlLineCount < 1) {
+            return text;
+          }
+
+          const isValueEscapedAlready = function(value: string): boolean {
+            return value.length > 1 && ((value.startsWith('\'') && value.endsWith('\'')) ||
+              (value.startsWith('"') && value.endsWith('"')));
+          };
+
+          const escapeSubstringIfNecessary = function(fullText: string, substring: string): string {
+            if (isValueEscapedAlready(substring)) {
+              return fullText;
+            }
+
+            // if there is no single quote, double quote, or colon to escape, skip this substring
+            const substringHasSingleQuote = substring.includes('\'');
+            const substringHasDoubleQuote = substring.includes('"');
+            const substringHasColonWithSpaceAfterIt = substring.includes(': ');
+            if (!substringHasSingleQuote && !substringHasDoubleQuote && !substringHasColonWithSpaceAfterIt) {
+              return fullText;
+            }
+
+            // if the substring already has a single quote and a double quote, there is nothing that can be done to escape the substring
+            if (substringHasSingleQuote && substringHasDoubleQuote) {
+              return fullText;
+            }
+
+            let newText: string;
+            if (substringHasSingleQuote) {
+              newText = fullText.replace(substring, `"${substring}"`);
+            } else if (substringHasDoubleQuote) {
+              newText = fullText.replace(substring, `'${substring}'`);
+            } else { // the line must have a colon with a space
+              newText = fullText.replace(substring, `${options['Default Escape Character']}${substring}${options['Default Escape Character']}`);
+            }
+
+            return newText;
+          };
+
+          for (let i = 0; i < yamlLineCount; i++) {
+            const line = yamlLines[i].trim();
+
+            const firstColonIndex = line.indexOf(':');
+            const isKeyValueLineWithoutValue = firstColonIndex < 0 || firstColonIndex + 1 >= line.length;
+            const startsWithDash = line.startsWith('-');
+            const isArrayItemLineWithoutValue = startsWithDash && line.length < 2;
+            if (isKeyValueLineWithoutValue && isArrayItemLineWithoutValue) {
+              continue;
+            }
+
+            let valueStartIndex = 1;
+            if (!startsWithDash) {
+              valueStartIndex += firstColonIndex;
+            }
+
+            const value = line.substring(valueStartIndex).trim();
+            if (value.startsWith('[')) {
+              if (options['Try to Escape Single Line Arrays']) {
+                if (value.length < 3) {
+                  continue;
+                }
+
+                // Note: this does not account for list items that are already in single or double quotes,
+                // but we can address that if we run into such a scenario
+                const arrayItems = value.substring(1, value.length - 1).split(',');
+                const numberOfArrayItems = arrayItems.length;
+                for (let j = 0; j < numberOfArrayItems; j++) {
+                  let arrayItem = arrayItems[j].trim();
+                  if (arrayItem.startsWith('[')) {
+                    arrayItem = arrayItem.substring(1).trimStart();
+                  }
+
+                  if (arrayItem.endsWith(']')) {
+                    arrayItem = arrayItem.substring(0, arrayItem.length - 1).trimEnd();
+                  }
+
+                  arrayItems[j] = escapeSubstringIfNecessary(arrayItems[j], arrayItem);
+                }
+
+                yamlLines[i] = yamlLines[i].replace(value, '[' + arrayItems.join(',') + ']');
+              }
+
+              continue;
+            }
+
+            yamlLines[i] = escapeSubstringIfNecessary(yamlLines[i], value);
+          }
+
+          return yamlLines.join('\n');
+        });
+      },
+      [
+        new Example(
+            'YAML without anything to escape',
+            dedent`
+       ---
+       key: value
+       otherKey: []
+       ---
+      `,
+            dedent`
+        ---
+        key: value
+        otherKey: []
+        ---
+      `,
+        ),
+        new Example(
+            'YAML with unescaped values',
+            dedent`
+          ---
+          key: value: with colon in the middle
+          secondKey: value with ' a single quote present
+          thirdKey: "already escaped: value"
+          fourthKey: value with " a double quote present
+          fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
+          sixthKey: colon:between characters is fine
+          otherKey: []
+          ---
+      `,
+            dedent`
+          ---
+          key: "value: with colon in the middle"
+          secondKey: "value with ' a single quote present"
+          thirdKey: "already escaped: value"
+          fourthKey: 'value with " a double quote present'
+          fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
+          sixthKey: colon:between characters is fine
+          otherKey: []
+          ---
+      `,
+        ),
+        new Example(
+            'YAML with unescaped values in an expanded list with `Default Escape Character = \'`',
+            dedent`
+        ---
+        key:
+          - value: with colon in the middle
+          - value with ' a single quote present
+          - 'already escaped: value'
+          - value with " a double quote present
+          - value with both ' " a double and single quote present is not escaped, but is invalid YAML
+          - colon:between characters is fine
+        ---
+    `,
+            dedent`
+        ---
+        key:
+          - 'value: with colon in the middle'
+          - "value with ' a single quote present"
+          - 'already escaped: value'
+          - 'value with " a double quote present'
+          - value with both ' " a double and single quote present is not escaped, but is invalid YAML
+          - colon:between characters is fine
+        ---
+    `,
+            {
+              'Default Escape Character': '\'',
+            },
+        ),
+        new Example(
+            'YAML with unescaped values with arrays',
+            dedent`
+        ---
+        array: [value: with colon in the middle, value with ' a single quote present, "already escaped: value", value with " a double quote present, value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+        nestedArray: [[value: with colon in the middle, value with ' a single quote present], ["already escaped: value", value with " a double quote present], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+        nestedArray2: [[value: with colon in the middle], value with ' a single quote present]
+        ---
+
+        _Note that escaped commas in a YAML array will be treated as a separator._
+    `,
+            dedent`
+        ---
+        array: ["value: with colon in the middle", "value with ' a single quote present", "already escaped: value", 'value with " a double quote present', value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+        nestedArray: [["value: with colon in the middle", "value with ' a single quote present"], ["already escaped: value", 'value with " a double quote present'], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+        nestedArray2: [["value: with colon in the middle"], "value with ' a single quote present"]
+        ---
+
+        _Note that escaped commas in a YAML array will be treated as a separator._
+    `,
+            {
+              'Try to Escape Single Line Arrays': true,
+            },
+        ),
+      ],
+      [new DropdownOption(
+          'Default Escape Character',
+          'The default character to use to escape YAML values when a single quote and double quote are not present.',
+          '"',
+          [
+            new DropdownRecord(
+                '"', 'Use a double quote to escape if no single or double quote is present',
+            ),
+            new DropdownRecord('\'', 'Use a single quote to escape if no single or double quote is present'),
+          ],
+      ),
+      new BooleanOption(
+          'Try to Escape Single Line Arrays',
+          'Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".',
+          false,
+      ),
+      ],
   ),
 
   // Heading rules

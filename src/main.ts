@@ -151,6 +151,13 @@ export default class LinterPlugin extends Plugin {
     lintText(oldText: string, file: TFile) {
       let newText = oldText;
 
+      // escape YAML where possible before parsing yaml
+      const escape_yaml_rule = rules.find((rule) => rule.name === 'Escape YAML Special Characters');
+      const escape_yaml_options = escape_yaml_rule.getOptions(this.settings);
+      if (escape_yaml_options[escape_yaml_rule.enabledOptionName()]) {
+        newText = escape_yaml_rule.apply(newText, escape_yaml_options);
+      }
+
       // remove hashtags from tags before parsing yaml
       const tag_rule = rules.find((rule) => rule.name === 'Format Tags in YAML');
       const tag_options = tag_rule.getOptions(this.settings);
@@ -161,8 +168,8 @@ export default class LinterPlugin extends Plugin {
       const disabledRules = getDisabledRules(newText);
 
       for (const rule of rules) {
-        // if you are yaml timestamp or a disabled rule, skip running them
-        if (disabledRules.includes(rule.alias()) || rule.alias() === 'yaml-timestamp') {
+        // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
+        if (disabledRules.includes(rule.alias()) || rule.alias() === 'yaml-timestamp' || rule.alias() === 'format-tags-in-yaml' || rule.alias() === 'escape-yaml-special-characters') {
           continue;
         }
 
