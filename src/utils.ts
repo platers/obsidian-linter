@@ -13,7 +13,7 @@ export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
-export const linkRegex = /((!?)\[[^[\n]*\]\([^[\n]*\))|(\[{2}[^[\n]*\]{2})/g;
+export const linkRegex = /((!?)\[[^[\n\]]*\]\([^[\n\]]*\))|(\[{2}[^[\n\]]*\]{2})/g;
 export const tagRegex = /#[^\s#]{1,}/g;
 
 // Reused placeholders
@@ -112,6 +112,10 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
 
   const positions: Position[] = getPositions('paragraph', text);
   if (positions.length === 0) {
+    if (yamlMatches) {
+      text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
+    }
+
     return text;
   }
 
