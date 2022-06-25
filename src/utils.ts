@@ -13,8 +13,12 @@ export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
-export const linkRegex = /((!?)\[[^[\n]*\]\([^[\n]*\))|(\[{2}[^[\n]*\]{2})/g;
+export const linkRegex = /((!?)\[[^[\n\]]*\]\([^[\n\]]*\))|(\[{2}[^[\n\]]*\]{2})/g;
 export const tagRegex = /#[^\s#]{1,}/g;
+
+// Reused placeholders
+
+const yamlPlaceholder = '---\n---';
 
 // Helper functions
 
@@ -100,8 +104,18 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
  * @return {string} The text with two spaces at the end of lines of paragraphs, list items, and blockquotes where there were consecutive lines of content.
  */
 export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text: string): string {
+  // added the placeholder for YAML in order to prevent the accidental misconstruing of the YAML as a paragraph when an array is in multiline form (i.e. it has a list for the array elements)
+  const yamlMatches = text.match(yamlRegex);
+  if (yamlMatches) {
+    text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
+  }
+
   const positions: Position[] = getPositions('paragraph', text);
   if (positions.length === 0) {
+    if (yamlMatches) {
+      text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
+    }
+
     return text;
   }
 
@@ -124,6 +138,10 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
     }
 
     text = text.substring(0, position.start.offset) + paragraphLines.join('\n') + text.substring(position.end.offset);
+  }
+
+  if (yamlMatches) {
+    text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
   }
 
   return text;
@@ -180,7 +198,6 @@ export function ignoreCodeBlocksYAMLTagsAndLinks(text: string, func: (text: stri
   text = ret.text;
   const replacedCodeBlocks = ret.replacedCodeBlocks;
 
-  const yamlPlaceholder = '---\n---';
   const yamlMatches = text.match(yamlRegex);
   if (yamlMatches) {
     text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
