@@ -229,9 +229,9 @@ title: Filename
 
 ```
 
-### Escape Special Special Characters
+### Escape YAML Special Characters
 
-Alias: `escape-special-special-characters`
+Alias: `escape-yaml-special-characters`
 
 Escapes colons with a space after them (: ), single quotes ('), and double quotes (") in YAML.
 
@@ -240,7 +240,7 @@ Options:
 	- Default: `"`
 	- `"`: Use a double quote to escape if no single or double quote is present
 	- `'`: Use a single quote to escape if no single or double quote is present
-- Try to Escape Arrays: Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".
+- Try to Escape Single Line Arrays: Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".
 	- Default: `false`
 
 Example: YAML without anything to escape

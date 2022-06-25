@@ -43,7 +43,7 @@ Documentation for all rules can be found in the [rules docs](https://github.com/
 - [insert-yaml-attributes](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#insert-yaml-attributes)
 - [yaml-timestamp](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-timestamp)
 - [yaml-title](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-title)
-- [escape-special-special-characters](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#escape-special-special-characters)
+- [escape-yaml-special-characters](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#escape-yaml-special-characters)
 
 ### Heading rules
 

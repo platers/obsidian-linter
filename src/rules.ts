@@ -1627,7 +1627,7 @@ export const rules: Rule[] = [
   ),
 
   new Rule(
-      'Escape Special Special Characters',
+      'Escape YAML Special Characters',
       'Escapes colons with a space after them (: ), single quotes (\'), and double quotes (") in YAML.',
       RuleType.YAML,
       (text: string, options = {}) => {
