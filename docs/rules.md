@@ -233,13 +233,15 @@ title: Filename
 
 Alias: `escape-special-special-characters`
 
-Escapes colons (:), single quotes ('), and double quotes (") in YAML.
+Escapes colons with a space after them (: ), single quotes ('), and double quotes (") in YAML.
 
 Options:
 - Default Escape Character: The default character to use to escape YAML values when a single quote and double quote are not present.
 	- Default: `"`
 	- `"`: Use a double quote to escape if no single or double quote is present
 	- `'`: Use a single quote to escape if no single or double quote is present
+- Try to Escape Arrays: Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".
+	- Default: `false`
 
 Example: YAML without anything to escape
 
@@ -271,6 +273,7 @@ secondKey: value with ' a single quote present
 thirdKey: "already escaped: value"
 fourthKey: value with " a double quote present
 fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
+sixthKey: colon:between characters is fine
 otherKey: []
 ---
 ```
@@ -284,8 +287,63 @@ secondKey: "value with ' a single quote present"
 thirdKey: "already escaped: value"
 fourthKey: 'value with " a double quote present'
 fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
+sixthKey: colon:between characters is fine
 otherKey: []
 ---
+```
+Example: YAML with unescaped values in an expanded list with `Default Escape Character = '`
+
+Before:
+
+```markdown
+---
+key:
+  - value: with colon in the middle
+  - value with ' a single quote present
+  - 'already escaped: value'
+  - value with " a double quote present
+  - value with both ' " a double and single quote present is not escaped, but is invalid YAML
+  - colon:between characters is fine
+---
+```
+
+After:
+
+```markdown
+---
+key:
+  - 'value: with colon in the middle'
+  - "value with ' a single quote present"
+  - 'already escaped: value'
+  - 'value with " a double quote present'
+  - value with both ' " a double and single quote present is not escaped, but is invalid YAML
+  - colon:between characters is fine
+---
+```
+Example: YAML with unescaped values with arrays
+
+Before:
+
+```markdown
+---
+array: [value: with colon in the middle, value with ' a single quote present, "already escaped: value", value with " a double quote present, value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+nestedArray: [[value: with colon in the middle, value with ' a single quote present], ["already escaped: value", value with " a double quote present], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+nestedArray2: [[value: with colon in the middle], value with ' a single quote present]
+---
+
+_Note that escaped commas in a YAML array will be treated as a separator._
+```
+
+After:
+
+```markdown
+---
+array: ["value: with colon in the middle", "value with ' a single quote present", "already escaped: value", 'value with " a double quote present', value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+nestedArray: [["value: with colon in the middle", "value with ' a single quote present"], ["already escaped: value", 'value with " a double quote present'], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+nestedArray2: [["value: with colon in the middle"], "value with ' a single quote present"]
+---
+
+_Note that escaped commas in a YAML array will be treated as a separator._
 ```
 
 ## Heading
