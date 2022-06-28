@@ -193,7 +193,7 @@ export function moveFootnotesToEnd(text: string) {
  * @return {string} The processed text
  */
 export function ignoreCodeBlocksYAMLTagsAndLinks(text: string, func: (text: string) => string): string {
-  const codePlaceholder = 'PLACEHOLDER 321417';
+  const codePlaceholder = '{PLACEHOLDER 321417}';
   const ret = replaceCodeblocks(text, codePlaceholder);
   text = ret.text;
   const replacedCodeBlocks = ret.replacedCodeBlocks;
@@ -203,7 +203,7 @@ export function ignoreCodeBlocksYAMLTagsAndLinks(text: string, func: (text: stri
     text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
   }
 
-  const linkPlaceHolder = 'PLACEHOLDER_LINK 57849';
+  const linkPlaceHolder = '{PLACEHOLDER_LINK 57849}';
   const linkMatches = text.match(linkRegex);
   text = text.replaceAll(linkRegex, linkPlaceHolder);
 
