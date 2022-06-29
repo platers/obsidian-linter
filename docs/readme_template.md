@@ -48,7 +48,7 @@ Pull requests are welcome, especially for new rules.
    1. Insert a new rule in the corresponding rule type(spacing, headings, etc)
    2. Follow the format of the existing rules
    3. Add tests for edge cases in `test.ts`
-   4. You should probably use some helper functions from `utils.ts`, such as `ignoreCodeBlocksYAMLAndLinks`.
+   4. You should probably use some helper functions from `utils.ts`, such as `ignoreCodeBlocksYAMLTagsAndLinks`.
 5. Run `npm run compile` to build, generate documentation, and test the plugin.
 6. Run `npm run lint` to lint the plugin.
 
