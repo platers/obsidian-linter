@@ -1032,6 +1032,17 @@ describe('Remove Multiple Spaces', () => {
 
     expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
   });
+  it('Links followed by parentheses do not prevent other removal of multiple spaces in a row', () => {
+    const before = dedent`
+    [Link text](path/fileName.md) (2 spaces in between  text)
+    `;
+
+    const after = dedent`
+    [Link text](path/fileName.md) (2 spaces in between text)
+    `;
+
+    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
+  });
 });
 
 describe('Remove Hyphenated Line Breaks', () => {
