@@ -13,7 +13,7 @@ import {
   escapeYamlString,
   makeEmphasisOrBoldConsistent,
   addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent,
-  linkRegex,
+  removeSpacesInLinkText,
 } from './utils';
 import {
   Option,
@@ -2341,26 +2341,7 @@ export const rules: Rule[] = [
       'Removes spacing around link text.',
       RuleType.SPACING,
       (text: string) => {
-        const linkMatches = text.match(linkRegex);
-
-        if (!linkMatches) {
-          return text;
-        }
-
-        for (const link of linkMatches) {
-          // regular markdown link
-          if (!link.startsWith('[[')) {
-            const endLinkTextPosition = link.lastIndexOf(']');
-            const newLink = link.substring(0, 1) + link.substring(1, endLinkTextPosition).trim() + link.substring(endLinkTextPosition);
-            text = text.replace(link, newLink);
-          } else if (link.includes('|')) { // wiki link with link text
-            const startLinkTextPosition = link.indexOf('|');
-            const newLink = link.substring(0, startLinkTextPosition+1) + link.substring(startLinkTextPosition+1, link.length - 2).trim() + ']]';
-            text = text.replace(link, newLink);
-          }
-        }
-
-        return text;
+        return removeSpacesInLinkText(text);
       },
       [
         new Example(
@@ -2372,6 +2353,8 @@ export const rules: Rule[] = [
       [here is link text4](link_here)
       [\there is link text5\t](link_here)
       [](link_here)
+      **Note that image markdown syntax does not get affected even if it is transclusion:**
+      ![\there is link text6 ](link_here)
       `,
             dedent`
       [here is link text1](link_here)
@@ -2380,25 +2363,29 @@ export const rules: Rule[] = [
       [here is link text4](link_here)
       [here is link text5](link_here)
       [](link_here)
+      **Note that image markdown syntax does not get affected even if it is transclusion:**
+      ![\there is link text6 ](link_here)
       `,
         ),
         new Example(
             'Space in wiki link text',
             dedent`
-    [[link_here| here is link text1 ]]
-    [[link_here|here is link text2 ]]
-    [[link_here| here is link text3]]
-    [[link_here|here is link text4]]
-    [[link_here|\there is link text5\t]]
-    [[link_here]]
+      [[link_here| here is link text1 ]]
+      [[link_here|here is link text2 ]]
+      [[link_here| here is link text3]]
+      [[link_here|here is link text4]]
+      [[link_here|\there is link text5\t]]
+      ![[link_here|\there is link text6\t]]
+      [[link_here]]
     `,
             dedent`
-    [[link_here|here is link text1]]
-    [[link_here|here is link text2]]
-    [[link_here|here is link text3]]
-    [[link_here|here is link text4]]
-    [[link_here|here is link text5]]
-    [[link_here]]
+      [[link_here|here is link text1]]
+      [[link_here|here is link text2]]
+      [[link_here|here is link text3]]
+      [[link_here|here is link text4]]
+      [[link_here|here is link text5]]
+      ![[link_here|here is link text6]]
+      [[link_here]]
     `,
         ),
       ],

@@ -1766,6 +1766,8 @@ Before:
 [here is link text4](link_here)
 [	here is link text5	](link_here)
 [](link_here)
+**Note that image markdown syntax does not get affected even if it is transclusion:**
+![	here is link text6 ](link_here)
 ```
 
 After:
@@ -1777,6 +1779,8 @@ After:
 [here is link text4](link_here)
 [here is link text5](link_here)
 [](link_here)
+**Note that image markdown syntax does not get affected even if it is transclusion:**
+![	here is link text6 ](link_here)
 ```
 Example: Space in wiki link text
 
@@ -1788,6 +1792,7 @@ Before:
 [[link_here| here is link text3]]
 [[link_here|here is link text4]]
 [[link_here|	here is link text5	]]
+![[link_here|	here is link text6	]]
 [[link_here]]
 ```
 
@@ -1799,5 +1804,6 @@ After:
 [[link_here|here is link text3]]
 [[link_here|here is link text4]]
 [[link_here|here is link text5]]
+![[link_here|here is link text6]]
 [[link_here]]
 ```

@@ -13,7 +13,7 @@ export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
-export const linkRegex = /((!?)\[[^[\n\]]*\]\([^[\n\]]*\))|(\[{2}[^[\n\]]*\]{2})/g;
+export const wikiLinkRegex = /(!?)(\[{2}[^[\n\]]*\]{2})/g;
 export const tagRegex = /#[^\s#]{1,}/g;
 
 // Reused placeholders
@@ -44,7 +44,7 @@ function getPositions(type: string, text: string) {
  * Replaces all codeblocks in the given text with a placeholder.
  * @param {string} text The text to replace codeblocks in
  * @param {string} placeholder The placeholder to use
- * @return {string} The text with codeblocks replaced, and the list of codeblocks
+ * @return {string} The text with codeblocks replaced
  * @return {string[]} The codeblocks replaced
  */
 function replaceCodeblocks(text: string, placeholder: string): {text: string, replacedCodeBlocks: string[]} {
@@ -61,6 +61,49 @@ function replaceCodeblocks(text: string, placeholder: string): {text: string, re
   replacedCodeBlocks.reverse();
 
   return {text, replacedCodeBlocks};
+}
+
+/**
+ * Replaces all links in the given text with a placeholder.
+ * @param {string} text The text to replace links in
+ * @param {string} regularLinkPlaceholder The placeholder to use for regular markdown links
+ * @param {string} wikiLinkPlaceholder The placeholder to use for wiki links
+ * @return {string} The text with links replaced
+ * @return {string[]} The regular markdown links replaced
+ * @return {string[]} The wiki links replaced
+ */
+function replaceLinks(text: string, regularLinkPlaceholder: string, wikiLinkPlaceholder: string): {text: string, replacedRegularLinks: string[], replacedWikiLinks: string[]} {
+  const positions: Position[] = getPositions('link', text);
+  const replacedRegularLinks: string[] = [];
+
+  for (const position of positions) {
+    if (position == undefined) {
+      continue;
+    }
+
+    const regularLink = text.substring(position.start.offset, position.end.offset);
+    // skip links that are not are not in markdown format
+    if (!regularLink.includes('[')) {
+      continue;
+    }
+
+    replacedRegularLinks.push(regularLink);
+    text = text.substring(0, position.start.offset) + regularLinkPlaceholder + text.substring(position.end.offset);
+  }
+
+  // Reverse the regular links so that they are in the same order as the original text
+  replacedRegularLinks.reverse();
+
+  const replacedWikiLinks: string[] = [];
+  const linkMatches = text.match(wikiLinkRegex);
+  text = text.replaceAll(wikiLinkRegex, wikiLinkPlaceholder);
+  if (linkMatches) {
+    for (const link of linkMatches) {
+      replacedWikiLinks.push(link);
+    }
+  }
+
+  return {text, replacedRegularLinks, replacedWikiLinks};
 }
 
 /**
@@ -147,6 +190,46 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
   return text;
 }
 
+
+/**
+ * Removes spaces before and after link text
+ * @param {string} text The text to make that there are no spaces around the link text of
+ * @return {string} The text with spaces around link text removed
+ */
+export function removeSpacesInLinkText(text: string): string {
+  const positions: Position[] = getPositions('link', text);
+
+  for (const position of positions) {
+    if (position == undefined) {
+      continue;
+    }
+
+    const regularLink = text.substring(position.start.offset, position.end.offset);
+    // skip links that are not are not in markdown format
+    if (!regularLink.includes('[')) {
+      continue;
+    }
+
+    const endLinkTextPosition = regularLink.lastIndexOf(']');
+    const newLink = regularLink.substring(0, 1) + regularLink.substring(1, endLinkTextPosition).trim() + regularLink.substring(endLinkTextPosition);
+    text = text.substring(0, position.start.offset) + newLink + text.substring(position.end.offset);
+  }
+
+  const linkMatches = text.match(wikiLinkRegex);
+  if (linkMatches) {
+    for (const link of linkMatches) {
+      // wiki link with link text
+      if (link.includes('|')) {
+        const startLinkTextPosition = link.indexOf('|');
+        const newLink = link.substring(0, startLinkTextPosition+1) + link.substring(startLinkTextPosition+1, link.length - 2).trim() + ']]';
+        text = text.replace(link, newLink);
+      }
+    }
+  }
+
+  return text;
+}
+
 /**
  * Moves footnote declarations to the end of the document.
  * @param {string} text The text to move footnotes in
@@ -203,9 +286,10 @@ export function ignoreCodeBlocksYAMLTagsAndLinks(text: string, func: (text: stri
     text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
   }
 
-  const linkPlaceHolder = '{PLACEHOLDER_LINK 57849}';
-  const linkMatches = text.match(linkRegex);
-  text = text.replaceAll(linkRegex, linkPlaceHolder);
+  const regularLinkPlaceHolder = '{PLACEHOLDER_REGULAR_LINK}';
+  const wikiLinkPlaceHolder = '{PLACEHOLDER_WIKI_LINK}';
+  const linkResults = replaceLinks(text, regularLinkPlaceHolder, wikiLinkPlaceHolder);
+  text = linkResults.text;
 
   const tagMatches = text.match(tagRegex);
   const tagPlaceholder = '#tag-placeholder';
@@ -219,12 +303,16 @@ export function ignoreCodeBlocksYAMLTagsAndLinks(text: string, func: (text: stri
     }
   }
 
-  if (linkMatches) {
-    for (const link of linkMatches) {
-      // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
-      // see https://github.com/platers/obsidian-linter/issues/201
-      text = text.replace(new RegExp(linkPlaceHolder, 'i'), link);
-    }
+  for (const regularLink of linkResults.replacedRegularLinks) {
+    // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
+    // see https://github.com/platers/obsidian-linter/issues/201
+    text = text.replace(new RegExp(regularLinkPlaceHolder, 'i'), regularLink);
+  }
+
+  for (const wikiLink of linkResults.replacedWikiLinks) {
+    // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
+    // see https://github.com/platers/obsidian-linter/issues/201
+    text = text.replace(new RegExp(wikiLinkPlaceHolder, 'i'), wikiLink);
   }
 
   if (yamlMatches) {
