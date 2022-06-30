@@ -6,6 +6,32 @@ import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextO
 import dedent from 'ts-dedent';
 import {stripCr} from './utils';
 
+// https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
+const langToMomentLocale = {
+  'en': 'en-gb',
+  'zh': 'zh-cn',
+  'zh-TW': 'zh-tw',
+  'ru': 'ru',
+  'ko': 'ko',
+  'it': 'it',
+  'id': 'id',
+  'ro': 'ro',
+  'pt-BR': 'pt-br',
+  'cz': 'cs',
+  'da': 'da',
+  'de': 'de',
+  'es': 'es',
+  'fr': 'fr',
+  'no': 'nn',
+  'pl': 'pl',
+  'pt': 'pt',
+  'tr': 'tr',
+  'hi': 'hi',
+  'nl': 'nl',
+  'ar': 'ar',
+  'ja': 'ja',
+};
+
 export default class LinterPlugin extends Plugin {
     settings: LinterSettings;
     private eventRef: EventRef;
@@ -104,6 +130,7 @@ export default class LinterPlugin extends Plugin {
         lintOnSave: false,
         displayChanged: true,
         foldersToIgnore: [],
+        linterLocale: 'system-default',
       };
       const data = await this.loadData();
       const storedSettings = data || {};
@@ -167,6 +194,7 @@ export default class LinterPlugin extends Plugin {
 
       const disabledRules = getDisabledRules(newText);
 
+      const locale = this.getLocaleFromSetting();
       for (const rule of rules) {
         // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
         if (disabledRules.includes(rule.alias()) || rule.alias() === 'yaml-timestamp' || rule.alias() === 'format-tags-in-yaml' || rule.alias() === 'escape-yaml-special-characters') {
@@ -178,6 +206,7 @@ export default class LinterPlugin extends Plugin {
             'metadata: file created time': moment(file.stat.ctime).format(),
             'metadata: file modified time': moment(file.stat.mtime).format(),
             'metadata: file name': file.basename,
+            'locale: ': locale,
           }, rule.getOptions(this.settings));
 
         if (options[rule.enabledOptionName()]) {
@@ -194,6 +223,7 @@ export default class LinterPlugin extends Plugin {
         'metadata: file modified time': moment(file.stat.mtime).format(),
         'metadata: file name': file.basename,
         'Already Modified': oldText != newText,
+        'locale: ': locale,
       }, yaml_timestamp_rule.getOptions(this.settings));
       if (yaml_timestamp_options[yaml_timestamp_rule.enabledOptionName()]) {
         newText = yaml_timestamp_rule.apply(newText, yaml_timestamp_options);
@@ -347,6 +377,23 @@ export default class LinterPlugin extends Plugin {
         new Notice(message);
       }
     }
+
+    // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
+    getLocaleFromSetting(): string {
+      const obsidianLang: string = localStorage.getItem('language') || 'en';
+      const systemLang = navigator.language?.toLowerCase();
+
+      let momentLocale = langToMomentLocale[obsidianLang as keyof typeof langToMomentLocale];
+
+      console.log(this.settings.linterLocale);
+      if (this.settings.linterLocale !== 'system-default') {
+        momentLocale = this.settings.linterLocale;
+      } else if (systemLang.startsWith(obsidianLang)) {
+        // If the system locale is more specific (en-gb vs en), use the system locale.
+        momentLocale = systemLang;
+      }
+      return momentLocale;
+    }
 }
 
 class SettingTab extends PluginSettingTab {
@@ -479,6 +526,8 @@ class SettingTab extends PluginSettingTab {
                 });
           });
 
+      this.addLocaleOverrideSetting();
+
       let prevSection = '';
 
       for (const rule of rules) {
@@ -495,6 +544,28 @@ class SettingTab extends PluginSettingTab {
           option.display(containerEl, this.plugin.settings, this.plugin);
         }
       }
+    }
+
+    addLocaleOverrideSetting(): void {
+      const {moment} = window;
+      const sysLocale = navigator.language?.toLowerCase();
+
+      new Setting(this.containerEl)
+          .setName('Override locale:')
+          .setDesc(
+              'Set this if you want to use a locale different from the default',
+          )
+          .addDropdown((dropdown) => {
+            dropdown.addOption('system-default', `Same as system (${sysLocale})`);
+            moment.locales().forEach((locale) => {
+              dropdown.addOption(locale, locale);
+            });
+            dropdown.setValue(this.plugin.settings.linterLocale);
+            dropdown.onChange(async (value) => {
+              this.plugin.settings.linterLocale = value;
+              await this.plugin.saveSettings();
+            });
+          });
     }
 }
 

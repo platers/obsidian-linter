@@ -35,6 +35,7 @@ export interface LinterSettings {
   lintOnSave: boolean;
   displayChanged: boolean;
   foldersToIgnore: string[];
+  linterLocale: string;
 }
 /* eslint-disable no-unused-vars */
 enum RuleType {
@@ -1401,6 +1402,8 @@ export const rules: Rule[] = [
           const created_key_match = new RegExp(created_key_match_str);
           const created_match = new RegExp(created_match_str);
 
+          moment.locale(options['locale']);
+
           if (options['Date Created'] === true) {
             const formatted_date = moment(
                 options['metadata: file created time'],
@@ -1424,6 +1427,16 @@ export const rules: Rule[] = [
               );
 
               textModified = true;
+            } else if (keyWithValueFound) {
+              const createdDateTime = moment(text.match(created_match)[0].replace(options['Date Created Key'] + ':', '').trim(), options['Format'], true);
+              if (createdDateTime == undefined || !createdDateTime.isValid()) {
+                text = text.replace(
+                    created_match,
+                    escapeDollarSigns(created_date_line) + '\n',
+                );
+
+                textModified = true;
+              }
             }
           }
 
@@ -1433,17 +1446,21 @@ export const rules: Rule[] = [
             const modified_key_match = new RegExp(modified_key_match_str);
             const modified_match = new RegExp(modified_match_str);
 
-            const formatted_date = moment(
+            const modified_date = moment(
                 options['metadata: file modified time'],
-            ).format(options['Format']);
-            const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_date}`;
+            );
+            const formatted_modified_date = modified_date.format(options['Format']);
+            const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_modified_date}`;
 
             const keyWithValueFound = modified_match.test(text);
-            if (keyWithValueFound && textModified) {
-              text = text.replace(
-                  modified_match,
-                  escapeDollarSigns(modified_date_line) + '\n',
-              );
+            if (keyWithValueFound) {
+              const modifiedDateTime = moment(text.match(modified_match)[0].replace(options['Date Modified Key'] + ':', '').trim(), options['Format'], true);
+              if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() || Math.abs(modifiedDateTime.diff(modified_date, 'seconds')) > 5) {
+                text = text.replace(
+                    modified_match,
+                    escapeDollarSigns(modified_date_line) + '\n',
+                );
+              }
             } else if (modified_key_match.test(text)) {
               text = text.replace(
                   modified_key_match,
