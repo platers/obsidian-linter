@@ -119,6 +119,9 @@ Options:
 	- Default: `date modified`
 - Format: Date format
 	- Default: `dddd, MMMM Do YYYY, h:mm:ss a`
+- Always Update Date Modified: Insert the date the file was last modified even if no changes have been made.
+ Note: almost always updates the file when seconds are in the date format since there is a slight delay between the insertion of the metadata and saving of the file.
+	- Default: `false`
 
 Example: Adds a header with the date.
 

@@ -1402,12 +1402,14 @@ export const rules: Rule[] = [
           const created_key_match = new RegExp(created_key_match_str);
           const created_match = new RegExp(created_match_str);
 
-          moment.locale(options['locale']);
+          const moment = options['moment'];
 
           if (options['Date Created'] === true) {
-            const formatted_date = moment(
+            const created_date = moment(
                 options['metadata: file created time'],
-            ).format(options['Format']);
+            );
+
+            const formatted_date = created_date.format(options['Format']);
             const created_date_line = `\n${options['Date Created Key']}: ${formatted_date}`;
 
             const keyWithValueFound = created_match.test(text);
@@ -1455,7 +1457,10 @@ export const rules: Rule[] = [
             const keyWithValueFound = modified_match.test(text);
             if (keyWithValueFound) {
               const modifiedDateTime = moment(text.match(modified_match)[0].replace(options['Date Modified Key'] + ':', '').trim(), options['Format'], true);
-              if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() || Math.abs(modifiedDateTime.diff(modified_date, 'seconds')) > 5) {
+              if (options['Always Update Date Modified'] || textModified ||
+                  modifiedDateTime == undefined || !modifiedDateTime.isValid() ||
+                  Math.abs(modifiedDateTime.diff(modified_date, 'seconds')) > 5
+              ) {
                 text = text.replace(
                     modified_match,
                     escapeDollarSigns(modified_date_line) + '\n',
@@ -1492,6 +1497,7 @@ export const rules: Rule[] = [
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
               'metadata: file modified time': '2020-01-02T00:00:00-00:00',
               'Already Modified': false,
+              'moment': moment,
             },
         ),
         new Example(
@@ -1510,6 +1516,7 @@ export const rules: Rule[] = [
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
               'metadata: file modified time': '2020-01-01T00:00:00-00:00',
               'Already Modified': false,
+              'moment': moment,
             },
         ),
         new Example(
@@ -1529,6 +1536,7 @@ export const rules: Rule[] = [
               'Date Created Key': 'created',
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
               'Already Modified': false,
+              'moment': moment,
             },
         ),
         new Example(
@@ -1548,11 +1556,16 @@ export const rules: Rule[] = [
               'Date Modified Key': 'modified',
               'metadata: file modified time': '2020-01-01T00:00:00-00:00',
               'Already Modified': false,
+              'moment': moment,
             },
         ),
       ],
       [
-        new BooleanOption('Date Created', 'Insert the file creation date', true),
+        new BooleanOption(
+            'Date Created',
+            'Insert the file creation date',
+            true,
+        ),
         new TextOption(
             'Date Created Key',
             'Which YAML key to use for creation date',
@@ -1572,6 +1585,11 @@ export const rules: Rule[] = [
             'Format',
             'Date format',
             'dddd, MMMM Do YYYY, h:mm:ss a',
+        ),
+        new BooleanOption(
+            'Always Update Date Modified',
+            'Insert the date the file was last modified even if no changes have been made.\n Note: almost always updates the file when seconds are in the date format since there is a slight delay between the insertion of the metadata and saving of the file.',
+            false,
         ),
       ],
   ),

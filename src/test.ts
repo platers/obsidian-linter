@@ -1,4 +1,5 @@
 import dedent from 'ts-dedent';
+import moment from 'moment';
 import {rules, Rule, rulesDict, Example, getDisabledRules} from './rules';
 import {escapeRegExp, yamlRegex} from './utils';
 
@@ -576,7 +577,7 @@ describe('yaml timestamp', () => {
     date created: 2019-01-01
     ---
     `;
-    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'date created', 'locale': 'en'})).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'date created', 'moment': moment})).toBe(after);
   });
   it('Respects created key', () => {
     const before = dedent`
@@ -589,7 +590,7 @@ describe('yaml timestamp', () => {
     created: 2019-01-01
     ---
     `;
-    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'created', 'locale': 'en'})).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'created', 'moment': moment})).toBe(after);
   });
   it('Respects modified key when nothing has changed', () => {
     const before = dedent`
@@ -610,7 +611,7 @@ describe('yaml timestamp', () => {
       'metadata: file modified time': '2020-01-01T00:00:00-00:00',
       'Already Modified': false,
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
-      'locale': 'en',
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
@@ -633,7 +634,7 @@ describe('yaml timestamp', () => {
       'metadata: file modified time': '2020-01-02T00:00:00-00:00',
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'Already Modified': false,
-      'locale': 'en',
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
@@ -656,7 +657,7 @@ describe('yaml timestamp', () => {
       'metadata: file modified time': '2020-01-01T00:00:00-00:00',
       'Format': 'dddd, MMMM Do YYYY',
       'Already Modified': false,
-      'locale': 'en',
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
@@ -679,7 +680,7 @@ describe('yaml timestamp', () => {
       'metadata: file modified time': '2020-02-01T00:00:00-00:00',
       'Already Modified': true,
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
-      'locale': 'en',
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
@@ -695,6 +696,7 @@ describe('yaml timestamp', () => {
     ---
     `;
 
+    moment.locale('fr');
     const options = {
       'Date Created': false,
       'Date Modified': true,
@@ -702,9 +704,10 @@ describe('yaml timestamp', () => {
       'metadata: file modified time': '2020-02-01T00:00:00-00:00',
       'Already Modified': false,
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
-      'locale': 'fr',
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    moment.locale('en');
   });
   it('Updates modified key when something has changed inside of the YAML timestamp rule', () => {
     const before = dedent`
@@ -728,7 +731,7 @@ describe('yaml timestamp', () => {
       'metadata: file modified time': '2020-01-02T00:00:00-00:00',
       'Already Modified': false,
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
-      'locale': 'en',
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
@@ -755,7 +758,7 @@ describe('yaml timestamp', () => {
       'metadata: file modified time': '2020-02-01T00:00:00-00:00',
       'Already Modified': false,
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
-      'locale': 'en',
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
@@ -782,7 +785,7 @@ describe('yaml timestamp', () => {
       'metadata: file created time': '2020-02-01T00:00:00-00:00',
       'Already Modified': false,
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
-      'locale': 'en',
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
@@ -809,7 +812,7 @@ describe('yaml timestamp', () => {
       'metadata: file created time': '2020-02-01T00:00:00-00:00',
       'Format': 'dddd, MMMM Do YYYY',
       'Already Modified': false,
-      'locale': 'en',
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
@@ -829,6 +832,7 @@ describe('yaml timestamp', () => {
     ---
     `;
 
+    moment.locale('fr');
     const options = {
       'Date Created': true,
       'Date Modified': false,
@@ -836,9 +840,10 @@ describe('yaml timestamp', () => {
       'metadata: file created time': '2020-02-01T00:00:00-00:00',
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'Already Modified': false,
-      'locale': 'fr',
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    moment.locale('en');
   });
   it('Updates modified value when format has changed causing created value updated', () => {
     const before = dedent`
@@ -867,7 +872,40 @@ describe('yaml timestamp', () => {
       'metadata: file modified time': '2020-02-02T00:00:00-00:00',
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'Already Modified': false,
-      'locale': 'en',
+      'moment': moment,
+    };
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+  });
+
+  it('Updates modified value when nothing has changed if always update date modified setting is on', () => {
+    const before = dedent`
+    ---
+    tag: tag1
+    modified: Saturday, February 1st 2020, 12:00:00 am
+    created: Wednesday, January 1st 2020, 12:00:00 am
+    location: "path"
+    ---
+    `;
+    const after = dedent`
+    ---
+    tag: tag1
+    modified: Sunday, February 2nd 2020, 12:00:00 am
+    created: Wednesday, January 1st 2020, 12:00:00 am
+    location: "path"
+    ---
+    `;
+
+    const options = {
+      'Date Created': true,
+      'Date Modified': true,
+      'Date Modified Key': 'modified',
+      'Date Created Key': 'created',
+      'metadata: file created time': '2020-01-01T00:00:00-00:00',
+      'metadata: file modified time': '2020-02-02T00:00:00-00:00',
+      'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
+      'Already Modified': false,
+      'Always Update Date Modified': true,
+      'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
