@@ -4,6 +4,9 @@ import DiffMatchPatch from 'diff-match-patch';
 import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils';
+import log from 'loglevel';
+import {logInfo, logError, logDebug, setLogLevel} from './logger';
+
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -37,7 +40,7 @@ export default class LinterPlugin extends Plugin {
     private eventRef: EventRef;
 
     async onload() {
-      console.log('Loading Linter plugin');
+      logInfo('Loading plugin');
       await this.loadSettings();
 
       this.addCommand({
@@ -120,7 +123,7 @@ export default class LinterPlugin extends Plugin {
     }
 
     async onunload() {
-      console.log('Unloading Linter plugin');
+      logInfo('Unloading plugin');
       this.app.workspace.offref(this.eventRef);
     }
 
@@ -131,6 +134,7 @@ export default class LinterPlugin extends Plugin {
         displayChanged: true,
         foldersToIgnore: [],
         linterLocale: 'system-default',
+        logLevel: log.levels.ERROR,
       };
       const data = await this.loadData();
       const storedSettings = data || {};
@@ -161,7 +165,11 @@ export default class LinterPlugin extends Plugin {
       if (Object.prototype.hasOwnProperty.call(storedSettings, 'linterLocale')) {
         this.settings.linterLocale = storedSettings.linterLocale;
       }
+      if (Object.prototype.hasOwnProperty.call(storedSettings, 'logLevel')) {
+        this.settings.logLevel = storedSettings.logLevel;
+      }
 
+      setLogLevel(this.settings.logLevel);
       this.setOrUpdateMomentInstance();
     }
     async saveSettings() {
@@ -214,7 +222,7 @@ export default class LinterPlugin extends Plugin {
           }, rule.getOptions(this.settings));
 
         if (options[rule.enabledOptionName()]) {
-          // console.log(`Running ${rule.name}`);
+          logDebug(`Running ${rule.name}`);
           newText = rule.apply(newText, options);
         }
       }
@@ -265,8 +273,8 @@ export default class LinterPlugin extends Plugin {
             } else {
               new Notice('An error occurred during linting. See console for details');
             }
-            console.log(`Linting error in file: ${file.path}`);
-            console.error(error);
+
+            logError(`Lint All Files Error in File '${file.path}'`, error);
 
             numberOfErrors+=1;
           }
@@ -281,7 +289,7 @@ export default class LinterPlugin extends Plugin {
     }
 
     async runLinterAllFilesInFolder(folder: TFolder) {
-      console.log('Linting folder ' + folder.name);
+      logInfo('Linting folder ' + folder.name);
 
       let numberOfErrors = 0;
       let lintedFiles = 0;
@@ -295,8 +303,8 @@ export default class LinterPlugin extends Plugin {
             } else {
               new Notice('An error occurred during linting. See console for details');
             }
-            console.log(`Linting error in file: ${file.path}`);
-            console.error(error);
+
+            logError(`Lint All Files in Folder Error in File '${file.path}'`, error);
 
             numberOfErrors+=1;
           }
@@ -326,7 +334,7 @@ export default class LinterPlugin extends Plugin {
     }
 
     runLinterEditor(editor: Editor) {
-      console.log('running linter');
+      logInfo('Running linter');
 
       const file = this.app.workspace.getActiveFile();
       const oldText = editor.getValue();
@@ -338,8 +346,9 @@ export default class LinterPlugin extends Plugin {
           new Notice('There is an error in the YAML ' + error.mark);
         } else {
           new Notice('An error occurred during linting. See console for details');
-          console.error(error);
         }
+
+        logError(`Lint File Error in File '${file.path}'`, error);
       }
 
       // Replace changed lines
@@ -391,9 +400,7 @@ export default class LinterPlugin extends Plugin {
       }
 
       const currentLocale = moment.locale(momentLocale);
-      console.debug(
-          `[Obsidian Linter] Trying to switch Moment.js global locale to ${momentLocale}. got ${currentLocale}`,
-      );
+      logDebug(`Trying to switch Moment.js global locale to ${momentLocale}, got ${currentLocale}`);
 
       this.momentInstance = moment;
     }
@@ -599,18 +606,18 @@ class LintConfirmationModal extends Modal {
     this.contentEl.createDiv('modal-button-container', (buttonsEl) => {
       buttonsEl.createEl('button', {text: 'Cancel'}).addEventListener('click', () => this.close());
 
-      const btnSumbit = buttonsEl.createEl('button', {
+      const btnSubmit = buttonsEl.createEl('button', {
         attr: {type: 'submit'},
         cls: 'mod-cta',
         text: submitBtnText,
       });
-      btnSumbit.addEventListener('click', async (e) => {
+      btnSubmit.addEventListener('click', async (e) => {
         new Notice(submitBtnNoticeText);
         this.close();
         await btnSubmitAction();
       });
       setTimeout(() => {
-        btnSumbit.focus();
+        btnSubmit.focus();
       }, 50);
     });
   }
