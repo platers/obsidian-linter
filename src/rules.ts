@@ -36,6 +36,7 @@ export interface LinterSettings {
   displayChanged: boolean;
   foldersToIgnore: string[];
   linterLocale: string;
+  logLevel: number;
 }
 /* eslint-disable no-unused-vars */
 enum RuleType {
