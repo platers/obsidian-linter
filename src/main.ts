@@ -1,13 +1,39 @@
 import {App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
 import {LinterSettings, Options, rules, getDisabledRules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
-import moment from 'moment';
 import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils';
 
+// https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
+const langToMomentLocale = {
+  'en': 'en-gb',
+  'zh': 'zh-cn',
+  'zh-TW': 'zh-tw',
+  'ru': 'ru',
+  'ko': 'ko',
+  'it': 'it',
+  'id': 'id',
+  'ro': 'ro',
+  'pt-BR': 'pt-br',
+  'cz': 'cs',
+  'da': 'da',
+  'de': 'de',
+  'es': 'es',
+  'fr': 'fr',
+  'no': 'nn',
+  'pl': 'pl',
+  'pt': 'pt',
+  'tr': 'tr',
+  'hi': 'hi',
+  'nl': 'nl',
+  'ar': 'ar',
+  'ja': 'ja',
+};
+
 export default class LinterPlugin extends Plugin {
     settings: LinterSettings;
+    public momentInstance: any;
     private eventRef: EventRef;
 
     async onload() {
@@ -104,6 +130,7 @@ export default class LinterPlugin extends Plugin {
         lintOnSave: false,
         displayChanged: true,
         foldersToIgnore: [],
+        linterLocale: 'system-default',
       };
       const data = await this.loadData();
       const storedSettings = data || {};
@@ -131,6 +158,11 @@ export default class LinterPlugin extends Plugin {
       if (Object.prototype.hasOwnProperty.call(storedSettings, 'foldersToIgnore')) {
         this.settings.foldersToIgnore = storedSettings.foldersToIgnore;
       }
+      if (Object.prototype.hasOwnProperty.call(storedSettings, 'linterLocale')) {
+        this.settings.linterLocale = storedSettings.linterLocale;
+      }
+
+      this.setOrUpdateMomentInstance();
     }
     async saveSettings() {
       await this.saveData(this.settings);
@@ -175,9 +207,10 @@ export default class LinterPlugin extends Plugin {
 
         const options: Options =
           Object.assign({
-            'metadata: file created time': moment(file.stat.ctime).format(),
-            'metadata: file modified time': moment(file.stat.mtime).format(),
+            'metadata: file created time': this.momentInstance(file.stat.ctime).format(),
+            'metadata: file modified time': this.momentInstance(file.stat.mtime).format(),
             'metadata: file name': file.basename,
+            'moment': this.momentInstance,
           }, rule.getOptions(this.settings));
 
         if (options[rule.enabledOptionName()]) {
@@ -190,10 +223,12 @@ export default class LinterPlugin extends Plugin {
       const yaml_timestamp_rule = rules.find((rule) => rule.alias() === 'yaml-timestamp');
       const yaml_timestamp_options: Options =
       Object.assign({
-        'metadata: file created time': moment(file.stat.ctime).format(),
-        'metadata: file modified time': moment(file.stat.mtime).format(),
+        'metadata: file created time': this.momentInstance(file.stat.ctime).format(),
+        'metadata: file modified time': this.momentInstance(file.stat.mtime).format(),
         'metadata: file name': file.basename,
+        'Current Time': this.momentInstance(),
         'Already Modified': oldText != newText,
+        'moment': this.momentInstance,
       }, yaml_timestamp_rule.getOptions(this.settings));
       if (yaml_timestamp_options[yaml_timestamp_rule.enabledOptionName()]) {
         newText = yaml_timestamp_rule.apply(newText, yaml_timestamp_options);
@@ -338,6 +373,31 @@ export default class LinterPlugin extends Plugin {
       this.displayChangedMessage(charsAdded, charsRemoved);
     }
 
+    // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
+    setOrUpdateMomentInstance() {
+      // loading moment as follows allows for updating the locale while using moment directly has issues loading the locale
+      const {moment} = window;
+
+      const obsidianLang: string = localStorage.getItem('language') || 'en';
+      const systemLang = navigator.language?.toLowerCase();
+
+      let momentLocale = langToMomentLocale[obsidianLang as keyof typeof langToMomentLocale];
+
+      if (this.settings.linterLocale !== 'system-default') {
+        momentLocale = this.settings.linterLocale;
+      } else if (systemLang.startsWith(obsidianLang)) {
+        // If the system locale is more specific (en-gb vs en), use the system locale.
+        momentLocale = systemLang;
+      }
+
+      const currentLocale = moment.locale(momentLocale);
+      console.debug(
+          `[Obsidian Linter] Trying to switch Moment.js global locale to ${momentLocale}. got ${currentLocale}`,
+      );
+
+      this.momentInstance = moment;
+    }
+
     private displayChangedMessage(charsAdded: number, charsRemoved: number) {
       if (this.settings.displayChanged) {
         const message = dedent`
@@ -479,6 +539,8 @@ class SettingTab extends PluginSettingTab {
                 });
           });
 
+      this.addLocaleOverrideSetting();
+
       let prevSection = '';
 
       for (const rule of rules) {
@@ -495,6 +557,29 @@ class SettingTab extends PluginSettingTab {
           option.display(containerEl, this.plugin.settings, this.plugin);
         }
       }
+    }
+
+    addLocaleOverrideSetting(): void {
+      const {moment} = window;
+      const sysLocale = navigator.language?.toLowerCase();
+
+      new Setting(this.containerEl)
+          .setName('Override locale:')
+          .setDesc(
+              'Set this if you want to use a locale different from the default',
+          )
+          .addDropdown((dropdown) => {
+            dropdown.addOption('system-default', `Same as system (${sysLocale})`);
+            moment.locales().forEach((locale) => {
+              dropdown.addOption(locale, locale);
+            });
+            dropdown.setValue(this.plugin.settings.linterLocale);
+            dropdown.onChange(async (value) => {
+              this.plugin.settings.linterLocale = value;
+              this.plugin.setOrUpdateMomentInstance();
+              await this.plugin.saveSettings();
+            });
+          });
     }
 }
 

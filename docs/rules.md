@@ -133,7 +133,7 @@ After:
 ```markdown
 ---
 date created: Wednesday, January 1st 2020, 12:00:00 am
-date modified: Thursday, January 2nd 2020, 12:00:00 am
+date modified: Thursday, January 2nd 2020, 12:00:05 am
 ---
 # H1
 ```
@@ -149,7 +149,7 @@ After:
 
 ```markdown
 ---
-date modified: Wednesday, January 1st 2020, 12:00:00 am
+date modified: Thursday, January 2nd 2020, 12:00:05 am
 ---
 # H1
 ```
@@ -181,7 +181,7 @@ After:
 
 ```markdown
 ---
-modified: Wednesday, January 1st 2020, 12:00:00 am
+modified: Wednesday, January 1st 2020, 4:00:00 pm
 ---
 # H1
 ```

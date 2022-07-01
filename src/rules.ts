@@ -35,6 +35,7 @@ export interface LinterSettings {
   lintOnSave: boolean;
   displayChanged: boolean;
   foldersToIgnore: string[];
+  linterLocale: string;
 }
 /* eslint-disable no-unused-vars */
 enum RuleType {
@@ -1401,10 +1402,14 @@ export const rules: Rule[] = [
           const created_key_match = new RegExp(created_key_match_str);
           const created_match = new RegExp(created_match_str);
 
+          const moment = options['moment'];
+
           if (options['Date Created'] === true) {
-            const formatted_date = moment(
+            const created_date = moment(
                 options['metadata: file created time'],
-            ).format(options['Format']);
+            );
+
+            const formatted_date = created_date.format(options['Format']);
             const created_date_line = `\n${options['Date Created Key']}: ${formatted_date}`;
 
             const keyWithValueFound = created_match.test(text);
@@ -1424,6 +1429,16 @@ export const rules: Rule[] = [
               );
 
               textModified = true;
+            } else if (keyWithValueFound) {
+              const createdDateTime = moment(text.match(created_match)[0].replace(options['Date Created Key'] + ':', '').trim(), options['Format'], true);
+              if (createdDateTime == undefined || !createdDateTime.isValid()) {
+                text = text.replace(
+                    created_match,
+                    escapeDollarSigns(created_date_line) + '\n',
+                );
+
+                textModified = true;
+              }
             }
           }
 
@@ -1433,17 +1448,25 @@ export const rules: Rule[] = [
             const modified_key_match = new RegExp(modified_key_match_str);
             const modified_match = new RegExp(modified_match_str);
 
-            const formatted_date = moment(
+            const modified_date = moment(
                 options['metadata: file modified time'],
-            ).format(options['Format']);
-            const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_date}`;
+            );
+            // using the current time helps prevent issues where the previous modified time was greater
+            // than 5 seconds prior to the time the linter will finish with the file (i.e. helps prevent accidental infinite loops on updating the date modified value)
+            const formatted_modified_date = options['Current Time'].format(options['Format']);
+            const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_modified_date}`;
 
             const keyWithValueFound = modified_match.test(text);
-            if (keyWithValueFound && textModified) {
-              text = text.replace(
-                  modified_match,
-                  escapeDollarSigns(modified_date_line) + '\n',
-              );
+            if (keyWithValueFound) {
+              const modifiedDateTime = moment(text.match(modified_match)[0].replace(options['Date Modified Key'] + ':', '').trim(), options['Format'], true);
+              if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() ||
+                  Math.abs(modifiedDateTime.diff(modified_date, 'seconds')) > 5
+              ) {
+                text = text.replace(
+                    modified_match,
+                    escapeDollarSigns(modified_date_line) + '\n',
+                );
+              }
             } else if (modified_key_match.test(text)) {
               text = text.replace(
                   modified_key_match,
@@ -1467,14 +1490,16 @@ export const rules: Rule[] = [
             dedent`
         ---
         date created: Wednesday, January 1st 2020, 12:00:00 am
-        date modified: Thursday, January 2nd 2020, 12:00:00 am
+        date modified: Thursday, January 2nd 2020, 12:00:05 am
         ---
         # H1
         `,
             {
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
               'metadata: file modified time': '2020-01-02T00:00:00-00:00',
+              'Current Time': moment('Thursday, January 2nd 2020, 12:00:05 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
               'Already Modified': false,
+              'moment': moment,
             },
         ),
         new Example(
@@ -1484,7 +1509,7 @@ export const rules: Rule[] = [
         `,
             dedent`
         ---
-        date modified: Wednesday, January 1st 2020, 12:00:00 am
+        date modified: Thursday, January 2nd 2020, 12:00:05 am
         ---
         # H1
         `,
@@ -1492,7 +1517,9 @@ export const rules: Rule[] = [
               'Date Created': false,
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
               'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+              'Current Time': moment('Thursday, January 2nd 2020, 12:00:05 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
               'Already Modified': false,
+              'moment': moment,
             },
         ),
         new Example(
@@ -1511,7 +1538,9 @@ export const rules: Rule[] = [
               'Date Modified': false,
               'Date Created Key': 'created',
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
+              'Current Time': moment('Thursday, January 2nd 2020, 12:00:03 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
               'Already Modified': false,
+              'moment': moment,
             },
         ),
         new Example(
@@ -1521,7 +1550,7 @@ export const rules: Rule[] = [
             `,
             dedent`
         ---
-        modified: Wednesday, January 1st 2020, 12:00:00 am
+        modified: Wednesday, January 1st 2020, 4:00:00 pm
         ---
         # H1
         `,
@@ -1530,12 +1559,18 @@ export const rules: Rule[] = [
               'Date Modified': true,
               'Date Modified Key': 'modified',
               'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+              'Current Time': moment('Wednesday, January 1st 2020, 4:00:00 pm', 'dddd, MMMM Do YYYY, h:mm:ss a'),
               'Already Modified': false,
+              'moment': moment,
             },
         ),
       ],
       [
-        new BooleanOption('Date Created', 'Insert the file creation date', true),
+        new BooleanOption(
+            'Date Created',
+            'Insert the file creation date',
+            true,
+        ),
         new TextOption(
             'Date Created Key',
             'Which YAML key to use for creation date',
