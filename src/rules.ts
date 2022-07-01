@@ -1451,14 +1451,15 @@ export const rules: Rule[] = [
             const modified_date = moment(
                 options['metadata: file modified time'],
             );
-            const formatted_modified_date = modified_date.format(options['Format']);
+            // using the current time helps prevent issues where the previous modified time was greater
+            // than 5 seconds prior to the time the linter will finish with the file (i.e. helps prevent accidental infinite loops on updating the date modified value)
+            const formatted_modified_date = options['Current Time'].format(options['Format']);
             const modified_date_line = `\n${options['Date Modified Key']}: ${formatted_modified_date}`;
 
             const keyWithValueFound = modified_match.test(text);
             if (keyWithValueFound) {
               const modifiedDateTime = moment(text.match(modified_match)[0].replace(options['Date Modified Key'] + ':', '').trim(), options['Format'], true);
-              if (options['Always Update Date Modified'] || textModified ||
-                  modifiedDateTime == undefined || !modifiedDateTime.isValid() ||
+              if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() ||
                   Math.abs(modifiedDateTime.diff(modified_date, 'seconds')) > 5
               ) {
                 text = text.replace(
@@ -1489,13 +1490,14 @@ export const rules: Rule[] = [
             dedent`
         ---
         date created: Wednesday, January 1st 2020, 12:00:00 am
-        date modified: Thursday, January 2nd 2020, 12:00:00 am
+        date modified: Thursday, January 2nd 2020, 12:00:05 am
         ---
         # H1
         `,
             {
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
               'metadata: file modified time': '2020-01-02T00:00:00-00:00',
+              'Current Time': moment('Thursday, January 2nd 2020, 12:00:05 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
               'Already Modified': false,
               'moment': moment,
             },
@@ -1507,7 +1509,7 @@ export const rules: Rule[] = [
         `,
             dedent`
         ---
-        date modified: Wednesday, January 1st 2020, 12:00:00 am
+        date modified: Thursday, January 2nd 2020, 12:00:05 am
         ---
         # H1
         `,
@@ -1515,6 +1517,7 @@ export const rules: Rule[] = [
               'Date Created': false,
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
               'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+              'Current Time': moment('Thursday, January 2nd 2020, 12:00:05 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
               'Already Modified': false,
               'moment': moment,
             },
@@ -1535,6 +1538,7 @@ export const rules: Rule[] = [
               'Date Modified': false,
               'Date Created Key': 'created',
               'metadata: file created time': '2020-01-01T00:00:00-00:00',
+              'Current Time': moment('Thursday, January 2nd 2020, 12:00:03 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
               'Already Modified': false,
               'moment': moment,
             },
@@ -1546,7 +1550,7 @@ export const rules: Rule[] = [
             `,
             dedent`
         ---
-        modified: Wednesday, January 1st 2020, 12:00:00 am
+        modified: Wednesday, January 1st 2020, 4:00:00 pm
         ---
         # H1
         `,
@@ -1555,6 +1559,7 @@ export const rules: Rule[] = [
               'Date Modified': true,
               'Date Modified Key': 'modified',
               'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+              'Current Time': moment('Wednesday, January 1st 2020, 4:00:00 pm', 'dddd, MMMM Do YYYY, h:mm:ss a'),
               'Already Modified': false,
               'moment': moment,
             },
@@ -1585,11 +1590,6 @@ export const rules: Rule[] = [
             'Format',
             'Date format',
             'dddd, MMMM Do YYYY, h:mm:ss a',
-        ),
-        new BooleanOption(
-            'Always Update Date Modified',
-            'Insert the date the file was last modified even if no changes have been made.\n Note: almost always updates the file when seconds are in the date format since we use the last time the file was modified which is not the same after we update the file with the previous date modified metadata.',
-            false,
         ),
       ],
   ),

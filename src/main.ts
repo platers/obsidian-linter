@@ -226,6 +226,7 @@ export default class LinterPlugin extends Plugin {
         'metadata: file created time': this.momentInstance(file.stat.ctime).format(),
         'metadata: file modified time': this.momentInstance(file.stat.mtime).format(),
         'metadata: file name': file.basename,
+        'Current Time': this.momentInstance(),
         'Already Modified': oldText != newText,
         'moment': this.momentInstance,
       }, yaml_timestamp_rule.getOptions(this.settings));

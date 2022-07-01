@@ -119,9 +119,6 @@ Options:
 	- Default: `date modified`
 - Format: Date format
 	- Default: `dddd, MMMM Do YYYY, h:mm:ss a`
-- Always Update Date Modified: Insert the date the file was last modified even if no changes have been made.
- Note: almost always updates the file when seconds are in the date format since we use the last time the file was modified which is not the same after we update the file with the previous date modified metadata.
-	- Default: `false`
 
 Example: Adds a header with the date.
 
@@ -136,7 +133,7 @@ After:
 ```markdown
 ---
 date created: Wednesday, January 1st 2020, 12:00:00 am
-date modified: Thursday, January 2nd 2020, 12:00:00 am
+date modified: Thursday, January 2nd 2020, 12:00:05 am
 ---
 # H1
 ```
@@ -152,7 +149,7 @@ After:
 
 ```markdown
 ---
-date modified: Wednesday, January 1st 2020, 12:00:00 am
+date modified: Thursday, January 2nd 2020, 12:00:05 am
 ---
 # H1
 ```
@@ -184,7 +181,7 @@ After:
 
 ```markdown
 ---
-modified: Wednesday, January 1st 2020, 12:00:00 am
+modified: Wednesday, January 1st 2020, 4:00:00 pm
 ---
 # H1
 ```

@@ -609,6 +609,7 @@ describe('yaml timestamp', () => {
       'Date Modified': true,
       'Date Modified Key': 'modified',
       'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+      'Current Time': moment('Thursday, January 2nd 2020, 12:00:00 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       'Already Modified': false,
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
@@ -631,7 +632,8 @@ describe('yaml timestamp', () => {
       'Date Created': false,
       'Date Modified': true,
       'Date Modified Key': 'modified',
-      'metadata: file modified time': '2020-01-02T00:00:00-00:00',
+      'metadata: file modified time': '2020-01-02T00:00:03-00:00',
+      'Current Time': moment('Thursday, January 2nd 2020, 12:00:00 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'Already Modified': false,
       'moment': moment,
@@ -655,6 +657,7 @@ describe('yaml timestamp', () => {
       'Date Modified': true,
       'Date Modified Key': 'modified',
       'metadata: file modified time': '2020-01-01T00:00:00-00:00',
+      'Current Time': moment('Wednesday, January 1st 2020, 12:00:00 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       'Format': 'dddd, MMMM Do YYYY',
       'Already Modified': false,
       'moment': moment,
@@ -677,7 +680,8 @@ describe('yaml timestamp', () => {
       'Date Created': false,
       'Date Modified': true,
       'Date Modified Key': 'modified',
-      'metadata: file modified time': '2020-02-01T00:00:00-00:00',
+      'metadata: file modified time': '2020-01-30T00:00:00-00:00',
+      'Current Time': moment('Saturday, February 1st 2020, 12:00:00 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       'Already Modified': true,
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
@@ -692,7 +696,7 @@ describe('yaml timestamp', () => {
     `;
     const after = dedent`
     ---
-    modified: samedi, février 1er 2020, 12:00:00 am
+    modified: samedi, février 1er 2020, 12:00:05 am
     ---
     `;
 
@@ -702,6 +706,7 @@ describe('yaml timestamp', () => {
       'Date Modified': true,
       'Date Modified Key': 'modified',
       'metadata: file modified time': '2020-02-01T00:00:00-00:00',
+      'Current Time': moment('samedi, février 1er 2020, 12:00:05 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       'Already Modified': false,
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
@@ -717,7 +722,7 @@ describe('yaml timestamp', () => {
     `;
     const after = dedent`
     ---
-    modified: Thursday, January 2nd 2020, 12:00:00 am
+    modified: Thursday, January 2nd 2020, 12:00:05 am
     created: Wednesday, January 1st 2020, 12:00:00 am
     ---
     `;
@@ -729,6 +734,7 @@ describe('yaml timestamp', () => {
       'Date Modified Key': 'modified',
       'metadata: file created time': '2020-01-01T00:00:00-00:00',
       'metadata: file modified time': '2020-01-02T00:00:00-00:00',
+      'Current Time': moment('Thursday, January 2nd 2020, 12:00:05 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       'Already Modified': false,
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
@@ -755,8 +761,9 @@ describe('yaml timestamp', () => {
       'Date Created': false,
       'Date Modified': true,
       'Date Modified Key': 'modified',
-      'metadata: file modified time': '2020-02-01T00:00:00-00:00',
+      'metadata: file modified time': '2020-01-30T00:00:00-00:00',
       'Already Modified': false,
+      'Current Time': moment('Saturday, February 1st 2020, 12:00:00 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
     };
@@ -857,7 +864,7 @@ describe('yaml timestamp', () => {
     const after = dedent`
     ---
     tag: tag1
-    modified: Sunday, February 2nd 2020, 12:00:00 am
+    modified: Tuesday, February 4th 2020, 6:00:00 pm
     created: Wednesday, January 1st 2020, 12:00:00 am
     location: "path"
     ---
@@ -870,41 +877,9 @@ describe('yaml timestamp', () => {
       'Date Created Key': 'created',
       'metadata: file created time': '2020-01-01T00:00:00-00:00',
       'metadata: file modified time': '2020-02-02T00:00:00-00:00',
+      'Current Time': moment('Tuesday, February 4th 2020, 6:00:00 pm', 'dddd, MMMM Do YYYY, h:mm:ss a'),
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'Already Modified': false,
-      'moment': moment,
-    };
-    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
-  });
-
-  it('Updates modified value when nothing has changed if always update date modified setting is on', () => {
-    const before = dedent`
-    ---
-    tag: tag1
-    modified: Saturday, February 1st 2020, 12:00:00 am
-    created: Wednesday, January 1st 2020, 12:00:00 am
-    location: "path"
-    ---
-    `;
-    const after = dedent`
-    ---
-    tag: tag1
-    modified: Sunday, February 2nd 2020, 12:00:00 am
-    created: Wednesday, January 1st 2020, 12:00:00 am
-    location: "path"
-    ---
-    `;
-
-    const options = {
-      'Date Created': true,
-      'Date Modified': true,
-      'Date Modified Key': 'modified',
-      'Date Created Key': 'created',
-      'metadata: file created time': '2020-01-01T00:00:00-00:00',
-      'metadata: file modified time': '2020-02-02T00:00:00-00:00',
-      'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
-      'Already Modified': false,
-      'Always Update Date Modified': true,
       'moment': moment,
     };
     expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
