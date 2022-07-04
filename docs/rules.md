@@ -236,7 +236,7 @@ Alias: `yaml-title-alias`
 Inserts the title of the file into the YAML frontmatter's aliases section. Gets the title from the first H1 or filename.
 
 Options:
-- YAML aliases new property style: The style of the newly created aliases YAML property
+- YAML aliases new section style: The style of the newly created aliases YAML property
 	- Default: `Multi-line array`
 	- `Multi-line array`: ```aliases:\n  - Title```
 	- `Single-line array`: ```aliases: [Title]```

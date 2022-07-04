@@ -1682,7 +1682,7 @@ export const rules: Rule[] = [
 
         if (!aliasesMatch) {
           let emptyValue;
-          switch (options['YAML aliases new property style']) {
+          switch (options['YAML aliases new section style']) {
             case 'Multi-line array':
               emptyValue = '\n  - \'\'';
               break;
@@ -1693,7 +1693,7 @@ export const rules: Rule[] = [
               emptyValue = ' \'\'';
               break;
             default:
-              throw new Error(`Unsupported setting 'YAML aliases new property style': ${options['YAML aliases new property style']}`);
+              throw new Error(`Unsupported setting 'YAML aliases new section style': ${options['YAML aliases new section style']}`);
           }
 
           const newAliasesSection = `aliases:${emptyValue} ${linterMarkerComment}\n`;
@@ -1725,11 +1725,11 @@ export const rules: Rule[] = [
           resultAliasesArray = [title, ...resultAliasesArray];
         }
 
-        const resultPropertyStyle = isSingleString ? (hasLinterMarkerComment ? 'Single string' : options['YAML aliases new array style']) : (isMultiline ? 'Multi-line array' : 'Single-line array');
+        const resultStyle = isSingleString ? (hasLinterMarkerComment ? 'Single string' : options['YAML aliases new array style']) : (isMultiline ? 'Multi-line array' : 'Single-line array');
 
         let newAliasesYaml;
 
-        switch (resultPropertyStyle) {
+        switch (resultStyle) {
           case 'Multi-line array': {
             const tailArrayYaml = resultAliasesArray.length === 1 ? '' : `\n${toYamlString(resultAliasesArray.slice(1))}`.replace(/\n-/g, '\n  -');
             newAliasesYaml = `\n  - ${toYamlString(resultAliasesArray[0])} ${linterMarkerComment}${tailArrayYaml}`;
@@ -1742,7 +1742,7 @@ export const rules: Rule[] = [
             newAliasesYaml = ` ${toYamlString(resultAliasesArray[0])} ${linterMarkerComment}`;
             break;
           default:
-            throw new Error(`Unsupported resultPropertyStyle: ${resultPropertyStyle}`);
+            throw new Error(`Unsupported resultStyle: ${resultStyle}`);
         }
 
         text = text.replace(aliasesMatch[0], `aliases:${newAliasesYaml}\n`);
@@ -1763,7 +1763,7 @@ export const rules: Rule[] = [
       # Obsidian
       `,
             {
-              'YAML aliases new property style': 'Multi-line array',
+              'YAML aliases new section style': 'Multi-line array',
             },
         ),
         new Example(
@@ -1779,13 +1779,13 @@ export const rules: Rule[] = [
       `,
             {
               'metadata: file name': 'Filename',
-              'YAML aliases new property style': 'Multi-line array',
+              'YAML aliases new section style': 'Multi-line array',
             },
         ),
       ],
       [
         new DropdownOption(
-            'YAML aliases new property style',
+            'YAML aliases new section style',
             'The style of the newly created aliases YAML property',
             'Multi-line array',
             [
