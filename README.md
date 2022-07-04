@@ -85,6 +85,18 @@ Documentation for all rules can be found in the [rules docs](https://github.com/
 - [remove-link-spacing](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-link-spacing)
 
 
+## Installing
+
+As of version [0.9.7 of Obsidian](https://forum.obsidian.md/t/obsidian-release-v0-9-7-insider-build/7628), this plugin is available to be installed directly from within the app. The plugin can be found in the Community Plugins directory which can be accessed from the Settings pane under Third Party Plugins.
+
+## Manual installation
+
+1. Download the [latest release](https://github.com/platers/obsidian-linter/releases/latest)
+1. Extract the obsidian-linter folder from the zip to your vault's plugins folder: `<vault>/.obsidian/plugins/`  
+Note: On some machines the `.obsidian` folder may be hidden. On MacOS you should be able to press `Command+Shift+Dot` to show the folder in Finder.
+1. Reload Obsidian
+1. If prompted about Safe Mode, you can disable safe mode and enable the plugin.
+
 ## Development Instructions
 
 Pull requests are welcome, especially for new rules.
@@ -100,4 +112,14 @@ Pull requests are welcome, especially for new rules.
 5. Run `npm run compile` to build, generate documentation, and test the plugin.
 6. Run `npm run lint` to lint the plugin.
 
-Make sure to use Node 15.x or higher.
+_Make sure to use Node 15.x or higher._
+
+## Creating a Release
+
+In order to create a release, there are a couple of steps to go through:
+
+1. Update the version number in `versions.json`, `package.json`, and `manifest.json`.
+2. Once the version change is merged into master, go to the [releases tab](https://github.com/platers/obsidian-linter//releases/latest) and select draft a new release.
+3. Then you can type in the new tag which should be the version of the release (i.e. `1.3.4`) and have it create the tag on creation of the release.
+4. Auto fill the release using the option to "Generate release notes".
+5. Then attach the compiled `main.js` and `manifest.json` to the release before publishing the release.
