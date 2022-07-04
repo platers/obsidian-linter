@@ -490,6 +490,6 @@ export function loadYAML(yaml_text: string): any {
   return parsed_yaml;
 }
 
-export function escapeYamlString(str: string): string {
-  return dump(str, {lineWidth: -1}).slice(0, -1);
+export function toYamlString(obj: any): string {
+  return dump(obj, {lineWidth: -1}).slice(0, -1);
 }

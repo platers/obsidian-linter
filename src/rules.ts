@@ -10,7 +10,7 @@ import {
   loadYAML,
   moveFootnotesToEnd,
   yamlRegex,
-  escapeYamlString,
+  toYamlString,
   makeEmphasisOrBoldConsistent,
   addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent,
   makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs,
@@ -1606,7 +1606,7 @@ export const rules: Rule[] = [
         });
         title = title || options['metadata: file name'];
 
-        title = escapeYamlString(title);
+        title = toYamlString(title);
 
         return formatYAML(text, (text) => {
           const title_match_str = `\n${options['Title Key']}.*\n`;
@@ -1656,6 +1656,87 @@ export const rules: Rule[] = [
         ),
       ],
       [new TextOption('Title Key', 'Which YAML key to use for title', 'title')],
+  ),
+
+  new Rule(
+      'YAML Title Alias',
+      'Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
+      RuleType.YAML,
+      (text: string, options = {}) => {
+        text = initYAML(text);
+        let title = ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
+          const result = text.match(/^#\s+(.*)/m);
+          if (result) {
+            return result[1];
+          }
+          return '';
+        });
+        title = title || options['metadata: file name'];
+
+        title = toYamlString(title);
+
+        const yaml = text.match(yamlRegex)[1];
+
+        const oldYamlTitleAliasResult = yaml.match(/ {2}# linter-yaml-title-alias\n {2}- .+?\n/);
+
+        if (oldYamlTitleAliasResult) {
+          text = text.replace(oldYamlTitleAliasResult[0], `  # linter-yaml-title-alias\n  - ${title}\n`);
+        } else {
+          const parsedYaml = loadYAML(yaml);
+
+          if (!parsedYaml.aliases) {
+            parsedYaml.aliases = [];
+          }
+
+          if (typeof parsedYaml.aliases === 'string') {
+            parsedYaml.aliases = [parsedYaml.aliases];
+          }
+
+          parsedYaml.aliases = [title, ...parsedYaml.aliases];
+
+          const newYaml = toYamlString(parsedYaml);
+          text = text.replace(`---\n${yaml}---`, `---\n${newYaml}\n---`);
+          text = text.replace('\naliases:\n  -', '\naliases:\n  # linter-yaml-title-alias\n  -');
+        }
+
+        return text;
+      },
+      [
+        new Example(
+            'Adds a header with the title from heading.',
+            dedent`
+      # Obsidian
+      `,
+            dedent`
+      ---
+      aliases:
+        # linter-yaml-title-alias
+        - Obsidian
+      ---
+      # Obsidian
+      `,
+            {
+              'metadata: file name': 'Filename',
+            },
+        ),
+        new Example(
+            'Adds a header with the title.',
+            dedent`
+      `,
+            dedent`
+      ---
+      aliases:
+        # linter-yaml-title-alias
+        - Filename
+      ---
+
+      `,
+            {
+              'metadata: file name': 'Filename',
+            },
+        ),
+      ],
+      [],
   ),
 
   new Rule(

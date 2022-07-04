@@ -1205,6 +1205,91 @@ describe('YAML Title', () => {
   });
 });
 
+describe('YAML Title Alias', () => {
+  it('Creates aliases if missing', () => {
+    const before = dedent`
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      # linter-yaml-title-alias
+      - Title
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
+
+  it('Converts single string alias to array', () => {
+    const before = dedent`
+    ---
+    aliases: other alias
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      # linter-yaml-title-alias
+      - Title
+      - other alias
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
+
+  it('Converts array in brackets into multiline array', () => {
+    const before = dedent`
+    ---
+    aliases: [alias1, alias2, alias3]
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      # linter-yaml-title-alias
+      - Title
+      - alias1
+      - alias2
+      - alias3
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
+
+  it('Updates changed alias', () => {
+    const before = dedent`
+    ---
+    aliases:
+      # linter-yaml-title-alias
+      - Old Title
+    ---
+    # New Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      # linter-yaml-title-alias
+      - New Title
+    ---
+    # New Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
+});
+
 describe('Links', () => {
   it('Regular link with spaces stays the same', () => {
     const before = dedent`

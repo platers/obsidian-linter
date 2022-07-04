@@ -229,6 +229,51 @@ title: Filename
 
 ```
 
+### YAML Title Alias
+
+Alias: `yaml-title-alias`
+
+Inserts the title of the file into the YAML frontmatter's aliases section. Gets the title from the first H1 or filename.
+
+
+
+Example: Adds a header with the title from heading.
+
+Before:
+
+```markdown
+# Obsidian
+```
+
+After:
+
+```markdown
+---
+aliases:
+  # linter-yaml-title-alias
+  - Obsidian
+---
+# Obsidian
+```
+Example: Adds a header with the title.
+
+Before:
+
+```markdown
+
+```
+
+After:
+
+```markdown
+---
+aliases:
+  # linter-yaml-title-alias
+  - Filename
+---
+
+```
+
 ### Escape YAML Special Characters
 
 Alias: `escape-yaml-special-characters`
