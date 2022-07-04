@@ -2677,7 +2677,7 @@ export const rules: Rule[] = [
           This is a fullwidth left parenthesis （ \twith text after it.
           This is a fullwidth right parenthesis ）  with text after it.
           This is a fullwidth opening double quote\t \t“  with text after it.
-          This is a fullwidth opening single ”  \twith text after it.
+          This is a fullwidth closing double quote ”  \twith text after it.
           This is a fullwidth colon ：  with text after it.
           This is a fullwidth semicolon ；  with text after it.
       `,
@@ -2687,7 +2687,7 @@ export const rules: Rule[] = [
           This is a fullwidth left parenthesis（with text after it.
           This is a fullwidth right parenthesis）with text after it.
           This is a fullwidth opening double quote“with text after it.
-          This is a fullwidth opening single”with text after it.
+          This is a fullwidth closing double quote”with text after it.
           This is a fullwidth colon：with text after it.
           This is a fullwidth semicolon；with text after it.
       `,
