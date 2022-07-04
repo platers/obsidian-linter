@@ -1747,6 +1747,42 @@ After:
 #标签A #标签2标签
 ```
 
+### Remove Space around Chinese Punctuation
+
+Alias: `remove-space-around-chinese-punctuation`
+
+Ensures that Chinese/fullwidth punctuation is not followed by whitespace (either single spaces or a tab)
+
+
+
+Example: Remove Spaces and Tabs around Fullwidth Punctuation
+
+Before:
+
+```markdown
+This is a fullwidth period	 。 with text after it.
+This is a fullwidth comma	，  with text after it.
+This is a fullwidth left parenthesis （ 	with text after it.
+This is a fullwidth right parenthesis ）  with text after it.
+This is a fullwidth opening double quote	 	“  with text after it.
+This is a fullwidth opening single ”  	with text after it.
+This is a fullwidth colon ：  with text after it.
+This is a fullwidth semicolon ；  with text after it.
+```
+
+After:
+
+```markdown
+This is a fullwidth period。with text after it.
+This is a fullwidth comma，with text after it.
+This is a fullwidth left parenthesis（with text after it.
+This is a fullwidth right parenthesis）with text after it.
+This is a fullwidth opening double quote“with text after it.
+This is a fullwidth opening single”with text after it.
+This is a fullwidth colon：with text after it.
+This is a fullwidth semicolon；with text after it.
+```
+
 ### Remove link spacing
 
 Alias: `remove-link-spacing`

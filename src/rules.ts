@@ -2369,6 +2369,42 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
+      'Remove Space around Chinese Punctuation',
+      'Ensures that Chinese/fullwidth punctuation is not followed by whitespace (either single spaces or a tab)',
+      RuleType.SPACING,
+      (text: string) => {
+        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
+          return text.replace(/([ \t])+([\u3002\uFF08\uFF0C\uFF09\u201C\u201D\uFF1A\uFF1B])/g, '$2').replace(/([\u3002\uFF08\uFF0C\uFF09\u201C\u201D\uFF1A\uFF1B])([ \t])+/g, '$1');
+        });
+      },
+      [
+
+        new Example(
+            'Remove Spaces and Tabs around Fullwidth Punctuation',
+            dedent`
+          This is a fullwidth period\t 。 with text after it.
+          This is a fullwidth comma\t，  with text after it.
+          This is a fullwidth left parenthesis （ \twith text after it.
+          This is a fullwidth right parenthesis ）  with text after it.
+          This is a fullwidth opening double quote\t \t“  with text after it.
+          This is a fullwidth opening single ”  \twith text after it.
+          This is a fullwidth colon ：  with text after it.
+          This is a fullwidth semicolon ；  with text after it.
+      `,
+            dedent`
+          This is a fullwidth period。with text after it.
+          This is a fullwidth comma，with text after it.
+          This is a fullwidth left parenthesis（with text after it.
+          This is a fullwidth right parenthesis）with text after it.
+          This is a fullwidth opening double quote“with text after it.
+          This is a fullwidth opening single”with text after it.
+          This is a fullwidth colon：with text after it.
+          This is a fullwidth semicolon；with text after it.
+      `,
+        ),
+      ],
+  ),
+  new Rule(
       'Remove link spacing',
       'Removes spacing around link text.',
       RuleType.SPACING,
