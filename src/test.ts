@@ -1288,6 +1288,23 @@ describe('YAML Title Alias', () => {
 
     expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
   });
+
+  it('Titles is colon are escaped', () => {
+    const before = dedent`
+    # Title: With Colon
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      # linter-yaml-title-alias
+      - 'Title: With Colon'
+    ---
+    # Title: With Colon
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
 });
 
 describe('Links', () => {

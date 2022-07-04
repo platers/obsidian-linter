@@ -1673,8 +1673,6 @@ export const rules: Rule[] = [
         });
         title = title || options['metadata: file name'];
 
-        title = toYamlString(title);
-
         const yaml = text.match(yamlRegex)[1];
 
         const oldYamlTitleAliasResult = yaml.match(/ {2}# linter-yaml-title-alias\n {2}- .+?\n/);
