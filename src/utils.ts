@@ -493,3 +493,7 @@ export function loadYAML(yaml_text: string): any {
 export function toYamlString(obj: any): string {
   return dump(obj, {lineWidth: -1}).slice(0, -1);
 }
+
+export function toSingleLineArrayYamlString<T>(arr: T[]): string {
+  return dump(arr, {flowLevel: 0}).slice(0, -1);
+}

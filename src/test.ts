@@ -1206,7 +1206,7 @@ describe('YAML Title', () => {
 });
 
 describe('YAML Title Alias', () => {
-  it('Creates aliases if missing', () => {
+  it('Creates multi-line array aliases when missing', () => {
     const before = dedent`
     # Title
     `;
@@ -1214,8 +1214,61 @@ describe('YAML Title Alias', () => {
     const after = dedent`
     ---
     aliases:
-      # linter-yaml-title-alias
-      - Title
+      - Title # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new property style': 'Multi-line array'})).toBe(after);
+  });
+
+  it('Creates single-line array aliases when missing', () => {
+    const before = dedent`
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: [Title] # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new property style': 'Single-line array'})).toBe(after);
+  });
+
+  it('Creates single string alias when missing', () => {
+    const before = dedent`
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: Title # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new property style': 'Single string'})).toBe(after);
+  });
+
+  it('Updates first alias in multi-line array', () => {
+    const before = dedent`
+    ---
+    aliases:
+      - alias1 # linter-yaml-title-alias
+      - alias2
+      - alias3
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      - Title # linter-yaml-title-alias
+      - alias2
+      - alias3
     ---
     # Title
     `;
@@ -1223,7 +1276,86 @@ describe('YAML Title Alias', () => {
     expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
   });
 
-  it('Converts single string alias to array', () => {
+  it('Adds before first alias in multi-line array', () => {
+    const before = dedent`
+    ---
+    aliases:
+      - alias1
+      - alias2
+      - alias3
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      - Title # linter-yaml-title-alias
+      - alias1
+      - alias2
+      - alias3
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
+
+  it('Updates first alias in single-line array', () => {
+    const before = dedent`
+    ---
+    aliases: [alias1, alias2, alias3] # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: [Title, alias2, alias3] # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
+
+  it('Adds before first alias in single-line array', () => {
+    const before = dedent`
+    ---
+    aliases: [alias1, alias2, alias3]
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: [Title, alias1, alias2, alias3] # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
+
+  it('Updates single string aliase', () => {
+    const before = dedent`
+    ---
+    aliases: other alias # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: Title # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
+
+  it('Changes single string aliases to multi-line array when adding', () => {
     const before = dedent`
     ---
     aliases: other alias
@@ -1234,102 +1366,47 @@ describe('YAML Title Alias', () => {
     const after = dedent`
     ---
     aliases:
-      # linter-yaml-title-alias
-      - Title
+      - Title # linter-yaml-title-alias
       - other alias
     ---
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new array style': 'Multi-line array'})).toBe(after);
   });
 
-  it('Adds title before existing aliases array', () => {
+  it('Changes single string aliases to single-line array when adding', () => {
     const before = dedent`
     ---
-    aliases:
-      - alias1
-      - alias2
-      - alias3
+    aliases: other alias
     ---
     # Title
     `;
 
     const after = dedent`
     ---
-    aliases:
-      # linter-yaml-title-alias
-      - Title
-      - alias1
-      - alias2
-      - alias3
+    aliases: [Title, other alias] # linter-yaml-title-alias
     ---
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new array style': 'Single-line array'})).toBe(after);
   });
 
-  it('Converts array in brackets into multiline array', () => {
+  it('Titles with special characters are escaped', () => {
     const before = dedent`
-    ---
-    aliases: [alias1, alias2, alias3]
-    ---
-    # Title
+    # Title with: colon, 'quote', "single quote"
     `;
 
     const after = dedent`
     ---
     aliases:
-      # linter-yaml-title-alias
-      - Title
-      - alias1
-      - alias2
-      - alias3
+      - 'Title with: colon, ''quote'', "single quote"' # linter-yaml-title-alias
     ---
-    # Title
+    # Title with: colon, 'quote', "single quote"
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
-  });
-
-  it('Updates changed alias', () => {
-    const before = dedent`
-    ---
-    aliases:
-      # linter-yaml-title-alias
-      - Old Title
-    ---
-    # New Title
-    `;
-
-    const after = dedent`
-    ---
-    aliases:
-      # linter-yaml-title-alias
-      - New Title
-    ---
-    # New Title
-    `;
-
-    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
-  });
-
-  it('Titles is colon are escaped', () => {
-    const before = dedent`
-    # Title: With Colon
-    `;
-
-    const after = dedent`
-    ---
-    aliases:
-      # linter-yaml-title-alias
-      - 'Title: With Colon'
-    ---
-    # Title: With Colon
-    `;
-
-    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new property style': 'Multi-line array'})).toBe(after);
   });
 });
 

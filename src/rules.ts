@@ -15,6 +15,7 @@ import {
   addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent,
   makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs,
   removeSpacesInLinkText,
+  toSingleLineArrayYamlString,
 } from './utils';
 import {
   Option,
@@ -1673,29 +1674,72 @@ export const rules: Rule[] = [
         });
         title = title || options['metadata: file name'];
 
-        const yaml = text.match(yamlRegex)[1];
+        let yaml = text.match(yamlRegex)[1];
+        const aliasesRegex = /(?<=^|\n)aliases: *((?:.|\n)*?)\n(?=$|\S)/;
+        let aliasesMatch = yaml.match(aliasesRegex);
 
-        const oldYamlTitleAliasResult = yaml.match(/ {2}# linter-yaml-title-alias\n {2}- .+?\n/);
+        const linterMarkerComment = '# linter-yaml-title-alias';
 
-        if (oldYamlTitleAliasResult) {
-          text = text.replace(oldYamlTitleAliasResult[0], `  # linter-yaml-title-alias\n  - ${title}\n`);
-        } else {
-          const parsedYaml = loadYAML(yaml);
-
-          if (!parsedYaml.aliases) {
-            parsedYaml.aliases = [];
+        if (!aliasesMatch) {
+          let emptyValue;
+          switch (options['YAML aliases new property style']) {
+            case 'Multi-line array':
+              emptyValue = '\n  - \'\'';
+              break;
+            case 'Single-line array':
+              emptyValue = ' [\'\']';
+              break;
+            case 'Single string':
+              emptyValue = ' \'\'';
+              break;
+            default:
+              throw new Error(`Unsupported setting 'YAML aliases new property style': ${options['YAML aliases new property style']}`);
           }
 
-          if (typeof parsedYaml.aliases === 'string') {
-            parsedYaml.aliases = [parsedYaml.aliases];
-          }
-
-          parsedYaml.aliases = [title, ...parsedYaml.aliases];
-
-          const newYaml = toYamlString(parsedYaml);
-          text = text.replace(`---\n${yaml}---`, `---\n${newYaml}\n---`);
-          text = text.replace('\naliases:\n  -', '\naliases:\n  # linter-yaml-title-alias\n  -');
+          const newYaml = `aliases:${emptyValue} ${linterMarkerComment}\n${yaml}`;
+          text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
+          yaml = newYaml;
+          aliasesMatch = yaml.match(aliasesRegex);
         }
+
+        const aliasesValue = aliasesMatch[1];
+
+        const hasLinterMarkerComment = aliasesValue.includes(linterMarkerComment);
+
+        const isMultiline = aliasesValue.includes('\n');
+        const parsedAliases = loadYAML(aliasesValue);
+
+        const isSingleString = !isMultiline && aliasesValue.match(/^\[.*\]/) === null;
+
+        let resultAliasesArray = isSingleString ? [parsedAliases] : [...parsedAliases];
+
+        if (hasLinterMarkerComment) {
+          resultAliasesArray[0] = title;
+        } else {
+          resultAliasesArray = [title, ...resultAliasesArray];
+        }
+
+        const resultPropertyStyle = isSingleString ? (hasLinterMarkerComment ? 'Single string' : options['YAML aliases new array style']) : (isMultiline ? 'Multi-line array' : 'Single-line array');
+
+        let newAliasesYaml;
+
+        switch (resultPropertyStyle) {
+          case 'Multi-line array': {
+            const tailArrayYaml = resultAliasesArray.length === 1 ? '' : `\n${toYamlString(resultAliasesArray.slice(1))}`.replace(/\n-/g, '\n  -');
+            newAliasesYaml = `\n  - ${toYamlString(resultAliasesArray[0])} ${linterMarkerComment}${tailArrayYaml}`;
+            break;
+          }
+          case 'Single-line array':
+            newAliasesYaml = ` ${toSingleLineArrayYamlString(resultAliasesArray)} ${linterMarkerComment}`;
+            break;
+          case 'Single string':
+            newAliasesYaml = ` ${toYamlString(resultAliasesArray[0])} ${linterMarkerComment}`;
+            break;
+          default:
+            throw new Error(`Unsupported resultPropertyStyle: ${resultPropertyStyle}`);
+        }
+
+        text = text.replace(aliasesMatch[0], `aliases:${newAliasesYaml}\n`);
 
         return text;
       },
@@ -1708,13 +1752,12 @@ export const rules: Rule[] = [
             dedent`
       ---
       aliases:
-        # linter-yaml-title-alias
-        - Obsidian
+        - Obsidian # linter-yaml-title-alias
       ---
       # Obsidian
       `,
             {
-              'metadata: file name': 'Filename',
+              'YAML aliases new property style': 'Multi-line array',
             },
         ),
         new Example(
@@ -1724,17 +1767,52 @@ export const rules: Rule[] = [
             dedent`
       ---
       aliases:
-        # linter-yaml-title-alias
-        - Filename
+        - Filename # linter-yaml-title-alias
       ---
 
       `,
             {
               'metadata: file name': 'Filename',
+              'YAML aliases new property style': 'Multi-line array',
             },
         ),
       ],
-      [],
+      [
+        new DropdownOption(
+            'YAML aliases new property style',
+            'The style of the newly created aliases YAML property',
+            'Multi-line array',
+            [
+              new DropdownRecord(
+                  'Multi-line array',
+                  '```aliases:\\n  - Title```',
+              ),
+              new DropdownRecord(
+                  'Single-line array',
+                  '```aliases: [Title]```',
+              ),
+              new DropdownRecord(
+                  'Single string',
+                  '```aliases: Title```',
+              ),
+            ],
+        ),
+        new DropdownOption(
+            'YAML aliases new array style',
+            'The style of the aliases YAML property for newly created arrays',
+            'Multi-line array',
+            [
+              new DropdownRecord(
+                  'Multi-line array',
+                  '```aliases:\\n  - Title```',
+              ),
+              new DropdownRecord(
+                  'Single-line array',
+                  '```aliases: [Title]```',
+              ),
+            ],
+        ),
+      ],
   ),
 
   new Rule(

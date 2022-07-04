@@ -235,7 +235,16 @@ Alias: `yaml-title-alias`
 
 Inserts the title of the file into the YAML frontmatter's aliases section. Gets the title from the first H1 or filename.
 
-
+Options:
+- YAML aliases new property style: The style of the newly created aliases YAML property
+	- Default: `Multi-line array`
+	- `Multi-line array`: ```aliases:\n  - Title```
+	- `Single-line array`: ```aliases: [Title]```
+	- `Single string`: ```aliases: Title```
+- YAML aliases new array style: The style of the aliases YAML property for newly created arrays
+	- Default: `Multi-line array`
+	- `Multi-line array`: ```aliases:\n  - Title```
+	- `Single-line array`: ```aliases: [Title]```
 
 Example: Adds a header with the title from heading.
 
@@ -250,8 +259,7 @@ After:
 ```markdown
 ---
 aliases:
-  # linter-yaml-title-alias
-  - Obsidian
+  - Obsidian # linter-yaml-title-alias
 ---
 # Obsidian
 ```
@@ -268,8 +276,7 @@ After:
 ```markdown
 ---
 aliases:
-  # linter-yaml-title-alias
-  - Filename
+  - Filename # linter-yaml-title-alias
 ---
 
 ```
