@@ -1244,6 +1244,32 @@ describe('YAML Title Alias', () => {
     expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
   });
 
+  it('Adds title before existing aliases array', () => {
+    const before = dedent`
+    ---
+    aliases:
+      - alias1
+      - alias2
+      - alias3
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      # linter-yaml-title-alias
+      - Title
+      - alias1
+      - alias2
+      - alias3
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
+
   it('Converts array in brackets into multiline array', () => {
     const before = dedent`
     ---
