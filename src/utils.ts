@@ -190,6 +190,102 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
   return text;
 }
 
+/**
+ * Makes sure that paragraphs have a single new line before and after them.
+ * @param {string} text The text to make sure that paragraphs have only 1 new line before and after them
+ * @return {string} The text with paragraphs with a single new line before and after them.
+ */
+export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: string): string {
+  // added the placeholder for YAML in order to prevent the accidental misconstruing of the YAML as a paragraph when an array is in multiline form (i.e. it has a list for the array elements)
+  const yamlMatches = text.match(yamlRegex);
+  if (yamlMatches) {
+    text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
+  }
+
+  const positions: Position[] = getPositions('paragraph', text);
+  if (positions.length === 0) {
+    if (yamlMatches) {
+      text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
+    }
+
+    return text;
+  }
+
+  for (const position of positions) {
+    // get index of previous new line character to get actual paragraph contents rather than just a snippet
+    let startIndex = position.start.offset;
+    if (startIndex > 0) {
+      startIndex--;
+    }
+
+    while (startIndex >= 0 && text.charAt(startIndex) != '\n') {
+      startIndex--;
+    }
+    startIndex++;
+
+    const paragraphLines = text.substring(startIndex, position.end.offset).split('\n');
+
+    // exclude list items and blockquotes
+    const firstLine = paragraphLines[0].trimStart();
+    if (firstLine.startsWith('> ') || firstLine.startsWith('>\t') || firstLine.startsWith('- ') || firstLine.startsWith('-\t') ||
+    firstLine.match(/^[0-9]+\.( |\t)+/)) {
+      continue;
+    }
+
+    const lineCount = paragraphLines.length;
+    const newParagraphLines: string[] = [];
+    let nextLineIsSameParagraph = false;
+    for (let i = 0; i < lineCount; i++) {
+      const paragraphLine = paragraphLines[i];
+
+      if (nextLineIsSameParagraph) {
+        const lastParagraphLineAdded = newParagraphLines.length-1;
+        newParagraphLines[lastParagraphLineAdded] += '\n' + paragraphLine;
+      } else {
+        newParagraphLines.push(paragraphLine);
+      }
+
+      // make sure that lines that end in <br>, <br/>, or two or more spaces are in the same paragraph
+      nextLineIsSameParagraph = paragraphLine.endsWith('<br>') || paragraphLine.endsWith('<br/>') || paragraphLine.endsWith('  ');
+    }
+
+    // remove new lines prior to paragraph
+    while (startIndex > 0 && text.charAt(startIndex-1) == '\n') {
+      startIndex--;
+    }
+
+    // remove new lines after paragraph
+    const textLength = text.length;
+    let endIndex = position.end.offset;
+    if (endIndex < textLength) {
+      endIndex++;
+    }
+
+    while (endIndex < textLength && text.charAt(endIndex) == '\n') {
+      endIndex++;
+    }
+
+    // make sure two new lines are only added between the paragraph and other content
+    let startNewLines = '\n\n';
+    if (startIndex == 0) {
+      startNewLines = '';
+    }
+
+    let endNewLines = '\n\n';
+    if (endIndex == textLength) {
+      endNewLines = '';
+    }
+
+    text = text.substring(0, startIndex) + startNewLines + newParagraphLines.join('\n\n') + endNewLines + text.substring(endIndex);
+  }
+
+  if (yamlMatches) {
+    text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
+  }
+
+  return text;
+}
+
 
 /**
  * Removes spaces before and after link text
