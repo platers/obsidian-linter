@@ -13,6 +13,7 @@ import {
   escapeYamlString,
   makeEmphasisOrBoldConsistent,
   addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent,
+  makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs,
   removeSpacesInLinkText,
 } from './utils';
 import {
@@ -300,12 +301,7 @@ export const rules: Rule[] = [
       'All paragraphs should have exactly one blank line both before and after.',
       RuleType.SPACING,
       (text: string) => {
-        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
-          text = text.replace(/\n+([a-zA-Z].*)/g, '\n\n$1'); // trim blank lines before
-          text = text.replace(/(^[a-zA-Z].*)\n+/gm, '$1\n\n'); // trim blank lines after
-          text = text.replace(/^\n+([a-zA-Z].*)/, '$1'); // remove blank lines before first line
-          return text;
-        });
+        return makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text);
       },
       [
         new Example(
