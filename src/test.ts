@@ -1337,7 +1337,7 @@ describe('YAML Title Alias', () => {
     expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
   });
 
-  it('Updates single string aliase', () => {
+  it('Updates single string alias', () => {
     const before = dedent`
     ---
     aliases: other alias # linter-yaml-title-alias
