@@ -1675,7 +1675,7 @@ export const rules: Rule[] = [
         title = title || options['metadata: file name'];
 
         let yaml = text.match(yamlRegex)[1];
-        const aliasesRegex = /(?<=^|\n)aliases:[ \t]*((?:\S|\n)(?:.|\n)+?)\n(?=$|\S)/;
+        const aliasesRegex = /(?<=^|\n)aliases:[ \t]*(\S.*|(?:\n {2}\S.*)+)\n(?=$|\S)/;
         let aliasesMatch = yaml.match(aliasesRegex);
 
         const linterMarkerComment = '# linter-yaml-title-alias';

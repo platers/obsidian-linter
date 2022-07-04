@@ -1463,6 +1463,62 @@ describe('YAML Title Alias', () => {
 
     expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Multi-line array'})).toBe(after);
   });
+
+  it('Position of existing non-empty aliases section is preserved', () => {
+    const before = dedent`
+    ---
+    key1: value1
+    key2: value2
+    aliases:
+      - alias1
+      - alias2
+      - alias3
+    key3: value3
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    key1: value1
+    key2: value2
+    aliases:
+      - Title # linter-yaml-title-alias
+      - alias1
+      - alias2
+      - alias3
+    key3: value3
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before)).toBe(after);
+  });
+
+  it('Position of existing empty aliases section is preserved', () => {
+    const before = dedent`
+    ---
+    key1: value1
+    key2: value2
+    aliases: 
+    key3: value3
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    key1: value1
+    key2: value2
+    aliases:
+      - Title # linter-yaml-title-alias
+    key3: value3
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Multi-line array'})).toBe(after);
+  });
 });
 
 describe('Links', () => {
