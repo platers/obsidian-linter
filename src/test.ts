@@ -1252,6 +1252,61 @@ describe('YAML Title Alias', () => {
     expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new property style': 'Single string'})).toBe(after);
   });
 
+  it('Creates multi-line array aliases when empty', () => {
+    const before = dedent`
+    ---
+    aliases: 
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      - Title # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new property style': 'Multi-line array'})).toBe(after);
+  });
+
+  it('Creates single-line array aliases when empty', () => {
+    const before = dedent`
+    ---
+    aliases: 
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: [Title] # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new property style': 'Single-line array'})).toBe(after);
+  });
+
+  it('Creates single string alias when empty', () => {
+    const before = dedent`
+    ---
+    aliases: 
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: Title # linter-yaml-title-alias
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new property style': 'Single string'})).toBe(after);
+  });
+
   it('Updates first alias in multi-line array', () => {
     const before = dedent`
     ---

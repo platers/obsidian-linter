@@ -1675,7 +1675,7 @@ export const rules: Rule[] = [
         title = title || options['metadata: file name'];
 
         let yaml = text.match(yamlRegex)[1];
-        const aliasesRegex = /(?<=^|\n)aliases: *((?:.|\n)*?)\n(?=$|\S)/;
+        const aliasesRegex = /(?<=^|\n)aliases:[ \t]*((?:\S|\n)(?:.|\n)+?)\n(?=$|\S)/;
         let aliasesMatch = yaml.match(aliasesRegex);
 
         const linterMarkerComment = '# linter-yaml-title-alias';
@@ -1696,7 +1696,13 @@ export const rules: Rule[] = [
               throw new Error(`Unsupported setting 'YAML aliases new property style': ${options['YAML aliases new property style']}`);
           }
 
-          const newYaml = `aliases:${emptyValue} ${linterMarkerComment}\n${yaml}`;
+          const newAliasesSection = `aliases:${emptyValue} ${linterMarkerComment}\n`;
+          let newYaml = yaml.replace(/(?<=^|\n)aliases:\s*/, newAliasesSection);
+
+          if (newYaml === yaml) {
+            newYaml = `${newAliasesSection}${yaml}`;
+          }
+
           text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
           yaml = newYaml;
           aliasesMatch = yaml.match(aliasesRegex);
