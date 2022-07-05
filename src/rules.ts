@@ -17,6 +17,8 @@ import {
   removeSpacesInLinkText,
   toSingleLineArrayYamlString,
   setYamlSection,
+  getYamlSectionValue,
+  removeYamlSection,
 } from './utils';
 import {
   Option,
@@ -1679,18 +1681,15 @@ export const rules: Rule[] = [
 
         let yaml = text.match(yamlRegex)[1];
 
-        const previousTitleMatch = yaml.match(/(?<=^|\n)linter-yaml-title-alias:[ \t]+(.+)/);
-
-        let previousTitle = previousTitleMatch == null ? null : loadYAML(previousTitleMatch[1]);
+        let previousTitle = loadYAML(getYamlSectionValue(yaml, 'linter-yaml-title-alias'));
 
         if ((previousTitle === title && !shouldRemoveTitleAlias) || (previousTitle === null && shouldRemoveTitleAlias)) {
           return text;
         }
 
-        const aliasesRegex = /(?<=^|\n)aliases:[ \t]*(\S.*|(?:\n {2}\S.*)+)\n(?=$|\S)/;
-        let aliasesMatch = yaml.match(aliasesRegex);
+        let aliasesValue = getYamlSectionValue(yaml, 'aliases');
 
-        if (!aliasesMatch) {
+        if (!aliasesValue) {
           if (shouldRemoveTitleAlias) {
             return text;
           }
@@ -1716,11 +1715,9 @@ export const rules: Rule[] = [
 
           text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
           yaml = newYaml;
-          aliasesMatch = yaml.match(aliasesRegex);
+          aliasesValue = getYamlSectionValue(yaml, 'aliases');
           previousTitle = '';
         }
-
-        const aliasesValue = aliasesMatch[1];
 
         const isMultiline = aliasesValue.includes('\n');
         const parsedAliases = loadYAML(aliasesValue);
@@ -1763,7 +1760,7 @@ export const rules: Rule[] = [
         newYaml = setYamlSection(newYaml, 'aliases', newAliasesYaml);
 
         if (shouldRemoveTitleAlias) {
-          newYaml = newYaml.replace(/(?<=^|\n)linter-yaml-title-alias:.+\n/, '');
+          newYaml = removeYamlSection(newYaml, 'linter-yaml-title-alias');
         } else {
           newYaml = setYamlSection(newYaml, 'linter-yaml-title-alias', ` ${toYamlString(title)}`);
         }
