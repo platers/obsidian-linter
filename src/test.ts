@@ -1655,6 +1655,132 @@ describe('YAML Title Alias', () => {
     expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': false, 'metadata: file name': 'Filename'})).toBe(after);
   });
 
+  it('Adds alias that matches the filename for multi-line array style aliases section', () => {
+    const before = dedent`
+    ---
+    aliases:
+      - alias1
+    ---
+    # Filename
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      - Filename
+      - alias1
+    linter-yaml-title-alias: Filename
+    ---
+    # Filename
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': true, 'metadata: file name': 'Filename'})).toBe(after);
+  });
+
+  it('Adds alias that matches the filename for single-line array style aliases section', () => {
+    const before = dedent`
+    ---
+    aliases: [alias1]
+    ---
+    # Filename
+    `;
+
+    const after = dedent`
+    ---
+    aliases: [Filename, alias1]
+    linter-yaml-title-alias: Filename
+    ---
+    # Filename
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': true, 'metadata: file name': 'Filename'})).toBe(after);
+  });
+
+  it('Adds alias that matches the filename for single string style aliases section', () => {
+    const before = dedent`
+    ---
+    aliases: alias1
+    ---
+    # Filename
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      - Filename
+      - alias1
+    linter-yaml-title-alias: Filename
+    ---
+    # Filename
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': true, 'metadata: file name': 'Filename', 'YAML aliases new array style': 'Multi-line array'})).toBe(after);
+  });
+
+  it('Replaces alias that matches the filename for multi-line array style aliases section', () => {
+    const before = dedent`
+    ---
+    aliases:
+      - alias1
+      - alias2
+    linter-yaml-title-alias: alias1
+    ---
+    # Filename
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      - Filename
+      - alias2
+    linter-yaml-title-alias: Filename
+    ---
+    # Filename
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': true, 'metadata: file name': 'Filename'})).toBe(after);
+  });
+
+  it('Replaces alias that matches the filename for single-line array style aliases section', () => {
+    const before = dedent`
+    ---
+    aliases: [alias1, alias2]
+    linter-yaml-title-alias: alias1
+    ---
+    # Filename
+    `;
+
+    const after = dedent`
+    ---
+    aliases: [Filename, alias2]
+    linter-yaml-title-alias: Filename
+    ---
+    # Filename
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': true, 'metadata: file name': 'Filename'})).toBe(after);
+  });
+
+  it('Replaces alias that matches the filename for single string style aliases section, removes previous alias', () => {
+    const before = dedent`
+    ---
+    aliases: alias1
+    linter-yaml-title-alias: alias1
+    ---
+    # Filename
+    `;
+
+    const after = dedent`
+    ---
+    aliases: Filename
+    linter-yaml-title-alias: Filename
+    ---
+    # Filename
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': true, 'metadata: file name': 'Filename'})).toBe(after);
+  });
+
   it('Dollar sign $ is handled properly', () => {
     const before = dedent`
     # Dollar $
