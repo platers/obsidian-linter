@@ -1654,6 +1654,23 @@ describe('YAML Title Alias', () => {
 
     expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': false, 'metadata: file name': 'Filename'})).toBe(after);
   });
+
+  it('Dollar sign $ is handled properly', () => {
+    const before = dedent`
+    # Dollar $
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      - Dollar $
+    linter-yaml-title-alias: Dollar $
+    ---
+    # Dollar $
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Multi-line array'})).toBe(after);
+  });
 });
 
 describe('Links', () => {
