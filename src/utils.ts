@@ -483,7 +483,7 @@ export function loadYAML(yaml_text: string): any {
   // replacing tabs at the beginning of new lines with 2 spaces fixes loading yaml that has tabs at the start of a line
   // https://github.com/platers/obsidian-linter/issues/157
   const parsed_yaml = load(yaml_text.replace(/\n(\t)+/g, '\n  ')) as {};
-  if (!parsed_yaml) {
+  if (parsed_yaml == null) {
     return {};
   }
 
@@ -496,4 +496,17 @@ export function toYamlString(obj: any): string {
 
 export function toSingleLineArrayYamlString<T>(arr: T[]): string {
   return dump(arr, {flowLevel: 0}).slice(0, -1);
+}
+
+export function setYamlSection(yaml: string, rawKey: string, rawValue: string): string {
+  const yamlSectionEscaped = `${rawKey}:${rawValue}\n`;
+  let isReplaced = false;
+  let result = yaml.replace(new RegExp(`(?<=^|\\n)${rawKey}:[ \\t]*(\\S.*|(?:\\n {2}\\S.*)*)\\n(?=$|\\S)`), () => {
+    isReplaced = true;
+    return yamlSectionEscaped;
+  });
+  if (!isReplaced) {
+    result = `${yaml}${yamlSectionEscaped}`;
+  }
+  return result;
 }

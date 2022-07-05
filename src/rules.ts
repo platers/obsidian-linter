@@ -16,6 +16,7 @@ import {
   makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs,
   removeSpacesInLinkText,
   toSingleLineArrayYamlString,
+  setYamlSection,
 } from './utils';
 import {
   Option,
@@ -1677,10 +1678,17 @@ export const rules: Rule[] = [
         const shouldRemoveTitleAlias = !options['Keep alias that matches the filename'] && title === options['metadata: file name'];
 
         let yaml = text.match(yamlRegex)[1];
+
+        const previousTitleMatch = yaml.match(/(?<=^|\n)linter-yaml-title-alias:[ \t]+(.+)/);
+
+        let previousTitle = previousTitleMatch == null ? null : loadYAML(previousTitleMatch[1]);
+
+        if ((previousTitle === title && !shouldRemoveTitleAlias) || (previousTitle === null && shouldRemoveTitleAlias)) {
+          return text;
+        }
+
         const aliasesRegex = /(?<=^|\n)aliases:[ \t]*(\S.*|(?:\n {2}\S.*)+)\n(?=$|\S)/;
         let aliasesMatch = yaml.match(aliasesRegex);
-
-        const linterMarkerComment = '# linter-yaml-title-alias';
 
         if (!aliasesMatch) {
           if (shouldRemoveTitleAlias) {
@@ -1702,25 +1710,17 @@ export const rules: Rule[] = [
               throw new Error(`Unsupported setting 'YAML aliases new section style': ${options['YAML aliases new section style']}`);
           }
 
-          const newAliasesSection = `aliases:${emptyValue} ${linterMarkerComment}\n`;
-          let newYaml = yaml.replace(/(?<=^|\n)aliases:\s*/, newAliasesSection);
-
-          if (newYaml === yaml) {
-            newYaml = `${newAliasesSection}${yaml}`;
-          }
+          let newYaml = yaml;
+          newYaml = setYamlSection(newYaml, 'aliases', emptyValue);
+          newYaml = setYamlSection(newYaml, 'linter-yaml-title-alias', ' \'\'');
 
           text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
           yaml = newYaml;
           aliasesMatch = yaml.match(aliasesRegex);
+          previousTitle = '';
         }
 
         const aliasesValue = aliasesMatch[1];
-
-        const hasLinterMarkerComment = aliasesValue.includes(linterMarkerComment);
-
-        if (!hasLinterMarkerComment && shouldRemoveTitleAlias) {
-          return text;
-        }
 
         const isMultiline = aliasesValue.includes('\n');
         const parsedAliases = loadYAML(aliasesValue);
@@ -1729,33 +1729,46 @@ export const rules: Rule[] = [
 
         let resultAliasesArray = isSingleString ? [parsedAliases] : [...parsedAliases];
 
-        if (hasLinterMarkerComment) {
-          resultAliasesArray[0] = title;
-        } else {
+        const previousTitleIndex = resultAliasesArray.indexOf(previousTitle);
+        if (previousTitleIndex !== -1) {
+          if (shouldRemoveTitleAlias) {
+            resultAliasesArray.splice(previousTitleIndex, 1);
+          } else {
+            resultAliasesArray[previousTitleIndex] = title;
+          }
+        } else if (!shouldRemoveTitleAlias) {
           resultAliasesArray = [title, ...resultAliasesArray];
         }
 
-        const resultStyle = isSingleString ? (hasLinterMarkerComment ? 'Single string' : options['YAML aliases new array style']) : (isMultiline ? 'Multi-line array' : 'Single-line array');
+        const resultStyle = isSingleString ? (resultAliasesArray.length <= 1 ? 'Single string' : options['YAML aliases new array style']) : (isMultiline ? 'Multi-line array' : 'Single-line array');
 
         let newAliasesYaml;
 
         switch (resultStyle) {
           case 'Multi-line array': {
-            const tailArrayYaml = resultAliasesArray.length === 1 ? '' : `\n${toYamlString(resultAliasesArray.slice(1))}`.replace(/\n-/g, '\n  -');
-            newAliasesYaml = shouldRemoveTitleAlias ? tailArrayYaml :`\n  - ${toYamlString(resultAliasesArray[0])} ${linterMarkerComment}${tailArrayYaml}`;
+            newAliasesYaml = `\n${toYamlString(resultAliasesArray)}`.replace(/\n-/g, '\n  -');
             break;
           }
           case 'Single-line array':
-            newAliasesYaml = shouldRemoveTitleAlias ? ` ${toSingleLineArrayYamlString(resultAliasesArray.slice(1))}` : ` ${toSingleLineArrayYamlString(resultAliasesArray)} ${linterMarkerComment}`;
+            newAliasesYaml = ` ${toSingleLineArrayYamlString(resultAliasesArray)}`;
             break;
           case 'Single string':
-            newAliasesYaml = shouldRemoveTitleAlias ? '' : ` ${toYamlString(resultAliasesArray[0])} ${linterMarkerComment}`;
+            newAliasesYaml = resultAliasesArray.length === 0 ? '' : ` ${toYamlString(resultAliasesArray[0])}`;
             break;
           default:
             throw new Error(`Unsupported resultStyle: ${resultStyle}`);
         }
 
-        text = text.replace(aliasesMatch[0], `aliases:${newAliasesYaml}\n`);
+        let newYaml = yaml;
+        newYaml = setYamlSection(newYaml, 'aliases', newAliasesYaml);
+
+        if (shouldRemoveTitleAlias) {
+          newYaml = newYaml.replace(/(?<=^|\n)linter-yaml-title-alias:.+\n/, '');
+        } else {
+          newYaml = setYamlSection(newYaml, 'linter-yaml-title-alias', ` ${toYamlString(title)}`);
+        }
+
+        text = text.replace(yaml, newYaml);
 
         return text;
       },
@@ -1768,7 +1781,8 @@ export const rules: Rule[] = [
             dedent`
       ---
       aliases:
-        - Obsidian # linter-yaml-title-alias
+        - Obsidian
+      linter-yaml-title-alias: Obsidian
       ---
       # Obsidian
       `,
@@ -1783,7 +1797,8 @@ export const rules: Rule[] = [
             dedent`
       ---
       aliases:
-        - Filename # linter-yaml-title-alias
+        - Filename
+      linter-yaml-title-alias: Filename
       ---
 
       `,

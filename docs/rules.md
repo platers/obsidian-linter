@@ -261,7 +261,8 @@ After:
 ```markdown
 ---
 aliases:
-  - Obsidian # linter-yaml-title-alias
+  - Obsidian
+linter-yaml-title-alias: Obsidian
 ---
 # Obsidian
 ```
@@ -278,7 +279,8 @@ After:
 ```markdown
 ---
 aliases:
-  - Filename # linter-yaml-title-alias
+  - Filename
+linter-yaml-title-alias: Filename
 ---
 
 ```

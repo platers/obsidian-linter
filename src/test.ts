@@ -1214,7 +1214,8 @@ describe('YAML Title Alias', () => {
     const after = dedent`
     ---
     aliases:
-      - Title # linter-yaml-title-alias
+      - Title
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1229,7 +1230,8 @@ describe('YAML Title Alias', () => {
 
     const after = dedent`
     ---
-    aliases: [Title] # linter-yaml-title-alias
+    aliases: [Title]
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1244,7 +1246,8 @@ describe('YAML Title Alias', () => {
 
     const after = dedent`
     ---
-    aliases: Title # linter-yaml-title-alias
+    aliases: Title
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1263,7 +1266,8 @@ describe('YAML Title Alias', () => {
     const after = dedent`
     ---
     aliases:
-      - Title # linter-yaml-title-alias
+      - Title
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1281,7 +1285,8 @@ describe('YAML Title Alias', () => {
 
     const after = dedent`
     ---
-    aliases: [Title] # linter-yaml-title-alias
+    aliases: [Title]
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1299,7 +1304,8 @@ describe('YAML Title Alias', () => {
 
     const after = dedent`
     ---
-    aliases: Title # linter-yaml-title-alias
+    aliases: Title
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1311,9 +1317,10 @@ describe('YAML Title Alias', () => {
     const before = dedent`
     ---
     aliases:
-      - alias1 # linter-yaml-title-alias
+      - alias1
       - alias2
       - alias3
+    linter-yaml-title-alias: alias1
     ---
     # Title
     `;
@@ -1321,9 +1328,10 @@ describe('YAML Title Alias', () => {
     const after = dedent`
     ---
     aliases:
-      - Title # linter-yaml-title-alias
+      - Title
       - alias2
       - alias3
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1345,10 +1353,11 @@ describe('YAML Title Alias', () => {
     const after = dedent`
     ---
     aliases:
-      - Title # linter-yaml-title-alias
+      - Title
       - alias1
       - alias2
       - alias3
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1359,14 +1368,16 @@ describe('YAML Title Alias', () => {
   it('Updates first alias in single-line array', () => {
     const before = dedent`
     ---
-    aliases: [alias1, alias2, alias3] # linter-yaml-title-alias
+    aliases: [alias1, alias2, alias3]
+    linter-yaml-title-alias: alias1
     ---
     # Title
     `;
 
     const after = dedent`
     ---
-    aliases: [Title, alias2, alias3] # linter-yaml-title-alias
+    aliases: [Title, alias2, alias3]
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1384,7 +1395,8 @@ describe('YAML Title Alias', () => {
 
     const after = dedent`
     ---
-    aliases: [Title, alias1, alias2, alias3] # linter-yaml-title-alias
+    aliases: [Title, alias1, alias2, alias3]
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1395,14 +1407,16 @@ describe('YAML Title Alias', () => {
   it('Updates single string alias', () => {
     const before = dedent`
     ---
-    aliases: other alias # linter-yaml-title-alias
+    aliases: other alias
+    linter-yaml-title-alias: other alias
     ---
     # Title
     `;
 
     const after = dedent`
     ---
-    aliases: Title # linter-yaml-title-alias
+    aliases: Title
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1421,8 +1435,9 @@ describe('YAML Title Alias', () => {
     const after = dedent`
     ---
     aliases:
-      - Title # linter-yaml-title-alias
+      - Title
       - other alias
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1440,7 +1455,8 @@ describe('YAML Title Alias', () => {
 
     const after = dedent`
     ---
-    aliases: [Title, other alias] # linter-yaml-title-alias
+    aliases: [Title, other alias]
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1456,7 +1472,8 @@ describe('YAML Title Alias', () => {
     const after = dedent`
     ---
     aliases:
-      - 'Title with: colon, ''quote'', "single quote"' # linter-yaml-title-alias
+      - 'Title with: colon, ''quote'', "single quote"'
+    linter-yaml-title-alias: 'Title with: colon, ''quote'', "single quote"'
     ---
     # Title with: colon, 'quote', "single quote"
     `;
@@ -1483,11 +1500,12 @@ describe('YAML Title Alias', () => {
     key1: value1
     key2: value2
     aliases:
-      - Title # linter-yaml-title-alias
+      - Title
       - alias1
       - alias2
       - alias3
     key3: value3
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1511,8 +1529,9 @@ describe('YAML Title Alias', () => {
     key1: value1
     key2: value2
     aliases:
-      - Title # linter-yaml-title-alias
+      - Title
     key3: value3
+    linter-yaml-title-alias: Title
     ---
     # Title
     `;
@@ -1580,8 +1599,9 @@ describe('YAML Title Alias', () => {
     const before = dedent`
     ---
     aliases:
-      - alias1 # linter-yaml-title-alias
+      - alias1
       - alias2
+    linter-yaml-title-alias: alias1
     ---
     # Filename
     `;
@@ -1597,10 +1617,11 @@ describe('YAML Title Alias', () => {
     expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': false, 'metadata: file name': 'Filename'})).toBe(after);
   });
 
-  it('Does not add alias that matches the filename for single-line array style aliases section', () => {
+  it('Does not add alias that matches the filename for single-line array style aliases section, removes previous alias', () => {
     const before = dedent`
     ---
-    aliases: [alias1, alias2] # linter-yaml-title-alias
+    aliases: [alias1, alias2]
+    linter-yaml-title-alias: alias1
     ---
     # Filename
     `;
@@ -1615,10 +1636,11 @@ describe('YAML Title Alias', () => {
     expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': false, 'metadata: file name': 'Filename'})).toBe(after);
   });
 
-  it('Does not add alias that matches the filename for single string style aliases section', () => {
+  it('Does not add alias that matches the filename for single string style aliases section, removes previous alias', () => {
     const before = dedent`
     ---
-    aliases: alias1 # linter-yaml-title-alias
+    aliases: alias1
+    linter-yaml-title-alias: alias1
     ---
     # Filename
     `;
