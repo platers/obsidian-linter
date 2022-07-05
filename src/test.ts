@@ -1595,7 +1595,7 @@ describe('YAML Title Alias', () => {
     expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': false, 'metadata: file name': 'Filename'})).toBe(after);
   });
 
-  it('Removes alias that matches the filename for multi-line array style aliases section', () => {
+  it('Does not add alias that matches the filename for multi-line array style aliases section, removes previous alias', () => {
     const before = dedent`
     ---
     aliases:
