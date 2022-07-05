@@ -1667,6 +1667,9 @@ export const rules: Rule[] = [
       'Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
       RuleType.YAML,
       (text: string, options = {}) => {
+        const ALIASES_YAML_SECTION_NAME = 'aliases';
+        const LINTER_ALIASES_HELPER_NAME = 'linter-yaml-title-alias';
+
         text = initYAML(text);
         let title = ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           const result = text.match(/^#\s+(.*)/m);
@@ -1681,13 +1684,13 @@ export const rules: Rule[] = [
 
         let yaml = text.match(yamlRegex)[1];
 
-        let previousTitle = loadYAML(getYamlSectionValue(yaml, 'linter-yaml-title-alias'));
+        let previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_NAME));
 
         if ((previousTitle === title && !shouldRemoveTitleAlias) || (previousTitle === null && shouldRemoveTitleAlias)) {
           return text;
         }
 
-        let aliasesValue = getYamlSectionValue(yaml, 'aliases');
+        let aliasesValue = getYamlSectionValue(yaml, ALIASES_YAML_SECTION_NAME);
 
         if (!aliasesValue) {
           if (shouldRemoveTitleAlias) {
@@ -1710,12 +1713,12 @@ export const rules: Rule[] = [
           }
 
           let newYaml = yaml;
-          newYaml = setYamlSection(newYaml, 'aliases', emptyValue);
-          newYaml = setYamlSection(newYaml, 'linter-yaml-title-alias', ' \'\'');
+          newYaml = setYamlSection(newYaml, ALIASES_YAML_SECTION_NAME, emptyValue);
+          newYaml = setYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME, ' \'\'');
 
           text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
           yaml = newYaml;
-          aliasesValue = getYamlSectionValue(yaml, 'aliases');
+          aliasesValue = getYamlSectionValue(yaml, ALIASES_YAML_SECTION_NAME);
           previousTitle = '';
         }
 
@@ -1757,12 +1760,12 @@ export const rules: Rule[] = [
         }
 
         let newYaml = yaml;
-        newYaml = setYamlSection(newYaml, 'aliases', newAliasesYaml);
+        newYaml = setYamlSection(newYaml, ALIASES_YAML_SECTION_NAME, newAliasesYaml);
 
         if (shouldRemoveTitleAlias) {
-          newYaml = removeYamlSection(newYaml, 'linter-yaml-title-alias');
+          newYaml = removeYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME);
         } else {
-          newYaml = setYamlSection(newYaml, 'linter-yaml-title-alias', ` ${toYamlString(title)}`);
+          newYaml = setYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME, ` ${toYamlString(title)}`);
         }
 
         text = text.replace(yaml, newYaml);
