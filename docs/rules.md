@@ -245,6 +245,8 @@ Options:
 	- Default: `Multi-line array`
 	- `Multi-line array`: ```aliases:\n  - Title```
 	- `Single-line array`: ```aliases: [Title]```
+- Keep alias that matches the filename: Such aliases are usually redundant
+	- Default: `false`
 
 Example: Adds a header with the title from heading.
 

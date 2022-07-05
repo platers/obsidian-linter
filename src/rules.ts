@@ -1674,6 +1674,8 @@ export const rules: Rule[] = [
         });
         title = title || options['metadata: file name'];
 
+        const shouldRemoveTitleAlias = !options['Keep alias that matches the filename'] && title === options['metadata: file name'];
+
         let yaml = text.match(yamlRegex)[1];
         const aliasesRegex = /(?<=^|\n)aliases:[ \t]*(\S.*|(?:\n {2}\S.*)+)\n(?=$|\S)/;
         let aliasesMatch = yaml.match(aliasesRegex);
@@ -1681,6 +1683,10 @@ export const rules: Rule[] = [
         const linterMarkerComment = '# linter-yaml-title-alias';
 
         if (!aliasesMatch) {
+          if (shouldRemoveTitleAlias) {
+            return text;
+          }
+
           let emptyValue;
           switch (options['YAML aliases new section style']) {
             case 'Multi-line array':
@@ -1712,6 +1718,10 @@ export const rules: Rule[] = [
 
         const hasLinterMarkerComment = aliasesValue.includes(linterMarkerComment);
 
+        if (!hasLinterMarkerComment && shouldRemoveTitleAlias) {
+          return text;
+        }
+
         const isMultiline = aliasesValue.includes('\n');
         const parsedAliases = loadYAML(aliasesValue);
 
@@ -1732,14 +1742,14 @@ export const rules: Rule[] = [
         switch (resultStyle) {
           case 'Multi-line array': {
             const tailArrayYaml = resultAliasesArray.length === 1 ? '' : `\n${toYamlString(resultAliasesArray.slice(1))}`.replace(/\n-/g, '\n  -');
-            newAliasesYaml = `\n  - ${toYamlString(resultAliasesArray[0])} ${linterMarkerComment}${tailArrayYaml}`;
+            newAliasesYaml = shouldRemoveTitleAlias ? tailArrayYaml :`\n  - ${toYamlString(resultAliasesArray[0])} ${linterMarkerComment}${tailArrayYaml}`;
             break;
           }
           case 'Single-line array':
-            newAliasesYaml = ` ${toSingleLineArrayYamlString(resultAliasesArray)} ${linterMarkerComment}`;
+            newAliasesYaml = shouldRemoveTitleAlias ? ` ${toSingleLineArrayYamlString(resultAliasesArray.slice(1))}` : ` ${toSingleLineArrayYamlString(resultAliasesArray)} ${linterMarkerComment}`;
             break;
           case 'Single string':
-            newAliasesYaml = ` ${toYamlString(resultAliasesArray[0])} ${linterMarkerComment}`;
+            newAliasesYaml = shouldRemoveTitleAlias ? '' : ` ${toYamlString(resultAliasesArray[0])} ${linterMarkerComment}`;
             break;
           default:
             throw new Error(`Unsupported resultStyle: ${resultStyle}`);
@@ -1780,6 +1790,7 @@ export const rules: Rule[] = [
             {
               'metadata: file name': 'Filename',
               'YAML aliases new section style': 'Multi-line array',
+              'Keep alias that matches the filename': true,
             },
         ),
       ],
@@ -1817,6 +1828,11 @@ export const rules: Rule[] = [
                   '```aliases: [Title]```',
               ),
             ],
+        ),
+        new BooleanOption(
+            'Keep alias that matches the filename',
+            'Such aliases are usually redundant',
+            false,
         ),
       ],
   ),
