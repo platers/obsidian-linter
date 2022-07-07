@@ -401,6 +401,38 @@ nestedArray2: [["value: with colon in the middle"], "value with ' a single quote
 _Note that escaped commas in a YAML array will be treated as a separator._
 ``````
 
+### YAML Key Sort
+
+Alias: `yaml-key-sort`
+
+Sorts the YAML keys based on the order and priority specified.
+
+Options:
+- YAML Key Sort Order: The order in which to sort keys with one on each line where it sorts in the order found in the list
+	- Default: ``
+- YAML Sort Order for Other Keys: The way in which to sort the keys that are not found in the YAML Key Sort Order Text Area
+	- Default: `None`
+	- `None`: No sorting other than what is in the YAML Key Sort Order Text Area
+	- `Ascending Alphabetical`: Sorts the keys based on key value from a to z
+	- `Descending Alphabetical`: Sorts the keys based on key value from z to a
+
+Example: Adds a header with the title from heading.
+
+Before:
+
+```markdown
+# Obsidian
+```
+
+After:
+
+```markdown
+---
+title: Obsidian
+---
+# Obsidian
+```
+
 ## Heading
 ### Header Increment
 

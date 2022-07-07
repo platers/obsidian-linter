@@ -2161,6 +2161,73 @@ export const rules: Rule[] = [
       ],
   ),
 
+  new Rule(
+      'YAML Key Sort',
+      'Sorts the YAML keys based on the order and priority specified.',
+      RuleType.YAML,
+      (text: string, options = {}) => {
+        const priorityOrder = options['YAML Key Sort Order'].split('\n');
+        return formatYAML(text, (text) => {
+          const yamlKeyToValue: Map<string, string> = new Map<string, string>();
+          const yamlLines = text.split('\n');
+          const lineCount = yamlLines.length;
+
+          let key: string = '';
+          let keyAndValue: string = '';
+          for (let i = 0; i < lineCount; i++) {
+            const line = yamlLines[i];
+            if (line === '---') {
+              continue;
+            }
+
+            const lineStartTrimmed = line.trimStart();
+            const indexOfFirstColon = lineStartTrimmed.indexOf(': ');
+            if (lineStartTrimmed.startsWith('- ') || lineStartTrimmed.startsWith('-\t') || lineStartTrimmed.startsWith('#') || indexOfFirstColon !== -1) {
+              keyAndValue += '\n' + line;
+              continue;
+            } else {
+              yamlKeyToValue.set(key, keyAndValue);
+              keyAndValue = line;
+              key = lineStartTrimmed.substring(0, indexOfFirstColon - 1);
+            }
+          }
+
+          return text;
+        });
+      },
+      [
+        new Example(
+            'Adds a header with the title from heading.',
+            dedent`
+      # Obsidian
+      `,
+            dedent`
+      ---
+      title: Obsidian
+      ---
+      # Obsidian
+      `,
+            {
+              'metadata: file name': 'Filename',
+            },
+        ),
+      ],
+      [
+        new TextAreaOption('YAML Key Sort Order', 'The order in which to sort keys with one on each line where it sorts in the order found in the list', ''),
+        // TODO: finish adding something to allow this at the start or end of the YAML new BooleanOption('YAML Key Sort Order'),
+        new DropdownOption(
+            'YAML Sort Order for Other Keys',
+            'The way in which to sort the keys that are not found in the YAML Key Sort Order Text Area',
+            'None',
+            [
+              new DropdownRecord('None', 'No sorting other than what is in the YAML Key Sort Order Text Area'),
+              new DropdownRecord('Ascending Alphabetical', 'Sorts the keys based on key value from a to z'),
+              new DropdownRecord('Descending Alphabetical', 'Sorts the keys based on key value from z to a'),
+            ],
+        ),
+      ],
+  ),
+
   // Heading rules
 
   new Rule(
