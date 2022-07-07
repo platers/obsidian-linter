@@ -1670,9 +1670,12 @@ export const rules: Rule[] = [
         const ALIASES_YAML_SECTION_NAME = 'aliases';
         const LINTER_ALIASES_HELPER_NAME = 'linter-yaml-title-alias';
 
-        if (options['Preserve existing aliases section style'] === undefined) {
-          options['Preserve existing aliases section style'] = true;
-        }
+        const optionsObj = {
+          yamlAliasesSectionStyle: options['YAML aliases section style'] as string,
+          preserveExistingAliasesSectionStyle: options['Preserve existing aliases section style'] as boolean ?? true,
+          keepAliasThatMatchesTheFilename: options['Keep alias that matches the filename'] as boolean,
+          fileName: options['metadata: file name'] as string,
+        };
 
         text = initYAML(text);
         let title = ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
@@ -1682,9 +1685,9 @@ export const rules: Rule[] = [
           }
           return '';
         });
-        title = title || options['metadata: file name'];
+        title = title || optionsObj.fileName;
 
-        const shouldRemoveTitleAlias = !options['Keep alias that matches the filename'] && title === options['metadata: file name'];
+        const shouldRemoveTitleAlias = !optionsObj.keepAliasThatMatchesTheFilename && title === optionsObj.fileName;
 
         let yaml = text.match(yamlRegex)[1];
 
@@ -1701,7 +1704,7 @@ export const rules: Rule[] = [
           requiresChanges = false;
         }
 
-        if (!requiresChanges && options['Preserve existing aliases section style']) {
+        if (!requiresChanges && optionsObj.preserveExistingAliasesSectionStyle) {
           return text;
         }
 
@@ -1713,7 +1716,7 @@ export const rules: Rule[] = [
           }
 
           let emptyValue;
-          switch (options['YAML aliases section style']) {
+          switch (optionsObj.yamlAliasesSectionStyle) {
             case 'Multi-line array':
               emptyValue = '\n  - \'\'';
               break;
@@ -1725,7 +1728,7 @@ export const rules: Rule[] = [
               emptyValue = ' \'\'';
               break;
             default:
-              throw new Error(`Unsupported setting 'YAML aliases section style': ${options['YAML aliases section style']}`);
+              throw new Error(`Unsupported setting 'YAML aliases section style': ${optionsObj.yamlAliasesSectionStyle}`);
           }
 
           let newYaml = yaml;
@@ -1757,7 +1760,7 @@ export const rules: Rule[] = [
         }
 
         if (!requiresChanges) {
-          switch (options['YAML aliases section style']) {
+          switch (optionsObj.yamlAliasesSectionStyle) {
             case 'Multi-line array':
               if (isMultiline) {
                 return text;
@@ -1791,8 +1794,8 @@ export const rules: Rule[] = [
 
         if (resultAliasesArray.length === 0) {
           resultStyle = 'Remove';
-        } else if (!options['Preserve existing aliases section style']) {
-          switch (options['YAML aliases section style']) {
+        } else if (!optionsObj.preserveExistingAliasesSectionStyle) {
+          switch (optionsObj.yamlAliasesSectionStyle) {
             case 'Multi-line array':
               resultStyle = 'Multi-line array';
               break;
@@ -1818,7 +1821,7 @@ export const rules: Rule[] = [
           if (resultAliasesArray.length === 1) {
             resultStyle = 'Single string';
           } else {
-            switch (options['YAML aliases section style']) {
+            switch (optionsObj.yamlAliasesSectionStyle) {
               case 'Multi-line array':
               case 'Single string that expands to multi-line array if needed':
                 resultStyle = 'Multi-line array';
