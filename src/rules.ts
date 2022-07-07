@@ -2664,21 +2664,7 @@ export const rules: Rule[] = [
       RuleType.SPACING,
       (text: string) => {
         return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
-          const fullwidthCharactersStartingWithSpaceRegex: RegExp = /([ \t])+([\u2013\u2014\u2026\u3001\u3002\u300a\u300d-\u300f\u3014\u3015\u3008-\u3011\uff00-\uffff])/g;
-          if (fullwidthCharactersStartingWithSpaceRegex.test(text) === true) {
-            const lines = text.split('\n');
-            const lineCount = lines.length;
-
-            for (let i = 0; i < lineCount; i++) {
-              const line = lines[i];
-              const lineWithTrimmedStart = line.trimStart();
-              lines[i] = line.replace(lineWithTrimmedStart, lineWithTrimmedStart.replace(fullwidthCharactersStartingWithSpaceRegex, '$2'));
-            }
-
-            text = lines.join('\n');
-          }
-
-          return text.replace(/([\u2013\u2014\u2026\u3001\u3002\u300a\u300d-\u300f\u3014\u3015\u3008-\u3011\uff00-\uffff])([ \t])+/g, '$1');
+          return text.replace(/([ \t])+([\u2013\u2014\u2026\u3001\u3002\u300a\u300d-\u300f\u3014\u3015\u3008-\u3011\uff00-\uffff])/g, '$2').replace(/([\u2013\u2014\u2026\u3001\u3002\u300a\u300d-\u300f\u3014\u3015\u3008-\u3011\uff00-\uffff])([ \t])+/g, '$1');
         });
       },
       [
@@ -2693,7 +2679,7 @@ export const rules: Rule[] = [
           This is a fullwidth right parenthesis ）  with text after it.
           This is a fullwidth colon ：  with text after it.
           This is a fullwidth semicolon ；  with text after it.
-            Ｉgnores space at start of line
+            Ｒemoves space at start of line
       `,
             dedent`
           Full list of affected charaters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
@@ -2703,7 +2689,7 @@ export const rules: Rule[] = [
           This is a fullwidth right parenthesis）with text after it.
           This is a fullwidth colon：with text after it.
           This is a fullwidth semicolon；with text after it.
-            Ｉgnores space at start of line
+          Ｒemoves space at start of line
       `,
         ),
       ],
