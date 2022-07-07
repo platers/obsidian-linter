@@ -1220,7 +1220,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Multi-line array'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Multi-line array'})).toBe(after);
   });
 
   it('Creates single-line array aliases when missing', () => {
@@ -1236,7 +1236,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single-line array'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Single-line array'})).toBe(after);
   });
 
   it('Creates single string alias when missing', () => {
@@ -1252,7 +1252,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
   });
 
   it('Creates multi-line array aliases when empty', () => {
@@ -1272,7 +1272,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Multi-line array'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Multi-line array'})).toBe(after);
   });
 
   it('Creates single-line array aliases when empty', () => {
@@ -1291,7 +1291,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single-line array'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Single-line array'})).toBe(after);
   });
 
   it('Creates single string alias when empty', () => {
@@ -1310,7 +1310,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
   });
 
   it('Updates first alias in multi-line array', () => {
@@ -1442,7 +1442,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
   });
 
   it('Changes single string aliases to single-line array when adding', () => {
@@ -1461,7 +1461,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single string that expands to single-line array if needed'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Single string that expands to single-line array if needed'})).toBe(after);
   });
 
   it('Titles with special characters are escaped', () => {
@@ -1478,7 +1478,7 @@ describe('YAML Title Alias', () => {
     # Title with: colon, 'quote', "single quote"
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Multi-line array'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Multi-line array'})).toBe(after);
   });
 
   it('Position of existing non-empty aliases section is preserved', () => {
@@ -1536,7 +1536,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Multi-line array'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Multi-line array'})).toBe(after);
   });
 
   it('Does not add alias that matches the filename for multi-line array style aliases section', () => {
@@ -1713,7 +1713,7 @@ describe('YAML Title Alias', () => {
     # Filename
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': true, 'metadata: file name': 'Filename', 'YAML aliases new section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': true, 'metadata: file name': 'Filename', 'YAML aliases section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
   });
 
   it('Replaces alias that matches the filename for multi-line array style aliases section', () => {
@@ -1794,7 +1794,7 @@ describe('YAML Title Alias', () => {
     # Dollar $
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Multi-line array'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Multi-line array'})).toBe(after);
   });
 });
 

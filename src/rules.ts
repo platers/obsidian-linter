@@ -1698,7 +1698,7 @@ export const rules: Rule[] = [
           }
 
           let emptyValue;
-          switch (options['YAML aliases new section style']) {
+          switch (options['YAML aliases section style']) {
             case 'Multi-line array':
               emptyValue = '\n  - \'\'';
               break;
@@ -1710,7 +1710,7 @@ export const rules: Rule[] = [
               emptyValue = ' \'\'';
               break;
             default:
-              throw new Error(`Unsupported setting 'YAML aliases new section style': ${options['YAML aliases new section style']}`);
+              throw new Error(`Unsupported setting 'YAML aliases section style': ${options['YAML aliases section style']}`);
           }
 
           let newYaml = yaml;
@@ -1745,11 +1745,34 @@ export const rules: Rule[] = [
 
         if (resultAliasesArray.length === 0) {
           resultStyle = 'Remove';
+        } else if (options['Preserve existing aliases section style'] === false) {
+          switch (options['YAML aliases section style']) {
+            case 'Multi-line array':
+              resultStyle = 'Multi-line array';
+              break;
+            case 'Single-line array':
+              resultStyle = 'Single-line array';
+              break;
+            case 'Single string that expands to multi-line array if needed':
+              if (resultAliasesArray.length === 1) {
+                resultStyle = 'Single string';
+              } else {
+                resultStyle = 'Multi-line array';
+              }
+              break;
+            case 'Single string that expands to single-line array if needed':
+              if (resultAliasesArray.length === 1) {
+                resultStyle = 'Single string';
+              } else {
+                resultStyle = 'Single-line array';
+              }
+              break;
+          }
         } else if (isSingleString) {
           if (resultAliasesArray.length === 1) {
             resultStyle = 'Single string';
           } else {
-            switch (options['YAML aliases new section style']) {
+            switch (options['YAML aliases section style']) {
               case 'Multi-line array':
               case 'Single string that expands to multi-line array if needed':
                 resultStyle = 'Multi-line array';
@@ -1817,7 +1840,7 @@ export const rules: Rule[] = [
       # Obsidian
       `,
             {
-              'YAML aliases new section style': 'Multi-line array',
+              'YAML aliases section style': 'Multi-line array',
             },
         ),
         new Example(
@@ -1834,14 +1857,14 @@ export const rules: Rule[] = [
       `,
             {
               'metadata: file name': 'Filename',
-              'YAML aliases new section style': 'Multi-line array',
+              'YAML aliases section style': 'Multi-line array',
               'Keep alias that matches the filename': true,
             },
         ),
       ],
       [
         new DropdownOption(
-            'YAML aliases new section style',
+            'YAML aliases section style',
             'The style of the newly created aliases YAML property',
             'Multi-line array',
             [
@@ -1862,6 +1885,11 @@ export const rules: Rule[] = [
                   '```aliases: Title```',
               ),
             ],
+        ),
+        new BooleanOption(
+            'Preserve existing aliases section style',
+            'If set, the `YAML aliases section style` setting applies only to the newly created sections',
+            true,
         ),
         new BooleanOption(
             'Keep alias that matches the filename',
