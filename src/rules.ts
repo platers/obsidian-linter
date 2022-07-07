@@ -1914,7 +1914,7 @@ export const rules: Rule[] = [
       [
         new DropdownOption(
             'YAML aliases section style',
-            'The style of the newly created aliases YAML property',
+            'The style of the aliases YAML section',
             'Multi-line array',
             [
               new DropdownRecord(
