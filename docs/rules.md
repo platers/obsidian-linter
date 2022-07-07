@@ -1802,6 +1802,42 @@ After:
 #标签A #标签2标签
 ```
 
+### Remove Space around Fullwidth Characters
+
+Alias: `remove-space-around-fullwidth-characters`
+
+Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab)
+
+
+
+Example: Remove Spaces and Tabs around Fullwidth Characrters
+
+Before:
+
+```markdown
+Full list of affected charaters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
+This is a fullwidth period	 。 with text after it.
+This is a fullwidth comma	，  with text after it.
+This is a fullwidth left parenthesis （ 	with text after it.
+This is a fullwidth right parenthesis ）  with text after it.
+This is a fullwidth colon ：  with text after it.
+This is a fullwidth semicolon ；  with text after it.
+  Ｒemoves space at start of line
+```
+
+After:
+
+```markdown
+Full list of affected charaters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
+This is a fullwidth period。with text after it.
+This is a fullwidth comma，with text after it.
+This is a fullwidth left parenthesis（with text after it.
+This is a fullwidth right parenthesis）with text after it.
+This is a fullwidth colon：with text after it.
+This is a fullwidth semicolon；with text after it.
+Ｒemoves space at start of line
+```
+
 ### Remove link spacing
 
 Alias: `remove-link-spacing`
