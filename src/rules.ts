@@ -1705,7 +1705,8 @@ export const rules: Rule[] = [
             case 'Single-line array':
               emptyValue = ' [\'\']';
               break;
-            case 'Single string':
+            case 'Single string that expands to multi-line array if needed':
+            case 'Single string that expands to single-line array if needed':
               emptyValue = ' \'\'';
               break;
             default:
@@ -1740,15 +1741,39 @@ export const rules: Rule[] = [
           resultAliasesArray = [title, ...resultAliasesArray];
         }
 
-        const resultStyle = isSingleString ? (resultAliasesArray.length <= 1 ? 'Single string' : options['YAML aliases new array style']) : (isMultiline ? 'Multi-line array' : 'Single-line array');
+        let resultStyle;
+
+        if (resultAliasesArray.length === 0) {
+          resultStyle = 'Remove';
+        } else if (isSingleString) {
+          if (resultAliasesArray.length === 1) {
+            resultStyle = 'Single string';
+          } else {
+            switch (options['YAML aliases new section style']) {
+              case 'Multi-line array':
+              case 'Single string that expands to multi-line array if needed':
+                resultStyle = 'Multi-line array';
+                break;
+              case 'Single-line array':
+              case 'Single string that expands to single-line array if needed':
+                resultStyle = 'Single-line array';
+                break;
+            }
+          }
+        } else if (isMultiline) {
+          resultStyle = 'Multi-line array';
+        } else {
+          resultStyle = 'Single-line array';
+        }
 
         let newAliasesYaml;
 
         switch (resultStyle) {
-          case 'Multi-line array': {
+          case 'Remove':
+            break;
+          case 'Multi-line array':
             newAliasesYaml = `\n${toYamlString(resultAliasesArray)}`.replace(/\n-/g, '\n  -');
             break;
-          }
           case 'Single-line array':
             newAliasesYaml = ` ${toSingleLineArrayYamlString(resultAliasesArray)}`;
             break;
@@ -1760,7 +1785,12 @@ export const rules: Rule[] = [
         }
 
         let newYaml = yaml;
-        newYaml = setYamlSection(newYaml, ALIASES_YAML_SECTION_NAME, newAliasesYaml);
+
+        if (resultStyle === 'Remove') {
+          newYaml = removeYamlSection(newYaml, ALIASES_YAML_SECTION_NAME);
+        } else {
+          newYaml = setYamlSection(newYaml, ALIASES_YAML_SECTION_NAME, newAliasesYaml);
+        }
 
         if (shouldRemoveTitleAlias) {
           newYaml = removeYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME);
@@ -1824,23 +1854,12 @@ export const rules: Rule[] = [
                   '```aliases: [Title]```',
               ),
               new DropdownRecord(
-                  'Single string',
+                  'Single string that expands to multi-line array if needed',
                   '```aliases: Title```',
               ),
-            ],
-        ),
-        new DropdownOption(
-            'YAML aliases new array style',
-            'The style of the aliases YAML property for newly created arrays',
-            'Multi-line array',
-            [
               new DropdownRecord(
-                  'Multi-line array',
-                  '```aliases:\\n  - Title```',
-              ),
-              new DropdownRecord(
-                  'Single-line array',
-                  '```aliases: [Title]```',
+                  'Single string that expands to single-line array if needed',
+                  '```aliases: Title```',
               ),
             ],
         ),

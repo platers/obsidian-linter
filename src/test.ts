@@ -1252,7 +1252,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single string'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
   });
 
   it('Creates multi-line array aliases when empty', () => {
@@ -1310,7 +1310,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single string'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
   });
 
   it('Updates first alias in multi-line array', () => {
@@ -1442,7 +1442,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new array style': 'Multi-line array'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
   });
 
   it('Changes single string aliases to single-line array when adding', () => {
@@ -1461,7 +1461,7 @@ describe('YAML Title Alias', () => {
     # Title
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new array style': 'Single-line array'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases new section style': 'Single string that expands to single-line array if needed'})).toBe(after);
   });
 
   it('Titles with special characters are escaped', () => {
@@ -1647,7 +1647,6 @@ describe('YAML Title Alias', () => {
 
     const after = dedent`
     ---
-    aliases:
     ---
     # Filename
     `;
@@ -1714,7 +1713,7 @@ describe('YAML Title Alias', () => {
     # Filename
     `;
 
-    expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': true, 'metadata: file name': 'Filename', 'YAML aliases new array style': 'Multi-line array'})).toBe(after);
+    expect(rulesDict['yaml-title-alias'].apply(before, {'Keep alias that matches the filename': true, 'metadata: file name': 'Filename', 'YAML aliases new section style': 'Single string that expands to multi-line array if needed'})).toBe(after);
   });
 
   it('Replaces alias that matches the filename for multi-line array style aliases section', () => {

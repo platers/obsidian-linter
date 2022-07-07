@@ -240,11 +240,8 @@ Options:
 	- Default: `Multi-line array`
 	- `Multi-line array`: ```aliases:\n  - Title```
 	- `Single-line array`: ```aliases: [Title]```
-	- `Single string`: ```aliases: Title```
-- YAML aliases new array style: The style of the aliases YAML property for newly created arrays
-	- Default: `Multi-line array`
-	- `Multi-line array`: ```aliases:\n  - Title```
-	- `Single-line array`: ```aliases: [Title]```
+	- `Single string that expands to multi-line array if needed`: ```aliases: Title```
+	- `Single string that expands to single-line array if needed`: ```aliases: Title```
 - Keep alias that matches the filename: Such aliases are usually redundant
 	- Default: `false`
 
