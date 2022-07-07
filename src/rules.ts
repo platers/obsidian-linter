@@ -10,11 +10,15 @@ import {
   loadYAML,
   moveFootnotesToEnd,
   yamlRegex,
-  escapeYamlString,
+  toYamlString,
   makeEmphasisOrBoldConsistent,
   addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent,
   makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs,
   removeSpacesInLinkText,
+  toSingleLineArrayYamlString,
+  setYamlSection,
+  getYamlSectionValue,
+  removeYamlSection,
 } from './utils';
 import {
   Option,
@@ -1606,7 +1610,7 @@ export const rules: Rule[] = [
         });
         title = title || options['metadata: file name'];
 
-        title = escapeYamlString(title);
+        title = toYamlString(title);
 
         return formatYAML(text, (text) => {
           const title_match_str = `\n${options['Title Key']}.*\n`;
@@ -1656,6 +1660,292 @@ export const rules: Rule[] = [
         ),
       ],
       [new TextOption('Title Key', 'Which YAML key to use for title', 'title')],
+  ),
+
+  new Rule(
+      'YAML Title Alias',
+      'Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
+      RuleType.YAML,
+      (text: string, options = {}) => {
+        const ALIASES_YAML_SECTION_NAME = 'aliases';
+        const LINTER_ALIASES_HELPER_NAME = 'linter-yaml-title-alias';
+
+        const optionsObj = {
+          yamlAliasesSectionStyle: options['YAML aliases section style'] as string,
+          preserveExistingAliasesSectionStyle: options['Preserve existing aliases section style'] as boolean ?? true,
+          keepAliasThatMatchesTheFilename: options['Keep alias that matches the filename'] as boolean,
+          fileName: options['metadata: file name'] as string,
+        };
+
+        text = initYAML(text);
+        let title = ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
+          const result = text.match(/^#\s+(.*)/m);
+          if (result) {
+            return result[1];
+          }
+          return '';
+        });
+        title = title || optionsObj.fileName;
+
+        const shouldRemoveTitleAlias = !optionsObj.keepAliasThatMatchesTheFilename && title === optionsObj.fileName;
+
+        let yaml = text.match(yamlRegex)[1];
+
+        let previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_NAME));
+
+
+        let requiresChanges = true;
+
+        if (previousTitle === title && !shouldRemoveTitleAlias) {
+          requiresChanges = false;
+        }
+
+        if (previousTitle === null && shouldRemoveTitleAlias) {
+          requiresChanges = false;
+        }
+
+        if (!requiresChanges && optionsObj.preserveExistingAliasesSectionStyle) {
+          return text;
+        }
+
+        let aliasesValue = getYamlSectionValue(yaml, ALIASES_YAML_SECTION_NAME);
+
+        if (!aliasesValue) {
+          if (shouldRemoveTitleAlias) {
+            return text;
+          }
+
+          let emptyValue;
+          switch (optionsObj.yamlAliasesSectionStyle) {
+            case 'Multi-line array':
+              emptyValue = '\n  - \'\'';
+              break;
+            case 'Single-line array':
+              emptyValue = ' [\'\']';
+              break;
+            case 'Single string that expands to multi-line array if needed':
+            case 'Single string that expands to single-line array if needed':
+              emptyValue = ' \'\'';
+              break;
+            default:
+              throw new Error(`Unsupported setting 'YAML aliases section style': ${optionsObj.yamlAliasesSectionStyle}`);
+          }
+
+          let newYaml = yaml;
+          newYaml = setYamlSection(newYaml, ALIASES_YAML_SECTION_NAME, emptyValue);
+          newYaml = setYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME, ' \'\'');
+
+          text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
+          yaml = newYaml;
+          aliasesValue = getYamlSectionValue(yaml, ALIASES_YAML_SECTION_NAME);
+          previousTitle = '';
+        }
+
+        const isMultiline = aliasesValue.includes('\n');
+        const parsedAliases = loadYAML(aliasesValue);
+
+        const isSingleString = !isMultiline && aliasesValue.match(/^\[.*\]/) === null;
+
+        let resultAliasesArray = isSingleString ? [parsedAliases] : [...parsedAliases];
+
+        const previousTitleIndex = resultAliasesArray.indexOf(previousTitle);
+        if (previousTitleIndex !== -1) {
+          if (shouldRemoveTitleAlias) {
+            resultAliasesArray.splice(previousTitleIndex, 1);
+          } else {
+            resultAliasesArray[previousTitleIndex] = title;
+          }
+        } else if (!shouldRemoveTitleAlias) {
+          resultAliasesArray = [title, ...resultAliasesArray];
+        }
+
+        if (!requiresChanges) {
+          switch (optionsObj.yamlAliasesSectionStyle) {
+            case 'Multi-line array':
+              if (isMultiline) {
+                return text;
+              }
+              break;
+            case 'Single-line array':
+              if (!isMultiline && !isSingleString) {
+                return text;
+              }
+              break;
+            case 'Single string that expands to multi-line array if needed':
+              if (isSingleString) {
+                return text;
+              }
+              if (isMultiline && resultAliasesArray.length > 1) {
+                return text;
+              }
+              break;
+            case 'Single string that expands to single-line array if needed':
+              if (isSingleString) {
+                return text;
+              }
+              if (!isMultiline && resultAliasesArray.length > 1) {
+                return text;
+              }
+              break;
+          }
+        }
+
+        let resultStyle;
+
+        if (resultAliasesArray.length === 0) {
+          resultStyle = 'Remove';
+        } else if (!optionsObj.preserveExistingAliasesSectionStyle) {
+          switch (optionsObj.yamlAliasesSectionStyle) {
+            case 'Multi-line array':
+              resultStyle = 'Multi-line array';
+              break;
+            case 'Single-line array':
+              resultStyle = 'Single-line array';
+              break;
+            case 'Single string that expands to multi-line array if needed':
+              if (resultAliasesArray.length === 1) {
+                resultStyle = 'Single string';
+              } else {
+                resultStyle = 'Multi-line array';
+              }
+              break;
+            case 'Single string that expands to single-line array if needed':
+              if (resultAliasesArray.length === 1) {
+                resultStyle = 'Single string';
+              } else {
+                resultStyle = 'Single-line array';
+              }
+              break;
+          }
+        } else if (isSingleString) {
+          if (resultAliasesArray.length === 1) {
+            resultStyle = 'Single string';
+          } else {
+            switch (optionsObj.yamlAliasesSectionStyle) {
+              case 'Multi-line array':
+              case 'Single string that expands to multi-line array if needed':
+                resultStyle = 'Multi-line array';
+                break;
+              case 'Single-line array':
+              case 'Single string that expands to single-line array if needed':
+                resultStyle = 'Single-line array';
+                break;
+            }
+          }
+        } else if (isMultiline) {
+          resultStyle = 'Multi-line array';
+        } else {
+          resultStyle = 'Single-line array';
+        }
+
+        let newAliasesYaml;
+
+        switch (resultStyle) {
+          case 'Remove':
+            break;
+          case 'Multi-line array':
+            newAliasesYaml = `\n${toYamlString(resultAliasesArray)}`.replace(/\n-/g, '\n  -');
+            break;
+          case 'Single-line array':
+            newAliasesYaml = ` ${toSingleLineArrayYamlString(resultAliasesArray)}`;
+            break;
+          case 'Single string':
+            newAliasesYaml = resultAliasesArray.length === 0 ? '' : ` ${toYamlString(resultAliasesArray[0])}`;
+            break;
+          default:
+            throw new Error(`Unsupported resultStyle: ${resultStyle}`);
+        }
+
+        let newYaml = yaml;
+
+        if (resultStyle === 'Remove') {
+          newYaml = removeYamlSection(newYaml, ALIASES_YAML_SECTION_NAME);
+        } else {
+          newYaml = setYamlSection(newYaml, ALIASES_YAML_SECTION_NAME, newAliasesYaml);
+        }
+
+        if (shouldRemoveTitleAlias) {
+          newYaml = removeYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME);
+        } else {
+          newYaml = setYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME, ` ${toYamlString(title)}`);
+        }
+
+        text = text.replace(yaml, newYaml);
+
+        return text;
+      },
+      [
+        new Example(
+            'Adds a header with the title from heading.',
+            dedent`
+      # Obsidian
+      `,
+            dedent`
+      ---
+      aliases:
+        - Obsidian
+      linter-yaml-title-alias: Obsidian
+      ---
+      # Obsidian
+      `,
+            {
+              'YAML aliases section style': 'Multi-line array',
+            },
+        ),
+        new Example(
+            'Adds a header with the title.',
+            dedent`
+      `,
+            dedent`
+      ---
+      aliases:
+        - Filename
+      linter-yaml-title-alias: Filename
+      ---
+
+      `,
+            {
+              'metadata: file name': 'Filename',
+              'YAML aliases section style': 'Multi-line array',
+              'Keep alias that matches the filename': true,
+            },
+        ),
+      ],
+      [
+        new DropdownOption(
+            'YAML aliases section style',
+            'The style of the aliases YAML section',
+            'Multi-line array',
+            [
+              new DropdownRecord(
+                  'Multi-line array',
+                  '```aliases:\\n  - Title```',
+              ),
+              new DropdownRecord(
+                  'Single-line array',
+                  '```aliases: [Title]```',
+              ),
+              new DropdownRecord(
+                  'Single string that expands to multi-line array if needed',
+                  '```aliases: Title```',
+              ),
+              new DropdownRecord(
+                  'Single string that expands to single-line array if needed',
+                  '```aliases: Title```',
+              ),
+            ],
+        ),
+        new BooleanOption(
+            'Preserve existing aliases section style',
+            'If set, the `YAML aliases section style` setting applies only to the newly created sections',
+            true,
+        ),
+        new BooleanOption(
+            'Keep alias that matches the filename',
+            'Such aliases are usually redundant',
+            false,
+        ),
+      ],
   ),
 
   new Rule(
