@@ -2659,37 +2659,51 @@ export const rules: Rule[] = [
       ],
   ),
   new Rule(
-      'Remove Space around Chinese Punctuation',
-      'Ensures that Chinese/fullwidth punctuation is not followed by whitespace (either single spaces or a tab)',
+      'Remove Space around Fullwidth Characters',
+      'Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab)',
       RuleType.SPACING,
       (text: string) => {
         return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
-          return text.replace(/([ \t])+([\u3002\uFF08\uFF0C\uFF09\u201C\u201D\uFF1A\uFF1B])/g, '$2').replace(/([\u3002\uFF08\uFF0C\uFF09\u201C\u201D\uFF1A\uFF1B])([ \t])+/g, '$1');
+          const fullwidthCharactersStartingWithSpaceRegex: RegExp = /([ \t])+([\u2013\u2014\u2026\u3001\u3002\u300a\u300d-\u300f\u3014\u3015\u3008-\u3011\uff00-\uffff])/g;
+          if (fullwidthCharactersStartingWithSpaceRegex.test(text) === true) {
+            const lines = text.split('\n');
+            const lineCount = lines.length;
+
+            for (let i = 0; i < lineCount; i++) {
+              const line = lines[i];
+              const lineWithTrimmedStart = line.trimStart();
+              lines[i] = line.replace(lineWithTrimmedStart, lineWithTrimmedStart.replace(fullwidthCharactersStartingWithSpaceRegex, '$2'));
+            }
+
+            text = lines.join('\n');
+          }
+
+          return text.replace(/([\u2013\u2014\u2026\u3001\u3002\u300a\u300d-\u300f\u3014\u3015\u3008-\u3011\uff00-\uffff])([ \t])+/g, '$1');
         });
       },
       [
 
         new Example(
-            'Remove Spaces and Tabs around Fullwidth Punctuation',
+            'Remove Spaces and Tabs around Fullwidth Characrters',
             dedent`
+          Full list of affected charaters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
           This is a fullwidth period\t 。 with text after it.
           This is a fullwidth comma\t，  with text after it.
           This is a fullwidth left parenthesis （ \twith text after it.
           This is a fullwidth right parenthesis ）  with text after it.
-          This is a fullwidth opening double quote\t \t“  with text after it.
-          This is a fullwidth closing double quote ”  \twith text after it.
           This is a fullwidth colon ：  with text after it.
           This is a fullwidth semicolon ；  with text after it.
+            Ｉgnores space at start of line
       `,
             dedent`
+          Full list of affected charaters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
           This is a fullwidth period。with text after it.
           This is a fullwidth comma，with text after it.
           This is a fullwidth left parenthesis（with text after it.
           This is a fullwidth right parenthesis）with text after it.
-          This is a fullwidth opening double quote“with text after it.
-          This is a fullwidth closing double quote”with text after it.
           This is a fullwidth colon：with text after it.
           This is a fullwidth semicolon；with text after it.
+            Ｉgnores space at start of line
       `,
         ),
       ],

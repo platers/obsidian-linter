@@ -1802,40 +1802,40 @@ After:
 #标签A #标签2标签
 ```
 
-### Remove Space around Chinese Punctuation
+### Remove Space around Fullwidth Characters
 
-Alias: `remove-space-around-chinese-punctuation`
+Alias: `remove-space-around-fullwidth-characters`
 
-Ensures that Chinese/fullwidth punctuation is not followed by whitespace (either single spaces or a tab)
+Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab)
 
 
 
-Example: Remove Spaces and Tabs around Fullwidth Punctuation
+Example: Remove Spaces and Tabs around Fullwidth Characrters
 
 Before:
 
 ```markdown
+Full list of affected charaters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
 This is a fullwidth period	 。 with text after it.
 This is a fullwidth comma	，  with text after it.
 This is a fullwidth left parenthesis （ 	with text after it.
 This is a fullwidth right parenthesis ）  with text after it.
-This is a fullwidth opening double quote	 	“  with text after it.
-This is a fullwidth closing double quote ”  	with text after it.
 This is a fullwidth colon ：  with text after it.
 This is a fullwidth semicolon ；  with text after it.
+  Ｉgnores space at start of line
 ```
 
 After:
 
 ```markdown
+Full list of affected charaters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
 This is a fullwidth period。with text after it.
 This is a fullwidth comma，with text after it.
 This is a fullwidth left parenthesis（with text after it.
 This is a fullwidth right parenthesis）with text after it.
-This is a fullwidth opening double quote“with text after it.
-This is a fullwidth closing double quote”with text after it.
 This is a fullwidth colon：with text after it.
 This is a fullwidth semicolon；with text after it.
+  Ｉgnores space at start of line
 ```
 
 ### Remove link spacing
