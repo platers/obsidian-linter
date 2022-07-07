@@ -1670,6 +1670,10 @@ export const rules: Rule[] = [
         const ALIASES_YAML_SECTION_NAME = 'aliases';
         const LINTER_ALIASES_HELPER_NAME = 'linter-yaml-title-alias';
 
+        if (options['Preserve existing aliases section style'] === undefined) {
+          options['Preserve existing aliases section style'] = true;
+        }
+
         text = initYAML(text);
         let title = ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           const result = text.match(/^#\s+(.*)/m);
@@ -1686,7 +1690,18 @@ export const rules: Rule[] = [
 
         let previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_NAME));
 
-        if ((previousTitle === title && !shouldRemoveTitleAlias) || (previousTitle === null && shouldRemoveTitleAlias)) {
+
+        let requiresChanges = true;
+
+        if (previousTitle === title && !shouldRemoveTitleAlias) {
+          requiresChanges = false;
+        }
+
+        if (previousTitle === null && shouldRemoveTitleAlias) {
+          requiresChanges = false;
+        }
+
+        if (!requiresChanges && options['Preserve existing aliases section style']) {
           return text;
         }
 
@@ -1741,11 +1756,42 @@ export const rules: Rule[] = [
           resultAliasesArray = [title, ...resultAliasesArray];
         }
 
+        if (!requiresChanges) {
+          switch (options['YAML aliases section style']) {
+            case 'Multi-line array':
+              if (isMultiline) {
+                return text;
+              }
+              break;
+            case 'Single-line array':
+              if (!isMultiline && !isSingleString) {
+                return text;
+              }
+              break;
+            case 'Single string that expands to multi-line array if needed':
+              if (isSingleString) {
+                return text;
+              }
+              if (isMultiline && resultAliasesArray.length > 1) {
+                return text;
+              }
+              break;
+            case 'Single string that expands to single-line array if needed':
+              if (isSingleString) {
+                return text;
+              }
+              if (!isMultiline && resultAliasesArray.length > 1) {
+                return text;
+              }
+              break;
+          }
+        }
+
         let resultStyle;
 
         if (resultAliasesArray.length === 0) {
           resultStyle = 'Remove';
-        } else if (options['Preserve existing aliases section style'] === false) {
+        } else if (!options['Preserve existing aliases section style']) {
           switch (options['YAML aliases section style']) {
             case 'Multi-line array':
               resultStyle = 'Multi-line array';

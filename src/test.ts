@@ -1796,6 +1796,130 @@ describe('YAML Title Alias', () => {
 
     expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Multi-line array'})).toBe(after);
   });
+
+  it('Converts from single-line array to multi-line array', () => {
+    const before = dedent`
+    ---
+    aliases: [Title]
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      - Title
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Multi-line array', 'Preserve existing aliases section style': false})).toBe(after);
+  });
+
+  it('Converts from single string to multi-line array', () => {
+    const before = dedent`
+    ---
+    aliases: Title
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases:
+      - Title
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Multi-line array', 'Preserve existing aliases section style': false})).toBe(after);
+  });
+
+  it('Converts from multi-line array to single-line array', () => {
+    const before = dedent`
+    ---
+    aliases:
+      - Title
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: [Title]
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Single-line array', 'Preserve existing aliases section style': false})).toBe(after);
+  });
+
+  it('Converts from single string to single-line array', () => {
+    const before = dedent`
+    ---
+    aliases: Title
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: [Title]
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Single-line array', 'Preserve existing aliases section style': false})).toBe(after);
+  });
+
+  it('Converts from multi-line array to single string', () => {
+    const before = dedent`
+    ---
+    aliases:
+      - Title
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: Title
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Single string that expands to multi-line array if needed', 'Preserve existing aliases section style': false})).toBe(after);
+  });
+
+  it('Converts from single-line array to single string', () => {
+    const before = dedent`
+    ---
+    aliases: [Title]
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    const after = dedent`
+    ---
+    aliases: Title
+    linter-yaml-title-alias: Title
+    ---
+    # Title
+    `;
+
+    expect(rulesDict['yaml-title-alias'].apply(before, {'YAML aliases section style': 'Single string that expands to multi-line array if needed', 'Preserve existing aliases section style': false})).toBe(after);
+  });
 });
 
 describe('Links', () => {
