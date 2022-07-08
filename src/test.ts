@@ -539,7 +539,7 @@ describe('Trailing spaces', () => {
         line with trailing tab and spaces
         
       `;
-    expect(rulesDict['trailing-spaces'].apply(before, {'Style': 'Two Space Linebreak'})).toBe(after);
+    expect(rulesDict['trailing-spaces'].apply(before, {'Two Space Linebreak': true})).toBe(after);
   });
   /* eslint-enable no-mixed-spaces-and-tabs, no-tabs */
   it('Two Space Linebreak not removed', () => {
@@ -553,7 +553,7 @@ describe('Trailing spaces', () => {
         line with one trailing spaces  
 
       `;
-    expect(rulesDict['trailing-spaces'].apply(before, {'Style': 'Two Space Linebreak'})).toBe(after);
+    expect(rulesDict['trailing-spaces'].apply(before, {'Two Space Linebreak': true})).toBe(after);
   });
 });
 
