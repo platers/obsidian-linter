@@ -2163,64 +2163,194 @@ export const rules: Rule[] = [
 
   new Rule(
       'YAML Key Sort',
-      'Sorts the YAML keys based on the order and priority specified.',
+      'Sorts the YAML keys based on the order and priority specified. Note: removes blank lines as well.',
       RuleType.YAML,
       (text: string, options = {}) => {
-        const priorityOrder = options['YAML Key Sort Order'].split('\n');
-        return formatYAML(text, (text) => {
-          const yamlKeyToValue: Map<string, string> = new Map<string, string>();
-          const yamlLines = text.split('\n');
-          const lineCount = yamlLines.length;
+        const yaml = text.match(yamlRegex);
+        if (!yaml) {
+          return text;
+        }
 
-          let key: string = '';
-          let keyAndValue: string = '';
-          for (let i = 0; i < lineCount; i++) {
-            const line = yamlLines[i];
-            if (line === '---') {
-              continue;
-            }
+        let yamlText = yaml[1];
 
-            const lineStartTrimmed = line.trimStart();
-            const indexOfFirstColon = lineStartTrimmed.indexOf(': ');
-            if (lineStartTrimmed.startsWith('- ') || lineStartTrimmed.startsWith('-\t') || lineStartTrimmed.startsWith('#') || indexOfFirstColon !== -1) {
-              keyAndValue += '\n' + line;
-              continue;
-            } else {
-              yamlKeyToValue.set(key, keyAndValue);
-              keyAndValue = line;
-              key = lineStartTrimmed.substring(0, indexOfFirstColon - 1);
+        const priorityAtStartOfYaml: boolean = options['Priority Keys at Start of YAML'];
+        const getNewYamlFrontmatter = function(priorityKeysSorted: string, remainingKeys: string, priorityAtStart: boolean): string {
+          if (priorityAtStart) {
+            return `---\n${priorityKeysSorted}${remainingKeys}---`;
+          }
+
+          return `---\n${remainingKeys}${priorityKeysSorted}---`;
+        }
+
+        const getYAMLKeysSorted = function(yaml: string, keys: string[]): {remainingYaml: string, sortedYamlKeyValues: string} {
+          let specifiedYamlKeysSorted = '';
+          for (const key of keys) {
+            const value = getYamlSectionValue(yaml, key);
+            
+            if (value !== null) {
+              if (value.includes('\n')) {
+                specifiedYamlKeysSorted += `${key}:${value}\n`;
+              } else {
+                specifiedYamlKeysSorted += `${key}: ${value}\n`;
+              }
+              
+              yaml = removeYamlSection(yaml, key);
             }
           }
 
-          return text;
-        });
+          return {
+            remainingYaml: yaml,
+            sortedYamlKeyValues: specifiedYamlKeysSorted,
+          }
+        }
+
+        const yamlKeys: string[] = options['YAML Key Priority Sort Order'].split('\n');
+        const sortKeysResult = getYAMLKeysSorted(yamlText, yamlKeys);
+        const priorityKeysSorted = sortKeysResult.sortedYamlKeyValues;
+        yamlText = sortKeysResult.remainingYaml;
+
+        const sortOrder = options['YAML Sort Order for Other Keys'];
+        const yamlObject = loadYAML(yamlText);
+        if (yamlObject == null) {
+          return getNewYamlFrontmatter(priorityKeysSorted, yamlText, priorityAtStartOfYaml);
+        }
+
+        const sortAlphabeticallyDesc = function(previousKey: string, currentKey: string): number {
+          previousKey = previousKey.toLowerCase();
+          currentKey = currentKey.toLowerCase();
+
+          return previousKey > currentKey ? -1 : currentKey > previousKey ? 1 : 0;
+        };
+        const sortAlphabeticallyAsc = function(previousKey: string, currentKey: string): number {
+          previousKey = previousKey.toLowerCase();
+          currentKey = currentKey.toLowerCase();
+
+          return previousKey < currentKey ? -1 : currentKey < previousKey ? 1 : 0;
+        };
+
+        let remainingKeys = Object.keys(yamlObject);
+        let sortMethod: (previousKey: string, currentKey: string) => number;
+        if (sortOrder === 'Ascending Alphabetical') {
+          sortMethod = sortAlphabeticallyAsc;
+        } else if (sortOrder === 'Descending Alphabetical') {
+          sortMethod = sortAlphabeticallyDesc;
+        } else {
+          return getNewYamlFrontmatter(priorityKeysSorted, yamlText, priorityAtStartOfYaml);
+        }
+
+        remainingKeys = remainingKeys.sort(sortMethod);
+        const remainingKeysSortResult = getYAMLKeysSorted(yamlText, remainingKeys);
+
+        return getNewYamlFrontmatter(priorityKeysSorted, remainingKeysSortResult.sortedYamlKeyValues, priorityAtStartOfYaml);
       },
       [
         new Example(
-            'Adds a header with the title from heading.',
+            'Sorts YAML keys in order specified by `YAML Key Priority Sort Order`',
             dedent`
-      # Obsidian
+      ---
+      language: Typescript
+      type: programming
+      tags: computer
+      keywords: []
+      status: WIP
+      date: 02/15/2022
+      ---
       `,
             dedent`
       ---
-      title: Obsidian
+      date: 02/15/2022
+      type: programming
+      language: Typescript
+      tags: computer
+      keywords: []
+      status: WIP
       ---
-      # Obsidian
       `,
-            {
-              'metadata: file name': 'Filename',
-            },
+      {'YAML Key Priority Sort Order': 'date\ntype\nlanguage', 'YAML Sort Order for Other Keys': 'None', 'Priority Keys at Start of YAML': true}
         ),
+        new Example(
+          'Sorts YAML keys in order specified by `YAML Key Priority Sort Order` with `\'YAML Sort Order for Other Keys\' = Ascending Alphabetical`',
+          dedent`
+      ---
+      language: Typescript
+      type: programming
+      tags: computer
+      keywords: []
+      status: WIP
+      date: 02/15/2022
+      ---
+      `,
+          dedent`
+      ---
+      date: 02/15/2022
+      type: programming
+      language: Typescript
+      keywords: []
+      status: WIP
+      tags: computer
+      ---
+      `,
+    {'YAML Key Priority Sort Order': 'date\ntype\nlanguage', 'YAML Sort Order for Other Keys': 'Ascending Alphabetical'}
+      ),
+      new Example(
+        'Sorts YAML keys in order specified by `YAML Key Priority Sort Order` with `\'YAML Sort Order for Other Keys\' = Descending Alphabetical`',
+        dedent`
+      ---
+      language: Typescript
+      type: programming
+      tags: computer
+      keywords: []
+      status: WIP
+      date: 02/15/2022
+      ---
+      `,
+        dedent`
+      ---
+      date: 02/15/2022
+      type: programming
+      language: Typescript
+      tags: computer
+      status: WIP
+      keywords: []
+      ---
+      `,
+  {'YAML Key Priority Sort Order': 'date\ntype\nlanguage', 'YAML Sort Order for Other Keys': 'Descending Alphabetical', 'Priority Keys at Start of YAML': true}
+    ),
+  new Example(
+    'Sorts YAML keys in order specified by `YAML Key Priority Sort Order` with `\'YAML Sort Order for Other Keys\' = Descending Alphabetical` and `\'Priority Keys at Start of YAML\' = false`',
+    dedent`
+  ---
+  language: Typescript
+  type: programming
+  tags: computer
+  keywords: []
+
+  status: WIP
+  date: 02/15/2022
+  ---
+  `,
+    dedent`
+  ---
+  tags: computer
+  status: WIP
+  keywords: []
+  date: 02/15/2022
+  type: programming
+  language: Typescript
+  ---
+  `,
+{'YAML Key Priority Sort Order': 'date\ntype\nlanguage', 'YAML Sort Order for Other Keys': 'Descending Alphabetical', 'Priority Keys at Start of YAML': false}
+    ),
       ],
       [
-        new TextAreaOption('YAML Key Sort Order', 'The order in which to sort keys with one on each line where it sorts in the order found in the list', ''),
-        // TODO: finish adding something to allow this at the start or end of the YAML new BooleanOption('YAML Key Sort Order'),
+        new TextAreaOption('YAML Key Priority Sort Order', 'The order in which to sort keys with one on each line where it sorts in the order found in the list', ''),
+        new BooleanOption('Priority Keys at Start of YAML', '`YAML Key Priority Sort Order` is placed at the start of the YAML frontmatter', true),
         new DropdownOption(
             'YAML Sort Order for Other Keys',
-            'The way in which to sort the keys that are not found in the YAML Key Sort Order Text Area',
+            'The way in which to sort the keys that are not found in the YAML Key Priority Sort Order Text Area',
             'None',
             [
-              new DropdownRecord('None', 'No sorting other than what is in the YAML Key Sort Order Text Area'),
+              new DropdownRecord('None', 'No sorting other than what is in the YAML Key Priority Sort Order Text Area'),
               new DropdownRecord('Ascending Alphabetical', 'Sorts the keys based on key value from a to z'),
               new DropdownRecord('Descending Alphabetical', 'Sorts the keys based on key value from z to a'),
             ],
