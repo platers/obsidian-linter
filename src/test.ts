@@ -2027,7 +2027,7 @@ describe('Links', () => {
         # Hello world
 
         [[File with  spaces]]
-        `,
+      `,
     });
   });
   it('Link in heading is still present with first letter capitalization rules on', () => {
