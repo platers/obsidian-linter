@@ -42,15 +42,15 @@ function generateDocs() {
 
     Before:
 
-    \`\`\`markdown
+    \`\`\`\`\`\`markdown
     ${test.before}
-    \`\`\`
+    \`\`\`\`\`\`
 
     After:
 
-    \`\`\`markdown
+    \`\`\`\`\`\`markdown
     ${test.after}
-    \`\`\`
+    \`\`\`\`\`\`
   `).join('\n');
 
     const options_list = rule.options.slice(1).map((option) => {
