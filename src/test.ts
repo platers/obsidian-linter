@@ -1,12 +1,12 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import {Rule, Example} from './rules';
+import {Rule, Example, Options} from './rules';
 import {rules, rulesDict, getDisabledRules} from './rules-list';
 import {escapeRegExp, yamlRegex} from './utils';
 import RuleBase from './Rules/RuleBase';
 import {TrailingSpaces, TrailingSpacesOptions} from './Rules/TrailingSpaces';
 
-function ruleTest<TOptions>(args: {ruleClass: typeof RuleBase, before: string, after: string, options?: TOptions}) {
+function ruleTest<TOptions extends Options>(args: {ruleClass: typeof RuleBase, before: string, after: string, options?: TOptions}) {
   const rule = args.ruleClass.rule;
   expect(rule.apply(args.before, args.options)).toBe(args.after);
 }
