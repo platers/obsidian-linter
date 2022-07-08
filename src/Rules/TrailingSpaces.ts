@@ -24,7 +24,7 @@ export class TrailingSpaces extends RuleBase<TrailingSpacesOptions> {
 
   apply(text: string, options: TrailingSpacesOptions) {
     return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
-      if (options.twoSpaceLineBreak === false) {
+      if (!options.twoSpaceLineBreak) {
         return text.replace(/[ \t]+$/gm, '');
       } else {
         text = text.replace(/(\S)[ \t]$/gm, '$1'); // one whitespace
