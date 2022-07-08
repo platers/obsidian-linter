@@ -27,9 +27,7 @@ export class TrailingSpaces extends RuleBase<TrailingSpacesOptions> {
       if (!options.twoSpaceLineBreak) {
         return text.replace(/[ \t]+$/gm, '');
       } else {
-        text = text.replace(/(\S)[ \t]$/gm, '$1'); // one whitespace
-        text = text.replace(/(\S)[ \t]{3,}$/gm, '$1'); // three or more whitespaces
-        text = text.replace(/(\S)( ?\t\t? ?)$/gm, '$1'); // two whitespaces with at least one tab
+        text = text.replace(/(\S)(?! {2}$)[ \t]+$/gm, '$1'); // exclude two trailing spaces
         return text;
       }
     });
