@@ -3,6 +3,13 @@ import moment from 'moment';
 import {Rule, Example} from './rules';
 import {rules, rulesDict, getDisabledRules} from './rules-list';
 import {escapeRegExp, yamlRegex} from './utils';
+import RuleBase from './Rules/RuleBase';
+import {TrailingSpaces, TrailingSpacesOptions} from './Rules/TrailingSpaces';
+
+function ruleTest<TOptions>(args: {ruleClass: typeof RuleBase, before: string, after: string, options?: TOptions}) {
+  const rule = args.ruleClass.rule;
+  expect(rule.apply(args.before, args.options)).toBe(args.after);
+}
 
 describe('Examples pass', () => {
   for (const rule of rules) {
@@ -506,54 +513,64 @@ describe('Convert spaces to tabs', () => {
 
 describe('Trailing spaces', () => {
   it('One trailing space removed', () => {
-    const before = dedent`
+    ruleTest({
+      ruleClass: TrailingSpaces,
+      before: dedent`
         # H1 
         line with one trailing spaces 
-      `;
-    const after = dedent`
+      `,
+      after: dedent`
         # H1
         line with one trailing spaces
-      `;
-    expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
+      `,
+    });
   });
   it('Three trailing whitespaces removed', () => {
-    const before = dedent`
+    ruleTest({
+      ruleClass: TrailingSpaces,
+      before: dedent`
         # H1   
         line with three trailing spaces   
-      `;
-    const after = dedent`
+      `,
+      after: dedent`
         # H1
         line with three trailing spaces
-      `;
-    expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
+      `,
+    });
   });
   /* eslint-disable no-mixed-spaces-and-tabs, no-tabs */
   it('Tab-Space-Linebreak removed', () => {
-    const before = dedent`
+    ruleTest({
+      ruleClass: TrailingSpaces,
+      before: dedent`
         # H1
         line with trailing tab and spaces    
-
-      `;
-    const after = dedent`
+      `,
+      after: dedent`
         # H1
         line with trailing tab and spaces
-        
-      `;
-    expect(rulesDict['trailing-spaces'].apply(before, {'Two Space Linebreak': true})).toBe(after);
+      `,
+      options: {
+        twoSpaceLineBreak: true,
+      } as TrailingSpacesOptions,
+    });
   });
   /* eslint-enable no-mixed-spaces-and-tabs, no-tabs */
   it('Two Space Linebreak not removed', () => {
-    const before = dedent`
+    ruleTest({
+      ruleClass: TrailingSpaces,
+      before: dedent`
         # H1
         line with one trailing spaces  
-
-      `;
-    const after = dedent`
+      `,
+      after: dedent`
         # H1
         line with one trailing spaces  
-
-      `;
-    expect(rulesDict['trailing-spaces'].apply(before, {'Two Space Linebreak': true})).toBe(after);
+      `,
+      options: {
+        twoSpaceLineBreak: true,
+      } as TrailingSpacesOptions,
+    });
   });
 });
 
@@ -1969,49 +1986,49 @@ describe('YAML Title Alias', () => {
 
 describe('Links', () => {
   it('Regular link with spaces stays the same', () => {
-    const before = dedent`
-    # Hello world
-
-    [This has  spaces in it](File with  spaces.md)
-    `;
-
-    const after = dedent`
-    # Hello world
-
-    [This has  spaces in it](File with  spaces.md)
-    `;
-
-    expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
+    ruleTest({
+      ruleClass: TrailingSpaces,
+      before: dedent`
+        # Hello world
+  
+        [This has  spaces in it](File with  spaces.md)
+      `,
+      after: dedent`
+        # Hello world
+  
+        [This has  spaces in it](File with  spaces.md)
+      `,
+    });
   });
   it('Image link with spaces stays the same', () => {
-    const before = dedent`
-    # Hello world
+    ruleTest({
+      ruleClass: TrailingSpaces,
+      before: dedent`
+        # Hello world
 
-    ![This has  spaces in it](File with  spaces.png)
-    `;
+        ![This has  spaces in it](File with  spaces.png)
+      `,
+      after: dedent`
+        # Hello world
 
-    const after = dedent`
-    # Hello world
-
-    ![This has  spaces in it](File with  spaces.png)
-    `;
-
-    expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
+        ![This has  spaces in it](File with  spaces.png)
+      `,
+    });
   });
   it('Wiki link with spaces stays the same', () => {
-    const before = dedent`
-    # Hello world
+    ruleTest({
+      ruleClass: TrailingSpaces,
+      before: dedent`
+        # Hello world
 
-    [[File with  spaces]]
-    `;
+        [[File with  spaces]]
+      `,
+      after: dedent`
+        # Hello world
 
-    const after = dedent`
-    # Hello world
-
-    [[File with  spaces]]
-    `;
-
-    expect(rulesDict['trailing-spaces'].apply(before)).toBe(after);
+        [[File with  spaces]]
+        `,
+    });
   });
   it('Link in heading is still present with first letter capitalization rules on', () => {
     const before = dedent`

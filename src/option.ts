@@ -1,5 +1,5 @@
 import LinterPlugin from './main';
-import {LinterSettings} from './rules';
+import {LinterSettings, Options} from './rules';
 
 /** Class representing an option of a rule */
 
@@ -8,6 +8,7 @@ export class Option {
   public description: string;
   public ruleName: string;
   public defaultValue: any;
+  public optionsKey: any;
 
   /**
    * Create an option
@@ -37,6 +38,18 @@ export class Option {
 
 export class BooleanOption extends Option {
   public defaultValue: boolean;
+
+  static create<TOptions extends Options>(args: {
+    optionsClass: (new() => TOptions),
+    name: string,
+    description: string,
+    optionsKey: keyof TOptions
+  }) : BooleanOption {
+    const defaultOptions = new args.optionsClass(); // eslint-disable-line new-cap
+    const result = new BooleanOption(args.name, args.description, defaultOptions[args.optionsKey]);
+    result.optionsKey = args.optionsKey;
+    return result;
+  }
 }
 
 export class TextOption extends Option {

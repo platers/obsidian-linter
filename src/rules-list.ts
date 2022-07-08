@@ -29,6 +29,7 @@ import {
   TextAreaOption,
 } from './option';
 import {Example, Rule, RuleType, RuleTypeOrder} from './rules';
+import {TrailingSpaces} from './Rules/TrailingSpaces';
 
 export function getDisabledRules(text: string): string[] {
   const yaml = text.match(yamlRegex);
@@ -61,51 +62,7 @@ export function getDisabledRules(text: string): string[] {
 }
 
 export const rules: Rule[] = [
-  new Rule(
-      'Trailing spaces',
-      'Removes extra spaces after every line.',
-      RuleType.SPACING,
-      (text: string, options = {}) => {
-        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
-          if (options['Two Space Linebreak'] === false) {
-            return text.replace(/[ \t]+$/gm, '');
-          } else {
-            text = text.replace(/(\S)[ \t]$/gm, '$1'); // one whitespace
-            text = text.replace(/(\S)[ \t]{3,}$/gm, '$1'); // three or more whitespaces
-            text = text.replace(/(\S)( ?\t\t? ?)$/gm, '$1'); // two whitespaces with at least one tab
-            return text;
-          }
-        });
-      },
-      [
-        new Example(
-            'Removes trailing spaces and tabs.',
-            dedent`
-        # H1   
-        Line with trailing spaces and tabs.	        `, // eslint-disable-line no-tabs
-            dedent`
-        # H1
-        Line with trailing spaces and tabs.`,
-        ),
-        new Example(
-            'With `Two Space Linebreak = true`',
-            dedent`
-        # H1
-        Line with trailing spaces and tabs.  `,
-            dedent`
-        # H1
-        Line with trailing spaces and tabs.  `,
-            {'Two Space Linebreak': true},
-        ),
-      ],
-      [
-        new BooleanOption(
-            'Two Space Linebreak',
-            'Ignore two spaces followed by a line break ("Two Space Rule").',
-            false,
-        ),
-      ],
-  ),
+  new TrailingSpaces().register(),
   new Rule(
       'Heading blank lines',
       'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',

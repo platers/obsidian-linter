@@ -123,4 +123,13 @@ export class Example {
     this.before = before;
     this.after = after;
   }
+
+  static create<TOptions extends Options>(args: {
+    description: string,
+    before: string,
+    after: string,
+    options?: TOptions
+  }): Example {
+    return new Example(args.description, args.before, args.after, args.options);
+  }
 }
