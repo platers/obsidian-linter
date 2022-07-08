@@ -1,6 +1,7 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import {rules, Rule, rulesDict, Example, getDisabledRules} from './rules';
+import {Rule, Example} from './rules';
+import {rules, rulesDict, getDisabledRules} from './rules-list';
 import {escapeRegExp, yamlRegex} from './utils';
 
 describe('Examples pass', () => {

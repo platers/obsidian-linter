@@ -1,5 +1,6 @@
 import {App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
-import {LinterSettings, Options, rules, getDisabledRules} from './rules';
+import {LinterSettings, Options} from './rules';
+import {rules, getDisabledRules} from './rules-list';
 import DiffMatchPatch from 'diff-match-patch';
 import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';
 import dedent from 'ts-dedent';
