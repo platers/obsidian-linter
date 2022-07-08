@@ -401,6 +401,133 @@ nestedArray2: [["value: with colon in the middle"], "value with ' a single quote
 _Note that escaped commas in a YAML array will be treated as a separator._
 ``````
 
+### YAML Key Sort
+
+Alias: `yaml-key-sort`
+
+Sorts the YAML keys based on the order and priority specified. Note: removes blank lines as well.
+
+Options:
+- YAML Key Priority Sort Order: The order in which to sort keys with one on each line where it sorts in the order found in the list
+	- Default: ``
+- Priority Keys at Start of YAML: `YAML Key Priority Sort Order` is placed at the start of the YAML frontmatter
+	- Default: `true`
+- YAML Sort Order for Other Keys: The way in which to sort the keys that are not found in the `YAML Key Priority Sort Order` text area
+	- Default: `None`
+	- `None`: No sorting other than what is in the `YAML Key Priority Sort Order` text area
+	- `Ascending Alphabetical`: Sorts the keys based on key value from a to z
+	- `Descending Alphabetical`: Sorts the keys based on key value from z to a
+
+Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language`
+
+Before:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+status: WIP
+date: 02/15/2022
+---
+``````
+
+After:
+
+``````markdown
+---
+date: 02/15/2022
+type: programming
+language: Typescript
+tags: computer
+keywords: []
+status: WIP
+---
+``````
+Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Ascending Alphabetical`
+
+Before:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+status: WIP
+date: 02/15/2022
+---
+``````
+
+After:
+
+``````markdown
+---
+date: 02/15/2022
+type: programming
+language: Typescript
+keywords: []
+status: WIP
+tags: computer
+---
+``````
+Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Descending Alphabetical`
+
+Before:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+status: WIP
+date: 02/15/2022
+---
+``````
+
+After:
+
+``````markdown
+---
+date: 02/15/2022
+type: programming
+language: Typescript
+tags: computer
+status: WIP
+keywords: []
+---
+``````
+Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Descending Alphabetical` and `'Priority Keys at Start of YAML' = false`
+
+Before:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+
+status: WIP
+date: 02/15/2022
+---
+``````
+
+After:
+
+``````markdown
+---
+tags: computer
+status: WIP
+keywords: []
+date: 02/15/2022
+type: programming
+language: Typescript
+---
+``````
+
 ## Heading
 ### Header Increment
 
