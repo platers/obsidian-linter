@@ -17,57 +17,57 @@ Example: Format Tags in YAML frontmatter
 
 Before:
 
-```markdown
+``````markdown
 ---
 tags: #one #two #three #nested/four/five
 ---
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 tags: one two three nested/four/five
 ---
-```
+``````
 Example: Format tags in array
 
 Before:
 
-```markdown
+``````markdown
 ---
 tags: [#one #two #three]
 ---
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 tags: [one two three]
 ---
-```
+``````
 Example: Format tags in list
 
 Before:
 
-```markdown
+``````markdown
 ---
 tags:
 - #tag1
 - #tag2
 ---
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 tags:
 - tag1
 - tag2
 ---
-```
+``````
 
 ### Insert YAML attributes
 
@@ -86,21 +86,21 @@ animal: dog`
 
 Before:
 
-```markdown
+``````markdown
 ---
 animal: cat
 ---
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 aliases:
 tags: doc
 animal: cat
 ---
-```
+``````
 
 ### YAML Timestamp
 
@@ -124,67 +124,67 @@ Example: Adds a header with the date.
 
 Before:
 
-```markdown
+``````markdown
 # H1
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 date created: Wednesday, January 1st 2020, 12:00:00 am
 date modified: Thursday, January 2nd 2020, 12:00:05 am
 ---
 # H1
-```
+``````
 Example: dateCreated option is false
 
 Before:
 
-```markdown
+``````markdown
 # H1
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 date modified: Thursday, January 2nd 2020, 12:00:05 am
 ---
 # H1
-```
+``````
 Example: Date Created Key is set
 
 Before:
 
-```markdown
+``````markdown
 # H1
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 created: Wednesday, January 1st 2020, 12:00:00 am
 ---
 # H1
-```
+``````
 Example: Date Modified Key is set
 
 Before:
 
-```markdown
+``````markdown
 # H1
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 modified: Wednesday, January 1st 2020, 4:00:00 pm
 ---
 # H1
-```
+``````
 
 ### YAML Title
 
@@ -200,34 +200,34 @@ Example: Adds a header with the title from heading.
 
 Before:
 
-```markdown
+``````markdown
 # Obsidian
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 title: Obsidian
 ---
 # Obsidian
-```
+``````
 Example: Adds a header with the title.
 
 Before:
 
-```markdown
+``````markdown
 
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 title: Filename
 ---
 
-```
+``````
 
 ### YAML Title Alias
 
@@ -251,38 +251,38 @@ Example: Adds a header with the title from heading.
 
 Before:
 
-```markdown
+``````markdown
 # Obsidian
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 aliases:
   - Obsidian
 linter-yaml-title-alias: Obsidian
 ---
 # Obsidian
-```
+``````
 Example: Adds a header with the title.
 
 Before:
 
-```markdown
+``````markdown
 
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 aliases:
   - Filename
 linter-yaml-title-alias: Filename
 ---
 
-```
+``````
 
 ### Escape YAML Special Characters
 
@@ -302,26 +302,26 @@ Example: YAML without anything to escape
 
 Before:
 
-```markdown
+``````markdown
 ---
 key: value
 otherKey: []
 ---
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 key: value
 otherKey: []
 ---
-```
+``````
 Example: YAML with unescaped values
 
 Before:
 
-```markdown
+``````markdown
 ---
 key: value: with colon in the middle
 secondKey: value with ' a single quote present
@@ -331,11 +331,11 @@ fifthKey: value with both ' " a double and single quote present is not escaped, 
 sixthKey: colon:between characters is fine
 otherKey: []
 ---
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 key: "value: with colon in the middle"
 secondKey: "value with ' a single quote present"
@@ -345,12 +345,12 @@ fifthKey: value with both ' " a double and single quote present is not escaped, 
 sixthKey: colon:between characters is fine
 otherKey: []
 ---
-```
+``````
 Example: YAML with unescaped values in an expanded list with `Default Escape Character = '`
 
 Before:
 
-```markdown
+``````markdown
 ---
 key:
   - value: with colon in the middle
@@ -360,11 +360,11 @@ key:
   - value with both ' " a double and single quote present is not escaped, but is invalid YAML
   - colon:between characters is fine
 ---
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 key:
   - 'value: with colon in the middle'
@@ -374,12 +374,12 @@ key:
   - value with both ' " a double and single quote present is not escaped, but is invalid YAML
   - colon:between characters is fine
 ---
-```
+``````
 Example: YAML with unescaped values with arrays
 
 Before:
 
-```markdown
+``````markdown
 ---
 array: [value: with colon in the middle, value with ' a single quote present, "already escaped: value", value with " a double quote present, value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
 nestedArray: [[value: with colon in the middle, value with ' a single quote present], ["already escaped: value", value with " a double quote present], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
@@ -387,11 +387,11 @@ nestedArray2: [[value: with colon in the middle], value with ' a single quote pr
 ---
 
 _Note that escaped commas in a YAML array will be treated as a separator._
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 array: ["value: with colon in the middle", "value with ' a single quote present", "already escaped: value", 'value with " a double quote present', value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
 nestedArray: [["value: with colon in the middle", "value with ' a single quote present"], ["already escaped: value", 'value with " a double quote present'], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
@@ -399,7 +399,7 @@ nestedArray2: [["value: with colon in the middle"], "value with ' a single quote
 ---
 
 _Note that escaped commas in a YAML array will be treated as a separator._
-```
+``````
 
 ## Heading
 ### Header Increment
@@ -414,7 +414,7 @@ Example:
 
 Before:
 
-```markdown
+``````markdown
 # H1
 ### H3
 ### H3
@@ -422,11 +422,11 @@ Before:
 ###### H6
 
 We skipped a 2nd level heading
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # H1
 ## H3
 ## H3
@@ -434,12 +434,12 @@ After:
 #### H6
 
 We skipped a 2nd level heading
-```
+``````
 Example: Skipped headings in sections that would be decremented will result in those headings not having the same meaning
 
 Before:
 
-```markdown
+``````markdown
 # H1
 ### H3
 
@@ -458,11 +458,11 @@ We skipped 6 previously so it will be treated the same as the H3 above since it 
 This resets the decrement section so the H6 below is decremented to an H3
 
 ###### H6
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # H1
 ## H3
 
@@ -481,7 +481,7 @@ We skipped 6 previously so it will be treated the same as the H3 above since it 
 This resets the decrement section so the H6 below is decremented to an H3
 
 ### H6
-```
+``````
 
 ### File Name Heading
 
@@ -495,36 +495,36 @@ Example: Inserts an H1 heading
 
 Before:
 
-```markdown
+``````markdown
 This is a line of text
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # File Name
 This is a line of text
-```
+``````
 Example: Inserts heading after YAML front matter
 
 Before:
 
-```markdown
+``````markdown
 ---
 title: My Title
 ---
 This is a line of text
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 title: My Title
 ---
 # File Name
 This is a line of text
-```
+``````
 
 ### Capitalize Headings
 
@@ -549,66 +549,66 @@ Example: With `Title Case=true`, `Ignore Cased Words=false`
 
 Before:
 
-```markdown
+``````markdown
 # this is a heading 1
 ## THIS IS A HEADING 2
 ### a heading 3
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # This is a Heading 1
 ## This is a Heading 2
 ### A Heading 3
-```
+``````
 Example: With `Title Case=true`, `Ignore Cased Words=true`
 
 Before:
 
-```markdown
+``````markdown
 # this is a heading 1
 ## THIS IS A HEADING 2
 ### a hEaDiNg 3
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # This is a Heading 1
 ## THIS IS A HEADING 2
 ### A hEaDiNg 3
-```
+``````
 Example: With `First letter=true`
 
 Before:
 
-```markdown
+``````markdown
 # this is a heading 1
 ## this is a heading 2
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # This is a heading 1
 ## This is a heading 2
-```
+``````
 Example: With `ALL CAPS=true`
 
 Before:
 
-```markdown
+``````markdown
 # this is a heading 1
 ## this is a heading 2
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # THIS IS A HEADING 1
 ## THIS IS A HEADING 2
-```
+``````
 
 ## Footnote
 ### Move Footnotes to the bottom
@@ -623,7 +623,7 @@ Example: Moving footnotes to the bottom
 
 Before:
 
-```markdown
+``````markdown
 Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
 
 [^1]: first footnote
@@ -632,11 +632,11 @@ Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
 [^2]: second footnote
 
 Maecenas malesuada dignissim purus ac volutpat.
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
 
 Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
@@ -644,7 +644,7 @@ Maecenas malesuada dignissim purus ac volutpat.
 
 [^1]: first footnote
 [^2]: second footnote
-```
+``````
 
 ### Re-Index Footnotes
 
@@ -658,61 +658,61 @@ Example: Re-indexing footnotes after having deleted previous footnotes
 
 Before:
 
-```markdown
+``````markdown
 Lorem ipsum at aliquet felis.[^3] Donec dictum turpis quis pellentesque,[^5] et iaculis tortor condimentum.
 
 [^3]: first footnote
 [^5]: second footnote
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
 
 [^1]: first footnote
 [^2]: second footnote
-```
+``````
 Example: Re-indexing footnotes after inserting a footnote between
 
 Before:
 
-```markdown
+``````markdown
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^1a] Vestibulum nec blandit felis, vulputate finibus purus.[^2] Praesent quis iaculis diam.
 
 [^1]: first footnote
 [^1a]: third footnote, inserted later
 [^2]: second footnotes
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^2] Vestibulum nec blandit felis, vulputate finibus purus.[^3] Praesent quis iaculis diam.
 
 [^1]: first footnote
 [^2]: third footnote, inserted later
 [^3]: second footnotes
-```
+``````
 Example: Re-indexing duplicate footnote keys
 
 Before:
 
-```markdown
+``````markdown
 Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^1] et iaculis tortor condimentum.
 
 [^1]: first footnote
 [^1]: second footnote
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
 
 [^1]: first footnote
 [^2]: second footnote
-```
+``````
 
 ### Footnote after Punctuation
 
@@ -726,15 +726,15 @@ Example: Placing footnotes after punctuation.
 
 Before:
 
-```markdown
+``````markdown
 Lorem[^1]. Ipsum[^2], doletes.
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Lorem.[^1] Ipsum,[^2] doletes.
-```
+``````
 
 ## Content
 ### Remove Multiple Spaces
@@ -749,15 +749,15 @@ Example: Removing double and triple space.
 
 Before:
 
-```markdown
+``````markdown
 Lorem ipsum   dolor  sit amet.
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Lorem ipsum dolor sit amet.
-```
+``````
 
 ### Remove Hyphenated Line Breaks
 
@@ -771,15 +771,15 @@ Example: Removing hyphenated line breaks.
 
 Before:
 
-```markdown
+``````markdown
 This text has a linebr‐ eak.
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 This text has a linebreak.
-```
+``````
 
 ### Remove Consecutive List Markers
 
@@ -793,23 +793,23 @@ Example: Removing consecutive list markers.
 
 Before:
 
-```markdown
+``````markdown
 - item 1
 - - copypasted item A
 - item 2
   - indented item
   - - copypasted item B
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 - item 1
 - copypasted item A
 - item 2
   - indented item
   - copypasted item B
-```
+``````
 
 ### Remove Empty List Markers
 
@@ -823,18 +823,18 @@ Example: Removes empty list markers.
 
 Before:
 
-```markdown
+``````markdown
 - item 1
 -
 - item 2
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 - item 1
 - item 2
-```
+``````
 
 ### Convert Bullet List Markers
 
@@ -848,34 +848,34 @@ Example: Converts •
 
 Before:
 
-```markdown
+``````markdown
 • item 1
 • item 2
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 - item 1
 - item 2
-```
+``````
 Example: Converts §
 
 Before:
 
-```markdown
+``````markdown
 • item 1
   § item 2
   § item 3
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 - item 1
   - item 2
   - item 3
-```
+``````
 
 ### Proper Ellipsis
 
@@ -889,15 +889,15 @@ Example: Replacing three consecutive dots with an ellipsis.
 
 Before:
 
-```markdown
+``````markdown
 Lorem (...) Impsum.
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Lorem (…) Impsum.
-```
+``````
 
 ### Emphasis Style
 
@@ -916,7 +916,7 @@ Example: Emphasis indicators should use underscores when style is set to 'unders
 
 Before:
 
-```markdown
+``````markdown
 # Emphasis Cases
 
 *Test emphasis*
@@ -931,11 +931,11 @@ This is ***nested emphasis* and ending bold**
 
 * List Item1 with *emphasized text*
 * List Item2
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # Emphasis Cases
 
 _Test emphasis_
@@ -950,12 +950,12 @@ This is **_nested emphasis_ and ending bold**
 
 * List Item1 with _emphasized text_
 * List Item2
-```
+``````
 Example: Emphasis indicators should use asterisks when style is set to 'asterisk'
 
 Before:
 
-```markdown
+``````markdown
 # Emphasis Cases
 
 _Test emphasis_
@@ -967,11 +967,11 @@ This is ___nested bold__ and ending emphasized_
 This is ___nested emphasis_ and ending bold__
 
 __Test bold__
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # Emphasis Cases
 
 *Test emphasis*
@@ -983,12 +983,12 @@ This is *__nested bold__ and ending emphasized*
 This is __*nested emphasis* and ending bold__
 
 __Test bold__
-```
+``````
 Example: Emphasis indicators should use consistent style based on first emphasis indicator in a file when style is set to 'consistent'
 
 Before:
 
-```markdown
+``````markdown
 # Emphasis First Emphasis Is an Asterisk
 
 *First emphasis*
@@ -999,11 +999,11 @@ This is *__nested bold__ and ending emphasized*
 This is **_nested emphasis_ and ending bold**
 
 __Test bold__
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # Emphasis First Emphasis Is an Asterisk
 
 *First emphasis*
@@ -1014,12 +1014,12 @@ This is *__nested bold__ and ending emphasized*
 This is ***nested emphasis* and ending bold**
 
 __Test bold__
-```
+``````
 Example: Emphasis indicators should use consistent style based on first emphasis indicator in a file when style is set to 'consistent'
 
 Before:
 
-```markdown
+``````markdown
 # Emphasis First Emphasis Is an Underscore
 
 **_First emphasis_**
@@ -1030,11 +1030,11 @@ This is _**nested bold** and ending emphasized_
 This is __*nested emphasis* and ending bold__
 
 __Test bold__
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # Emphasis First Emphasis Is an Underscore
 
 **_First emphasis_**
@@ -1045,7 +1045,7 @@ This is _**nested bold** and ending emphasized_
 This is ___nested emphasis_ and ending bold__
 
 __Test bold__
-```
+``````
 
 ### Strong Style
 
@@ -1064,7 +1064,7 @@ Example: Strong indicators should use underscores when style is set to 'undersco
 
 Before:
 
-```markdown
+``````markdown
 # Strong/Bold Cases
 
 **Test bold**
@@ -1079,11 +1079,11 @@ This is ***nested emphasis* and ending bold**
 
 * List Item1 with **bold text**
 * List Item2
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # Strong/Bold Cases
 
 __Test bold__
@@ -1098,12 +1098,12 @@ This is __*nested emphasis* and ending bold__
 
 * List Item1 with __bold text__
 * List Item2
-```
+``````
 Example: Strong indicators should use asterisks when style is set to 'asterisk'
 
 Before:
 
-```markdown
+``````markdown
 # Strong/Bold Cases
 
 __Test bold__
@@ -1115,11 +1115,11 @@ This is ___nested bold__ and ending emphasized_
 This is ___nested emphasis_ and ending bold__
 
 _Test emphasis_
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # Strong/Bold Cases
 
 **Test bold**
@@ -1131,12 +1131,12 @@ This is _**nested bold** and ending emphasized_
 This is **_nested emphasis_ and ending bold**
 
 _Test emphasis_
-```
+``````
 Example: Strong indicators should use consistent style based on first strong indicator in a file when style is set to 'consistent'
 
 Before:
 
-```markdown
+``````markdown
 # Strong First Strong Is an Asterisk
 
 **First bold**
@@ -1147,11 +1147,11 @@ This is *__nested bold__ and ending emphasized*
 This is **_nested emphasis_ and ending bold**
 
 __Test bold__
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # Strong First Strong Is an Asterisk
 
 **First bold**
@@ -1162,12 +1162,12 @@ This is ***nested bold** and ending emphasized*
 This is **_nested emphasis_ and ending bold**
 
 **Test bold**
-```
+``````
 Example: Strong indicators should use consistent style based on first strong indicator in a file when style is set to 'consistent'
 
 Before:
 
-```markdown
+``````markdown
 # Strong First Strong Is an Underscore
 
 __First bold__
@@ -1178,11 +1178,11 @@ This is ***nested bold** and ending emphasized*
 This is ___nested emphasis_ and ending bold__
 
 **Test bold**
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # Strong First Strong Is an Underscore
 
 __First bold__
@@ -1193,7 +1193,7 @@ This is *__nested bold__ and ending emphasized*
 This is ___nested emphasis_ and ending bold__
 
 __Test bold__
-```
+``````
 
 ### No Bare URLs
 
@@ -1207,7 +1207,7 @@ Example: Make sure that links are inside of angle brackets when not in single qu
 
 Before:
 
-```markdown
+``````markdown
 https://github.com
 braces around url should stay the same: [https://github.com]
 backticks around url should stay the same: `https://github.com`
@@ -1217,11 +1217,11 @@ Links mid-sentence should be updated like https://google.com will be.
 <https://github.com>
 links should stay the same: [](https://github.com)
 https://gitlab.com
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 <https://github.com>
 braces around url should stay the same: [https://github.com]
 backticks around url should stay the same: `https://github.com`
@@ -1231,26 +1231,26 @@ Links mid-sentence should be updated like <https://google.com> will be.
 <https://github.com>
 links should stay the same: [](https://github.com)
 <https://gitlab.com>
-```
+``````
 Example: Angle brackets are added if the url is not the only text in the single quotes('), double quotes("), or backticks(`)
 
 Before:
 
-```markdown
+``````markdown
 [https://github.com some text here]
 backticks around a url should stay the same, but only if the only contents of the backticks: `https://github.com some text here`
 single quotes around a url should stay the same, but only if the contents of the single quotes is the url: 'https://github.com some text here'
 double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "https://github.com some text here"
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 [<https://github.com> some text here]
 backticks around a url should stay the same, but only if the only contents of the backticks: `<https://github.com> some text here`
 single quotes around a url should stay the same, but only if the contents of the single quotes is the url: '<https://github.com> some text here'
 double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "<https://github.com> some text here"
-```
+``````
 
 ### Two Spaces Between Lines with Content
 
@@ -1264,7 +1264,7 @@ Example: Make sure two spaces are added to the ends of lines that have content o
 
 Before:
 
-```markdown
+``````markdown
 # Heading 1
 First paragraph stays as the first paragraph
 
@@ -1303,11 +1303,11 @@ should be ignored
 </div>
 Even more content here
 
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # Heading 1
 First paragraph stays as the first paragraph
 
@@ -1346,7 +1346,7 @@ should be ignored
 </div>
 Even more content here
 
-```
+``````
 
 ## Spacing
 ### Trailing spaces
@@ -1363,32 +1363,32 @@ Example: Removes trailing spaces and tabs.
 
 Before:
 
-```markdown
+``````markdown
 # H1   
 Line with trailing spaces and tabs.	        
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # H1
 Line with trailing spaces and tabs.
-```
+``````
 Example: With `Two Space Linebreak = true`
 
 Before:
 
-```markdown
+``````markdown
 # H1
 Line with trailing spaces and tabs.  
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # H1
 Line with trailing spaces and tabs.  
-```
+``````
 
 ### Heading blank lines
 
@@ -1404,7 +1404,7 @@ Example: Headings should be surrounded by blank lines
 
 Before:
 
-```markdown
+``````markdown
 # H1
 ## H2
 
@@ -1413,11 +1413,11 @@ Before:
 line
 ## H2
 
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # H1
 
 ## H2
@@ -1427,22 +1427,22 @@ After:
 line
 
 ## H2
-```
+``````
 Example: With `Bottom=false`
 
 Before:
 
-```markdown
+``````markdown
 # H1
 line
 ## H2
 # H1
 line
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # H1
 line
 
@@ -1450,7 +1450,7 @@ line
 
 # H1
 line
-```
+``````
 
 ### Paragraph blank lines
 
@@ -1464,21 +1464,21 @@ Example: Paragraphs should be surrounded by blank lines
 
 Before:
 
-```markdown
+``````markdown
 # H1
 Newlines are inserted.
 A paragraph is a line that starts with a letter.
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 # H1
 
 Newlines are inserted.
 
 A paragraph is a line that starts with a letter.
-```
+``````
 
 ### Space after list markers
 
@@ -1492,25 +1492,25 @@ Example:
 
 Before:
 
-```markdown
+``````markdown
 1.   Item 1
 2.  Item 2
 
 -   [ ] Item 1
 - [x]    Item 2
 	-  [ ] Item 3
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 1. Item 1
 2. Item 2
 
 - [ ] Item 1
 - [x] Item 2
 	- [ ] Item 3
-```
+``````
 
 ### Remove Empty Lines Between List Markers and Checklists
 
@@ -1524,7 +1524,7 @@ Example:
 
 Before:
 
-```markdown
+``````markdown
 1. Item 1
 
 2. Item 2
@@ -1552,11 +1552,11 @@ Before:
 	* Subitem 1
 
 * Item 2
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 1. Item 1
 2. Item 2
 
@@ -1575,7 +1575,7 @@ After:
 * Item 1
 	* Subitem 1
 * Item 2
-```
+``````
 
 ### Compact YAML
 
@@ -1591,7 +1591,7 @@ Example: Remove blank lines at the start and end of the YAML
 
 Before:
 
-```markdown
+``````markdown
 ---
 
 date: today
@@ -1599,22 +1599,22 @@ date: today
 title: unchanged without inner new lines turned on
 
 ---
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 date: today
 
 title: unchanged without inner new lines turned on
 ---
-```
+``````
 Example: Remove blank lines anywhere in YAML with inner new lines set to true
 
 Before:
 
-```markdown
+``````markdown
 ---
 
 date: today
@@ -1628,11 +1628,11 @@ title: remove inner new lines
 
 
 Body content here.
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 ---
 date: today
 title: remove inner new lines
@@ -1642,7 +1642,7 @@ title: remove inner new lines
 
 
 Body content here.
-```
+``````
 
 ### Consecutive blank lines
 
@@ -1656,20 +1656,20 @@ Example:
 
 Before:
 
-```markdown
+``````markdown
 Some text
 
 
 Some more text
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Some text
 
 Some more text
-```
+``````
 
 ### Convert Spaces to Tabs
 
@@ -1685,21 +1685,21 @@ Example: Converting spaces to tabs with `tabsize = 3`
 
 Before:
 
-```markdown
+``````markdown
 - text with no indention
    - text indented with 3 spaces
 - text with no indention
       - text indented with 6 spaces
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 - text with no indention
 	- text indented with 3 spaces
 - text with no indention
 		- text indented with 6 spaces
-```
+``````
 
 ### Line Break at Document End
 
@@ -1713,33 +1713,33 @@ Example: Appending a line break to the end of the document.
 
 Before:
 
-```markdown
+``````markdown
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
-```
+``````
 Example: Removing trailing line breaks to the end of the document, except one.
 
 Before:
 
-```markdown
+``````markdown
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 
 
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
-```
+``````
 
 ### Space between Chinese and English or numbers
 
@@ -1753,54 +1753,54 @@ Example: Space between Chinese and English
 
 Before:
 
-```markdown
+``````markdown
 中文字符串english中文字符串。
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 中文字符串 english 中文字符串。
-```
+``````
 Example: Space between Chinese and link
 
 Before:
 
-```markdown
+``````markdown
 中文字符串[english](http://example.com)中文字符串。
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 中文字符串 [english](http://example.com) 中文字符串。
-```
+``````
 Example: Space between Chinese and inline code block
 
 Before:
 
-```markdown
+``````markdown
 中文字符串`code`中文字符串。
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 中文字符串 `code` 中文字符串。
-```
+``````
 Example: No space between Chinese and English in tag
 
 Before:
 
-```markdown
+``````markdown
 #标签A #标签2标签
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 #标签A #标签2标签
-```
+``````
 
 ### Remove Space around Fullwidth Characters
 
@@ -1814,7 +1814,7 @@ Example: Remove Spaces and Tabs around Fullwidth Characrters
 
 Before:
 
-```markdown
+``````markdown
 Full list of affected charaters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
 This is a fullwidth period	 。 with text after it.
 This is a fullwidth comma	，  with text after it.
@@ -1823,11 +1823,11 @@ This is a fullwidth right parenthesis ）  with text after it.
 This is a fullwidth colon ：  with text after it.
 This is a fullwidth semicolon ；  with text after it.
   Ｒemoves space at start of line
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 Full list of affected charaters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
 This is a fullwidth period。with text after it.
 This is a fullwidth comma，with text after it.
@@ -1836,7 +1836,7 @@ This is a fullwidth right parenthesis）with text after it.
 This is a fullwidth colon：with text after it.
 This is a fullwidth semicolon；with text after it.
 Ｒemoves space at start of line
-```
+``````
 
 ### Remove link spacing
 
@@ -1850,7 +1850,7 @@ Example: Space in regular markdown link text
 
 Before:
 
-```markdown
+``````markdown
 [ here is link text1 ](link_here)
 [ here is link text2](link_here)
 [here is link text3 ](link_here)
@@ -1859,11 +1859,11 @@ Before:
 [](link_here)
 **Note that image markdown syntax does not get affected even if it is transclusion:**
 ![	here is link text6 ](link_here)
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 [here is link text1](link_here)
 [here is link text2](link_here)
 [here is link text3](link_here)
@@ -1872,12 +1872,12 @@ After:
 [](link_here)
 **Note that image markdown syntax does not get affected even if it is transclusion:**
 ![	here is link text6 ](link_here)
-```
+``````
 Example: Space in wiki link text
 
 Before:
 
-```markdown
+``````markdown
 [[link_here| here is link text1 ]]
 [[link_here|here is link text2 ]]
 [[link_here| here is link text3]]
@@ -1885,11 +1885,11 @@ Before:
 [[link_here|	here is link text5	]]
 ![[link_here|	here is link text6	]]
 [[link_here]]
-```
+``````
 
 After:
 
-```markdown
+``````markdown
 [[link_here|here is link text1]]
 [[link_here|here is link text2]]
 [[link_here|here is link text3]]
@@ -1897,4 +1897,4 @@ After:
 [[link_here|here is link text5]]
 ![[link_here|here is link text6]]
 [[link_here]]
-```
+``````
