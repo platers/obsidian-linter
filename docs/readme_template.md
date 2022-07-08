@@ -59,12 +59,18 @@ Pull requests are welcome, especially for new rules.
 4. Add a new rule in `rules.ts`.
    1. Insert a new rule in the corresponding rule type(spacing, headings, etc)
    2. Follow the format of the existing rules
-   3. Add tests for edge cases in `test.ts`
+   3. Add tests for edge cases in `src/test/rule_alias_here.test.ts`
    4. You should probably use some helper functions from `utils.ts`, such as `ignoreCodeBlocksYAMLTagsAndLinks`.
 5. Run `npm run compile` to build, generate documentation, and test the plugin.
 6. Run `npm run lint` to lint the plugin.
 
 _Make sure to use Node 15.x or higher._
+
+## Tests
+
+Tests are located in `src/test/` and should have dashes between words and end in `.test.ts`. These files will be run by jest.
+When adding a a test, please add it in `src/test/rule_alias.test.ts`. If the file does not already exist, please create it and
+add the new test(s).
 
 ## Creating a Release
 
