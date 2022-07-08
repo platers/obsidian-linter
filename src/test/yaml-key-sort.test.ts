@@ -44,12 +44,12 @@ describe('YAML Key Sort', () => {
           tags: computer
           keywords: []
 
-          status: WIP
           date: 02/15/2022
           aliases:
             - alias1
             - alias2
             - alias3
+          status: WIP
           ---
           `;
     
