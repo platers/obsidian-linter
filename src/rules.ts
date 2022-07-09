@@ -2174,12 +2174,24 @@ export const rules: Rule[] = [
         let yamlText = yaml[1];
 
         const priorityAtStartOfYaml: boolean = options['Priority Keys at Start of YAML'];
-        const getTextWithNewYamlFrontmatter = function(priorityKeysSorted: string, remainingKeys: string, priorityAtStart: boolean): string {
-          if (priorityAtStart) {
-            return text.replace(yaml[1], `${priorityKeysSorted}${remainingKeys}`);
+        const updateDateModifiedIfYamlChanged = function(oldYaml: string, newYaml: string): string {
+          if (oldYaml == newYaml) {
+            return newYaml;
           }
 
-          return text.replace(yaml[1], `${remainingKeys}${priorityKeysSorted}`);
+          return setYamlSection(newYaml, options['Date Modified Key'], ' ' + options['Current Time'].format(options['Format']) );
+        };
+        const getTextWithNewYamlFrontmatter = function(priorityKeysSorted: string, remainingKeys: string, priorityAtStart: boolean): string {
+          let newYaml = `${remainingKeys}${priorityKeysSorted}`;
+          if (priorityAtStart) {
+            newYaml = `${priorityKeysSorted}${remainingKeys}`;
+          }
+          console.log('Yaml Timestamp Date Modified Enabled', options['Yaml Timestamp Date Modified Enabled']);
+          if (options['Yaml Timestamp Date Modified Enabled']) {
+            newYaml = updateDateModifiedIfYamlChanged(yaml[1], newYaml);
+          }
+
+          return text.replace(yaml[1], newYaml);
         };
 
         const getYAMLKeysSorted = function(yaml: string, keys: string[]): {remainingYaml: string, sortedYamlKeyValues: string} {
