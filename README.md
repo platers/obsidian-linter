@@ -45,7 +45,6 @@ Documentation for all rules can be found in the [rules docs](https://github.com/
 - [yaml-title](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-title)
 - [yaml-title-alias](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-title-alias)
 - [escape-yaml-special-characters](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#escape-yaml-special-characters)
-- [yaml-key-sort](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-key-sort)
 
 ### Heading rules
 
