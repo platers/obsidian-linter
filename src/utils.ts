@@ -15,6 +15,7 @@ export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
 export const wikiLinkRegex = /(!?)(\[{2}[^[\n\]]*\]{2})/g;
 export const tagRegex = /#[^\s#]{1,}/g;
+export const obsidianMultilineCommentRegex = /%%\n[^%]*\n%%/g;
 
 // Reused placeholders
 
@@ -104,6 +105,22 @@ function replaceLinks(text: string, regularLinkPlaceholder: string, wikiLinkPlac
   }
 
   return {text, replacedRegularLinks, replacedWikiLinks};
+}
+
+export function ignoreObsidianMultilineComments(text: string, func: (text: string) => string): string {
+  const obsidianMultilineCommentMatches = text.match(obsidianMultilineCommentRegex);
+  const obsidianCommentPlaceholder = '{OBSIDIAN COMMENT PLACEHOLDER}';
+  text = text.replaceAll(obsidianMultilineCommentRegex, obsidianCommentPlaceholder);
+
+  text = func(text);
+
+  if (obsidianMultilineCommentMatches) {
+    for (const obsidianMultilineComment of obsidianMultilineCommentMatches) {
+      text = text.replace(obsidianCommentPlaceholder, obsidianMultilineComment);
+    }
+  }
+
+  return text;
 }
 
 /**
