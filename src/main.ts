@@ -209,7 +209,8 @@ export default class LinterPlugin extends Plugin {
 
       for (const rule of rules) {
         // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
-        if (disabledRules.includes(rule.alias()) || rule.alias() === 'yaml-timestamp' || rule.alias() === 'format-tags-in-yaml' || rule.alias() === 'escape-yaml-special-characters') {
+        if (disabledRules.includes(rule.alias()) || rule.alias() === 'yaml-timestamp' || rule.alias() === 'format-tags-in-yaml' || rule.alias() === 'escape-yaml-special-characters' ||
+          rule.alias() === 'yaml-key-sort') {
           continue;
         }
 
@@ -238,8 +239,22 @@ export default class LinterPlugin extends Plugin {
         'Already Modified': oldText != newText,
         'moment': this.momentInstance,
       }, yaml_timestamp_rule.getOptions(this.settings));
-      if (yaml_timestamp_options[yaml_timestamp_rule.enabledOptionName()]) {
+      const yaml_timestamp_is_enabled = yaml_timestamp_options[yaml_timestamp_rule.enabledOptionName()];
+      if (yaml_timestamp_is_enabled) {
         newText = yaml_timestamp_rule.apply(newText, yaml_timestamp_options);
+      }
+
+      const yaml_key_sort_rule = rules.find((rule) => rule.alias() === 'yaml-key-sort');
+      const yaml_key_sort_options: Options = Object.assign({
+        'metadata: file created time': this.momentInstance(file.stat.ctime).format(),
+        'metadata: file modified time': this.momentInstance(file.stat.mtime).format(),
+        'metadata: file name': file.basename,
+        'Current Time Formatted': this.momentInstance().format(yaml_timestamp_options['Format']),
+        'Yaml Timestamp Date Modified Enabled': yaml_timestamp_is_enabled && yaml_timestamp_options['Date Modified'],
+        'Date Modified Key': yaml_timestamp_options['Date Modified Key'],
+      }, yaml_key_sort_rule.getOptions(this.settings));
+      if (yaml_key_sort_options[yaml_key_sort_rule.enabledOptionName()]) {
+        newText = yaml_key_sort_rule.apply(newText, yaml_key_sort_options);
       }
 
       return newText;
