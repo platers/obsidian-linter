@@ -2179,14 +2179,14 @@ export const rules: Rule[] = [
             return newYaml;
           }
 
-          return setYamlSection(newYaml, options['Date Modified Key'], ' ' + options['Current Time'].format(options['Format']) );
+          return setYamlSection(newYaml, options['Date Modified Key'], ' ' + options['Current Time Formatted']);
         };
         const getTextWithNewYamlFrontmatter = function(priorityKeysSorted: string, remainingKeys: string, priorityAtStart: boolean): string {
           let newYaml = `${remainingKeys}${priorityKeysSorted}`;
           if (priorityAtStart) {
             newYaml = `${priorityKeysSorted}${remainingKeys}`;
           }
-          console.log('Yaml Timestamp Date Modified Enabled', options['Yaml Timestamp Date Modified Enabled']);
+
           if (options['Yaml Timestamp Date Modified Enabled']) {
             newYaml = updateDateModifiedIfYamlChanged(yaml[1], newYaml);
           }

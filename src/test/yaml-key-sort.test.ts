@@ -1,5 +1,4 @@
 import dedent from 'ts-dedent';
-import moment from 'moment';
 import {rulesDict} from '../rules';
 
 describe('YAML Key Sort', () => {
@@ -32,10 +31,8 @@ describe('YAML Key Sort', () => {
       'YAML Sort Order for Other Keys': 'None',
       'Priority Keys at Start of YAML': true,
       'Date Modified Key': 'modified',
-      'Current Time': moment('Thursday, January 2nd 2020, 12:00:00 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
+      'Current Time Formatted': 'Thursday, January 2nd 2020, 12:00:00 am',
       'Already Modified': false,
-      'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
-      'moment': moment,
       'Yaml Timestamp Date Modified Enabled': true,
     };
     expect(rulesDict['yaml-key-sort'].apply(before, options)).toBe(after);
