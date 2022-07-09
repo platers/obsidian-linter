@@ -410,11 +410,11 @@ Sorts the YAML keys based on the order and priority specified. Note: removes bla
 Options:
 - YAML Key Priority Sort Order: The order in which to sort keys with one on each line where it sorts in the order found in the list
 	- Default: ``
-- Priority Keys at Start of YAML: `YAML Key Priority Sort Order` is placed at the start of the YAML frontmatter
+- Priority Keys at Start of YAML: YAML Key Priority Sort Order is placed at the start of the YAML frontmatter
 	- Default: `true`
-- YAML Sort Order for Other Keys: The way in which to sort the keys that are not found in the `YAML Key Priority Sort Order` text area
+- YAML Sort Order for Other Keys: The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area
 	- Default: `None`
-	- `None`: No sorting other than what is in the `YAML Key Priority Sort Order` text area
+	- `None`: No sorting other than what is in the YAML Key Priority Sort Order text area
 	- `Ascending Alphabetical`: Sorts the keys based on key value from a to z
 	- `Descending Alphabetical`: Sorts the keys based on key value from z to a
 

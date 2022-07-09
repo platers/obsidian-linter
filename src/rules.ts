@@ -2174,12 +2174,12 @@ export const rules: Rule[] = [
         let yamlText = yaml[1];
 
         const priorityAtStartOfYaml: boolean = options['Priority Keys at Start of YAML'];
-        const getNewYamlFrontmatter = function(priorityKeysSorted: string, remainingKeys: string, priorityAtStart: boolean): string {
+        const getTextWithNewYamlFrontmatter = function(priorityKeysSorted: string, remainingKeys: string, priorityAtStart: boolean): string {
           if (priorityAtStart) {
-            return `---\n${priorityKeysSorted}${remainingKeys}---`;
+            return text.replace(yaml[1], `${priorityKeysSorted}${remainingKeys}`);
           }
 
-          return `---\n${remainingKeys}${priorityKeysSorted}---`;
+          return text.replace(yaml[1], `${remainingKeys}${priorityKeysSorted}`);
         };
 
         const getYAMLKeysSorted = function(yaml: string, keys: string[]): {remainingYaml: string, sortedYamlKeyValues: string} {
@@ -2212,7 +2212,7 @@ export const rules: Rule[] = [
         const sortOrder = options['YAML Sort Order for Other Keys'];
         const yamlObject = loadYAML(yamlText);
         if (yamlObject == null) {
-          return getNewYamlFrontmatter(priorityKeysSorted, yamlText, priorityAtStartOfYaml);
+          return getTextWithNewYamlFrontmatter(priorityKeysSorted, yamlText, priorityAtStartOfYaml);
         }
 
         const sortAlphabeticallyDesc = function(previousKey: string, currentKey: string): number {
@@ -2235,13 +2235,13 @@ export const rules: Rule[] = [
         } else if (sortOrder === 'Descending Alphabetical') {
           sortMethod = sortAlphabeticallyDesc;
         } else {
-          return getNewYamlFrontmatter(priorityKeysSorted, yamlText, priorityAtStartOfYaml);
+          return getTextWithNewYamlFrontmatter(priorityKeysSorted, yamlText, priorityAtStartOfYaml);
         }
 
         remainingKeys = remainingKeys.sort(sortMethod);
         const remainingKeysSortResult = getYAMLKeysSorted(yamlText, remainingKeys);
 
-        return getNewYamlFrontmatter(priorityKeysSorted, remainingKeysSortResult.sortedYamlKeyValues, priorityAtStartOfYaml);
+        return getTextWithNewYamlFrontmatter(priorityKeysSorted, remainingKeysSortResult.sortedYamlKeyValues, priorityAtStartOfYaml);
       },
       [
         new Example(
@@ -2344,13 +2344,13 @@ export const rules: Rule[] = [
       ],
       [
         new TextAreaOption('YAML Key Priority Sort Order', 'The order in which to sort keys with one on each line where it sorts in the order found in the list', ''),
-        new BooleanOption('Priority Keys at Start of YAML', '`YAML Key Priority Sort Order` is placed at the start of the YAML frontmatter', true),
+        new BooleanOption('Priority Keys at Start of YAML', 'YAML Key Priority Sort Order is placed at the start of the YAML frontmatter', true),
         new DropdownOption(
             'YAML Sort Order for Other Keys',
-            'The way in which to sort the keys that are not found in the `YAML Key Priority Sort Order` text area',
+            'The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area',
             'None',
             [
-              new DropdownRecord('None', 'No sorting other than what is in the `YAML Key Priority Sort Order` text area'),
+              new DropdownRecord('None', 'No sorting other than what is in the YAML Key Priority Sort Order text area'),
               new DropdownRecord('Ascending Alphabetical', 'Sorts the keys based on key value from a to z'),
               new DropdownRecord('Descending Alphabetical', 'Sorts the keys based on key value from z to a'),
             ],
