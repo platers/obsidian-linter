@@ -19,6 +19,7 @@ import {
   setYamlSection,
   getYamlSectionValue,
   removeYamlSection,
+  ignoreObsidianMultilineComments,
 } from './utils';
 import {
   Option,
@@ -305,7 +306,7 @@ export const rules: Rule[] = [
       'All paragraphs should have exactly one blank line both before and after.',
       RuleType.SPACING,
       (text: string) => {
-        return makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text);
+        return ignoreObsidianMultilineComments(text, makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs);
       },
       [
         new Example(
@@ -1188,7 +1189,7 @@ export const rules: Rule[] = [
       'Makes sure that two spaces are added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items',
       RuleType.CONTENT,
       (text: string) => {
-        return addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text);
+        return ignoreObsidianMultilineComments(text, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent);
       },
       [
         new Example(
