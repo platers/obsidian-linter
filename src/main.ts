@@ -440,7 +440,7 @@ class SettingTab extends PluginSettingTab {
 
       // Inject display functions. Necessary because the Settings object cannot be used in tests.
       BooleanOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        new Setting(containerEl)
+        const setting = new Setting(containerEl)
             .setName(this.name)
             .setDesc(this.description)
             .addToggle((toggle) => {
@@ -451,10 +451,13 @@ class SettingTab extends PluginSettingTab {
                 plugin.saveData(plugin.settings);
               });
             });
+
+        // remove border around every setting item
+        setting.settingEl.style.border = 'none';
       };
 
       TextOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        new Setting(containerEl)
+        const setting = new Setting(containerEl)
             .setName(this.name)
             .setDesc(this.description)
             .addText((textbox) => {
@@ -465,10 +468,13 @@ class SettingTab extends PluginSettingTab {
                 plugin.saveData(plugin.settings);
               });
             });
+
+        // remove border around every setting item
+        setting.settingEl.style.border = 'none';
       };
 
       TextAreaOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        new Setting(containerEl)
+        const setting = new Setting(containerEl)
             .setName(this.name)
             .setDesc(this.description)
             .addTextArea((textbox) => {
@@ -479,10 +485,13 @@ class SettingTab extends PluginSettingTab {
                 plugin.saveData(plugin.settings);
               });
             });
+
+        // remove border around every setting item
+        setting.settingEl.style.border = 'none';
       };
 
       MomentFormatOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        new Setting(containerEl)
+        const setting = new Setting(containerEl)
             .setName(this.name)
             .setDesc(this.description)
             .addMomentFormat((format) => {
@@ -494,10 +503,13 @@ class SettingTab extends PluginSettingTab {
                 plugin.saveData(plugin.settings);
               });
             });
+
+        // remove border around every setting item
+        setting.settingEl.style.border = 'none';
       };
 
       DropdownOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        new Setting(containerEl)
+        const setting = new Setting(containerEl)
             .setName(this.name)
             .setDesc(this.description)
             .addDropdown((dropdown) => {
@@ -515,6 +527,9 @@ class SettingTab extends PluginSettingTab {
                 plugin.saveData(plugin.settings);
               });
             });
+
+        // remove border around every setting item
+        setting.settingEl.style.border = 'none';
       };
     }
 
