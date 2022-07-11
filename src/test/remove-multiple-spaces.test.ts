@@ -52,4 +52,47 @@ describe('Remove Multiple Spaces', () => {
 
     expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
   });
+  it('Tables are ignored', () => {
+    const before = dedent`
+    # Table 1
+      
+    | Column 1 | Column 2 | Column 3 |
+    |----------|----------|----------|
+    | foo      | bar      | blob     |
+    | baz      | qux      | trust    |
+    | quux     | quuz     | glob     |
+    
+    # Table 2
+
+    | Column 1 | Column 2 |
+    |----------|----------|
+    | foo      | bar      |
+    | baz      | qux      |
+    | quux     | quuz     |
+    
+    New paragraph.
+      `;
+
+    const after = dedent`
+      # Table 1
+        
+      | Column 1 | Column 2 | Column 3 |
+      |----------|----------|----------|
+      | foo      | bar      | blob     |
+      | baz      | qux      | trust    |
+      | quux     | quuz     | glob     |
+      
+      # Table 2
+
+      | Column 1 | Column 2 |
+      |----------|----------|
+      | foo      | bar      |
+      | baz      | qux      |
+      | quux     | quuz     |
+      
+      New paragraph.
+      `;
+
+    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
+  });
 });

@@ -20,6 +20,8 @@ import {
   getYamlSectionValue,
   removeYamlSection,
   ignoreObsidianMultilineComments,
+  ignoreTables,
+  ensureEmptyLinesAroundTables,
 } from './utils';
 import {
   Option,
@@ -648,9 +650,9 @@ export const rules: Rule[] = [
       'Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. ',
       RuleType.CONTENT,
       (text: string) => {
-        return ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
+        return ignoreTables(text, (text) => ignoreCodeBlocksYAMLTagsAndLinks(text, (text) => {
           return text.replace(/([^\s])( ){2,}([^\s])/g, '$1 $3');
-        });
+        }));
       },
       [
         new Example(
@@ -1274,6 +1276,94 @@ export const rules: Rule[] = [
             Even more content here
 
         `,
+        ),
+      ],
+  ),
+
+  new Rule(
+      'Empty Line Around Tables',
+      'Ensures that there is an empty line around tables unless they start or end a document.',
+      RuleType.SPACING,
+      (text: string) => {
+        return ensureEmptyLinesAroundTables(text);
+      },
+      [
+        new Example(
+            'Tables that start a document do not get an empty line before them.',
+            dedent`
+        | Column 1 | Column 2 |
+        |----------|----------|
+        | foo      | bar      |
+        | baz      | qux      |
+        | quux     | quuz     |
+        New paragraph.
+  `,
+            dedent`
+        | Column 1 | Column 2 |
+        |----------|----------|
+        | foo      | bar      |
+        | baz      | qux      |
+        | quux     | quuz     |
+        
+        New paragraph.
+  `,
+        ),
+        new Example(
+            'Tables that end a document do not get an empty line after them.',
+            dedent`
+        # Heading 1
+        | Column 1 | Column 2 |
+        |----------|----------|
+        | foo      | bar      |
+        | baz      | qux      |
+        | quux     | quuz     |
+  `,
+            dedent`
+        # Heading 1
+
+        | Column 1 | Column 2 |
+        |----------|----------|
+        | foo      | bar      |
+        | baz      | qux      |
+        | quux     | quuz     |
+  `,
+        ),
+        new Example(
+            'Tables that are not at the start or the end of the document will have an empty line added before and after them',
+            dedent`
+      # Table 1
+      | Column 1 | Column 2 | Column 3 |
+      |----------|----------|----------|
+      | foo      | bar      | blob     |
+      | baz      | qux      | trust    |
+      | quux     | quuz     | glob     |
+      # Table 2
+      | Column 1 | Column 2 |
+      |----------|----------|
+      | foo      | bar      |
+      | baz      | qux      |
+      | quux     | quuz     |
+      New paragraph.
+`,
+            dedent`
+      # Table 1
+      
+      | Column 1 | Column 2 | Column 3 |
+      |----------|----------|----------|
+      | foo      | bar      | blob     |
+      | baz      | qux      | trust    |
+      | quux     | quuz     | glob     |
+      
+      # Table 2
+
+      | Column 1 | Column 2 |
+      |----------|----------|
+      | foo      | bar      |
+      | baz      | qux      |
+      | quux     | quuz     |
+      
+      New paragraph.
+`,
         ),
       ],
   ),
