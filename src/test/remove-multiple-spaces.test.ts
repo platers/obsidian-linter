@@ -52,6 +52,7 @@ describe('Remove Multiple Spaces', () => {
 
     expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
   });
+  // accounts for https://github.com/platers/obsidian-linter/issues/244
   it('Tables are ignored', () => {
     const before = dedent`
     # Table 1
