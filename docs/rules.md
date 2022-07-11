@@ -1868,6 +1868,104 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 ``````
 
+### Empty Line Around Tables
+
+Alias: `empty-line-around-tables`
+
+Ensures that there is an empty line around tables unless they start or end a document.
+
+
+
+Example: Tables that start a document do not get an empty line before them.
+
+Before:
+
+``````markdown
+| Column 1 | Column 2 |
+|----------|----------|
+| foo      | bar      |
+| baz      | qux      |
+| quux     | quuz     |
+New paragraph.
+``````
+
+After:
+
+``````markdown
+| Column 1 | Column 2 |
+|----------|----------|
+| foo      | bar      |
+| baz      | qux      |
+| quux     | quuz     |
+
+New paragraph.
+``````
+Example: Tables that end a document do not get an empty line after them.
+
+Before:
+
+``````markdown
+# Heading 1
+| Column 1 | Column 2 |
+|----------|----------|
+| foo      | bar      |
+| baz      | qux      |
+| quux     | quuz     |
+``````
+
+After:
+
+``````markdown
+# Heading 1
+
+| Column 1 | Column 2 |
+|----------|----------|
+| foo      | bar      |
+| baz      | qux      |
+| quux     | quuz     |
+``````
+Example: Tables that are not at the start or the end of the document will have an empty line added before and after them
+
+Before:
+
+``````markdown
+# Table 1
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| foo      | bar      | blob     |
+| baz      | qux      | trust    |
+| quux     | quuz     | glob     |
+# Table 2
+| Column 1 | Column 2 |
+|----------|----------|
+| foo      | bar      |
+| baz      | qux      |
+| quux     | quuz     |
+New paragraph.
+``````
+
+After:
+
+``````markdown
+# Table 1
+
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| foo      | bar      | blob     |
+| baz      | qux      | trust    |
+| quux     | quuz     | glob     |
+
+# Table 2
+
+| Column 1 | Column 2 |
+|----------|----------|
+| foo      | bar      |
+| baz      | qux      |
+| quux     | quuz     |
+
+New paragraph.
+``````
+
 ### Space between Chinese and English or numbers
 
 Alias: `space-between-chinese-and-english-or-numbers`
