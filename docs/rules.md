@@ -1935,12 +1935,11 @@ Before:
 | foo      | bar      | blob     |
 | baz      | qux      | trust    |
 | quux     | quuz     | glob     |
-# Table 2
+# Table 2 without Pipe at Start and End
 | Column 1 | Column 2 |
-|----------|----------|
-| foo      | bar      |
-| baz      | qux      |
-| quux     | quuz     |
+:-: | -----------:
+bar | baz
+foo | bar
 New paragraph.
 ``````
 
@@ -1955,13 +1954,12 @@ After:
 | baz      | qux      | trust    |
 | quux     | quuz     | glob     |
 
-# Table 2
+# Table 2 without Pipe at Start and End
 
 | Column 1 | Column 2 |
-|----------|----------|
-| foo      | bar      |
-| baz      | qux      |
-| quux     | quuz     |
+:-: | -----------:
+bar | baz
+foo | bar
 
 New paragraph.
 ``````
