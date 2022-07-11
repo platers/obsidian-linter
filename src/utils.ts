@@ -16,6 +16,7 @@ export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeB
 export const wikiLinkRegex = /(!?)(\[{2}[^[\n\]]*\]{2})/g;
 export const tagRegex = /#[^\s#]{1,}/g;
 export const obsidianMultilineCommentRegex = /%%\n[^%]*\n%%/g;
+export const tableRegex = /([ ]{0,3}\[.*?\][ \t]*\n)?([ ]{0,3}\S+.*?\|.*?\n([^\n]*?\|[^\n]*?\n)*?)?[ ]{0,3}[|\-+:.][ \-+|:.]*?\|[ \-+|:.]*(?:\n?[^\n]*?\|[^\n]*?(\n)?)+/g;
 
 // Reused placeholders
 
@@ -105,6 +106,52 @@ function replaceLinks(text: string, regularLinkPlaceholder: string, wikiLinkPlac
   }
 
   return {text, replacedRegularLinks, replacedWikiLinks};
+}
+
+/**
+ * Makes sure to add a blank line before and after tables except before a table that is on the first line of the text.
+ * @param {string} text The text to make sure it has an empty line before and after tables
+ * @return {string} The text with an empty line before and after tables unless the table starts off the file
+ */
+export function ensureEmptyLinesAroundTables(text: string): string {
+  const tableMatches = text.match(new RegExp(`(\n)*${tableRegex.source}(\n)*`, 'g'));
+  if (tableMatches == null) {
+    return text;
+  }
+
+  for (const table of tableMatches) {
+    const start = text.indexOf(table);
+    const end = start + table.length;
+
+    let newTable = table.trim();
+    if (start !== 0) {
+      newTable = '\n\n' + newTable;
+    }
+
+    if (end < text.length) {
+      newTable += '\n\n';
+    }
+
+    text = text.replace(table, newTable);
+  }
+
+  return text;
+}
+
+export function ignoreTables(text: string, func: (text: string) => string): string {
+  const tableMatches = text.match(tableRegex);
+  const tablePlaceholder = '{TABLE PLACEHOLDER}';
+  text = text.replaceAll(tableRegex, tablePlaceholder);
+
+  text = func(text);
+
+  if (tableMatches) {
+    for (const table of tableMatches) {
+      text = text.replace(tablePlaceholder, table);
+    }
+  }
+
+  return text;
 }
 
 export function ignoreObsidianMultilineComments(text: string, func: (text: string) => string): string {
