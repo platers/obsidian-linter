@@ -103,7 +103,7 @@ If you are looking to update the rules list information like section, examples, 
 There are currently two documentation templates:
 
 1. [readme_template.md](docs/readme_template.md)
-  - This template is used for generating the [readme](README.md) file and should be updated for changes that are not rules documentation links and their corresponding sections.
+  - This template is used for generating the [README](README.md) file and should be updated for changes that are not rules documentation links and their corresponding sections.
 2. [rules_template.md](docs/rules_template.md)
   - This template is used for generating the [rules.md](docs/rules.md) file and should be updated when you want to change the style or escaping of rule information or examples.
 
