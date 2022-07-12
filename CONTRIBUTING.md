@@ -3,7 +3,25 @@
 Thanks for considering contributing to this plugin. This document will hopefully give you some tips and tricks to help you and us
 with making this plugin better.
 
-## Development Instructions
+## Development Setup
+
+You will want to start by forking this repository. Once that is done, you will want to clone your fork of the repository.
+The command should look something like the following:
+`git clone https://github.com/{USERNAME_HERE}/obsidian-linter/`.
+
+### Node and NPM
+
+Next you will want to install the appropriate versions of node and npm.  
+This plugin **requires** Node version `15.x` or higher.
+
+#### Windows
+
+Install the
+
+#### Linux, Mac, and Windows via WSL/WSL2
+
+It is recommended that you use [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) which is a node version manager that comes in handy when swapping and installing node versions,
+especially since most linux package managers do not have the needed node version in the standard packages.
 
 1. Fork this repository
 2. Clone the repository
