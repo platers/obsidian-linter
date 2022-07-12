@@ -9,10 +9,10 @@ with making this plugin better.
 2. Clone the repository
 3. Run `npm ci` to install dependencies
 4. Add a new rule in `rules.ts`.
-   1. Insert a new rule in the corresponding rule type(spacing, headings, etc)
+   1. Insert a new rule in the corresponding rule type (spacing, headings, etc)
    2. Follow the format of the existing rules
    3. Add tests for edge cases in `src/test/rule_alias_here.test.ts`
-   4. You should probably use some helper functions from `utils.ts`, such as `ignoreCodeBlocksYAMLTagsAndLinks`.
+   4. You should probably use some helper functions from `utils.ts`, such as `formatYAML`.
 5. Run `npm run compile` to build, generate documentation, and test the plugin.
 6. Run `npm run lint` to lint the plugin.
 

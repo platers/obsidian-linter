@@ -20,7 +20,7 @@ export const tableRegex = /([ ]{0,3}\[.*?\][ \t]*\n)?([ ]{0,3}\S+.*?\|.*?\n([^\n
 
 // Reused placeholders
 
-const yamlPlaceholder = '---\n---';
+export const yamlPlaceholder = '---\n---';
 
 // Helper functions
 
@@ -30,7 +30,7 @@ const yamlPlaceholder = '---\n---';
  * @param {string} text The markdown text
  * @return {Position[]} The positions of the given element type in the given text
  */
-function getPositions(type: string, text: string) {
+export function getPositions(type: string, text: string): Position[] {
   const ast = remark().use(remarkGfm).parse(text);
   const positions: Position[] = [];
   visit(ast, type, (node) => {
@@ -40,72 +40,6 @@ function getPositions(type: string, text: string) {
   // Sort positions by start position in reverse order
   positions.sort((a, b) => b.start.offset - a.start.offset);
   return positions;
-}
-
-/**
- * Replaces all codeblocks in the given text with a placeholder.
- * @param {string} text The text to replace codeblocks in
- * @param {string} placeholder The placeholder to use
- * @return {string} The text with codeblocks replaced
- * @return {string[]} The codeblocks replaced
- */
-function replaceCodeblocks(text: string, placeholder: string): {text: string, replacedCodeBlocks: string[]} {
-  const positions: Position[] = getPositions('code', text);
-  const replacedCodeBlocks: string[] = [];
-
-  for (const position of positions) {
-    const codeblock = text.substring(position.start.offset, position.end.offset);
-    replacedCodeBlocks.push(codeblock);
-    text = text.substring(0, position.start.offset) + placeholder + text.substring(position.end.offset);
-  }
-
-  // Reverse the codeblocks so that they are in the same order as the original text
-  replacedCodeBlocks.reverse();
-
-  return {text, replacedCodeBlocks};
-}
-
-/**
- * Replaces all links in the given text with a placeholder.
- * @param {string} text The text to replace links in
- * @param {string} regularLinkPlaceholder The placeholder to use for regular markdown links
- * @param {string} wikiLinkPlaceholder The placeholder to use for wiki links
- * @return {string} The text with links replaced
- * @return {string[]} The regular markdown links replaced
- * @return {string[]} The wiki links replaced
- */
-function replaceLinks(text: string, regularLinkPlaceholder: string, wikiLinkPlaceholder: string): {text: string, replacedRegularLinks: string[], replacedWikiLinks: string[]} {
-  const positions: Position[] = getPositions('link', text);
-  const replacedRegularLinks: string[] = [];
-
-  for (const position of positions) {
-    if (position == undefined) {
-      continue;
-    }
-
-    const regularLink = text.substring(position.start.offset, position.end.offset);
-    // skip links that are not are not in markdown format
-    if (!regularLink.includes('[')) {
-      continue;
-    }
-
-    replacedRegularLinks.push(regularLink);
-    text = text.substring(0, position.start.offset) + regularLinkPlaceholder + text.substring(position.end.offset);
-  }
-
-  // Reverse the regular links so that they are in the same order as the original text
-  replacedRegularLinks.reverse();
-
-  const replacedWikiLinks: string[] = [];
-  const linkMatches = text.match(wikiLinkRegex);
-  text = text.replaceAll(wikiLinkRegex, wikiLinkPlaceholder);
-  if (linkMatches) {
-    for (const link of linkMatches) {
-      replacedWikiLinks.push(link);
-    }
-  }
-
-  return {text, replacedRegularLinks, replacedWikiLinks};
 }
 
 /**
@@ -133,38 +67,6 @@ export function ensureEmptyLinesAroundTables(text: string): string {
     }
 
     text = text.replace(table, newTable);
-  }
-
-  return text;
-}
-
-export function ignoreTables(text: string, func: (text: string) => string): string {
-  const tableMatches = text.match(tableRegex);
-  const tablePlaceholder = '{TABLE PLACEHOLDER}';
-  text = text.replaceAll(tableRegex, tablePlaceholder);
-
-  text = func(text);
-
-  if (tableMatches) {
-    for (const table of tableMatches) {
-      text = text.replace(tablePlaceholder, table);
-    }
-  }
-
-  return text;
-}
-
-export function ignoreObsidianMultilineComments(text: string, func: (text: string) => string): string {
-  const obsidianMultilineCommentMatches = text.match(obsidianMultilineCommentRegex);
-  const obsidianCommentPlaceholder = '{OBSIDIAN COMMENT PLACEHOLDER}';
-  text = text.replaceAll(obsidianMultilineCommentRegex, obsidianCommentPlaceholder);
-
-  text = func(text);
-
-  if (obsidianMultilineCommentMatches) {
-    for (const obsidianMultilineComment of obsidianMultilineCommentMatches) {
-      text = text.replace(obsidianCommentPlaceholder, obsidianMultilineComment);
-    }
   }
 
   return text;
@@ -211,18 +113,8 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
  * @return {string} The text with two spaces at the end of lines of paragraphs, list items, and blockquotes where there were consecutive lines of content.
  */
 export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text: string): string {
-  // added the placeholder for YAML in order to prevent the accidental misconstruing of the YAML as a paragraph when an array is in multiline form (i.e. it has a list for the array elements)
-  const yamlMatches = text.match(yamlRegex);
-  if (yamlMatches) {
-    text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
-  }
-
   const positions: Position[] = getPositions('paragraph', text);
   if (positions.length === 0) {
-    if (yamlMatches) {
-      text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
-    }
-
     return text;
   }
 
@@ -247,10 +139,6 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
     text = text.substring(0, position.start.offset) + paragraphLines.join('\n') + text.substring(position.end.offset);
   }
 
-  if (yamlMatches) {
-    text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
-  }
-
   return text;
 }
 
@@ -260,18 +148,8 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
  * @return {string} The text with paragraphs with a single new line before and after them.
  */
 export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: string): string {
-  // added the placeholder for YAML in order to prevent the accidental misconstruing of the YAML as a paragraph when an array is in multiline form (i.e. it has a list for the array elements)
-  const yamlMatches = text.match(yamlRegex);
-  if (yamlMatches) {
-    text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
-  }
-
   const positions: Position[] = getPositions('paragraph', text);
   if (positions.length === 0) {
-    if (yamlMatches) {
-      text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
-    }
-
     return text;
   }
 
@@ -343,13 +221,8 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
     text = text.substring(0, startIndex) + startNewLines + newParagraphLines.join('\n\n') + endNewLines + text.substring(endIndex);
   }
 
-  if (yamlMatches) {
-    text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
-  }
-
   return text;
 }
-
 
 /**
  * Removes spaces before and after link text
@@ -422,65 +295,6 @@ export function moveFootnotesToEnd(text: string) {
   }
   for (const footnote of footnotes) {
     text += '\n' + footnote;
-  }
-
-  return text;
-}
-
-/**
- * Substitutes YAML, links, tags, and codeblocks in a text with a placeholder.
- * Then applies the given function to the text.
- * Substitutes the YAML, links, tags, and codeblocks back to their original form.
- * @param {string} text - The text to process
- * @param {function(string): string} func - The function to apply to the text
- * @return {string} The processed text
- */
-export function ignoreCodeBlocksYAMLTagsAndLinks(text: string, func: (text: string) => string): string {
-  const codePlaceholder = '{PLACEHOLDER 321417}';
-  const ret = replaceCodeblocks(text, codePlaceholder);
-  text = ret.text;
-  const replacedCodeBlocks = ret.replacedCodeBlocks;
-
-  const yamlMatches = text.match(yamlRegex);
-  if (yamlMatches) {
-    text = text.replace(yamlMatches[0], escapeDollarSigns(yamlPlaceholder));
-  }
-
-  const regularLinkPlaceHolder = '{PLACEHOLDER_REGULAR_LINK}';
-  const wikiLinkPlaceHolder = '{PLACEHOLDER_WIKI_LINK}';
-  const linkResults = replaceLinks(text, regularLinkPlaceHolder, wikiLinkPlaceHolder);
-  text = linkResults.text;
-
-  const tagMatches = text.match(tagRegex);
-  const tagPlaceholder = '#tag-placeholder';
-  text = text.replaceAll(tagRegex, tagPlaceholder);
-
-  text = func(text);
-
-  if (tagMatches) {
-    for (const tag of tagMatches) {
-      text = text.replace(tagPlaceholder, tag);
-    }
-  }
-
-  for (const regularLink of linkResults.replacedRegularLinks) {
-    // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
-    // see https://github.com/platers/obsidian-linter/issues/201
-    text = text.replace(new RegExp(regularLinkPlaceHolder, 'i'), regularLink);
-  }
-
-  for (const wikiLink of linkResults.replacedWikiLinks) {
-    // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
-    // see https://github.com/platers/obsidian-linter/issues/201
-    text = text.replace(new RegExp(wikiLinkPlaceHolder, 'i'), wikiLink);
-  }
-
-  if (yamlMatches) {
-    text = text.replace(yamlPlaceholder, escapeDollarSigns(yamlMatches[0]));
-  }
-
-  for (const codeblock of replacedCodeBlocks) {
-    text = text.replace(codePlaceholder, escapeDollarSigns(codeblock));
   }
 
   return text;
