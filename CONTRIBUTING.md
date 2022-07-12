@@ -12,22 +12,55 @@ The command should look something like the following:
 ### Node and NPM
 
 Next you will want to install the appropriate versions of node and npm.  
-This plugin **requires** Node version `15.x` or higher.
+_This plugin requires Node version `15.x` or higher._
 
 #### Windows
 
-Install the
+Install the version of [Node](https://nodejs.org/en/download/) you would like. Make sure to add it to your path under environment variables.
 
 #### Linux, Mac, and Windows via WSL/WSL2
 
 It is recommended that you use [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) which is a node version manager that comes in handy when swapping and installing node versions,
 especially since most linux package managers do not have the needed node version in the standard packages.
 
-1. Fork this repository
-2. Clone the repository
-3. Run `npm ci` to install dependencies
+### Install Dependencies
+
+Now that Node and NPM are installed, we can go ahead and run `npm ci` from the base of the cloned repository.
+This should install the necessary dependencies for working on the plugin. The command may take several minutes to complete.
+
+Once this is done, you should be all set up for contributing to the plugin.
+
+## Making Changes
+
+Now that the repository is set up, you should be able to start making changes.
+
+### Adding a Rule
+
+When adding a rule, please add that rule in `rules.ts`.
+Make sure to add it to the corresponding rule type section (spacing, headings, etc) in that file.
+Try to follow the format of existing tests where possible as it makes the code easier to maintain and changes easier to review.
+Yoy may find it useful to reference methods from `ignore-types.ts` and yo `utils.ts`.  
+For example, you may want to ignore tables and tags which will require `ignoreTypes` from `ignore-types.ts`.
+
+Once the rule has been created, see about adding tests for edge cases as described [below](#adding-tests).
+
+### Bug Fixes
+
+When fixing a bug, if the bug is specific to one of more rules, please add tests to cover the scenarios where the bug ocurred.
+If you are not aware of how to do this, please see [Adding Tests](#adding-tests) below.
+
+This may not work for everyone, but it can be helpful to add a test that creates the failure prior to making changes to the code.
+Once the failing test case(s) is/are in place, all that is left is to get them to pass without breaking other tests.
+
+### Refactoring Code
+
+### Adding Tests
+
+### Updating Documentation
+
+
 4. Add a new rule in `rules.ts`.
-   1. Insert a new rule in the corresponding rule type (spacing, headings, etc)
+   1. Insert a new rule in the corresponding rule type 
    2. Follow the format of the existing rules
    3. Add tests for edge cases in `src/test/rule_alias_here.test.ts`
    4. You should probably use some helper functions from `utils.ts`, such as `formatYAML`.
