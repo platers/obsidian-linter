@@ -58,6 +58,26 @@ Once the failing test case(s) is/are in place, all that is left is to get them t
 
 ### Updating Documentation
 
+Documentation can be broken up into two parts: generated documentation and documentation templates.
+
+#### Generated Documentation
+
+A lot of the documentation for this plugin is generated.
+For example, the ReadMe file is generated from the list of rules that exist and the [ReadMe template)(docs/readme_template.ts).
+
+Another generated file is `docs/rules.md`.
+
+To make changes to the documentation for rule examples or rule descriptions as found in `docs/rules.md`, you will want to modify the rule information in `rules.ts`.  
+If you just want to modify some of the look of the document in general you can modify `docs/rules_template.ts`.
+
+#### Documentation Templates
+
+There are currently two documentation templates:
+
+1. Readme
+  - This template is used for generating the ReadMe file.
+2. Rules
+  - This template is used for generating the `docs/rules.md` file.
 
 4. Add a new rule in `rules.ts`.
    1. Insert a new rule in the corresponding rule type 
@@ -66,8 +86,6 @@ Once the failing test case(s) is/are in place, all that is left is to get them t
    4. You should probably use some helper functions from `utils.ts`, such as `formatYAML`.
 5. Run `npm run compile` to build, generate documentation, and test the plugin.
 6. Run `npm run lint` to lint the plugin.
-
-_Make sure to use Node 15.x or higher._
 
 ## Tests
 
