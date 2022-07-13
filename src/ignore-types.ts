@@ -10,6 +10,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   // mdast node types
   code: {replaceAction: 'code', placeholder: '{CODE_BLOCK_PLACEHOLDER}', replaceDollarSigns: true},
   image: {replaceAction: 'image', placeholder: '{IMAGE_PLACEHOLDER}', replaceDollarSigns: false},
+  thematicBreak: {replaceAction: 'thematicBreak', placeholder: '{HORIZONTAL_RULE_PLACEHOLDER}', replaceDollarSigns: false},
   // RegExp
   yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns(yamlPlaceholder), replaceDollarSigns: true},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}', replaceDollarSigns: false},
