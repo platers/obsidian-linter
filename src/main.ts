@@ -119,6 +119,12 @@ export default class LinterPlugin extends Plugin {
         };
       }
 
+      // defines the vim command for saving a file and lets the linter run on save for it
+      // accounts for https://github.com/platers/obsidian-linter/issues/19
+      (window.CodeMirror as any).Vim?.defineEx('write', 'w', function() {
+        saveCommandDefinition.callback();
+      });
+
       this.addSettingTab(new SettingTab(this.app, this));
     }
 
@@ -542,7 +548,7 @@ class SettingTab extends PluginSettingTab {
 
       new Setting(containerEl)
           .setName('Lint on save')
-          .setDesc('Lint the file on manual save (when `Ctrl + S` is pressed)')
+          .setDesc('Lint the file on manual save (when `Ctrl + S` is pressed or when `:w` is executed while using vim keybindings)')
           .addToggle((toggle) => {
             toggle
                 .setValue(this.plugin.settings.lintOnSave)
