@@ -43,7 +43,7 @@
     "diff-match-patch": "^1.0.5",
     "js-yaml": "^3.14.1",
     "loglevel": "^1.8.0",
-    "moment": "^2.29.2",
+    "moment": "^2.29.4",
     "remark": "^14.0.1",
     "remark-gfm": "^3.0.0",
     "ts-dedent": "^2.2.0",
