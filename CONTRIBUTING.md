@@ -107,6 +107,8 @@ There are currently two documentation templates:
 2. [rules_template.md](docs/rules_template.md)
   - This template is used for generating the [rules.md](docs/rules.md) file and should be updated when you want to change the style or escaping of rule information or examples.
 
+You may also want to take a look at `docs.ts` to modify how the generated files are created.
+
 #### Generating Documentation
 
 To update the documentation you can run `npm run compile` if you need to compile the code as well or just run `npm run docs` which just generates the documentation.
