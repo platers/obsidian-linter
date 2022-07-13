@@ -119,6 +119,12 @@ export default class LinterPlugin extends Plugin {
         };
       }
 
+      // defines the vim command for saving a file and lets the linter run on save for it
+      // accounts for https://github.com/platers/obsidian-linter/issues/19
+      (window.CodeMirror as any).Vim?.defineEx('write', 'w', function() {
+        saveCommandDefinition.callback();
+      });
+
       this.addSettingTab(new SettingTab(this.app, this));
     }
 
