@@ -368,7 +368,7 @@ export const rules: Rule[] = [
       'There should not be any empty lines between list markers and checklists.',
       RuleType.SPACING,
       (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.thematicBreak], text, (text) => {
           const replaceEmptyLinesBetweenList = function(text: string, listRegex: RegExp, replaceWith: string): string {
             let match;
             let newText = text;
