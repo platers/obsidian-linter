@@ -3,7 +3,7 @@ import {LinterSettings, Options, rules, getDisabledRules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';
 import dedent from 'ts-dedent';
-import {stripCr} from './utils';
+import {stripCr} from './utils/strings';
 import log from 'loglevel';
 import {logInfo, logError, logDebug, setLogLevel} from './logger';
 import type moment from 'moment';
@@ -225,7 +225,8 @@ export default class LinterPlugin extends Plugin {
       }
 
       const disabledRules = getDisabledRules(newText);
-
+      const modifiedAtTime = window.moment(file.stat.mtime).format();
+      const createdAtTime = window.moment(file.stat.ctime).format();
       for (const rule of rules) {
         // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
         if (disabledRules.includes(rule.alias()) || rule.alias() === 'yaml-timestamp' || rule.alias() === 'format-tags-in-yaml' || rule.alias() === 'escape-yaml-special-characters' ||
@@ -235,8 +236,8 @@ export default class LinterPlugin extends Plugin {
 
         const options: Options =
           Object.assign({
-            'metadata: file created time': window.moment(file.stat.ctime).format(),
-            'metadata: file modified time': window.moment(file.stat.mtime).format(),
+            'metadata: file created time': modifiedAtTime,
+            'metadata: file modified time': createdAtTime,
             'metadata: file name': file.basename,
             'moment': window.moment,
           }, rule.getOptions(this.settings));
@@ -251,8 +252,8 @@ export default class LinterPlugin extends Plugin {
       const yaml_timestamp_rule = rules.find((rule) => rule.alias() === 'yaml-timestamp');
       const yaml_timestamp_options: Options =
       Object.assign({
-        'metadata: file created time': window.moment(file.stat.ctime).format(),
-        'metadata: file modified time': window.moment(file.stat.mtime).format(),
+        'metadata: file created time': createdAtTime,
+        'metadata: file modified time': modifiedAtTime,
         'metadata: file name': file.basename,
         'Current Time': window.moment(),
         'Already Modified': oldText != newText,
@@ -265,8 +266,8 @@ export default class LinterPlugin extends Plugin {
 
       const yaml_key_sort_rule = rules.find((rule) => rule.alias() === 'yaml-key-sort');
       const yaml_key_sort_options: Options = Object.assign({
-        'metadata: file created time': window.moment(file.stat.ctime).format(),
-        'metadata: file modified time': window.moment(file.stat.mtime).format(),
+        'metadata: file created time': createdAtTime,
+        'metadata: file modified time': modifiedAtTime,
         'metadata: file name': file.basename,
         'Current Time Formatted': window.moment().format(yaml_timestamp_options['Format']),
         'Yaml Timestamp Date Modified Enabled': yaml_timestamp_is_enabled && yaml_timestamp_options['Date Modified'],
