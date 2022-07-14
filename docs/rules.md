@@ -1964,6 +1964,57 @@ foo | bar
 New paragraph.
 ``````
 
+### Empty Line Around Code Fences
+
+Alias: `empty-line-around-code-fences`
+
+Ensures that there is an empty line around code fences unless they start or end a document.
+
+
+
+Example: Fenced code blocks that start a document do not get an empty line before them.
+
+Before:
+
+``````markdown
+``` js
+var temp = 'text';
+// this is a code block
+```
+Text after code block.
+``````
+
+After:
+
+``````markdown
+``` js
+var temp = 'text';
+// this is a code block
+```
+
+Text after code block.
+``````
+Example: Fenced code blocs that end a document do not get an empty line after them.
+
+Before:
+
+``````markdown
+# Heading 1
+```
+Here is a code block
+```
+``````
+
+After:
+
+``````markdown
+# Heading 1
+
+```
+Here is a code block
+```
+``````
+
 ### Space between Chinese and English or numbers
 
 Alias: `space-between-chinese-and-english-or-numbers`

@@ -1364,6 +1364,71 @@ export const rules: Rule[] = [
       ],
   ),
 
+  new Rule(
+      'Empty Line Around Code Fences',
+      'Ensures that there is an empty line around code fences unless they start or end a document.',
+      RuleType.SPACING,
+      (text: string) => {
+        const matches = text.match(/(^|(\n+)?)`{3}( ?[\S]+)?\n([\s\S]+)\n`{3}(\n+)?/gm);
+        if (matches == null) {
+          return text;
+        }
+
+        for (const fencedCodeBlock of matches) {
+          const start = text.indexOf(fencedCodeBlock);
+          const end = start + fencedCodeBlock.length;
+
+          let newFencedCodeBlock = fencedCodeBlock.trim();
+          if (start !== 0) {
+            newFencedCodeBlock = '\n\n' + newFencedCodeBlock;
+          }
+
+          if (end < text.length) {
+            newFencedCodeBlock = newFencedCodeBlock + '\n\n';
+          }
+
+          text = text.replace(fencedCodeBlock, newFencedCodeBlock);
+        }
+
+        return text;
+      },
+      [
+        new Example(
+            'Fenced code blocks that start a document do not get an empty line before them.',
+            dedent`
+            \`\`\` js
+            var temp = 'text';
+            // this is a code block
+            \`\`\`
+            Text after code block.
+`,
+            dedent`
+            \`\`\` js
+            var temp = 'text';
+            // this is a code block
+            \`\`\`
+
+            Text after code block.
+`,
+        ),
+        new Example(
+            'Fenced code blocs that end a document do not get an empty line after them.',
+            dedent`
+      # Heading 1
+      \`\`\`
+      Here is a code block
+      \`\`\`
+`,
+            dedent`
+      # Heading 1
+
+      \`\`\`
+      Here is a code block
+      \`\`\``,
+        ),
+      ],
+  ),
+
   // YAML rules
 
   new Rule(
