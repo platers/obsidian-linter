@@ -1,4 +1,4 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
+import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
 import {LinterSettings, Options, rules, getDisabledRules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';
@@ -6,7 +6,19 @@ import dedent from 'ts-dedent';
 import {stripCr} from './utils';
 import log from 'loglevel';
 import {logInfo, logError, logDebug, setLogLevel} from './logger';
+import type moment from 'moment';
 
+declare global {
+  // eslint-disable-next-line no-unused-vars
+  interface Window {
+    CodeMirrorAdapter: {
+      commands: {
+        save(): void;
+      }
+    };
+    moment: typeof moment;
+  }
+}
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -36,7 +48,6 @@ const langToMomentLocale = {
 
 export default class LinterPlugin extends Plugin {
     settings: LinterSettings;
-    public momentInstance: any;
     private eventRef: EventRef;
 
     async onload() {
@@ -101,7 +112,8 @@ export default class LinterPlugin extends Plugin {
 
       // Source for save setting
       // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
-      const saveCommandDefinition = (this.app as any).commands?.commands?.[
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const saveCommandDefinition = (<any> this.app).commands?.commands?.[
         'editor:save-file'
       ];
       const save = saveCommandDefinition?.callback;
@@ -122,8 +134,8 @@ export default class LinterPlugin extends Plugin {
       // defines the vim command for saving a file and lets the linter run on save for it
       // accounts for https://github.com/platers/obsidian-linter/issues/19
       const that = this;
-      (window as any).CodeMirrorAdapter.commands.save = () => {
-        (that.app as any)?.commands.executeCommandById('editor:save-file');
+      window.CodeMirrorAdapter.commands.save = () => {
+        (<any> that.app).commands.executeCommandById('editor:save-file');
       };
 
       this.addSettingTab(new SettingTab(this.app, this));
@@ -223,10 +235,10 @@ export default class LinterPlugin extends Plugin {
 
         const options: Options =
           Object.assign({
-            'metadata: file created time': this.momentInstance(file.stat.ctime).format(),
-            'metadata: file modified time': this.momentInstance(file.stat.mtime).format(),
+            'metadata: file created time': window.moment(file.stat.ctime).format(),
+            'metadata: file modified time': window.moment(file.stat.mtime).format(),
             'metadata: file name': file.basename,
-            'moment': this.momentInstance,
+            'moment': window.moment,
           }, rule.getOptions(this.settings));
 
         if (options[rule.enabledOptionName()]) {
@@ -239,12 +251,12 @@ export default class LinterPlugin extends Plugin {
       const yaml_timestamp_rule = rules.find((rule) => rule.alias() === 'yaml-timestamp');
       const yaml_timestamp_options: Options =
       Object.assign({
-        'metadata: file created time': this.momentInstance(file.stat.ctime).format(),
-        'metadata: file modified time': this.momentInstance(file.stat.mtime).format(),
+        'metadata: file created time': window.moment(file.stat.ctime).format(),
+        'metadata: file modified time': window.moment(file.stat.mtime).format(),
         'metadata: file name': file.basename,
-        'Current Time': this.momentInstance(),
+        'Current Time': window.moment(),
         'Already Modified': oldText != newText,
-        'moment': this.momentInstance,
+        'moment': window.moment,
       }, yaml_timestamp_rule.getOptions(this.settings));
       const yaml_timestamp_is_enabled = yaml_timestamp_options[yaml_timestamp_rule.enabledOptionName()];
       if (yaml_timestamp_is_enabled) {
@@ -253,10 +265,10 @@ export default class LinterPlugin extends Plugin {
 
       const yaml_key_sort_rule = rules.find((rule) => rule.alias() === 'yaml-key-sort');
       const yaml_key_sort_options: Options = Object.assign({
-        'metadata: file created time': this.momentInstance(file.stat.ctime).format(),
-        'metadata: file modified time': this.momentInstance(file.stat.mtime).format(),
+        'metadata: file created time': window.moment(file.stat.ctime).format(),
+        'metadata: file modified time': window.moment(file.stat.mtime).format(),
         'metadata: file name': file.basename,
-        'Current Time Formatted': this.momentInstance().format(yaml_timestamp_options['Format']),
+        'Current Time Formatted': window.moment().format(yaml_timestamp_options['Format']),
         'Yaml Timestamp Date Modified Enabled': yaml_timestamp_is_enabled && yaml_timestamp_options['Date Modified'],
         'Date Modified Key': yaml_timestamp_options['Date Modified Key'],
       }, yaml_key_sort_rule.getOptions(this.settings));
@@ -315,8 +327,9 @@ export default class LinterPlugin extends Plugin {
 
       let numberOfErrors = 0;
       let lintedFiles = 0;
+      const folderPath = normalizePath(folder.path) + '/';
       await Promise.all(this.app.vault.getMarkdownFiles().map(async (file) => {
-        if (this.convertPathToNormalizedString(file.path).startsWith(this.convertPathToNormalizedString(folder.path) + '|') && !this.shouldIgnoreFile(file)) {
+        if (normalizePath(file.path).startsWith(folderPath) && !this.shouldIgnoreFile(file)) {
           try {
             await this.runLinterFile(file);
           } catch (error) {
@@ -340,11 +353,6 @@ export default class LinterPlugin extends Plugin {
         const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error': 'were ' + numberOfErrors + ' errors';
         new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + ' and there ' + amountOfErrorsMessage + '.');
       }
-    }
-
-    // convert the path separators to | in order to "normalize" the path for better comparisons
-    convertPathToNormalizedString(path: string): string {
-      return path.replace('\\', '|').replace('/', '|');
     }
 
     // handles the creation of the folder linting modal since this happens in multiple places and it should be consistent
@@ -424,7 +432,7 @@ export default class LinterPlugin extends Plugin {
       const currentLocale = moment.locale(momentLocale);
       logDebug(`Trying to switch Moment.js global locale to ${momentLocale}, got ${currentLocale}`);
 
-      this.momentInstance = moment;
+      window.moment = moment;
     }
 
     private displayChangedMessage(charsAdded: number, charsRemoved: number) {
