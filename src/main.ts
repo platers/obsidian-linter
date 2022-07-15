@@ -20,6 +20,21 @@ declare global {
   }
 }
 
+// allows for the removal of the any cast by defining some extra properties for Typescript so it knows these properties exist
+declare module 'obsidian' {
+  // eslint-disable-next-line no-unused-vars
+  interface App {
+    commands: {
+        executeCommandById(id: string): void;
+        commands: {
+            'editor:save-file': {
+                callback(): void;
+            };
+        };
+    };
+  }
+}
+
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
   'en': 'en-gb',
@@ -112,8 +127,7 @@ export default class LinterPlugin extends Plugin {
 
       // Source for save setting
       // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const saveCommandDefinition = (<any> this.app).commands?.commands?.[
+      const saveCommandDefinition = this.app.commands?.commands?.[
         'editor:save-file'
       ];
       const save = saveCommandDefinition?.callback;
@@ -135,7 +149,7 @@ export default class LinterPlugin extends Plugin {
       // accounts for https://github.com/platers/obsidian-linter/issues/19
       const that = this;
       window.CodeMirrorAdapter.commands.save = () => {
-        (<any> that.app).commands.executeCommandById('editor:save-file');
+        that.app.commands.executeCommandById('editor:save-file');
       };
 
       this.addSettingTab(new SettingTab(this.app, this));
