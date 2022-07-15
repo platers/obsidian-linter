@@ -528,6 +528,53 @@ language: Typescript
 ---
 ``````
 
+### Remove YAML Keys
+
+Alias: `remove-yaml-keys`
+
+Removes the YAML keys specified
+
+Options:
+- YAML Keys to Remove: The yaml keys to remove from the yaml frontmatter with or without colons
+	- Default: ``
+
+Example: Removes the values specified in `YAML Keys to Remove` = "status:
+keywords
+date"
+
+Before:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+keywords:
+  - keyword1
+  - keyword2
+status: WIP
+date: 02/15/2022
+---
+
+# Header Context
+
+Text
+``````
+
+After:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+---
+
+# Header Context
+
+Text
+``````
+
 ## Heading
 ### Header Increment
 
