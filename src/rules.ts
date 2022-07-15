@@ -644,7 +644,7 @@ export const rules: Rule[] = [
       RuleType.CONTENT,
       (text: string) => {
         return ignoreListOfTypes([IgnoreTypes.table, IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          return text.replace(/([^\s])( ){2,}([^\s])/g, '$1 $3');
+          return text.replace(/(?!^>)([^\s])( ){2,}([^\s])/gm, '$1 $3');
         });
       },
       [
