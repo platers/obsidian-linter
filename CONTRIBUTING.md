@@ -41,9 +41,9 @@ Now that the repository is set up, you should be able to start making changes.
 When adding a rule, please add that rule in `rules.ts`.
 Make sure to add it to the corresponding rule type section (spacing, headings, etc) in that file.
 Try to follow the format of existing tests where possible as it makes the code easier to maintain and changes easier to review.
-You may find it useful to reference methods from `ignore-types.ts` and `utils.ts`.
+You may find it useful to reference methods from `src/utils/`.
 
-For example, you may want to ignore tables and tags which will require `ignoreListOfTypes` from `ignore-types.ts`.
+For example, you may want to ignore tables and tags which will require `ignoreListOfTypes` from `src/utils/ignore-types.ts`.
 
 Once a rule has been created, see about adding tests for edge cases as described [below](#adding-tests).
 

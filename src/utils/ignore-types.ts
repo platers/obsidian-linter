@@ -1,5 +1,7 @@
-import {getPositions, escapeDollarSigns, obsidianMultilineCommentRegex, tableRegex, tagRegex, wikiLinkRegex, yamlPlaceholder, yamlRegex} from './utils';
+import {obsidianMultilineCommentRegex, tableRegex, tagRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns} from './regex';
+import {getPositions} from './mdast';
 import type {Position} from 'unist';
+import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 
 export type IgnoreResults = {replacedValues: string[], newText: string};
@@ -12,7 +14,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   image: {replaceAction: 'image', placeholder: '{IMAGE_PLACEHOLDER}', replaceDollarSigns: false},
   thematicBreak: {replaceAction: 'thematicBreak', placeholder: '{HORIZONTAL_RULE_PLACEHOLDER}', replaceDollarSigns: false},
   // RegExp
-  yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns(yamlPlaceholder), replaceDollarSigns: true},
+  yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---'), replaceDollarSigns: true},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}', replaceDollarSigns: false},
   tag: {replaceAction: tagRegex, placeholder: '#tag-placeholder', replaceDollarSigns: false},
   table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}', replaceDollarSigns: false},
@@ -76,7 +78,7 @@ function replaceMdastType(text: string, placeholder: string, type: string): Igno
   for (const position of positions) {
     const valueToReplace = text.substring(position.start.offset, position.end.offset);
     replacedValues.push(valueToReplace);
-    text = text.substring(0, position.start.offset) + placeholder + text.substring(position.end.offset);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, placeholder);
   }
 
   // Reverse the replaced values so that they are in the same order as the original text
@@ -138,7 +140,7 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): Ign
     }
 
     replacedRegularLinks.push(regularLink);
-    text = text.substring(0, position.start.offset) + regularLinkPlaceholder + text.substring(position.end.offset);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, regularLinkPlaceholder);
   }
 
   // Reverse the regular links so that they are in the same order as the original text

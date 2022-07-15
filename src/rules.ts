@@ -1,25 +1,18 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
 import {
-  escapeDollarSigns,
+  insert, replaceTextBetweenStartAndEndWithNewValue,
+} from './utils/strings';
+import {
   formatYAML,
-  headerRegex,
   initYAML,
-  insert,
   loadYAML,
-  moveFootnotesToEnd,
-  yamlRegex,
   toYamlString,
-  makeEmphasisOrBoldConsistent,
-  addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent,
-  makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs,
-  removeSpacesInLinkText,
-  toSingleLineArrayYamlString,
   setYamlSection,
   getYamlSectionValue,
   removeYamlSection,
-  ensureEmptyLinesAroundTables,
-} from './utils';
+  toSingleLineArrayYamlString,
+} from './utils/yaml';
 import {
   Option,
   BooleanOption,
@@ -29,7 +22,9 @@ import {
   DropdownRecord,
   TextAreaOption,
 } from './option';
-import {ignoreListOfTypes, IgnoreTypes} from './ignore-types';
+import {ignoreListOfTypes, IgnoreTypes} from './utils/ignore-types';
+import {makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs, makeEmphasisOrBoldConsistent, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent, moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
+import {yamlRegex, ensureEmptyLinesAroundRegexMatches, tableRegex, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -1134,7 +1129,7 @@ export const rules: Rule[] = [
               continue;
             }
 
-            text = text.substring(0, urlStart) + '<' + urlMatch + '>' + text.substring(urlStart + urlMatch.length);
+            text = replaceTextBetweenStartAndEndWithNewValue(text, urlStart, urlStart + urlMatch.length, '<' + urlMatch + '>');
             startSearch = urlStart + urlMatch.length + 2;
           }
 
@@ -1283,7 +1278,7 @@ export const rules: Rule[] = [
       'Ensures that there is an empty line around tables unless they start or end a document.',
       RuleType.SPACING,
       (text: string) => {
-        return ensureEmptyLinesAroundTables(text);
+        return ensureEmptyLinesAroundRegexMatches(text, new RegExp(`(\n)*${tableRegex.source}(\n)*`, 'g'));
       },
       [
         new Example(
@@ -1369,28 +1364,7 @@ export const rules: Rule[] = [
       'Ensures that there is an empty line around code fences unless they start or end a document.',
       RuleType.SPACING,
       (text: string) => {
-        const matches = text.match(/(^|(\n+)?)`{3}( ?[\S]+)?\n([\s\S]+)\n`{3}(\n+)?/gm);
-        if (matches == null) {
-          return text;
-        }
-
-        for (const fencedCodeBlock of matches) {
-          const start = text.indexOf(fencedCodeBlock);
-          const end = start + fencedCodeBlock.length;
-
-          let newFencedCodeBlock = fencedCodeBlock.trim();
-          if (start !== 0) {
-            newFencedCodeBlock = '\n\n' + newFencedCodeBlock;
-          }
-
-          if (end < text.length) {
-            newFencedCodeBlock = newFencedCodeBlock + '\n\n';
-          }
-
-          text = text.replace(fencedCodeBlock, newFencedCodeBlock);
-        }
-
-        return text;
+        return ensureEmptyLinesAroundRegexMatches(text, /(^|(\n+)?)`{3}( ?[\S]+)?\n([\s\S]+)\n`{3}(\n+)?/gm);
       },
       [
         new Example(
@@ -3059,7 +3033,8 @@ export const rules: Rule[] = [
       'Removes spacing around link text.',
       RuleType.SPACING,
       (text: string) => {
-        return removeSpacesInLinkText(text);
+        text = removeSpacesInLinkText(text);
+        return removeSpacesInWikiLinkText(text);
       },
       [
         new Example(
