@@ -3,7 +3,6 @@ import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import remarkGfm from 'remark-gfm';
-import {wikiLinkRegex} from './regex';
 import {replaceWithValueBetweenStartAndEnd} from './strings';
 
 const mdastTypes: Record<string, string> = {
@@ -12,12 +11,8 @@ const mdastTypes: Record<string, string> = {
   paragraph: 'paragraph',
 };
 
-// let cachedASTRoot: Root;
-
 function parseTextToAST(text: string): Root {
   const ast = remark().use(remarkGfm).parse(text);
-  //   cachedASTRoot = ast;
-
   return ast;
 }
 
@@ -28,7 +23,6 @@ function parseTextToAST(text: string): Root {
  * @return {Position[]} The positions of the given element type in the given text
  */
 export function getPositions(type: string, text: string): Position[] {
-//   const ast = cachedASTRoot ?? parseTextToAST(text);
   const ast = parseTextToAST(text);
   const positions: Position[] = [];
   visit(ast, type, (node) => {
@@ -39,16 +33,6 @@ export function getPositions(type: string, text: string): Position[] {
   positions.sort((a, b) => b.start.offset - a.start.offset);
   return positions;
 }
-
-/**
- * Invalidates the cache of the ast root, so that we do not accidentally use an old ast root
- * @param {boolean} textHasChanged Whether or not the text has changed
- */
-// export function textChanged(textHasChanged: boolean): void {
-//   if (textHasChanged) {
-//     cachedASTRoot = undefined;
-//   }
-// }
 
 // mdast helper methods
 
