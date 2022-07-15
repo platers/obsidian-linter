@@ -2496,6 +2496,68 @@ export const rules: Rule[] = [
       ],
   ),
 
+  new Rule(
+      'Remove YAML Keys',
+      'Removes the YAML keys specified',
+      RuleType.YAML,
+      (text: string, options = {}) => {
+        const yamlKeysToRemove: string[] = options['YAML Keys to Remove'].split('\n');
+        const yaml = text.match(yamlRegex);
+        if (!yaml || yamlKeysToRemove.length === 0) {
+          return text;
+        }
+
+        let yamlText = yaml[1];
+        for (const key of yamlKeysToRemove) {
+          let actualKey = key.trim();
+          if (actualKey.endsWith(':')) {
+            actualKey = actualKey.substring(0, actualKey.length - 1);
+          }
+
+          yamlText = removeYamlSection(yamlText, actualKey);
+        }
+
+
+        return text.replace(yaml[1], yamlText);
+      },
+      [
+        new Example(
+            'Removes the values specified in `YAML Keys to Remove` = "status:\nkeywords\ndate"',
+            dedent`
+            ---
+            language: Typescript
+            type: programming
+            tags: computer
+            keywords:
+              - keyword1
+              - keyword2
+            status: WIP
+            date: 02/15/2022
+            ---
+
+            # Header Context
+
+            Text
+            `,
+            dedent`
+            ---
+            language: Typescript
+            type: programming
+            tags: computer
+            ---
+
+            # Header Context
+
+            Text
+            `,
+            {'YAML Keys to Remove': 'status:\nkeywords\ndate'},
+        ),
+      ],
+      [
+        new TextAreaOption('YAML Keys to Remove', 'The yaml keys to remove from the yaml frontmatter with or without colons', ''),
+      ],
+  ),
+
   // Heading rules
 
   new Rule(
