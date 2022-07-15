@@ -96,4 +96,91 @@ describe('Remove Multiple Spaces', () => {
 
     expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
   });
+  // accounts for https://github.com/platers/obsidian-linter/issues/289
+  it('Callouts and block quotes allow multiple spaces at start to allow for code and list item indentation', () => {
+    const before = dedent`
+      # List Item in Callout
+        
+      > [!info] Unordered List
+      > - First Level
+      > - First Level
+      >   - Second Level
+      >     - Third Level
+      > - First Level
+
+      # Code in Callout
+
+      > [!info] Code
+      >     Line 1
+      >     Line 2
+      >     Line 3
+
+      # List Item in Block Quote
+        
+      > Unordered List
+      > - First Level
+      > - First Level
+      >   - Second Level
+      >     - Third Level
+      > - First Level
+
+      # Code in Block Quote
+      
+      > Code
+      >     Line 1
+      >     Line 2
+      >     Line 3
+    `;
+
+    const after = dedent`
+      # List Item in Callout
+        
+      > [!info] Unordered List
+      > - First Level
+      > - First Level
+      >   - Second Level
+      >     - Third Level
+      > - First Level
+
+      # Code in Callout
+
+      > [!info] Code
+      >     Line 1
+      >     Line 2
+      >     Line 3
+
+      # List Item in Block Quote
+        
+      > Unordered List
+      > - First Level
+      > - First Level
+      >   - Second Level
+      >     - Third Level
+      > - First Level
+
+      # Code in Block Quote
+      
+      > Code
+      >     Line 1
+      >     Line 2
+      >     Line 3
+    `;
+
+    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
+  });
+  it('Multiple spaces after ">" are still removed if not the start of a line', () => {
+    const before = dedent`
+    # Text with > with multiple spaces after it
+      
+    Text >  other text
+    `;
+
+    const after = dedent`
+    # Text with > with multiple spaces after it
+      
+    Text > other text
+    `;
+
+    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
+  });
 });
