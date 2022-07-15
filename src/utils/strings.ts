@@ -17,7 +17,7 @@ export function insert(str: string, index: number, value: string): string {
  * @param {string} value - The string to insert
  * @return {string} The string with the replacement string added over the specified start and stop
  */
-export function replaceWithValueBetweenStartAndEnd(str: string, start: number, end: number, value: string): string {
+export function replaceTextBetweenStartAndEndWithNewValue(str: string, start: number, end: number, value: string): string {
   return str.substring(0, start) + value + str.substring(end);
 }
 

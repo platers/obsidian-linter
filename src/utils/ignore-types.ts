@@ -1,7 +1,7 @@
 import {obsidianMultilineCommentRegex, tableRegex, tagRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns} from './regex';
 import {getPositions} from './mdast';
 import type {Position} from 'unist';
-import {replaceWithValueBetweenStartAndEnd} from './strings';
+import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 
 export type IgnoreResults = {replacedValues: string[], newText: string};
@@ -78,7 +78,7 @@ function replaceMdastType(text: string, placeholder: string, type: string): Igno
   for (const position of positions) {
     const valueToReplace = text.substring(position.start.offset, position.end.offset);
     replacedValues.push(valueToReplace);
-    text = replaceWithValueBetweenStartAndEnd(text, position.start.offset, position.end.offset, placeholder);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, placeholder);
   }
 
   // Reverse the replaced values so that they are in the same order as the original text
@@ -140,7 +140,7 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): Ign
     }
 
     replacedRegularLinks.push(regularLink);
-    text = replaceWithValueBetweenStartAndEnd(text, position.start.offset, position.end.offset, regularLinkPlaceholder);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, regularLinkPlaceholder);
   }
 
   // Reverse the regular links so that they are in the same order as the original text

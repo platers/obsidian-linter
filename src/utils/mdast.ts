@@ -3,7 +3,7 @@ import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import remarkGfm from 'remark-gfm';
-import {replaceWithValueBetweenStartAndEnd} from './strings';
+import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 const mdastTypes: Record<string, string> = {
   link: 'link',
@@ -103,7 +103,7 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
 
   for (const position of positions) {
     const newContent = indicator + text.substring(position.start.offset + indicator.length, position.end.offset - indicator.length) + indicator;
-    text = replaceWithValueBetweenStartAndEnd(text, position.start.offset, position.end.offset, newContent);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, newContent);
   }
 
   return text;
@@ -138,7 +138,7 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
       paragraphLines[i] = paragraphLine + '  ';
     }
 
-    text = replaceWithValueBetweenStartAndEnd(text, position.start.offset, position.end.offset, paragraphLines.join('\n'));
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, paragraphLines.join('\n'));
   }
 
   return text;
@@ -220,7 +220,7 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
       endNewLines = '';
     }
 
-    text = replaceWithValueBetweenStartAndEnd(text, startIndex, endIndex, startNewLines + newParagraphLines.join('\n\n') + endNewLines);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, endIndex, startNewLines + newParagraphLines.join('\n\n') + endNewLines);
   }
 
   return text;
@@ -244,7 +244,7 @@ export function removeSpacesInLinkText(text: string): string {
 
     const endLinkTextPosition = regularLink.lastIndexOf(']');
     const newLink = regularLink.substring(0, 1) + regularLink.substring(1, endLinkTextPosition).trim() + regularLink.substring(endLinkTextPosition);
-    text = replaceWithValueBetweenStartAndEnd(text, position.start.offset, position.end.offset, newLink);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, newLink);
   }
 
   return text;

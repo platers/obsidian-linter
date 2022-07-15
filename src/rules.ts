@@ -1,7 +1,7 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
 import {
-  insert, replaceWithValueBetweenStartAndEnd,
+  insert, replaceTextBetweenStartAndEndWithNewValue,
 } from './utils/strings';
 import {
   formatYAML,
@@ -1129,7 +1129,7 @@ export const rules: Rule[] = [
               continue;
             }
 
-            text = replaceWithValueBetweenStartAndEnd(text, urlStart, urlStart + urlMatch.length, '<' + urlMatch + '>');
+            text = replaceTextBetweenStartAndEndWithNewValue(text, urlStart, urlStart + urlMatch.length, '<' + urlMatch + '>');
             startSearch = urlStart + urlMatch.length + 2;
           }
 
