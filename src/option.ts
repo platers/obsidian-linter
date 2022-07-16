@@ -1,9 +1,10 @@
+import {Setting} from 'obsidian';
 import LinterPlugin from './main';
 import {LinterSettings} from './rules';
 
 /** Class representing an option of a rule */
 
-export class Option {
+export abstract class Option {
   public name: string;
   public description: string;
   public ruleName: string;
@@ -26,9 +27,7 @@ export class Option {
     }
   }
 
-  public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-    throw new Error('Not implemented');
-  }
+  public abstract display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void;
 
   protected setOption(value: any, settings: LinterSettings): void {
     settings.ruleConfigs[this.ruleName][this.name] = value;
@@ -37,18 +36,87 @@ export class Option {
 
 export class BooleanOption extends Option {
   public defaultValue: boolean;
+
+  public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+    const setting = new Setting(containerEl)
+        .setName(this.name)
+        .setDesc(this.description)
+        .addToggle((toggle) => {
+          toggle.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+          toggle.onChange((value) => {
+            this.setOption(value, settings);
+            plugin.settings = settings;
+            plugin.saveData(plugin.settings);
+          });
+        });
+
+    // remove border around every setting item
+    setting.settingEl.style.border = 'none';
+  }
 }
 
 export class TextOption extends Option {
   public defaultValue: string;
+
+  public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+    const setting = new Setting(containerEl)
+        .setName(this.name)
+        .setDesc(this.description)
+        .addText((textbox) => {
+          textbox.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+          textbox.onChange((value) => {
+            this.setOption(value, settings);
+            plugin.settings = settings;
+            plugin.saveData(plugin.settings);
+          });
+        });
+
+    // remove border around every setting item
+    setting.settingEl.style.border = 'none';
+  }
 }
 
 export class TextAreaOption extends Option {
   public defaultValue: string;
+
+  public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+    const setting = new Setting(containerEl)
+        .setName(this.name)
+        .setDesc(this.description)
+        .addTextArea((textbox) => {
+          textbox.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+          textbox.onChange((value) => {
+            this.setOption(value, settings);
+            plugin.settings = settings;
+            plugin.saveData(plugin.settings);
+          });
+        });
+
+    // remove border around every setting item
+    setting.settingEl.style.border = 'none';
+  }
 }
 
 export class MomentFormatOption extends Option {
   public defaultValue: boolean;
+
+  public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+    const setting = new Setting(containerEl)
+        .setName(this.name)
+        .setDesc(this.description)
+        .addMomentFormat((format) => {
+          format.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+          format.setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a');
+          format.onChange((value) => {
+            this.setOption(value, settings);
+            plugin.settings = settings;
+            plugin.saveData(plugin.settings);
+          });
+        });
+
+    // remove border around every setting item
+    setting.settingEl.style.border = 'none';
+  }
 }
 
 export class DropdownRecord {
@@ -68,5 +136,29 @@ export class DropdownOption extends Option {
   constructor(name: string, description: string, defaultValue: string, options: DropdownRecord[], ruleName?: string | null) {
     super(name, description, defaultValue, ruleName);
     this.options = options;
+  }
+
+  public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+    const setting = new Setting(containerEl)
+        .setName(this.name)
+        .setDesc(this.description)
+        .addDropdown((dropdown) => {
+        // First, add all the available options
+          for (const option of this.options) {
+            dropdown.addOption(option.value, option.value);
+          }
+
+          // Set currently selected value from existing settings
+          dropdown.setValue(settings.ruleConfigs[this.ruleName][this.name]);
+
+          dropdown.onChange((value) => {
+            this.setOption(value, settings);
+            plugin.settings = settings;
+            plugin.saveData(plugin.settings);
+          });
+        });
+
+    // remove border around every setting item
+    setting.settingEl.style.border = 'none';
   }
 }

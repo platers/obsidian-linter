@@ -1,7 +1,6 @@
 import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
 import {LinterSettings, Options, rules, getDisabledRules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
-import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
 import log from 'loglevel';
@@ -467,100 +466,6 @@ class SettingTab extends PluginSettingTab {
     constructor(app: App, plugin: LinterPlugin) {
       super(app, plugin);
       this.plugin = plugin;
-
-      // Inject display functions. Necessary because the Settings object cannot be used in tests.
-      BooleanOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        const setting = new Setting(containerEl)
-            .setName(this.name)
-            .setDesc(this.description)
-            .addToggle((toggle) => {
-              toggle.setValue(settings.ruleConfigs[this.ruleName][this.name]);
-              toggle.onChange((value) => {
-                this.setOption(value, settings);
-                plugin.settings = settings;
-                plugin.saveData(plugin.settings);
-              });
-            });
-
-        // remove border around every setting item
-        setting.settingEl.style.border = 'none';
-      };
-
-      TextOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        const setting = new Setting(containerEl)
-            .setName(this.name)
-            .setDesc(this.description)
-            .addText((textbox) => {
-              textbox.setValue(settings.ruleConfigs[this.ruleName][this.name]);
-              textbox.onChange((value) => {
-                this.setOption(value, settings);
-                plugin.settings = settings;
-                plugin.saveData(plugin.settings);
-              });
-            });
-
-        // remove border around every setting item
-        setting.settingEl.style.border = 'none';
-      };
-
-      TextAreaOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        const setting = new Setting(containerEl)
-            .setName(this.name)
-            .setDesc(this.description)
-            .addTextArea((textbox) => {
-              textbox.setValue(settings.ruleConfigs[this.ruleName][this.name]);
-              textbox.onChange((value) => {
-                this.setOption(value, settings);
-                plugin.settings = settings;
-                plugin.saveData(plugin.settings);
-              });
-            });
-
-        // remove border around every setting item
-        setting.settingEl.style.border = 'none';
-      };
-
-      MomentFormatOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        const setting = new Setting(containerEl)
-            .setName(this.name)
-            .setDesc(this.description)
-            .addMomentFormat((format) => {
-              format.setValue(settings.ruleConfigs[this.ruleName][this.name]);
-              format.setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a');
-              format.onChange((value) => {
-                this.setOption(value, settings);
-                plugin.settings = settings;
-                plugin.saveData(plugin.settings);
-              });
-            });
-
-        // remove border around every setting item
-        setting.settingEl.style.border = 'none';
-      };
-
-      DropdownOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        const setting = new Setting(containerEl)
-            .setName(this.name)
-            .setDesc(this.description)
-            .addDropdown((dropdown) => {
-              // First, add all the available options
-              for (const option of this.options) {
-                dropdown.addOption(option.value, option.value);
-              }
-
-              // Set currently selected value from existing settings
-              dropdown.setValue(settings.ruleConfigs[this.ruleName][this.name]);
-
-              dropdown.onChange((value) => {
-                this.setOption(value, settings);
-                plugin.settings = settings;
-                plugin.saveData(plugin.settings);
-              });
-            });
-
-        // remove border around every setting item
-        setting.settingEl.style.border = 'none';
-      };
     }
 
     display(): void {
