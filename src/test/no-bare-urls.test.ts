@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {rulesDict} from '../rules-list';
 
 describe('Move Footnotes to the bottom', () => {
   // accounts for https://github.com/platers/obsidian-linter/issues/275

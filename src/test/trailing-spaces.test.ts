@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {rulesDict} from '../rules-list';
 
 describe('Trailing spaces', () => {
   it('One trailing space removed', () => {

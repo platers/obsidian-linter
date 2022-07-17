@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {rulesDict} from '../rules-list';
 
 describe('YAML Title', () => {
   it('Keeps unescaped title if possible', () => {

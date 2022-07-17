@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {rulesDict} from '../rules-list';
 
 describe('Paragraph blank lines', () => {
   it('Make sure obsidian multiline comments are not affected', () => {

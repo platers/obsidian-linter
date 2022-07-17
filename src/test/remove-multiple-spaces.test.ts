@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {rulesDict} from '../rules-list';
 
 describe('Remove Multiple Spaces', () => {
   it('Make sure spaces at the end of the line are ignored', () => {

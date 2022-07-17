@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {rulesDict} from '../rules-list';
 
 describe('YAML Title Alias', () => {
   it('Creates multi-line array aliases when missing', () => {

@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import {rulesDict} from '../rules';
+import {rulesDict} from '../rules-list';
 
 describe('yaml timestamp', () => {
   it('Doesn\'t add date created if already there', () => {

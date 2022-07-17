@@ -1,5 +1,6 @@
 import dedent from 'ts-dedent';
-import {rules, Example} from '../rules';
+import {Example} from '../rules';
+import {rules} from '../rules-list';
 import {yamlRegex, escapeRegExp} from '../utils/regex';
 
 describe('Examples pass', () => {

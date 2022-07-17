@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {rulesDict} from '../rules-list';
 
 describe('Remove Hyphenated Line Breaks', () => {
   // accounts for https://github.com/platers/obsidian-linter/issues/241
