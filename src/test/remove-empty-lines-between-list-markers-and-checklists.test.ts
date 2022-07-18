@@ -6,6 +6,7 @@ ruleTest({
   RuleBuilderClass: RemoveEmptyLinesBetweenListMarkersAndChecklists,
   testCases: [
     {
+      // accounts for https://github.com/platers/obsidian-linter/issues/283
       testName: 'Horizontal Rules after list should not be affected',
       before: dedent`
         Starting Text
