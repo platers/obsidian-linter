@@ -32,6 +32,7 @@ import SpaceAfterListMarkers from './rules/space-after-list-markers';
 import RemoveEmptyLinesBetweenListMarkersAndChecklists from './rules/remove-empty-lines-between-list-markers-and-checklists';
 import CompactYaml from './rules/compact-yaml';
 import ConsecutiveBlankLines from './rules/consecutive-blank-lines';
+import ConvertSpacesToTabs from './rules/convert-spaces-to-tabs';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -78,52 +79,7 @@ export const rules: Rule[] = [
   RemoveEmptyLinesBetweenListMarkersAndChecklists.getRule(),
   CompactYaml.getRule(),
   ConsecutiveBlankLines.getRule(),
-  new Rule(
-      'Convert Spaces to Tabs',
-      'Converts leading spaces to tabs.',
-      RuleType.SPACING,
-      (text: string, options = {}) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          const tabsize = String(options['Tabsize']);
-          const tabsize_regex = new RegExp(
-              '^(\t*) {' + String(tabsize) + '}',
-              'gm',
-          );
-
-          while (text.match(tabsize_regex) != null) {
-            text = text.replace(tabsize_regex, '$1\t');
-          }
-          return text;
-        });
-      },
-      /* eslint-disable no-mixed-spaces-and-tabs, no-tabs */
-      [
-        new Example(
-            'Converting spaces to tabs with `tabsize = 3`',
-            dedent`
-          - text with no indention
-             - text indented with 3 spaces
-          - text with no indention
-                - text indented with 6 spaces
-      `,
-            dedent`
-          - text with no indention
-          \t- text indented with 3 spaces
-          - text with no indention
-          \t\t- text indented with 6 spaces
-      `,
-            {Tabsize: '3'},
-        ),
-      ],
-      /* eslint-enable no-mixed-spaces-and-tabs, no-tabs */
-      [
-        new TextOption(
-            'Tabsize',
-            'Number of spaces that will be converted to a tab',
-            '4',
-        ),
-      ],
-  ),
+  ConvertSpacesToTabs.getRule(),
   new Rule(
       'Line Break at Document End',
       'Ensures that there is exactly one line break at the end of a document.',

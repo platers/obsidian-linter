@@ -1,5 +1,5 @@
 import {Example, Options, Rule, RuleType} from '../rules';
-import {BooleanOption, Option} from '../option';
+import {BooleanOption, Option, TextOption} from '../option';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -85,5 +85,11 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
 export class BooleanOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, boolean> {
   protected buildOption(): Option {
     return new BooleanOption(this.name, this.description, this.defaultValue);
+  }
+}
+
+export class NumberOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, Number> {
+  protected buildOption(): Option {
+    return new TextOption(this.name, this.description, this.defaultValue);
   }
 }
