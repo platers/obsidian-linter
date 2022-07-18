@@ -53,20 +53,20 @@ export class ExampleBuilder<TOptions extends Options> {
   }
 }
 
-type KeysMatchingValueType<TObject, TValue> = {[TKey in keyof TObject]-?: TObject[TKey] extends TValue ? TKey : never}[keyof TObject];
+type KeysOfObjectMatchingPropertyValueType<TObject, TValue> = string & {[TKey in keyof TObject]-?: TObject[TKey] extends TValue ? TKey : never}[keyof TObject];
 
 export abstract class OptionBuilder<TOptions extends Options, TValue> {
   readonly OptionsClass: (new() => TOptions);
   readonly name: string;
   readonly description: string;
-  readonly optionsKey: string & KeysMatchingValueType<TOptions, TValue>;
+  readonly optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
   readonly option: Option;
 
   constructor(args: {
     OptionsClass: (new() => TOptions),
     name: string
     description: string,
-    optionsKey: string & KeysMatchingValueType<TOptions, TValue>;
+    optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
   }) {
     this.OptionsClass = args.OptionsClass;
     this.name = args.name;
