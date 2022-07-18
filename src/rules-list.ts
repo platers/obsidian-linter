@@ -28,6 +28,7 @@ import {Example, Rule, RuleType} from './rules';
 import TrailingSpaces from './rules/trailing-spaces';
 import HeadingBlankLines from './rules/heading-blank-lines';
 import ParagraphBlankLines from './rules/paragraph-blank-lines';
+import SpaceAfterListMarkers from './rules/space-after-list-markers';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -70,43 +71,7 @@ export const rules: Rule[] = [
   TrailingSpaces.getRule(),
   HeadingBlankLines.getRule(),
   ParagraphBlankLines.getRule(),
-  new Rule(
-      `Space after list markers`,
-      'There should be a single space after list markers and checkboxes.',
-      RuleType.SPACING,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-        // Space after marker
-          text = text.replace(/^(\s*\d+\.|\s*[-+*])[^\S\r\n]+/gm, '$1 ');
-          // Space after checkbox
-          return text.replace(
-              /^(\s*\d+\.|\s*[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm,
-              '$1 ',
-          );
-        });
-      },
-      [
-        new Example(
-            '',
-            dedent`
-        1.   Item 1
-        2.  Item 2
-
-        -   [ ] Item 1
-        - [x]    Item 2
-        \t-  [ ] Item 3
-        `,
-            dedent`
-        1. Item 1
-        2. Item 2
-
-        - [ ] Item 1
-        - [x] Item 2
-        \t- [ ] Item 3
-        `,
-        ),
-      ],
-  ),
+  SpaceAfterListMarkers.getRule(),
   new Rule(
       `Remove Empty Lines Between List Markers and Checklists`,
       'There should not be any empty lines between list markers and checklists.',
