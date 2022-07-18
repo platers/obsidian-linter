@@ -35,6 +35,7 @@ import ConsecutiveBlankLines from './rules/consecutive-blank-lines';
 import ConvertSpacesToTabs from './rules/convert-spaces-to-tabs';
 import LineBreakAtDocumentEnd from './rules/line-break-at-document-end';
 import RemoveMultipleSpaces from './rules/remove-multiple-spaces';
+import RemoveHyphenatedLineBreaks from './rules/remove-hyphenated-line-breaks';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -87,28 +88,8 @@ export const rules: Rule[] = [
   // Content rules
 
   RemoveMultipleSpaces.getRule(),
+  RemoveHyphenatedLineBreaks.getRule(),
 
-  new Rule(
-      'Remove Hyphenated Line Breaks',
-      'Removes hyphenated line breaks. Useful when pasting text from textbooks.',
-      RuleType.CONTENT,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          return text.replace(/\b[-‐] \b/g, '');
-        });
-      },
-      [
-        new Example(
-            'Removing hyphenated line breaks.',
-            dedent`
-            This text has a linebr‐ eak.
-            `,
-            dedent`
-            This text has a linebreak.
-            `,
-        ),
-      ],
-  ),
   new Rule(
       'Remove Consecutive List Markers',
       'Removes consecutive list markers. Useful when copy-pasting list items.',
