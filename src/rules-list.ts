@@ -25,6 +25,7 @@ import {ignoreListOfTypes, IgnoreTypes} from './utils/ignore-types';
 import {makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs, makeEmphasisOrBoldConsistent, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent, moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
 import {yamlRegex, ensureEmptyLinesAroundRegexMatches, tableRegex, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
 import {Example, Rule, RuleType} from './rules';
+import TrailingSpaces from './rules/trailing-spaces';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -64,51 +65,7 @@ export function getDisabledRules(text: string): string[] {
 }
 
 export const rules: Rule[] = [
-  new Rule(
-      'Trailing spaces',
-      'Removes extra spaces after every line.',
-      RuleType.SPACING,
-      (text: string, options = {}) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          if (options['Two Space Linebreak'] === false) {
-            return text.replace(/[ \t]+$/gm, '');
-          } else {
-            text = text.replace(/(\S)[ \t]$/gm, '$1'); // one whitespace
-            text = text.replace(/(\S)[ \t]{3,}$/gm, '$1'); // three or more whitespaces
-            text = text.replace(/(\S)( ?\t\t? ?)$/gm, '$1'); // two whitespaces with at least one tab
-            return text;
-          }
-        });
-      },
-      [
-        new Example(
-            'Removes trailing spaces and tabs.',
-            dedent`
-        # H1   
-        Line with trailing spaces and tabs.	        `, // eslint-disable-line no-tabs
-            dedent`
-        # H1
-        Line with trailing spaces and tabs.`,
-        ),
-        new Example(
-            'With `Two Space Linebreak = true`',
-            dedent`
-        # H1
-        Line with trailing spaces and tabs.  `,
-            dedent`
-        # H1
-        Line with trailing spaces and tabs.  `,
-            {'Two Space Linebreak': true},
-        ),
-      ],
-      [
-        new BooleanOption(
-            'Two Space Linebreak',
-            'Ignore two spaces followed by a line break ("Two Space Rule").',
-            false,
-        ),
-      ],
-  ),
+  TrailingSpaces.getRule(),
   new Rule(
       'Heading blank lines',
       'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',

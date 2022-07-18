@@ -1538,7 +1538,7 @@ Example: Removes trailing spaces and tabs.
 Before:
 
 ``````markdown
-# H1   
+# H1
 Line with trailing spaces and tabs.	        
 ``````
 
