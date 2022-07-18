@@ -33,6 +33,7 @@ import RemoveEmptyLinesBetweenListMarkersAndChecklists from './rules/remove-empt
 import CompactYaml from './rules/compact-yaml';
 import ConsecutiveBlankLines from './rules/consecutive-blank-lines';
 import ConvertSpacesToTabs from './rules/convert-spaces-to-tabs';
+import LineBreakAtDocumentEnd from './rules/line-break-at-document-end';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -80,41 +81,7 @@ export const rules: Rule[] = [
   CompactYaml.getRule(),
   ConsecutiveBlankLines.getRule(),
   ConvertSpacesToTabs.getRule(),
-  new Rule(
-      'Line Break at Document End',
-      'Ensures that there is exactly one line break at the end of a document.',
-      RuleType.SPACING,
-      (text: string) => {
-        text = text.replace(/\n+$/g, '');
-        text += '\n';
-        return text;
-      },
-      [
-        new Example(
-            'Appending a line break to the end of the document.',
-            dedent`
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-      `,
-            dedent`
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-
-      `,
-        ),
-        new Example(
-            'Removing trailing line breaks to the end of the document, except one.',
-            dedent`
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-
-
-          
-      `,
-            dedent`
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-
-      `,
-        ),
-      ],
-  ),
+  LineBreakAtDocumentEnd.getRule(),
 
   // Content rules
 
