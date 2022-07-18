@@ -37,6 +37,7 @@ import LineBreakAtDocumentEnd from './rules/line-break-at-document-end';
 import RemoveMultipleSpaces from './rules/remove-multiple-spaces';
 import RemoveHyphenatedLineBreaks from './rules/remove-hyphenated-line-breaks';
 import RemoveConsecutiveListMarkers from './rules/remove-consecutive-list-markers';
+import RemoveEmptyListMarkers from './rules/remove-empty-list-markers';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -91,31 +92,8 @@ export const rules: Rule[] = [
   RemoveMultipleSpaces.getRule(),
   RemoveHyphenatedLineBreaks.getRule(),
   RemoveConsecutiveListMarkers.getRule(),
+  RemoveEmptyListMarkers.getRule(),
 
-  new Rule(
-      'Remove Empty List Markers',
-      'Removes empty list markers, i.e. list items without content.',
-      RuleType.CONTENT,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          return text.replace(/^\s*-\s*\n/gm, '');
-        });
-      },
-      [
-        new Example(
-            'Removes empty list markers.',
-            dedent`
-            - item 1
-            -
-            - item 2
-            `,
-            dedent`
-            - item 1
-            - item 2
-            `,
-        ),
-      ],
-  ),
   new Rule(
       'Convert Bullet List Markers',
       'Converts common bullet list marker symbols to markdown list markers.',
