@@ -31,6 +31,7 @@ import ParagraphBlankLines from './rules/paragraph-blank-lines';
 import SpaceAfterListMarkers from './rules/space-after-list-markers';
 import RemoveEmptyLinesBetweenListMarkersAndChecklists from './rules/remove-empty-lines-between-list-markers-and-checklists';
 import CompactYaml from './rules/compact-yaml';
+import ConsecutiveBlankLines from './rules/consecutive-blank-lines';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -76,32 +77,7 @@ export const rules: Rule[] = [
   SpaceAfterListMarkers.getRule(),
   RemoveEmptyLinesBetweenListMarkersAndChecklists.getRule(),
   CompactYaml.getRule(),
-  new Rule(
-      'Consecutive blank lines',
-      'There should be at most one consecutive blank line.',
-      RuleType.SPACING,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          return text.replace(/\n{2,}/g, '\n\n');
-        });
-      },
-      [
-        new Example(
-            '',
-            dedent`
-        Some text
-
-
-        Some more text
-        `,
-            dedent`
-        Some text
-
-        Some more text
-        `,
-        ),
-      ],
-  ),
+  ConsecutiveBlankLines.getRule(),
   new Rule(
       'Convert Spaces to Tabs',
       'Converts leading spaces to tabs.',
