@@ -26,6 +26,7 @@ import {makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs, makeEmphasisOrB
 import {yamlRegex, ensureEmptyLinesAroundRegexMatches, tableRegex, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
 import {Example, Rule, RuleType} from './rules';
 import TrailingSpaces from './rules/trailing-spaces';
+import HeadingBlankLines from './rules/heading-blank-lines';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -66,73 +67,7 @@ export function getDisabledRules(text: string): string[] {
 
 export const rules: Rule[] = [
   TrailingSpaces.getRule(),
-  new Rule(
-      'Heading blank lines',
-      'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',
-      RuleType.SPACING,
-      (text: string, options = {}) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          if (options['Bottom'] === false) {
-            text = text.replace(/(^#+\s.*)\n+/gm, '$1\n'); // trim blank lines after headings
-            text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
-          } else {
-            text = text.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings
-            text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
-            text = text.replace(/(^#+\s.*)\n+/gm, '$1\n\n'); // trim blank lines after headings
-          }
-          text = text.replace(/^\n+(#+\s.*)/, '$1'); // remove blank lines before first heading
-          text = text.replace(/(#+\s.*)\n+$/, '$1'); // remove blank lines after last heading
-          return text;
-        });
-      },
-      [
-        new Example(
-            'Headings should be surrounded by blank lines',
-            dedent`
-        # H1
-        ## H2
-
-
-        # H1
-        line
-        ## H2
-
-        `,
-            dedent`
-        # H1
-
-        ## H2
-
-        # H1
-
-        line
-
-        ## H2
-        `,
-        ),
-        new Example(
-            'With `Bottom=false`',
-            dedent`
-        # H1
-        line
-        ## H2
-        # H1
-        line
-        `,
-            dedent`
-        # H1
-        line
-
-        ## H2
-
-        # H1
-        line
-        `,
-            {Bottom: false},
-        ),
-      ],
-      [new BooleanOption('Bottom', 'Insert a blank line after headings', true)],
-  ),
+  HeadingBlankLines.getRule(),
   new Rule(
       'Paragraph blank lines',
       'All paragraphs should have exactly one blank line both before and after.',
