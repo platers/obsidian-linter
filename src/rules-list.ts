@@ -22,11 +22,12 @@ import {
   TextAreaOption,
 } from './option';
 import {ignoreListOfTypes, IgnoreTypes} from './utils/ignore-types';
-import {makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs, makeEmphasisOrBoldConsistent, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent, moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
+import {makeEmphasisOrBoldConsistent, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent, moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
 import {yamlRegex, ensureEmptyLinesAroundRegexMatches, tableRegex, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
 import {Example, Rule, RuleType} from './rules';
 import TrailingSpaces from './rules/trailing-spaces';
 import HeadingBlankLines from './rules/heading-blank-lines';
+import ParagraphBlankLines from './rules/paragraph-blank-lines';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -68,31 +69,7 @@ export function getDisabledRules(text: string): string[] {
 export const rules: Rule[] = [
   TrailingSpaces.getRule(),
   HeadingBlankLines.getRule(),
-  new Rule(
-      'Paragraph blank lines',
-      'All paragraphs should have exactly one blank line both before and after.',
-      RuleType.SPACING,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml], text, makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs);
-      },
-      [
-        new Example(
-            'Paragraphs should be surrounded by blank lines',
-            dedent`
-      # H1
-      Newlines are inserted.
-      A paragraph is a line that starts with a letter.
-      `,
-            dedent`
-      # H1
-
-      Newlines are inserted.
-
-      A paragraph is a line that starts with a letter.
-      `,
-        ),
-      ],
-  ),
+  ParagraphBlankLines.getRule(),
   new Rule(
       `Space after list markers`,
       'There should be a single space after list markers and checkboxes.',
