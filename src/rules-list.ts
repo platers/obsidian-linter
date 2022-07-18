@@ -34,6 +34,7 @@ import CompactYaml from './rules/compact-yaml';
 import ConsecutiveBlankLines from './rules/consecutive-blank-lines';
 import ConvertSpacesToTabs from './rules/convert-spaces-to-tabs';
 import LineBreakAtDocumentEnd from './rules/line-break-at-document-end';
+import RemoveMultipleSpaces from './rules/remove-multiple-spaces';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -85,27 +86,8 @@ export const rules: Rule[] = [
 
   // Content rules
 
-  new Rule(
-      'Remove Multiple Spaces',
-      'Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. ',
-      RuleType.CONTENT,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.table, IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          return text.replace(/(?!^>)([^\s])( ){2,}([^\s])/gm, '$1 $3');
-        });
-      },
-      [
-        new Example(
-            'Removing double and triple space.',
-            dedent`
-          Lorem ipsum   dolor  sit amet.
-      `,
-            dedent`
-          Lorem ipsum dolor sit amet.
-      `,
-        ),
-      ],
-  ),
+  RemoveMultipleSpaces.getRule(),
+
   new Rule(
       'Remove Hyphenated Line Breaks',
       'Removes hyphenated line breaks. Useful when pasting text from textbooks.',
