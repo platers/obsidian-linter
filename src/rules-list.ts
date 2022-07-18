@@ -36,6 +36,7 @@ import ConvertSpacesToTabs from './rules/convert-spaces-to-tabs';
 import LineBreakAtDocumentEnd from './rules/line-break-at-document-end';
 import RemoveMultipleSpaces from './rules/remove-multiple-spaces';
 import RemoveHyphenatedLineBreaks from './rules/remove-hyphenated-line-breaks';
+import RemoveConsecutiveListMarkers from './rules/remove-consecutive-list-markers';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -89,36 +90,8 @@ export const rules: Rule[] = [
 
   RemoveMultipleSpaces.getRule(),
   RemoveHyphenatedLineBreaks.getRule(),
+  RemoveConsecutiveListMarkers.getRule(),
 
-  new Rule(
-      'Remove Consecutive List Markers',
-      'Removes consecutive list markers. Useful when copy-pasting list items.',
-      RuleType.CONTENT,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          return text.replace(/^([ |\t]*)- - \b/gm, '$1- ');
-        });
-      },
-      [
-        new Example(
-            'Removing consecutive list markers.',
-            dedent`
-            - item 1
-            - - copypasted item A
-            - item 2
-              - indented item
-              - - copypasted item B
-            `,
-            dedent`
-            - item 1
-            - copypasted item A
-            - item 2
-              - indented item
-              - copypasted item B
-            `,
-        ),
-      ],
-  ),
   new Rule(
       'Remove Empty List Markers',
       'Removes empty list markers, i.e. list items without content.',
