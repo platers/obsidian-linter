@@ -29,6 +29,7 @@ import TrailingSpaces from './rules/trailing-spaces';
 import HeadingBlankLines from './rules/heading-blank-lines';
 import ParagraphBlankLines from './rules/paragraph-blank-lines';
 import SpaceAfterListMarkers from './rules/space-after-list-markers';
+import RemoveEmptyLinesBetweenListMarkersAndChecklists from './rules/remove-empty-lines-between-list-markers-and-checklists';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -72,102 +73,7 @@ export const rules: Rule[] = [
   HeadingBlankLines.getRule(),
   ParagraphBlankLines.getRule(),
   SpaceAfterListMarkers.getRule(),
-  new Rule(
-      `Remove Empty Lines Between List Markers and Checklists`,
-      'There should not be any empty lines between list markers and checklists.',
-      RuleType.SPACING,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.thematicBreak], text, (text) => {
-          const replaceEmptyLinesBetweenList = function(text: string, listRegex: RegExp, replaceWith: string): string {
-            let match;
-            let newText = text;
-
-            do {
-              match = newText.match(listRegex);
-              newText = newText.replaceAll(listRegex, replaceWith);
-            } while (match);
-
-            return newText;
-          };
-
-          /* eslint-disable no-useless-escape */
-          // account for '- [x]' and  '- [ ]' checkbox markers
-          const checkboxMarker = new RegExp(/^(( |\t)*- \[( |x)\].+)\n{2,}(( |\t)*- \[( |x)\].+)$/gm);
-          text = replaceEmptyLinesBetweenList(text, checkboxMarker, '$1\n$4');
-
-          // account for ordered list marker
-          const orderedMarker = new RegExp(/^(( |\t)*\d+\..+)\n{2,}(( |\t)*\d+\..+)$/gm);
-          text = replaceEmptyLinesBetweenList(text, orderedMarker, '$1\n$3');
-
-          // account for '+' list marker
-          const plusMarker = new RegExp(/^(( |\t)*\+.+)\n{2,}(( |\t)*\+.+)$/gm);
-          text = replaceEmptyLinesBetweenList(text, plusMarker, '$1\n$3');
-
-          // account for '-' list marker
-          const dashMarker = new RegExp(/^(( |\t)*-(?! \[( |x)\]).+)\n{2,}(( |\t)*-(?! \[( |x)\]).+)$/gm);
-          text = replaceEmptyLinesBetweenList(text, dashMarker, '$1\n$4');
-
-          // account for '*' list marker
-          const splatMarker = new RegExp(/^(( |\t)*\*.+)\n{2,}(( |\t)*\*.+)$/gm);
-          return replaceEmptyLinesBetweenList(text, splatMarker, '$1\n$3');
-          /* eslint-enable no-useless-escape */
-        });
-      },
-      [
-        new Example(
-            '',
-            dedent`
-      1. Item 1
-
-      2. Item 2
-
-      - Item 1
-
-      \t- Subitem 1
-
-      - Item 2
-
-      - [x] Item 1
-
-      \t- [ ] Subitem 1
-
-      - [ ] Item 2
-
-      + Item 1
-      
-      \t+ Subitem 1
-
-      + Item 2
-
-      * Item 1
-
-      \t* Subitem 1
-
-      * Item 2
-      `,
-            dedent`
-      1. Item 1
-      2. Item 2
-
-      - Item 1
-      \t- Subitem 1
-      - Item 2
-
-      - [x] Item 1
-      \t- [ ] Subitem 1
-      - [ ] Item 2
-
-      + Item 1
-      \t+ Subitem 1
-      + Item 2
-
-      * Item 1
-      \t* Subitem 1
-      * Item 2
-      `,
-        ),
-      ],
-  ),
+  RemoveEmptyLinesBetweenListMarkersAndChecklists.getRule(),
   new Rule(
       'Compact YAML',
       'Removes leading and trailing blank lines in the YAML front matter.',
