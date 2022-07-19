@@ -1,7 +1,7 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
 import {
-  insert, replaceTextBetweenStartAndEndWithNewValue,
+  insert,
 } from './utils/strings';
 import {
   formatYAML,
@@ -42,6 +42,7 @@ import ConvertBulletListMarkers from './rules/convert-bullet-list-markers';
 import ProperEllipsis from './rules/proper-ellipsis';
 import EmphasisStyle from './rules/emphasis-style';
 import StrongStyle from './rules/strong-style';
+import NoBareUrls from './rules/no-bare-urls';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -101,84 +102,7 @@ export const rules: Rule[] = [
   ProperEllipsis.getRule(),
   EmphasisStyle.getRule(),
   StrongStyle.getRule(),
-  new Rule(
-      'No Bare URLs',
-      'Encloses bare URLs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.',
-      RuleType.CONTENT,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image], text, (text) => {
-          const URLMatches = text.match(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'">]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'">]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'">]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'">]{2,})/gi);
-
-          if (!URLMatches) {
-            return text;
-          }
-
-          // make sure you do not match on the same thing more than once by keeping track of the last position you checked up to
-          let startSearch = 0;
-          const numMatches = URLMatches.length;
-          for (let i = 0; i < numMatches; i++) {
-            const urlMatch = URLMatches[i];
-            const urlStart = text.indexOf(urlMatch, startSearch);
-            const urlEnd = urlStart + urlMatch.length;
-
-            const previousChar = urlStart === 0 ? undefined : text.charAt(urlStart - 1);
-            const nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
-            if (previousChar != undefined && (previousChar === '`' || previousChar === '"' || previousChar === '\'' || previousChar === '[' || previousChar === '<') &&
-              nextChar != undefined && (nextChar === '`' || nextChar === '"' || nextChar === '\'' || nextChar === ']' || nextChar === '>')) {
-              startSearch = urlStart + urlMatch.length;
-              continue;
-            }
-
-            text = replaceTextBetweenStartAndEndWithNewValue(text, urlStart, urlStart + urlMatch.length, '<' + urlMatch + '>');
-            startSearch = urlStart + urlMatch.length + 2;
-          }
-
-          return text;
-        });
-      },
-      [
-        new Example(
-            'Make sure that links are inside of angle brackets when not in single quotes(\'), double quotes("), or backticks(`)',
-            dedent`
-          https://github.com
-          braces around url should stay the same: [https://github.com]
-          backticks around url should stay the same: \`https://github.com\`
-          Links mid-sentence should be updated like https://google.com will be.
-          'https://github.com'
-          "https://github.com"
-          <https://github.com>
-          links should stay the same: [](https://github.com)
-          https://gitlab.com
-          `,
-            dedent`
-          <https://github.com>
-          braces around url should stay the same: [https://github.com]
-          backticks around url should stay the same: \`https://github.com\`
-          Links mid-sentence should be updated like <https://google.com> will be.
-          'https://github.com'
-          "https://github.com"
-          <https://github.com>
-          links should stay the same: [](https://github.com)
-          <https://gitlab.com>
-          `,
-        ),
-        new Example(
-            'Angle brackets are added if the url is not the only text in the single quotes(\'), double quotes("), or backticks(`)',
-            dedent`
-        [https://github.com some text here]
-        backticks around a url should stay the same, but only if the only contents of the backticks: \`https://github.com some text here\`
-        single quotes around a url should stay the same, but only if the contents of the single quotes is the url: 'https://github.com some text here'
-        double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "https://github.com some text here"
-        `,
-            dedent`
-          [<https://github.com> some text here]
-          backticks around a url should stay the same, but only if the only contents of the backticks: \`<https://github.com> some text here\`
-          single quotes around a url should stay the same, but only if the contents of the single quotes is the url: '<https://github.com> some text here'
-          double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "<https://github.com> some text here"
-        `,
-        ),
-      ],
-  ),
+  NoBareUrls.getRule(),
   new Rule(
       'Two Spaces Between Lines with Content',
       'Makes sure that two spaces are added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items',
