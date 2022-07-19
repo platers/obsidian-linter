@@ -1,5 +1,5 @@
 import {Example, Options, Rule, RuleType} from '../rules';
-import {BooleanOption, Option, TextOption} from '../option';
+import {BooleanOption, DropdownOption, DropdownRecord, Option, TextOption} from '../option';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -43,6 +43,10 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
 export class ExampleBuilder<TOptions extends Options> {
   readonly example: Example;
 
+  // HACK to bypass the Typescript generics system flaw
+  // https://github.com/microsoft/TypeScript/wiki/FAQ#why-is-astring-assignable-to-anumber-for-interface-at--
+  #_: TOptions;
+
   constructor(args: {
     description: string,
     before: string,
@@ -55,28 +59,37 @@ export class ExampleBuilder<TOptions extends Options> {
 
 type KeysOfObjectMatchingPropertyValueType<TObject, TValue> = string & {[TKey in keyof TObject]-?: TObject[TKey] extends TValue ? TKey : never}[keyof TObject];
 
+type OptionBuilderConstructorArgs<TOptions extends Options, TValue> = {
+  OptionsClass: (new() => TOptions),
+  name: string
+  description: string,
+  optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
+};
+
 export abstract class OptionBuilder<TOptions extends Options, TValue> {
   readonly OptionsClass: (new() => TOptions);
   readonly name: string;
   readonly description: string;
   readonly optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
-  readonly option: Option;
+  #option: Option;
 
-  constructor(args: {
-    OptionsClass: (new() => TOptions),
-    name: string
-    description: string,
-    optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
-  }) {
+  constructor(args: OptionBuilderConstructorArgs<TOptions, TValue>) {
     this.OptionsClass = args.OptionsClass;
     this.name = args.name;
     this.description = args.description;
     this.optionsKey = args.optionsKey;
-    this.option = this.buildOption();
   }
 
   protected get defaultValue(): TValue {
     return new this.OptionsClass()[this.optionsKey];
+  }
+
+  get option(): Option {
+    if (!this.#option) {
+      this.#option = this.buildOption();
+    }
+
+    return this.#option;
   }
 
   protected abstract buildOption(): Option;
@@ -91,5 +104,23 @@ export class BooleanOptionBuilder<TOptions extends Options> extends OptionBuilde
 export class NumberOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, Number> {
   protected buildOption(): Option {
     return new TextOption(this.name, this.description, this.defaultValue);
+  }
+}
+
+export class DropdownOptionBuilder<TOptions extends Options, TValue extends string> extends OptionBuilder<TOptions, TValue> {
+  readonly records: DropdownRecord[];
+
+  constructor(args: OptionBuilderConstructorArgs<TOptions, TValue> & {
+    records: {
+      value: TValue,
+      description: string
+    }[]
+  }) {
+    super(args);
+    this.records = args.records.map((record) => new DropdownRecord(record.value, record.description));
+  }
+
+  protected buildOption(): Option {
+    return new DropdownOption(this.name, this.description, this.defaultValue, this.records);
   }
 }
