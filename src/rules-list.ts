@@ -22,7 +22,7 @@ import {
   TextAreaOption,
 } from './option';
 import {ignoreListOfTypes, IgnoreTypes} from './utils/ignore-types';
-import {makeEmphasisOrBoldConsistent, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent, moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
+import {addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent, moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
 import {yamlRegex, ensureEmptyLinesAroundRegexMatches, tableRegex, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
 import {Example, Rule, RuleType} from './rules';
 import TrailingSpaces from './rules/trailing-spaces';
@@ -41,6 +41,7 @@ import RemoveEmptyListMarkers from './rules/remove-empty-list-markers';
 import ConvertBulletListMarkers from './rules/convert-bullet-list-markers';
 import ProperEllipsis from './rules/proper-ellipsis';
 import EmphasisStyle from './rules/emphasis-style';
+import StrongStyle from './rules/strong-style';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -99,161 +100,7 @@ export const rules: Rule[] = [
   ConvertBulletListMarkers.getRule(),
   ProperEllipsis.getRule(),
   EmphasisStyle.getRule(),
-  new Rule(
-      'Strong Style',
-      'Makes sure the strong style is consistent.',
-      RuleType.CONTENT,
-      (text: string, options = {}) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          return makeEmphasisOrBoldConsistent(text, options['Style'], 'strong');
-        });
-      },
-      [
-        new Example(
-            'Strong indicators should use underscores when style is set to \'underscore\'',
-            dedent`
-          # Strong/Bold Cases
-          
-          **Test bold**
-          ** Test not bold **
-          This is **bold** mid sentence
-          This is **bold** mid sentence with a second **bold** on the same line
-          This is ***bold and emphasized***
-          This is ***nested bold** and ending emphasized*
-          This is ***nested emphasis* and ending bold**
-          
-          *Test emphasis*
-
-          * List Item1 with **bold text**
-          * List Item2
-          `,
-            dedent`
-          # Strong/Bold Cases
-          
-          __Test bold__
-          ** Test not bold **
-          This is __bold__ mid sentence
-          This is __bold__ mid sentence with a second __bold__ on the same line
-          This is *__bold and emphasized__*
-          This is *__nested bold__ and ending emphasized*
-          This is __*nested emphasis* and ending bold__
-          
-          *Test emphasis*
-
-          * List Item1 with __bold text__
-          * List Item2
-          `,
-            {'Style': 'underscore'},
-        ),
-        new Example(
-            'Strong indicators should use asterisks when style is set to \'asterisk\'',
-            dedent`
-          # Strong/Bold Cases
-          
-          __Test bold__
-          __ Test not bold __
-          This is __bold__ mid sentence
-          This is __bold__ mid sentence with a second __bold__ on the same line
-          This is ___bold and emphasized___
-          This is ___nested bold__ and ending emphasized_
-          This is ___nested emphasis_ and ending bold__
-          
-          _Test emphasis_
-          `,
-            dedent`
-          # Strong/Bold Cases
-          
-          **Test bold**
-          __ Test not bold __
-          This is **bold** mid sentence
-          This is **bold** mid sentence with a second **bold** on the same line
-          This is _**bold and emphasized**_
-          This is _**nested bold** and ending emphasized_
-          This is **_nested emphasis_ and ending bold**
-
-          _Test emphasis_
-          `,
-            {'Style': 'asterisk'},
-        ),
-        new Example(
-            'Strong indicators should use consistent style based on first strong indicator in a file when style is set to \'consistent\'',
-            dedent`
-          # Strong First Strong Is an Asterisk
-
-          **First bold**
-          This is __bold__ mid sentence
-          This is __bold__ mid sentence with a second **bold** on the same line
-          This is ___bold and emphasized___
-          This is *__nested bold__ and ending emphasized*
-          This is **_nested emphasis_ and ending bold**
-
-          __Test bold__
-          `,
-            dedent`
-          # Strong First Strong Is an Asterisk
-
-          **First bold**
-          This is **bold** mid sentence
-          This is **bold** mid sentence with a second **bold** on the same line
-          This is _**bold and emphasized**_
-          This is ***nested bold** and ending emphasized*
-          This is **_nested emphasis_ and ending bold**
-
-          **Test bold**
-          `,
-            {'Style': 'consistent'},
-        ),
-        new Example(
-            'Strong indicators should use consistent style based on first strong indicator in a file when style is set to \'consistent\'',
-            dedent`
-          # Strong First Strong Is an Underscore
-
-          __First bold__
-          This is **bold** mid sentence
-          This is **bold** mid sentence with a second __bold__ on the same line
-          This is **_bold and emphasized_**
-          This is ***nested bold** and ending emphasized*
-          This is ___nested emphasis_ and ending bold__
-
-          **Test bold**
-          `,
-            dedent`
-          # Strong First Strong Is an Underscore
-
-          __First bold__
-          This is __bold__ mid sentence
-          This is __bold__ mid sentence with a second __bold__ on the same line
-          This is ___bold and emphasized___
-          This is *__nested bold__ and ending emphasized*
-          This is ___nested emphasis_ and ending bold__
-
-          __Test bold__
-            `,
-            {'Style': 'consistent'},
-        ),
-      ],
-      [
-        new DropdownOption(
-            'Style',
-            'The style used to denote strong/bolded content',
-            'consistent',
-            [
-              new DropdownRecord(
-                  'consistent',
-                  'Makes sure the first instance of strong is the style that will be used throughout the document',
-              ),
-              new DropdownRecord(
-                  'asterisk',
-                  'Makes sure ** is the strong indicator',
-              ),
-              new DropdownRecord(
-                  'underscore',
-                  'Makes sure __ is the strong indicator',
-              ),
-            ],
-        ),
-      ],
-  ),
+  StrongStyle.getRule(),
   new Rule(
       'No Bare URLs',
       'Encloses bare URLs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.',
