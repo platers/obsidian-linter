@@ -36,13 +36,13 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
       new ExampleBuilder({
         description: 'Remove blank lines at the start and end of the YAML',
         before: dedent`
-        ---
+          ---
 
-        date: today
+          date: today
 
-        title: unchanged without inner new lines turned on
+          title: unchanged without inner new lines turned on
 
-        ---
+          ---
         `,
         after: dedent`
           ---
