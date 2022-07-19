@@ -39,6 +39,7 @@ import RemoveHyphenatedLineBreaks from './rules/remove-hyphenated-line-breaks';
 import RemoveConsecutiveListMarkers from './rules/remove-consecutive-list-markers';
 import RemoveEmptyListMarkers from './rules/remove-empty-list-markers';
 import ConvertBulletListMarkers from './rules/convert-bullet-list-markers';
+import ProperEllipsis from './rules/proper-ellipsis';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -95,28 +96,7 @@ export const rules: Rule[] = [
   RemoveConsecutiveListMarkers.getRule(),
   RemoveEmptyListMarkers.getRule(),
   ConvertBulletListMarkers.getRule(),
-
-  new Rule(
-      'Proper Ellipsis',
-      'Replaces three consecutive dots with an ellipsis.',
-      RuleType.CONTENT,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          return text.replaceAll('...', '…');
-        });
-      },
-      [
-        new Example(
-            'Replacing three consecutive dots with an ellipsis.',
-            dedent`
-            Lorem (...) Impsum.
-            `,
-            dedent`
-            Lorem (…) Impsum.
-            `,
-        ),
-      ],
-  ),
+  ProperEllipsis.getRule(),
   new Rule(
       'Emphasis Style',
       'Makes sure the emphasis style is consistent.',
