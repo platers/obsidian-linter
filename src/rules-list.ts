@@ -23,7 +23,7 @@ import {
 } from './option';
 import {ignoreListOfTypes, IgnoreTypes} from './utils/ignore-types';
 import {moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
-import {yamlRegex, ensureEmptyLinesAroundRegexMatches, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
+import {yamlRegex, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
 import {Example, Rule, RuleType} from './rules';
 
 const RuleTypeOrder = Object.values(RuleType);
@@ -64,50 +64,6 @@ export function getDisabledRules(text: string): string[] {
 }
 
 const _rules: Rule[] = [
-  new Rule(
-      'Empty Line Around Code Fences',
-      'Ensures that there is an empty line around code fences unless they start or end a document.',
-      RuleType.SPACING,
-      (text: string) => {
-        return ensureEmptyLinesAroundRegexMatches(text, /(^|(\n+)?)`{3}( ?[\S]+)?\n([\s\S]+)\n`{3}(\n+)?/gm);
-      },
-      [
-        new Example(
-            'Fenced code blocks that start a document do not get an empty line before them.',
-            dedent`
-            \`\`\` js
-            var temp = 'text';
-            // this is a code block
-            \`\`\`
-            Text after code block.
-`,
-            dedent`
-            \`\`\` js
-            var temp = 'text';
-            // this is a code block
-            \`\`\`
-
-            Text after code block.
-`,
-        ),
-        new Example(
-            'Fenced code blocs that end a document do not get an empty line after them.',
-            dedent`
-      # Heading 1
-      \`\`\`
-      Here is a code block
-      \`\`\`
-`,
-            dedent`
-      # Heading 1
-
-      \`\`\`
-      Here is a code block
-      \`\`\``,
-        ),
-      ],
-  ),
-
   // YAML rules
 
   new Rule(
