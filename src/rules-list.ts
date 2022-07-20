@@ -1864,6 +1864,6 @@ export default {
 
   get rulesDict() : Record<string, Rule> {
     return _rulesDict;
-  }
+  },
 };
 
