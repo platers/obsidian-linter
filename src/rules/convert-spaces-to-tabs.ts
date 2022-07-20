@@ -7,6 +7,7 @@ class ConvertSpacesToTabsOptions implements Options {
   tabsize: Number = 4;
 }
 
+@RuleBuilder.register
 export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabsOptions> {
   get OptionsClass(): new () => ConvertSpacesToTabsOptions {
     return ConvertSpacesToTabsOptions;

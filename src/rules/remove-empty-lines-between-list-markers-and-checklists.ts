@@ -6,6 +6,7 @@ import dedent from 'ts-dedent';
 class RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends RuleBuilder<RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions> {
   get OptionsClass(): new () => RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions {
     return RemoveEmptyLinesBetweenListMarkersAndChecklists;

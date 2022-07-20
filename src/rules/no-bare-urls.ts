@@ -7,6 +7,7 @@ import {replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
 class NoBareUrlsOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
   get OptionsClass(): new () => NoBareUrlsOptions {
     return NoBareUrlsOptions;

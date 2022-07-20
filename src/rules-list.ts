@@ -25,26 +25,6 @@ import {ignoreListOfTypes, IgnoreTypes} from './utils/ignore-types';
 import {moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
 import {yamlRegex, ensureEmptyLinesAroundRegexMatches, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
 import {Example, Rule, RuleType} from './rules';
-import TrailingSpaces from './rules/trailing-spaces';
-import HeadingBlankLines from './rules/heading-blank-lines';
-import ParagraphBlankLines from './rules/paragraph-blank-lines';
-import SpaceAfterListMarkers from './rules/space-after-list-markers';
-import RemoveEmptyLinesBetweenListMarkersAndChecklists from './rules/remove-empty-lines-between-list-markers-and-checklists';
-import CompactYaml from './rules/compact-yaml';
-import ConsecutiveBlankLines from './rules/consecutive-blank-lines';
-import ConvertSpacesToTabs from './rules/convert-spaces-to-tabs';
-import LineBreakAtDocumentEnd from './rules/line-break-at-document-end';
-import RemoveMultipleSpaces from './rules/remove-multiple-spaces';
-import RemoveHyphenatedLineBreaks from './rules/remove-hyphenated-line-breaks';
-import RemoveConsecutiveListMarkers from './rules/remove-consecutive-list-markers';
-import RemoveEmptyListMarkers from './rules/remove-empty-list-markers';
-import ConvertBulletListMarkers from './rules/convert-bullet-list-markers';
-import ProperEllipsis from './rules/proper-ellipsis';
-import EmphasisStyle from './rules/emphasis-style';
-import StrongStyle from './rules/strong-style';
-import NoBareUrls from './rules/no-bare-urls';
-import TwoSpacesBetweenLinesWithContent from './rules/two-spaces-between-lines-with-content';
-import EmptyLineAroundTables from './rules/empty-line-around-tables';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -84,30 +64,6 @@ export function getDisabledRules(text: string): string[] {
 }
 
 export const rules: Rule[] = [
-  TrailingSpaces.getRule(),
-  HeadingBlankLines.getRule(),
-  ParagraphBlankLines.getRule(),
-  SpaceAfterListMarkers.getRule(),
-  RemoveEmptyLinesBetweenListMarkersAndChecklists.getRule(),
-  CompactYaml.getRule(),
-  ConsecutiveBlankLines.getRule(),
-  ConvertSpacesToTabs.getRule(),
-  LineBreakAtDocumentEnd.getRule(),
-
-  // Content rules
-
-  RemoveMultipleSpaces.getRule(),
-  RemoveHyphenatedLineBreaks.getRule(),
-  RemoveConsecutiveListMarkers.getRule(),
-  RemoveEmptyListMarkers.getRule(),
-  ConvertBulletListMarkers.getRule(),
-  ProperEllipsis.getRule(),
-  EmphasisStyle.getRule(),
-  StrongStyle.getRule(),
-  NoBareUrls.getRule(),
-  TwoSpacesBetweenLinesWithContent.getRule(),
-  EmptyLineAroundTables.getRule(),
-
   new Rule(
       'Empty Line Around Code Fences',
       'Ensures that there is an empty line around code fences unless they start or end a document.',

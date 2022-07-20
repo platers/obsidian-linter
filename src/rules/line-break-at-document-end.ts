@@ -5,6 +5,7 @@ import dedent from 'ts-dedent';
 class LineBreakAtDocumentEndOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class LineBreakAtDocumentEnd extends RuleBuilder<LineBreakAtDocumentEndOptions> {
   get OptionsClass(): new () => LineBreakAtDocumentEndOptions {
     return LineBreakAtDocumentEndOptions;

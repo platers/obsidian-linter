@@ -6,6 +6,7 @@ import {ensureEmptyLinesAroundRegexMatches, tableRegex} from '../utils/regex';
 class EmptyLineAroundTablesOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTablesOptions> {
   get OptionsClass(): new () => EmptyLineAroundTablesOptions {
     return EmptyLineAroundTablesOptions;

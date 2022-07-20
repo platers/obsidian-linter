@@ -6,6 +6,7 @@ import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 class RemoveConsecutiveListMarkersOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class RemoveConsecutiveListMarkers extends RuleBuilder<RemoveConsecutiveListMarkersOptions> {
   get OptionsClass(): new () => RemoveConsecutiveListMarkersOptions {
     return RemoveConsecutiveListMarkersOptions;

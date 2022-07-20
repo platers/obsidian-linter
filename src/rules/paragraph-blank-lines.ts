@@ -7,6 +7,7 @@ import dedent from 'ts-dedent';
 class ParagraphBlankLinesOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLinesOptions> {
   get OptionsClass(): new () => ParagraphBlankLinesOptions {
     return ParagraphBlankLinesOptions;

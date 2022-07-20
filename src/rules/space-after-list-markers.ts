@@ -6,6 +6,7 @@ import dedent from 'ts-dedent';
 class SpaceAfterListMarkersOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class SpaceAfterListMarkers extends RuleBuilder<SpaceAfterListMarkersOptions> {
   get OptionsClass(): new () => SpaceAfterListMarkersOptions {
     return SpaceAfterListMarkersOptions;

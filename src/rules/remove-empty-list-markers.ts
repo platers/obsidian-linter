@@ -6,6 +6,7 @@ import dedent from 'ts-dedent';
 class RemoveEmptyListMarkersOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class RemoveEmptyListMarkers extends RuleBuilder<RemoveEmptyListMarkersOptions> {
   get OptionsClass(): new () => RemoveEmptyListMarkersOptions {
     return RemoveEmptyListMarkersOptions;

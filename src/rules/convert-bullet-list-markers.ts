@@ -6,6 +6,7 @@ import dedent from 'ts-dedent';
 class ConvertBulletListMarkersOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class ConvertBulletListMarkers extends RuleBuilder<ConvertBulletListMarkersOptions> {
   get OptionsClass(): new () => ConvertBulletListMarkersOptions {
     return ConvertBulletListMarkersOptions;

@@ -6,6 +6,7 @@ import dedent from 'ts-dedent';
 class ConsecutiveBlankLinesOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class ConsecutiveBlankLines extends RuleBuilder<ConsecutiveBlankLinesOptions> {
   get OptionsClass(): new () => ConsecutiveBlankLinesOptions {
     return ConsecutiveBlankLinesOptions;

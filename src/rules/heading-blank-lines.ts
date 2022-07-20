@@ -7,6 +7,7 @@ class HeadingBlankLinesOptions implements Options {
   bottom: boolean = true;
 }
 
+@RuleBuilder.register
 export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOptions> {
   get OptionsClass(): new () => HeadingBlankLinesOptions {
     return HeadingBlankLinesOptions;

@@ -6,6 +6,7 @@ import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 class RemoveMultipleSpacesOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class RemoveMultipleSpaces extends RuleBuilder<RemoveMultipleSpacesOptions> {
   get OptionsClass(): new () => RemoveMultipleSpacesOptions {
     return RemoveMultipleSpacesOptions;

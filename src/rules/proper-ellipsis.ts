@@ -6,6 +6,7 @@ import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 class ProperEllipsisOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class ProperEllipsis extends RuleBuilder<ProperEllipsisOptions> {
   get OptionsClass(): new () => ProperEllipsisOptions {
     return ProperEllipsisOptions;

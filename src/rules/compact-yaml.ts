@@ -7,6 +7,7 @@ class CompactYamlOptions implements Options {
   innerNewLines: boolean = false;
 }
 
+@RuleBuilder.register
 export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
   get OptionsClass(): new () => CompactYamlOptions {
     return CompactYamlOptions;

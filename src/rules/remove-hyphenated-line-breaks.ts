@@ -6,6 +6,7 @@ import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 class RemoveHyphenatedLineBreaksOptions implements Options {
 }
 
+@RuleBuilder.register
 export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphenatedLineBreaksOptions> {
   get OptionsClass(): new () => RemoveHyphenatedLineBreaksOptions {
     return RemoveHyphenatedLineBreaksOptions;

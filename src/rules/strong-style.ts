@@ -10,6 +10,7 @@ class StrongStyleOptions implements Options {
   style: StrongStyleValues = 'consistent';
 }
 
+@RuleBuilder.register
 export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
   get OptionsClass(): new () => StrongStyleOptions {
     return StrongStyleOptions;

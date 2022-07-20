@@ -10,6 +10,7 @@ class EmphasisStyleOptions implements Options {
   style: EmphasisStyleValues = 'consistent';
 }
 
+@RuleBuilder.register
 export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
   get OptionsClass(): new () => EmphasisStyleOptions {
     return EmphasisStyleOptions;

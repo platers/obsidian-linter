@@ -7,6 +7,7 @@ class TrailingSpacesOptions implements Options {
   twoSpaceLineBreak: boolean = false;
 }
 
+@RuleBuilder.register
 export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
   get OptionsClass(): new () => TrailingSpacesOptions {
     return TrailingSpacesOptions;
