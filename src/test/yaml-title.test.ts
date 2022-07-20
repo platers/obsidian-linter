@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules-list';
+import rulesList from '../rules-list';
 
 describe('YAML Title', () => {
   it('Keeps unescaped title if possible', () => {
@@ -14,7 +14,7 @@ describe('YAML Title', () => {
       # Hello world
       `;
 
-    expect(rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
+    expect(rulesList.rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
   });
 
   it('Escapes title if it contains colon', () => {
@@ -29,7 +29,7 @@ describe('YAML Title', () => {
       # Hello: world
       `;
 
-    expect(rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
+    expect(rulesList.rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
   });
 
   it('Escapes title if it starts with single quote', () => {
@@ -44,7 +44,7 @@ describe('YAML Title', () => {
       # 'Hello world
       `;
 
-    expect(rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
+    expect(rulesList.rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
   });
 
   it('Escapes title if it starts with double quote', () => {
@@ -59,7 +59,7 @@ describe('YAML Title', () => {
       # "Hello world
       `;
 
-    expect(rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
+    expect(rulesList.rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
   });
 
   it('Does not insert line breaks for long title', () => {
@@ -74,6 +74,6 @@ describe('YAML Title', () => {
       # Very long title 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
       `;
 
-    expect(rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
+    expect(rulesList.rulesDict['yaml-title'].apply(before, {'Title Key': 'title'})).toBe(after);
   });
 });

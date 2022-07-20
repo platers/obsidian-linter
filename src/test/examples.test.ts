@@ -1,10 +1,10 @@
 import dedent from 'ts-dedent';
 import {Example} from '../rules';
-import {rules} from '../rules-list';
+import rulesList from '../rules-list';
 import {yamlRegex, escapeRegExp} from '../utils/regex';
 
 describe('Examples pass', () => {
-  for (const rule of rules) {
+  for (const rule of rulesList.rules) {
     describe(rule.name, () => {
       test.each(rule.examples)('$description', (example: Example) => {
         const options = rule.getDefaultOptions();
@@ -18,7 +18,7 @@ describe('Examples pass', () => {
 });
 
 describe('Augmented examples pass', () => {
-  for (const rule of rules) {
+  for (const rule of rulesList.rules) {
     describe(rule.name, () => {
       test.each(rule.examples)('$description', (example: Example) => {
         const options = rule.getDefaultOptions();

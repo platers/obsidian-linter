@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules-list';
+import rulesList from '../rules-list';
 
 describe('Move Footnotes to the bottom', () => {
   it('Simple case', () => {
@@ -13,7 +13,7 @@ describe('Move Footnotes to the bottom', () => {
 
     [^alpha]: bravo and charlie.
     `;
-    expect(rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
+    expect(rulesList.rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
   });
   it('Multiline footnotes', () => {
     const before = dedent`
@@ -44,7 +44,7 @@ describe('Move Footnotes to the bottom', () => {
 
         it will mess up every multiline note instantly
     `;
-    expect(rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
+    expect(rulesList.rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
   });
   it('Long Document with multiple consecutive footnotes', () => {
     const before = dedent`
@@ -111,7 +111,7 @@ describe('Move Footnotes to the bottom', () => {
    [^31]: Abraham in -@abrahamPostcolonialTheologies2015, says, “Ei eos deleniti electram. Prima prompta partiendo ius ne.”
    [^41]: Wright in -@wrightPaulFreshPerspective2005 says, “Modo omnes neglegentur cu vel.”
    `;
-    expect(rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
+    expect(rulesList.rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
   });
   it('Footnote already at the bottom does not add an extra newline', () => {
     const before = dedent`
@@ -124,6 +124,6 @@ describe('Move Footnotes to the bottom', () => {
 
     [^alpha]: bravo and charlie.
     `;
-    expect(rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
+    expect(rulesList.rulesDict['move-footnotes-to-the-bottom'].apply(before)).toBe(after);
   });
 });

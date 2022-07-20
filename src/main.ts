@@ -1,6 +1,6 @@
 import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
 import {LinterSettings, Options} from './rules';
-import {rules, getDisabledRules} from './rules-list';
+import rulesList, {getDisabledRules} from './rules-list';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
@@ -173,7 +173,7 @@ export default class LinterPlugin extends Plugin {
       const data = await this.loadData();
       const storedSettings = data || {};
 
-      for (const rule of rules) {
+      for (const rule of rulesList.rules) {
         this.settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
         if (storedSettings?.ruleConfigs && storedSettings?.ruleConfigs[rule.name]) {
           Object.assign(this.settings.ruleConfigs[rule.name], storedSettings.ruleConfigs[rule.name]);
@@ -226,14 +226,14 @@ export default class LinterPlugin extends Plugin {
       let newText = oldText;
 
       // escape YAML where possible before parsing yaml
-      const escape_yaml_rule = rules.find((rule) => rule.name === 'Escape YAML Special Characters');
+      const escape_yaml_rule = rulesList.rules.find((rule) => rule.name === 'Escape YAML Special Characters');
       const escape_yaml_options = escape_yaml_rule.getOptions(this.settings);
       if (escape_yaml_options[escape_yaml_rule.enabledOptionName()]) {
         newText = escape_yaml_rule.apply(newText, escape_yaml_options);
       }
 
       // remove hashtags from tags before parsing yaml
-      const tag_rule = rules.find((rule) => rule.name === 'Format Tags in YAML');
+      const tag_rule = rulesList.rules.find((rule) => rule.name === 'Format Tags in YAML');
       const tag_options = tag_rule.getOptions(this.settings);
       if (tag_options[tag_rule.enabledOptionName()]) {
         newText = tag_rule.apply(newText, tag_options);
@@ -242,7 +242,7 @@ export default class LinterPlugin extends Plugin {
       const disabledRules = getDisabledRules(newText);
       const modifiedAtTime = window.moment(file.stat.mtime).format();
       const createdAtTime = window.moment(file.stat.ctime).format();
-      for (const rule of rules) {
+      for (const rule of rulesList.rules) {
         // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
         if (disabledRules.includes(rule.alias()) || rule.alias() === 'yaml-timestamp' || rule.alias() === 'format-tags-in-yaml' || rule.alias() === 'escape-yaml-special-characters' ||
           rule.alias() === 'yaml-key-sort') {
@@ -264,7 +264,7 @@ export default class LinterPlugin extends Plugin {
       }
 
       // run yaml timestamp at the end to help determine if something has changed
-      const yaml_timestamp_rule = rules.find((rule) => rule.alias() === 'yaml-timestamp');
+      const yaml_timestamp_rule = rulesList.rules.find((rule) => rule.alias() === 'yaml-timestamp');
       const yaml_timestamp_options: Options =
       Object.assign({
         'metadata: file created time': createdAtTime,
@@ -279,7 +279,7 @@ export default class LinterPlugin extends Plugin {
         newText = yaml_timestamp_rule.apply(newText, yaml_timestamp_options);
       }
 
-      const yaml_key_sort_rule = rules.find((rule) => rule.alias() === 'yaml-key-sort');
+      const yaml_key_sort_rule = rulesList.rules.find((rule) => rule.alias() === 'yaml-key-sort');
       const yaml_key_sort_options: Options = Object.assign({
         'metadata: file created time': createdAtTime,
         'metadata: file modified time': modifiedAtTime,
@@ -517,7 +517,7 @@ class SettingTab extends PluginSettingTab {
 
       let prevSection = '';
 
-      for (const rule of rules) {
+      for (const rule of rulesList.rules) {
         if (rule.type !== prevSection) {
           containerEl.createEl('h2', {text: rule.type});
           prevSection = rule.type;

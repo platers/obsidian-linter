@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rules, getDisabledRules} from '../rules-list';
+import rulesList, {getDisabledRules} from '../rules-list';
 
 describe('Disabled rules parsing', () => {
   it('No YAML', () => {
@@ -51,7 +51,7 @@ describe('Disabled rules parsing', () => {
         ---
         Text
         `;
-    expect(getDisabledRules(text)).toEqual(rules.map((r) => r.alias()));
+    expect(getDisabledRules(text)).toEqual(rulesList.rules.map((r) => r.alias()));
   });
   it('Works with misformatted yamls', () => {
     const text = dedent`

@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules-list';
+import rulesList from '../rules-list';
 
 describe('Capitalize Headings', () => {
   it('Ignores not words', () => {
@@ -21,8 +21,8 @@ describe('Capitalize Headings', () => {
         `;
     const options = Object.assign({
       'Style': 'Title Case',
-    }, rulesDict['capitalize-headings'].getDefaultOptions());
-    expect(rulesDict['capitalize-headings'].apply(before, options)).toBe(after);
+    }, rulesList.rulesDict['capitalize-headings'].getDefaultOptions());
+    expect(rulesList.rulesDict['capitalize-headings'].apply(before, options)).toBe(after);
   });
   it('Ignores tags', () => {
     const before = dedent`
@@ -31,7 +31,7 @@ describe('Capitalize Headings', () => {
     const after = dedent`
         #tag not line
         `;
-    expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'Title Case'})).toBe(after);
+    expect(rulesList.rulesDict['capitalize-headings'].apply(before, {'Style': 'Title Case'})).toBe(after);
   });
   it('Can capitalize only first letter', () => {
     const before = dedent`
@@ -40,7 +40,7 @@ describe('Capitalize Headings', () => {
     const after = dedent`
         # This is a heading
         `;
-    expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First letter'})).toBe(after);
+    expect(rulesList.rulesDict['capitalize-headings'].apply(before, {'Style': 'First letter'})).toBe(after);
   });
   it('Can capitalize only first letter that is a - Z', () => {
     const before = dedent`
@@ -51,7 +51,7 @@ describe('Capitalize Headings', () => {
         # 1. Heading attempt
         # 1 John
         `;
-    expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First letter'})).toBe(after);
+    expect(rulesList.rulesDict['capitalize-headings'].apply(before, {'Style': 'First letter'})).toBe(after);
   });
   it('Can capitalize to all caps', () => {
     const before = dedent`
@@ -60,7 +60,7 @@ describe('Capitalize Headings', () => {
     const after = dedent`
         # THIS IS A HEADING
         `;
-    expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'ALL CAPS'})).toBe(after);
+    expect(rulesList.rulesDict['capitalize-headings'].apply(before, {'Style': 'ALL CAPS'})).toBe(after);
   });
   it('Link in heading is still present with first letter capitalization rules on', () => {
     const before = dedent`
@@ -75,6 +75,6 @@ describe('Capitalize Headings', () => {
     # Heading ![docker](docker)
     `;
 
-    expect(rulesDict['capitalize-headings'].apply(before, {'Style': 'First letter'})).toBe(after);
+    expect(rulesList.rulesDict['capitalize-headings'].apply(before, {'Style': 'First letter'})).toBe(after);
   });
 });

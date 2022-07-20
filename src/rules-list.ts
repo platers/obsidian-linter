@@ -57,13 +57,13 @@ export function getDisabledRules(text: string): string[] {
   }
 
   if (disabled_rules.includes('all')) {
-    return rules.map((rule) => rule.alias());
+    return _rules.map((rule) => rule.alias());
   }
 
   return disabled_rules;
 }
 
-export const rules: Rule[] = [
+const _rules: Rule[] = [
   new Rule(
       'Empty Line Around Code Fences',
       'Ensures that there is an empty line around code fences unless they start or end a document.',
@@ -1852,7 +1852,18 @@ export const rules: Rule[] = [
   ),
 ].sort((a, b) => RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type));
 
-export const rulesDict = rules.reduce(
+const _rulesDict = _rules.reduce(
     (dict, rule) => ((dict[rule.alias()] = rule), dict),
   {} as Record<string, Rule>,
 );
+
+export default {
+  get rules() : Rule[] {
+    return _rules;
+  },
+
+  get rulesDict() : Record<string, Rule> {
+    return _rulesDict;
+  }
+};
+

@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules-list';
+import rulesList from '../rules-list';
 
 describe('File Name Heading', () => {
   it('Handles stray dashes', () => {
@@ -18,6 +18,6 @@ describe('File Name Heading', () => {
       
       Text 2
         `;
-    expect(rulesDict['file-name-heading'].apply(before, {'metadata: file name': 'File Name'})).toBe(after);
+    expect(rulesList.rulesDict['file-name-heading'].apply(before, {'metadata: file name': 'File Name'})).toBe(after);
   });
 });
