@@ -23,7 +23,7 @@ import {
 } from './option';
 import {ignoreListOfTypes, IgnoreTypes} from './utils/ignore-types';
 import {moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
-import {yamlRegex, ensureEmptyLinesAroundRegexMatches, tableRegex, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
+import {yamlRegex, ensureEmptyLinesAroundRegexMatches, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
 import {Example, Rule, RuleType} from './rules';
 import TrailingSpaces from './rules/trailing-spaces';
 import HeadingBlankLines from './rules/heading-blank-lines';
@@ -44,6 +44,7 @@ import EmphasisStyle from './rules/emphasis-style';
 import StrongStyle from './rules/strong-style';
 import NoBareUrls from './rules/no-bare-urls';
 import TwoSpacesBetweenLinesWithContent from './rules/two-spaces-between-lines-with-content';
+import EmptyLineAroundTables from './rules/empty-line-around-tables';
 
 const RuleTypeOrder = Object.values(RuleType);
 
@@ -105,92 +106,7 @@ export const rules: Rule[] = [
   StrongStyle.getRule(),
   NoBareUrls.getRule(),
   TwoSpacesBetweenLinesWithContent.getRule(),
-
-  new Rule(
-      'Empty Line Around Tables',
-      'Ensures that there is an empty line around tables unless they start or end a document.',
-      RuleType.SPACING,
-      (text: string) => {
-        return ensureEmptyLinesAroundRegexMatches(text, new RegExp(`(\n)*${tableRegex.source}(\n)*`, 'g'));
-      },
-      [
-        new Example(
-            'Tables that start a document do not get an empty line before them.',
-            dedent`
-        | Column 1 | Column 2 |
-        |----------|----------|
-        | foo      | bar      |
-        | baz      | qux      |
-        | quux     | quuz     |
-        New paragraph.
-  `,
-            dedent`
-        | Column 1 | Column 2 |
-        |----------|----------|
-        | foo      | bar      |
-        | baz      | qux      |
-        | quux     | quuz     |
-        
-        New paragraph.
-  `,
-        ),
-        new Example(
-            'Tables that end a document do not get an empty line after them.',
-            dedent`
-        # Heading 1
-        | Column 1 | Column 2 |
-        |----------|----------|
-        | foo      | bar      |
-        | baz      | qux      |
-        | quux     | quuz     |
-  `,
-            dedent`
-        # Heading 1
-
-        | Column 1 | Column 2 |
-        |----------|----------|
-        | foo      | bar      |
-        | baz      | qux      |
-        | quux     | quuz     |
-  `,
-        ),
-        new Example(
-            'Tables that are not at the start or the end of the document will have an empty line added before and after them',
-            dedent`
-      # Table 1
-      | Column 1 | Column 2 | Column 3 |
-      |----------|----------|----------|
-      | foo      | bar      | blob     |
-      | baz      | qux      | trust    |
-      | quux     | quuz     | glob     |
-      # Table 2 without Pipe at Start and End
-      | Column 1 | Column 2 |
-      :-: | -----------:
-      bar | baz
-      foo | bar
-      New paragraph.
-`,
-            dedent`
-      # Table 1
-      
-      | Column 1 | Column 2 | Column 3 |
-      |----------|----------|----------|
-      | foo      | bar      | blob     |
-      | baz      | qux      | trust    |
-      | quux     | quuz     | glob     |
-      
-      # Table 2 without Pipe at Start and End
-
-      | Column 1 | Column 2 |
-      :-: | -----------:
-      bar | baz
-      foo | bar
-      
-      New paragraph.
-`,
-        ),
-      ],
-  ),
+  EmptyLineAroundTables.getRule(),
 
   new Rule(
       'Empty Line Around Code Fences',
