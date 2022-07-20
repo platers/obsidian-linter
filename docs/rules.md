@@ -5,6 +5,123 @@
 
 
 ## YAML
+### Escape YAML Special Characters
+
+Alias: `escape-yaml-special-characters`
+
+Escapes colons with a space after them (: ), single quotes ('), and double quotes (") in YAML.
+
+Options:
+- Default Escape Character: The default character to use to escape YAML values when a single quote and double quote are not present.
+	- Default: `"`
+	- `"`: Use a double quote to escape if no single or double quote is present
+	- `'`: Use a single quote to escape if no single or double quote is present
+- Try to Escape Single Line Arrays: Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".
+	- Default: `false`
+
+Example: YAML without anything to escape
+
+Before:
+
+``````markdown
+---
+key: value
+otherKey: []
+---
+``````
+
+After:
+
+``````markdown
+---
+key: value
+otherKey: []
+---
+``````
+Example: YAML with unescaped values
+
+Before:
+
+``````markdown
+---
+key: value: with colon in the middle
+secondKey: value with ' a single quote present
+thirdKey: "already escaped: value"
+fourthKey: value with " a double quote present
+fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
+sixthKey: colon:between characters is fine
+otherKey: []
+---
+``````
+
+After:
+
+``````markdown
+---
+key: "value: with colon in the middle"
+secondKey: "value with ' a single quote present"
+thirdKey: "already escaped: value"
+fourthKey: 'value with " a double quote present'
+fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
+sixthKey: colon:between characters is fine
+otherKey: []
+---
+``````
+Example: YAML with unescaped values in an expanded list with `Default Escape Character = '`
+
+Before:
+
+``````markdown
+---
+key:
+  - value: with colon in the middle
+  - value with ' a single quote present
+  - 'already escaped: value'
+  - value with " a double quote present
+  - value with both ' " a double and single quote present is not escaped, but is invalid YAML
+  - colon:between characters is fine
+---
+``````
+
+After:
+
+``````markdown
+---
+key:
+  - 'value: with colon in the middle'
+  - "value with ' a single quote present"
+  - 'already escaped: value'
+  - 'value with " a double quote present'
+  - value with both ' " a double and single quote present is not escaped, but is invalid YAML
+  - colon:between characters is fine
+---
+``````
+Example: YAML with unescaped values with arrays
+
+Before:
+
+``````markdown
+---
+array: [value: with colon in the middle, value with ' a single quote present, "already escaped: value", value with " a double quote present, value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+nestedArray: [[value: with colon in the middle, value with ' a single quote present], ["already escaped: value", value with " a double quote present], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+nestedArray2: [[value: with colon in the middle], value with ' a single quote present]
+---
+
+_Note that escaped commas in a YAML array will be treated as a separator._
+``````
+
+After:
+
+``````markdown
+---
+array: ["value: with colon in the middle", "value with ' a single quote present", "already escaped: value", 'value with " a double quote present', value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+nestedArray: [["value: with colon in the middle", "value with ' a single quote present"], ["already escaped: value", 'value with " a double quote present'], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+nestedArray2: [["value: with colon in the middle"], "value with ' a single quote present"]
+---
+
+_Note that escaped commas in a YAML array will be treated as a separator._
+``````
+
 ### Format Tags in YAML
 
 Alias: `format-tags-in-yaml`
@@ -99,6 +216,180 @@ After:
 aliases:
 tags: doc
 animal: cat
+---
+``````
+
+### Remove YAML Keys
+
+Alias: `remove-yaml-keys`
+
+Removes the YAML keys specified
+
+Options:
+- YAML Keys to Remove: The yaml keys to remove from the yaml frontmatter with or without colons
+	- Default: ``
+
+Example: Removes the values specified in `YAML Keys to Remove` = "status:
+keywords
+date"
+
+Before:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+keywords:
+  - keyword1
+  - keyword2
+status: WIP
+date: 02/15/2022
+---
+
+# Header Context
+
+Text
+``````
+
+After:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+---
+
+# Header Context
+
+Text
+``````
+
+### YAML Key Sort
+
+Alias: `yaml-key-sort`
+
+Sorts the YAML keys based on the order and priority specified. Note: removes blank lines as well.
+
+Options:
+- YAML Key Priority Sort Order: The order in which to sort keys with one on each line where it sorts in the order found in the list
+	- Default: ``
+- Priority Keys at Start of YAML: YAML Key Priority Sort Order is placed at the start of the YAML frontmatter
+	- Default: `true`
+- YAML Sort Order for Other Keys: The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area
+	- Default: `None`
+	- `None`: No sorting other than what is in the YAML Key Priority Sort Order text area
+	- `Ascending Alphabetical`: Sorts the keys based on key value from a to z
+	- `Descending Alphabetical`: Sorts the keys based on key value from z to a
+
+Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language`
+
+Before:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+status: WIP
+date: 02/15/2022
+---
+``````
+
+After:
+
+``````markdown
+---
+date: 02/15/2022
+type: programming
+language: Typescript
+tags: computer
+keywords: []
+status: WIP
+---
+``````
+Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Ascending Alphabetical`
+
+Before:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+status: WIP
+date: 02/15/2022
+---
+``````
+
+After:
+
+``````markdown
+---
+date: 02/15/2022
+type: programming
+language: Typescript
+keywords: []
+status: WIP
+tags: computer
+---
+``````
+Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Descending Alphabetical`
+
+Before:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+status: WIP
+date: 02/15/2022
+---
+``````
+
+After:
+
+``````markdown
+---
+date: 02/15/2022
+type: programming
+language: Typescript
+tags: computer
+status: WIP
+keywords: []
+---
+``````
+Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Descending Alphabetical` and `'Priority Keys at Start of YAML' = false`
+
+Before:
+
+``````markdown
+---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+
+status: WIP
+date: 02/15/2022
+---
+``````
+
+After:
+
+``````markdown
+---
+tags: computer
+status: WIP
+keywords: []
+date: 02/15/2022
+type: programming
+language: Typescript
 ---
 ``````
 
@@ -284,422 +575,7 @@ linter-yaml-title-alias: Filename
 
 ``````
 
-### Escape YAML Special Characters
-
-Alias: `escape-yaml-special-characters`
-
-Escapes colons with a space after them (: ), single quotes ('), and double quotes (") in YAML.
-
-Options:
-- Default Escape Character: The default character to use to escape YAML values when a single quote and double quote are not present.
-	- Default: `"`
-	- `"`: Use a double quote to escape if no single or double quote is present
-	- `'`: Use a single quote to escape if no single or double quote is present
-- Try to Escape Single Line Arrays: Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".
-	- Default: `false`
-
-Example: YAML without anything to escape
-
-Before:
-
-``````markdown
----
-key: value
-otherKey: []
----
-``````
-
-After:
-
-``````markdown
----
-key: value
-otherKey: []
----
-``````
-Example: YAML with unescaped values
-
-Before:
-
-``````markdown
----
-key: value: with colon in the middle
-secondKey: value with ' a single quote present
-thirdKey: "already escaped: value"
-fourthKey: value with " a double quote present
-fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
-sixthKey: colon:between characters is fine
-otherKey: []
----
-``````
-
-After:
-
-``````markdown
----
-key: "value: with colon in the middle"
-secondKey: "value with ' a single quote present"
-thirdKey: "already escaped: value"
-fourthKey: 'value with " a double quote present'
-fifthKey: value with both ' " a double and single quote present is not escaped, but is invalid YAML
-sixthKey: colon:between characters is fine
-otherKey: []
----
-``````
-Example: YAML with unescaped values in an expanded list with `Default Escape Character = '`
-
-Before:
-
-``````markdown
----
-key:
-  - value: with colon in the middle
-  - value with ' a single quote present
-  - 'already escaped: value'
-  - value with " a double quote present
-  - value with both ' " a double and single quote present is not escaped, but is invalid YAML
-  - colon:between characters is fine
----
-``````
-
-After:
-
-``````markdown
----
-key:
-  - 'value: with colon in the middle'
-  - "value with ' a single quote present"
-  - 'already escaped: value'
-  - 'value with " a double quote present'
-  - value with both ' " a double and single quote present is not escaped, but is invalid YAML
-  - colon:between characters is fine
----
-``````
-Example: YAML with unescaped values with arrays
-
-Before:
-
-``````markdown
----
-array: [value: with colon in the middle, value with ' a single quote present, "already escaped: value", value with " a double quote present, value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
-nestedArray: [[value: with colon in the middle, value with ' a single quote present], ["already escaped: value", value with " a double quote present], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
-nestedArray2: [[value: with colon in the middle], value with ' a single quote present]
----
-
-_Note that escaped commas in a YAML array will be treated as a separator._
-``````
-
-After:
-
-``````markdown
----
-array: ["value: with colon in the middle", "value with ' a single quote present", "already escaped: value", 'value with " a double quote present', value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
-nestedArray: [["value: with colon in the middle", "value with ' a single quote present"], ["already escaped: value", 'value with " a double quote present'], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
-nestedArray2: [["value: with colon in the middle"], "value with ' a single quote present"]
----
-
-_Note that escaped commas in a YAML array will be treated as a separator._
-``````
-
-### YAML Key Sort
-
-Alias: `yaml-key-sort`
-
-Sorts the YAML keys based on the order and priority specified. Note: removes blank lines as well.
-
-Options:
-- YAML Key Priority Sort Order: The order in which to sort keys with one on each line where it sorts in the order found in the list
-	- Default: ``
-- Priority Keys at Start of YAML: YAML Key Priority Sort Order is placed at the start of the YAML frontmatter
-	- Default: `true`
-- YAML Sort Order for Other Keys: The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area
-	- Default: `None`
-	- `None`: No sorting other than what is in the YAML Key Priority Sort Order text area
-	- `Ascending Alphabetical`: Sorts the keys based on key value from a to z
-	- `Descending Alphabetical`: Sorts the keys based on key value from z to a
-
-Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language`
-
-Before:
-
-``````markdown
----
-language: Typescript
-type: programming
-tags: computer
-keywords: []
-status: WIP
-date: 02/15/2022
----
-``````
-
-After:
-
-``````markdown
----
-date: 02/15/2022
-type: programming
-language: Typescript
-tags: computer
-keywords: []
-status: WIP
----
-``````
-Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Ascending Alphabetical`
-
-Before:
-
-``````markdown
----
-language: Typescript
-type: programming
-tags: computer
-keywords: []
-status: WIP
-date: 02/15/2022
----
-``````
-
-After:
-
-``````markdown
----
-date: 02/15/2022
-type: programming
-language: Typescript
-keywords: []
-status: WIP
-tags: computer
----
-``````
-Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Descending Alphabetical`
-
-Before:
-
-``````markdown
----
-language: Typescript
-type: programming
-tags: computer
-keywords: []
-status: WIP
-date: 02/15/2022
----
-``````
-
-After:
-
-``````markdown
----
-date: 02/15/2022
-type: programming
-language: Typescript
-tags: computer
-status: WIP
-keywords: []
----
-``````
-Example: Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Descending Alphabetical` and `'Priority Keys at Start of YAML' = false`
-
-Before:
-
-``````markdown
----
-language: Typescript
-type: programming
-tags: computer
-keywords: []
-
-status: WIP
-date: 02/15/2022
----
-``````
-
-After:
-
-``````markdown
----
-tags: computer
-status: WIP
-keywords: []
-date: 02/15/2022
-type: programming
-language: Typescript
----
-``````
-
-### Remove YAML Keys
-
-Alias: `remove-yaml-keys`
-
-Removes the YAML keys specified
-
-Options:
-- YAML Keys to Remove: The yaml keys to remove from the yaml frontmatter with or without colons
-	- Default: ``
-
-Example: Removes the values specified in `YAML Keys to Remove` = "status:
-keywords
-date"
-
-Before:
-
-``````markdown
----
-language: Typescript
-type: programming
-tags: computer
-keywords:
-  - keyword1
-  - keyword2
-status: WIP
-date: 02/15/2022
----
-
-# Header Context
-
-Text
-``````
-
-After:
-
-``````markdown
----
-language: Typescript
-type: programming
-tags: computer
----
-
-# Header Context
-
-Text
-``````
-
 ## Heading
-### Header Increment
-
-Alias: `header-increment`
-
-Heading levels should only increment by one level at a time
-
-
-
-Example: 
-
-Before:
-
-``````markdown
-# H1
-### H3
-### H3
-#### H4
-###### H6
-
-We skipped a 2nd level heading
-``````
-
-After:
-
-``````markdown
-# H1
-## H3
-## H3
-### H4
-#### H6
-
-We skipped a 2nd level heading
-``````
-Example: Skipped headings in sections that would be decremented will result in those headings not having the same meaning
-
-Before:
-
-``````markdown
-# H1
-### H3
-
-We skip from 1 to 3
-
-####### H7
-
-We skip from 3 to 7 leaving out 4, 5, and 6. Thus headings level 4, 5, and 6 will be treated like H3 above until another H2 or H1 is encountered
-
-###### H6
-
-We skipped 6 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
-
-## H2
-
-This resets the decrement section so the H6 below is decremented to an H3
-
-###### H6
-``````
-
-After:
-
-``````markdown
-# H1
-## H3
-
-We skip from 1 to 3
-
-### H7
-
-We skip from 3 to 7 leaving out 4, 5, and 6. Thus headings level 4, 5, and 6 will be treated like H3 above until another H2 or H1 is encountered
-
-## H6
-
-We skipped 6 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
-
-## H2
-
-This resets the decrement section so the H6 below is decremented to an H3
-
-### H6
-``````
-
-### File Name Heading
-
-Alias: `file-name-heading`
-
-Inserts the file name as a H1 heading if no H1 heading exists.
-
-
-
-Example: Inserts an H1 heading
-
-Before:
-
-``````markdown
-This is a line of text
-``````
-
-After:
-
-``````markdown
-# File Name
-This is a line of text
-``````
-Example: Inserts heading after YAML front matter
-
-Before:
-
-``````markdown
----
-title: My Title
----
-This is a line of text
-``````
-
-After:
-
-``````markdown
----
-title: My Title
----
-# File Name
-This is a line of text
-``````
-
 ### Capitalize Headings
 
 Alias: `capitalize-headings`
@@ -784,7 +660,153 @@ After:
 ## THIS IS A HEADING 2
 ``````
 
+### File Name Heading
+
+Alias: `file-name-heading`
+
+Inserts the file name as a H1 heading if no H1 heading exists.
+
+
+
+Example: Inserts an H1 heading
+
+Before:
+
+``````markdown
+This is a line of text
+``````
+
+After:
+
+``````markdown
+# File Name
+This is a line of text
+``````
+Example: Inserts heading after YAML front matter
+
+Before:
+
+``````markdown
+---
+title: My Title
+---
+This is a line of text
+``````
+
+After:
+
+``````markdown
+---
+title: My Title
+---
+# File Name
+This is a line of text
+``````
+
+### Header Increment
+
+Alias: `header-increment`
+
+Heading levels should only increment by one level at a time
+
+
+
+Example: 
+
+Before:
+
+``````markdown
+# H1
+### H3
+### H3
+#### H4
+###### H6
+
+We skipped a 2nd level heading
+``````
+
+After:
+
+``````markdown
+# H1
+## H3
+## H3
+### H4
+#### H6
+
+We skipped a 2nd level heading
+``````
+Example: Skipped headings in sections that would be decremented will result in those headings not having the same meaning
+
+Before:
+
+``````markdown
+# H1
+### H3
+
+We skip from 1 to 3
+
+####### H7
+
+We skip from 3 to 7 leaving out 4, 5, and 6. Thus headings level 4, 5, and 6 will be treated like H3 above until another H2 or H1 is encountered
+
+###### H6
+
+We skipped 6 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
+
+## H2
+
+This resets the decrement section so the H6 below is decremented to an H3
+
+###### H6
+``````
+
+After:
+
+``````markdown
+# H1
+## H3
+
+We skip from 1 to 3
+
+### H7
+
+We skip from 3 to 7 leaving out 4, 5, and 6. Thus headings level 4, 5, and 6 will be treated like H3 above until another H2 or H1 is encountered
+
+## H6
+
+We skipped 6 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
+
+## H2
+
+This resets the decrement section so the H6 below is decremented to an H3
+
+### H6
+``````
+
 ## Footnote
+### Footnote after Punctuation
+
+Alias: `footnote-after-punctuation`
+
+Ensures that footnote references are placed after punctuation, not before.
+
+
+
+Example: Placing footnotes after punctuation.
+
+Before:
+
+``````markdown
+Lorem[^1]. Ipsum[^2], doletes.
+``````
+
+After:
+
+``````markdown
+Lorem.[^1] Ipsum,[^2] doletes.
+``````
+
 ### Move Footnotes to the bottom
 
 Alias: `move-footnotes-to-the-bottom`
@@ -888,128 +910,7 @@ Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et 
 [^2]: second footnote
 ``````
 
-### Footnote after Punctuation
-
-Alias: `footnote-after-punctuation`
-
-Ensures that footnote references are placed after punctuation, not before.
-
-
-
-Example: Placing footnotes after punctuation.
-
-Before:
-
-``````markdown
-Lorem[^1]. Ipsum[^2], doletes.
-``````
-
-After:
-
-``````markdown
-Lorem.[^1] Ipsum,[^2] doletes.
-``````
-
 ## Content
-### Remove Multiple Spaces
-
-Alias: `remove-multiple-spaces`
-
-Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. 
-
-
-
-Example: Removing double and triple space.
-
-Before:
-
-``````markdown
-Lorem ipsum   dolor  sit amet.
-``````
-
-After:
-
-``````markdown
-Lorem ipsum dolor sit amet.
-``````
-
-### Remove Hyphenated Line Breaks
-
-Alias: `remove-hyphenated-line-breaks`
-
-Removes hyphenated line breaks. Useful when pasting text from textbooks.
-
-
-
-Example: Removing hyphenated line breaks.
-
-Before:
-
-``````markdown
-This text has a linebr‐ eak.
-``````
-
-After:
-
-``````markdown
-This text has a linebreak.
-``````
-
-### Remove Consecutive List Markers
-
-Alias: `remove-consecutive-list-markers`
-
-Removes consecutive list markers. Useful when copy-pasting list items.
-
-
-
-Example: Removing consecutive list markers.
-
-Before:
-
-``````markdown
-- item 1
-- - copypasted item A
-- item 2
-  - indented item
-  - - copypasted item B
-``````
-
-After:
-
-``````markdown
-- item 1
-- copypasted item A
-- item 2
-  - indented item
-  - copypasted item B
-``````
-
-### Remove Empty List Markers
-
-Alias: `remove-empty-list-markers`
-
-Removes empty list markers, i.e. list items without content.
-
-
-
-Example: Removes empty list markers.
-
-Before:
-
-``````markdown
-- item 1
--
-- item 2
-``````
-
-After:
-
-``````markdown
-- item 1
-- item 2
-``````
-
 ### Convert Bullet List Markers
 
 Alias: `convert-bullet-list-markers`
@@ -1049,28 +950,6 @@ After:
 - item 1
   - item 2
   - item 3
-``````
-
-### Proper Ellipsis
-
-Alias: `proper-ellipsis`
-
-Replaces three consecutive dots with an ellipsis.
-
-
-
-Example: Replacing three consecutive dots with an ellipsis.
-
-Before:
-
-``````markdown
-Lorem (...) Impsum.
-``````
-
-After:
-
-``````markdown
-Lorem (…) Impsum.
 ``````
 
 ### Emphasis Style
@@ -1221,6 +1100,184 @@ This is ___nested emphasis_ and ending bold__
 __Test bold__
 ``````
 
+### No Bare URLs
+
+Alias: `no-bare-urls`
+
+Encloses bare URLs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.
+
+
+
+Example: Make sure that links are inside of angle brackets when not in single quotes('), double quotes("), or backticks(`)
+
+Before:
+
+``````markdown
+https://github.com
+braces around url should stay the same: [https://github.com]
+backticks around url should stay the same: `https://github.com`
+Links mid-sentence should be updated like https://google.com will be.
+'https://github.com'
+"https://github.com"
+<https://github.com>
+links should stay the same: [](https://github.com)
+https://gitlab.com
+``````
+
+After:
+
+``````markdown
+<https://github.com>
+braces around url should stay the same: [https://github.com]
+backticks around url should stay the same: `https://github.com`
+Links mid-sentence should be updated like <https://google.com> will be.
+'https://github.com'
+"https://github.com"
+<https://github.com>
+links should stay the same: [](https://github.com)
+<https://gitlab.com>
+``````
+Example: Angle brackets are added if the url is not the only text in the single quotes('), double quotes("), or backticks(`)
+
+Before:
+
+``````markdown
+[https://github.com some text here]
+backticks around a url should stay the same, but only if the only contents of the backticks: `https://github.com some text here`
+single quotes around a url should stay the same, but only if the contents of the single quotes is the url: 'https://github.com some text here'
+double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "https://github.com some text here"
+``````
+
+After:
+
+``````markdown
+[<https://github.com> some text here]
+backticks around a url should stay the same, but only if the only contents of the backticks: `<https://github.com> some text here`
+single quotes around a url should stay the same, but only if the contents of the single quotes is the url: '<https://github.com> some text here'
+double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "<https://github.com> some text here"
+``````
+
+### Proper Ellipsis
+
+Alias: `proper-ellipsis`
+
+Replaces three consecutive dots with an ellipsis.
+
+
+
+Example: Replacing three consecutive dots with an ellipsis.
+
+Before:
+
+``````markdown
+Lorem (...) Impsum.
+``````
+
+After:
+
+``````markdown
+Lorem (…) Impsum.
+``````
+
+### Remove Consecutive List Markers
+
+Alias: `remove-consecutive-list-markers`
+
+Removes consecutive list markers. Useful when copy-pasting list items.
+
+
+
+Example: Removing consecutive list markers.
+
+Before:
+
+``````markdown
+- item 1
+- - copypasted item A
+- item 2
+  - indented item
+  - - copypasted item B
+``````
+
+After:
+
+``````markdown
+- item 1
+- copypasted item A
+- item 2
+  - indented item
+  - copypasted item B
+``````
+
+### Remove Empty List Markers
+
+Alias: `remove-empty-list-markers`
+
+Removes empty list markers, i.e. list items without content.
+
+
+
+Example: Removes empty list markers.
+
+Before:
+
+``````markdown
+- item 1
+-
+- item 2
+``````
+
+After:
+
+``````markdown
+- item 1
+- item 2
+``````
+
+### Remove Hyphenated Line Breaks
+
+Alias: `remove-hyphenated-line-breaks`
+
+Removes hyphenated line breaks. Useful when pasting text from textbooks.
+
+
+
+Example: Removing hyphenated line breaks.
+
+Before:
+
+``````markdown
+This text has a linebr‐ eak.
+``````
+
+After:
+
+``````markdown
+This text has a linebreak.
+``````
+
+### Remove Multiple Spaces
+
+Alias: `remove-multiple-spaces`
+
+Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. 
+
+
+
+Example: Removing double and triple space.
+
+Before:
+
+``````markdown
+Lorem ipsum   dolor  sit amet.
+``````
+
+After:
+
+``````markdown
+Lorem ipsum dolor sit amet.
+``````
+
 ### Strong Style
 
 Alias: `strong-style`
@@ -1369,63 +1426,6 @@ This is ___nested emphasis_ and ending bold__
 __Test bold__
 ``````
 
-### No Bare URLs
-
-Alias: `no-bare-urls`
-
-Encloses bare URLs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.
-
-
-
-Example: Make sure that links are inside of angle brackets when not in single quotes('), double quotes("), or backticks(`)
-
-Before:
-
-``````markdown
-https://github.com
-braces around url should stay the same: [https://github.com]
-backticks around url should stay the same: `https://github.com`
-Links mid-sentence should be updated like https://google.com will be.
-'https://github.com'
-"https://github.com"
-<https://github.com>
-links should stay the same: [](https://github.com)
-https://gitlab.com
-``````
-
-After:
-
-``````markdown
-<https://github.com>
-braces around url should stay the same: [https://github.com]
-backticks around url should stay the same: `https://github.com`
-Links mid-sentence should be updated like <https://google.com> will be.
-'https://github.com'
-"https://github.com"
-<https://github.com>
-links should stay the same: [](https://github.com)
-<https://gitlab.com>
-``````
-Example: Angle brackets are added if the url is not the only text in the single quotes('), double quotes("), or backticks(`)
-
-Before:
-
-``````markdown
-[https://github.com some text here]
-backticks around a url should stay the same, but only if the only contents of the backticks: `https://github.com some text here`
-single quotes around a url should stay the same, but only if the contents of the single quotes is the url: 'https://github.com some text here'
-double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "https://github.com some text here"
-``````
-
-After:
-
-``````markdown
-[<https://github.com> some text here]
-backticks around a url should stay the same, but only if the only contents of the backticks: `<https://github.com> some text here`
-single quotes around a url should stay the same, but only if the contents of the single quotes is the url: '<https://github.com> some text here'
-double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "<https://github.com> some text here"
-``````
-
 ### Two Spaces Between Lines with Content
 
 Alias: `two-spaces-between-lines-with-content`
@@ -1523,234 +1523,6 @@ Even more content here
 ``````
 
 ## Spacing
-### Trailing spaces
-
-Alias: `trailing-spaces`
-
-Removes extra spaces after every line.
-
-Options:
-- Two Space Linebreak: Ignore two spaces followed by a line break ("Two Space Rule").
-	- Default: `false`
-
-Example: Removes trailing spaces and tabs.
-
-Before:
-
-``````markdown
-# H1
-Line with trailing spaces and tabs.	        
-``````
-
-After:
-
-``````markdown
-# H1
-Line with trailing spaces and tabs.
-``````
-Example: With `Two Space Linebreak = true`
-
-Before:
-
-``````markdown
-# H1
-Line with trailing spaces and tabs.  
-``````
-
-After:
-
-``````markdown
-# H1
-Line with trailing spaces and tabs.  
-``````
-
-### Heading blank lines
-
-Alias: `heading-blank-lines`
-
-All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).
-
-Options:
-- Bottom: Insert a blank line after headings
-	- Default: `true`
-
-Example: Headings should be surrounded by blank lines
-
-Before:
-
-``````markdown
-# H1
-## H2
-
-
-# H1
-line
-## H2
-
-``````
-
-After:
-
-``````markdown
-# H1
-
-## H2
-
-# H1
-
-line
-
-## H2
-``````
-Example: With `Bottom=false`
-
-Before:
-
-``````markdown
-# H1
-line
-## H2
-# H1
-line
-``````
-
-After:
-
-``````markdown
-# H1
-line
-
-## H2
-
-# H1
-line
-``````
-
-### Paragraph blank lines
-
-Alias: `paragraph-blank-lines`
-
-All paragraphs should have exactly one blank line both before and after.
-
-
-
-Example: Paragraphs should be surrounded by blank lines
-
-Before:
-
-``````markdown
-# H1
-Newlines are inserted.
-A paragraph is a line that starts with a letter.
-``````
-
-After:
-
-``````markdown
-# H1
-
-Newlines are inserted.
-
-A paragraph is a line that starts with a letter.
-``````
-
-### Space after list markers
-
-Alias: `space-after-list-markers`
-
-There should be a single space after list markers and checkboxes.
-
-
-
-Example: 
-
-Before:
-
-``````markdown
-1.   Item 1
-2.  Item 2
-
--   [ ] Item 1
-- [x]    Item 2
-	-  [ ] Item 3
-``````
-
-After:
-
-``````markdown
-1. Item 1
-2. Item 2
-
-- [ ] Item 1
-- [x] Item 2
-	- [ ] Item 3
-``````
-
-### Remove Empty Lines Between List Markers and Checklists
-
-Alias: `remove-empty-lines-between-list-markers-and-checklists`
-
-There should not be any empty lines between list markers and checklists.
-
-
-
-Example: 
-
-Before:
-
-``````markdown
-1. Item 1
-
-2. Item 2
-
-- Item 1
-
-	- Subitem 1
-
-- Item 2
-
-- [x] Item 1
-
-	- [ ] Subitem 1
-
-- [ ] Item 2
-
-+ Item 1
-
-	+ Subitem 1
-
-+ Item 2
-
-* Item 1
-
-	* Subitem 1
-
-* Item 2
-``````
-
-After:
-
-``````markdown
-1. Item 1
-2. Item 2
-
-- Item 1
-	- Subitem 1
-- Item 2
-
-- [x] Item 1
-	- [ ] Subitem 1
-- [ ] Item 2
-
-+ Item 1
-	+ Subitem 1
-+ Item 2
-
-* Item 1
-	* Subitem 1
-* Item 2
-``````
-
 ### Compact YAML
 
 Alias: `compact-yaml`
@@ -1875,44 +1647,55 @@ After:
 		- text indented with 6 spaces
 ``````
 
-### Line Break at Document End
+### Empty Line Around Code Fences
 
-Alias: `line-break-at-document-end`
+Alias: `empty-line-around-code-fences`
 
-Ensures that there is exactly one line break at the end of a document.
+Ensures that there is an empty line around code fences unless they start or end a document.
 
 
 
-Example: Appending a line break to the end of the document.
+Example: Fenced code blocks that start a document do not get an empty line before them.
 
 Before:
 
 ``````markdown
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+``` js
+var temp = 'text';
+// this is a code block
+```
+Text after code block.
 ``````
 
 After:
 
 ``````markdown
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+``` js
+var temp = 'text';
+// this is a code block
+```
 
+Text after code block.
 ``````
-Example: Removing trailing line breaks to the end of the document, except one.
+Example: Fenced code blocs that end a document do not get an empty line after them.
 
 Before:
 
 ``````markdown
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-
-
-
+# Heading 1
+```
+Here is a code block
+```
 ``````
 
 After:
 
 ``````markdown
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+# Heading 1
 
+```
+Here is a code block
+```
 ``````
 
 ### Empty Line Around Tables
@@ -2011,55 +1794,328 @@ foo | bar
 New paragraph.
 ``````
 
-### Empty Line Around Code Fences
+### Heading blank lines
 
-Alias: `empty-line-around-code-fences`
+Alias: `heading-blank-lines`
 
-Ensures that there is an empty line around code fences unless they start or end a document.
+All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).
 
+Options:
+- Bottom: Insert a blank line after headings
+	- Default: `true`
 
-
-Example: Fenced code blocks that start a document do not get an empty line before them.
+Example: Headings should be surrounded by blank lines
 
 Before:
 
 ``````markdown
-``` js
-var temp = 'text';
-// this is a code block
-```
-Text after code block.
+# H1
+## H2
+
+
+# H1
+line
+## H2
+
 ``````
 
 After:
 
 ``````markdown
-``` js
-var temp = 'text';
-// this is a code block
-```
+# H1
 
-Text after code block.
+## H2
+
+# H1
+
+line
+
+## H2
 ``````
-Example: Fenced code blocs that end a document do not get an empty line after them.
+Example: With `Bottom=false`
 
 Before:
 
 ``````markdown
-# Heading 1
-```
-Here is a code block
-```
+# H1
+line
+## H2
+# H1
+line
 ``````
 
 After:
 
 ``````markdown
-# Heading 1
+# H1
+line
 
-```
-Here is a code block
-```
+## H2
+
+# H1
+line
+``````
+
+### Line Break at Document End
+
+Alias: `line-break-at-document-end`
+
+Ensures that there is exactly one line break at the end of a document.
+
+
+
+Example: Appending a line break to the end of the document.
+
+Before:
+
+``````markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+``````
+
+After:
+
+``````markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+``````
+Example: Removing trailing line breaks to the end of the document, except one.
+
+Before:
+
+``````markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+
+
+``````
+
+After:
+
+``````markdown
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+``````
+
+### Paragraph blank lines
+
+Alias: `paragraph-blank-lines`
+
+All paragraphs should have exactly one blank line both before and after.
+
+
+
+Example: Paragraphs should be surrounded by blank lines
+
+Before:
+
+``````markdown
+# H1
+Newlines are inserted.
+A paragraph is a line that starts with a letter.
+``````
+
+After:
+
+``````markdown
+# H1
+
+Newlines are inserted.
+
+A paragraph is a line that starts with a letter.
+``````
+
+### Remove Empty Lines Between List Markers and Checklists
+
+Alias: `remove-empty-lines-between-list-markers-and-checklists`
+
+There should not be any empty lines between list markers and checklists.
+
+
+
+Example: 
+
+Before:
+
+``````markdown
+1. Item 1
+
+2. Item 2
+
+- Item 1
+
+	- Subitem 1
+
+- Item 2
+
+- [x] Item 1
+
+	- [ ] Subitem 1
+
+- [ ] Item 2
+
++ Item 1
+
+	+ Subitem 1
+
++ Item 2
+
+* Item 1
+
+	* Subitem 1
+
+* Item 2
+``````
+
+After:
+
+``````markdown
+1. Item 1
+2. Item 2
+
+- Item 1
+	- Subitem 1
+- Item 2
+
+- [x] Item 1
+	- [ ] Subitem 1
+- [ ] Item 2
+
++ Item 1
+	+ Subitem 1
++ Item 2
+
+* Item 1
+	* Subitem 1
+* Item 2
+``````
+
+### Remove link spacing
+
+Alias: `remove-link-spacing`
+
+Removes spacing around link text.
+
+
+
+Example: Space in regular markdown link text
+
+Before:
+
+``````markdown
+[ here is link text1 ](link_here)
+[ here is link text2](link_here)
+[here is link text3 ](link_here)
+[here is link text4](link_here)
+[	here is link text5	](link_here)
+[](link_here)
+**Note that image markdown syntax does not get affected even if it is transclusion:**
+![	here is link text6 ](link_here)
+``````
+
+After:
+
+``````markdown
+[here is link text1](link_here)
+[here is link text2](link_here)
+[here is link text3](link_here)
+[here is link text4](link_here)
+[here is link text5](link_here)
+[](link_here)
+**Note that image markdown syntax does not get affected even if it is transclusion:**
+![	here is link text6 ](link_here)
+``````
+Example: Space in wiki link text
+
+Before:
+
+``````markdown
+[[link_here| here is link text1 ]]
+[[link_here|here is link text2 ]]
+[[link_here| here is link text3]]
+[[link_here|here is link text4]]
+[[link_here|	here is link text5	]]
+![[link_here|	here is link text6	]]
+[[link_here]]
+``````
+
+After:
+
+``````markdown
+[[link_here|here is link text1]]
+[[link_here|here is link text2]]
+[[link_here|here is link text3]]
+[[link_here|here is link text4]]
+[[link_here|here is link text5]]
+![[link_here|here is link text6]]
+[[link_here]]
+``````
+
+### Remove Space around Fullwidth Characters
+
+Alias: `remove-space-around-fullwidth-characters`
+
+Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab)
+
+
+
+Example: Remove Spaces and Tabs around Fullwidth Characrters
+
+Before:
+
+``````markdown
+Full list of affected charaters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
+This is a fullwidth period	 。 with text after it.
+This is a fullwidth comma	，  with text after it.
+This is a fullwidth left parenthesis （ 	with text after it.
+This is a fullwidth right parenthesis ）  with text after it.
+This is a fullwidth colon ：  with text after it.
+This is a fullwidth semicolon ；  with text after it.
+  Ｒemoves space at start of line
+``````
+
+After:
+
+``````markdown
+Full list of affected charaters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
+This is a fullwidth period。with text after it.
+This is a fullwidth comma，with text after it.
+This is a fullwidth left parenthesis（with text after it.
+This is a fullwidth right parenthesis）with text after it.
+This is a fullwidth colon：with text after it.
+This is a fullwidth semicolon；with text after it.
+Ｒemoves space at start of line
+``````
+
+### Space after list markers
+
+Alias: `space-after-list-markers`
+
+There should be a single space after list markers and checkboxes.
+
+
+
+Example: 
+
+Before:
+
+``````markdown
+1.   Item 1
+2.  Item 2
+
+-   [ ] Item 1
+- [x]    Item 2
+	-  [ ] Item 3
+``````
+
+After:
+
+``````markdown
+1. Item 1
+2. Item 2
+
+- [ ] Item 1
+- [x] Item 2
+	- [ ] Item 3
 ``````
 
 ### Space between Chinese and English or numbers
@@ -2123,99 +2179,43 @@ After:
 #标签A #标签2标签
 ``````
 
-### Remove Space around Fullwidth Characters
+### Trailing spaces
 
-Alias: `remove-space-around-fullwidth-characters`
+Alias: `trailing-spaces`
 
-Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab)
+Removes extra spaces after every line.
 
+Options:
+- Two Space Linebreak: Ignore two spaces followed by a line break ("Two Space Rule").
+	- Default: `false`
 
-
-Example: Remove Spaces and Tabs around Fullwidth Characrters
+Example: Removes trailing spaces and tabs.
 
 Before:
 
 ``````markdown
-Full list of affected charaters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
-This is a fullwidth period	 。 with text after it.
-This is a fullwidth comma	，  with text after it.
-This is a fullwidth left parenthesis （ 	with text after it.
-This is a fullwidth right parenthesis ）  with text after it.
-This is a fullwidth colon ：  with text after it.
-This is a fullwidth semicolon ；  with text after it.
-  Ｒemoves space at start of line
+# H1
+Line with trailing spaces and tabs.	        
 ``````
 
 After:
 
 ``````markdown
-Full list of affected charaters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
-This is a fullwidth period。with text after it.
-This is a fullwidth comma，with text after it.
-This is a fullwidth left parenthesis（with text after it.
-This is a fullwidth right parenthesis）with text after it.
-This is a fullwidth colon：with text after it.
-This is a fullwidth semicolon；with text after it.
-Ｒemoves space at start of line
+# H1
+Line with trailing spaces and tabs.
 ``````
-
-### Remove link spacing
-
-Alias: `remove-link-spacing`
-
-Removes spacing around link text.
-
-
-
-Example: Space in regular markdown link text
+Example: With `Two Space Linebreak = true`
 
 Before:
 
 ``````markdown
-[ here is link text1 ](link_here)
-[ here is link text2](link_here)
-[here is link text3 ](link_here)
-[here is link text4](link_here)
-[	here is link text5	](link_here)
-[](link_here)
-**Note that image markdown syntax does not get affected even if it is transclusion:**
-![	here is link text6 ](link_here)
+# H1
+Line with trailing spaces and tabs.  
 ``````
 
 After:
 
 ``````markdown
-[here is link text1](link_here)
-[here is link text2](link_here)
-[here is link text3](link_here)
-[here is link text4](link_here)
-[here is link text5](link_here)
-[](link_here)
-**Note that image markdown syntax does not get affected even if it is transclusion:**
-![	here is link text6 ](link_here)
-``````
-Example: Space in wiki link text
-
-Before:
-
-``````markdown
-[[link_here| here is link text1 ]]
-[[link_here|here is link text2 ]]
-[[link_here| here is link text3]]
-[[link_here|here is link text4]]
-[[link_here|	here is link text5	]]
-![[link_here|	here is link text6	]]
-[[link_here]]
-``````
-
-After:
-
-``````markdown
-[[link_here|here is link text1]]
-[[link_here|here is link text2]]
-[[link_here|here is link text3]]
-[[link_here|here is link text4]]
-[[link_here|here is link text5]]
-![[link_here|here is link text6]]
-[[link_here]]
+# H1
+Line with trailing spaces and tabs.  
 ``````

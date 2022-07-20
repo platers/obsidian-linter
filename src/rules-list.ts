@@ -1850,7 +1850,7 @@ const _rules: Rule[] = [
         ),
       ],
   ),
-].sort((a, b) => RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type));
+];
 
 const _rulesDict = _rules.reduce(
     (dict, rule) => ((dict[rule.alias()] = rule), dict),
@@ -1868,7 +1868,7 @@ export default {
 
   register(rule: Rule): void {
     _rules.push(rule);
-    _rules.sort((a, b) => RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type));
+    _rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.name.localeCompare(b.name)));
     _rulesDict[rule.alias()] = rule;
   },
 };
