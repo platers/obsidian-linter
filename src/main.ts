@@ -7,6 +7,7 @@ import {stripCr} from './utils/strings';
 import log from 'loglevel';
 import {logInfo, logError, logDebug, setLogLevel} from './logger';
 import type moment from 'moment';
+import './rules/*.ts';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
