@@ -1865,5 +1865,11 @@ export default {
   get rulesDict() : Record<string, Rule> {
     return _rulesDict;
   },
+
+  register(rule: Rule): void {
+    _rules.push(rule);
+    _rules.sort((a, b) => RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type));
+    _rulesDict[rule.alias()] = rule;
+  },
 };
 
