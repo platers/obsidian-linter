@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "importHelpers": true,
     "experimentalDecorators": true,
+    "strictBindCallApply": true,
     "lib": [
       "dom",
       "es5",
