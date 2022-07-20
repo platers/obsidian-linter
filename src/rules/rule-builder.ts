@@ -15,8 +15,8 @@ export abstract class RuleBuilderBase {
     return RuleBuilderBase.#ruleMap.get(this.name);
   }
 
-  static register<TOptions extends Options>(RuleBuilderClass: new() => RuleBuilder<TOptions>): void {
-    const rule = RuleBuilderBase.getRule.bind(RuleBuilderClass)() as Rule;
+  static register<TOptions extends Options>(RuleBuilderClass: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>)): void {
+    const rule = RuleBuilderClass.getRule();
     rulesList.register(rule);
   }
 }
