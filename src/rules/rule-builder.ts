@@ -16,7 +16,7 @@ export abstract class RuleBuilderBase {
   }
 
   static register<TOptions extends Options>(RuleBuilderClass: new() => RuleBuilder<TOptions>): void {
-    const rule = this.getRule.bind(RuleBuilderClass)() as Rule;
+    const rule = RuleBuilderBase.getRule.bind(RuleBuilderClass)() as Rule;
     rulesList.rulesDict[rule.alias()] = rule;
   }
 }
