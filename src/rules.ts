@@ -185,55 +185,6 @@ export function getDisabledRules(text: string): string[] {
 
 export const rules: Rule[] = [
   new Rule(
-      'Insert YAML attributes',
-      'Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.',
-      RuleType.YAML,
-      (text: string, options = {}) => {
-        text = initYAML(text);
-        return formatYAML(text, (text) => {
-          const insert_lines = String(options['Text to insert'])
-              .split('\n')
-              .reverse();
-          const parsed_yaml = loadYAML(text.match(yamlRegex)[1]);
-
-          for (const line of insert_lines) {
-            const key = line.split(':')[0];
-            if (!Object.prototype.hasOwnProperty.call(parsed_yaml, key)) {
-              text = text.replace(/^---\n/, escapeDollarSigns(`---\n${line}\n`));
-            }
-          }
-
-          return text;
-        });
-      },
-      [
-        new Example(
-            'Insert static lines into YAML frontmatter. Text to insert: `aliases:\ntags: doc\nanimal: dog`',
-            dedent`
-            ---
-            animal: cat
-            ---
-            `,
-            dedent`
-            ---
-            aliases:
-            tags: doc
-            animal: cat
-            ---
-            `,
-            {'Text to insert': 'aliases:\ntags: doc\nanimal: dog'},
-        ),
-      ],
-      [
-        new TextAreaOption(
-            'Text to insert',
-            'Text to insert into the YAML frontmatter',
-            'aliases: \ntags: ',
-        ),
-      ],
-  ),
-
-  new Rule(
       'YAML Timestamp',
       'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.',
       RuleType.YAML,
