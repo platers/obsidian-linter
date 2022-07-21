@@ -5,7 +5,8 @@ type TestCase<TOptions extends Options> = {
   testName: string,
   before: string,
   after: string,
-  options?: TOptions
+  options?: TOptions | (() => TOptions),
+  afterTestFunc?: () => void,
 };
 
 export function ruleTest<TOptions extends Options>(args: {
@@ -17,7 +18,9 @@ export function ruleTest<TOptions extends Options>(args: {
   describe(rule.name, () => {
     for (const testCase of args.testCases) {
       it(testCase.testName, () => {
-        expect(rule.apply(testCase.before, testCase.options)).toBe(testCase.after);
+        const options = testCase.options instanceof Function ? testCase.options() : testCase.options;
+        expect(rule.apply(testCase.before, options)).toBe(testCase.after);
+        testCase.afterTestFunc?.call(testCase);
       });
     }
   });

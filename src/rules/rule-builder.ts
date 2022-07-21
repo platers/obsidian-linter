@@ -1,5 +1,5 @@
 import {Example, Options, Rule, RuleType, registerRule} from '../rules';
-import {BooleanOption, DropdownOption, DropdownRecord, Option, TextAreaOption, TextOption} from '../option';
+import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -133,5 +133,17 @@ export class DropdownOptionBuilder<TOptions extends Options, TValue extends stri
 export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
   protected buildOption(): Option {
     return new TextAreaOption(this.name, this.description, this.defaultValue);
+  }
+}
+
+export class TextOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
+  protected buildOption(): Option {
+    return new TextOption(this.name, this.description, this.defaultValue);
+  }
+}
+
+export class MomentFormatOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
+  protected buildOption(): Option {
+    return new MomentFormatOption(this.name, this.description, this.defaultValue);
   }
 }
