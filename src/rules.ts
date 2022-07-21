@@ -184,68 +184,6 @@ export function getDisabledRules(text: string): string[] {
 }
 
 export const rules: Rule[] = [
-  // YAML rules
-
-  new Rule(
-      'Format Tags in YAML',
-      'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
-      RuleType.YAML,
-      (text: string) => {
-        return formatYAML(text, (text) => {
-          return text.replace(
-              /\ntags:(.*?)(?=\n(?:[A-Za-z-]+?:|---))/s,
-              function(tagsYAML) {
-                return tagsYAML.replaceAll('#', '');
-              },
-          );
-        });
-      },
-      [
-        new Example(
-            'Format Tags in YAML frontmatter',
-            dedent`
-         ---
-         tags: #one #two #three #nested/four/five
-         ---
-        `,
-            dedent`
-         ---
-         tags: one two three nested/four/five
-         ---
-        `,
-        ),
-        new Example(
-            'Format tags in array',
-            dedent`
-         ---
-         tags: [#one #two #three]
-         ---
-        `,
-            dedent`
-         ---
-         tags: [one two three]
-         ---
-        `,
-        ),
-        new Example(
-            'Format tags in list',
-            dedent`
-          ---
-          tags:
-          - #tag1
-          - #tag2
-          ---
-        `,
-            dedent`
-          ---
-          tags:
-          - tag1
-          - tag2
-          ---
-        `,
-        ),
-      ],
-  ),
   new Rule(
       'Insert YAML attributes',
       'Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.',
