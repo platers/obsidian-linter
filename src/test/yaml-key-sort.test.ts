@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import rulesList from '../rules-list';
+import {rulesDict} from '../rules-list';
 
 describe('YAML Key Sort', () => {
   it('When the sort changes the yaml contents and yaml timestamp date modified is active, update date modified value', () => {
@@ -35,6 +35,6 @@ describe('YAML Key Sort', () => {
       'Already Modified': false,
       'Yaml Timestamp Date Modified Enabled': true,
     };
-    expect(rulesList.rulesDict['yaml-key-sort'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-key-sort'].apply(before, options)).toBe(after);
   });
 });

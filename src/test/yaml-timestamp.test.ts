@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
-import rulesList from '../rules-list';
+import {rulesDict} from '../rules-list';
 
 describe('yaml timestamp', () => {
   it('Doesn\'t add date created if already there', () => {
@@ -14,7 +14,7 @@ describe('yaml timestamp', () => {
       date created: 2019-01-01
       ---
       `;
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'date created', 'moment': moment})).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'date created', 'moment': moment})).toBe(after);
   });
   it('Respects created key', () => {
     const before = dedent`
@@ -27,7 +27,7 @@ describe('yaml timestamp', () => {
       created: 2019-01-01
       ---
       `;
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'created', 'moment': moment})).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, {'Date Created': true, 'Date Created Key': 'created', 'moment': moment})).toBe(after);
   });
   it('Respects modified key when nothing has changed', () => {
     const before = dedent`
@@ -51,7 +51,7 @@ describe('yaml timestamp', () => {
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
   it('Updates modified value when nothing has changed, but date modified is more than 5 seconds different than the file metadata', () => {
     const before = dedent`
@@ -75,7 +75,7 @@ describe('yaml timestamp', () => {
       'Already Modified': false,
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
   it('Updates modified value when format has changed', () => {
     const before = dedent`
@@ -99,7 +99,7 @@ describe('yaml timestamp', () => {
       'Already Modified': false,
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
   it('Updates modified key when something has changed outside of the YAML timestamp rule', () => {
     const before = dedent`
@@ -123,7 +123,7 @@ describe('yaml timestamp', () => {
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
   it('Updates modified key when locale has changed', () => {
     const before = dedent`
@@ -148,7 +148,7 @@ describe('yaml timestamp', () => {
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
     moment.locale('en');
   });
   it('Updates modified key when something has changed inside of the YAML timestamp rule', () => {
@@ -176,7 +176,7 @@ describe('yaml timestamp', () => {
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
   it('Updates modified key when present, but lacks a value', () => {
     const before = dedent`
@@ -204,7 +204,7 @@ describe('yaml timestamp', () => {
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
   it('Updates created key when present, but lacks a value', () => {
     const before = dedent`
@@ -231,7 +231,7 @@ describe('yaml timestamp', () => {
       'Format': 'dddd, MMMM Do YYYY, h:mm:ss a',
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
   it('Updates created value when format has changed', () => {
     const before = dedent`
@@ -258,7 +258,7 @@ describe('yaml timestamp', () => {
       'Already Modified': false,
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
   it('Updates created value when locale has changed', () => {
     const before = dedent`
@@ -286,7 +286,7 @@ describe('yaml timestamp', () => {
       'Already Modified': false,
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
     moment.locale('en');
   });
   it('Updates modified value when format has changed causing created value updated', () => {
@@ -319,6 +319,6 @@ describe('yaml timestamp', () => {
       'Already Modified': false,
       'moment': moment,
     };
-    expect(rulesList.rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
+    expect(rulesDict['yaml-timestamp'].apply(before, options)).toBe(after);
   });
 });

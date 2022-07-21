@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import rulesList from '../rules-list';
+import {rulesDict} from '../rules-list';
 
 describe('Insert yaml attributes', () => {
   it('Inits yaml if it does not exist', () => {
@@ -11,7 +11,7 @@ describe('Insert yaml attributes', () => {
       ---
       
       `;
-    expect(rulesList.rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
+    expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
   });
   // accounts for https://github.com/platers/obsidian-linter/issues/176
   it('Inits yaml when the file has --- in it and no frontmatter', () => {
@@ -38,7 +38,7 @@ describe('Insert yaml attributes', () => {
     ---
 
     `;
-    expect(rulesList.rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
+    expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
   });
   // accounts for https://github.com/platers/obsidian-linter/issues/157
   it('When a file has tabs at the start of a line in the frontmatter, the yaml insertion still works leaving other tabs as they were', () => {
@@ -59,6 +59,6 @@ describe('Insert yaml attributes', () => {
       \t- test2
       ---
       `;
-    expect(rulesList.rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'blob:'})).toBe(after);
+    expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'blob:'})).toBe(after);
   });
 });

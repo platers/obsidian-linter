@@ -57,13 +57,13 @@ export function getDisabledRules(text: string): string[] {
   }
 
   if (disabled_rules.includes('all')) {
-    return _rules.map((rule) => rule.alias());
+    return rules.map((rule) => rule.alias());
   }
 
   return disabled_rules;
 }
 
-const _rules: Rule[] = [
+export const rules: Rule[] = [
   // YAML rules
 
   new Rule(
@@ -1808,24 +1808,13 @@ const _rules: Rule[] = [
   ),
 ];
 
-const _rulesDict = _rules.reduce(
+export const rulesDict = rules.reduce(
     (dict, rule) => ((dict[rule.alias()] = rule), dict),
   {} as Record<string, Rule>,
 );
 
-export default {
-  get rules() : Rule[] {
-    return _rules;
-  },
-
-  get rulesDict() : Record<string, Rule> {
-    return _rulesDict;
-  },
-
-  register(rule: Rule): void {
-    _rules.push(rule);
-    _rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.name.localeCompare(b.name)));
-    _rulesDict[rule.alias()] = rule;
-  },
-};
-
+export function registerRule(rule: Rule): void {
+  rules.push(rule);
+  rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.name.localeCompare(b.name)));
+  rulesDict[rule.alias()] = rule;
+}

@@ -1,6 +1,6 @@
 import {Example, Options, Rule, RuleType} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, Option, TextOption} from '../option';
-import rulesList from '../rules-list';
+import {registerRule} from '../rules-list';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -17,7 +17,7 @@ export abstract class RuleBuilderBase {
 
   static register<TOptions extends Options>(RuleBuilderClass: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>)): void {
     const rule = RuleBuilderClass.getRule();
-    rulesList.register(rule);
+    registerRule(rule);
   }
 }
 

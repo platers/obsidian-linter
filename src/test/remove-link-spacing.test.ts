@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import rulesList from '../rules-list';
+import {rulesDict} from '../rules-list';
 
 describe('Remove Link Spacing', () => {
   // accounts for https://github.com/platers/obsidian-linter/issues/236
@@ -14,6 +14,6 @@ describe('Remove Link Spacing', () => {
       - [ ] [[fileName]]
       `;
 
-    expect(rulesList.rulesDict['remove-link-spacing'].apply(before)).toBe(after);
+    expect(rulesDict['remove-link-spacing'].apply(before)).toBe(after);
   });
 });

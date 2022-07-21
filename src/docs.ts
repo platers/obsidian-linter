@@ -1,7 +1,7 @@
 import {readFileSync, writeFileSync} from 'fs';
 import dedent from 'ts-dedent';
 import {DropdownOption} from './option';
-import rulesList from './rules-list';
+import {rules} from './rules-list';
 import './rules/*.ts';
 
 const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->\n';
@@ -19,7 +19,7 @@ function generateReadme() {
 
   let rules_list = '';
   let prevSection = '';
-  for (const rule of rulesList.rules) {
+  for (const rule of rules) {
     if (rule.type !== prevSection) {
       rules_list += `\n### ${rule.type} rules\n\n`;
       prevSection = rule.type;
@@ -37,7 +37,7 @@ function generateDocs() {
 
   let rules_docs = '';
   let prevSection = '';
-  for (const rule of rulesList.rules) {
+  for (const rule of rules) {
     const examples = rule.examples.map((test) => dedent`
     Example: ${test.description}
 

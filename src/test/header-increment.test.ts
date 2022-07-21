@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import rulesList from '../rules-list';
+import {rulesDict} from '../rules-list';
 
 describe('Header Increment', () => {
   it('Handles large increments', () => {
@@ -13,7 +13,7 @@ describe('Header Increment', () => {
         ## H4
         ### H7
         `;
-    expect(rulesList.rulesDict['header-increment'].apply(before)).toBe(after);
+    expect(rulesDict['header-increment'].apply(before)).toBe(after);
   });
   it('Handles change from decrement to regular increment', () => {
     const before = dedent`
@@ -30,7 +30,7 @@ describe('Header Increment', () => {
         ## H6
         ## H2
         `;
-    expect(rulesList.rulesDict['header-increment'].apply(before)).toBe(after);
+    expect(rulesDict['header-increment'].apply(before)).toBe(after);
   });
   it('Handles a variety of changes in header size', () => {
     const before = dedent`
@@ -61,6 +61,6 @@ describe('Header Increment', () => {
         ##### H5
         ### H3
         `;
-    expect(rulesList.rulesDict['header-increment'].apply(before)).toBe(after);
+    expect(rulesDict['header-increment'].apply(before)).toBe(after);
   });
 });
