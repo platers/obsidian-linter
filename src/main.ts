@@ -1,6 +1,5 @@
 import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
-import {LinterSettings, Options} from './rules';
-import {getDisabledRules, rules} from './rules-list';
+import {LinterSettings, Options, getDisabledRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';

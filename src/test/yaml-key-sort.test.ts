@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules-list';
+import {rulesDict} from '../rules';
 
 describe('YAML Key Sort', () => {
   it('When the sort changes the yaml contents and yaml timestamp date modified is active, update date modified value', () => {

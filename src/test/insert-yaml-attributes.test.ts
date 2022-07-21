@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules-list';
+import {rulesDict} from '../rules';
 
 describe('Insert yaml attributes', () => {
   it('Inits yaml if it does not exist', () => {

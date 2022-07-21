@@ -1,6 +1,5 @@
-import {Example, Options, Rule, RuleType} from '../rules';
+import {Example, Options, Rule, RuleType, registerRule} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, Option, TextOption} from '../option';
-import {registerRule} from '../rules-list';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();

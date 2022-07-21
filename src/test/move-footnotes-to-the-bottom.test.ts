@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules-list';
+import {rulesDict} from '../rules';
 
 describe('Move Footnotes to the bottom', () => {
   it('Simple case', () => {
