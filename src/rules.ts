@@ -15,7 +15,6 @@ import {
 import {
   Option,
   BooleanOption,
-  TextOption,
   DropdownOption,
   DropdownRecord,
   TextAreaOption,
@@ -182,73 +181,6 @@ export function getDisabledRules(text: string): string[] {
 }
 
 export const rules: Rule[] = [
-  new Rule(
-      'YAML Title',
-      'Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename.',
-      RuleType.YAML,
-      (text: string, options = {}) => {
-        text = initYAML(text);
-        let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          const result = text.match(/^#\s+(.*)/m);
-          if (result) {
-            return result[1];
-          }
-          return '';
-        });
-        title = title || options['metadata: file name'];
-
-        title = toYamlString(title);
-
-        return formatYAML(text, (text) => {
-          const title_match_str = `\n${options['Title Key']}.*\n`;
-          const title_match = new RegExp(title_match_str);
-          if (title_match.test(text)) {
-            text = text.replace(
-                title_match,
-                escapeDollarSigns(`\n${options['Title Key']}: ${title}\n`),
-            );
-          } else {
-            const yaml_end = text.indexOf('\n---');
-            text = insert(text, yaml_end, `\n${options['Title Key']}: ${title}`);
-          }
-
-          return text;
-        });
-      },
-      [
-        new Example(
-            'Adds a header with the title from heading.',
-            dedent`
-        # Obsidian
-        `,
-            dedent`
-        ---
-        title: Obsidian
-        ---
-        # Obsidian
-        `,
-            {
-              'metadata: file name': 'Filename',
-            },
-        ),
-        new Example(
-            'Adds a header with the title.',
-            dedent`
-        `,
-            dedent`
-        ---
-        title: Filename
-        ---
-
-        `,
-            {
-              'metadata: file name': 'Filename',
-            },
-        ),
-      ],
-      [new TextOption('Title Key', 'Which YAML key to use for title', 'title')],
-  ),
-
   new Rule(
       'YAML Title Alias',
       'Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
