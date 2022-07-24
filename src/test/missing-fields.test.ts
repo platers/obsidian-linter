@@ -1,5 +1,5 @@
 import {Rule, rules} from '../rules';
-import '../rules/*.ts';
+import '../rules-registry';
 
 describe('Check missing fields', () => {
   test.each(rules)('$name', (rule: Rule) => {

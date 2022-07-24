@@ -6,7 +6,7 @@ import {stripCr} from './utils/strings';
 import log from 'loglevel';
 import {logInfo, logError, logDebug, setLogLevel} from './logger';
 import moment from 'moment';
-import './rules/*.ts';
+import './rules-registry';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
 import YamlTimestamp from './rules/yaml-timestamp';
