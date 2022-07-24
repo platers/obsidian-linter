@@ -193,7 +193,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         options: {
           dateCreated: false,
           dateModified: true,
-          dateCreatedKey: 'modified',
+          dateModifiedKey: 'modified',
           fileModifiedTime: '2020-01-01T00:00:00-00:00',
           currentTime: moment('Wednesday, January 1st 2020, 4:00:00 pm', 'dddd, MMMM Do YYYY, h:mm:ss a'),
           alreadyModified: false,
