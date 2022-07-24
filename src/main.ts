@@ -1,16 +1,17 @@
 import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
-import {LinterSettings, Options, getDisabledRules, rules} from './rules';
+import {LinterSettings, getDisabledRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
 import log from 'loglevel';
 import {logInfo, logError, logDebug, setLogLevel} from './logger';
-import type moment from 'moment';
+import moment from 'moment';
 import './rules/*.ts';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
 import YamlTimestamp from './rules/yaml-timestamp';
 import YamlKeySort from './rules/yaml-key-sort';
+import {RuleBuilderBase} from './rules/rule-builder';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -229,18 +230,10 @@ export default class LinterPlugin extends Plugin {
       let newText = oldText;
 
       // escape YAML where possible before parsing yaml
-      const escape_yaml_rule = EscapeYamlSpecialCharacters.getRule();
-      const escape_yaml_options = escape_yaml_rule.getOptions(this.settings);
-      if (escape_yaml_options[escape_yaml_rule.enabledOptionName()]) {
-        newText = escape_yaml_rule.apply(newText, escape_yaml_options);
-      }
+      [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, this.settings);
 
       // remove hashtags from tags before parsing yaml
-      const tag_rule = FormatTagsInYaml.getRule();
-      const tag_options = tag_rule.getOptions(this.settings);
-      if (tag_options[tag_rule.enabledOptionName()]) {
-        newText = tag_rule.apply(newText, tag_options);
-      }
+      [newText] = FormatTagsInYaml.applyIfEnabled(newText, this.settings);
 
       const disabledRules = getDisabledRules(newText);
       const modifiedAtTime = window.moment(file.stat.mtime).format();
@@ -250,56 +243,39 @@ export default class LinterPlugin extends Plugin {
         YamlTimestamp.getRule(),
         FormatTagsInYaml.getRule(),
         EscapeYamlSpecialCharacters.getRule(),
-        YamlKeySort.getRule()
-      ].map(rule => rule.alias());
+        YamlKeySort.getRule(),
+      ].map((rule) => rule.alias());
       for (const rule of rules) {
         // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
         if (disabledRules.includes(rule.alias()) || specialRuleAliases.includes(rule.alias())) {
           continue;
         }
 
-        const options: Options =
-          Object.assign({
-            'metadata: file created time': modifiedAtTime,
-            'metadata: file modified time': createdAtTime,
-            'metadata: file name': file.basename,
-            'moment': window.moment,
-          }, rule.getOptions(this.settings));
-
-        if (options[rule.enabledOptionName()]) {
-          logDebug(`Running ${rule.name}`);
-          newText = rule.apply(newText, options);
-        }
+        [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, this.settings, {
+          fileCreatedTime: createdAtTime,
+          fileModifiedTime: modifiedAtTime,
+          fileName: file.basename,
+          moment: moment,
+        });
       }
 
       // run yaml timestamp at the end to help determine if something has changed
-      const yaml_timestamp_rule = YamlTimestamp.getRule();
-      const yaml_timestamp_options: Options =
-      Object.assign({
-        'metadata: file created time': createdAtTime,
-        'metadata: file modified time': modifiedAtTime,
-        'metadata: file name': file.basename,
-        'Current Time': window.moment(),
-        'Already Modified': oldText != newText,
-        'moment': window.moment,
-      }, yaml_timestamp_rule.getOptions(this.settings));
-      const yaml_timestamp_is_enabled = yaml_timestamp_options[yaml_timestamp_rule.enabledOptionName()];
-      if (yaml_timestamp_is_enabled) {
-        newText = yaml_timestamp_rule.apply(newText, yaml_timestamp_options);
-      }
+      let isYamlTimestampEnabled;
+      [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, this.settings, {
+        fileCreatedTime: createdAtTime,
+        fileModifiedTime: modifiedAtTime,
+        currentTime: moment(),
+        alreadyModified: oldText != newText,
+        moment: moment,
+      });
 
-      const yaml_key_sort_rule = YamlKeySort.getRule();
-      const yaml_key_sort_options: Options = Object.assign({
-        'metadata: file created time': createdAtTime,
-        'metadata: file modified time': modifiedAtTime,
-        'metadata: file name': file.basename,
-        'Current Time Formatted': window.moment().format(yaml_timestamp_options['Format']),
-        'Yaml Timestamp Date Modified Enabled': yaml_timestamp_is_enabled && yaml_timestamp_options['Date Modified'],
-        'Date Modified Key': yaml_timestamp_options['Date Modified Key'],
-      }, yaml_key_sort_rule.getOptions(this.settings));
-      if (yaml_key_sort_options[yaml_key_sort_rule.enabledOptionName()]) {
-        newText = yaml_key_sort_rule.apply(newText, yaml_key_sort_options);
-      }
+      const yamlTimestampOptions = YamlTimestamp.getRuleOptions(this.settings);
+
+      [newText] = YamlKeySort.applyIfEnabled(newText, this.settings, {
+        currentTimeFormatted: moment().format(yamlTimestampOptions.format),
+        yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
+        dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
+      });
 
       return newText;
     }

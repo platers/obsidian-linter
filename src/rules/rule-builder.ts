@@ -1,5 +1,6 @@
-import {Example, Options, Rule, RuleType, registerRule} from '../rules';
+import {Example, Options, Rule, RuleType, registerRule, LinterSettings} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
+import {logDebug} from '../logger';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -13,6 +14,17 @@ export abstract class RuleBuilderBase {
 
     return RuleBuilderBase.#ruleMap.get(this.name);
   }
+
+  static applyIfEnabledBase(rule: Rule, text: string, settings: LinterSettings, extraOptions: Options): [result: string, isEnabled: boolean] {
+    const optionsFromSettings = rule.getOptions(settings);
+    if (optionsFromSettings[rule.enabledOptionName()]) {
+      const options = Object.assign({}, optionsFromSettings, extraOptions) as Options;
+      logDebug(`Running ${rule.name}`);
+      return [rule.apply(text, options), true];
+    } else {
+      return [text, false];
+    }
+  }
 }
 
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
@@ -24,6 +36,10 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   }
 
   safeApply(text: string, options?: Options): string {
+    return this.apply(text, this.buildRuleOptions(options));
+  }
+
+  buildRuleOptions(options?: Options): TOptions {
     options = options ?? {};
     const defaultOptions = new this.OptionsClass();
     const ruleOptions = Object.assign(defaultOptions, options) as TOptions;
@@ -31,7 +47,8 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     for (const optionBuilder of this.optionBuilders) {
       optionBuilder.setRuleOption(ruleOptions, options);
     }
-    return this.apply(text, ruleOptions);
+
+    return ruleOptions;
   }
 
   abstract get name(): string;
@@ -40,6 +57,18 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   abstract apply(text: string, options: TOptions): string;
   abstract get exampleBuilders(): ExampleBuilder<TOptions>[];
   abstract get optionBuilders(): OptionBuilderBase<TOptions>[];
+
+  static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, extraOptions?: TOptions): [result: string, isEnabled: boolean] {
+    const rule = this.getRule();
+    return RuleBuilderBase.applyIfEnabledBase(rule, text, settings, extraOptions);
+  }
+
+  static getRuleOptions<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>), settings: LinterSettings): TOptions {
+    const rule = RuleBuilderBase.getRule.bind(this)();
+    const builder = new this();
+    const optionsFromSettings = rule.getOptions(settings);
+    return builder.buildRuleOptions(optionsFromSettings);
+  }
 }
 
 export class ExampleBuilder<TOptions extends Options> {
