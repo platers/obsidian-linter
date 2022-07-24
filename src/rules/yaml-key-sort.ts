@@ -287,4 +287,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
       }),
     ];
   }
+  get isSpecial(): boolean {
+    return true;
+  }
 }

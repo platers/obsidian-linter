@@ -242,4 +242,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
       }),
     ];
   }
+  get isSpecial(): boolean {
+    return true;
+  }
 }

@@ -239,15 +239,9 @@ export default class LinterPlugin extends Plugin {
       const modifiedAtTime = window.moment(file.stat.mtime).format();
       const createdAtTime = window.moment(file.stat.ctime).format();
 
-      const specialRuleAliases = [
-        YamlTimestamp.getRule(),
-        FormatTagsInYaml.getRule(),
-        EscapeYamlSpecialCharacters.getRule(),
-        YamlKeySort.getRule(),
-      ].map((rule) => rule.alias());
       for (const rule of rules) {
         // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
-        if (disabledRules.includes(rule.alias()) || specialRuleAliases.includes(rule.alias())) {
+        if (disabledRules.includes(rule.alias()) || rule.isSpecial) {
           continue;
         }
 

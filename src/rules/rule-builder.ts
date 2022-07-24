@@ -8,7 +8,7 @@ export abstract class RuleBuilderBase {
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
     if (!RuleBuilderBase.#ruleMap.has(this.name)) {
       const builder = new this();
-      const rule = new Rule(builder.name, builder.description, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option));
+      const rule = new Rule(builder.name, builder.description, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.isSpecial);
       RuleBuilderBase.#ruleMap.set(this.name, rule);
     }
 
@@ -57,6 +57,9 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   abstract apply(text: string, options: TOptions): string;
   abstract get exampleBuilders(): ExampleBuilder<TOptions>[];
   abstract get optionBuilders(): OptionBuilderBase<TOptions>[];
+  get isSpecial(): boolean {
+    return false;
+  }
 
   static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, extraOptions?: TOptions): [result: string, isEnabled: boolean] {
     const rule = this.getRule();

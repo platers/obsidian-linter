@@ -235,4 +235,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       }),
     ];
   }
+  get isSpecial(): boolean {
+    return true;
+  }
 }
