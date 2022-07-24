@@ -169,57 +169,6 @@ export function getDisabledRules(text: string): string[] {
 
 export const rules: Rule[] = [
   new Rule(
-      'Space between Chinese and English or numbers',
-      'Ensures that Chinese and English or numbers are separated by a single space. Follow this [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)',
-      RuleType.SPACING,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          const head = /([\u4e00-\u9fa5])( *)(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+'"([{¥$]|\*[^*])/gm;
-          const tail = /(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+;:'"°%)\]}]|[^*]\*)( *)([\u4e00-\u9fa5])/gm;
-          return text.replace(head, '$1 $3').replace(tail, '$1 $3');
-        });
-      },
-      [
-        new Example(
-            'Space between Chinese and English',
-            dedent`
-        中文字符串english中文字符串。
-        `,
-            dedent`
-        中文字符串 english 中文字符串。
-        `,
-        ),
-        new Example(
-            'Space between Chinese and link',
-            dedent`
-        中文字符串[english](http://example.com)中文字符串。
-        `,
-            dedent`
-        中文字符串 [english](http://example.com) 中文字符串。
-        `,
-        ),
-        new Example(
-            'Space between Chinese and inline code block',
-            dedent`
-        中文字符串\`code\`中文字符串。
-        `,
-            dedent`
-        中文字符串 \`code\` 中文字符串。
-        `,
-        ),
-        // accounts for https://github.com/platers/obsidian-linter/issues/234
-        new Example(
-            'No space between Chinese and English in tag',
-            dedent`
-          #标签A #标签2标签
-      `,
-            dedent`
-          #标签A #标签2标签
-      `,
-        ),
-      ],
-  ),
-  new Rule(
       'Remove Space around Fullwidth Characters',
       'Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab)',
       RuleType.SPACING,
