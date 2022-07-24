@@ -5,7 +5,7 @@ import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
 import log from 'loglevel';
 import {logInfo, logError, logDebug, setLogLevel} from './logger';
-import moment from 'moment';
+import type moment from 'moment';
 import './rules-registry';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
@@ -249,7 +249,7 @@ export default class LinterPlugin extends Plugin {
           fileCreatedTime: createdAtTime,
           fileModifiedTime: modifiedAtTime,
           fileName: file.basename,
-          moment: moment,
+          moment: window.moment,
         });
       }
 
@@ -258,15 +258,15 @@ export default class LinterPlugin extends Plugin {
       [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, this.settings, {
         fileCreatedTime: createdAtTime,
         fileModifiedTime: modifiedAtTime,
-        currentTime: moment(),
+        currentTime: window.moment(),
         alreadyModified: oldText != newText,
-        moment: moment,
+        moment: window.moment,
       });
 
       const yamlTimestampOptions = YamlTimestamp.getRuleOptions(this.settings);
 
       [newText] = YamlKeySort.applyIfEnabled(newText, this.settings, {
-        currentTimeFormatted: moment().format(yamlTimestampOptions.format),
+        currentTimeFormatted: window.moment().format(yamlTimestampOptions.format),
         yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
         dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
       });
