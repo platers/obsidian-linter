@@ -38,9 +38,8 @@ Now that the repository is set up, you should be able to start making changes.
 
 ### Adding a Rule
 
-When adding a rule, please add that rule in `rules.ts`.
-Make sure to add it to the corresponding rule type section (spacing, headings, etc) in that file.
-Try to follow the format of existing tests where possible as it makes the code easier to maintain and changes easier to review.
+When adding a rule, please add that rule in `src/rules/` directory. You can use `src/rules/_rule-template.ts.ts` as the quick start.
+Try to follow the format of the existing rules where possible as it makes the code easier to maintain and changes easier to review.
 You may find it useful to reference methods from `src/utils/`.
 
 For example, you may want to ignore tables and tags which will require `ignoreListOfTypes` from `src/utils/ignore-types.ts`.
@@ -67,22 +66,28 @@ Tests for rule other than the examples will be in the format `{RULE_ALIAS}.test.
 
 A test will take the form of
 ```Typescript
-describe('{RULE_NAME_HERE}', () => { // test suite
-  it('{TEST_CASE_NAME_HERE}', () => { // test case 1
-    const before = dedent`
-      - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          - Vestibulum id tortor lobortis, tristique mi quis, pretium metus.
-      - Nunc ut arcu fermentum enim auctor accumsan ut a risus.
-              - Donec ut auctor dui.
-      `;
-    const after = dedent`
-      - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-      \t- Vestibulum id tortor lobortis, tristique mi quis, pretium metus.
-      - Nunc ut arcu fermentum enim auctor accumsan ut a risus.
-      \t\t- Donec ut auctor dui.
-      `;
-    expect(rulesDict['{RULE_ALIAS_HERE}'].apply(before, {OPTIONS_OBJECT_HERE})).toBe(after);
-  });
+ruleTest({
+  RuleBuilderClass: {RULE_BUILDER_CLASS},
+  testCases: [
+    {
+      testName: '{TEST_NAME}',
+      before: dedent`
+        NOTE
+        BEFORE
+        APPLYING
+        THE RULE
+      `,
+      after: dedent`
+        NOTE
+        AFTER
+        APPLYING
+        THE RULE
+      `,
+      options: {
+        {RULE_OPTIONS_PROPERTY_KEY}: '{RULE_OPTIONS_PROPERTY_VALUE}',
+      },
+    }
+  ]
 });
 ```
 
