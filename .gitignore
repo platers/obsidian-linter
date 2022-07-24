@@ -18,3 +18,5 @@ data.json
 yarn.lock
 
 .DS_Store
+
+!__mocks__/*.js

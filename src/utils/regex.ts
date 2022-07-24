@@ -12,6 +12,7 @@ export const wikiLinkRegex = /(!?)(\[{2}[^[\n\]]*\]{2})/g;
 export const tagRegex = /#[^\s#]{1,}/g;
 export const obsidianMultilineCommentRegex = /%%\n[^%]*\n%%/g;
 export const tableRegex = /([ ]{0,3}\[.*?\][ \t]*\n)?([ ]{0,3}\S+.*?\|.*?\n([^\n]*?\|[^\n]*?\n)*?)?[ ]{0,3}[|\-+:.][ \-+|:.]*?\|[ \-+|:.]*(?:\n?[^\n]*?\|([^\n]*?)*(\n)?)+/g;
+export const wordSplitterRegex = /[,\s]+/;
 
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string

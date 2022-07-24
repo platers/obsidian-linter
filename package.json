@@ -16,6 +16,7 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.14.8",
+    "@babel/plugin-proposal-decorators": "^7.18.9",
     "@babel/preset-env": "^7.14.9",
     "@babel/preset-typescript": "^7.14.5",
     "@rollup/plugin-commonjs": "^18.0.0",
@@ -28,12 +29,15 @@
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
     "babel-jest": "^27.0.6",
+    "babel-plugin-import-glob": "^2.0.0",
     "eslint": "^7.32.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-jest": "^25.0.5",
     "jest": "^27.0.6",
     "obsidian": "^0.12.0",
     "rollup": "^2.32.1",
+    "rollup-plugin-external-globals": "^0.6.1",
+    "rollup-plugin-glob-import": "^0.5.0",
     "ts-node": "^10.1.0",
     "tslib": "^2.2.0",
     "typescript": "^4.2.4"

@@ -150,6 +150,7 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
    * @return {string} The text with paragraphs with a single new line before and after them.
    */
 export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: string): string {
+  const hasTrailingLineBreak = text.endsWith('\n');
   const positions: Position[] = getPositions(mdastTypes.paragraph, text);
   if (positions.length === 0) {
     return text;
@@ -221,6 +222,10 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
     }
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, endIndex, startNewLines + newParagraphLines.join('\n\n') + endNewLines);
+  }
+
+  if (hasTrailingLineBreak && !text.endsWith('\n')) {
+    text += '\n';
   }
 
   return text;

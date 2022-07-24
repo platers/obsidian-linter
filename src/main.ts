@@ -1,12 +1,18 @@
 import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
-import {LinterSettings, Options, rules, getDisabledRules} from './rules';
+import {LinterSettings, getDisabledRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
-import {BooleanOption, DropdownOption, MomentFormatOption, TextAreaOption, TextOption} from './option';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
 import log from 'loglevel';
 import {logInfo, logError, logDebug, setLogLevel} from './logger';
-import type moment from 'moment';
+import moment from './moment-with-locales';
+
+import './rules-registry';
+import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
+import FormatTagsInYaml from './rules/format-tags-in-yaml';
+import YamlTimestamp from './rules/yaml-timestamp';
+import YamlKeySort from './rules/yaml-key-sort';
+import {RuleBuilderBase} from './rules/rule-builder';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -16,7 +22,6 @@ declare global {
         save(): void;
       }
     };
-    moment: typeof moment;
   }
 }
 
@@ -225,71 +230,46 @@ export default class LinterPlugin extends Plugin {
       let newText = oldText;
 
       // escape YAML where possible before parsing yaml
-      const escape_yaml_rule = rules.find((rule) => rule.name === 'Escape YAML Special Characters');
-      const escape_yaml_options = escape_yaml_rule.getOptions(this.settings);
-      if (escape_yaml_options[escape_yaml_rule.enabledOptionName()]) {
-        newText = escape_yaml_rule.apply(newText, escape_yaml_options);
-      }
+      [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, this.settings);
 
       // remove hashtags from tags before parsing yaml
-      const tag_rule = rules.find((rule) => rule.name === 'Format Tags in YAML');
-      const tag_options = tag_rule.getOptions(this.settings);
-      if (tag_options[tag_rule.enabledOptionName()]) {
-        newText = tag_rule.apply(newText, tag_options);
-      }
+      [newText] = FormatTagsInYaml.applyIfEnabled(newText, this.settings);
 
       const disabledRules = getDisabledRules(newText);
-      const modifiedAtTime = window.moment(file.stat.mtime).format();
-      const createdAtTime = window.moment(file.stat.ctime).format();
+      const modifiedAtTime = moment(file.stat.mtime).format();
+      const createdAtTime = moment(file.stat.ctime).format();
+
       for (const rule of rules) {
         // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
-        if (disabledRules.includes(rule.alias()) || rule.alias() === 'yaml-timestamp' || rule.alias() === 'format-tags-in-yaml' || rule.alias() === 'escape-yaml-special-characters' ||
-          rule.alias() === 'yaml-key-sort') {
+        if (disabledRules.includes(rule.alias()) || rule.hasSpecialExecutionOrder) {
           continue;
         }
 
-        const options: Options =
-          Object.assign({
-            'metadata: file created time': modifiedAtTime,
-            'metadata: file modified time': createdAtTime,
-            'metadata: file name': file.basename,
-            'moment': window.moment,
-          }, rule.getOptions(this.settings));
-
-        if (options[rule.enabledOptionName()]) {
-          logDebug(`Running ${rule.name}`);
-          newText = rule.apply(newText, options);
-        }
+        [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, this.settings, {
+          fileCreatedTime: createdAtTime,
+          fileModifiedTime: modifiedAtTime,
+          fileName: file.basename,
+          moment: moment,
+        });
       }
 
       // run yaml timestamp at the end to help determine if something has changed
-      const yaml_timestamp_rule = rules.find((rule) => rule.alias() === 'yaml-timestamp');
-      const yaml_timestamp_options: Options =
-      Object.assign({
-        'metadata: file created time': createdAtTime,
-        'metadata: file modified time': modifiedAtTime,
-        'metadata: file name': file.basename,
-        'Current Time': window.moment(),
-        'Already Modified': oldText != newText,
-        'moment': window.moment,
-      }, yaml_timestamp_rule.getOptions(this.settings));
-      const yaml_timestamp_is_enabled = yaml_timestamp_options[yaml_timestamp_rule.enabledOptionName()];
-      if (yaml_timestamp_is_enabled) {
-        newText = yaml_timestamp_rule.apply(newText, yaml_timestamp_options);
-      }
+      let isYamlTimestampEnabled;
+      [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, this.settings, {
+        fileCreatedTime: createdAtTime,
+        fileModifiedTime: modifiedAtTime,
+        currentTime: moment(),
+        alreadyModified: oldText != newText,
+        moment: moment,
+      });
 
-      const yaml_key_sort_rule = rules.find((rule) => rule.alias() === 'yaml-key-sort');
-      const yaml_key_sort_options: Options = Object.assign({
-        'metadata: file created time': createdAtTime,
-        'metadata: file modified time': modifiedAtTime,
-        'metadata: file name': file.basename,
-        'Current Time Formatted': window.moment().format(yaml_timestamp_options['Format']),
-        'Yaml Timestamp Date Modified Enabled': yaml_timestamp_is_enabled && yaml_timestamp_options['Date Modified'],
-        'Date Modified Key': yaml_timestamp_options['Date Modified Key'],
-      }, yaml_key_sort_rule.getOptions(this.settings));
-      if (yaml_key_sort_options[yaml_key_sort_rule.enabledOptionName()]) {
-        newText = yaml_key_sort_rule.apply(newText, yaml_key_sort_options);
-      }
+      const yamlTimestampOptions = YamlTimestamp.getRuleOptions(this.settings);
+
+      [newText] = YamlKeySort.applyIfEnabled(newText, this.settings, {
+        currentTimeFormatted: moment().format(yamlTimestampOptions.format),
+        yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
+        dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
+      });
 
       return newText;
     }
@@ -429,9 +409,6 @@ export default class LinterPlugin extends Plugin {
 
     // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
     setOrUpdateMomentInstance() {
-      // loading moment as follows allows for updating the locale while using moment directly has issues loading the locale
-      const {moment} = window;
-
       const obsidianLang: string = localStorage.getItem('language') || 'en';
       const systemLang = navigator.language?.toLowerCase();
 
@@ -446,8 +423,6 @@ export default class LinterPlugin extends Plugin {
 
       const currentLocale = moment.locale(momentLocale);
       logDebug(`Trying to switch Moment.js global locale to ${momentLocale}, got ${currentLocale}`);
-
-      window.moment = moment;
     }
 
     private displayChangedMessage(charsAdded: number, charsRemoved: number) {
@@ -467,100 +442,6 @@ class SettingTab extends PluginSettingTab {
     constructor(app: App, plugin: LinterPlugin) {
       super(app, plugin);
       this.plugin = plugin;
-
-      // Inject display functions. Necessary because the Settings object cannot be used in tests.
-      BooleanOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        const setting = new Setting(containerEl)
-            .setName(this.name)
-            .setDesc(this.description)
-            .addToggle((toggle) => {
-              toggle.setValue(settings.ruleConfigs[this.ruleName][this.name]);
-              toggle.onChange((value) => {
-                this.setOption(value, settings);
-                plugin.settings = settings;
-                plugin.saveData(plugin.settings);
-              });
-            });
-
-        // remove border around every setting item
-        setting.settingEl.style.border = 'none';
-      };
-
-      TextOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        const setting = new Setting(containerEl)
-            .setName(this.name)
-            .setDesc(this.description)
-            .addText((textbox) => {
-              textbox.setValue(settings.ruleConfigs[this.ruleName][this.name]);
-              textbox.onChange((value) => {
-                this.setOption(value, settings);
-                plugin.settings = settings;
-                plugin.saveData(plugin.settings);
-              });
-            });
-
-        // remove border around every setting item
-        setting.settingEl.style.border = 'none';
-      };
-
-      TextAreaOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        const setting = new Setting(containerEl)
-            .setName(this.name)
-            .setDesc(this.description)
-            .addTextArea((textbox) => {
-              textbox.setValue(settings.ruleConfigs[this.ruleName][this.name]);
-              textbox.onChange((value) => {
-                this.setOption(value, settings);
-                plugin.settings = settings;
-                plugin.saveData(plugin.settings);
-              });
-            });
-
-        // remove border around every setting item
-        setting.settingEl.style.border = 'none';
-      };
-
-      MomentFormatOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        const setting = new Setting(containerEl)
-            .setName(this.name)
-            .setDesc(this.description)
-            .addMomentFormat((format) => {
-              format.setValue(settings.ruleConfigs[this.ruleName][this.name]);
-              format.setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a');
-              format.onChange((value) => {
-                this.setOption(value, settings);
-                plugin.settings = settings;
-                plugin.saveData(plugin.settings);
-              });
-            });
-
-        // remove border around every setting item
-        setting.settingEl.style.border = 'none';
-      };
-
-      DropdownOption.prototype.display = function(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-        const setting = new Setting(containerEl)
-            .setName(this.name)
-            .setDesc(this.description)
-            .addDropdown((dropdown) => {
-              // First, add all the available options
-              for (const option of this.options) {
-                dropdown.addOption(option.value, option.value);
-              }
-
-              // Set currently selected value from existing settings
-              dropdown.setValue(settings.ruleConfigs[this.ruleName][this.name]);
-
-              dropdown.onChange((value) => {
-                this.setOption(value, settings);
-                plugin.settings = settings;
-                plugin.saveData(plugin.settings);
-              });
-            });
-
-        // remove border around every setting item
-        setting.settingEl.style.border = 'none';
-      };
     }
 
     display(): void {

@@ -1,21 +1,26 @@
+import HeadingBlankLines from '../rules/heading-blank-lines';
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {ruleTest} from './common';
 
-describe('Heading blank lines', () => {
-  it('Ignores codeblocks', () => {
-    const before = dedent`
+ruleTest({
+  RuleBuilderClass: HeadingBlankLines,
+  testCases: [
+    {
+      testName: 'Ignores codeblocks',
+      before: dedent`
         ---
         front matter
         ---
-        
+
         # H1
         \`\`\`
         # comment not header
         $$
         a = b
         $$
-        \`\`\``;
-    const after = dedent`
+        \`\`\`
+      `,
+      after: dedent`
         ---
         front matter
         ---
@@ -27,11 +32,12 @@ describe('Heading blank lines', () => {
         $$
         a = b
         $$
-        \`\`\``;
-    expect(rulesDict['heading-blank-lines'].apply(before)).toBe(after);
-  });
-  it('Ignores # not in headings', () => {
-    const before = dedent`
+        \`\`\`
+      `,
+    },
+    {
+      testName: 'Ignores # not in headings',
+      before: dedent`
         Not a header # .
         Line
         \`\`\`
@@ -43,8 +49,8 @@ describe('Heading blank lines', () => {
         ~~~
           # tabbed not header
             # space not header
-        `;
-    const after = dedent`
+      `,
+      after: dedent`
         Not a header # .
         Line
         \`\`\`
@@ -56,25 +62,25 @@ describe('Heading blank lines', () => {
         ~~~
           # tabbed not header
             # space not header
-        `;
-    expect(rulesDict['heading-blank-lines'].apply(before)).toBe(after);
-  });
-  it('Works normally', () => {
-    const before = dedent`
+      `,
+    },
+    {
+      testName: 'Works normally',
+      before: dedent`
         # H1
         ## H2
         Line
         ### H3
-        `;
-    const after = dedent`
+      `,
+      after: dedent`
         # H1
 
         ## H2
 
         Line
-        
+
         ### H3
-        `;
-    expect(rulesDict['heading-blank-lines'].apply(before)).toBe(after);
-  });
+      `,
+    },
+  ],
 });

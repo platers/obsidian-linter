@@ -1,198 +1,209 @@
+import ParagraphBlankLines from '../rules/paragraph-blank-lines';
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {ruleTest} from './common';
 
-describe('Paragraph blank lines', () => {
-  it('Ignores codeblocks', () => {
-    const before = dedent`
-    ---
-    front matter
-    front matter
-    ---
+ruleTest({
+  RuleBuilderClass: ParagraphBlankLines,
+  testCases: [
+    {
+      testName: 'Ignores codeblocks',
+      before: dedent`
+        ---
+        front matter
+        front matter
+        ---
 
-    Hello
-    World
-    \`\`\`python
-    # comment not header
-    a = b
-    c = d
-    \`\`\`
-    `;
-    const after = dedent`
-    ---
-    front matter
-    front matter
-    ---
+        Hello
+        World
+        \`\`\`python
+        # comment not header
+        a = b
+        c = d
+        \`\`\`
+      `,
+      after: dedent`
+        ---
+        front matter
+        front matter
+        ---
 
-    Hello
+        Hello
 
-    World
+        World
 
-    \`\`\`python
-    # comment not header
-    a = b
-    c = d
-    \`\`\`
-    `;
-    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
-  });
-  it('Handles lists', () => {
-    const before = dedent`
-    Hello
-    World
-    - 1
-    \t- 2
-        - 3
-    `;
-    const after = dedent`
-    Hello
+        \`\`\`python
+        # comment not header
+        a = b
+        c = d
+        \`\`\`
+      `,
+    },
+    {
+      testName: 'Handles lists',
+      before: dedent`
+        Hello
+        World
+        - 1
+        \t- 2
+            - 3
+      `,
+      after: dedent`
+        Hello
 
-    World
+        World
 
-    - 1
-    \t- 2
-        - 3
-    `;
-    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
-  });
-  // accounts for https://github.com/platers/obsidian-linter/issues/250
-  it('Paragraphs that start with numbers are spaced out', () => {
-    const before = dedent`
-    # Hello world
-
-
-    123 foo
-    123 bar
-    `;
-
-    const after = dedent`
-    # Hello world
-
-    123 foo
-
-    123 bar
-    `;
-
-    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
-  });
-  // accounts for https://github.com/platers/obsidian-linter/issues/250
-  it('Paragraphs that start with foreign characters are spaced out', () => {
-    const before = dedent`
-    # Hello world
+        - 1
+        \t- 2
+            - 3
+      `,
+    },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/250
+      testName: 'Paragraphs that start with numbers are spaced out',
+      before: dedent`
+        # Hello world
 
 
-    测试 foo
-    测试 bar
-    `;
+        123 foo
+        123 bar
+      `,
+      after: dedent`
+        # Hello world
 
-    const after = dedent`
-    # Hello world
+        123 foo
 
-    测试 foo
-
-    测试 bar
-    `;
-
-    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
-  });
-  // accounts for https://github.com/platers/obsidian-linter/issues/250
-  it('Paragraphs that start with whitespace characters are spaced out', () => {
-    const before = dedent`
-    # Hello world
-
-    foo
-    bar
-    `;
-
-    const after = dedent`
-    # Hello world
-
-    foo
-
-    bar
-    `;
-
-    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
-  });
-  it('Make sure blockquotes are not affected', () => {
-    const before = dedent`
-      # Hello world
-  
-      > blockquote
-      > blockquote line 2
-      `;
-
-    const after = dedent`
-      # Hello world
-  
-      > blockquote
-      > blockquote line 2
-      `;
-
-    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
-  });
-  it('Make sure lists are not affected', () => {
-    const before = dedent`
-      # Hello world
-  
-      > blockquote
-      > blockquote line 2
-      `;
-
-    const after = dedent`
-      # Hello world
-  
-      > blockquote
-      > blockquote line 2
-      `;
-
-    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
-  });
-  it('Make sure lines ending in a line break are not affected', () => {
-    const before = dedent`
-    # Hello world
+        123 bar
+      `,
+    },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/250
+      testName: 'Paragraphs that start with foreign characters are spaced out',
+      before: dedent`
+        # Hello world
 
 
-    paragraph line 1 <br>
-    paragraph line 2  
-    paragraph line 3 <br/>
-    paragraph final line
+        测试 foo
+        测试 bar
+      `,
+      after: dedent`
+        # Hello world
+
+        测试 foo
+
+        测试 bar
+      `,
+    },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/250
+      testName: 'Paragraphs that start with whitespace characters are spaced out',
+      before: dedent`
+        # Hello world
+
+        foo
+        bar
+      `,
+      after: dedent`
+        # Hello world
+
+        foo
+
+        bar
+      `,
+    },
+    {
+      testName: 'Make sure blockquotes are not affected',
+      before: dedent`
+        # Hello world
+    
+        > blockquote
+        > blockquote line 2
+      `,
+      after: dedent`
+        # Hello world
+    
+        > blockquote
+        > blockquote line 2
+      `,
+    },
+    {
+      testName: 'Make sure lists are not affected',
+      before: dedent`
+        # Hello world
+
+        > blockquote
+        > blockquote line 2
+      `,
+      after: dedent`
+        # Hello world
+
+        > blockquote
+        > blockquote line 2
+      `,
+    },
+    {
+      testName: 'Make sure lines ending in a line break are not affected',
+      before: dedent`
+        # Hello world
 
 
-    `;
+        paragraph line 1 <br>
+        paragraph line 2  
+        paragraph line 3 <br/>
+        paragraph final line
 
-    const after = dedent`
-    # Hello world
 
-    paragraph line 1 <br>
-    paragraph line 2  
-    paragraph line 3 <br/>
-    paragraph final line
-    `;
+      `,
+      after: dedent`
+        # Hello world
 
-    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
-  });
-  it('Make sure obsidian multiline comments are not affected', () => {
-    const before = dedent`
-    Here is some inline comments: %%You can't see this text%% (Can't see it)
+        paragraph line 1 <br>
+        paragraph line 2  
+        paragraph line 3 <br/>
+        paragraph final line
 
-    Here is a block comment:
-    %%
-    It can span
-    multiple lines
-    %%
-    `;
+      `,
+    },
+    {
+      testName: 'Make sure obsidian multiline comments are not affected',
+      before: dedent`
+        Here is some inline comments: %%You can't see this text%% (Can't see it)
 
-    const after = dedent`
-    Here is some inline comments: %%You can't see this text%% (Can't see it)
+        Here is a block comment:
+        %%
+        It can span
+        multiple lines
+        %%
+      `,
+      after: dedent`
+        Here is some inline comments: %%You can't see this text%% (Can't see it)
 
-    Here is a block comment:
+        Here is a block comment:
 
-    %%
-    It can span
-    multiple lines
-    %%
-    `;
+        %%
+        It can span
+        multiple lines
+        %%
+      `,
+    },
+    {
+      testName: 'Preserves trailing line break',
+      before: dedent`
+        Line followed by line break
 
-    expect(rulesDict['paragraph-blank-lines'].apply(before)).toBe(after);
-  });
+      `,
+      after: dedent`
+        Line followed by line break
+
+      `,
+    },
+    {
+      testName: 'Doesn\'t add trailing line break',
+      before: dedent`
+        Line not followed by line break
+      `,
+      after: dedent`
+        Line not followed by line break
+      `,
+    },
+  ],
 });

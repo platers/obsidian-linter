@@ -1,17 +1,21 @@
+import NoBareUrls from '../rules/no-bare-urls';
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {ruleTest} from './common';
 
-describe('Move Footnotes to the bottom', () => {
-  // accounts for https://github.com/platers/obsidian-linter/issues/275
-  it('Leaves markdown links and images alone', () => {
-    const before = dedent`
-    [regular link](https://google.com)
-    ![image alt text](https://github.com/favicon.ico)
-    `;
-    const after = dedent`
-    [regular link](https://google.com)
-    ![image alt text](https://github.com/favicon.ico)
-    `;
-    expect(rulesDict['no-bare-urls'].apply(before)).toBe(after);
-  });
+ruleTest({
+  RuleBuilderClass: NoBareUrls,
+  testCases: [
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/275
+      testName: 'Leaves markdown links and images alone',
+      before: dedent`
+        [regular link](https://google.com)
+        ![image alt text](https://github.com/favicon.ico)
+      `,
+      after: dedent`
+        [regular link](https://google.com)
+        ![image alt text](https://github.com/favicon.ico)
+      `,
+    },
+  ],
 });

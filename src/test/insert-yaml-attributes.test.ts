@@ -1,64 +1,83 @@
+import InsertYamlAttributes from '../rules/insert-yaml-attributes';
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {ruleTest} from './common';
 
-describe('Insert yaml attributes', () => {
-  it('Inits yaml if it does not exist', () => {
-    const before = dedent`
-      `;
-    const after = dedent`
-      ---
-      tags:
-      ---
-      
-      `;
-    expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
-  });
-  // accounts for https://github.com/platers/obsidian-linter/issues/176
-  it('Inits yaml when the file has --- in it and no frontmatter', () => {
-    const before = dedent`
-    # Heading
-    Text
+ruleTest({
+  RuleBuilderClass: InsertYamlAttributes,
+  testCases: [
+    {
+      testName: 'Inits yaml if it does not exist',
+      before: dedent`
+      `,
+      after: dedent`
+        ---
+        tags:
+        ---
 
-    # Heading
-    - Text
-    - Text
-    ---
+      `,
+      options: {
+        textToInsert: [
+          'tags:',
+        ],
+      },
+    },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/176
+      testName: 'Inits yaml when the file has --- in it and no frontmatter',
+      before: dedent`
+        # Heading
+        Text
 
-    `;
-    const after = dedent`
-    ---
-    tags:
-    ---
-    # Heading
-    Text
+        # Heading
+        - Text
+        - Text
+        ---
 
-    # Heading
-    - Text
-    - Text
-    ---
+      `,
+      after: dedent`
+        ---
+        tags:
+        ---
+        # Heading
+        Text
 
-    `;
-    expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'tags:'})).toBe(after);
-  });
-  // accounts for https://github.com/platers/obsidian-linter/issues/157
-  it('When a file has tabs at the start of a line in the frontmatter, the yaml insertion still works leaving other tabs as they were', () => {
-    const before = dedent`
-      ---
-      title: this title\thas a tab
-      tags:
-      \t- test1
-      \t- test2
-      ---
-      `;
-    const after = dedent`
-      ---
-      blob:
-      title: this title\thas a tab
-      tags:
-      \t- test1
-      \t- test2
-      ---
-      `;
-    expect(rulesDict['insert-yaml-attributes'].apply(before, {'Text to insert': 'blob:'})).toBe(after);
-  });
+        # Heading
+        - Text
+        - Text
+        ---
+
+      `,
+      options: {
+        textToInsert: [
+          'tags:',
+        ],
+      },
+    },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/157
+      testName: 'When a file has tabs at the start of a line in the frontmatter, the yaml insertion still works leaving other tabs as they were',
+      before: dedent`
+        ---
+        title: this title\thas a tab
+        tags:
+        \t- test1
+        \t- test2
+        ---
+      `,
+      after: dedent`
+        ---
+        blob:
+        title: this title\thas a tab
+        tags:
+        \t- test1
+        \t- test2
+        ---
+      `,
+      options: {
+        textToInsert: [
+          'blob:',
+        ],
+      },
+    },
+  ],
 });

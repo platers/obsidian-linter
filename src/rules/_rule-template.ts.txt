@@ -1,0 +1,54 @@
+// Basic Rule template
+//
+// Simply perform text replace `RuleTemplate` with your rule, e.g. `MyNewRule`
+// And save the file as `my-new-rule.ts`
+
+import {Options, RuleType} from '../rules';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
+import dedent from 'ts-dedent';
+
+class RuleTemplateOptions implements Options {
+  someProperty: string = 'some default value';
+}
+
+@RuleBuilder.register
+export default class RuleTemplate extends RuleBuilder<RuleTemplateOptions> {
+  get OptionsClass(): new () => RuleTemplateOptions {
+    return RuleTemplateOptions;
+  }
+  get name(): string {
+    return '{CHOOSE_PROPER_NAME}';
+  }
+  get description(): string {
+    return '{CHOOSE_PROPER_DESCRIPTION}';
+  }
+  get type(): RuleType {
+    return RuleType.CHOOSE_PROPER_TYPE;
+  }
+  apply(text: string, options: RuleTemplateOptions): string {
+    return '{PUT_PROPER_IMPLEMENTATION}';
+  }
+  get exampleBuilders(): ExampleBuilder<RuleTemplateOptions>[] {
+    return [
+      new ExampleBuilder({
+        description: 'Example',
+        before: dedent`
+          Before
+        `,
+        after: dedent`
+          After
+        `
+      })
+    ];
+  }
+  get optionBuilders(): OptionBuilderBase<RuleTemplateOptions>[] {
+    return [
+      new TextOptionBuilder({
+        OptionsClass: RuleTemplateOptions,
+        name: 'option 1',
+        description: 'description 1',
+        optionsKey: 'someProperty'
+      })
+    ];
+  }
+}

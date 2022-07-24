@@ -1,39 +1,43 @@
+import HeaderIncrement from '../rules/header-increment';
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {ruleTest} from './common';
 
-describe('Header Increment', () => {
-  it('Handles large increments', () => {
-    const before = dedent`
+ruleTest({
+  RuleBuilderClass: HeaderIncrement,
+  testCases: [
+    {
+      testName: 'Handles large increments',
+      before: dedent`
         # H1
         #### H4
         ####### H7
-        `;
-    const after = dedent`
+      `,
+      after: dedent`
         # H1
         ## H4
         ### H7
-        `;
-    expect(rulesDict['header-increment'].apply(before)).toBe(after);
-  });
-  it('Handles change from decrement to regular increment', () => {
-    const before = dedent`
+      `,
+    },
+    {
+      testName: 'Handles change from decrement to regular increment',
+      before: dedent`
         # H1
         ##### H5
         ####### H7
         ###### H6
         ## H2
-        `;
-    const after = dedent`
+      `,
+      after: dedent`
         # H1
         ## H5
         ### H7
         ## H6
         ## H2
-        `;
-    expect(rulesDict['header-increment'].apply(before)).toBe(after);
-  });
-  it('Handles a variety of changes in header size', () => {
-    const before = dedent`
+      `,
+    },
+    {
+      testName: 'Handles a variety of changes in header size',
+      before: dedent`
         # H1
         ### H3
         #### H4
@@ -46,8 +50,8 @@ describe('Header Increment', () => {
         ###### H6
         ##### H5
         ### H3
-        `;
-    const after = dedent`
+      `,
+      after: dedent`
         # H1
         ## H3
         ### H4
@@ -60,7 +64,7 @@ describe('Header Increment', () => {
         ##### H6
         ##### H5
         ### H3
-        `;
-    expect(rulesDict['header-increment'].apply(before)).toBe(after);
-  });
+      `,
+    },
+  ],
 });

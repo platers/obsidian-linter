@@ -1,0 +1,210 @@
+import {Example, Options, Rule, RuleType, registerRule, LinterSettings} from '../rules';
+import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
+import {logDebug} from '../logger';
+
+export abstract class RuleBuilderBase {
+  static #ruleMap = new Map<string, Rule>();
+
+  static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
+    if (!RuleBuilderBase.#ruleMap.has(this.name)) {
+      const builder = new this();
+      const rule = new Rule(builder.name, builder.description, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder);
+      RuleBuilderBase.#ruleMap.set(this.name, rule);
+    }
+
+    return RuleBuilderBase.#ruleMap.get(this.name);
+  }
+
+  static applyIfEnabledBase(rule: Rule, text: string, settings: LinterSettings, extraOptions: Options): [result: string, isEnabled: boolean] {
+    const optionsFromSettings = rule.getOptions(settings);
+    if (optionsFromSettings[rule.enabledOptionName()]) {
+      const options = Object.assign({}, optionsFromSettings, extraOptions) as Options;
+      logDebug(`Running ${rule.name}`);
+      return [rule.apply(text, options), true];
+    } else {
+      return [text, false];
+    }
+  }
+}
+
+export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
+  abstract get OptionsClass(): (new() => TOptions);
+
+  static register<TOptions extends Options>(RuleBuilderClass: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>)): void {
+    const rule = RuleBuilderClass.getRule();
+    registerRule(rule);
+  }
+
+  safeApply(text: string, options?: Options): string {
+    return this.apply(text, this.buildRuleOptions(options));
+  }
+
+  buildRuleOptions(options?: Options): TOptions {
+    options = options ?? {};
+    const defaultOptions = new this.OptionsClass();
+    const ruleOptions = Object.assign(defaultOptions, options) as TOptions;
+
+    for (const optionBuilder of this.optionBuilders) {
+      optionBuilder.setRuleOption(ruleOptions, options);
+    }
+
+    return ruleOptions;
+  }
+
+  abstract get name(): string;
+  abstract get description(): string;
+  abstract get type(): RuleType;
+  abstract apply(text: string, options: TOptions): string;
+  abstract get exampleBuilders(): ExampleBuilder<TOptions>[];
+  abstract get optionBuilders(): OptionBuilderBase<TOptions>[];
+  get hasSpecialExecutionOrder(): boolean {
+    return false;
+  }
+
+  static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, extraOptions?: TOptions): [result: string, isEnabled: boolean] {
+    const rule = this.getRule();
+    return RuleBuilderBase.applyIfEnabledBase(rule, text, settings, extraOptions);
+  }
+
+  static getRuleOptions<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>), settings: LinterSettings): TOptions {
+    const rule = RuleBuilderBase.getRule.bind(this)();
+    const builder = new this();
+    const optionsFromSettings = rule.getOptions(settings);
+    return builder.buildRuleOptions(optionsFromSettings);
+  }
+}
+
+export class ExampleBuilder<TOptions extends Options> {
+  readonly example: Example;
+
+  // HACK to bypass the Typescript generics system flaw
+  // https://github.com/microsoft/TypeScript/wiki/FAQ#why-is-astring-assignable-to-anumber-for-interface-at--
+  #_: TOptions;
+
+  constructor(args: {
+    description: string,
+    before: string,
+    after: string,
+    options?: TOptions
+  }) {
+    this.example = new Example(args.description, args.before, args.after, args.options);
+  }
+}
+
+type KeysOfObjectMatchingPropertyValueType<TObject, TValue> = {[TKey in keyof TObject]-?: TObject[TKey] extends TValue ? (TValue extends TObject[TKey] ? TKey : never) : never }[keyof TObject & string];
+
+type OptionBuilderConstructorArgs<TOptions extends Options, TValue> = {
+  OptionsClass: (new() => TOptions),
+  name: string
+  description: string,
+  optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
+};
+
+export abstract class OptionBuilderBase<TOptions extends Options> {
+  abstract setRuleOption(ruleOptions: TOptions, options: Options): void;
+  abstract get option(): Option;
+}
+
+export abstract class OptionBuilder<TOptions extends Options, TValue> {
+  readonly OptionsClass: (new() => TOptions);
+  readonly name: string;
+  readonly description: string;
+  readonly optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
+  #option: Option;
+
+  constructor(args: OptionBuilderConstructorArgs<TOptions, TValue>) {
+    this.OptionsClass = args.OptionsClass;
+    this.name = args.name;
+    this.description = args.description;
+    this.optionsKey = args.optionsKey;
+  }
+
+  protected get defaultValue(): TValue {
+    return new this.OptionsClass()[this.optionsKey];
+  }
+
+  get option(): Option {
+    if (!this.#option) {
+      this.#option = this.buildOption();
+    }
+
+    return this.#option;
+  }
+
+  setRuleOption(ruleOptions: TOptions, options: Options) {
+    // `as TValue` is not enough because of the https://github.com/microsoft/TypeScript/issues/48992
+    const optionValue = options[this.name] as TOptions[KeysOfObjectMatchingPropertyValueType<TOptions, TValue>];
+    if (optionValue !== undefined) {
+      ruleOptions[this.optionsKey] = optionValue;
+    }
+  }
+
+  protected abstract buildOption(): Option;
+}
+
+export class BooleanOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, boolean> {
+  protected buildOption(): Option {
+    return new BooleanOption(this.name, this.description, this.defaultValue);
+  }
+}
+
+export class NumberOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, Number> {
+  protected buildOption(): Option {
+    return new TextOption(this.name, this.description, this.defaultValue);
+  }
+}
+
+export class DropdownOptionBuilder<TOptions extends Options, TValue extends string> extends OptionBuilder<TOptions, TValue> {
+  readonly records: DropdownRecord[];
+
+  constructor(args: OptionBuilderConstructorArgs<TOptions, TValue> & {
+    records: {
+      value: TValue,
+      description: string
+    }[]
+  }) {
+    super(args);
+    this.records = args.records.map((record) => new DropdownRecord(record.value, record.description));
+  }
+
+  protected buildOption(): Option {
+    return new DropdownOption(this.name, this.description, this.defaultValue, this.records);
+  }
+}
+
+export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string[]> {
+  separator: string;
+  splitter: RegExp;
+  constructor(args: OptionBuilderConstructorArgs<TOptions, string[]> & {
+    separator?: string,
+    splitter?: RegExp
+  }) {
+    super(args);
+    this.separator = args.separator ?? '\n';
+    this.splitter = args.splitter ?? /\n/;
+  }
+
+
+  protected buildOption(): Option {
+    return new TextAreaOption(this.name, this.description, this.defaultValue.join(this.separator));
+  }
+
+  setRuleOption(ruleOptions: TOptions, options: Options) {
+    if (options[this.name] !== undefined) {
+      // `as string[]` is not enough because of the https://github.com/microsoft/TypeScript/issues/48992
+      ruleOptions[this.optionsKey] = (options[this.name] as string).split(this.splitter) as TOptions[KeysOfObjectMatchingPropertyValueType<TOptions, string[]>];
+    }
+  }
+}
+
+export class TextOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
+  protected buildOption(): Option {
+    return new TextOption(this.name, this.description, this.defaultValue);
+  }
+}
+
+export class MomentFormatOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
+  protected buildOption(): Option {
+    return new MomentFormatOption(this.name, this.description, this.defaultValue);
+  }
+}
