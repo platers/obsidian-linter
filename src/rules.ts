@@ -5,13 +5,10 @@ import {
 import {
   Option,
   BooleanOption,
-  DropdownOption,
-  DropdownRecord,
-  TextAreaOption,
 } from './option';
 import {ignoreListOfTypes, IgnoreTypes} from './utils/ignore-types';
 import {moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
-import {yamlRegex, escapeDollarSigns, headerRegex, removeSpacesInWikiLinkText} from './utils/regex';
+import {yamlRegex, removeSpacesInWikiLinkText} from './utils/regex';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -171,163 +168,6 @@ export function getDisabledRules(text: string): string[] {
 }
 
 export const rules: Rule[] = [
-  new Rule(
-      'Capitalize Headings',
-      'Headings should be formatted with capitalization',
-      RuleType.HEADING,
-      (text: string, options = {}) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          const lines = text.split('\n');
-          for (let i = 0; i < lines.length; i++) {
-            const match = lines[i].match(headerRegex); // match only headings
-            if (!match) {
-              continue;
-            }
-            switch (options['Style']) {
-              case 'Title Case': {
-                const headerWords = lines[i].match(/\S+/g);
-                // split by comma or whitespace
-                const keepCasing = (options['Ignore Words'] as string).split(
-                    /[,\s]+/,
-                );
-                const ignoreShortWords = (
-                options['Lowercase Words'] as string
-                ).split(/[,\s]+/);
-                let firstWord = true;
-                for (let j = 1; j < headerWords.length; j++) {
-                  const isWord = headerWords[j].match(/^[A-Za-z'-]+[.?!,:;]?$/);
-                  if (!isWord) {
-                    continue;
-                  }
-
-                  const ignoreCasedWord =
-                  options['Ignore Cased Words'] &&
-                  headerWords[j] !== headerWords[j].toLowerCase();
-                  const keepWordCasing =
-                  ignoreCasedWord || keepCasing.includes(headerWords[j]);
-                  if (!keepWordCasing) {
-                    headerWords[j] = headerWords[j].toLowerCase();
-                    const ignoreWord = ignoreShortWords.includes(headerWords[j]);
-                    if (!ignoreWord || firstWord === true) {
-                    // ignore words that are not capitalized in titles except if they are the first word
-                      headerWords[j] =
-                      headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
-                    }
-                  }
-
-                  firstWord = false;
-                }
-
-                lines[i] = lines[i].replace(
-                    headerRegex,
-                    escapeDollarSigns(`${headerWords.join(' ')}`),
-                );
-                break;
-              }
-              case 'ALL CAPS':
-                lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
-                break;
-              case 'First letter':
-                lines[i] = lines[i]
-                    .toLowerCase()
-                    .replace(/^#*\s+([^a-z])*([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
-                break;
-            }
-          }
-          return lines.join('\n');
-        });
-      },
-      [
-        new Example(
-            'With `Title Case=true`, `Ignore Cased Words=false`',
-            dedent`
-        # this is a heading 1
-        ## THIS IS A HEADING 2
-        ### a heading 3
-        `,
-            dedent`
-        # This is a Heading 1
-        ## This is a Heading 2
-        ### A Heading 3
-        `,
-            {'Style': 'Title Case', 'Ignore Cased Words': false},
-        ),
-        new Example(
-            'With `Title Case=true`, `Ignore Cased Words=true`',
-            dedent`
-        # this is a heading 1
-        ## THIS IS A HEADING 2
-        ### a hEaDiNg 3
-        `,
-            dedent`
-        # This is a Heading 1
-        ## THIS IS A HEADING 2
-        ### A hEaDiNg 3
-        `,
-            {'Style': 'Title Case', 'Ignore Cased Words': true},
-        ),
-        new Example(
-            'With `First letter=true`',
-            dedent`
-        # this is a heading 1
-        ## this is a heading 2
-        `,
-            dedent`
-        # This is a heading 1
-        ## This is a heading 2
-        `,
-            {Style: 'First letter'},
-        ),
-        new Example(
-            'With `ALL CAPS=true`',
-            dedent`
-        # this is a heading 1
-        ## this is a heading 2
-        `,
-            dedent`
-        # THIS IS A HEADING 1
-        ## THIS IS A HEADING 2
-        `,
-            {Style: 'ALL CAPS'},
-        ),
-      ],
-      [
-        new DropdownOption(
-            'Style',
-            'The style of capitalization to use',
-            'Title Case',
-            [
-              new DropdownRecord('Title Case', 'Capitalize Using Title Case Rules'),
-              new DropdownRecord(
-                  'ALL CAPS',
-                  'CAPITALIZE THE WHOLE TITLE',
-              ),
-              new DropdownRecord(
-                  'First letter',
-                  'Only capitalize the first letter',
-              ),
-            ],
-        ),
-        new BooleanOption(
-            'Ignore Cased Words',
-            'Only apply title case style to words that are all lowercase',
-            true,
-        ),
-        new TextAreaOption(
-            'Ignore Words',
-            'A comma separated list of words to ignore when capitalizing',
-            dedent`
-          macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript`,
-        ),
-        new TextAreaOption(
-            'Lowercase Words',
-            'A comma separated list of words to keep lowercase',
-            dedent`
-          via, a, an, the, and, or, but, for, nor, so, yet, at, by, in, of, on, to, up, as, is, if, it, for, to, with, without, into, onto, per`,
-        ),
-      ],
-  ),
-
   // Footnote rules
 
   new Rule(
