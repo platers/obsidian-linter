@@ -29,6 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
     "babel-jest": "^27.0.6",
+    "babel-plugin-import-glob": "^2.0.0",
     "eslint": "^7.32.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-jest": "^25.0.5",
