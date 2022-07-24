@@ -169,29 +169,6 @@ export function getDisabledRules(text: string): string[] {
 
 export const rules: Rule[] = [
   new Rule(
-      'Footnote after Punctuation',
-      'Ensures that footnote references are placed after punctuation, not before.',
-      RuleType.FOOTNOTE,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-        // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
-        // needed to ensure that no footnote text followed by ":" is matched
-          return text.replace(/(?!^)(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
-        });
-      },
-      [
-        new Example(
-            'Placing footnotes after punctuation.',
-            dedent`
-            Lorem[^1]. Ipsum[^2], doletes.
-        `,
-            dedent`
-            Lorem.[^1] Ipsum,[^2] doletes.
-        `,
-        ),
-      ],
-  ),
-  new Rule(
       'Space between Chinese and English or numbers',
       'Ensures that Chinese and English or numbers are separated by a single space. Follow this [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)',
       RuleType.SPACING,
