@@ -1,8 +1,8 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {yamlRegex} from 'src/utils/regex';
-import {removeYamlSection} from 'src/utils/yaml';
+import {yamlRegex} from '../utils/regex';
+import {removeYamlSection} from '../utils/yaml';
 
 class RemoveYamlKeysOptions implements Options {
   yamlKeysToRemove: string[] = [];

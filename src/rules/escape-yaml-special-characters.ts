@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {formatYAML} from 'src/utils/yaml';
+import {formatYAML} from '../utils/yaml';
 
 type DefaultEscapeCharacter = '"' | '\'';
 
