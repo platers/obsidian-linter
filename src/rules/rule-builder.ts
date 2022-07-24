@@ -100,8 +100,10 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
-    if (options[this.name] !== undefined) {
-      ruleOptions[this.optionsKey] = options[this.name];
+    // `as TValue` is not enough because of the https://github.com/microsoft/TypeScript/issues/48992
+    const optionValue = options[this.name] as TOptions[KeysOfObjectMatchingPropertyValueType<TOptions, TValue>];
+    if (optionValue !== undefined) {
+      ruleOptions[this.optionsKey] = optionValue;
     }
   }
 
