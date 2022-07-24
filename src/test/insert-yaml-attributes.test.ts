@@ -16,7 +16,9 @@ ruleTest({
 
       `,
       options: {
-        textToInsert: 'tags:',
+        textToInsert: [
+          'tags:',
+        ],
       },
     },
     {
@@ -46,7 +48,9 @@ ruleTest({
 
       `,
       options: {
-        textToInsert: 'tags:',
+        textToInsert: [
+          'tags:',
+        ],
       },
     },
     {
@@ -70,7 +74,9 @@ ruleTest({
         ---
       `,
       options: {
-        textToInsert: 'blob:',
+        textToInsert: [
+          'blob:',
+        ],
       },
     },
   ],

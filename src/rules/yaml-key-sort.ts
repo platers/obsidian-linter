@@ -11,7 +11,7 @@ class YamlKeySortOptions implements Options {
   dateModifiedKey?: string;
   currentTimeFormatted?: string;
   yamlTimestampDateModifiedEnabled?: boolean;
-  yamlKeyPrioritySortOrder?: string = '';
+  yamlKeyPrioritySortOrder?: string[] = [];
   yamlSortOrderForOtherKeys?: YamlSortOrderForOtherKeys = 'None';
 }
 
@@ -80,7 +80,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
       };
     };
 
-    const yamlKeys: string[] = options.yamlKeyPrioritySortOrder.split('\n');
+    const yamlKeys: string[] = options.yamlKeyPrioritySortOrder;
     const sortKeysResult = getYAMLKeysSorted(yamlText, yamlKeys);
     const priorityKeysSorted = sortKeysResult.sortedYamlKeyValues;
     yamlText = sortKeysResult.remainingYaml;
@@ -144,7 +144,11 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
           ---
         `,
         options: {
-          yamlKeyPrioritySortOrder: 'date\ntype\nlanguage',
+          yamlKeyPrioritySortOrder: [
+            'date',
+            'type',
+            'language',
+          ],
           yamlSortOrderForOtherKeys: 'None',
           priorityKeysAtStartOfYaml: true,
         },
@@ -172,7 +176,11 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
           ---
         `,
         options: {
-          yamlKeyPrioritySortOrder: 'date\ntype\nlanguage',
+          yamlKeyPrioritySortOrder: [
+            'date',
+            'type',
+            'language',
+          ],
           yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
         },
       }),
@@ -199,7 +207,11 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
           ---
         `,
         options: {
-          yamlKeyPrioritySortOrder: 'date\ntype\nlanguage',
+          yamlKeyPrioritySortOrder: [
+            'date',
+            'type',
+            'language',
+          ],
           yamlSortOrderForOtherKeys: 'Descending Alphabetical',
           priorityKeysAtStartOfYaml: true,
         },
@@ -228,7 +240,11 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
           ---
         `,
         options: {
-          yamlKeyPrioritySortOrder: 'date\ntype\nlanguage',
+          yamlKeyPrioritySortOrder: [
+            'date',
+            'type',
+            'language',
+          ],
           yamlSortOrderForOtherKeys: 'Descending Alphabetical',
           priorityKeysAtStartOfYaml: false,
         },

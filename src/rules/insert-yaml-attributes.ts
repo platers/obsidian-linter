@@ -5,7 +5,10 @@ import {formatYAML, initYAML, loadYAML} from '../utils/yaml';
 import {escapeDollarSigns, yamlRegex} from '../utils/regex';
 
 class InsertYamlAttributesOptions implements Options {
-  textToInsert: string = 'aliases: \ntags: ';
+  textToInsert: string[] = [
+    'aliases: ',
+    'tags: ',
+  ];
 }
 
 @RuleBuilder.register
@@ -25,9 +28,7 @@ export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttribut
   apply(text: string, options: InsertYamlAttributesOptions): string {
     text = initYAML(text);
     return formatYAML(text, (text) => {
-      const insert_lines = String(options.textToInsert)
-          .split('\n')
-          .reverse();
+      const insert_lines = options.textToInsert.reverse();
       const parsed_yaml = loadYAML(text.match(yamlRegex)[1]);
 
       for (const line of insert_lines) {
@@ -57,7 +58,11 @@ export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttribut
           ---
         `,
         options: {
-          textToInsert: 'aliases:\ntags: doc\nanimal: dog',
+          textToInsert: [
+            'aliases:',
+            'tags: doc',
+            'animal: dog',
+          ],
         },
       }),
     ];

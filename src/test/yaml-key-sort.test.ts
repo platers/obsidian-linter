@@ -30,7 +30,11 @@ ruleTest({
         ---
       `,
       options: {
-        yamlKeyPrioritySortOrder: 'date\ntype\nlanguage',
+        yamlKeyPrioritySortOrder: [
+          'date',
+          'type',
+          'language',
+        ],
         dateModifiedKey: 'modified',
         currentTimeFormatted: 'Thursday, January 2nd 2020, 12:00:00 am',
         yamlTimestampDateModifiedEnabled: true,

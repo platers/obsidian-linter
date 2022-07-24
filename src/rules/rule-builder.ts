@@ -138,9 +138,15 @@ export class DropdownOptionBuilder<TOptions extends Options, TValue extends stri
   }
 }
 
-export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
+export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string[]> {
   protected buildOption(): Option {
-    return new TextAreaOption(this.name, this.description, this.defaultValue);
+    return new TextAreaOption(this.name, this.description, this.defaultValue.join('\n'));
+  }
+
+  setRuleOption(ruleOptions: TOptions, options: Options) {
+    if (options[this.name] !== undefined) {
+      ruleOptions[this.optionsKey] = options[this.name].split('\n');
+    }
   }
 }
 
