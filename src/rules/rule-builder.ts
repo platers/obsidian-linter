@@ -100,7 +100,7 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
-    if (ruleOptions[this.optionsKey] === undefined) {
+    if (options[this.name] !== undefined) {
       ruleOptions[this.optionsKey] = options[this.name];
     }
   }
