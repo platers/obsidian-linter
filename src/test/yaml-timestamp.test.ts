@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import moment from 'moment';
+import moment from '../moment-with-locales';
 import {ruleTest} from './common';
 import YamlTimestamp from '../rules/yaml-timestamp';
 

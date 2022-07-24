@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MomentFormatOptionBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML, initYAML} from '../utils/yaml';
-import moment from 'moment';
+import moment from '../moment-with-locales';
 import {escapeDollarSigns} from '../utils/regex';
 import {insert} from '../utils/strings';
 
