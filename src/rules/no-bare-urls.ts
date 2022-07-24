@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
@@ -96,7 +96,7 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<NoBareUrlsOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<NoBareUrlsOptions>[] {
     return [];
   }
 }

@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 
@@ -46,7 +46,7 @@ export default class RemoveConsecutiveListMarkers extends RuleBuilder<RemoveCons
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<RemoveConsecutiveListMarkersOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<RemoveConsecutiveListMarkersOptions>[] {
     return [];
   }
 }

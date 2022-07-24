@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML, initYAML, loadYAML} from '../utils/yaml';
 import {escapeDollarSigns, yamlRegex} from '../utils/regex';
@@ -62,7 +62,7 @@ export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttribut
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<InsertYamlAttributesOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<InsertYamlAttributesOptions>[] {
     return [
       new TextAreaOptionBuilder({
         OptionsClass: InsertYamlAttributesOptions,

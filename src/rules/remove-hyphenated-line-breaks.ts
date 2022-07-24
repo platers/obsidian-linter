@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 
@@ -38,7 +38,7 @@ export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphen
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<RemoveHyphenatedLineBreaksOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<RemoveHyphenatedLineBreaksOptions>[] {
     return [];
   }
 }

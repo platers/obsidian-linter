@@ -1,6 +1,6 @@
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, NumberOptionBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, NumberOptionBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
 class ConvertSpacesToTabsOptions implements Options {
@@ -59,7 +59,7 @@ export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabs
       /* eslint-enable no-mixed-spaces-and-tabs, no-tabs */
     ];
   }
-  get optionBuilders(): OptionBuilder<ConvertSpacesToTabsOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<ConvertSpacesToTabsOptions>[] {
     return [
       new NumberOptionBuilder({
         OptionsClass: ConvertSpacesToTabsOptions,

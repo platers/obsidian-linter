@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML} from '../utils/yaml';
 
@@ -77,7 +77,7 @@ export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOption
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<FormatTagsInYamlOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<FormatTagsInYamlOptions>[] {
     return [];
   }
 }

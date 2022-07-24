@@ -1,6 +1,6 @@
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
 class TrailingSpacesOptions implements Options {
@@ -64,7 +64,7 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<TrailingSpacesOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<TrailingSpacesOptions>[] {
     return [
       new BooleanOptionBuilder({
         OptionsClass: TrailingSpacesOptions,

@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder, RuleBuilderBase} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, RuleBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent} from '../utils/mdast';
@@ -111,7 +111,7 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<TwoSpacesBetweenLinesWithContentOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<TwoSpacesBetweenLinesWithContentOptions>[] {
     return [];
   }
 }

@@ -1,6 +1,6 @@
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
 class HeadingBlankLinesOptions implements Options {
@@ -86,7 +86,7 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<HeadingBlankLinesOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<HeadingBlankLinesOptions>[] {
     return [
       new BooleanOptionBuilder({
         OptionsClass: HeadingBlankLinesOptions,

@@ -1,7 +1,7 @@
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs} from '../utils/mdast';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
 class ParagraphBlankLinesOptions implements Options {
@@ -43,7 +43,7 @@ export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLines
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<ParagraphBlankLinesOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<ParagraphBlankLinesOptions>[] {
     return [];
   }
 }

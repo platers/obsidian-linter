@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MomentFormatOptionBuilder, OptionBuilder, TextOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MomentFormatOptionBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML, initYAML} from '../utils/yaml';
 import moment from 'moment';
@@ -201,7 +201,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<YamlTimestampOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<YamlTimestampOptions>[] {
     return [
       new BooleanOptionBuilder({
         OptionsClass: YamlTimestampOptions,

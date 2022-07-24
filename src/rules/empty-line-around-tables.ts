@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ensureEmptyLinesAroundRegexMatches, tableRegex} from '../utils/regex';
 
@@ -102,7 +102,7 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<EmptyLineAroundTablesOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<EmptyLineAroundTablesOptions>[] {
     return [];
   }
 }

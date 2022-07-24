@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ensureEmptyLinesAroundRegexMatches} from '../utils/regex';
 
@@ -61,7 +61,7 @@ export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineArou
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<EmptyLineAroundCodeFencesOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<EmptyLineAroundCodeFencesOptions>[] {
     return [];
   }
 }

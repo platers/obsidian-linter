@@ -1,6 +1,6 @@
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
 class ConsecutiveBlankLinesOptions implements Options {
@@ -43,7 +43,7 @@ export default class ConsecutiveBlankLines extends RuleBuilder<ConsecutiveBlankL
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<ConsecutiveBlankLinesOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<ConsecutiveBlankLinesOptions>[] {
     return [];
   }
 }

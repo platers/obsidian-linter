@@ -1,6 +1,6 @@
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
 class RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions implements Options {
@@ -113,7 +113,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions>[] {
     return [];
   }
 }

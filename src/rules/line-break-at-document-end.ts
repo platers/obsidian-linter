@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
 class LineBreakAtDocumentEndOptions implements Options {
@@ -51,7 +51,7 @@ export default class LineBreakAtDocumentEnd extends RuleBuilder<LineBreakAtDocum
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<LineBreakAtDocumentEndOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<LineBreakAtDocumentEndOptions>[] {
     return [];
   }
 }

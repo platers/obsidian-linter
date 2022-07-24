@@ -1,6 +1,6 @@
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
 class ConvertBulletListMarkersOptions implements Options {
@@ -54,7 +54,7 @@ export default class ConvertBulletListMarkers extends RuleBuilder<ConvertBulletL
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<ConvertBulletListMarkersOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<ConvertBulletListMarkersOptions>[] {
     return [];
   }
 }

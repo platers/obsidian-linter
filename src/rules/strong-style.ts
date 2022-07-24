@@ -1,6 +1,6 @@
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {makeEmphasisOrBoldConsistent} from '../utils/mdast';
 
@@ -163,7 +163,7 @@ export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<StrongStyleOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<StrongStyleOptions>[] {
     return [
       new DropdownOptionBuilder<StrongStyleOptions, StrongStyleValues>({
         OptionsClass: StrongStyleOptions,

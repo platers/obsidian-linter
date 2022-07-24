@@ -1,6 +1,6 @@
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
 class RemoveEmptyListMarkersOptions implements Options {
@@ -41,7 +41,7 @@ export default class RemoveEmptyListMarkers extends RuleBuilder<RemoveEmptyListM
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<RemoveEmptyListMarkersOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<RemoveEmptyListMarkersOptions>[] {
     return [];
   }
 }

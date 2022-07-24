@@ -29,10 +29,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     const ruleOptions = Object.assign(defaultOptions, options) as TOptions;
 
     for (const optionBuilder of this.optionBuilders) {
-      const optionsKey = optionBuilder.optionsKey as keyof TOptions;
-      if (ruleOptions[optionsKey] === undefined) {
-        ruleOptions[optionsKey] = options[optionBuilder.name];
-      }
+      optionBuilder.setRuleOption(ruleOptions, options);
     }
     return this.apply(text, ruleOptions);
   }
@@ -42,7 +39,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   abstract get type(): RuleType;
   abstract apply(text: string, options: TOptions): string;
   abstract get exampleBuilders(): ExampleBuilder<TOptions>[];
-  abstract get optionBuilders(): OptionBuilder<TOptions, any>[];
+  abstract get optionBuilders(): OptionBuilderBase<TOptions>[];
 }
 
 export class ExampleBuilder<TOptions extends Options> {
@@ -71,6 +68,11 @@ type OptionBuilderConstructorArgs<TOptions extends Options, TValue> = {
   optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
 };
 
+export abstract class OptionBuilderBase<TOptions extends Options> {
+  abstract setRuleOption(ruleOptions: TOptions, options: Options): void;
+  abstract get option(): Option;
+}
+
 export abstract class OptionBuilder<TOptions extends Options, TValue> {
   readonly OptionsClass: (new() => TOptions);
   readonly name: string;
@@ -95,6 +97,12 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
     }
 
     return this.#option;
+  }
+
+  setRuleOption(ruleOptions: TOptions, options: Options) {
+    if (ruleOptions[this.optionsKey] === undefined) {
+      ruleOptions[this.optionsKey] = options[this.name];
+    }
   }
 
   protected abstract buildOption(): Option;

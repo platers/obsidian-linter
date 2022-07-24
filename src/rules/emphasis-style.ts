@@ -1,6 +1,6 @@
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {makeEmphasisOrBoldConsistent} from '../utils/mdast';
 
@@ -163,7 +163,7 @@ export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<EmphasisStyleOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<EmphasisStyleOptions>[] {
     return [
       new DropdownOptionBuilder<EmphasisStyleOptions, EmphasisStyleValues>({
         OptionsClass: EmphasisStyleOptions,

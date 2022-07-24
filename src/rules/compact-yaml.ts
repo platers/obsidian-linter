@@ -1,6 +1,6 @@
 import {formatYAML} from '../utils/yaml';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
 class CompactYamlOptions implements Options {
@@ -87,7 +87,7 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<CompactYamlOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<CompactYamlOptions>[] {
     return [
       new BooleanOptionBuilder({
         OptionsClass: CompactYamlOptions,

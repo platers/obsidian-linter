@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilder, TextOptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML, initYAML, toYamlString} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
@@ -88,7 +88,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
       }),
     ];
   }
-  get optionBuilders(): OptionBuilder<YamlTitleOptions, any>[] {
+  get optionBuilders(): OptionBuilderBase<YamlTitleOptions>[] {
     return [
       new TextOptionBuilder({
         OptionsClass: YamlTitleOptions,
