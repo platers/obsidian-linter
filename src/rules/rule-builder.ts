@@ -141,13 +141,26 @@ export class DropdownOptionBuilder<TOptions extends Options, TValue extends stri
 }
 
 export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string[]> {
+  separator: string;
+  splitter: RegExp;
+  constructor(args: OptionBuilderConstructorArgs<TOptions, string[]> & {
+    separator?: string,
+    splitter?: RegExp
+  }) {
+    super(args);
+    this.separator = args.separator ?? '\n';
+    this.splitter = args.splitter ?? /\n/;
+  }
+
+
   protected buildOption(): Option {
-    return new TextAreaOption(this.name, this.description, this.defaultValue.join('\n'));
+    return new TextAreaOption(this.name, this.description, this.defaultValue.join(this.separator));
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
     if (options[this.name] !== undefined) {
-      ruleOptions[this.optionsKey] = options[this.name].split('\n');
+      // `as string[]` is not enough because of the https://github.com/microsoft/TypeScript/issues/48992
+      ruleOptions[this.optionsKey] = (options[this.name] as string).split(this.splitter) as TOptions[KeysOfObjectMatchingPropertyValueType<TOptions, string[]>];
     }
   }
 }
