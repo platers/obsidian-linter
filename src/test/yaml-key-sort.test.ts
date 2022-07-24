@@ -1,40 +1,40 @@
+import YamlKeySort from '../rules/yaml-key-sort';
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {ruleTest} from './common';
 
-describe('YAML Key Sort', () => {
-  it('When the sort changes the yaml contents and yaml timestamp date modified is active, update date modified value', () => {
-    const before = dedent`
-      ---
-      language: Typescript
-      type: programming
-      tags: computer
-      keywords: []
-      status: WIP
-      date: 01/15/2022
-      modified: Wednesday, January 1st 2020, 12:00:00 am
-      ---
-      `;
-    const after = dedent`
-      ---
-      date: 01/15/2022
-      type: programming
-      language: Typescript
-      tags: computer
-      keywords: []
-      status: WIP
-      modified: Thursday, January 2nd 2020, 12:00:00 am
-      ---
-      `;
-
-    const options = {
-      'YAML Key Priority Sort Order': 'date\ntype\nlanguage',
-      'YAML Sort Order for Other Keys': 'None',
-      'Priority Keys at Start of YAML': true,
-      'Date Modified Key': 'modified',
-      'Current Time Formatted': 'Thursday, January 2nd 2020, 12:00:00 am',
-      'Already Modified': false,
-      'Yaml Timestamp Date Modified Enabled': true,
-    };
-    expect(rulesDict['yaml-key-sort'].apply(before, options)).toBe(after);
-  });
+ruleTest({
+  RuleBuilderClass: YamlKeySort,
+  testCases: [
+    {
+      testName: 'When the sort changes the yaml contents and yaml timestamp date modified is active, update date modified value',
+      before: dedent`
+        ---
+        language: Typescript
+        type: programming
+        tags: computer
+        keywords: []
+        status: WIP
+        date: 01/15/2022
+        modified: Wednesday, January 1st 2020, 12:00:00 am
+        ---
+      `,
+      after: dedent`
+        ---
+        date: 01/15/2022
+        type: programming
+        language: Typescript
+        tags: computer
+        keywords: []
+        status: WIP
+        modified: Thursday, January 2nd 2020, 12:00:00 am
+        ---
+      `,
+      options: {
+        yamlKeyPrioritySortOrder: 'date\ntype\nlanguage',
+        dateModifiedKey: 'modified',
+        currentTimeFormatted: 'Thursday, January 2nd 2020, 12:00:00 am',
+        yamlTimestampDateModifiedEnabled: true,
+      },
+    },
+  ],
 });
