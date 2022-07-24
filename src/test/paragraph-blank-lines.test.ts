@@ -160,6 +160,7 @@ ruleTest({
         paragraph line 2  
         paragraph line 3 <br/>
         paragraph final line
+
       `,
     },
     {
@@ -182,6 +183,26 @@ ruleTest({
         It can span
         multiple lines
         %%
+      `,
+    },
+    {
+      testName: 'Preserves trailing line break',
+      before: dedent`
+        Line followed by line break
+
+      `,
+      after: dedent`
+        Line followed by line break
+
+      `,
+    },
+    {
+      testName: 'Doesn\'t add trailing line break',
+      before: dedent`
+        Line not followed by line break
+      `,
+      after: dedent`
+        Line not followed by line break
       `,
     },
   ],
