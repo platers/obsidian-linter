@@ -13,15 +13,15 @@ export abstract class RuleBuilderBase {
 
     return RuleBuilderBase.#ruleMap.get(this.name);
   }
+}
+
+export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
+  abstract get OptionsClass(): (new() => TOptions);
 
   static register<TOptions extends Options>(RuleBuilderClass: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>)): void {
     const rule = RuleBuilderClass.getRule();
     registerRule(rule);
   }
-}
-
-export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
-  abstract get OptionsClass(): (new() => TOptions);
 
   safeApply(text: string, options?: Options): string {
     options = options ?? {};
