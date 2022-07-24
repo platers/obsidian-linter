@@ -59,7 +59,7 @@ export class ExampleBuilder<TOptions extends Options> {
   }
 }
 
-type KeysOfObjectMatchingPropertyValueType<TObject, TValue> = string & {[TKey in keyof TObject]-?: TObject[TKey] extends TValue ? TKey : (TValue extends TObject[TKey] ? TValue : never)}[keyof TObject];
+type KeysOfObjectMatchingPropertyValueType<TObject, TValue> = {[TKey in keyof TObject]-?: TObject[TKey] extends TValue ? (TValue extends TObject[TKey] ? TKey : never) : never }[keyof TObject & string];
 
 type OptionBuilderConstructorArgs<TOptions extends Options, TValue> = {
   OptionsClass: (new() => TOptions),
