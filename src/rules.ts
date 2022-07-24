@@ -1,4 +1,3 @@
-import dedent from 'ts-dedent';
 import {
   loadYAML,
 } from './utils/yaml';
@@ -6,8 +5,7 @@ import {
   Option,
   BooleanOption,
 } from './option';
-import {removeSpacesInLinkText} from './utils/mdast';
-import {yamlRegex, removeSpacesInWikiLinkText} from './utils/regex';
+import {yamlRegex} from './utils/regex';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -166,63 +164,7 @@ export function getDisabledRules(text: string): string[] {
   return disabled_rules;
 }
 
-export const rules: Rule[] = [
-  new Rule(
-      'Remove link spacing',
-      'Removes spacing around link text.',
-      RuleType.SPACING,
-      (text: string) => {
-        text = removeSpacesInLinkText(text);
-        return removeSpacesInWikiLinkText(text);
-      },
-      [
-        new Example(
-            'Space in regular markdown link text',
-            dedent`
-      [ here is link text1 ](link_here)
-      [ here is link text2](link_here)
-      [here is link text3 ](link_here)
-      [here is link text4](link_here)
-      [\there is link text5\t](link_here)
-      [](link_here)
-      **Note that image markdown syntax does not get affected even if it is transclusion:**
-      ![\there is link text6 ](link_here)
-      `,
-            dedent`
-      [here is link text1](link_here)
-      [here is link text2](link_here)
-      [here is link text3](link_here)
-      [here is link text4](link_here)
-      [here is link text5](link_here)
-      [](link_here)
-      **Note that image markdown syntax does not get affected even if it is transclusion:**
-      ![\there is link text6 ](link_here)
-      `,
-        ),
-        new Example(
-            'Space in wiki link text',
-            dedent`
-      [[link_here| here is link text1 ]]
-      [[link_here|here is link text2 ]]
-      [[link_here| here is link text3]]
-      [[link_here|here is link text4]]
-      [[link_here|\there is link text5\t]]
-      ![[link_here|\there is link text6\t]]
-      [[link_here]]
-    `,
-            dedent`
-      [[link_here|here is link text1]]
-      [[link_here|here is link text2]]
-      [[link_here|here is link text3]]
-      [[link_here|here is link text4]]
-      [[link_here|here is link text5]]
-      ![[link_here|here is link text6]]
-      [[link_here]]
-    `,
-        ),
-      ],
-  ),
-];
+export const rules: Rule[] = [];
 
 export const rulesDict = rules.reduce(
     (dict, rule) => ((dict[rule.alias()] = rule), dict),
