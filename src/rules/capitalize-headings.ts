@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {escapeDollarSigns, headerRegex} from '../utils/regex';
+import {escapeDollarSigns, headerRegex, wordSplitterRegex} from '../utils/regex';
 
 type Style = 'Title Case' | 'ALL CAPS' | 'First letter';
 
@@ -222,7 +222,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
         name: 'Ignore Words',
         description: 'A comma separated list of words to ignore when capitalizing',
         optionsKey: 'ignoreWords',
-        splitter: /[,\s]+/,
+        splitter: wordSplitterRegex,
         separator: ', ',
       }),
       new TextAreaOptionBuilder({
@@ -230,7 +230,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
         name: 'Lowercase Words',
         description: 'A comma separated list of words to keep lowercase',
         optionsKey: 'lowercaseWords',
-        splitter: /[,\s]+/,
+        splitter: wordSplitterRegex,
         separator: ', ',
       }),
     ];
