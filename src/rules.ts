@@ -7,7 +7,7 @@ import {
   BooleanOption,
 } from './option';
 import {ignoreListOfTypes, IgnoreTypes} from './utils/ignore-types';
-import {moveFootnotesToEnd, removeSpacesInLinkText} from './utils/mdast';
+import {removeSpacesInLinkText} from './utils/mdast';
 import {yamlRegex, removeSpacesInWikiLinkText} from './utils/regex';
 
 export type Options = { [optionName: string]: any };
@@ -168,42 +168,6 @@ export function getDisabledRules(text: string): string[] {
 }
 
 export const rules: Rule[] = [
-  // Footnote rules
-
-  new Rule(
-      'Move Footnotes to the bottom',
-      'Move all footnotes to the bottom of the document.',
-      RuleType.FOOTNOTE,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          return moveFootnotesToEnd(text);
-        });
-      },
-      [
-        new Example(
-            'Moving footnotes to the bottom',
-            dedent`
-            Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
-
-            [^1]: first footnote
-
-            Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
-            [^2]: second footnote
-
-            Maecenas malesuada dignissim purus ac volutpat.
-        `,
-            dedent`
-            Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
-
-            Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
-            Maecenas malesuada dignissim purus ac volutpat.
-
-            [^1]: first footnote
-            [^2]: second footnote
-        `,
-        ),
-      ],
-  ),
   new Rule(
       'Re-Index Footnotes',
       'Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)',
