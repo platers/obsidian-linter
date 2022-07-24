@@ -39,7 +39,7 @@ export class Rule {
   public apply: ApplyFunction;
 
   public examples: Array<Example>;
-  public readonly isSpecial: boolean;
+  public readonly hasSpecialExecutionOrder: boolean;
 
   /**
    * Create a rule
@@ -49,7 +49,7 @@ export class Rule {
    * @param {ApplyFunction} apply - The function to apply the rule
    * @param {Array<Example>} examples - The examples to be displayed in the documentation
    * @param {Array<Option>} [options=[]] - The options of the rule to be displayed in the documentation
-   * @param {boolean} [isSpecial=false] - The rule has special role and should be invoked manually
+   * @param {boolean} [hasSpecialExecutionOrder=false] - The rule has special execution order
    */
   constructor(
       name: string,
@@ -58,7 +58,7 @@ export class Rule {
       apply: ApplyFunction,
       examples: Array<Example>,
       options: Array<Option> = [],
-      isSpecial: boolean = false,
+      hasSpecialExecutionOrder: boolean = false,
   ) {
     this.name = name;
     this.description = description;
@@ -71,7 +71,7 @@ export class Rule {
       option.ruleName = name;
     }
     this.options = options;
-    this.isSpecial = isSpecial;
+    this.hasSpecialExecutionOrder = hasSpecialExecutionOrder;
   }
 
   public alias(): string {

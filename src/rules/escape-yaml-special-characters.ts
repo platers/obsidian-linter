@@ -242,7 +242,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
       }),
     ];
   }
-  get isSpecial(): boolean {
+  get hasSpecialExecutionOrder(): boolean {
     return true;
   }
 }

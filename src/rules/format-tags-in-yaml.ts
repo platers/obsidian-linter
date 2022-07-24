@@ -80,7 +80,7 @@ export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOption
   get optionBuilders(): OptionBuilderBase<FormatTagsInYamlOptions>[] {
     return [];
   }
-  get isSpecial(): boolean {
+  get hasSpecialExecutionOrder(): boolean {
     return true;
   }
 }

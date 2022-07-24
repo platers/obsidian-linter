@@ -235,7 +235,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       }),
     ];
   }
-  get isSpecial(): boolean {
+  get hasSpecialExecutionOrder(): boolean {
     return true;
   }
 }
