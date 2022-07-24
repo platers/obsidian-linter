@@ -6,7 +6,6 @@ import {
   Option,
   BooleanOption,
 } from './option';
-import {ignoreListOfTypes, IgnoreTypes} from './utils/ignore-types';
 import {removeSpacesInLinkText} from './utils/mdast';
 import {yamlRegex, removeSpacesInWikiLinkText} from './utils/regex';
 
@@ -168,41 +167,6 @@ export function getDisabledRules(text: string): string[] {
 }
 
 export const rules: Rule[] = [
-  new Rule(
-      'Remove Space around Fullwidth Characters',
-      'Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab)',
-      RuleType.SPACING,
-      (text: string) => {
-        return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-          return text.replace(/([ \t])+([\u2013\u2014\u2026\u3001\u3002\u300a\u300d-\u300f\u3014\u3015\u3008-\u3011\uff00-\uffff])/g, '$2').replace(/([\u2013\u2014\u2026\u3001\u3002\u300a\u300d-\u300f\u3014\u3015\u3008-\u3011\uff00-\uffff])([ \t])+/g, '$1');
-        });
-      },
-      [
-        new Example(
-            'Remove Spaces and Tabs around Fullwidth Characrters',
-            dedent`
-          Full list of affected charaters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
-          This is a fullwidth period\t 。 with text after it.
-          This is a fullwidth comma\t，  with text after it.
-          This is a fullwidth left parenthesis （ \twith text after it.
-          This is a fullwidth right parenthesis ）  with text after it.
-          This is a fullwidth colon ：  with text after it.
-          This is a fullwidth semicolon ；  with text after it.
-            Ｒemoves space at start of line
-      `,
-            dedent`
-          Full list of affected charaters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
-          This is a fullwidth period。with text after it.
-          This is a fullwidth comma，with text after it.
-          This is a fullwidth left parenthesis（with text after it.
-          This is a fullwidth right parenthesis）with text after it.
-          This is a fullwidth colon：with text after it.
-          This is a fullwidth semicolon；with text after it.
-          Ｒemoves space at start of line
-      `,
-        ),
-      ],
-  ),
   new Rule(
       'Remove link spacing',
       'Removes spacing around link text.',
