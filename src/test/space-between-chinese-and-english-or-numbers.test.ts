@@ -9,10 +9,10 @@ ruleTest({
       // accounts for https://github.com/platers/obsidian-linter/issues/303
       testName: 'Make sure that spaces are added after a dollar sign if followed by Chinese characters',
       before: dedent`
-      这是一个数学公式$f(x)=x^2$这是一个数学公式
+        这是一个数学公式$f(x)=x^2$这是一个数学公式
       `,
       after: dedent`
-      这是一个数学公式 $f(x)=x^2$ 这是一个数学公式
+        这是一个数学公式 $f(x)=x^2$ 这是一个数学公式
       `,
     },
   ],

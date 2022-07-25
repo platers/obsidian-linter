@@ -209,60 +209,60 @@ ruleTest({
       // accounts for https://github.com/platers/obsidian-linter/issues/300
       testName: 'Make sure obsidian multiline comments with single line comment prior is not affected',
       before: dedent`
-      %% fold %%
+        %% fold %%
 
-      ## R
-      
-      %%
-      HW:: --
-      T:: 0
-      %%
+        ## R
 
-      # A %% fold %%
+        %%
+        HW:: --
+        T:: 0
+        %%
 
-      ## R
+        # A %% fold %%
 
-      %%
-      HW:: --
-      T:: 0
-      %%
+        ## R
 
-      # A %% fold %% nocomment
+        %%
+        HW:: --
+        T:: 0
+        %%
 
-      ## R
+        # A %% fold %% nocomment
 
-      %%
-      HW:: --
-      T:: 0
-      %%
+        ## R
+
+        %%
+        HW:: --
+        T:: 0
+        %%
       `,
       after: dedent`
-      %% fold %%
+        %% fold %%
 
-      ## R
-      
-      %%
-      HW:: --
-      T:: 0
-      %%
+        ## R
 
-      # A %% fold %%
+        %%
+        HW:: --
+        T:: 0
+        %%
 
-      ## R
+        # A %% fold %%
 
-      %%
-      HW:: --
-      T:: 0
-      %%
+        ## R
 
-      # A %% fold %% nocomment
+        %%
+        HW:: --
+        T:: 0
+        %%
 
-      ## R
+        # A %% fold %% nocomment
 
-      %%
-      HW:: --
-      T:: 0
-      %%
+        ## R
+
+        %%
+        HW:: --
+        T:: 0
+        %%
       `,
     },
   ],
