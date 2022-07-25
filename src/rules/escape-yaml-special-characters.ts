@@ -149,7 +149,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
           sixthKey: colon:between characters is fine
           otherKey: []
           ---
-          `,
+        `,
         after: dedent`
           ---
           key: "value: with colon in the middle"

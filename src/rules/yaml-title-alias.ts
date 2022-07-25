@@ -257,7 +257,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       new ExampleBuilder({
         description: 'Adds a header with the title.',
         before: dedent`
-        ${''}
+          ${''}
         `,
         after: dedent`
           ---

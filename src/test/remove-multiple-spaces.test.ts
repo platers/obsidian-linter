@@ -23,14 +23,14 @@ ruleTest({
     {
       testName: 'Make sure spaces at the start of the line are ignored',
       before: dedent`
-          Paragraph contents are here
-          Second paragraph here...
-          ${''}
+        Paragraph contents are here
+        Second paragraph here...
+        ${''}
       `,
       after: dedent`
-          Paragraph contents are here
-          Second paragraph here...
-          ${''}
+        Paragraph contents are here
+        Second paragraph here...
+        ${''}
       `,
     },
     {

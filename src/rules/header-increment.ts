@@ -98,7 +98,7 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
           This resets the decrement section so the H6 below is decremented to an H3
           ${''}
           ###### H6
-          `,
+        `,
         after: dedent`
           # H1
           ## H3
