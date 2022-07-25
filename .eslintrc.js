@@ -22,5 +22,6 @@ module.exports = {
     'camelcase': 'off',
     'max-len': 'off',
     'require-jsdoc': 'off',
+    'unicorn/template-indent': 'error'
   }
 };
