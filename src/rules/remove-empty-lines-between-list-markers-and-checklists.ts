@@ -63,49 +63,49 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
         description: '',
         before: dedent`
           1. Item 1
-
+          ${''}
           2. Item 2
-
+          ${''}
           - Item 1
-
+          ${''}
           \t- Subitem 1
-
+          ${''}
           - Item 2
-
+          ${''}
           - [x] Item 1
-
+          ${''}
           \t- [ ] Subitem 1
-
+          ${''}
           - [ ] Item 2
-
+          ${''}
           + Item 1
-          
+          ${''}
           \t+ Subitem 1
-
+          ${''}
           + Item 2
-
+          ${''}
           * Item 1
-
+          ${''}
           \t* Subitem 1
-
+          ${''}
           * Item 2
         `,
         after: dedent`
           1. Item 1
           2. Item 2
-
+          ${''}
           - Item 1
           \t- Subitem 1
           - Item 2
-
+          ${''}
           - [x] Item 1
           \t- [ ] Subitem 1
           - [ ] Item 2
-
+          ${''}
           + Item 1
           \t+ Subitem 1
           + Item 2
-
+          ${''}
           * Item 1
           \t* Subitem 1
           * Item 2

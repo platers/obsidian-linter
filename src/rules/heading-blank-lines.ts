@@ -43,22 +43,22 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
         before: dedent`
           # H1
           ## H2
-
-
+          ${''}
+          ${''}
           # H1
           line
           ## H2
-
+          ${''}
         `,
         after: dedent`
           # H1
-
+          ${''}
           ## H2
-
+          ${''}
           # H1
-
+          ${''}
           line
-
+          ${''}
           ## H2
         `,
       }),
@@ -74,9 +74,9 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
         after: dedent`
           # H1
           line
-
+          ${''}
           ## H2
-
+          ${''}
           # H1
           line
         `,

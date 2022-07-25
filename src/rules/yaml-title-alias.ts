@@ -257,7 +257,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       new ExampleBuilder({
         description: 'Adds a header with the title.',
         before: dedent`
-
+        ${''}
         `,
         after: dedent`
           ---
@@ -265,7 +265,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
             - Filename
           linter-yaml-title-alias: Filename
           ---
-
+          ${''}
         `,
         options: {
           fileName: 'Filename',

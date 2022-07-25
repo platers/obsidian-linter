@@ -12,7 +12,7 @@ ruleTest({
         front matter
         front matter
         ---
-
+        ${''}
         Hello
         World
         \`\`\`python
@@ -26,11 +26,11 @@ ruleTest({
         front matter
         front matter
         ---
-
+        ${''}
         Hello
-
+        ${''}
         World
-
+        ${''}
         \`\`\`python
         # comment not header
         a = b
@@ -49,9 +49,9 @@ ruleTest({
       `,
       after: dedent`
         Hello
-
+        ${''}
         World
-
+        ${''}
         - 1
         \t- 2
             - 3
@@ -62,16 +62,16 @@ ruleTest({
       testName: 'Paragraphs that start with numbers are spaced out',
       before: dedent`
         # Hello world
-
-
+        ${''}
+        ${''}
         123 foo
         123 bar
       `,
       after: dedent`
         # Hello world
-
+        ${''}
         123 foo
-
+        ${''}
         123 bar
       `,
     },
@@ -80,16 +80,16 @@ ruleTest({
       testName: 'Paragraphs that start with foreign characters are spaced out',
       before: dedent`
         # Hello world
-
-
+        ${''}
+        ${''}
         测试 foo
         测试 bar
       `,
       after: dedent`
         # Hello world
-
+        ${''}
         测试 foo
-
+        ${''}
         测试 bar
       `,
     },
@@ -98,15 +98,15 @@ ruleTest({
       testName: 'Paragraphs that start with whitespace characters are spaced out',
       before: dedent`
         # Hello world
-
+        ${''}
         foo
         bar
       `,
       after: dedent`
         # Hello world
-
+        ${''}
         foo
-
+        ${''}
         bar
       `,
     },
@@ -114,13 +114,13 @@ ruleTest({
       testName: 'Make sure blockquotes are not affected',
       before: dedent`
         # Hello world
-    
+        ${''}
         > blockquote
         > blockquote line 2
       `,
       after: dedent`
         # Hello world
-    
+        ${''}
         > blockquote
         > blockquote line 2
       `,
@@ -129,13 +129,13 @@ ruleTest({
       testName: 'Make sure lists are not affected',
       before: dedent`
         # Hello world
-
+        ${''}
         > blockquote
         > blockquote line 2
       `,
       after: dedent`
         # Hello world
-
+        ${''}
         > blockquote
         > blockquote line 2
       `,
@@ -144,30 +144,30 @@ ruleTest({
       testName: 'Make sure lines ending in a line break are not affected',
       before: dedent`
         # Hello world
-
-
+        ${''}
+        ${''}
         paragraph line 1 <br>
-        paragraph line 2  
+        paragraph line 2  ${''}
         paragraph line 3 <br/>
         paragraph final line
-
-
+        ${''}
+        ${''}
       `,
       after: dedent`
         # Hello world
-
+        ${''}
         paragraph line 1 <br>
-        paragraph line 2  
+        paragraph line 2  ${''}
         paragraph line 3 <br/>
         paragraph final line
-
+        ${''}
       `,
     },
     {
       testName: 'Make sure obsidian multiline comments are not affected',
       before: dedent`
         Here is some inline comments: %%You can't see this text%% (Can't see it)
-
+        ${''}
         Here is a block comment:
         %%
         It can span
@@ -176,9 +176,9 @@ ruleTest({
       `,
       after: dedent`
         Here is some inline comments: %%You can't see this text%% (Can't see it)
-
+        ${''}
         Here is a block comment:
-
+        ${''}
         %%
         It can span
         multiple lines
@@ -189,11 +189,11 @@ ruleTest({
       testName: 'Preserves trailing line break',
       before: dedent`
         Line followed by line break
-
+        ${''}
       `,
       after: dedent`
         Line followed by line break
-
+        ${''}
       `,
     },
     {
@@ -210,27 +210,27 @@ ruleTest({
       testName: 'Make sure obsidian multiline comments with single line comment prior is not affected',
       before: dedent`
         %% fold %%
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0
         %%
-
+        ${''}
         # A %% fold %%
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0
         %%
-
+        ${''}
         # A %% fold %% nocomment
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0
@@ -238,27 +238,27 @@ ruleTest({
       `,
       after: dedent`
         %% fold %%
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0
         %%
-
+        ${''}
         # A %% fold %%
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0
         %%
-
+        ${''}
         # A %% fold %% nocomment
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0

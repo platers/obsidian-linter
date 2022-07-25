@@ -57,8 +57,8 @@ describe('Disabled rules parsing', () => {
     const text = dedent`
         ---
         tfratfrat
-  
-        
+        ${''}
+        ${''}
         ---
         `;
     expect(getDisabledRules(text)).toEqual([]);

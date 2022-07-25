@@ -64,7 +64,7 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
           ### H3
           #### H4
           ###### H6
-
+          ${''}
           We skipped a 2nd level heading
         `,
         after: dedent`
@@ -73,7 +73,7 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
           ## H3
           ### H4
           #### H6
-
+          ${''}
           We skipped a 2nd level heading
         `,
       }),
@@ -82,41 +82,41 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
         before: dedent`
           # H1
           ### H3
-
+          ${''}
           We skip from 1 to 3
-
+          ${''}
           ####### H7
-
+          ${''}
           We skip from 3 to 7 leaving out 4, 5, and 6. Thus headings level 4, 5, and 6 will be treated like H3 above until another H2 or H1 is encountered
-
+          ${''}
           ###### H6
-
+          ${''}
           We skipped 6 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
-
+          ${''}
           ## H2
-
+          ${''}
           This resets the decrement section so the H6 below is decremented to an H3
-
+          ${''}
           ###### H6
           `,
         after: dedent`
           # H1
           ## H3
-
+          ${''}
           We skip from 1 to 3
-
+          ${''}
           ### H7
-
+          ${''}
           We skip from 3 to 7 leaving out 4, 5, and 6. Thus headings level 4, 5, and 6 will be treated like H3 above until another H2 or H1 is encountered
-
+          ${''}
           ## H6
-
+          ${''}
           We skipped 6 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
-
+          ${''}
           ## H2
-
+          ${''}
           This resets the decrement section so the H6 below is decremented to an H3
-
+          ${''}
           ### H6
         `,
       }),

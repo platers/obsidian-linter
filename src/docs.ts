@@ -40,15 +40,15 @@ function generateDocs() {
   for (const rule of rules) {
     const examples = rule.examples.map((test) => dedent`
     Example: ${test.description}
-
+    ${''}
     Before:
-
+    ${''}
     \`\`\`\`\`\`markdown
     ${test.before}
     \`\`\`\`\`\`
-
+    ${''}
     After:
-
+    ${''}
     \`\`\`\`\`\`markdown
     ${test.after}
     \`\`\`\`\`\`
@@ -77,32 +77,32 @@ function generateDocs() {
 
     if (rule.type !== prevSection) {
       rules_docs += dedent`
-
+      ${''}
       ## ${rule.type}
     `;
       prevSection = rule.type;
     }
 
     rules_docs += dedent`
-
+  ${''}
   ### ${rule.name}
-
+  ${''}
   Alias: \`${rule.alias()}\`
-
+  ${''}
   ${rule.description}
-
+  ${''}
   ${options}
-
+  ${''}
   ${examples}
-
+  ${''}
   `;
   }
 
   const rules_documentation = dedent`
   ${autogen_warning}
-
+  ${''}
   ${rules_template}
-
+  ${''}
   ${rules_docs}
   `;
 

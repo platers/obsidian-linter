@@ -31,13 +31,13 @@ export default class ConsecutiveBlankLines extends RuleBuilder<ConsecutiveBlankL
         description: '',
         before: dedent`
           Some text
-
-
+          ${''}
+          ${''}
           Some more text
         `,
         after: dedent`
           Some text
-
+          ${''}
           Some more text
         `,
       }),

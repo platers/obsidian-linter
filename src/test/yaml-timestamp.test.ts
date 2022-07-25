@@ -197,7 +197,7 @@ ruleTest({
       before: dedent`
         ---
         tag: tag1
-        modified: 
+        modified: ${''}
         location: "path"
         ---
       `,
@@ -221,7 +221,7 @@ ruleTest({
       before: dedent`
         ---
         tag: tag1
-        created: 
+        created: ${''}
         location: "path"
         ---
       `,

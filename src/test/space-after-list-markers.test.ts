@@ -10,13 +10,13 @@ ruleTest({
       before: dedent`
         Line
         - 1
-        - 
+        - ${''}
         Line
       `,
       after: dedent`
         Line
         - 1
-        - 
+        - ${''}
         Line
       `,
     },

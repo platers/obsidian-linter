@@ -8,8 +8,8 @@ ruleTest({
     {
       testName: 'One trailing space removed',
       before: dedent`
-        # H1 
-        line with one trailing spaces 
+        # H1 ${''}
+        line with one trailing spaces ${''}
       `,
       after: dedent`
         # H1
@@ -19,8 +19,8 @@ ruleTest({
     {
       testName: 'Three trailing whitespaces removed',
       before: dedent`
-        # H1   
-        line with three trailing spaces   
+        # H1   ${''}
+        line with three trailing spaces   ${''}
       `,
       after: dedent`
         # H1
@@ -31,13 +31,13 @@ ruleTest({
       testName: 'Tab-Space-Linebreak removed',
       before: dedent`
         # H1
-        line with trailing tab and spaces    
-
+        line with trailing tab and spaces    ${''}
+        ${''}
       `,
       after: dedent`
         # H1
         line with trailing tab and spaces
-
+        ${''}
       `,
       options: {
         twoSpaceLineBreak: true,
@@ -47,13 +47,13 @@ ruleTest({
       testName: 'Two Space Linebreak not removed',
       before: dedent`
         # H1
-        line with one trailing spaces  
-
+        line with one trailing spaces  ${''}
+        ${''}
       `,
       after: dedent`
         # H1
-        line with one trailing spaces  
-
+        line with one trailing spaces  ${''}
+        ${''}
       `,
       options: {
         twoSpaceLineBreak: true,
@@ -63,12 +63,12 @@ ruleTest({
       testName: 'Regular link with spaces stays the same',
       before: dedent`
         # Hello world
-
+        ${''}
         [This has  spaces in it](File with  spaces.md)
       `,
       after: dedent`
         # Hello world
-
+        ${''}
         [This has  spaces in it](File with  spaces.md)
       `,
     },
@@ -76,12 +76,12 @@ ruleTest({
       testName: 'Image link with spaces stays the same',
       before: dedent`
         # Hello world
-
+        ${''}
         ![This has  spaces in it](File with  spaces.png)
       `,
       after: dedent`
         # Hello world
-
+        ${''}
         ![This has  spaces in it](File with  spaces.png)
       `,
     },
@@ -89,12 +89,12 @@ ruleTest({
       testName: 'Wiki link with spaces stays the same',
       before: dedent`
         # Hello world
-
+        ${''}
         [[File with  spaces]]
       `,
       after: dedent`
         # Hello world
-
+        ${''}
         [[File with  spaces]]
       `,
     },

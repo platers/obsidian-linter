@@ -11,7 +11,7 @@ ruleTest({
         ---
         front matter
         ---
-
+        ${''}
         # H1
         \`\`\`
         # comment not header
@@ -24,9 +24,9 @@ ruleTest({
         ---
         front matter
         ---
-
+        ${''}
         # H1
-
+        ${''}
         \`\`\`
         # comment not header
         $$
@@ -74,11 +74,11 @@ ruleTest({
       `,
       after: dedent`
         # H1
-
+        ${''}
         ## H2
-
+        ${''}
         Line
-
+        ${''}
         ### H3
       `,
     },

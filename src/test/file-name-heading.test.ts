@@ -9,17 +9,17 @@ ruleTest({
       testName: 'Handles stray dashes',
       before: dedent`
         Text 1
-
+        ${''}
         ---
-        
+        ${''}
         Text 2
       `,
       after: dedent`
         # File Name
         Text 1
-
+        ${''}
         ---
-
+        ${''}
         Text 2
       `,
       options: {

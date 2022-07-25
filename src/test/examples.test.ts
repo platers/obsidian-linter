@@ -22,7 +22,9 @@ describe('Augmented examples pass', () => {
           const yaml = dedent`
             ---
             foo: bar
-            ---\n\n`;
+            ---
+            ${''}
+          `;
 
           const before = yaml + example.before;
           expect(rule.apply(before, example.options)).toMatch(new RegExp(`${escapeRegExp(yaml)}\n?${escapeRegExp(example.after)}`));

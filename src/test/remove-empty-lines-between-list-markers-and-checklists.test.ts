@@ -10,44 +10,44 @@ ruleTest({
       testName: 'Horizontal Rules after list should not be affected',
       before: dedent`
         Starting Text
-
+        ${''}
         ---
-
+        ${''}
         - Some list item 1
         - Some list item 2
-
+        ${''}
         ---
-
+        ${''}
         Some text
-
+        ${''}
         ***
-
+        ${''}
         * Some list item 1
         * Some list item 2
-
+        ${''}
         ***
-
+        ${''}
         More Text
       `,
       after: dedent`
         Starting Text
-
+        ${''}
         ---
-
+        ${''}
         - Some list item 1
         - Some list item 2
-        
+        ${''}
         ---
-        
+        ${''}
         Some text
-
+        ${''}
         ***
-
+        ${''}
         * Some list item 1
         * Some list item 2
-        
+        ${''}
         ***
-
+        ${''}
         More Text
       `,
     },

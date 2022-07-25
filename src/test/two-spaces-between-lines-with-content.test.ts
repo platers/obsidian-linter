@@ -9,7 +9,7 @@ ruleTest({
       testName: 'Make sure obsidian multiline comments are not affected',
       before: dedent`
         Here is some inline comments: %%You can't see this text%% (Can't see it)
-
+        ${''}
         Here is a block comment:
         %%
         It can span
@@ -18,8 +18,8 @@ ruleTest({
       `,
       after: dedent`
         Here is some inline comments: %%You can't see this text%% (Can't see it)
-
-        Here is a block comment:  
+        ${''}
+        Here is a block comment:  ${''}
         %%
         It can span
         multiple lines
@@ -31,27 +31,27 @@ ruleTest({
       testName: 'Make sure obsidian multiline comments with single line comment prior is not affected',
       before: dedent`
         %% fold %%
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0
         %%
-
+        ${''}
         # A %% fold %%
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0
         %%
-
+        ${''}
         # A %% fold %% nocomment
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0
@@ -59,27 +59,27 @@ ruleTest({
       `,
       after: dedent`
         %% fold %%
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0
         %%
-
+        ${''}
         # A %% fold %%
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0
         %%
-
+        ${''}
         # A %% fold %% nocomment
-
+        ${''}
         ## R
-
+        ${''}
         %%
         HW:: --
         T:: 0

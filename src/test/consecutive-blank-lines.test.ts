@@ -9,21 +9,21 @@ ruleTest({
       testName: 'Handles ignores code blocks',
       before: dedent`
         Line 1
-
-
+        ${''}
+        ${''}
         \`\`\`
-        
-
-
+        ${''}
+        ${''}
+        ${''}
         \`\`\`
       `,
       after: dedent`
         Line 1
-
+        ${''}
         \`\`\`
-
-
-
+        ${''}
+        ${''}
+        ${''}
         \`\`\`
       `,
     },

@@ -39,7 +39,7 @@ export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineArou
           var temp = 'text';
           // this is a code block
           \`\`\`
-
+          ${''}
           Text after code block.
         `,
       }),
@@ -53,7 +53,7 @@ export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineArou
         `,
         after: dedent`
           # Heading 1
-
+          ${''}
           \`\`\`
           Here is a code block
           \`\`\`
