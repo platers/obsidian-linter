@@ -1,4 +1,4 @@
-import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder} from 'obsidian';
+import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder, addIcon} from 'obsidian';
 import {LinterSettings, getDisabledRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -13,6 +13,7 @@ import FormatTagsInYaml from './rules/format-tags-in-yaml';
 import YamlTimestamp from './rules/yaml-timestamp';
 import YamlKeySort from './rules/yaml-key-sort';
 import {RuleBuilderBase} from './rules/rule-builder';
+import {iconInfo} from './icons';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -72,12 +73,20 @@ export default class LinterPlugin extends Plugin {
 
     async onload() {
       logInfo('Loading plugin');
+
+      // eslint-disable-next-line guard-for-in
+      for (const key in iconInfo) {
+        const svg = iconInfo[key];
+        addIcon(svg.id, svg.source);
+      }
+
       await this.loadSettings();
 
       this.addCommand({
         id: 'lint-file',
         name: 'Lint the current file',
         editorCallback: (editor) => this.runLinterEditor(editor),
+        icon: iconInfo.file.id,
         hotkeys: [
           {
             modifiers: ['Mod', 'Alt'],
@@ -89,6 +98,7 @@ export default class LinterPlugin extends Plugin {
       this.addCommand({
         id: 'lint-all-files',
         name: 'Lint all files in the vault',
+        icon: iconInfo.vault.id,
         callback: () => {
           const startMessage = 'This will edit all of your files and may introduce errors.';
           const submitBtnText = 'Lint All';
@@ -102,6 +112,7 @@ export default class LinterPlugin extends Plugin {
       this.addCommand({
         id: 'lint-all-files-in-folder',
         name: 'Lint all files in the current folder',
+        icon: iconInfo.folder.id,
         editorCheckCallback: (checking: Boolean, _) => {
           if (checking) {
             return !this.app.workspace.getActiveFile().parent.isRoot();
@@ -119,7 +130,7 @@ export default class LinterPlugin extends Plugin {
               menu.addItem((item) => {
                 item
                     .setTitle('Lint folder')
-                    .setIcon('wrench-screwdriver-glyph')
+                    .setIcon(iconInfo.folder.id)
                     .onClick(() => this.createFolderLintModal(file));
               });
             }
@@ -217,7 +228,7 @@ export default class LinterPlugin extends Plugin {
     onMenuOpenCallback(menu: Menu, file: TAbstractFile, source: string) {
       if (file instanceof TFile && file.extension === 'md') {
         menu.addItem((item) => {
-          item.setIcon('wrench-screwdriver-glyph');
+          item.setIcon(iconInfo.file.id);
           item.setTitle('Lint file');
           item.onClick(async (evt) => {
             this.runLinterFile(file);
