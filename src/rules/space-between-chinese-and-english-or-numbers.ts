@@ -23,7 +23,7 @@ export default class SpaceBetweenChineseAndEnglishOrNumbers extends RuleBuilder<
   apply(text: string, options: SpaceBetweenChineseAndEnglishOrNumbersOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
       const head = /([\u4e00-\u9fa5])( *)(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+'"([{¥$]|\*[^*])/gm;
-      const tail = /(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+;:'"°%)\]}]|[^*]\*)( *)([\u4e00-\u9fa5])/gm;
+      const tail = /(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+;:'"°%$)\]}]|[^*]\*)( *)([\u4e00-\u9fa5])/gm;
       return text.replace(head, '$1 $3').replace(tail, '$1 $3');
     });
   }
