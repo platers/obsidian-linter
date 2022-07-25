@@ -20,3 +20,6 @@ yarn.lock
 .DS_Store
 
 !__mocks__/*.js
+!/.eslintrc.js
+!/babel.config.js
+!/rollup.config.js

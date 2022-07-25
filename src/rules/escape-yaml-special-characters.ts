@@ -149,7 +149,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
           sixthKey: colon:between characters is fine
           otherKey: []
           ---
-          `,
+        `,
         after: dedent`
           ---
           key: "value: with colon in the middle"
@@ -198,7 +198,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
           nestedArray: [[value: with colon in the middle, value with ' a single quote present], ["already escaped: value", value with " a double quote present], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
           nestedArray2: [[value: with colon in the middle], value with ' a single quote present]
           ---
-
+          ${''}
           _Note that escaped commas in a YAML array will be treated as a separator._
         `,
         after: dedent`
@@ -207,7 +207,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
           nestedArray: [["value: with colon in the middle", "value with ' a single quote present"], ["already escaped: value", 'value with " a double quote present'], value with both ' " a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
           nestedArray2: [["value: with colon in the middle"], "value with ' a single quote present"]
           ---
-
+          ${''}
           _Note that escaped commas in a YAML array will be treated as a separator._
         `,
         options: {

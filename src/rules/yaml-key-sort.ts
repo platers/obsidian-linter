@@ -224,7 +224,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
           type: programming
           tags: computer
           keywords: []
-
+          ${''}
           status: WIP
           date: 02/15/2022
           ---

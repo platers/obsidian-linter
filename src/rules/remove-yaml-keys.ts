@@ -55,9 +55,9 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
           status: WIP
           date: 02/15/2022
           ---
-
+          ${''}
           # Header Context
-
+          ${''}
           Text
         `,
         after: dedent`
@@ -66,9 +66,9 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
           type: programming
           tags: computer
           ---
-
+          ${''}
           # Header Context
-
+          ${''}
           Text
         `,
         options: {

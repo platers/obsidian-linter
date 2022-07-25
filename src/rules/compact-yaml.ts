@@ -38,17 +38,17 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
         description: 'Remove blank lines at the start and end of the YAML',
         before: dedent`
           ---
-
+          ${''}
           date: today
-
+          ${''}
           title: unchanged without inner new lines turned on
-
+          ${''}
           ---
         `,
         after: dedent`
           ---
           date: today
-
+          ${''}
           title: unchanged without inner new lines turned on
           ---
         `,
@@ -57,17 +57,17 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
         description: 'Remove blank lines anywhere in YAML with inner new lines set to true',
         before: dedent`
           ---
-
+          ${''}
           date: today
-
-
+          ${''}
+          ${''}
           title: remove inner new lines
-
+          ${''}
           ---
-
+          ${''}
           # Header 1
-
-
+          ${''}
+          ${''}
           Body content here.
         `,
         after: dedent`
@@ -75,10 +75,10 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
           date: today
           title: remove inner new lines
           ---
-
+          ${''}
           # Header 1
-
-
+          ${''}
+          ${''}
           Body content here.
         `,
         options: {

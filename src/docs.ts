@@ -39,25 +39,26 @@ function generateDocs() {
   let prevSection = '';
   for (const rule of rules) {
     const examples = rule.examples.map((test) => dedent`
-    Example: ${test.description}
-
-    Before:
-
-    \`\`\`\`\`\`markdown
-    ${test.before}
-    \`\`\`\`\`\`
-
-    After:
-
-    \`\`\`\`\`\`markdown
-    ${test.after}
-    \`\`\`\`\`\`
-  `).join('\n');
+      Example: ${test.description}
+      ${''}
+      Before:
+      ${''}
+      \`\`\`\`\`\`markdown
+      ${test.before}
+      \`\`\`\`\`\`
+      ${''}
+      After:
+      ${''}
+      \`\`\`\`\`\`markdown
+      ${test.after}
+      \`\`\`\`\`\`
+    `).join('\n');
 
     const options_list = rule.options.slice(1).map((option) => {
       let text = dedent`
-                  - ${option.name}: ${option.description}
-                  \t- Default: \`${option.defaultValue}\``;
+        - ${option.name}: ${option.description}
+        \t- Default: \`${option.defaultValue}\`
+      `;
 
       if (option instanceof DropdownOption) {
         for (const record of option.options) {
@@ -70,40 +71,40 @@ function generateDocs() {
     let options = '';
     if (options_list.length > 0) {
       options = dedent`
-      Options:
-      ${options_list}
-    `;
+        Options:
+        ${options_list}
+      `;
     }
 
     if (rule.type !== prevSection) {
       rules_docs += dedent`
-
-      ## ${rule.type}
-    `;
+        ${''}
+        ## ${rule.type}
+      `;
       prevSection = rule.type;
     }
 
     rules_docs += dedent`
-
-  ### ${rule.name}
-
-  Alias: \`${rule.alias()}\`
-
-  ${rule.description}
-
-  ${options}
-
-  ${examples}
-
-  `;
+      ${''}
+      ### ${rule.name}
+      ${''}
+      Alias: \`${rule.alias()}\`
+      ${''}
+      ${rule.description}
+      ${''}
+      ${options}
+      ${''}
+      ${examples}
+      ${''}
+    `;
   }
 
   const rules_documentation = dedent`
-  ${autogen_warning}
-
-  ${rules_template}
-
-  ${rules_docs}
+    ${autogen_warning}
+    ${''}
+    ${rules_template}
+    ${''}
+    ${rules_docs}
   `;
 
   writeFileSync('./docs/rules.md', rules_documentation);

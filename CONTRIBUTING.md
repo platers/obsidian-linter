@@ -126,6 +126,16 @@ Tests are run by jest. They can be run by either running `npm run test` or `npm 
 
 Files should be linted prior to creating a pull request. The linter will make sure that the code follows the desired codestyle and formats the files as needed. The linter can be run by `npm run lint` or `npm run compile`
 
+Note that linter removes trailing spaces and blank lines. In case if they are essential use the following trick to preserve them
+
+```js
+const str = dedent`
+  line with essential trailing spaces   ${''}
+  ${''}
+  previous line is completely blank
+`;
+```
+
 ## Issuing a Pull Request
 
 Once all changes have been made, any applicable tests added, and the linter has applied formats and identified no issues, then it is time to create a pull request.

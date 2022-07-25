@@ -10,13 +10,13 @@ ruleTest({
       testName: 'Make sure text ending in a hyphen followed by a link does not trigger the hyphenated line break rule',
       before: dedent`
         # Hello world
-
+        ${''}
         Paragraph contents are here- [link text](pathToFile/file.md)
         Paragraph contents are here- [[file]]
       `,
       after: dedent`
         # Hello world
-
+        ${''}
         Paragraph contents are here- [link text](pathToFile/file.md)
         Paragraph contents are here- [[file]]
       `,

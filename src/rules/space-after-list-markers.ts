@@ -38,7 +38,7 @@ export default class SpaceAfterListMarkers extends RuleBuilder<SpaceAfterListMar
         before: dedent`
           1.   Item 1
           2.  Item 2
-
+          ${''}
           -   [ ] Item 1
           - [x]    Item 2
           \t-  [ ] Item 3
@@ -46,7 +46,7 @@ export default class SpaceAfterListMarkers extends RuleBuilder<SpaceAfterListMar
         after: dedent`
           1. Item 1
           2. Item 2
-
+          ${''}
           - [ ] Item 1
           - [x] Item 2
           \t- [ ] Item 3

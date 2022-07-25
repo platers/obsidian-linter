@@ -74,13 +74,13 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
       new ExampleBuilder({
         description: 'Adds a header with the title.',
         before: dedent`
-
+          ${''}
         `,
         after: dedent`
           ---
           title: Filename
           ---
-
+          ${''}
         `,
         options: {
           fileName: 'Filename',

@@ -41,7 +41,7 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
           | foo      | bar      |
           | baz      | qux      |
           | quux     | quuz     |
-
+          ${''}
           New paragraph.
         `,
       }),
@@ -57,7 +57,7 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
         `,
         after: dedent`
           # Heading 1
-
+          ${''}
           | Column 1 | Column 2 |
           |----------|----------|
           | foo      | bar      |
@@ -83,20 +83,20 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
         `,
         after: dedent`
           # Table 1
-
+          ${''}
           | Column 1 | Column 2 | Column 3 |
           |----------|----------|----------|
           | foo      | bar      | blob     |
           | baz      | qux      | trust    |
           | quux     | quuz     | glob     |
-
+          ${''}
           # Table 2 without Pipe at Start and End
-
+          ${''}
           | Column 1 | Column 2 |
           :-: | -----------:
           bar | baz
           foo | bar
-
+          ${''}
           New paragraph.
         `,
       }),

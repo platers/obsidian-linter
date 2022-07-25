@@ -8,12 +8,13 @@ ruleTest({
     {
       testName: 'Inits yaml if it does not exist',
       before: dedent`
+        ${''}
       `,
       after: dedent`
         ---
         tags:
         ---
-
+        ${''}
       `,
       options: {
         textToInsert: [
@@ -27,12 +28,12 @@ ruleTest({
       before: dedent`
         # Heading
         Text
-
+        ${''}
         # Heading
         - Text
         - Text
         ---
-
+        ${''}
       `,
       after: dedent`
         ---
@@ -40,12 +41,12 @@ ruleTest({
         ---
         # Heading
         Text
-
+        ${''}
         # Heading
         - Text
         - Text
         ---
-
+        ${''}
       `,
       options: {
         textToInsert: [

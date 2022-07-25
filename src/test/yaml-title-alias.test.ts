@@ -55,7 +55,7 @@ ruleTest({
       testName: 'Creates multi-line array aliases when empty',
       before: dedent`
         ---
-        aliases: 
+        aliases: ${''}
         ---
         # Title
       `,
@@ -72,7 +72,7 @@ ruleTest({
       testName: 'Creates single-line array aliases when empty',
       before: dedent`
         ---
-        aliases: 
+        aliases: ${''}
         ---
         # Title
       `,
@@ -91,7 +91,7 @@ ruleTest({
       testName: 'Creates single string alias when empty',
       before: dedent`
         ---
-        aliases: 
+        aliases: ${''}
         ---
         # Title
       `,
@@ -291,7 +291,7 @@ ruleTest({
         ---
         key1: value1
         key2: value2
-        aliases: 
+        aliases: ${''}
         key3: value3
         ---
         # Title

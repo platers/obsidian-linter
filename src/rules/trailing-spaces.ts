@@ -40,7 +40,7 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
         /* eslint-disable no-tabs */
         before: dedent`
           # H1
-          Line with trailing spaces and tabs.	        
+          Line with trailing spaces and tabs.	        ${''}
         `,
         /* eslint-enable no-tabs */
         after: dedent`
@@ -52,11 +52,11 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
         description: 'With `Two Space Linebreak = true`',
         before: dedent`
           # H1
-          Line with trailing spaces and tabs.  
+          Line with trailing spaces and tabs.  ${''}
         `,
         after: dedent`
           # H1
-          Line with trailing spaces and tabs.  
+          Line with trailing spaces and tabs.  ${''}
         `,
         options: {
           twoSpaceLineBreak: true,

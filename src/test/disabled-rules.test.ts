@@ -4,63 +4,63 @@ import {getDisabledRules, rules} from '../rules';
 describe('Disabled rules parsing', () => {
   it('No YAML', () => {
     const text = dedent`
-        Text
-        `;
+      Text
+    `;
     expect(getDisabledRules(text)).toEqual([]);
   });
   it('No ignored rules', () => {
     const text = dedent`
-        ---
-        ---
-        Text
-        `;
+      ---
+      ---
+      Text
+    `;
     expect(getDisabledRules(text)).toEqual([]);
   });
   it('Ignore one rule', () => {
     const text = dedent`
-        ---
-        disabled rules: [ yaml-timestamp ]
-        ---
-        Text
-        `;
+      ---
+      disabled rules: [ yaml-timestamp ]
+      ---
+      Text
+    `;
     expect(getDisabledRules(text)).toEqual(['yaml-timestamp']);
   });
   it('Ignore some rules', () => {
     const text = dedent`
-        ---
-        random-rule: true
-        disabled rules: [ yaml-timestamp, capitalize-headings ]
-        ---
-        Text
-        `;
+      ---
+      random-rule: true
+      disabled rules: [ yaml-timestamp, capitalize-headings ]
+      ---
+      Text
+    `;
     expect(getDisabledRules(text)).toEqual(['yaml-timestamp', 'capitalize-headings']);
   });
   it('Ignored no rules', () => {
     const text = dedent`
-        ---
-        disabled rules:
-        ---
-        Text
-        `;
+      ---
+      disabled rules:
+      ---
+      Text
+    `;
     expect(getDisabledRules(text)).toEqual([]);
   });
   it('Ignored all rules', () => {
     const text = dedent`
-        ---
-        disabled rules: all
-        ---
-        Text
-        `;
+      ---
+      disabled rules: all
+      ---
+      Text
+    `;
     expect(getDisabledRules(text)).toEqual(rules.map((r) => r.alias()));
   });
   it('Works with misformatted yamls', () => {
     const text = dedent`
-        ---
-        tfratfrat
-  
-        
-        ---
-        `;
+      ---
+      tfratfrat
+      ${''}
+      ${''}
+      ---
+    `;
     expect(getDisabledRules(text)).toEqual([]);
   });
 });

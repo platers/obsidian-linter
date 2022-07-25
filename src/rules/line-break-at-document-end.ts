@@ -33,20 +33,20 @@ export default class LineBreakAtDocumentEnd extends RuleBuilder<LineBreakAtDocum
         `,
         after: dedent`
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-
+          ${''}
         `,
       }),
       new ExampleBuilder({
         description: 'Removing trailing line breaks to the end of the document, except one.',
         before: dedent`
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-
-
-
+          ${''}
+          ${''}
+          ${''}
         `,
         after: dedent`
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-
+          ${''}
         `,
       }),
     ];

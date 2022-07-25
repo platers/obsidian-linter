@@ -32,20 +32,20 @@ export default class MoveFootnotesToTheBottom extends RuleBuilder<MoveFootnotesT
         description: 'Moving footnotes to the bottom',
         before: dedent`
           Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
-
+          ${''}
           [^1]: first footnote
-
+          ${''}
           Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
           [^2]: second footnote
-
+          ${''}
           Maecenas malesuada dignissim purus ac volutpat.
         `,
         after: dedent`
           Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
-
+          ${''}
           Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
           Maecenas malesuada dignissim purus ac volutpat.
-
+          ${''}
           [^1]: first footnote
           [^2]: second footnote
         `,
