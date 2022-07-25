@@ -50,6 +50,7 @@
     "moment": "^2.29.4",
     "remark": "^14.0.1",
     "remark-gfm": "^3.0.0",
+    "rollup-plugin-terser": "^7.0.2",
     "ts-dedent": "^2.2.0",
     "unified-lint-rule": "^2.1.0",
     "unist-util-visit": "^4.1.0"
