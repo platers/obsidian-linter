@@ -1,23 +1,30 @@
+import FileNameHeading from '../rules/file-name-heading';
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {ruleTest} from './common';
 
-describe('File Name Heading', () => {
-  it('Handles stray dashes', () => {
-    const before = dedent`
-      Text 1
+ruleTest({
+  RuleBuilderClass: FileNameHeading,
+  testCases: [
+    {
+      testName: 'Handles stray dashes',
+      before: dedent`
+        Text 1
 
-      ---
-      
-      Text 2
-        `;
-    const after = dedent`
-      # File Name
-      Text 1
-      
-      ---
-      
-      Text 2
-        `;
-    expect(rulesDict['file-name-heading'].apply(before, {'metadata: file name': 'File Name'})).toBe(after);
-  });
+        ---
+        
+        Text 2
+      `,
+      after: dedent`
+        # File Name
+        Text 1
+
+        ---
+
+        Text 2
+      `,
+      options: {
+        fileName: 'File Name',
+      },
+    },
+  ],
 });

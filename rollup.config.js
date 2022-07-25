@@ -1,7 +1,9 @@
 import typescript from '@rollup/plugin-typescript';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import { terser } from 'rollup-plugin-terser';
+import externalGlobals from 'rollup-plugin-external-globals';
+import {plugin as globImport} from 'rollup-plugin-glob-import';
+import {terser} from 'rollup-plugin-terser';
 
 const isProd = (process.env.BUILD === 'production');
 
@@ -31,6 +33,9 @@ export default [
       typescript(),
       nodeResolve({browser: true}),
       commonjs(),
+      globImport({
+        format: 'default'
+      }),
       terser(),
     ]
   },
@@ -47,6 +52,12 @@ export default [
       typescript(),
       nodeResolve({browser: true}),
       commonjs(),
+      externalGlobals({
+        'obsidian': 'obsidian'
+      }),
+      globImport({
+        format: 'default'
+      }),
     ]
   }
 ];

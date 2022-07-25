@@ -1,186 +1,184 @@
+import RemoveMultipleSpaces from '../rules/remove-multiple-spaces';
 import dedent from 'ts-dedent';
-import {rulesDict} from '../rules';
+import {ruleTest} from './common';
 
-describe('Remove Multiple Spaces', () => {
-  it('Make sure spaces at the end of the line are ignored', () => {
-    const before = dedent`
-      # Hello world
-  
-      Paragraph contents are here  
-      Second paragraph contents here  
-      `;
+ruleTest({
+  RuleBuilderClass: RemoveMultipleSpaces,
+  testCases: [
+    {
+      testName: 'Make sure spaces at the end of the line are ignored',
+      before: dedent`
+        # Hello world
 
-    const after = dedent`
-      # Hello world
-  
-      Paragraph contents are here  
-      Second paragraph contents here  
-      `;
+        Paragraph contents are here  
+        Second paragraph contents here  
+      `,
+      after: dedent`
+        # Hello world
 
-    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
-  });
-  it('Make sure spaces at the start of the line are ignored', () => {
-    const before = '  Paragraph contents are here\n  Second paragraph here...';
-
-    const after = '  Paragraph contents are here\n  Second paragraph here...';
-
-    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
-  });
-  it('Make sure non-letter followed or preceeded by 2 spaces has them cut down to 1 space', () => {
-    const before = dedent`
-    # Hello world
-
-    Paragraph contents  (something). Something else  .
-    `;
-
-    const after = dedent`
-    # Hello world
-
-    Paragraph contents (something). Something else .
-    `;
-
-    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
-  });
-  it('Links followed by parentheses do not prevent other removal of multiple spaces in a row', () => {
-    const before = dedent`
-      [Link text](path/fileName.md) (2 spaces in between  text)
-      `;
-
-    const after = dedent`
-      [Link text](path/fileName.md) (2 spaces in between text)
-      `;
-
-    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
-  });
-  // accounts for https://github.com/platers/obsidian-linter/issues/244
-  it('Tables are ignored', () => {
-    const before = dedent`
-    # Table 1
-      
-    | Column 1 | Column 2 | Column 3 |
-    |----------|----------|----------|
-    | foo      | bar      | blob     |
-    | baz      | qux      | trust    |
-    | quux     | quuz     | glob     |
-    
-    # Table 2
-
-    | Column 1 | Column 2 |
-    |----------|----------|
-    | foo      | bar      |
-    | baz      | qux      |
-    | quux     | quuz     |
-    
-    New paragraph.
-      `;
-
-    const after = dedent`
-      # Table 1
+        Paragraph contents are here  
+        Second paragraph contents here  
+      `,
+    },
+    {
+      testName: 'Make sure spaces at the start of the line are ignored',
+      before: dedent`
+          Paragraph contents are here
+          Second paragraph here...
         
-      | Column 1 | Column 2 | Column 3 |
-      |----------|----------|----------|
-      | foo      | bar      | blob     |
-      | baz      | qux      | trust    |
-      | quux     | quuz     | glob     |
-      
-      # Table 2
-
-      | Column 1 | Column 2 |
-      |----------|----------|
-      | foo      | bar      |
-      | baz      | qux      |
-      | quux     | quuz     |
-      
-      New paragraph.
-      `;
-
-    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
-  });
-  // accounts for https://github.com/platers/obsidian-linter/issues/289
-  it('Callouts and block quotes allow multiple spaces at start to allow for code and list item indentation', () => {
-    const before = dedent`
-      # List Item in Callout
+      `,
+      after: dedent`
+          Paragraph contents are here
+          Second paragraph here...
         
-      > [!info] Unordered List
-      > - First Level
-      > - First Level
-      >   - Second Level
-      >     - Third Level
-      > - First Level
+      `,
+    },
+    {
+      testName: 'Make sure non-letter followed or preceeded by 2 spaces has them cut down to 1 space',
+      before: dedent`
+        # Hello world
 
-      # Code in Callout
+        Paragraph contents  (something). Something else  .
+      `,
+      after: dedent`
+        # Hello world
 
-      > [!info] Code
-      >     Line 1
-      >     Line 2
-      >     Line 3
+        Paragraph contents (something). Something else .
+      `,
+    },
+    {
+      testName: 'Links followed by parentheses do not prevent other removal of multiple spaces in a row',
+      before: dedent`
+        [Link text](path/fileName.md) (2 spaces in between  text)
+      `,
+      after: dedent`
+        [Link text](path/fileName.md) (2 spaces in between text)
+      `,
+    },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/244
+      testName: 'Tables are ignored',
+      before: dedent`
+        # Table 1
 
-      # List Item in Block Quote
-        
-      > Unordered List
-      > - First Level
-      > - First Level
-      >   - Second Level
-      >     - Third Level
-      > - First Level
+        | Column 1 | Column 2 | Column 3 |
+        |----------|----------|----------|
+        | foo      | bar      | blob     |
+        | baz      | qux      | trust    |
+        | quux     | quuz     | glob     |
 
-      # Code in Block Quote
-      
-      > Code
-      >     Line 1
-      >     Line 2
-      >     Line 3
-    `;
+        # Table 2
 
-    const after = dedent`
-      # List Item in Callout
-        
-      > [!info] Unordered List
-      > - First Level
-      > - First Level
-      >   - Second Level
-      >     - Third Level
-      > - First Level
+        | Column 1 | Column 2 |
+        |----------|----------|
+        | foo      | bar      |
+        | baz      | qux      |
+        | quux     | quuz     |
 
-      # Code in Callout
+        New paragraph.
+      `,
+      after: dedent`
+        # Table 1
 
-      > [!info] Code
-      >     Line 1
-      >     Line 2
-      >     Line 3
+        | Column 1 | Column 2 | Column 3 |
+        |----------|----------|----------|
+        | foo      | bar      | blob     |
+        | baz      | qux      | trust    |
+        | quux     | quuz     | glob     |
 
-      # List Item in Block Quote
-        
-      > Unordered List
-      > - First Level
-      > - First Level
-      >   - Second Level
-      >     - Third Level
-      > - First Level
+        # Table 2
 
-      # Code in Block Quote
-      
-      > Code
-      >     Line 1
-      >     Line 2
-      >     Line 3
-    `;
+        | Column 1 | Column 2 |
+        |----------|----------|
+        | foo      | bar      |
+        | baz      | qux      |
+        | quux     | quuz     |
 
-    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
-  });
-  it('Multiple spaces after ">" are still removed if not the start of a line', () => {
-    const before = dedent`
-    # Text with > with multiple spaces after it
-      
-    Text >  other text
-    `;
+        New paragraph.
+      `,
+    },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/289
+      testName: 'Callouts and block quotes allow multiple spaces at start to allow for code and list item indentation',
+      before: dedent`
+        # List Item in Callout
 
-    const after = dedent`
-    # Text with > with multiple spaces after it
-      
-    Text > other text
-    `;
+        > [!info] Unordered List
+        > - First Level
+        > - First Level
+        >   - Second Level
+        >     - Third Level
+        > - First Level
 
-    expect(rulesDict['remove-multiple-spaces'].apply(before)).toBe(after);
-  });
+        # Code in Callout
+
+        > [!info] Code
+        >     Line 1
+        >     Line 2
+        >     Line 3
+
+        # List Item in Block Quote
+
+        > Unordered List
+        > - First Level
+        > - First Level
+        >   - Second Level
+        >     - Third Level
+        > - First Level
+
+        # Code in Block Quote
+
+        > Code
+        >     Line 1
+        >     Line 2
+        >     Line 3
+      `,
+      after: dedent`
+        # List Item in Callout
+
+        > [!info] Unordered List
+        > - First Level
+        > - First Level
+        >   - Second Level
+        >     - Third Level
+        > - First Level
+
+        # Code in Callout
+
+        > [!info] Code
+        >     Line 1
+        >     Line 2
+        >     Line 3
+
+        # List Item in Block Quote
+
+        > Unordered List
+        > - First Level
+        > - First Level
+        >   - Second Level
+        >     - Third Level
+        > - First Level
+
+        # Code in Block Quote
+
+        > Code
+        >     Line 1
+        >     Line 2
+        >     Line 3
+      `,
+    },
+    {
+      testName: 'Multiple spaces after ">" are still removed if not the start of a line',
+      before: dedent`
+        # Text with > with multiple spaces after it
+
+        Text >  other text
+      `,
+      after: dedent`
+        # Text with > with multiple spaces after it
+
+        Text > other text
+      `,
+    },
+  ],
 });
