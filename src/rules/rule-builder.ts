@@ -61,8 +61,12 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     return false;
   }
 
-  static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, extraOptions?: TOptions): [result: string, isEnabled: boolean] {
+  static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions): [result: string, isEnabled: boolean] {
     const rule = this.getRule();
+    if (disabledRules.includes(rule.alias())) {
+      return [text, false];
+    }
+
     return RuleBuilderBase.applyIfEnabledBase(rule, text, settings, extraOptions);
   }
 

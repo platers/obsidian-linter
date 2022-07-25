@@ -240,13 +240,14 @@ export default class LinterPlugin extends Plugin {
     lintText(oldText: string, file: TFile) {
       let newText = oldText;
 
+      const disabledRules = getDisabledRules(newText);
       // escape YAML where possible before parsing yaml
-      [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, this.settings);
+      [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, this.settings, disabledRules);
+
 
       // remove hashtags from tags before parsing yaml
-      [newText] = FormatTagsInYaml.applyIfEnabled(newText, this.settings);
+      [newText] = FormatTagsInYaml.applyIfEnabled(newText, this.settings, disabledRules);
 
-      const disabledRules = getDisabledRules(newText);
       const modifiedAtTime = moment(file.stat.mtime).format();
       const createdAtTime = moment(file.stat.ctime).format();
 
@@ -266,7 +267,7 @@ export default class LinterPlugin extends Plugin {
 
       // run yaml timestamp at the end to help determine if something has changed
       let isYamlTimestampEnabled;
-      [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, this.settings, {
+      [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, this.settings, disabledRules, {
         fileCreatedTime: createdAtTime,
         fileModifiedTime: modifiedAtTime,
         currentTime: moment(),
@@ -276,7 +277,7 @@ export default class LinterPlugin extends Plugin {
 
       const yamlTimestampOptions = YamlTimestamp.getRuleOptions(this.settings);
 
-      [newText] = YamlKeySort.applyIfEnabled(newText, this.settings, {
+      [newText] = YamlKeySort.applyIfEnabled(newText, this.settings, disabledRules, {
         currentTimeFormatted: moment().format(yamlTimestampOptions.format),
         yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
         dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
