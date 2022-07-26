@@ -3,7 +3,6 @@ import {nodeResolve} from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import externalGlobals from 'rollup-plugin-external-globals';
 import {plugin as globImport} from 'rollup-plugin-glob-import';
-import {terser} from 'rollup-plugin-terser';
 
 const isProd = (process.env.BUILD === 'production');
 
@@ -24,11 +23,6 @@ export default [
       format: 'cjs',
       exports: 'default',
       banner,
-      plugins: [
-        ...isProd ? [
-          terser({toplevel: true, compress: {passes: 2}}),
-        ] : [terser()],
-      ],
     },
     external: ['obsidian'],
     plugins: [
@@ -38,9 +32,6 @@ export default [
       globImport({
         format: 'default',
       }),
-      ...isProd ? [
-        terser({toplevel: true, compress: {passes: 2}}),
-      ] : [terser()],
     ],
   },
   {
