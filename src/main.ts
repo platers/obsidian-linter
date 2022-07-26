@@ -420,7 +420,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
-  setOrUpdateMomentInstance() {
+  async setOrUpdateMomentInstance() {
     const obsidianLang: string = localStorage.getItem('language') || 'en';
     const systemLang = navigator.language?.toLowerCase();
 
@@ -434,7 +434,7 @@ export default class LinterPlugin extends Plugin {
     }
 
     const currentLocale = moment.locale(momentLocale);
-    logDebug(`Trying to switch Moment.js global locale to ${momentLocale}, got ${currentLocale}`);
+    logDebug(`Trying to switch Moment.js locale to ${momentLocale}, got ${currentLocale}`);
   }
 
   private displayChangedMessage(charsAdded: number, charsRemoved: number) {
@@ -536,7 +536,7 @@ class SettingTab extends PluginSettingTab {
           dropdown.setValue(this.plugin.settings.linterLocale);
           dropdown.onChange(async (value) => {
             this.plugin.settings.linterLocale = value;
-            this.plugin.setOrUpdateMomentInstance();
+            await this.plugin.setOrUpdateMomentInstance();
             await this.plugin.saveSettings();
           });
         });
