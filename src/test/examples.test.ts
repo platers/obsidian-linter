@@ -1,7 +1,21 @@
+import {moment} from '../../__mocks__/obsidian';
 import dedent from 'ts-dedent';
 import {Example, rules} from '../rules';
 import {yamlRegex, escapeRegExp} from '../utils/regex';
 import '../rules-registry';
+// import * as Moment from 'moment';
+
+// const obsidian = jest.createMockFromModule('obsidian');
+// obsidian['moment'] = typeof Moment;
+
+// jest.mock('obsidian', () => ({
+//   moment: () => typeof Moment,
+// }))
+
+// jest.mock('obsidian', () => ({
+//   __esModule: true,
+//   default: () => 'You have called a mocked method 1!',
+// }))
 
 describe('Examples pass', () => {
   for (const rule of rules) {

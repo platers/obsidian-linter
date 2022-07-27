@@ -42,7 +42,8 @@
     "rollup-plugin-terser": "^7.0.2",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.0",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "moment": "^2.29.4"
   },
   "dependencies": {
     "@types/js-yaml": "^4.0.5",
@@ -53,7 +54,6 @@
     "remark-gfm": "^3.0.1",
     "unified": "^10.1.2",
     "unified-lint-rule": "^2.1.0",
-    "moment": "^2.29.4",
     "ts-dedent": "^2.2.0"
   }
 }

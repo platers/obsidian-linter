@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import moment from '../moment-with-locales';
+import moment from 'moment';
 import {ruleTest} from './common';
 import YamlTimestamp from '../rules/yaml-timestamp';
 
@@ -156,18 +156,15 @@ ruleTest({
         ---
       `,
       options: () => {
-        moment.locale('fr');
         return {
           dateCreated: false,
           dateModifiedKey: 'modified',
           fileModifiedTime: '2020-02-01T00:00:00-00:00',
           currentTime: moment('samedi, février 1er 2020, 12:00:05 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
           alreadyModified: false,
+          locale: 'fr',
           moment: moment,
         };
-      },
-      afterTestFunc: () => {
-        moment.locale('en');
       },
     },
     {
@@ -280,16 +277,13 @@ ruleTest({
         ---
       `,
       options: () => {
-        moment.locale('fr');
         return {
           dateModified: false,
           dateCreatedKey: 'created',
           fileCreatedTime: '2020-02-01T00:00:00-00:00',
           alreadyModified: false,
+          locale: 'fr',
         };
-      },
-      afterTestFunc: () => {
-        moment.locale('en');
       },
     },
     {

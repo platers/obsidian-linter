@@ -46,7 +46,7 @@ export default [
     plugins: [
       typescript(),
       nodeResolve({browser: true}),
-      commonjs(),
+      commonjs({exclude: 'src/test/**'}),
       externalGlobals({
         'obsidian': 'obsidian',
       }),

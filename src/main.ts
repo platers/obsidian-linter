@@ -5,7 +5,7 @@ import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
 import log from 'loglevel';
 import {logInfo, logError, logDebug, setLogLevel} from './logger';
-import moment from './moment-with-locales';
+import {moment} from 'obsidian'
 
 import './rules-registry';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
@@ -71,7 +71,8 @@ const langToMomentLocale = {
 export default class LinterPlugin extends Plugin {
   settings: LinterSettings;
   private eventRef: EventRef;
-
+  private momentLocale: string;
+  
   async onload() {
     logInfo('Loading plugin');
 
@@ -249,8 +250,8 @@ export default class LinterPlugin extends Plugin {
     // remove hashtags from tags before parsing yaml
     [newText] = FormatTagsInYaml.applyIfEnabled(newText, this.settings, disabledRules);
 
-    const modifiedAtTime = moment(file.stat.mtime).format();
-    const createdAtTime = moment(file.stat.ctime).format();
+    const modifiedAtTime = moment(file.stat.mtime, this.momentLocale).format();
+    const createdAtTime = moment(file.stat.ctime, this.momentLocale).format();
 
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
@@ -262,24 +263,30 @@ export default class LinterPlugin extends Plugin {
         fileCreatedTime: createdAtTime,
         fileModifiedTime: modifiedAtTime,
         fileName: file.basename,
+        locale: this.momentLocale,
         moment: moment,
       });
     }
 
+    let currentTime = moment();
+    currentTime.locale(this.momentLocale);
     // run yaml timestamp at the end to help determine if something has changed
     let isYamlTimestampEnabled;
     [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, this.settings, disabledRules, {
       fileCreatedTime: createdAtTime,
       fileModifiedTime: modifiedAtTime,
-      currentTime: moment(),
+      currentTime: currentTime,
       alreadyModified: oldText != newText,
+      locale: this.momentLocale,
       moment: moment,
     });
 
     const yamlTimestampOptions = YamlTimestamp.getRuleOptions(this.settings);
 
+    currentTime = moment();
+    currentTime.locale(this.momentLocale);
     [newText] = YamlKeySort.applyIfEnabled(newText, this.settings, disabledRules, {
-      currentTimeFormatted: moment().format(yamlTimestampOptions.format),
+      currentTimeFormatted: currentTime.format(yamlTimestampOptions.format),
       yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
       dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
     });
@@ -416,8 +423,12 @@ export default class LinterPlugin extends Plugin {
       momentLocale = systemLang;
     }
 
+    this.momentLocale = momentLocale;
+    const oldLocale = moment.locale();
     const currentLocale = moment.locale(momentLocale);
     logDebug(`Trying to switch Moment.js locale to ${momentLocale}, got ${currentLocale}`);
+
+    moment.locale(oldLocale);
   }
 
   private displayChangedMessage(charsAdded: number, charsRemoved: number) {
@@ -516,7 +527,6 @@ class SettingTab extends PluginSettingTab {
   }
 
   addLocaleOverrideSetting(): void {
-    const {moment} = window;
     const sysLocale = navigator.language?.toLowerCase();
 
     new Setting(this.containerEl)

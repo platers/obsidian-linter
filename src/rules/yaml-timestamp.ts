@@ -2,20 +2,21 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MomentFormatOptionBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML, initYAML} from '../utils/yaml';
-import moment from '../moment-with-locales';
+import {moment} from 'obsidian';
 import {escapeDollarSigns} from '../utils/regex';
 import {insert} from '../utils/strings';
 
 class YamlTimestampOptions implements Options {
   alreadyModified?: boolean;
   dateCreatedKey?: string = 'date created';
-  moment?: typeof moment = moment;
+  moment?: typeof moment;
   dateCreated?: boolean = true;
   fileCreatedTime?: string;
   format?: string = 'dddd, MMMM Do YYYY, h:mm:ss a';
   dateModified?: boolean = true;
   dateModifiedKey?: string = 'date modified';
   fileModifiedTime?: string;
+  locale?: string = 'en';
   currentTime?: moment.Moment;
 }
 
@@ -47,7 +48,8 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       const moment = options.moment;
 
       if (options.dateCreated) {
-        const created_date = moment(options.fileCreatedTime);
+        let created_date = moment(options.fileCreatedTime);
+        created_date.locale(options.locale);
 
         const formatted_date = created_date.format(options.format);
         const created_date_line = `\n${options.dateCreatedKey}: ${formatted_date}`;
@@ -70,7 +72,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
           textModified = true;
         } else if (keyWithValueFound) {
-          const createdDateTime = moment(text.match(created_match)[0].replace(options.dateCreatedKey + ':', '').trim(), options.format, true);
+          const createdDateTime = moment(text.match(created_match)[0].replace(options.dateCreatedKey + ':', '').trim(), options.format, options.locale, true);
           if (createdDateTime == undefined || !createdDateTime.isValid()) {
             text = text.replace(
                 created_match,
@@ -88,7 +90,8 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         const modified_key_match = new RegExp(modified_key_match_str);
         const modified_match = new RegExp(modified_match_str);
 
-        const modified_date = moment(options.fileModifiedTime);
+        let modified_date = moment(options.fileModifiedTime);
+        modified_date.locale(options.locale);
         // using the current time helps prevent issues where the previous modified time was greater
         // than 5 seconds prior to the time the linter will finish with the file (i.e. helps prevent accidental infinite loops on updating the date modified value)
         const formatted_modified_date = options.currentTime.format(options.format);
@@ -96,7 +99,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
         const keyWithValueFound = modified_match.test(text);
         if (keyWithValueFound) {
-          const modifiedDateTime = moment(text.match(modified_match)[0].replace(options.dateModifiedKey + ':', '').trim(), options.format, true);
+          const modifiedDateTime = moment(text.match(modified_match)[0].replace(options.dateModifiedKey + ':', '').trim(), options.format, options.locale, true);
           if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() ||
               Math.abs(modifiedDateTime.diff(modified_date, 'seconds')) > 5
           ) {
