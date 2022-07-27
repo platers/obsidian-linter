@@ -13,6 +13,8 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   code: {replaceAction: 'code', placeholder: '{CODE_BLOCK_PLACEHOLDER}', replaceDollarSigns: true},
   image: {replaceAction: 'image', placeholder: '{IMAGE_PLACEHOLDER}', replaceDollarSigns: false},
   thematicBreak: {replaceAction: 'thematicBreak', placeholder: '{HORIZONTAL_RULE_PLACEHOLDER}', replaceDollarSigns: false},
+  italics: {replaceAction: 'emphasis', placeholder: '{ITALICS_PLACEHOLDER}', replaceDollarSigns: false},
+  bold: {replaceAction: 'strong', placeholder: '{STRONG_PLACEHOLDER}', replaceDollarSigns: false},
   // RegExp
   yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---'), replaceDollarSigns: true},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}', replaceDollarSigns: false},
