@@ -2178,6 +2178,50 @@ After:
 ``````markdown
 #标签A #标签2标签
 ``````
+Example: Make sure that spaces are not added between italics and chinese characters to preserve markdown syntax
+
+Before:
+
+``````markdown
+_这是一个数学公式_
+*这是一个数学公式english*
+
+# Handling bold and italics nested in each other is not supported at this time
+
+**_这是一_个数学公式**
+*这是一hello__个数学world公式__*
+``````
+
+After:
+
+``````markdown
+_这是一个数学公式_
+*这是一个数学公式 english*
+
+# Handling bold and italics nested in each other is not supported at this time
+
+**_ 这是一 _ 个数学公式**
+*这是一 hello__ 个数学 world 公式 __*
+``````
+Example: Images and links are ignored
+
+Before:
+
+``````markdown
+[[这是一个数学公式english]]
+![[这是一个数学公式english.jpg]]
+[这是一个数学公式english](这是一个数学公式english.md)
+![这是一个数学公式english](这是一个数学公式english.jpg)
+``````
+
+After:
+
+``````markdown
+[[这是一个数学公式english]]
+![[这是一个数学公式english.jpg]]
+[这是一个数学公式english](这是一个数学公式english.md)
+![这是一个数学公式english](这是一个数学公式english.jpg)
+``````
 
 ### Trailing spaces
 

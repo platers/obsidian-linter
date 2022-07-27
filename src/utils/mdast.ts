@@ -9,6 +9,8 @@ const mdastTypes: Record<string, string> = {
   link: 'link',
   footnote: 'footnoteDefinition',
   paragraph: 'paragraph',
+  italics: 'emphasis',
+  bold: 'strong',
 };
 
 function parseTextToAST(text: string): Root {
@@ -250,6 +252,34 @@ export function removeSpacesInLinkText(text: string): string {
     const endLinkTextPosition = regularLink.lastIndexOf(']');
     const newLink = regularLink.substring(0, 1) + regularLink.substring(1, endLinkTextPosition).trim() + regularLink.substring(endLinkTextPosition);
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, newLink);
+  }
+
+  return text;
+}
+
+export function updateItalicsText(text: string, func:(text: string) => string): string {
+  const positions: Position[] = getPositions(mdastTypes.italics, text);
+
+  for (const position of positions) {
+    let italicText = text.substring(position.start.offset+1, position.end.offset-1);
+
+    italicText = func(italicText);
+
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+1, position.end.offset-1, italicText);
+  }
+
+  return text;
+}
+
+export function updateBoldText(text: string, func:(text: string) => string): string {
+  const positions: Position[] = getPositions(mdastTypes.bold, text);
+
+  for (const position of positions) {
+    let boldText = text.substring(position.start.offset+2, position.end.offset-2);
+
+    boldText = func(boldText);
+
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+2, position.end.offset-2, boldText);
   }
 
   return text;
