@@ -1,0 +1,17 @@
+{
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true,
+    },
+    "editor.tabSize": 2,
+    "files.eol": "\n",
+    "files.insertFinalNewline": true,
+    "editor.detectIndentation": true,
+    "files.encoding": "utf8",
+    "files.trimTrailingWhitespace": false,
+}

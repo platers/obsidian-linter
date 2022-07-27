@@ -87,17 +87,17 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
               }
 
               const ignoreCasedWord =
-              options.ignoreCasedWords &&
-              headerWords[j] !== headerWords[j].toLowerCase();
+                options.ignoreCasedWords &&
+                headerWords[j] !== headerWords[j].toLowerCase();
               const keepWordCasing =
-              ignoreCasedWord || keepCasing.includes(headerWords[j]);
+                ignoreCasedWord || keepCasing.includes(headerWords[j]);
               if (!keepWordCasing) {
                 headerWords[j] = headerWords[j].toLowerCase();
                 const ignoreWord = ignoreShortWords.includes(headerWords[j]);
                 if (!ignoreWord || firstWord === true) {
-                // ignore words that are not capitalized in titles except if they are the first word
+                  // ignore words that are not capitalized in titles except if they are the first word
                   headerWords[j] =
-                  headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+                    headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
                 }
               }
 

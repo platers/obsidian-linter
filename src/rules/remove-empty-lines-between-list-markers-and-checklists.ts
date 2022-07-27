@@ -22,7 +22,8 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
   }
   apply(text: string, options: RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.thematicBreak], text, (text) => {
-      const replaceEmptyLinesBetweenList = function(text: string, listRegex: RegExp, replaceWith: string): string {
+      const replaceEmptyLinesBetweenList = function(text: string, listIndicatorRegexText: string, replaceWith: string): string {
+        const listRegex = new RegExp(`^${listIndicatorRegexText}\n{2,}${listIndicatorRegexText}$`, 'gm');
         let match;
         let newText = text;
 
@@ -36,24 +37,24 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
 
       /* eslint-disable no-useless-escape */
       // account for '- [x]' and  '- [ ]' checkbox markers
-      const checkboxMarker = new RegExp(/^(( |\t)*- \[( |x)\].+)\n{2,}(( |\t)*- \[( |x)\].+)$/gm);
-      text = replaceEmptyLinesBetweenList(text, checkboxMarker, '$1\n$4');
+      const checkBoxMarkerRegexText = '(( |\\t)*- \\[( |x)\\]( |\\t)+.+)';
+      text = replaceEmptyLinesBetweenList(text, checkBoxMarkerRegexText, '$1\n$5');
 
       // account for ordered list marker
-      const orderedMarker = new RegExp(/^(( |\t)*\d+\..+)\n{2,}(( |\t)*\d+\..+)$/gm);
-      text = replaceEmptyLinesBetweenList(text, orderedMarker, '$1\n$3');
+      const orderedMarkerRegexText = '(( |\\t)*\\d+\\.( |\\t)+.+)';
+      text = replaceEmptyLinesBetweenList(text, orderedMarkerRegexText, '$1\n$4');
 
       // account for '+' list marker
-      const plusMarker = new RegExp(/^(( |\t)*\+.+)\n{2,}(( |\t)*\+.+)$/gm);
-      text = replaceEmptyLinesBetweenList(text, plusMarker, '$1\n$3');
+      const plusMarkerRegexText = '(( |\\t)*\\+( |\\t)+.+)';
+      text = replaceEmptyLinesBetweenList(text, plusMarkerRegexText, '$1\n$4');
 
       // account for '-' list marker
-      const dashMarker = new RegExp(/^(( |\t)*-(?! \[( |x)\]).+)\n{2,}(( |\t)*-(?! \[( |x)\]).+)$/gm);
-      text = replaceEmptyLinesBetweenList(text, dashMarker, '$1\n$4');
+      const dashMarkerRegexText = '(( |\\t)*-(?! \\[( |x)\\])( |\\t)+.+)';
+      text = replaceEmptyLinesBetweenList(text, dashMarkerRegexText, '$1\n$5');
 
       // account for '*' list marker
-      const splatMarker = new RegExp(/^(( |\t)*\*.+)\n{2,}(( |\t)*\*.+)$/gm);
-      return replaceEmptyLinesBetweenList(text, splatMarker, '$1\n$3');
+      const splatMarkerRegexText = '(( |\\t)*\\*( |\\t)+.+)';
+      return replaceEmptyLinesBetweenList(text, splatMarkerRegexText, '$1\n$4');
       /* eslint-enable no-useless-escape */
     });
   }
