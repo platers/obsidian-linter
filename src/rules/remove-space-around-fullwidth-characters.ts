@@ -87,21 +87,6 @@ export default class RemoveSpaceAroundFullwidthCharacters extends RuleBuilder<Re
           > - ［contents here］
         `,
       }),
-      new ExampleBuilder({
-        description: 'Fullwidth Characters in Block Quote Do not Affect Block Quote Markdown Syntax',
-        before: dedent`
-          # A fullwidth character as the first non-whitespace character in a block quote should not mess with the the blockquote syntax
-          ${''}
-          > ［ contents here ］
-          >    ［ contents here ］
-        `,
-        after: dedent`
-          # A fullwidth character as the first non-whitespace character in a block quote should not mess with the the blockquote syntax
-          ${''}
-          > ［contents here］
-          > ［contents here］
-        `,
-      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<RemoveSpaceAroundFullwidthCharactersOptions>[] {

@@ -301,8 +301,6 @@ export function updateListItemText(text: string, func:(text: string) => string):
       listText = listText.substring(0, end);
     }
 
-    console.log(listText);
-
     listText = func(listText);
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, endIndex, listText);
@@ -311,27 +309,3 @@ export function updateListItemText(text: string, func:(text: string) => string):
   return text;
 }
 
-
-export function updateBlockquoteText(text: string, func:(text: string) => string): string {
-  const positions: Position[] = getPositions(mdastTypes.blockquote, text);
-
-  for (const position of positions) {
-    const startIndex = position.start.offset+2;
-    let endIndex = position.end.offset;
-    let listText = text.substring(startIndex, position.end.offset);
-    // This helps account for a weird scenario where list items is pulling back multiple list items in one go sometimes
-    const end = listText.search(/\n( |\t)*(\*|-|\+|- \[( | x)\]|\d+\.)( | ]t)+/);
-    if (end !== -1) {
-      endIndex = startIndex + end;
-      listText = listText.substring(0, end);
-    }
-
-    console.log(listText);
-
-    listText = func(listText);
-
-    text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, endIndex, listText);
-  }
-
-  return text;
-}
