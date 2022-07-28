@@ -11,6 +11,7 @@ const mdastTypes: Record<string, string> = {
   paragraph: 'paragraph',
   italics: 'emphasis',
   bold: 'strong',
+  listItem: 'listItem',
 };
 
 function parseTextToAST(text: string): Root {
@@ -280,6 +281,41 @@ export function updateBoldText(text: string, func:(text: string) => string): str
     boldText = func(boldText);
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+2, position.end.offset-2, boldText);
+  }
+
+  return text;
+}
+
+export function updateListItemText(text: string, func:(text: string) => string): string {
+  const positions: Position[] = getPositions(mdastTypes.listItem, text);
+
+  for (const position of positions) {
+    let listText = text.substring(position.start.offset+2, position.end.offset);
+    // This helps account for a weird scenario where list items is pulling back multiple list items in one go sometimes
+    const listIndicatorRegex = /\n(( |\t)*>?)*(\*|-|\+|- \[( | x)\]|\d+\.) /g;
+    const matches = listText.match(listIndicatorRegex);
+    if (matches) {
+      // capturing groups get added back to the results of split so we need the capturing groups to be converted to non-capturing groups
+      // https://stackoverflow.com/questions/37838532/javascript-split-string-with-matchregex
+      const listItems = listText.split(new RegExp(listIndicatorRegex.source.replaceAll('(', '(?:')));
+      let newListText: string = '';
+      let index = 0;
+      // eslint-disable-next-line guard-for-in
+      for (const listItem of listItems) {
+        if (index > 0) {
+          newListText += matches[index - 1];
+        }
+
+        newListText += func(listItem);
+        index++;
+      }
+
+      listText = newListText;
+    } else {
+      listText = func(listText);
+    }
+
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+2, position.end.offset, listText);
   }
 
   return text;
