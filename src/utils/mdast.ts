@@ -296,6 +296,7 @@ export function updateListItemText(text: string, func:(text: string) => string):
     let listText = text.substring(startIndex, position.end.offset);
     // This helps account for a weird scenario where list items is pulling back multiple list items in one go sometimes
     const end = listText.search(/\n( |\t)*(\*|-|\+|- \[( | x)\]|\d+\.)( | ]t)+/);
+    console.log(listText);
     if (end !== -1) {
       endIndex = startIndex + end;
       listText = listText.substring(0, end);

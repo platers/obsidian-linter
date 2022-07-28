@@ -2058,12 +2058,12 @@ Ensures that fullwidth characters are not followed by whitespace (either single 
 
 
 
-Example: Remove Spaces and Tabs around Fullwidth Characrters
+Example: Remove Spaces and Tabs around Fullwidth Characters
 
 Before:
 
 ``````markdown
-Full list of affected charaters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
+Full list of affected characters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
 This is a fullwidth period	 。 with text after it.
 This is a fullwidth comma	，  with text after it.
 This is a fullwidth left parenthesis （ 	with text after it.
@@ -2076,7 +2076,7 @@ This is a fullwidth semicolon ；  with text after it.
 After:
 
 ``````markdown
-Full list of affected charaters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
+Full list of affected characters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
 This is a fullwidth period。with text after it.
 This is a fullwidth comma，with text after it.
 This is a fullwidth left parenthesis（with text after it.
@@ -2084,6 +2084,37 @@ This is a fullwidth right parenthesis）with text after it.
 This is a fullwidth colon：with text after it.
 This is a fullwidth semicolon；with text after it.
 Ｒemoves space at start of line
+``````
+Example: Fullwidth Characters in List Do not Affect List Markdown Syntax
+
+Before:
+
+``````markdown
+# List indicators should not have the space after them removed if they are followed by a fullwidth character
+
+- ［ contents here］
+  - 	［ more contents here］ more text here
++ 	［ another item here］
+* ［ one last item here］
+
+# Nested in a block quote
+
+> - ［ contents here ］
+``````
+
+After:
+
+``````markdown
+# List indicators should not have the space after them removed if they are followed by a fullwidth character
+
+- ［contents here］
+  - ［more contents here］more text here
++ ［another item here］
+* ［one last item here］
+
+# Nested in a block quote
+
+> - ［contents here］
 ``````
 
 ### Space after list markers
