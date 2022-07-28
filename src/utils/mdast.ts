@@ -11,6 +11,8 @@ const mdastTypes: Record<string, string> = {
   paragraph: 'paragraph',
   italics: 'emphasis',
   bold: 'strong',
+  listItem: 'listItem',
+  blockquote: 'blockquote',
 };
 
 function parseTextToAST(text: string): Root {
@@ -280,6 +282,55 @@ export function updateBoldText(text: string, func:(text: string) => string): str
     boldText = func(boldText);
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+2, position.end.offset-2, boldText);
+  }
+
+  return text;
+}
+
+export function updateListItemText(text: string, func:(text: string) => string): string {
+  const positions: Position[] = getPositions(mdastTypes.listItem, text);
+
+  for (const position of positions) {
+    const startIndex = position.start.offset+2;
+    let endIndex = position.end.offset;
+    let listText = text.substring(startIndex, position.end.offset);
+    // This helps account for a weird scenario where list items is pulling back multiple list items in one go sometimes
+    const end = listText.search(/\n( |\t)*(\*|-|\+|- \[( | x)\]|\d+\.)( | ]t)+/);
+    if (end !== -1) {
+      endIndex = startIndex + end;
+      listText = listText.substring(0, end);
+    }
+
+    console.log(listText);
+
+    listText = func(listText);
+
+    text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, endIndex, listText);
+  }
+
+  return text;
+}
+
+
+export function updateBlockquoteText(text: string, func:(text: string) => string): string {
+  const positions: Position[] = getPositions(mdastTypes.blockquote, text);
+
+  for (const position of positions) {
+    const startIndex = position.start.offset+2;
+    let endIndex = position.end.offset;
+    let listText = text.substring(startIndex, position.end.offset);
+    // This helps account for a weird scenario where list items is pulling back multiple list items in one go sometimes
+    const end = listText.search(/\n( |\t)*(\*|-|\+|- \[( | x)\]|\d+\.)( | ]t)+/);
+    if (end !== -1) {
+      endIndex = startIndex + end;
+      listText = listText.substring(0, end);
+    }
+
+    console.log(listText);
+
+    listText = func(listText);
+
+    text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, endIndex, listText);
   }
 
   return text;

@@ -15,6 +15,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   thematicBreak: {replaceAction: 'thematicBreak', placeholder: '{HORIZONTAL_RULE_PLACEHOLDER}', replaceDollarSigns: false},
   italics: {replaceAction: 'emphasis', placeholder: '{ITALICS_PLACEHOLDER}', replaceDollarSigns: false},
   bold: {replaceAction: 'strong', placeholder: '{STRONG_PLACEHOLDER}', replaceDollarSigns: false},
+  list: {replaceAction: 'list', placeholder: '{LIST_PLACEHOLDER}', replaceDollarSigns: false},
   // RegExp
   yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---'), replaceDollarSigns: true},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}', replaceDollarSigns: false},
