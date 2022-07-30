@@ -102,6 +102,28 @@ export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineArou
           > > \`\`\`
         `,
       }),
+      new ExampleBuilder({
+        description: 'Nested fenced code blocks get empty lines added around them',
+        before: dedent`
+          \`\`\`markdown
+          # Header
+          ${''}
+          \`\`\`\`JavaScript
+          var text = 'some string';
+          \`\`\`\`
+          \`\`\`
+        `,
+        after: dedent`
+          \`\`\`markdown
+          # Header
+          ${''}
+          \`\`\`\`JavaScript
+          var text = 'some string';
+          \`\`\`\`
+          ${''}
+          \`\`\`
+        `,
+      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<EmptyLineAroundCodeFencesOptions>[] {

@@ -81,7 +81,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
             const ignoreShortWords = options.lowercaseWords;
             let firstWord = true;
             for (let j = 1; j < headerWords.length; j++) {
-              const isWord = headerWords[j].match(/^[A-Za-z'-]+[.?!,:;]?$/);
+              const isWord = headerWords[j].match(/^[\p{L}'-]+[.?!,:;]?$/u);
               if (!isWord) {
                 continue;
               }
@@ -114,9 +114,10 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
             lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
             break;
           case 'First letter':
+            // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
             lines[i] = lines[i]
                 .toLowerCase()
-                .replace(/^#*\s+([^a-z])*([a-z])/, (string) => string.toUpperCase()); // capitalize first letter of heading
+                .replace(/^#*\s+([^\p{L}])*([\p{L}])/u, (string) => string.toUpperCase()); // capitalize first letter of heading
             break;
         }
       }
