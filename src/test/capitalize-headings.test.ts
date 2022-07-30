@@ -14,6 +14,8 @@ ruleTest({
         ## I can't do this
         ## comma, comma, comma
         ## 1.1 the Header
+        ## état
+        ## this état
       `,
       after: dedent`
         # h1
@@ -22,6 +24,8 @@ ruleTest({
         ## I Can't Do This
         ## Comma, Comma, Comma
         ## 1.1 The Header
+        ## État
+        ## This État
       `,
       options: {
         style: 'Title Case',
@@ -88,6 +92,19 @@ ruleTest({
         # Heading [[docker]]
         # Heading [docker](docker)
         # Heading ![docker](docker)
+      `,
+      options: {
+        style: 'First letter',
+      },
+    },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/321
+      testName: 'Make sure non-english letters get capitalized when they are the first letter and the rule is set to capitalize the first letter',
+      before: dedent`
+        # état
+      `,
+      after: dedent`
+        # État
       `,
       options: {
         style: 'First letter',

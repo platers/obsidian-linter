@@ -1743,6 +1743,32 @@ After:
 > > var other text = 'this is more text';
 > > ```
 ``````
+Example: Nested fenced code blocks get empty lines added around them
+
+Before:
+
+``````markdown
+```markdown
+# Header
+
+````JavaScript
+var text = 'some string';
+````
+```
+``````
+
+After:
+
+``````markdown
+```markdown
+# Header
+
+````JavaScript
+var text = 'some string';
+````
+
+```
+``````
 
 ### Empty Line Around Tables
 

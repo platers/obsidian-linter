@@ -1,7 +1,6 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-// import {ensureEmptyLinesAroundRegexMatches, tableRegex} from '../utils/regex';
 import {IgnoreTypes, ignoreListOfTypes} from '../utils/ignore-types';
 import {ensureEmptyLinesAroundTables} from '../utils/mdast';
 
