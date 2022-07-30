@@ -2,6 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ensureEmptyLinesAroundRegexMatches, tableRegex} from '../utils/regex';
+import {IgnoreTypes, ignoreListOfTypes} from '../utils/ignore-types';
 
 class EmptyLineAroundTablesOptions implements Options {
 }
@@ -21,7 +22,9 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
     return RuleType.SPACING;
   }
   apply(text: string, options: EmptyLineAroundTablesOptions): string {
-    return ensureEmptyLinesAroundRegexMatches(text, new RegExp(`(\n)*${tableRegex.source}(\n)*`, 'g'));
+    return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.blockquote], text, (text: string) => {
+      return ensureEmptyLinesAroundRegexMatches(text, new RegExp(`(\n)*${tableRegex.source}(\n)*`, 'g'));
+    });
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundTablesOptions>[] {
     return [
@@ -98,6 +101,29 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
           foo | bar
           ${''}
           New paragraph.
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Tables in callouts or blockquotes are ignored',
+        before: dedent`
+          > Table in blockquote
+          > | Column 1 | Column 2 | Column 3 |
+          > |----------|----------|----------|
+          > | foo      | bar      | blob     |
+          > | baz      | qux      | trust    |
+          > | quux     | quuz     | glob     |
+          ${''}
+          More content here
+        `,
+        after: dedent`
+          > Table in blockquote
+          > | Column 1 | Column 2 | Column 3 |
+          > |----------|----------|----------|
+          > | foo      | bar      | blob     |
+          > | baz      | qux      | trust    |
+          > | quux     | quuz     | glob     |
+          ${''}
+          More content here
         `,
       }),
     ];

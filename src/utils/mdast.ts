@@ -1,9 +1,12 @@
-import {remark} from 'remark';
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
-import remarkGfm from 'remark-gfm';
+import {fromMarkdown} from 'mdast-util-from-markdown';
+import {gfm} from 'micromark-extension-gfm';
+import {gfmFromMarkdown} from 'mdast-util-gfm';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
+import {escapeRegExp} from './regex';
+import {start} from 'repl';
 
 const mdastTypes: Record<string, string> = {
   link: 'link',
@@ -12,10 +15,14 @@ const mdastTypes: Record<string, string> = {
   italics: 'emphasis',
   bold: 'strong',
   listItem: 'listItem',
+  code: 'code',
 };
 
 function parseTextToAST(text: string): Root {
-  const ast = remark().use(remarkGfm).parse(text);
+  const ast = fromMarkdown(text, {
+    extensions: [gfm()],
+    mdastExtensions: [gfmFromMarkdown()],
+  });
   return ast;
 }
 
@@ -316,6 +323,59 @@ export function updateListItemText(text: string, func:(text: string) => string):
     }
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+2, position.end.offset, listText);
+  }
+
+  return text;
+}
+
+export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
+  const positions: Position[] = getPositions(mdastTypes.code, text);
+
+  const textMatches = function(expectedText: string, actualText: string, requireSameTrailingWhitespace: boolean): boolean {
+    if (requireSameTrailingWhitespace) {
+      return expectedText == actualText;
+    }
+
+    return actualText.match(escapeRegExp(expectedText) + '( |\\t)*') != null;
+  };
+
+  for (const position of positions) {
+    const codeBlock = text.substring(position.start.offset, position.end.offset);
+    if (!codeBlock.startsWith('```')) {
+      continue;
+    }
+
+
+    let startOfLine = '';
+    let requireSameTrailingWhitespace = true;
+    let contentPriorToBlock = text.substring(0, position.start.offset);
+    if (contentPriorToBlock.length > 0) {
+      const contentLinesPriorToBlock = contentPriorToBlock.split('\n');
+      // contentLinesPriorToBlock.lastIndexOf('\n')
+      startOfLine = contentLinesPriorToBlock[contentLinesPriorToBlock.length - 1] ?? '';
+      requireSameTrailingWhitespace = startOfLine.trim() == '';
+      if (!requireSameTrailingWhitespace) {
+        startOfLine = startOfLine.trimEnd();
+      }
+
+      if (contentPriorToBlock.length > 1 && !textMatches(startOfLine, contentLinesPriorToBlock[contentLinesPriorToBlock.length - 2], requireSameTrailingWhitespace)) {
+        contentLinesPriorToBlock.splice(contentLinesPriorToBlock.length - 1, 0, startOfLine);
+      }
+
+      contentPriorToBlock = contentLinesPriorToBlock.join('\n');
+    }
+
+    let contentAfterBlock = text.substring(position.end.offset);
+    if (contentAfterBlock.length > 0) {
+      const contentLinesAfterBlock = contentAfterBlock.split('\n');
+      if (contentLinesAfterBlock.length > 1 && !textMatches(startOfLine, contentLinesAfterBlock[1], requireSameTrailingWhitespace)) {
+        contentLinesAfterBlock.splice(1, 0, startOfLine);
+      }
+
+      contentAfterBlock = contentLinesAfterBlock.join('\n');
+    }
+
+    text = contentPriorToBlock + codeBlock + contentAfterBlock;
   }
 
   return text;
