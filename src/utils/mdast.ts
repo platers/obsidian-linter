@@ -333,7 +333,7 @@ function textMatches(expectedText: string, actualText: string, requireSameTraili
     return expectedText == actualText;
   }
 
-  return actualText.match('^' + escapeRegExp(expectedText) + '( |\\t)*$') != null;
+  return actualText.match(new RegExp('^' + escapeRegExp(expectedText) + '( |\\t)*$', 'm')) != null;
 }
 
 function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number): string {
@@ -343,12 +343,22 @@ function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: nu
   let contentPriorToContent = text.substring(0, start);
   if (contentPriorToContent.length > 0) {
     const contentLinesPriorToContent = contentPriorToContent.split('\n');
-    // contentLinesPriorToBlock.lastIndexOf('\n')
     startOfLine = contentLinesPriorToContent[contentLinesPriorToContent.length - 1] ?? '';
     requireSameTrailingWhitespace = startOfLine.trim() == '';
     if (!requireSameTrailingWhitespace) {
       startOfLine = startOfLine.trimEnd();
     }
+
+    let numberOfIndexesToRemove = 0;
+    while (contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove) >= 0) {
+      if (!textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove)], requireSameTrailingWhitespace)) {
+        break;
+      }
+
+      numberOfIndexesToRemove++;
+    }
+
+    contentLinesPriorToContent.splice(contentLinesPriorToContent.length - (1 + numberOfIndexesToRemove), numberOfIndexesToRemove);
 
     if (contentLinesPriorToContent.length > 1 && !textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - 2], requireSameTrailingWhitespace)) {
       contentLinesPriorToContent.splice(contentLinesPriorToContent.length - 1, 0, startOfLine);
@@ -360,6 +370,17 @@ function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: nu
   let contentAfterContent = text.substring(end);
   if (contentAfterContent.length > 0) {
     const contentLinesAfterBlock = contentAfterContent.split('\n');
+    let numberOfIndexesToRemove = 0;
+    while (numberOfIndexesToRemove + 1 < contentLinesAfterBlock.length) {
+      if (!textMatches(startOfLine, contentLinesAfterBlock[1+numberOfIndexesToRemove], requireSameTrailingWhitespace)) {
+        break;
+      }
+
+      numberOfIndexesToRemove++;
+    }
+
+    contentLinesAfterBlock.splice(1, numberOfIndexesToRemove);
+
     if (contentLinesAfterBlock.length > 1 && !textMatches(startOfLine, contentLinesAfterBlock[1], requireSameTrailingWhitespace)) {
       contentLinesAfterBlock.splice(1, 0, startOfLine);
     }
