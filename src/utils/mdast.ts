@@ -7,16 +7,22 @@ import {gfmFromMarkdown} from 'mdast-util-gfm';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 import {escapeRegExp} from './regex';
 
-const mdastTypes: Record<string, string> = {
-  link: 'link',
-  footnote: 'footnoteDefinition',
-  paragraph: 'paragraph',
-  italics: 'emphasis',
-  bold: 'strong',
-  listItem: 'listItem',
-  code: 'code',
-  table: 'table',
-};
+/* eslint-disable no-unused-vars */
+export enum MDAstTypes {
+  Link = 'link',
+  Footnote = 'footnoteDefinition',
+  Paragraph = 'paragraph',
+  Italics = 'emphasis',
+  Bold = 'strong',
+  ListItem = 'listItem',
+  Code = 'code',
+  Table = 'table',
+  Image = 'image',
+  List = 'list',
+  Blockquote = 'blockquote',
+  HorizontalRule = 'thematicBreak',
+}
+/* eslint-enable no-unused-vars */
 
 function parseTextToAST(text: string): Root {
   const ast = fromMarkdown(text, {
@@ -32,10 +38,10 @@ function parseTextToAST(text: string): Root {
  * @param {string} text The markdown text
  * @return {Position[]} The positions of the given element type in the given text
  */
-export function getPositions(type: string, text: string): Position[] {
+export function getPositions(type: MDAstTypes, text: string): Position[] {
   const ast = parseTextToAST(text);
   const positions: Position[] = [];
-  visit(ast, type, (node) => {
+  visit(ast, type as string, (node) => {
     positions.push(node.position);
   });
 
@@ -52,7 +58,7 @@ export function getPositions(type: string, text: string): Position[] {
  * @return {string} The text with footnote declarations moved to the end
  */
 export function moveFootnotesToEnd(text: string) {
-  const positions: Position[] = getPositions(mdastTypes.footnote, text);
+  const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
   const footnotes: string[] = [];
 
   for (const position of positions) {
@@ -87,10 +93,10 @@ export function moveFootnotesToEnd(text: string) {
  * Makes sure that the style of either strong or emphasis is consistent.
  * @param {string} text The text to style either the strong or emphasis in a consistent manner
  * @param {string} style The style to use for the emphasis indicator (i.e. underscore, asterisk, or consistent)
- * @param {string} type The type of element to make consistent and the value should be either strong or emphasis
+ * @param {MDAstTypes} type The type of element to make consistent and the value should be either strong or emphasis
  * @return {string} The text with either strong or emphasis styles made consistent
  */
-export function makeEmphasisOrBoldConsistent(text: string, style: string, type: string): string {
+export function makeEmphasisOrBoldConsistent(text: string, style: string, type: MDAstTypes): string {
   const positions: Position[] = getPositions(type, text);
   if (positions.length === 0) {
     return text;
@@ -125,7 +131,7 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
    * @return {string} The text with two spaces at the end of lines of paragraphs, list items, and blockquotes where there were consecutive lines of content.
    */
 export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text: string): string {
-  const positions: Position[] = getPositions(mdastTypes.paragraph, text);
+  const positions: Position[] = getPositions(MDAstTypes.Paragraph, text);
   if (positions.length === 0) {
     return text;
   }
@@ -161,7 +167,7 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
    */
 export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: string): string {
   const hasTrailingLineBreak = text.endsWith('\n');
-  const positions: Position[] = getPositions(mdastTypes.paragraph, text);
+  const positions: Position[] = getPositions(MDAstTypes.Paragraph, text);
   if (positions.length === 0) {
     return text;
   }
@@ -248,7 +254,7 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
  * @return {string} The text with spaces around link text removed
  */
 export function removeSpacesInLinkText(text: string): string {
-  const positions: Position[] = getPositions(mdastTypes.link, text);
+  const positions: Position[] = getPositions(MDAstTypes.Link, text);
 
   for (const position of positions) {
     const regularLink = text.substring(position.start.offset, position.end.offset);
@@ -266,7 +272,7 @@ export function removeSpacesInLinkText(text: string): string {
 }
 
 export function updateItalicsText(text: string, func:(text: string) => string): string {
-  const positions: Position[] = getPositions(mdastTypes.italics, text);
+  const positions: Position[] = getPositions(MDAstTypes.Italics, text);
 
   for (const position of positions) {
     let italicText = text.substring(position.start.offset+1, position.end.offset-1);
@@ -280,7 +286,7 @@ export function updateItalicsText(text: string, func:(text: string) => string): 
 }
 
 export function updateBoldText(text: string, func:(text: string) => string): string {
-  const positions: Position[] = getPositions(mdastTypes.bold, text);
+  const positions: Position[] = getPositions(MDAstTypes.Bold, text);
 
   for (const position of positions) {
     let boldText = text.substring(position.start.offset+2, position.end.offset-2);
@@ -294,7 +300,7 @@ export function updateBoldText(text: string, func:(text: string) => string): str
 }
 
 export function updateListItemText(text: string, func:(text: string) => string): string {
-  const positions: Position[] = getPositions(mdastTypes.listItem, text);
+  const positions: Position[] = getPositions(MDAstTypes.ListItem, text);
 
   for (const position of positions) {
     let listText = text.substring(position.start.offset+2, position.end.offset);
@@ -393,7 +399,7 @@ function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: nu
 }
 
 export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
-  const positions: Position[] = getPositions(mdastTypes.code, text);
+  const positions: Position[] = getPositions(MDAstTypes.Code, text);
 
   for (const position of positions) {
     const codeBlock = text.substring(position.start.offset, position.end.offset);
@@ -408,7 +414,7 @@ export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
 }
 
 export function ensureEmptyLinesAroundTables(text: string): string {
-  const positions: Position[] = getPositions(mdastTypes.table, text);
+  const positions: Position[] = getPositions(MDAstTypes.Table, text);
   for (const position of positions) {
     text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
   }

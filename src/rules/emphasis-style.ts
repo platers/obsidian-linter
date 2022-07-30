@@ -2,7 +2,7 @@ import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {makeEmphasisOrBoldConsistent} from '../utils/mdast';
+import {makeEmphasisOrBoldConsistent, MDAstTypes} from '../utils/mdast';
 
 type EmphasisStyleValues = 'consistent' | 'asterisk' | 'underscore';
 
@@ -26,7 +26,7 @@ export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
   }
   apply(text: string, options: EmphasisStyleOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      return makeEmphasisOrBoldConsistent(text, options.style, 'emphasis');
+      return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Italics);
     });
   }
   get exampleBuilders(): ExampleBuilder<EmphasisStyleOptions>[] {

@@ -1,23 +1,23 @@
 import {obsidianMultilineCommentRegex, tagRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns} from './regex';
-import {getPositions} from './mdast';
+import {getPositions, MDAstTypes} from './mdast';
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 
 export type IgnoreResults = {replacedValues: string[], newText: string};
 export type IgnoreFunction = ((text: string, placeholder: string) => IgnoreResults);
-export type IgnoreType = {replaceAction: string | RegExp | IgnoreFunction, placeholder: string, replaceDollarSigns: boolean};
+export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string, replaceDollarSigns: boolean};
 
 export const IgnoreTypes: Record<string, IgnoreType> = {
   // mdast node types
-  code: {replaceAction: 'code', placeholder: '{CODE_BLOCK_PLACEHOLDER}', replaceDollarSigns: true},
-  image: {replaceAction: 'image', placeholder: '{IMAGE_PLACEHOLDER}', replaceDollarSigns: false},
-  thematicBreak: {replaceAction: 'thematicBreak', placeholder: '{HORIZONTAL_RULE_PLACEHOLDER}', replaceDollarSigns: false},
-  italics: {replaceAction: 'emphasis', placeholder: '{ITALICS_PLACEHOLDER}', replaceDollarSigns: false},
-  bold: {replaceAction: 'strong', placeholder: '{STRONG_PLACEHOLDER}', replaceDollarSigns: false},
-  list: {replaceAction: 'list', placeholder: '{LIST_PLACEHOLDER}', replaceDollarSigns: false},
-  blockquote: {replaceAction: 'blockquote', placeholder: '{BLOCKQUOTE_PLACEHOLDER}', replaceDollarSigns: false},
-  table: {replaceAction: 'table', placeholder: '{TABLE_PLACEHOLDER}', replaceDollarSigns: false},
+  code: {replaceAction: MDAstTypes.Code, placeholder: '{CODE_BLOCK_PLACEHOLDER}', replaceDollarSigns: true},
+  image: {replaceAction: MDAstTypes.Image, placeholder: '{IMAGE_PLACEHOLDER}', replaceDollarSigns: false},
+  thematicBreak: {replaceAction: MDAstTypes.HorizontalRule, placeholder: '{HORIZONTAL_RULE_PLACEHOLDER}', replaceDollarSigns: false},
+  italics: {replaceAction: MDAstTypes.Italics, placeholder: '{ITALICS_PLACEHOLDER}', replaceDollarSigns: false},
+  bold: {replaceAction: MDAstTypes.Bold, placeholder: '{STRONG_PLACEHOLDER}', replaceDollarSigns: false},
+  list: {replaceAction: MDAstTypes.List, placeholder: '{LIST_PLACEHOLDER}', replaceDollarSigns: false},
+  blockquote: {replaceAction: MDAstTypes.Blockquote, placeholder: '{BLOCKQUOTE_PLACEHOLDER}', replaceDollarSigns: false},
+  table: {replaceAction: MDAstTypes.Table, placeholder: '{TABLE_PLACEHOLDER}', replaceDollarSigns: false},
   // RegExp
   yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---'), replaceDollarSigns: true},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}', replaceDollarSigns: false},
@@ -72,11 +72,11 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
  * Replaces all mdast type instances in the given text with a placeholder.
  * @param {string} text The text to replace the given mdast node type in
  * @param {string} placeholder The placeholder to use
- * @param {string} type The type of node to ignore by replacing with the specified placeholder
+ * @param {MDAstTypes} type The type of node to ignore by replacing with the specified placeholder
  * @return {string} The text with mdast nodes types specified replaced
  * @return {string[]} The mdast nodes values replaced
  */
-function replaceMdastType(text: string, placeholder: string, type: string): IgnoreResults {
+function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): IgnoreResults {
   const positions: Position[] = getPositions(type, text);
   const replacedValues: string[] = [];
 
@@ -130,7 +130,7 @@ function replaceRegex(text: string, placeholder: string, regex: RegExp): IgnoreR
  * @return {string[]} The regular markdown links replaced
  */
 function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): IgnoreResults {
-  const positions: Position[] = getPositions('link', text);
+  const positions: Position[] = getPositions(MDAstTypes.Link, text);
   const replacedRegularLinks: string[] = [];
 
   for (const position of positions) {

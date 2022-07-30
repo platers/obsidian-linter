@@ -2,7 +2,7 @@ import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {makeEmphasisOrBoldConsistent} from '../utils/mdast';
+import {makeEmphasisOrBoldConsistent, MDAstTypes} from '../utils/mdast';
 
 type StrongStyleValues = 'consistent' | 'asterisk' | 'underscore';
 
@@ -26,7 +26,7 @@ export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
   }
   apply(text: string, options: StrongStyleOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      return makeEmphasisOrBoldConsistent(text, options.style, 'strong');
+      return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Bold);
     });
   }
   get exampleBuilders(): ExampleBuilder<StrongStyleOptions>[] {
