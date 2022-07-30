@@ -1,4 +1,4 @@
-import {obsidianMultilineCommentRegex, tagRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, tableRegex} from './regex';
+import {obsidianMultilineCommentRegex, tagRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns} from './regex';
 import {getPositions} from './mdast';
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
@@ -17,11 +17,12 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   bold: {replaceAction: 'strong', placeholder: '{STRONG_PLACEHOLDER}', replaceDollarSigns: false},
   list: {replaceAction: 'list', placeholder: '{LIST_PLACEHOLDER}', replaceDollarSigns: false},
   blockquote: {replaceAction: 'blockquote', placeholder: '{BLOCKQUOTE_PLACEHOLDER}', replaceDollarSigns: false},
+  table: {replaceAction: 'table', placeholder: '{TABLE_PLACEHOLDER}', replaceDollarSigns: false},
   // RegExp
   yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---'), replaceDollarSigns: true},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}', replaceDollarSigns: false},
   tag: {replaceAction: tagRegex, placeholder: '#tag-placeholder', replaceDollarSigns: false},
-  table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}', replaceDollarSigns: false},
+  // table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}', replaceDollarSigns: false},
   obsidianMultiLineComments: {replaceAction: obsidianMultilineCommentRegex, placeholder: '{OBSIDIAN_COMMENT_PLACEHOLDER}', replaceDollarSigns: false},
   // custom functions
   link: {replaceAction: replaceMarkdownLinks, placeholder: '{REGULAR_LINK_PLACEHOLDER}', replaceDollarSigns: false},

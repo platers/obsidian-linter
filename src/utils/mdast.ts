@@ -6,7 +6,6 @@ import {gfm} from 'micromark-extension-gfm';
 import {gfmFromMarkdown} from 'mdast-util-gfm';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 import {escapeRegExp} from './regex';
-import {start} from 'repl';
 
 const mdastTypes: Record<string, string> = {
   link: 'link',
@@ -16,6 +15,7 @@ const mdastTypes: Record<string, string> = {
   bold: 'strong',
   listItem: 'listItem',
   code: 'code',
+  table: 'table',
 };
 
 function parseTextToAST(text: string): Root {
@@ -328,16 +328,51 @@ export function updateListItemText(text: string, func:(text: string) => string):
   return text;
 }
 
-export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
-  const positions: Position[] = getPositions(mdastTypes.code, text);
+function textMatches(expectedText: string, actualText: string, requireSameTrailingWhitespace: boolean): boolean {
+  if (requireSameTrailingWhitespace) {
+    return expectedText == actualText;
+  }
 
-  const textMatches = function(expectedText: string, actualText: string, requireSameTrailingWhitespace: boolean): boolean {
-    if (requireSameTrailingWhitespace) {
-      return expectedText == actualText;
+  return actualText.match('^' + escapeRegExp(expectedText) + '( |\\t)*$') != null;
+}
+
+function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number): string {
+  const content = text.substring(start, end);
+  let startOfLine = '';
+  let requireSameTrailingWhitespace = true;
+  let contentPriorToContent = text.substring(0, start);
+  if (contentPriorToContent.length > 0) {
+    const contentLinesPriorToContent = contentPriorToContent.split('\n');
+    // contentLinesPriorToBlock.lastIndexOf('\n')
+    startOfLine = contentLinesPriorToContent[contentLinesPriorToContent.length - 1] ?? '';
+    requireSameTrailingWhitespace = startOfLine.trim() == '';
+    if (!requireSameTrailingWhitespace) {
+      startOfLine = startOfLine.trimEnd();
     }
 
-    return actualText.match(escapeRegExp(expectedText) + '( |\\t)*') != null;
-  };
+    if (contentLinesPriorToContent.length > 1 && !textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - 2], requireSameTrailingWhitespace)) {
+      contentLinesPriorToContent.splice(contentLinesPriorToContent.length - 1, 0, startOfLine);
+    }
+
+    contentPriorToContent = contentLinesPriorToContent.join('\n');
+  }
+
+  let contentAfterContent = text.substring(end);
+  if (contentAfterContent.length > 0) {
+    const contentLinesAfterBlock = contentAfterContent.split('\n');
+    if (contentLinesAfterBlock.length > 1 && !textMatches(startOfLine, contentLinesAfterBlock[1], requireSameTrailingWhitespace)) {
+      contentLinesAfterBlock.splice(1, 0, startOfLine);
+    }
+
+    contentAfterContent = contentLinesAfterBlock.join('\n');
+  }
+
+
+  return contentPriorToContent + content + contentAfterContent;
+}
+
+export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
+  const positions: Position[] = getPositions(mdastTypes.code, text);
 
   for (const position of positions) {
     const codeBlock = text.substring(position.start.offset, position.end.offset);
@@ -345,37 +380,16 @@ export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
       continue;
     }
 
+    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+  }
 
-    let startOfLine = '';
-    let requireSameTrailingWhitespace = true;
-    let contentPriorToBlock = text.substring(0, position.start.offset);
-    if (contentPriorToBlock.length > 0) {
-      const contentLinesPriorToBlock = contentPriorToBlock.split('\n');
-      // contentLinesPriorToBlock.lastIndexOf('\n')
-      startOfLine = contentLinesPriorToBlock[contentLinesPriorToBlock.length - 1] ?? '';
-      requireSameTrailingWhitespace = startOfLine.trim() == '';
-      if (!requireSameTrailingWhitespace) {
-        startOfLine = startOfLine.trimEnd();
-      }
+  return text;
+}
 
-      if (contentPriorToBlock.length > 1 && !textMatches(startOfLine, contentLinesPriorToBlock[contentLinesPriorToBlock.length - 2], requireSameTrailingWhitespace)) {
-        contentLinesPriorToBlock.splice(contentLinesPriorToBlock.length - 1, 0, startOfLine);
-      }
-
-      contentPriorToBlock = contentLinesPriorToBlock.join('\n');
-    }
-
-    let contentAfterBlock = text.substring(position.end.offset);
-    if (contentAfterBlock.length > 0) {
-      const contentLinesAfterBlock = contentAfterBlock.split('\n');
-      if (contentLinesAfterBlock.length > 1 && !textMatches(startOfLine, contentLinesAfterBlock[1], requireSameTrailingWhitespace)) {
-        contentLinesAfterBlock.splice(1, 0, startOfLine);
-      }
-
-      contentAfterBlock = contentLinesAfterBlock.join('\n');
-    }
-
-    text = contentPriorToBlock + codeBlock + contentAfterBlock;
+export function ensureEmptyLinesAroundTables(text: string): string {
+  const positions: Position[] = getPositions(mdastTypes.table, text);
+  for (const position of positions) {
+    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
   }
 
   return text;
