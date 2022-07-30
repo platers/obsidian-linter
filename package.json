@@ -39,19 +39,19 @@
     "rollup": "^2.77.0",
     "rollup-plugin-external-globals": "^0.6.1",
     "rollup-plugin-glob-import": "^0.5.0",
+    "rollup-plugin-terser": "^7.0.2",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.0",
-    "typescript": "^4.7.4",
-    "rollup-plugin-terser": "^7.0.2"
+    "typescript": "^4.7.4"
   },
   "dependencies": {
     "@types/js-yaml": "^4.0.5",
     "diff-match-patch": "^1.0.5",
     "js-yaml": "^4.1.0",
     "loglevel": "^1.8.0",
+    "mdast-util-gfm": "^2.0.1",
+    "micromark-extension-gfm": "^2.0.1",
     "moment": "^2.29.4",
-    "remark": "^14.0.2",
-    "remark-gfm": "^3.0.1",
     "rollup-plugin-terser": "^7.0.2",
     "ts-dedent": "^2.2.0",
     "unified-lint-rule": "^2.1.1",

@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ensureEmptyLinesAroundRegexMatches} from '../utils/regex';
+import {ensureEmptyLinesAroundFencedCodeBlocks} from '../utils/mdast';
 
 class EmptyLineAroundCodeFencesOptions implements Options {
 }
@@ -21,7 +21,7 @@ export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineArou
     return RuleType.SPACING;
   }
   apply(text: string, options: EmptyLineAroundCodeFencesOptions): string {
-    return ensureEmptyLinesAroundRegexMatches(text, /(^|(\n+)?)`{3}( ?[\S]+)?\n([\s\S]+)\n`{3}(\n+)?/gm);
+    return ensureEmptyLinesAroundFencedCodeBlocks(text);
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundCodeFencesOptions>[] {
     return [
@@ -44,7 +44,7 @@ export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineArou
         `,
       }),
       new ExampleBuilder({
-        description: 'Fenced code blocs that end a document do not get an empty line after them.',
+        description: 'Fenced code blocks that end a document do not get an empty line after them.',
         before: dedent`
           # Heading 1
           \`\`\`
@@ -57,6 +57,49 @@ export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineArou
           \`\`\`
           Here is a code block
           \`\`\`
+        `,
+      }),
+      new ExampleBuilder({
+        // accounts for https://github.com/platers/obsidian-linter/issues/299
+        description: 'Fenced code blocks that are in a blockquote have the proper empty line added',
+        before: dedent`
+          # Make sure that code blocks in blockquotes are accounted for correctly
+          > \`\`\`js
+          > var text = 'this is some text';
+          > \`\`\`
+          >
+          > \`\`\`js
+          > var other text = 'this is more text';
+          > \`\`\`
+          ${''}
+          **Note that the blanks blockquote lines added do not have whitespace after them**
+          ${''}
+          # Doubly nested code block
+          ${''}
+          > > \`\`\`js
+          > > var other text = 'this is more text';
+          > > \`\`\`
+        `,
+        after: dedent`
+          # Make sure that code blocks in blockquotes are accounted for correctly
+          >
+          > \`\`\`js
+          > var text = 'this is some text';
+          > \`\`\`
+          >
+          > \`\`\`js
+          > var other text = 'this is more text';
+          > \`\`\`
+          >
+          ${''}
+          **Note that the blanks blockquote lines added do not have whitespace after them**
+          ${''}
+          # Doubly nested code block
+          ${''}
+          > >
+          > > \`\`\`js
+          > > var other text = 'this is more text';
+          > > \`\`\`
         `,
       }),
     ];

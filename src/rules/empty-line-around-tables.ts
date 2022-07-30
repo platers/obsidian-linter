@@ -1,7 +1,9 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ensureEmptyLinesAroundRegexMatches, tableRegex} from '../utils/regex';
+// import {ensureEmptyLinesAroundRegexMatches, tableRegex} from '../utils/regex';
+import {IgnoreTypes, ignoreListOfTypes} from '../utils/ignore-types';
+import {ensureEmptyLinesAroundTables} from '../utils/mdast';
 
 class EmptyLineAroundTablesOptions implements Options {
 }
@@ -15,13 +17,15 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
     return 'Empty Line Around Tables';
   }
   get description(): string {
-    return 'Ensures that there is an empty line around tables unless they start or end a document.';
+    return 'Ensures that there is an empty line around github flavored tables unless they start or end a document.';
   }
   get type(): RuleType {
     return RuleType.SPACING;
   }
   apply(text: string, options: EmptyLineAroundTablesOptions): string {
-    return ensureEmptyLinesAroundRegexMatches(text, new RegExp(`(\n)*${tableRegex.source}(\n)*`, 'g'));
+    return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.code], text, (text: string) => {
+      return ensureEmptyLinesAroundTables(text);
+    });
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundTablesOptions>[] {
     return [
@@ -33,7 +37,10 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
           | foo      | bar      |
           | baz      | qux      |
           | quux     | quuz     |
-          New paragraph.
+          More text.
+          # Heading
+          ${''}
+          **Note that text directly following a table is considered part of a table according to github markdown**
         `,
         after: dedent`
           | Column 1 | Column 2 |
@@ -41,8 +48,11 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
           | foo      | bar      |
           | baz      | qux      |
           | quux     | quuz     |
+          More text.
           ${''}
-          New paragraph.
+          # Heading
+          ${''}
+          **Note that text directly following a table is considered part of a table according to github markdown**
         `,
       }),
       new ExampleBuilder({
@@ -79,6 +89,7 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
           :-: | -----------:
           bar | baz
           foo | bar
+          # Header for more content
           New paragraph.
         `,
         after: dedent`
@@ -97,7 +108,48 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
           bar | baz
           foo | bar
           ${''}
+          # Header for more content
           New paragraph.
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Tables in callouts or blockquotes have the appropriately formatted blank lines added',
+        before: dedent`
+          > Table in blockquote
+          > | Column 1 | Column 2 | Column 3 |
+          > |----------|----------|----------|
+          > | foo      | bar      | blob     |
+          > | baz      | qux      | trust    |
+          > | quux     | quuz     | glob     |
+          ${''}
+          More content here
+          ${''}
+          > Table doubly nested in blockquote
+          > > | Column 1 | Column 2 | Column 3 |
+          > > |----------|----------|----------|
+          > > | foo      | bar      | blob     |
+          > > | baz      | qux      | trust    |
+          > > | quux     | quuz     | glob     |
+        `,
+        after: dedent`
+          > Table in blockquote
+          >
+          > | Column 1 | Column 2 | Column 3 |
+          > |----------|----------|----------|
+          > | foo      | bar      | blob     |
+          > | baz      | qux      | trust    |
+          > | quux     | quuz     | glob     |
+          >
+          ${''}
+          More content here
+          ${''}
+          > Table doubly nested in blockquote
+          > >
+          > > | Column 1 | Column 2 | Column 3 |
+          > > |----------|----------|----------|
+          > > | foo      | bar      | blob     |
+          > > | baz      | qux      | trust    |
+          > > | quux     | quuz     | glob     |
         `,
       }),
     ];

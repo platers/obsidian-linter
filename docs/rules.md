@@ -1677,7 +1677,7 @@ var temp = 'text';
 
 Text after code block.
 ``````
-Example: Fenced code blocs that end a document do not get an empty line after them.
+Example: Fenced code blocks that end a document do not get an empty line after them.
 
 Before:
 
@@ -1697,12 +1697,58 @@ After:
 Here is a code block
 ```
 ``````
+Example: Fenced code blocks that are in a blockquote have the proper empty line added
+
+Before:
+
+``````markdown
+# Make sure that code blocks in blockquotes are accounted for correctly
+> ```js
+> var text = 'this is some text';
+> ```
+>
+> ```js
+> var other text = 'this is more text';
+> ```
+
+**Note that the blanks blockquote lines added do not have whitespace after them**
+
+# Doubly nested code block
+
+> > ```js
+> > var other text = 'this is more text';
+> > ```
+``````
+
+After:
+
+``````markdown
+# Make sure that code blocks in blockquotes are accounted for correctly
+>
+> ```js
+> var text = 'this is some text';
+> ```
+>
+> ```js
+> var other text = 'this is more text';
+> ```
+>
+
+**Note that the blanks blockquote lines added do not have whitespace after them**
+
+# Doubly nested code block
+
+> >
+> > ```js
+> > var other text = 'this is more text';
+> > ```
+``````
 
 ### Empty Line Around Tables
 
 Alias: `empty-line-around-tables`
 
-Ensures that there is an empty line around tables unless they start or end a document.
+Ensures that there is an empty line around github flavored tables unless they start or end a document.
 
 
 
@@ -1716,7 +1762,10 @@ Before:
 | foo      | bar      |
 | baz      | qux      |
 | quux     | quuz     |
-New paragraph.
+More text.
+# Heading
+
+**Note that text directly following a table is considered part of a table according to github markdown**
 ``````
 
 After:
@@ -1727,8 +1776,11 @@ After:
 | foo      | bar      |
 | baz      | qux      |
 | quux     | quuz     |
+More text.
 
-New paragraph.
+# Heading
+
+**Note that text directly following a table is considered part of a table according to github markdown**
 ``````
 Example: Tables that end a document do not get an empty line after them.
 
@@ -1770,6 +1822,7 @@ Before:
 :-: | -----------:
 bar | baz
 foo | bar
+# Header for more content
 New paragraph.
 ``````
 
@@ -1791,7 +1844,52 @@ After:
 bar | baz
 foo | bar
 
+# Header for more content
 New paragraph.
+``````
+Example: Tables in callouts or blockquotes have the appropriately formatted blank lines added
+
+Before:
+
+``````markdown
+> Table in blockquote
+> | Column 1 | Column 2 | Column 3 |
+> |----------|----------|----------|
+> | foo      | bar      | blob     |
+> | baz      | qux      | trust    |
+> | quux     | quuz     | glob     |
+
+More content here
+
+> Table doubly nested in blockquote
+> > | Column 1 | Column 2 | Column 3 |
+> > |----------|----------|----------|
+> > | foo      | bar      | blob     |
+> > | baz      | qux      | trust    |
+> > | quux     | quuz     | glob     |
+``````
+
+After:
+
+``````markdown
+> Table in blockquote
+>
+> | Column 1 | Column 2 | Column 3 |
+> |----------|----------|----------|
+> | foo      | bar      | blob     |
+> | baz      | qux      | trust    |
+> | quux     | quuz     | glob     |
+>
+
+More content here
+
+> Table doubly nested in blockquote
+> >
+> > | Column 1 | Column 2 | Column 3 |
+> > |----------|----------|----------|
+> > | foo      | bar      | blob     |
+> > | baz      | qux      | trust    |
+> > | quux     | quuz     | glob     |
 ``````
 
 ### Heading blank lines
@@ -2099,7 +2197,18 @@ Before:
 
 # Nested in a block quote
 
-> - ［ contents here ］
+> - ［ contents here］
+>   - 	［ more contents here］ more text here
+> + 	［ another item here］
+> * ［ one last item here］
+
+# Doubly nested in a block quote
+
+> The following is doubly nested
+> > - ［ contents here］
+> >   - 	［ more contents here］ more text here
+> > + 	［ another item here］
+> > * ［ one last item here］
 ``````
 
 After:
@@ -2115,6 +2224,17 @@ After:
 # Nested in a block quote
 
 > - ［contents here］
+>   - ［more contents here］more text here
+> + ［another item here］
+> * ［one last item here］
+
+# Doubly nested in a block quote
+
+> The following is doubly nested
+> > - ［contents here］
+> >   - ［more contents here］more text here
+> > + ［another item here］
+> > * ［one last item here］
 ``````
 
 ### Space after list markers
