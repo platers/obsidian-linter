@@ -49,12 +49,11 @@
     "diff-match-patch": "^1.0.5",
     "js-yaml": "^4.1.0",
     "loglevel": "^1.8.0",
-    "mdast-util-gfm": "^2.0.1",
-    "micromark-extension-gfm": "^2.0.1",
+    "remark": "^14.0.2",
+    "remark-gfm": "^3.0.1",
+    "unified": "^10.1.2",
+    "unified-lint-rule": "^2.1.0",
     "moment": "^2.29.4",
-    "rollup-plugin-terser": "^7.0.2",
-    "ts-dedent": "^2.2.0",
-    "unified-lint-rule": "^2.1.1",
-    "unist-util-visit": "^4.1.0"
+    "ts-dedent": "^2.2.0"
   }
 }

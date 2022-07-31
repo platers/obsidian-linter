@@ -1,11 +1,10 @@
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
-import {fromMarkdown} from 'mdast-util-from-markdown';
-import {gfm} from 'micromark-extension-gfm';
-import {gfmFromMarkdown} from 'mdast-util-gfm';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 import {escapeRegExp} from './regex';
+import {remark} from 'remark';
+import remarkGfm from 'remark-gfm';
 
 /* eslint-disable no-unused-vars */
 export enum MDAstTypes {
@@ -25,10 +24,7 @@ export enum MDAstTypes {
 /* eslint-enable no-unused-vars */
 
 function parseTextToAST(text: string): Root {
-  const ast = fromMarkdown(text, {
-    extensions: [gfm()],
-    mdastExtensions: [gfmFromMarkdown()],
-  });
+  const ast = remark().use(remarkGfm).parse(text);
   return ast;
 }
 
