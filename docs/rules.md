@@ -846,7 +846,7 @@ Maecenas malesuada dignissim purus ac volutpat.
 
 Alias: `re-index-footnotes`
 
-Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)
+Re-indexes footnote keys and footnote, based on the order of occurrence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)
 
 
 
