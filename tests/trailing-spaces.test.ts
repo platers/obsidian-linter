@@ -1,4 +1,4 @@
-import TrailingSpaces from '../rules/trailing-spaces';
+import TrailingSpaces from '../src/rules/trailing-spaces';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

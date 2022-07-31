@@ -1,7 +1,7 @@
 import dedent from 'ts-dedent';
 import moment from 'moment';
 import {ruleTest} from './common';
-import YamlTimestamp from '../rules/yaml-timestamp';
+import YamlTimestamp from '../src/rules/yaml-timestamp';
 
 ruleTest({
   RuleBuilderClass: YamlTimestamp,
@@ -156,14 +156,14 @@ ruleTest({
         ---
       `,
       options: () => {
+        const locale = 'fr';
         return {
           dateCreated: false,
           dateModifiedKey: 'modified',
           fileModifiedTime: '2020-02-01T00:00:00-00:00',
-          currentTime: moment('samedi, février 1er 2020, 12:00:05 am', 'dddd, MMMM Do YYYY, h:mm:ss a'),
+          currentTime: moment('samedi, février 1er 2020, 12:00:05 am', 'dddd, MMMM Do YYYY, h:mm:ss a', locale),
           alreadyModified: false,
-          locale: 'fr',
-          moment: moment,
+          locale: locale,
         };
       },
     },

@@ -9,7 +9,6 @@ import {insert} from '../utils/strings';
 class YamlTimestampOptions implements Options {
   alreadyModified?: boolean;
   dateCreatedKey?: string = 'date created';
-  moment?: typeof moment;
   dateCreated?: boolean = true;
   fileCreatedTime?: string;
   format?: string = 'dddd, MMMM Do YYYY, h:mm:ss a';
@@ -44,8 +43,6 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       const created_key_match_str = `\n${options.dateCreatedKey}:[ \t]*\n`;
       const created_key_match = new RegExp(created_key_match_str);
       const created_match = new RegExp(created_match_str);
-
-      const moment = options.moment;
 
       if (options.dateCreated) {
         let created_date = moment(options.fileCreatedTime);
@@ -90,6 +87,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         const modified_key_match = new RegExp(modified_key_match_str);
         const modified_match = new RegExp(modified_match_str);
 
+        console.log(moment);
         let modified_date = moment(options.fileModifiedTime);
         modified_date.locale(options.locale);
         // using the current time helps prevent issues where the previous modified time was greater

@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {getDisabledRules, rules} from '../rules';
+import {getDisabledRules, rules} from '../src/rules';
 
 describe('Disabled rules parsing', () => {
   it('No YAML', () => {

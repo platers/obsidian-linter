@@ -1,4 +1,4 @@
-import NoBareUrls from '../rules/no-bare-urls';
+import NoBareUrls from '../src/rules/no-bare-urls';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

@@ -1,4 +1,4 @@
-import ConsecutiveBlankLines from '../rules/consecutive-blank-lines';
+import ConsecutiveBlankLines from '../src/rules/consecutive-blank-lines';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

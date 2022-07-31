@@ -1,4 +1,4 @@
-import YamlTitle from '../rules/yaml-title';
+import YamlTitle from '../src/rules/yaml-title';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

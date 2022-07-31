@@ -1,4 +1,4 @@
-import RemoveLinkSpacing from '../rules/remove-link-spacing';
+import RemoveLinkSpacing from '../src/rules/remove-link-spacing';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

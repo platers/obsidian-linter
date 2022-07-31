@@ -1,4 +1,4 @@
-import ParagraphBlankLines from '../rules/paragraph-blank-lines';
+import ParagraphBlankLines from '../src/rules/paragraph-blank-lines';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

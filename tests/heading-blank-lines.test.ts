@@ -1,4 +1,4 @@
-import HeadingBlankLines from '../rules/heading-blank-lines';
+import HeadingBlankLines from '../src/rules/heading-blank-lines';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

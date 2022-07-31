@@ -1,4 +1,4 @@
-import YamlKeySort from '../rules/yaml-key-sort';
+import YamlKeySort from '../src/rules/yaml-key-sort';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

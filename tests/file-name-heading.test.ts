@@ -1,4 +1,4 @@
-import FileNameHeading from '../rules/file-name-heading';
+import FileNameHeading from '../src/rules/file-name-heading';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

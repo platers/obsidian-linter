@@ -1,4 +1,4 @@
-import CapitalizeHeadings from '../rules/capitalize-headings';
+import CapitalizeHeadings from '../src/rules/capitalize-headings';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

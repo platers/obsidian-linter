@@ -61,7 +61,7 @@ Once the proof of concept, if requested, or refactor idea gets the green light, 
 
 ### Adding Tests
 
-Tests are located in `src/test/`. File names for tests must end in `.test.ts` and should have dashes between words.  
+Tests are located in `tests/`. File names for tests must end in `.test.ts` and should have dashes between words.  
 Tests for rule other than the examples will be in the format `{RULE_ALIAS}.test.ts` which will help keep testing files manageable.
 
 A test will take the form of
