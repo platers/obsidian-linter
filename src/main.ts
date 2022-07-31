@@ -14,6 +14,7 @@ import YamlTimestamp from './rules/yaml-timestamp';
 import YamlKeySort from './rules/yaml-key-sort';
 import {RuleBuilderBase} from './rules/rule-builder';
 import {iconInfo} from './icons';
+import {YAMLException} from 'js-yaml';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -309,13 +310,7 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          if (error.name === 'YAMLException') {
-            new Notice(`There is an error in file "${file.path}" in the YAML ` + error.mark);
-          } else {
-            new Notice('An error occurred during linting. See console for details');
-          }
-
-          logError(`Lint All Files Error in File '${file.path}'`, error);
+          this.handleLintError(file, error, 'There is an error in the yaml of file \'${file.path}\': ', 'Lint All Files Error in File \'${file.path}\'');
 
           numberOfErrors+=1;
         }
@@ -340,13 +335,7 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          if (error.name === 'YAMLException') {
-            new Notice(`There is an error in file "${file.path}" in the YAML ` + error.mark);
-          } else {
-            new Notice('An error occurred during linting. See console for details');
-          }
-
-          logError(`Lint All Files in Folder Error in File '${file.path}'`, error);
+          this.handleLintError(file, error, 'There is an error in the yaml of file \'${file.path}\': ', 'Lint All Files in Folder Error in File \'${file.path}\'');
 
           numberOfErrors+=1;
         }
@@ -379,13 +368,7 @@ export default class LinterPlugin extends Plugin {
     try {
       newText = this.lintText(oldText, file);
     } catch (error) {
-      if (error.name === 'YAMLException') {
-        new Notice('There is an error in the YAML ' + error.mark);
-      } else {
-        new Notice('An error occurred during linting. See console for details');
-      }
-
-      logError(`Lint File Error in File '${file.path}'`, error);
+      this.handleLintError(file, error, 'There is an error in the yaml: ', 'Lint File Error in File \'${file.path}\'');
     }
 
     // Replace changed lines
@@ -445,6 +428,19 @@ export default class LinterPlugin extends Plugin {
       `;
       new Notice(message);
     }
+  }
+
+  private handleLintError(file: TFile, error: Error, yamlErrorStringTemplate: string, logErrorStringTemplate: string) {
+    if (error instanceof YAMLException) {
+      let errorMessage = error.toString();
+      errorMessage = errorMessage.substring(errorMessage.indexOf(':') + 1);
+
+      new Notice(yamlErrorStringTemplate.replace('${file.path}', file.path) + errorMessage);
+    } else {
+      new Notice('An error occurred during linting. See console for details');
+    }
+
+    logError(logErrorStringTemplate.replace('${file.path}', file.path), error);
   }
 }
 
