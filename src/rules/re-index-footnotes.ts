@@ -15,7 +15,7 @@ export default class ReIndexFootnotes extends RuleBuilder<ReIndexFootnotesOption
     return 'Re-Index Footnotes';
   }
   get description(): string {
-    return 'Re-indexes footnote keys and footnote, based on the order of occurence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)';
+    return 'Re-indexes footnote keys and footnote, based on the order of occurrence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)';
   }
   get type(): RuleType {
     return RuleType.FOOTNOTE;

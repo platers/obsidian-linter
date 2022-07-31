@@ -55,7 +55,26 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
  */
 export function moveFootnotesToEnd(text: string) {
   const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
-  const footnotes: string[] = [];
+  let footnotes: string[] = [];
+
+  const alreadyUsedReferencePositions = new Set<number>();
+  const mapOfFootnoteToFootnoteReferenceIndex = new Map<string, number>();
+  const referencePosition = function(footnote: string, startOfFootnoteReferenceSearch: number): number {
+    const footnoteReference = footnote.match(/\[\^.*?\]/)[0];
+    let footnoteReferenceLocation: number;
+    do {
+      footnoteReferenceLocation = text.lastIndexOf(footnoteReference, startOfFootnoteReferenceSearch);
+      startOfFootnoteReferenceSearch = footnoteReferenceLocation;
+    } while (alreadyUsedReferencePositions.has(footnoteReferenceLocation) && footnoteReferenceLocation !== -1 );
+
+    if (footnoteReferenceLocation === -1) {
+      throw new Error(`Footnote '${footnote}' has no corresponding footnote reference before the footnote contents and cannot be processed. Please make sure that all footnotes have a corresponding reference before the content of the footnote.`);
+    }
+
+    alreadyUsedReferencePositions.add(footnoteReferenceLocation);
+    return footnoteReferenceLocation;
+  };
+
 
   for (const position of positions) {
     const footnote = text.substring(position.start.offset, position.end.offset);
@@ -69,10 +88,13 @@ export function moveFootnotesToEnd(text: string) {
       text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
     }
     text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
+    mapOfFootnoteToFootnoteReferenceIndex.set(footnote, referencePosition(footnote, position.start.offset));
   }
 
-  // Reverse the footnotes so that they are in the same order as the original text
-  footnotes.reverse();
+  // Sort the footnotes into the order of their references in the text
+  footnotes = footnotes.sort((f1: string, f2: string) => {
+    return mapOfFootnoteToFootnoteReferenceIndex.get(f1) - mapOfFootnoteToFootnoteReferenceIndex.get(f2);
+  });
 
   // Add the footnotes to the end of the document
   if (footnotes.length > 0) {
