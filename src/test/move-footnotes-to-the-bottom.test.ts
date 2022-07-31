@@ -8,11 +8,13 @@ ruleTest({
     {
       testName: 'Simple case',
       before: dedent`
+        This has a footnote reference at the end [^alpha]
         [^alpha]: bravo and charlie.
         ${''}
         Line
       `,
       after: dedent`
+        This has a footnote reference at the end [^alpha]
         Line
         ${''}
         [^alpha]: bravo and charlie.
@@ -119,15 +121,40 @@ ruleTest({
     {
       testName: 'Footnote already at the bottom does not add an extra newline',
       before: dedent`
-        Line
+        Line [^alpha]
         ${''}
         [^alpha]: bravo and charlie.
       `,
       after: dedent`
-        Line
+        Line [^alpha]
         ${''}
         [^alpha]: bravo and charlie.
       `,
     },
+    {
+      testName: 'Make sure that a footnote placed between footnotes that already have content at the end of the file properly gets properly ordered',
+      before: dedent`
+        reference A [^1]
+        ${''}
+        reference C [^2]
+        [^2]: footnote C (inserted between A and B)
+        ${''}
+        reference B [^2]
+        ${''}
+        [^1]: footnote A (first in document)
+        [^2]: footnote B (last in document)
+      `,
+      after: dedent`
+        reference A [^1]
+        ${''}
+        reference C [^2]
+        reference B [^2]
+        ${''}
+        [^1]: footnote A (first in document)
+        [^2]: footnote C (inserted between A and B)
+        [^2]: footnote B (last in document)
+      `,
+    },
   ],
 });
+
