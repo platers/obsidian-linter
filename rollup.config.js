@@ -28,7 +28,7 @@ export default [
     plugins: [
       typescript({inlineSources: !isProd}),
       nodeResolve({browser: true}),
-      commonjs(),
+      commonjs({exclude: 'tests/**'}),
       globImport({
         format: 'default',
       }),
