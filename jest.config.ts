@@ -9,7 +9,7 @@ const config: Config.InitialOptions = {
     '"/node_modules/(?!unified-lint-rule)',
   ],
   moduleNameMapper: {
-    "obsidian": "__mocks__/obsidian.ts"
+    'obsidian': '__mocks__/obsidian.ts',
   },
 };
 export default config;

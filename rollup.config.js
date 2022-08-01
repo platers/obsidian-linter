@@ -1,7 +1,6 @@
 import typescript from '@rollup/plugin-typescript';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import externalGlobals from 'rollup-plugin-external-globals';
 import {plugin as globImport} from 'rollup-plugin-glob-import';
 import replace from '@rollup/plugin-replace';
 
@@ -46,17 +45,18 @@ export default [
     external: ['obsidian'],
     plugins: [
       typescript(),
-      nodeResolve({browser: true}),
-      commonjs({exclude: 'tests/**'}),
-      globImport({
-        format: 'default',
-      }),
       replace({
         values: {
           'obsidian.moment': 'moment',
           'var obsidian = require(\'obsidian\');': 'var moment = require(\'moment\');',
         },
         preventAssignment: true,
+        delimiters: ['', ''],
+      }),
+      nodeResolve({browser: true}),
+      commonjs({exclude: 'tests/**'}),
+      globImport({
+        format: 'default',
       }),
     ],
   },

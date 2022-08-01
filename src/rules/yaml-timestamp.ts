@@ -45,7 +45,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       const created_match = new RegExp(created_match_str);
 
       if (options.dateCreated) {
-        let created_date = moment(options.fileCreatedTime);
+        const created_date = moment(options.fileCreatedTime);
         created_date.locale(options.locale);
 
         const formatted_date = created_date.format(options.format);
@@ -87,8 +87,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         const modified_key_match = new RegExp(modified_key_match_str);
         const modified_match = new RegExp(modified_match_str);
 
-        console.log(moment);
-        let modified_date = moment(options.fileModifiedTime);
+        const modified_date = moment(options.fileModifiedTime);
         modified_date.locale(options.locale);
         // using the current time helps prevent issues where the previous modified time was greater
         // than 5 seconds prior to the time the linter will finish with the file (i.e. helps prevent accidental infinite loops on updating the date modified value)
