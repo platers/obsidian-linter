@@ -1,4 +1,4 @@
-import SpaceBetweenChineseAndEnglishOrNumbers from '../rules/space-between-chinese-and-english-or-numbers';
+import SpaceBetweenChineseAndEnglishOrNumbers from '../src/rules/space-between-chinese-and-english-or-numbers';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

@@ -1,4 +1,4 @@
-import TwoSpacesBetweenLinesWithContent from '../rules/two-spaces-between-lines-with-content';
+import TwoSpacesBetweenLinesWithContent from '../src/rules/two-spaces-between-lines-with-content';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

@@ -1,4 +1,4 @@
-import SpaceAfterListMarkers from '../rules/space-after-list-markers';
+import SpaceAfterListMarkers from '../src/rules/space-after-list-markers';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

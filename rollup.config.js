@@ -1,8 +1,8 @@
 import typescript from '@rollup/plugin-typescript';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import externalGlobals from 'rollup-plugin-external-globals';
 import {plugin as globImport} from 'rollup-plugin-glob-import';
+import replace from '@rollup/plugin-replace';
 
 const isProd = (process.env.BUILD === 'production');
 
@@ -28,7 +28,7 @@ export default [
     plugins: [
       typescript({inlineSources: !isProd}),
       nodeResolve({browser: true}),
-      commonjs(),
+      commonjs({exclude: 'tests/**'}),
       globImport({
         format: 'default',
       }),
@@ -45,11 +45,16 @@ export default [
     external: ['obsidian'],
     plugins: [
       typescript(),
-      nodeResolve({browser: true}),
-      commonjs(),
-      externalGlobals({
-        'obsidian': 'obsidian',
+      replace({
+        values: {
+          'obsidian.moment': 'moment',
+          'var obsidian = require(\'obsidian\');': 'var moment = require(\'moment\');',
+        },
+        preventAssignment: true,
+        delimiters: ['', ''],
       }),
+      nodeResolve({browser: true}),
+      commonjs({exclude: 'tests/**'}),
       globImport({
         format: 'default',
       }),

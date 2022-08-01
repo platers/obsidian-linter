@@ -1,4 +1,4 @@
-import ConvertSpacesToTabs from '../rules/convert-spaces-to-tabs';
+import ConvertSpacesToTabs from '../src/rules/convert-spaces-to-tabs';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

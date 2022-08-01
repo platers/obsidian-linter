@@ -1,4 +1,4 @@
-import HeaderIncrement from '../rules/header-increment';
+import HeaderIncrement from '../src/rules/header-increment';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

@@ -1,4 +1,4 @@
-import MoveFootnotesToTheBottom from '../rules/move-footnotes-to-the-bottom';
+import MoveFootnotesToTheBottom from '../src/rules/move-footnotes-to-the-bottom';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

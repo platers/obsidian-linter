@@ -1,4 +1,4 @@
-import RemoveEmptyLinesBetweenListMarkersAndChecklists from '../rules/remove-empty-lines-between-list-markers-and-checklists';
+import RemoveEmptyLinesBetweenListMarkersAndChecklists from '../src/rules/remove-empty-lines-between-list-markers-and-checklists';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

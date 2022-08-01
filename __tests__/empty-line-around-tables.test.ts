@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
-import EmptyLineAroundTables from '../rules/empty-line-around-tables';
+import EmptyLineAroundTables from '../src/rules/empty-line-around-tables';
 
 ruleTest({
   RuleBuilderClass: EmptyLineAroundTables,

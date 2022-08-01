@@ -1,6 +1,6 @@
+import EmptyLineAroundCodeFences from '../src/rules/empty-line-around-code-fences';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
-import EmptyLineAroundCodeFences from '../rules/empty-line-around-code-fences';
 
 ruleTest({
   RuleBuilderClass: EmptyLineAroundCodeFences,

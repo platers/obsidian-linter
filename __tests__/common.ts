@@ -1,5 +1,5 @@
-import {Options} from '../rules';
-import RuleBuilder, {RuleBuilderBase} from '../rules/rule-builder';
+import {Options} from '../src/rules';
+import RuleBuilder, {RuleBuilderBase} from '../src/rules/rule-builder';
 
 type TestCase<TOptions extends Options> = {
   testName: string,

@@ -1,4 +1,4 @@
-import RemoveHyphenatedLineBreaks from '../rules/remove-hyphenated-line-breaks';
+import RemoveHyphenatedLineBreaks from '../src/rules/remove-hyphenated-line-breaks';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

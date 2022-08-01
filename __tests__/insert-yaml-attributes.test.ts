@@ -1,4 +1,4 @@
-import InsertYamlAttributes from '../rules/insert-yaml-attributes';
+import InsertYamlAttributes from '../src/rules/insert-yaml-attributes';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 

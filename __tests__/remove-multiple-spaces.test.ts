@@ -1,4 +1,4 @@
-import RemoveMultipleSpaces from '../rules/remove-multiple-spaces';
+import RemoveMultipleSpaces from '../src/rules/remove-multiple-spaces';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 
