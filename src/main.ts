@@ -71,7 +71,7 @@ export default class LinterPlugin extends Plugin {
   settings: LinterSettings;
   private eventRef: EventRef;
   private momentLocale: string;
-  
+
   async onload() {
     logInfo('Loading plugin');
 
@@ -263,7 +263,6 @@ export default class LinterPlugin extends Plugin {
         fileModifiedTime: modifiedAtTime,
         fileName: file.basename,
         locale: this.momentLocale,
-        moment: moment,
       });
     }
 
@@ -277,7 +276,6 @@ export default class LinterPlugin extends Plugin {
       currentTime: currentTime,
       alreadyModified: oldText != newText,
       locale: this.momentLocale,
-      moment: moment,
     });
 
     const yamlTimestampOptions = YamlTimestamp.getRuleOptions(this.settings);
