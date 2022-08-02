@@ -2111,9 +2111,9 @@ Before:
 
 ``````markdown
 ---
-alias: ['authoughts']
+key: value
 ---
-# Automatic thoughts
+# Header
 Paragraph here...
 ``````
 
@@ -2121,9 +2121,9 @@ After:
 
 ``````markdown
 ---
-alias: ['authoughts']
+key: value
 ---
-# Automatic thoughts
+# Header
 
 Paragraph here...
 ``````
