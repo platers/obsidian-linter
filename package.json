@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
-    "build": "rollup --config rollup.config.js --environment BUILD:production && terser main.js --compress toplevel=true,passes=2 --ecma 2016 --comments false --output main.js",
+    "build": "rollup --config rollup.config.js --environment BUILD:production && terser main.js --compress toplevel=true,passes=2 --ecma 2016 --comments \"/(GENERATED|Copyright|license)/\" --output main.js",
     "test": "jest",
     "docs": "node docs.js",
     "compile": "npm run build && npm run docs && npm run lint && npm run test",
