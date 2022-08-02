@@ -1295,6 +1295,68 @@ After:
 
 _Note that this will affect checked and uncheck checked list items_
 ``````
+Example: Removes empty list, checklist, and ordered list markers in callouts/blockquotes
+
+Before:
+
+``````markdown
+> Checklist in blockquote
+> - [ ]  item 1
+> - [x]
+> - [ ] item 2
+> - [ ]   
+
+> Ordered List in blockquote
+> > 1. item 1
+> > 2.
+> > 3. item 2
+> > 4.  
+
+> Regular lists in blockquote
+>
+> - item 1
+> -
+> - item 2
+>
+> List 2
+>
+> * item 1
+>     *
+> * list 2 item 2
+>
+> List 3
+>
+> + item 1
+> + 
+> + item 2
+``````
+
+After:
+
+``````markdown
+> Checklist in blockquote
+> - [ ]  item 1
+> - [ ] item 2
+
+> Ordered List in blockquote
+> > 1. item 1
+> > 3. item 2
+
+> Regular lists in blockquote
+>
+> - item 1
+> - item 2
+>
+> List 2
+>
+> * item 1
+> * list 2 item 2
+>
+> List 3
+>
+> + item 1
+> + item 2
+``````
 
 ### Remove Hyphenated Line Breaks
 
@@ -1989,6 +2051,8 @@ All headings have a blank line both before and after (except where the heading i
 Options:
 - Bottom: Insert a blank line after headings
 	- Default: `true`
+- Empty Line Between Yaml and Header: Keep the empty line between the Yaml frontmatter and header
+	- Default: `true`
 
 Example: Headings should be surrounded by blank lines
 
@@ -2040,6 +2104,28 @@ line
 
 # H1
 line
+``````
+Example: Empty line before header and after Yaml is removed with `Empty Line Between Yaml and Header=true`
+
+Before:
+
+``````markdown
+---
+alias: ['authoughts']
+---
+# Automatic thoughts
+Paragraph here...
+``````
+
+After:
+
+``````markdown
+---
+alias: ['authoughts']
+---
+# Automatic thoughts
+
+Paragraph here...
 ``````
 
 ### Line Break at Document End
