@@ -1225,6 +1225,14 @@ Before:
 - item 1
 -
 - item 2
+
+* list 2 item 1
+    *
+* list 2 item 2
+
++ list 3 item 1
++
++ list 3 item 2
 ``````
 
 After:
@@ -1232,6 +1240,60 @@ After:
 ``````markdown
 - item 1
 - item 2
+
+* list 2 item 1
+* list 2 item 2
+
++ list 3 item 1
++ list 3 item 2
+``````
+Example: Removes empty ordered list markers.
+
+Before:
+
+``````markdown
+1. item 1
+2.
+3. item 2
+
+1. list 2 item 1
+2. list 2 item 2
+3. 
+
+_Note that this rule does not make sure that the ordered list is sequential after removal_
+``````
+
+After:
+
+``````markdown
+1. item 1
+3. item 2
+
+1. list 2 item 1
+2. list 2 item 2
+
+_Note that this rule does not make sure that the ordered list is sequential after removal_
+``````
+Example: Removes empty checklist markers.
+
+Before:
+
+``````markdown
+- [ ]  item 1
+- [x]
+- [ ] item 2
+- [ ]   
+
+_Note that this will affect checked and uncheck checked list items_
+``````
+
+After:
+
+``````markdown
+- [ ]  item 1
+- [ ] item 2
+
+_Note that this will affect checked and uncheck checked list items_
 ``````
 
 ### Remove Hyphenated Line Breaks
