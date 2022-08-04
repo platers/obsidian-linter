@@ -1,6 +1,6 @@
 import {Example, Options, Rule, RuleType, registerRule, LinterSettings} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
-import {logDebug} from '../logger';
+import {logDebug, logInfo} from '../logger';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -64,6 +64,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions): [result: string, isEnabled: boolean] {
     const rule = this.getRule();
     if (disabledRules.includes(rule.alias())) {
+      logInfo(rule.alias() + ' is disabled');
       return [text, false];
     }
 

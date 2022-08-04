@@ -242,12 +242,12 @@ export default class LinterPlugin extends Plugin {
     let newText = oldText;
 
     const disabledRules = getDisabledRules(newText);
+    // remove hashtags from tags before parsing yaml
+    [newText] = FormatTagsInYaml.applyIfEnabled(newText, this.settings, disabledRules);
+
     // escape YAML where possible before parsing yaml
     [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, this.settings, disabledRules);
 
-
-    // remove hashtags from tags before parsing yaml
-    [newText] = FormatTagsInYaml.applyIfEnabled(newText, this.settings, disabledRules);
 
     const modifiedAtTime = moment(file.stat.mtime, this.momentLocale).format();
     const createdAtTime = moment(file.stat.ctime, this.momentLocale).format();
