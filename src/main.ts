@@ -255,7 +255,7 @@ export default class LinterPlugin extends Plugin {
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
       if (disabledRules.includes(rule.alias())) {
-        logInfo(rule.alias() + ' is disabled');
+        logDebug(rule.alias() + ' is disabled');
         continue;
       } else if (rule.hasSpecialExecutionOrder) {
         continue;
