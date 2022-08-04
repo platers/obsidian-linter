@@ -1,4 +1,5 @@
 import {
+  getYamlSectionValue,
   loadYAML,
 } from './utils/yaml';
 import {
@@ -145,11 +146,15 @@ export function getDisabledRules(text: string): string[] {
   }
 
   const yaml_text = yaml[1];
-  const parsed_yaml = loadYAML(yaml_text);
-  if (!Object.prototype.hasOwnProperty.call(parsed_yaml, 'disabled rules')) {
+  const disabledRulesValue = getYamlSectionValue(yaml_text, 'disabled rules');
+  if (disabledRulesValue == null) {
     return [];
   }
 
+  let disabledRulesKeyAndValue = disabledRulesValue.includes('\n') ? 'disabled rules:\n' : 'disabled rules: ';
+  disabledRulesKeyAndValue += disabledRulesValue;
+
+  const parsed_yaml = loadYAML(disabledRulesKeyAndValue);
   let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string })[
       'disabled rules'
   ];

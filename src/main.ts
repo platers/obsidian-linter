@@ -242,19 +242,22 @@ export default class LinterPlugin extends Plugin {
     let newText = oldText;
 
     const disabledRules = getDisabledRules(newText);
+    // remove hashtags from tags before parsing yaml
+    [newText] = FormatTagsInYaml.applyIfEnabled(newText, this.settings, disabledRules);
+
     // escape YAML where possible before parsing yaml
     [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, this.settings, disabledRules);
 
-
-    // remove hashtags from tags before parsing yaml
-    [newText] = FormatTagsInYaml.applyIfEnabled(newText, this.settings, disabledRules);
 
     const modifiedAtTime = moment(file.stat.mtime, this.momentLocale).format();
     const createdAtTime = moment(file.stat.ctime, this.momentLocale).format();
 
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
-      if (disabledRules.includes(rule.alias()) || rule.hasSpecialExecutionOrder) {
+      if (disabledRules.includes(rule.alias())) {
+        logDebug(rule.alias() + ' is disabled');
+        continue;
+      } else if (rule.hasSpecialExecutionOrder) {
         continue;
       }
 
