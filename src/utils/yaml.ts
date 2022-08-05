@@ -75,3 +75,89 @@ export function loadYAML(yaml_text: string): any {
 
   return parsed_yaml;
 }
+
+export type TagSpecificYamlArrayFormats = 'single string space delimited' | 'single-line space delimited';
+
+export type SpecialYamlArrayFormats = 'single string to single-line' | 'single string to multi-line' | 'single string comma delimited';
+
+export type NormalYamlArrayFormats = 'single-line' | 'multi-line';
+
+export function formatYamlArrayValue(value: string | string[], format: NormalYamlArrayFormats | SpecialYamlArrayFormats | TagSpecificYamlArrayFormats): string {
+  if (typeof value === 'string') {
+    value = [value];
+  }
+
+  switch (format) {
+    case 'single-line':
+      if (value == null || value.length === 0) {
+        return ' []';
+      }
+
+      return ' ' + toSingleLineArrayYamlString(value);
+    case 'multi-line':
+      if (value == null || value.length === 0) {
+        return '\n  - ';
+      }
+      return '\n  - ' + value.join('\n  - ');
+    case 'single string to single-line':
+      if (value == null || value.length === 0) {
+        return ' ';
+      } else if (value.length === 1) {
+        return ' ' + value[0];
+      }
+
+      return ' ' + toSingleLineArrayYamlString(value);
+    case 'single string to multi-line':
+      if (value == null || value.length === 0) {
+        return ' ';
+      } else if (value.length === 1) {
+        return ' ' + value[0];
+      }
+
+      return '\n  - ' + value.join('\n  - ');
+    case 'single string space delimited':
+      if (value == null || value.length === 0) {
+        return ' ';
+      } else if (value.length === 1) {
+        return ' ' + value[0];
+      }
+
+      return ' ' +value.join(' ');
+    case 'single string comma delimited':
+      if (value == null || value.length === 0) {
+        return ' ';
+      } else if (value.length === 1) {
+        return ' ' + value[0];
+      }
+
+      return ' ' + value.join(', ');
+    case 'single-line space delimited':
+      if (value == null || value.length === 0) {
+        return ' []';
+      } else if (value.length === 1) {
+        return ' ' + value[0];
+      }
+
+      return ' ' + toSingleLineArrayYamlString(value).replaceAll(', ', ' ');
+  }
+}
+
+export function convertTagValueToStringOrStringArray(value: string | string[]): string[] {
+  if (typeof value === 'string') {
+    if (value.includes(',')) {
+      return value.split(', ');
+    }
+
+    return value.split(' ');
+  }
+
+  return value;
+}
+
+export function convertAliasValueToStringOrStringArray(value: string | string[]): string[] {
+  if (typeof value === 'string') {
+    return value.split(', ');
+  }
+
+  return value;
+}

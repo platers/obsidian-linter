@@ -1,13 +1,15 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {formatYAML, loadYAML, setYamlSection, toSingleLineArrayYamlString} from '../utils/yaml';
-
-type TagSpecificYamlArrayFormats = 'single string space delimited' | 'single-line space delimited';
-
-type SpecialYamlArrayFormats = 'single string to single-line' | 'single string to multi-line' | 'single string comma delimited';
-
-type NormalYamlArrayFormats = 'single-line' | 'multi-line';
+import {convertAliasValueToStringOrStringArray,
+  convertTagValueToStringOrStringArray,
+  formatYAML,
+  formatYamlArrayValue,
+  loadYAML,
+  NormalYamlArrayFormats,
+  setYamlSection,
+  SpecialYamlArrayFormats,
+  TagSpecificYamlArrayFormats} from '../utils/yaml';
 
 class FormatYamlArrayOptions implements Options {
   aliasArrayStyle?: NormalYamlArrayFormats | SpecialYamlArrayFormats = 'single-line';
@@ -43,86 +45,6 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
       if (!yaml) {
         return text;
       }
-
-      const formatYamlArrayValue = function(value: string | string[], format: NormalYamlArrayFormats | SpecialYamlArrayFormats | TagSpecificYamlArrayFormats): string {
-        if (typeof value === 'string') {
-          value = [value];
-        }
-
-        switch (format) {
-          case 'single-line':
-            if (value == null || value.length === 0) {
-              return ' []';
-            }
-
-            return ' ' + toSingleLineArrayYamlString(value);
-          case 'multi-line':
-            if (value == null || value.length === 0) {
-              return '\n  - ';
-            }
-            return '\n  - ' + value.join('\n  - ');
-          case 'single string to single-line':
-            if (value == null || value.length === 0) {
-              return ' ';
-            } else if (value.length === 1) {
-              return ' ' + value[0];
-            }
-
-            return ' ' + toSingleLineArrayYamlString(value);
-          case 'single string to multi-line':
-            if (value == null || value.length === 0) {
-              return ' ';
-            } else if (value.length === 1) {
-              return ' ' + value[0];
-            }
-
-            return '\n  - ' + value.join('\n  - ');
-          case 'single string space delimited':
-            if (value == null || value.length === 0) {
-              return ' ';
-            } else if (value.length === 1) {
-              return ' ' + value[0];
-            }
-
-            return ' ' +value.join(' ');
-          case 'single string comma delimited':
-            if (value == null || value.length === 0) {
-              return ' ';
-            } else if (value.length === 1) {
-              return ' ' + value[0];
-            }
-
-            return ' ' + value.join(', ');
-          case 'single-line space delimited':
-            if (value == null || value.length === 0) {
-              return ' []';
-            } else if (value.length === 1) {
-              return ' ' + value[0];
-            }
-
-            return ' ' + toSingleLineArrayYamlString(value).replaceAll(', ', ' ');
-        }
-      };
-
-      const convertTagValueToStringOrStringArray = function(value: string | string[]): string[] {
-        if (typeof value === 'string') {
-          if (value.includes(',')) {
-            return value.split(', ');
-          }
-
-          return value.split(' ');
-        }
-
-        return value;
-      };
-
-      const convertAliasValueToStringOrStringArray = function(value: string | string[]): string[] {
-        if (typeof value === 'string') {
-          return value.split(', ');
-        }
-
-        return value;
-      };
 
       if (options.formatAliasKey && Object.keys(yaml).includes(obsidianAliasKey)) {
         text = setYamlSection(text, obsidianAliasKey, formatYamlArrayValue(convertAliasValueToStringOrStringArray(yaml[obsidianAliasKey]), options.aliasArrayStyle) );
