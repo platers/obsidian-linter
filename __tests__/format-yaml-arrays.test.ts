@@ -687,7 +687,7 @@ ruleTest({
       },
     },
     {
-      testName: 'Trying to format aliases to a single-line separated by spaces when it is has an empty string will result in an empty single-line',
+      testName: 'Trying to format aliases to a single-line when it is has an empty string will result in an empty single-line',
       before: dedent`
         ---
         aliases: 
@@ -699,7 +699,25 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single-line space delimited',
+        aliasArrayStyle: 'single-line',
+      },
+    },
+    {
+      testName: 'Un-indented array items are associated with array',
+      before: dedent`
+        ---
+        aliases:
+        - title 1
+        - title 2
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: [title 1, title 2]
+        ---
+      `,
+      options: {
+        tagArrayStyle: 'single-line',
       },
     },
   ],
