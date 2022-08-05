@@ -248,7 +248,6 @@ export default class LinterPlugin extends Plugin {
     // escape YAML where possible before parsing yaml
     [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, this.settings, disabledRules);
 
-
     const modifiedAtTime = moment(file.stat.mtime, this.momentLocale).format();
     const createdAtTime = moment(file.stat.ctime, this.momentLocale).format();
 
