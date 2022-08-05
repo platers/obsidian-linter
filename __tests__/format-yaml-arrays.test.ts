@@ -5,6 +5,7 @@ import {ruleTest} from './common';
 ruleTest({
   RuleBuilderClass: FormatYamlArray,
   testCases: [
+    // tags
     {
       testName: 'Convert tags from single-line with spaces to multi-line array',
       before: dedent`
@@ -178,5 +179,161 @@ ruleTest({
         tagArrayStyle: 'single string to multi-line',
       },
     },
+    {
+      testName: 'Formatting yaml tags does nothing when disabled',
+      before: dedent`
+        ---
+        tags: tag1, tag2, tag3, tag4
+        ---
+      `,
+      after: dedent`
+        ---
+        tags: tag1, tag2, tag3, tag4
+        ---
+      `,
+      options: {
+        tagArrayStyle: 'single string to multi-line',
+        formatTagKey: false,
+      },
+    },
+
+    // aliases
+    {
+      testName: 'Convert aliases from single-line to multi-line array',
+      before: dedent`
+        ---
+        aliases: [title1, title2, title3]
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - title1
+          - title2
+          - title3
+        ---
+      `,
+      options: {
+        aliasArrayStyle: 'multi-line',
+      },
+    },
+    {
+      testName: 'Convert aliases from multi-line to single string which is comma delimited',
+      before: dedent`
+        ---
+        aliases:
+          - title1
+          - title2
+          - title3
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: title1, title2, title3
+        ---
+      `,
+      options: {
+        aliasArrayStyle: 'single string comma delimited',
+      },
+    },
+    {
+      testName: 'Convert multi-line to single string when there is 1 element and the style is single string to single-line',
+      before: dedent`
+        ---
+        aliases:
+          - title
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: title
+        ---
+      `,
+      options: {
+        aliasArrayStyle: 'single string to single-line',
+      },
+    },
+    {
+      testName: 'Convert multi-line to single string when there is 1 element and the style is single string to multi-line',
+      before: dedent`
+        ---
+        aliases:
+          - title
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: title
+        ---
+      `,
+      options: {
+        aliasArrayStyle: 'single string to multi-line',
+      },
+    },
+    {
+      testName: 'Convert single-line to multi-line string when there is more than 1 element and the style is single string to multi-line',
+      before: dedent`
+        ---
+        aliases: [title, other title]
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - title
+          - other title
+        ---
+      `,
+      options: {
+        aliasArrayStyle: 'single string to multi-line',
+      },
+    },
+    {
+      testName: 'Convert multi-line to single-line when there is more than 1 element and the style is single string to single-line',
+      before: dedent`
+        ---
+        aliases:
+          - title
+          - other title
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: [title, other title]
+        ---
+      `,
+      options: {
+        aliasArrayStyle: 'single string to single-line',
+      },
+    },
+    {
+      testName: 'Formatting aliases does nothing when disabled',
+      before: dedent`
+        ---
+        aliases:
+          - title
+          - other title
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - title
+          - other title
+        ---
+      `,
+      options: {
+        aliasArrayStyle: 'single string to single-line',
+        formatAliasKey: false,
+      },
+    },
+
+    // default array style
+
+    // force single-line
+
+    // force multi-line
+
+    // combinations
   ],
 });

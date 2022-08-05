@@ -3,136 +3,9 @@ import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder
 import dedent from 'ts-dedent';
 import {formatYAML, loadYAML, setYamlSection, toSingleLineArrayYamlString} from '../utils/yaml';
 
-/**
- * new Rule(
-    'Format YAML Arrays',
-    '',
-    RuleType.YAML,
-    (text: string, options = {}) => {
-      const yaml = text.match(yamlRegex);
-      if (!yaml) {
-        return text;
-      }
+type TagSpecificYamlArrayFormats = 'single string space delimited' | 'single-line space delimited';
 
-      const yamlKeysToRemove: string[] = options['YAML Keys to Remove'].split('\n');
-
-      let yamlText = yaml[1];
-      for (const key of yamlKeysToRemove) {
-        let actualKey = key.trim();
-        if (actualKey.endsWith(':')) {
-          actualKey = actualKey.substring(0, actualKey.length - 1);
-        }
-
-        yamlText = removeYamlSection(yamlText, actualKey);
-      }
-
-
-      return text.replace(yaml[1], yamlText);
-    },
-    [
-      new Example(
-          'Removes the values specified in `YAML Keys to Remove` = "status:\nkeywords\ndate"',
-          dedent`
-        ---
-        language: Typescript
-        type: programming
-        tags: computer
-        keywords:
-          - keyword1
-          - keyword2
-        status: WIP
-        date: 02/15/2022
-        ---
-
-        # Header Context
-
-        Text
-        `,
-          dedent`
-        ---
-        language: Typescript
-        type: programming
-        tags: computer
-        ---
-
-        # Header Context
-
-        Text
-        `,
-          {'YAML Keys to Remove': 'status:\nkeywords\ndate'},
-      ),
-    ],
-    [
-      new DropdownOption(
-          'YAML aliases section style',
-          'The style of the aliases YAML section',
-          'Multi-line array',
-          [
-            new DropdownRecord(
-                'Multi-line array',
-                '```aliases:\\n  - Title```',
-            ),
-            new DropdownRecord(
-                'Single-line array',
-                '```aliases: [Title]```',
-            ),
-            new DropdownRecord(
-                'Single string that expands to multi-line array if needed',
-                '```aliases: Title```',
-            ),
-            new DropdownRecord(
-                'Single string that expands to single-line array if needed',
-                '```aliases: Title```',
-            ),
-          ],
-      ),
-      new DropdownOption(
-          'YAML tags section style',
-          'The style of the tags YAML section',
-          'Multi-line array',
-          [
-            new DropdownRecord(
-                'Multi-line array',
-                '```tags:\\n  - tag```',
-            ),
-            new DropdownRecord(
-                'Single-line array',
-                '```tags: [tag]```',
-            ),
-            new DropdownRecord(
-                'Single string that expands to multi-line array if needed',
-                '```tags: tag```',
-            ),
-            new DropdownRecord(
-                'Single string that expands to single-line array if needed',
-                '```tags: tag```',
-            ),
-          ],
-      ),
-      new DropdownOption(
-          'Default YAML array section style',
-          'The style to use for any YAML array except `tags` and `aliases`',
-          'Multi-line array',
-          [
-            new DropdownRecord(
-                'Multi-line array',
-                '```key:\\n  - value```',
-            ),
-            new DropdownRecord(
-                'Single-line array',
-                '```key: [value]```',
-            ),
-          ],
-      ),
-      new TextAreaOption('Force Single-line Array for YAML Keys', 'The yaml keys to make sure that they are single-line arrays', ''),
-      new TextAreaOption('Force Multi-line Array for YAML Keys', 'The yaml keys to make sure that they are multi-line arrays', ''),
-    ],
-),
- */
-
-type TagSpecificYamlArrayFormats = 'single string space delimited' | 'single string comma delimited' | 'single-line space delimited';
-
-type SpecialYamlArrayFormats = 'single string to single-line' | 'single string to multi-line';
+type SpecialYamlArrayFormats = 'single string to single-line' | 'single string to multi-line' | 'single string comma delimited';
 
 type NormalYamlArrayFormats = 'single-line' | 'multi-line';
 
@@ -228,10 +101,9 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         text = setYamlSection(text, obsidianAliasKey, formatYamlArrayValue(yaml[obsidianAliasKey], options.aliasArrayStyle) );
       }
 
-      if (options.formatAliasKey && Object.keys(yaml).includes(obsidianTagKey)) {
+      if (options.formatTagKey && Object.keys(yaml).includes(obsidianTagKey)) {
         text = setYamlSection(text, obsidianTagKey, formatYamlArrayValue(convertTagValueToStringOrStringArray(yaml[obsidianTagKey]), options.tagArrayStyle));
       }
-
 
       if (options.formatArrayKeys) {
         const keysToIgnore = [obsidianAliasKey, obsidianTagKey, ...options.forceMultiLineArrayStyle, ...options.forceSingleLineArrayStyle];
@@ -334,6 +206,10 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           {
             value: 'single-line',
             description: '```aliases: [Title]```',
+          },
+          {
+            value: 'single string comma delimited',
+            description: '```aliases: Title, Other Title```',
           },
           {
             value: 'single string to single-line',
