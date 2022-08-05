@@ -195,7 +195,6 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           Nesting yaml arrays may result in unexpected results.
         `,
         options: {
-          tagArrayStyle: 'single-line',
           aliasArrayStyle: 'multi-line',
           forceSingleLineArrayStyle: ['test'],
         },
@@ -215,7 +214,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           ---
           aliases: Typescript
           types: [thought provoking, peer reviewed]
-          tags: computer, science, trajectory
+          tags: computer science trajectory
           ---
         `,
         options: {
