@@ -34,7 +34,7 @@ export function toSingleLineArrayYamlString<T>(arr: T[]): string {
 }
 
 function getYamlSectionRegExp(rawKey: string): RegExp {
-  return new RegExp(`(?<=^|\\n)${rawKey}:[ \\t]*(\\S.*|(?:\\n {2}\\S.*)*)\\n`);
+  return new RegExp(`(?<=^|\\n)${rawKey}:[ \\t]*(\\S.*|(?:\\n *- \\S.*)*)\\n`);
 }
 
 export function setYamlSection(yaml: string, rawKey: string, rawValue: string): string {
@@ -82,6 +82,12 @@ export type SpecialYamlArrayFormats = 'single string to single-line' | 'single s
 
 export type NormalYamlArrayFormats = 'single-line' | 'multi-line';
 
+/**
+ * Formats the yaml array value passed in with the specified format.
+ * @param {string | string[]} value The value(s) that will be used as the parts of the array that is assumed to already be broken down into the appropriate format to be put in the array.
+ * @param {NormalYamlArrayFormats | SpecialYamlArrayFormats | TagSpecificYamlArrayFormats} format The format that the array should be converted into.
+ * @return {string} The formatted array in the specified yaml/obsidian yaml format.
+ */
 export function formatYamlArrayValue(value: string | string[], format: NormalYamlArrayFormats | SpecialYamlArrayFormats | TagSpecificYamlArrayFormats): string {
   if (typeof value === 'string') {
     value = [value];
@@ -142,6 +148,11 @@ export function formatYamlArrayValue(value: string | string[], format: NormalYam
   }
 }
 
+/**
+ * Converts the tag string to the proper split up values based on whether or not it is already an array and if it has delimiters.
+ * @param {string | string[]} value The value that is already good to go or needs to be split on a comma or spaces.
+ * @return {string} The converted tag key value that should account for its obsidian formats.
+ */
 export function convertTagValueToStringOrStringArray(value: string | string[]): string[] {
   if (typeof value === 'string') {
     if (value.includes(',')) {
@@ -154,6 +165,11 @@ export function convertTagValueToStringOrStringArray(value: string | string[]): 
   return value;
 }
 
+/**
+ * Converts the alias over to the appropriate array items for formatting taking into account obsidian formats.
+ * @param {string | string[]} value The value of the aliases key that may need to be split into the appropriate parts.
+ * @return {string} The alias value converted to the appropriate array items for formatting.
+ */
 export function convertAliasValueToStringOrStringArray(value: string | string[]): string[] {
   if (typeof value === 'string') {
     return value.split(', ');

@@ -141,7 +141,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         `,
         options: {
           formatAliasKey: false,
-          tagArrayStyle: 'single-line space delimited',
+          tagArrayStyle: 'single string space delimited',
         },
       }),
     ];
@@ -168,11 +168,11 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           },
           {
             value: 'single string to single-line',
-            description: '```aliases: Title```',
+            description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a single-line array.',
           },
           {
             value: 'single string to multi-line',
-            description: '```aliases: Title```',
+            description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a multi-line array.',
           },
         ],
       }),
@@ -198,11 +198,11 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           },
           {
             value: 'single string to single-line',
-            description: '```tags: tag1```',
+            description: 'Tags will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a single-line array.',
           },
           {
             value: 'single string to multi-line',
-            description: '```tags: tag1```',
+            description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a multi-line array.',
           },
           {
             value: 'single-line space delimited',
