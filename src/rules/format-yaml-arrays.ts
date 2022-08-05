@@ -51,33 +51,52 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
 
         switch (format) {
           case 'single-line':
+            if (value == null || value.length === 0) {
+              return ' []';
+            }
+
             return ' ' + toSingleLineArrayYamlString(value);
           case 'multi-line':
+            if (value == null || value.length === 0) {
+              return '\n  - ';
+            }
             return '\n  - ' + value.join('\n  - ');
           case 'single string to single-line':
-            if (value.length === 1) {
+            if (value == null || value.length === 0) {
+              return ' ';
+            } else if (value.length === 1) {
               return ' ' + value[0];
             }
 
             return ' ' + toSingleLineArrayYamlString(value);
           case 'single string to multi-line':
-            if (value.length === 1) {
+            if (value == null || value.length === 0) {
+              return ' ';
+            } else if (value.length === 1) {
               return ' ' + value[0];
             }
 
             return '\n  - ' + value.join('\n  - ');
           case 'single string space delimited':
-            if (value.length === 1) {
+            if (value == null || value.length === 0) {
+              return ' ';
+            } else if (value.length === 1) {
               return ' ' + value[0];
             }
+
             return ' ' +value.join(' ');
           case 'single string comma delimited':
-            if (value.length === 1) {
+            if (value == null || value.length === 0) {
+              return ' ';
+            } else if (value.length === 1) {
               return ' ' + value[0];
             }
+
             return ' ' + value.join(', ');
           case 'single-line space delimited':
-            if (value.length === 1) {
+            if (value == null || value.length === 0) {
+              return ' []';
+            } else if (value.length === 1) {
               return ' ' + value[0];
             }
 
@@ -297,10 +316,6 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         description: 'Forces the yaml array for the new line separated keys to be in multi-line format',
         optionsKey: 'forceMultiLineArrayStyle',
       }),
-      /**
-       *
-  formatTagKey: boolean = true;
-       */
     ];
   }
 }
