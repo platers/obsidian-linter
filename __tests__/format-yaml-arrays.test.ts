@@ -690,12 +690,12 @@ ruleTest({
       testName: 'Trying to format aliases to a single-line separated by spaces when it is has an empty string will result in an empty single-line',
       before: dedent`
         ---
-        tags: 
+        aliases: 
         ---
       `,
       after: dedent`
         ---
-        tags: []
+        aliases: []
         ---
       `,
       options: {
