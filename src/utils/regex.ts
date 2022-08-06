@@ -9,6 +9,7 @@ export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
 export const wikiLinkRegex = /(!?)(\[{2}[^[\n\]]*\]{2})/g;
+export const genericLinkRegex = /^!?\[.*\](.*)$/;
 export const tagRegex = /#[^\s#]{1,}/g;
 export const obsidianMultilineCommentRegex = /^%%\n[^%]*\n%%/gm;
 export const wordSplitterRegex = /[,\s]+/;

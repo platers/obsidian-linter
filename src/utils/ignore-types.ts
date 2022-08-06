@@ -1,4 +1,4 @@
-import {obsidianMultilineCommentRegex, tagRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns} from './regex';
+import {obsidianMultilineCommentRegex, tagRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex} from './regex';
 import {getPositions, MDAstTypes} from './mdast';
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
@@ -140,7 +140,7 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): Ign
 
     const regularLink = text.substring(position.start.offset, position.end.offset);
     // skip links that are not in markdown format
-    if (!regularLink.includes('[')) {
+    if (!regularLink.match(genericLinkRegex)) {
       continue;
     }
 
