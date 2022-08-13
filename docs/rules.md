@@ -239,8 +239,6 @@ test: this is a value
 
 Nesting yaml arrays may result in unexpected results.
 
-Arrays that can be treated as strings like an array of integers might accidentally get caught up in the formatting.
-
 Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
 ``````
 
@@ -258,8 +256,6 @@ test: [this is a value]
 # Notes:
 
 Nesting yaml arrays may result in unexpected results.
-
-Arrays that can be treated as strings like an array of integers might accidentally get caught up in the formatting.
 
 Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
 ``````
