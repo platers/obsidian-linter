@@ -39,8 +39,25 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
 
         const previousChar = urlStart === 0 ? undefined : text.charAt(urlStart - 1);
         const nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
-        if (previousChar != undefined && (previousChar === '`' || previousChar === '"' || previousChar === '\'' || previousChar === '[' || previousChar === '<') &&
-          nextChar != undefined && (nextChar === '`' || nextChar === '"' || nextChar === '\'' || nextChar === ']' || nextChar === '>')) {
+        if (previousChar != undefined && (previousChar === '`' || previousChar === '"' || previousChar === '\'' || previousChar === '[') &&
+          nextChar != undefined && (nextChar === '`' || nextChar === '"' || nextChar === '\'' || nextChar === ']')) {
+          startSearch = urlStart + urlMatch.length;
+          continue;
+        }
+
+        if (previousChar != undefined && previousChar === '<' && nextChar != undefined && nextChar === '>') {
+          let startOfOpeningChevrons = urlStart - 1;
+          while (startOfOpeningChevrons > 0 && text.charAt(startOfOpeningChevrons-1) === '<') {
+            startOfOpeningChevrons--;
+          }
+
+          let endOfClosingChevrons = urlEnd;
+          while (endOfClosingChevrons < text.length -1 && text.charAt(endOfClosingChevrons+1) === '>') {
+            endOfClosingChevrons++;
+          }
+
+          text = replaceTextBetweenStartAndEndWithNewValue(text, startOfOpeningChevrons, endOfClosingChevrons+1, '<' + urlMatch + '>');
+
           startSearch = urlStart + urlMatch.length;
           continue;
         }
@@ -92,6 +109,19 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
           backticks around a url should stay the same, but only if the only contents of the backticks: \`<https://github.com> some text here\`
           single quotes around a url should stay the same, but only if the contents of the single quotes is the url: '<https://github.com> some text here'
           double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "<https://github.com> some text here"
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Multiple angle brackets at the start and or end of a url will be reduced down to 1',
+        before: dedent`
+          <<https://github.com>
+          <https://google.com>>
+          <<https://gitlab.com>>
+        `,
+        after: dedent`
+          <https://github.com>
+          <https://google.com>
+          <https://gitlab.com>
         `,
       }),
     ];
