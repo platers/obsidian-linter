@@ -5,6 +5,7 @@ import {convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
   formatYAML,
   formatYamlArrayValue,
+  getYamlSectionValue,
   loadYAML,
   NormalYamlArrayFormats,
   setYamlSection,
@@ -41,17 +42,54 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
       const obsidianTagKey = 'tags';
       const obsidianAliasKey = 'aliases';
 
+      const splitValueIfSingleOrMultilineArray = function(value: string): string | string[] {
+        if (value == null || value.length === 0) {
+          return null;
+        }
+
+        value = value.trimEnd();
+        if (value.startsWith('[')) {
+          value = value.substring(1);
+
+          if (value.endsWith(']')) {
+            value = value.substring(0, value.length - 1);
+          }
+
+          // accounts for an empty single line array which can then be converted as needed later on
+          if (value.length === 0) {
+            return null;
+          }
+
+          const arrayItems = value.split(', ');
+
+          return arrayItems.length > 1 ? arrayItems : arrayItems[0].split(',');
+        }
+
+        if (value.includes('\n')) {
+          const arrayItems = value.split(/\s*\n\s*-\s*/);
+          arrayItems.splice(0, 1);
+
+          if (arrayItems.length === 1 && arrayItems[0] === '') {
+            return null;
+          }
+
+          return arrayItems;
+        }
+
+        return value;
+      };
+
       const yaml = loadYAML(text.replace('---\n', '').replace('\n---', ''));
       if (!yaml) {
         return text;
       }
 
       if (options.formatAliasKey && Object.keys(yaml).includes(obsidianAliasKey)) {
-        text = setYamlSection(text, obsidianAliasKey, formatYamlArrayValue(convertAliasValueToStringOrStringArray(yaml[obsidianAliasKey]), options.aliasArrayStyle) );
+        text = setYamlSection(text, obsidianAliasKey, formatYamlArrayValue(convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, obsidianAliasKey))), options.aliasArrayStyle));
       }
 
       if (options.formatTagKey && Object.keys(yaml).includes(obsidianTagKey)) {
-        text = setYamlSection(text, obsidianTagKey, formatYamlArrayValue(convertTagValueToStringOrStringArray(yaml[obsidianTagKey]), options.tagArrayStyle));
+        text = setYamlSection(text, obsidianTagKey, formatYamlArrayValue(convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, obsidianTagKey))), options.tagArrayStyle));
       }
 
       if (options.formatArrayKeys) {
@@ -59,11 +97,11 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays and already accounted for keys
-          if (keysToIgnore.includes(key) || !(typeof yaml[key] !== 'string' && yaml[key] as string[])) {
+          if (keysToIgnore.includes(key) || !(typeof yaml[key] === 'object' && yaml[key] as string[])) {
             continue;
           }
 
-          text = setYamlSection(text, key, formatYamlArrayValue(yaml[key], options.defaultArrayStyle));
+          text = setYamlSection(text, key, formatYamlArrayValue(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, key)), options.defaultArrayStyle));
         }
       }
 
@@ -72,7 +110,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           continue;
         }
 
-        text = setYamlSection(text, singleLineArrayKey, formatYamlArrayValue(yaml[singleLineArrayKey], 'single-line'));
+        text = setYamlSection(text, singleLineArrayKey, formatYamlArrayValue(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, singleLineArrayKey)), 'single-line'));
       }
 
       for (const multiLineArrayKey of options.forceMultiLineArrayStyle) {
@@ -80,7 +118,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           continue;
         }
 
-        text = setYamlSection(text, multiLineArrayKey, formatYamlArrayValue(yaml[multiLineArrayKey], 'multi-line'));
+        text = setYamlSection(text, multiLineArrayKey, formatYamlArrayValue(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, multiLineArrayKey)), 'multi-line'));
       }
 
       return text;

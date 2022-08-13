@@ -99,7 +99,7 @@ export function formatYamlArrayValue(value: string | string[], format: NormalYam
         return ' []';
       }
 
-      return ' ' + toSingleLineArrayYamlString(value);
+      return ' ' + convertStringArrayToSingleLineArray(value);
     case 'multi-line':
       if (value == null || value.length === 0) {
         return '\n  - ';
@@ -112,7 +112,7 @@ export function formatYamlArrayValue(value: string | string[], format: NormalYam
         return ' ' + value[0];
       }
 
-      return ' ' + toSingleLineArrayYamlString(value);
+      return ' ' + convertStringArrayToSingleLineArray(value);
     case 'single string to multi-line':
       if (value == null || value.length === 0) {
         return ' ';
@@ -144,8 +144,16 @@ export function formatYamlArrayValue(value: string | string[], format: NormalYam
         return ' ' + value[0];
       }
 
-      return ' ' + toSingleLineArrayYamlString(value).replaceAll(', ', ' ');
+      return ' ' + convertStringArrayToSingleLineArray(value).replaceAll(', ', ' ');
   }
+}
+
+function convertStringArrayToSingleLineArray(arrayItems: string[]): string {
+  if (arrayItems == null || arrayItems.length === 0) {
+    return '[]';
+  }
+
+  return '[' + arrayItems.join(', ') + ']';
 }
 
 /**
