@@ -755,5 +755,18 @@ ruleTest({
         forceMultiLineArrayStyle: ['speakers'],
       },
     },
+    {
+      testName: 'A single-line array with an empty value at the end should have the empty value removed',
+      before: dedent`
+        ---
+        speakers: [speaker1, ]
+        ---
+      `,
+      after: dedent`
+        ---
+        speakers: [speaker1]
+        ---
+      `,
+    },
   ],
 });

@@ -179,9 +179,13 @@ export function splitValueIfSingleOrMultilineArray(value: string): string | stri
       return null;
     }
 
-    const arrayItems = value.split(', ');
+    let arrayItems = value.split(', ');
 
-    return arrayItems.length > 1 ? arrayItems : arrayItems[0].split(',');
+    arrayItems = arrayItems.length > 1 ? arrayItems : arrayItems[0].split(',');
+
+    return arrayItems.filter((el: string) => {
+      return el != '';
+    });
   }
 
   if (value.includes('\n')) {
