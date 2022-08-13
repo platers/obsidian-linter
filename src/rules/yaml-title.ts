@@ -20,7 +20,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
     return 'YAML Title';
   }
   get description(): string {
-    return 'Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename.';
+    return 'Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename if there is no H1.';
   }
   get type(): RuleType {
     return RuleType.YAML;
