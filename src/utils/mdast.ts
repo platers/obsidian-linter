@@ -2,7 +2,7 @@ import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
-import {escapeRegExp} from './regex';
+import {escapeRegExp, genericLinkRegex} from './regex';
 import {remark} from 'remark';
 import remarkGfm from 'remark-gfm';
 
@@ -277,7 +277,7 @@ export function removeSpacesInLinkText(text: string): string {
   for (const position of positions) {
     const regularLink = text.substring(position.start.offset, position.end.offset);
     // skip links that are not are not in markdown format
-    if (!regularLink.includes('[')) {
+    if (!regularLink.match(genericLinkRegex)) {
       continue;
     }
 

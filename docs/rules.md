@@ -186,6 +186,103 @@ tags:
 ---
 ``````
 
+### Format Yaml Array
+
+Alias: `format-yaml-array`
+
+Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.
+
+Options:
+- Yaml aliases section style: The style of the yaml aliases section
+	- Default: `single-line`
+	- `multi-line`: ```aliases:\n  - Title```
+	- `single-line`: ```aliases: [Title]```
+	- `single string comma delimited`: ```aliases: Title, Other Title```
+	- `single string to single-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a single-line array.
+	- `single string to multi-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a multi-line array.
+- Format yaml aliases section: Turns on formatting for the yaml aliases section
+	- Default: `true`
+- Yaml tags section style: The style of the yaml tags section
+	- Default: `single-line`
+	- `multi-line`: ```tags:\n  - tag1```
+	- `single-line`: ```tags: [tag1]```
+	- `single string to single-line`: Tags will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a single-line array.
+	- `single string to multi-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a multi-line array.
+	- `single-line space delimited`: ```tags: [tag1 tag2]```
+	- `single string space delimited`: ```tags: tag1 tag2```
+	- `single string comma delimited`: ```tags: tag1, tag2```
+- Default yaml array section style: The style of other yaml arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays`
+	- Default: `single-line`
+	- `multi-line`: ```key:\n  - value```
+	- `single-line`: ```key: [value]```
+- Format yaml array sections: Turns on formatting for regular yaml arrays
+	- Default: `true`
+- Force key values to be single-line arrays: Forces the yaml array for the new line separated keys to be in single-line format (leave empty to disable this option)
+	- Default: ``
+- Force key values to be multi-line arrays: Forces the yaml array for the new line separated keys to be in multi-line format (leave empty to disable this option)
+	- Default: ``
+
+Example: Format tags as a single-line array delimited by spaces and aliases as a multi-line array and format the key `test` to be a single-line array
+
+Before:
+
+``````markdown
+---
+tags:
+  - computer
+  - research
+aliases: Title 1, Title2
+test: this is a value
+---
+
+# Notes:
+
+Nesting yaml arrays may result in unexpected results.
+
+Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
+``````
+
+After:
+
+``````markdown
+---
+tags: [computer, research]
+aliases:
+  - Title 1
+  - Title2
+test: [this is a value]
+---
+
+# Notes:
+
+Nesting yaml arrays may result in unexpected results.
+
+Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
+``````
+Example: Format tags as a single string with space delimiters, ignore aliases, and format regular yaml arrays as single-line arrays
+
+Before:
+
+``````markdown
+---
+aliases: Typescript
+types:
+  - thought provoking
+  - peer reviewed
+tags: [computer, science, trajectory]
+---
+``````
+
+After:
+
+``````markdown
+---
+aliases: Typescript
+types: [thought provoking, peer reviewed]
+tags: computer science trajectory
+---
+``````
+
 ### Insert YAML attributes
 
 Alias: `insert-yaml-attributes`
