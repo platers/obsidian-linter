@@ -235,9 +235,13 @@ aliases: Title 1, Title2
 test: this is a value
 ---
 
-# Note
+# Notes:
 
 Nesting yaml arrays may result in unexpected results.
+
+Arrays that can be treated as strings like an array of integers might accidentally get caught up in the formatting.
+
+Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
 ``````
 
 After:
@@ -251,9 +255,13 @@ aliases:
 test: [this is a value]
 ---
 
-# Note
+# Notes:
 
 Nesting yaml arrays may result in unexpected results.
+
+Arrays that can be treated as strings like an array of integers might accidentally get caught up in the formatting.
+
+Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
 ``````
 Example: Format tags as a single string with space delimiters, ignore aliases, and format regular yaml arrays as single-line arrays
 
