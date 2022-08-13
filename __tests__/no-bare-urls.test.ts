@@ -17,5 +17,15 @@ ruleTest({
         ![image alt text](https://github.com/favicon.ico)
       `,
     },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/339
+      testName: 'Urls with a hashtag referring to header that are surrounded by `<` and `> should be left alone',
+      before: dedent`
+        <https://google.com#hashtag>
+      `,
+      after: dedent`
+        <https://google.com#hashtag>
+      `,
+    },
   ],
 });
