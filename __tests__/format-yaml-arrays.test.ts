@@ -717,5 +717,43 @@ ruleTest({
         ---
       `,
     },
+    {
+      testName: 'An empty multi-line array does not get modified when linted and it is supposed to be a multi-line array',
+      before: dedent`
+        ---
+        speakers:
+          - 
+        ---
+      `,
+      after: dedent`
+        ---
+        speakers:
+          - 
+        ---
+      `,
+      options: {
+        forceMultiLineArrayStyle: ['speakers'],
+      },
+    },
+    {
+      testName: 'A multi-line array with mixed empty and non-empty values should have empty values removed',
+      before: dedent`
+        ---
+        speakers:
+          - 
+          - speaker1
+          - 
+        ---
+      `,
+      after: dedent`
+        ---
+        speakers:
+          - speaker1
+        ---
+      `,
+      options: {
+        forceMultiLineArrayStyle: ['speakers'],
+      },
+    },
   ],
 });

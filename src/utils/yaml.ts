@@ -34,7 +34,7 @@ export function toSingleLineArrayYamlString<T>(arr: T[]): string {
 }
 
 function getYamlSectionRegExp(rawKey: string): RegExp {
-  return new RegExp(`(?<=^|\\n)${rawKey}:[ \\t]*(\\S.*|(?:\\n *- \\S.*)*)\\n`);
+  return new RegExp(`(?<=^|\\n)${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*)*)\\n`);
 }
 
 export function setYamlSection(yaml: string, rawKey: string, rawValue: string): string {
@@ -154,6 +154,52 @@ function convertStringArrayToSingleLineArray(arrayItems: string[]): string {
   }
 
   return '[' + arrayItems.join(', ') + ']';
+}
+
+/**
+ * Parses single-line and multi-line arrays into an array that can be used for formatting down the line
+ * @param {string} value The value to see about parsing if it is a sing-line or multi-line array
+ * @return {string|string[]} The original value if it was not a single or multi-line array or the an array of the values from the array (multi-line arrays will have empty values removed)
+ */
+export function splitValueIfSingleOrMultilineArray(value: string): string | string[] {
+  if (value == null || value.length === 0) {
+    return null;
+  }
+
+  value = value.trimEnd();
+  if (value.startsWith('[')) {
+    value = value.substring(1);
+
+    if (value.endsWith(']')) {
+      value = value.substring(0, value.length - 1);
+    }
+
+    // accounts for an empty single line array which can then be converted as needed later on
+    if (value.length === 0) {
+      return null;
+    }
+
+    const arrayItems = value.split(', ');
+
+    return arrayItems.length > 1 ? arrayItems : arrayItems[0].split(',');
+  }
+
+  if (value.includes('\n')) {
+    let arrayItems = value.split(/[ \t]*\n[ \t]*-[ \t]*/);
+    arrayItems.splice(0, 1);
+
+    arrayItems = arrayItems.filter((el: string) => {
+      return el != '';
+    });
+
+    if (arrayItems == null || arrayItems.length === 0 ) {
+      return null;
+    }
+
+    return arrayItems;
+  }
+
+  return value;
 }
 
 /**

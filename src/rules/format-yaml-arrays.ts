@@ -10,6 +10,7 @@ import {convertAliasValueToStringOrStringArray,
   NormalYamlArrayFormats,
   setYamlSection,
   SpecialYamlArrayFormats,
+  splitValueIfSingleOrMultilineArray,
   TagSpecificYamlArrayFormats} from '../utils/yaml';
 
 class FormatYamlArrayOptions implements Options {
@@ -41,43 +42,6 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
     return formatYAML(text, (text: string) => {
       const obsidianTagKey = 'tags';
       const obsidianAliasKey = 'aliases';
-
-      const splitValueIfSingleOrMultilineArray = function(value: string): string | string[] {
-        if (value == null || value.length === 0) {
-          return null;
-        }
-
-        value = value.trimEnd();
-        if (value.startsWith('[')) {
-          value = value.substring(1);
-
-          if (value.endsWith(']')) {
-            value = value.substring(0, value.length - 1);
-          }
-
-          // accounts for an empty single line array which can then be converted as needed later on
-          if (value.length === 0) {
-            return null;
-          }
-
-          const arrayItems = value.split(', ');
-
-          return arrayItems.length > 1 ? arrayItems : arrayItems[0].split(',');
-        }
-
-        if (value.includes('\n')) {
-          const arrayItems = value.split(/\s*\n\s*-\s*/);
-          arrayItems.splice(0, 1);
-
-          if (arrayItems.length === 1 && arrayItems[0] === '') {
-            return null;
-          }
-
-          return arrayItems;
-        }
-
-        return value;
-      };
 
       const yaml = loadYAML(text.replace('---\n', '').replace('\n---', ''));
       if (!yaml) {
