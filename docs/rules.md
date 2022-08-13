@@ -578,7 +578,7 @@ modified: Wednesday, January 1st 2020, 4:00:00 pm
 
 Alias: `yaml-title`
 
-Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename.
+Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename if there is no H1.
 
 Options:
 - Title Key: Which YAML key to use for title
@@ -1252,6 +1252,23 @@ After:
 backticks around a url should stay the same, but only if the only contents of the backticks: `<https://github.com> some text here`
 single quotes around a url should stay the same, but only if the contents of the single quotes is the url: '<https://github.com> some text here'
 double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "<https://github.com> some text here"
+``````
+Example: Multiple angle brackets at the start and or end of a url will be reduced down to 1
+
+Before:
+
+``````markdown
+<<https://github.com>
+<https://google.com>>
+<<https://gitlab.com>>
+``````
+
+After:
+
+``````markdown
+<https://github.com>
+<https://google.com>
+<https://gitlab.com>
 ``````
 
 ### Proper Ellipsis
