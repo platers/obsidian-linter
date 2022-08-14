@@ -248,8 +248,12 @@ export default class LinterPlugin extends Plugin {
     // escape YAML where possible before parsing yaml
     [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, this.settings, disabledRules);
 
-    const modifiedAtTime = moment(file.stat.mtime, this.momentLocale).format();
-    const createdAtTime = moment(file.stat.ctime, this.momentLocale).format();
+    const createdAt = moment(file.stat.mtime);
+    createdAt.locale(this.momentLocale);
+    const modifiedAt = moment(file.stat.mtime);
+    modifiedAt.locale(this.momentLocale);
+    const modifiedAtTime = modifiedAt.format();
+    const createdAtTime = createdAt.format();
 
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
