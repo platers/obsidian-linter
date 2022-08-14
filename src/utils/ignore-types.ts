@@ -6,26 +6,25 @@ import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 export type IgnoreResults = {replacedValues: string[], newText: string};
 export type IgnoreFunction = ((text: string, placeholder: string) => IgnoreResults);
-export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string, replaceDollarSigns: boolean};
+export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string};
 
 export const IgnoreTypes: Record<string, IgnoreType> = {
   // mdast node types
-  code: {replaceAction: MDAstTypes.Code, placeholder: '{CODE_BLOCK_PLACEHOLDER}', replaceDollarSigns: true},
-  image: {replaceAction: MDAstTypes.Image, placeholder: '{IMAGE_PLACEHOLDER}', replaceDollarSigns: false},
-  thematicBreak: {replaceAction: MDAstTypes.HorizontalRule, placeholder: '{HORIZONTAL_RULE_PLACEHOLDER}', replaceDollarSigns: false},
-  italics: {replaceAction: MDAstTypes.Italics, placeholder: '{ITALICS_PLACEHOLDER}', replaceDollarSigns: false},
-  bold: {replaceAction: MDAstTypes.Bold, placeholder: '{STRONG_PLACEHOLDER}', replaceDollarSigns: false},
-  list: {replaceAction: MDAstTypes.List, placeholder: '{LIST_PLACEHOLDER}', replaceDollarSigns: false},
-  blockquote: {replaceAction: MDAstTypes.Blockquote, placeholder: '{BLOCKQUOTE_PLACEHOLDER}', replaceDollarSigns: false},
-  table: {replaceAction: MDAstTypes.Table, placeholder: '{TABLE_PLACEHOLDER}', replaceDollarSigns: false},
+  code: {replaceAction: MDAstTypes.Code, placeholder: '{CODE_BLOCK_PLACEHOLDER}'},
+  image: {replaceAction: MDAstTypes.Image, placeholder: '{IMAGE_PLACEHOLDER}'},
+  thematicBreak: {replaceAction: MDAstTypes.HorizontalRule, placeholder: '{HORIZONTAL_RULE_PLACEHOLDER}'},
+  italics: {replaceAction: MDAstTypes.Italics, placeholder: '{ITALICS_PLACEHOLDER}'},
+  bold: {replaceAction: MDAstTypes.Bold, placeholder: '{STRONG_PLACEHOLDER}'},
+  list: {replaceAction: MDAstTypes.List, placeholder: '{LIST_PLACEHOLDER}'},
+  blockquote: {replaceAction: MDAstTypes.Blockquote, placeholder: '{BLOCKQUOTE_PLACEHOLDER}'},
+  table: {replaceAction: MDAstTypes.Table, placeholder: '{TABLE_PLACEHOLDER}'},
   // RegExp
-  yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---'), replaceDollarSigns: true},
-  wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}', replaceDollarSigns: false},
-  tag: {replaceAction: tagRegex, placeholder: '#tag-placeholder', replaceDollarSigns: false},
-  // table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}', replaceDollarSigns: false},
-  obsidianMultiLineComments: {replaceAction: obsidianMultilineCommentRegex, placeholder: '{OBSIDIAN_COMMENT_PLACEHOLDER}', replaceDollarSigns: false},
+  yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---')},
+  wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}'},
+  tag: {replaceAction: tagRegex, placeholder: '#tag-placeholder'},
+  obsidianMultiLineComments: {replaceAction: obsidianMultilineCommentRegex, placeholder: '{OBSIDIAN_COMMENT_PLACEHOLDER}'},
   // custom functions
-  link: {replaceAction: replaceMarkdownLinks, placeholder: '{REGULAR_LINK_PLACEHOLDER}', replaceDollarSigns: false},
+  link: {replaceAction: replaceMarkdownLinks, placeholder: '{REGULAR_LINK_PLACEHOLDER}'},
 };
 
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
@@ -54,13 +53,9 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
   if (setOfPlaceholders != null && setOfPlaceholders.length > 0) {
     setOfPlaceholders.forEach((replacedInfo: {placeholder: string, replacedValues: string[], replaceDollarSigns: boolean}) => {
       replacedInfo.replacedValues.forEach((replacedValue: string) => {
-        if (replacedInfo.replaceDollarSigns == true) {
-          replacedValue = escapeDollarSigns(replacedValue);
-        }
-
         // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
         // see https://github.com/platers/obsidian-linter/issues/201
-        text = text.replace(new RegExp(replacedInfo.placeholder, 'i'), replacedValue);
+        text = text.replace(new RegExp(replacedInfo.placeholder, 'i'), escapeDollarSigns(replacedValue));
       });
     });
   }
