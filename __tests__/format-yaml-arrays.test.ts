@@ -768,5 +768,21 @@ ruleTest({
         ---
       `,
     },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/352
+      testName: 'Date stays the same',
+      before: dedent`
+        ---
+        date: 2022-08-14
+        tags: []
+        ---
+      `,
+      after: dedent`
+        ---
+        date: 2022-08-14
+        tags: []
+        ---
+      `,
+    },
   ],
 });

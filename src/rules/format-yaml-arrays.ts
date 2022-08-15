@@ -48,6 +48,11 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         return text;
       }
 
+      // https://stackoverflow.com/a/44198641
+      const isValidDate = function(date: any) {
+        return date && Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date);
+      };
+
       if (options.formatAliasKey && Object.keys(yaml).includes(obsidianAliasKey)) {
         text = setYamlSection(text, obsidianAliasKey, formatYamlArrayValue(convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, obsidianAliasKey))), options.aliasArrayStyle));
       }
@@ -61,7 +66,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays and already accounted for keys
-          if (keysToIgnore.includes(key) || !(typeof yaml[key] === 'object' && yaml[key] as string[])) {
+          if (keysToIgnore.includes(key) || !(typeof yaml[key] === 'object' && !isValidDate(yaml[key]) && yaml[key] as string[])) {
             continue;
           }
 
