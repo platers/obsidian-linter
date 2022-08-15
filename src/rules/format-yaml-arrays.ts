@@ -190,7 +190,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
       new BooleanOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
         name: 'Format yaml aliases section',
-        description: 'Turns on formatting for the yaml aliases section',
+        description: 'Turns on formatting for the yaml aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.',
         optionsKey: 'formatAliasKey',
       }),
       new DropdownOptionBuilder({

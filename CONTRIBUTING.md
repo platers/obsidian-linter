@@ -122,6 +122,8 @@ To update the documentation you can run `npm run compile` if you need to compile
 
 Tests are run by jest. They can be run by either running `npm run test` or `npm run compile`. The output will let you know how many of the tests passed and if any failed, why they failed.
 
+If you know the suite of tests that you would like to run, you can use `npm run test-suite TEST_SUITE_HERE` to run just the desired test suite. The test suite names are the names of the files in `__tests` minus `.test.ts`. So for example, `npm run test-suite format-yaml-arrays` would run the test suite for formatting yaml arrays. _Note: this does not run the examples for that rule as all examples are bundled together in the examples test suite._
+
 ## Linting Files
 
 Files should be linted prior to creating a pull request. The linter will make sure that the code follows the desired codestyle and formats the files as needed. The linter can be run by `npm run lint` or `npm run compile`

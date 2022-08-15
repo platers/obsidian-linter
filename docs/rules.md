@@ -200,7 +200,7 @@ Options:
 	- `single string comma delimited`: ```aliases: Title, Other Title```
 	- `single string to single-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a single-line array.
 	- `single string to multi-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a multi-line array.
-- Format yaml aliases section: Turns on formatting for the yaml aliases section
+- Format yaml aliases section: Turns on formatting for the yaml aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.
 	- Default: `true`
 - Yaml tags section style: The style of the yaml tags section
 	- Default: `single-line`
@@ -2440,7 +2440,7 @@ After:
 
 Alias: `remove-space-around-fullwidth-characters`
 
-Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab)
+Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab). Note that this may causes issues with markdown format in some cases.
 
 
 
