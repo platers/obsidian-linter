@@ -16,7 +16,7 @@ export default class RemoveSpaceAroundFullwidthCharacters extends RuleBuilder<Re
     return 'Remove Space around Fullwidth Characters';
   }
   get description(): string {
-    return 'Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab)';
+    return 'Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab). Note that this may causes issues with markdown format in some cases.';
   }
   get type(): RuleType {
     return RuleType.SPACING;
