@@ -28,7 +28,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
 };
 
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
-  let setOfPlaceholders: {placeholder: string, replacedValues: string[], replaceDollarSigns: boolean}[] = [];
+  let setOfPlaceholders: {placeholder: string, replacedValues: string[]}[] = [];
 
   // replace ignore blocks with their placeholders
   for (const ignoreType of ignoreTypes) {
@@ -43,7 +43,7 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
     }
 
     text = ignoredResult.newText;
-    setOfPlaceholders.push({replacedValues: ignoredResult.replacedValues, placeholder: ignoreType.placeholder, replaceDollarSigns: ignoreType.replaceDollarSigns});
+    setOfPlaceholders.push({replacedValues: ignoredResult.replacedValues, placeholder: ignoreType.placeholder});
   }
 
   text = func(text);
