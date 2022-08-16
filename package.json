@@ -1,6 +1,6 @@
 {
   "name": "obsidian-linter",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Enforces consistent markdown styling for Obsidian (https://obsidian.md)",
   "main": "main.js",
   "scripts": {
