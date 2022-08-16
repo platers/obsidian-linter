@@ -275,6 +275,10 @@ export function removeSpacesInLinkText(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Link, text);
 
   for (const position of positions) {
+    if (position == null) {
+      continue;
+    }
+
     const regularLink = text.substring(position.start.offset, position.end.offset);
     // skip links that are not are not in markdown format
     if (!regularLink.match(genericLinkRegex)) {

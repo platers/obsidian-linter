@@ -17,5 +17,32 @@ ruleTest({
         - [ ] [[fileName]]
       `,
     },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/236
+      testName: 'Alias with an email in it should not cause an issue',
+      before: dedent`
+        ---
+        title: John & Jane Doe
+        aliases: [John & Jane Doe, email@example.xyz, (123) 456-7890]
+        cssclass: [table-lines-bright, col-lines, row-lines]
+        ---
+
+        # John & Jane Doe
+
+        This stuff doesn't really matter.
+      `,
+      after: dedent`
+        ---
+        title: John & Jane Doe
+        aliases: [John & Jane Doe, email@example.xyz, (123) 456-7890]
+        cssclass: [table-lines-bright, col-lines, row-lines]
+        ---
+
+        # John & Jane Doe
+
+        This stuff doesn't really matter.
+      `,
+    },
   ],
 });
+
