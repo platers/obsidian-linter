@@ -229,6 +229,12 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           },
         ],
       }),
+      new BooleanOptionBuilder({
+        OptionsClass: FormatYamlArrayOptions,
+        name: 'Format yaml tags section',
+        description: 'Turns on formatting for the yaml tags section.',
+        optionsKey: 'formatTagKey',
+      }),
       new DropdownOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
         name: 'Default yaml array section style',
