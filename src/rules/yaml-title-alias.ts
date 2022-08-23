@@ -21,7 +21,9 @@ class YamlTitleAliasOptions implements Options {
   yamlAliasesSectionStyle?: YamlAliasesSectionStyle = 'Multi-line array';
   preserveExistingAliasesSectionStyle?: boolean = true;
   keepAliasThatMatchesTheFilename?: boolean = false;
-  fileName?: string;
+
+  @RuleBuilder.noSettingControl()
+    fileName?: string;
 }
 
 @RuleBuilder.register

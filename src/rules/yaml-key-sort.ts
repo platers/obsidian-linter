@@ -8,9 +8,16 @@ type YamlSortOrderForOtherKeys = 'None' | 'Ascending Alphabetical' | 'Descending
 
 class YamlKeySortOptions implements Options {
   priorityKeysAtStartOfYaml?: boolean = true;
-  dateModifiedKey?: string;
-  currentTimeFormatted?: string;
-  yamlTimestampDateModifiedEnabled?: boolean;
+
+  @RuleBuilder.noSettingControl()
+    dateModifiedKey?: string;
+
+  @RuleBuilder.noSettingControl()
+    currentTimeFormatted?: string;
+
+  @RuleBuilder.noSettingControl()
+    yamlTimestampDateModifiedEnabled?: boolean;
+
   yamlKeyPrioritySortOrder?: string[] = [];
   yamlSortOrderForOtherKeys?: YamlSortOrderForOtherKeys = 'None';
 }

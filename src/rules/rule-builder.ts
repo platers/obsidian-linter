@@ -1,6 +1,7 @@
 import {Example, Options, Rule, RuleType, registerRule, LinterSettings} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
 import {logDebug} from '../logger';
+import 'reflect-metadata';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -34,6 +35,8 @@ export abstract class RuleBuilderBase {
 }
 
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
+  static readonly NoSettingControlKey = Symbol('noSettingControl');
+
   abstract get OptionsClass(): (new() => TOptions);
 
   static register<TOptions extends Options>(RuleBuilderClass: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>)): void {
@@ -82,6 +85,10 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     const builder = new this();
     const optionsFromSettings = rule.getOptions(settings);
     return builder.buildRuleOptions(optionsFromSettings);
+  }
+
+  static noSettingControl() {
+    return Reflect.metadata(RuleBuilder.NoSettingControlKey, true);
   }
 }
 
