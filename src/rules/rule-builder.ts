@@ -4,12 +4,14 @@ import {logDebug} from '../logger';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
+  static #ruleBuilderMap = new Map<string, RuleBuilderBase>();
 
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
     if (!RuleBuilderBase.#ruleMap.has(this.name)) {
       const builder = new this();
       const rule = new Rule(builder.name, builder.description, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder);
       RuleBuilderBase.#ruleMap.set(this.name, rule);
+      RuleBuilderBase.#ruleBuilderMap.set(builder.name, builder);
     }
 
     return RuleBuilderBase.#ruleMap.get(this.name);
@@ -24,6 +26,10 @@ export abstract class RuleBuilderBase {
     } else {
       return [text, false];
     }
+  }
+
+  static getBuilderByName(name: string): RuleBuilderBase {
+    return RuleBuilderBase.#ruleBuilderMap.get(name);
   }
 }
 
