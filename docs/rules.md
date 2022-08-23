@@ -211,6 +211,8 @@ Options:
 	- `single-line space delimited`: ```tags: [tag1 tag2]```
 	- `single string space delimited`: ```tags: tag1 tag2```
 	- `single string comma delimited`: ```tags: tag1, tag2```
+- Format yaml tags section: Turns on formatting for the yaml tags section.
+	- Default: `true`
 - Default yaml array section style: The style of other yaml arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays`
 	- Default: `single-line`
 	- `multi-line`: ```key:\n  - value```
