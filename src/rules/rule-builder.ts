@@ -46,8 +46,6 @@ export abstract class RuleBuilderBase {
 }
 
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
-  
-
   abstract get OptionsClass(): (new() => TOptions);
 
   static register<TOptions extends Options>(RuleBuilderClass: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>)): void {
