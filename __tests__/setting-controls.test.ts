@@ -1,7 +1,6 @@
 import RuleBuilder, {OptionBuilder, RuleBuilderBase} from '../src/rules/rule-builder';
 import {Options, rules} from '../src/rules';
 import '../src/rules-registry';
-import 'reflect-metadata';
 
 describe('Setting controls initialize all options class keys', () => {
   for (const rule of rules) {
@@ -13,11 +12,11 @@ describe('Setting controls initialize all options class keys', () => {
 
       for (const optionsClassKey of optionsClassKeys) {
         it(`${optionsClassKey}`, () => {
-          const noSettingControl = Reflect.getMetadata(RuleBuilder.NoSettingControlKey, optionsInstance, optionsClassKey);
-          if (noSettingControl === true) {
-            expect(optionsControlKeys).not.toContain(optionsClassKey);
-          } else {
+          const hasSettingControl = RuleBuilderBase.hasSettingControl(builder.OptionsClass.name, optionsClassKey);
+          if (hasSettingControl) {
             expect(optionsControlKeys).toContain(optionsClassKey);
+          } else {
+            expect(optionsControlKeys).not.toContain(optionsClassKey);
           }
         });
       }

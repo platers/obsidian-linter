@@ -1,11 +1,11 @@
 import {Example, Options, Rule, RuleType, registerRule, LinterSettings} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
 import {logDebug} from '../logger';
-import 'reflect-metadata';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
   static #ruleBuilderMap = new Map<string, RuleBuilderBase>();
+  static #noSettingsControlMap = new Map<string, string[]>();
 
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
     if (!RuleBuilderBase.#ruleMap.has(this.name)) {
@@ -32,10 +32,21 @@ export abstract class RuleBuilderBase {
   static getBuilderByName(name: string): RuleBuilderBase {
     return RuleBuilderBase.#ruleBuilderMap.get(name);
   }
+
+  protected static setNoSettingControl(optionsClassName: string, propertyKey: string) {
+    if (!RuleBuilderBase.#noSettingsControlMap.has(optionsClassName)) {
+      RuleBuilderBase.#noSettingsControlMap.set(optionsClassName, []);
+    }
+    RuleBuilderBase.#noSettingsControlMap.get(optionsClassName).push(propertyKey);
+  }
+
+  static hasSettingControl(optionsClassName: string, optionsClassKey: string) {
+    return !RuleBuilderBase.#noSettingsControlMap.has(optionsClassName) || !RuleBuilderBase.#noSettingsControlMap.get(optionsClassName).includes(optionsClassKey);
+  }
 }
 
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
-  static readonly NoSettingControlKey = Symbol('noSettingControl');
+  
 
   abstract get OptionsClass(): (new() => TOptions);
 
@@ -88,7 +99,10 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   }
 
   static noSettingControl() {
-    return Reflect.metadata(RuleBuilder.NoSettingControlKey, true);
+    return (target: Object, propertyKey: string) => {
+      const optionsClassName = target.constructor.name;
+      RuleBuilderBase.setNoSettingControl(optionsClassName, propertyKey);
+    };
   }
 }
 
