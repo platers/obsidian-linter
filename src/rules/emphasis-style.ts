@@ -25,7 +25,7 @@ export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
     return RuleType.CONTENT;
   }
   apply(text: string, options: EmphasisStyleOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath], text, (text) => {
       return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Italics);
     });
   }

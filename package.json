@@ -53,6 +53,7 @@
     "loglevel": "^1.8.0",
     "remark": "^14.0.2",
     "remark-gfm": "^3.0.1",
+    "remark-math": "^5.1.1",
     "ts-dedent": "^2.2.0",
     "unified": "^10.1.2",
     "unified-lint-rule": "^2.1.0"
