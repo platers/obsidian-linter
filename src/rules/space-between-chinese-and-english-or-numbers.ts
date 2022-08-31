@@ -28,7 +28,7 @@ export default class SpaceBetweenChineseAndEnglishOrNumbers extends RuleBuilder<
       return text.replace(head, '$1 $3').replace(tail, '$1 $3');
     };
 
-    let newText = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.image, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.italics, IgnoreTypes.bold], text, addSpaceAroundChineseAndEnglish);
+    let newText = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.yaml, IgnoreTypes.image, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.italics, IgnoreTypes.bold], text, addSpaceAroundChineseAndEnglish);
 
     newText = updateItalicsText(newText, addSpaceAroundChineseAndEnglish);
 

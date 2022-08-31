@@ -15,6 +15,7 @@ export enum MDAstTypes {
   Bold = 'strong',
   ListItem = 'listItem',
   Code = 'code',
+  InlineCode = 'inlineCode',
   Table = 'table',
   Image = 'image',
   List = 'list',

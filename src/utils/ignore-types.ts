@@ -11,6 +11,7 @@ export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, p
 export const IgnoreTypes: Record<string, IgnoreType> = {
   // mdast node types
   code: {replaceAction: MDAstTypes.Code, placeholder: '{CODE_BLOCK_PLACEHOLDER}'},
+  inlineCode: {replaceAction: MDAstTypes.InlineCode, placeholder: '{INLINE_CODE_BLOCK_PLACEHOLDER}'},
   image: {replaceAction: MDAstTypes.Image, placeholder: '{IMAGE_PLACEHOLDER}'},
   thematicBreak: {replaceAction: MDAstTypes.HorizontalRule, placeholder: '{HORIZONTAL_RULE_PLACEHOLDER}'},
   italics: {replaceAction: MDAstTypes.Italics, placeholder: '{ITALICS_PLACEHOLDER}'},
@@ -25,7 +26,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   obsidianMultiLineComments: {replaceAction: obsidianMultilineCommentRegex, placeholder: '{OBSIDIAN_COMMENT_PLACEHOLDER}'},
   // custom functions
   link: {replaceAction: replaceMarkdownLinks, placeholder: '{REGULAR_LINK_PLACEHOLDER}'},
-};
+} as const;
 
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
   let setOfPlaceholders: {placeholder: string, replacedValues: string[]}[] = [];
