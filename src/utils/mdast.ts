@@ -5,6 +5,7 @@ import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 import {escapeRegExp, genericLinkRegex} from './regex';
 import {remark} from 'remark';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
 
 /* eslint-disable no-unused-vars */
 export enum MDAstTypes {
@@ -21,11 +22,14 @@ export enum MDAstTypes {
   List = 'list',
   Blockquote = 'blockquote',
   HorizontalRule = 'thematicBreak',
+  // math types
+  Math = 'math',
+  InlineMath = 'inlineMath',
 }
 /* eslint-enable no-unused-vars */
 
 function parseTextToAST(text: string): Root {
-  const ast = remark().use(remarkGfm).parse(text);
+  const ast = remark().use(remarkGfm).use(remarkMath).parse(text);
   return ast;
 }
 
