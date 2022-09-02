@@ -71,10 +71,12 @@ export default class LinterPlugin extends Plugin {
   settings: LinterSettings;
   private eventRef: EventRef;
   private momentLocale: string;
+  private isEnabled: boolean = true;
 
   async onload() {
     logInfo('Loading plugin');
 
+    this.isEnabled = true;
     // eslint-disable-next-line guard-for-in
     for (const key in iconInfo) {
       const svg = iconInfo[key];
@@ -151,7 +153,7 @@ export default class LinterPlugin extends Plugin {
 
     if (typeof save === 'function') {
       saveCommandDefinition.callback = () => {
-        if (this.settings.lintOnSave) {
+        if (this.settings.lintOnSave && this.isEnabled) {
           const editor = this.app.workspace.getActiveViewOfType(MarkdownView).editor;
           const file = this.app.workspace.getActiveFile();
 
@@ -174,6 +176,7 @@ export default class LinterPlugin extends Plugin {
 
   async onunload() {
     logInfo('Unloading plugin');
+    this.isEnabled = false;
     this.app.workspace.offref(this.eventRef);
   }
 
