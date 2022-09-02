@@ -34,7 +34,7 @@ export function toSingleLineArrayYamlString<T>(arr: T[]): string {
 }
 
 function getYamlSectionRegExp(rawKey: string): RegExp {
-  return new RegExp(`(?<=^|\\n)${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*)*)\\n`);
+  return new RegExp(`${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*)*)\\n`);
 }
 
 export function setYamlSection(yaml: string, rawKey: string, rawValue: string): string {
