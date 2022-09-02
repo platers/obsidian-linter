@@ -9,6 +9,9 @@ import dedent from 'ts-dedent';
 
 class RuleTemplateOptions implements Options {
   someProperty: string = 'some default value';
+
+  @RuleBuilder.noSettingControl()
+    somePropertyThatDoesNotHaveCorrespondingSettingControl: string = 'some other default value';
 }
 
 @RuleBuilder.register
