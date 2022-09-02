@@ -28,7 +28,7 @@ export default [
     plugins: [
       typescript({inlineSources: !isProd}),
       nodeResolve({browser: true}),
-      commonjs({exclude: 'tests/**'}),
+      commonjs(),
       globImport({
         format: 'default',
       }),
@@ -54,7 +54,7 @@ export default [
         delimiters: ['', ''],
       }),
       nodeResolve({browser: true}),
-      commonjs({exclude: 'tests/**'}),
+      commonjs(),
       globImport({
         format: 'default',
       }),
