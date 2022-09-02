@@ -7,16 +7,27 @@ import {escapeDollarSigns} from '../utils/regex';
 import {insert} from '../utils/strings';
 
 class YamlTimestampOptions implements Options {
-  alreadyModified?: boolean;
+  @RuleBuilder.noSettingControl()
+    alreadyModified?: boolean;
+
   dateCreatedKey?: string = 'date created';
   dateCreated?: boolean = true;
-  fileCreatedTime?: string;
+
+  @RuleBuilder.noSettingControl()
+    fileCreatedTime?: string;
+
   format?: string = 'dddd, MMMM Do YYYY, h:mm:ss a';
   dateModified?: boolean = true;
   dateModifiedKey?: string = 'date modified';
-  fileModifiedTime?: string;
-  locale?: string = 'en';
-  currentTime?: moment.Moment;
+
+  @RuleBuilder.noSettingControl()
+    fileModifiedTime?: string;
+
+  @RuleBuilder.noSettingControl()
+    locale?: string = 'en';
+
+  @RuleBuilder.noSettingControl()
+    currentTime?: moment.Moment;
 }
 
 @RuleBuilder.register

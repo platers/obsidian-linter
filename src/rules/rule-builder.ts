@@ -4,12 +4,15 @@ import {logDebug} from '../logger';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
+  static #ruleBuilderMap = new Map<string, RuleBuilderBase>();
+  static #noSettingsControlMap = new Map<string, string[]>();
 
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
     if (!RuleBuilderBase.#ruleMap.has(this.name)) {
       const builder = new this();
       const rule = new Rule(builder.name, builder.description, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder);
       RuleBuilderBase.#ruleMap.set(this.name, rule);
+      RuleBuilderBase.#ruleBuilderMap.set(builder.name, builder);
     }
 
     return RuleBuilderBase.#ruleMap.get(this.name);
@@ -24,6 +27,21 @@ export abstract class RuleBuilderBase {
     } else {
       return [text, false];
     }
+  }
+
+  static getBuilderByName(name: string): RuleBuilderBase {
+    return RuleBuilderBase.#ruleBuilderMap.get(name);
+  }
+
+  protected static setNoSettingControl(optionsClassName: string, propertyKey: string) {
+    if (!RuleBuilderBase.#noSettingsControlMap.has(optionsClassName)) {
+      RuleBuilderBase.#noSettingsControlMap.set(optionsClassName, []);
+    }
+    RuleBuilderBase.#noSettingsControlMap.get(optionsClassName).push(propertyKey);
+  }
+
+  static hasSettingControl(optionsClassName: string, optionsClassKey: string) {
+    return !RuleBuilderBase.#noSettingsControlMap.has(optionsClassName) || !RuleBuilderBase.#noSettingsControlMap.get(optionsClassName).includes(optionsClassKey);
   }
 }
 
@@ -76,6 +94,13 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     const builder = new this();
     const optionsFromSettings = rule.getOptions(settings);
     return builder.buildRuleOptions(optionsFromSettings);
+  }
+
+  static noSettingControl() {
+    return (target: Object, propertyKey: string) => {
+      const optionsClassName = target.constructor.name;
+      RuleBuilderBase.setNoSettingControl(optionsClassName, propertyKey);
+    };
   }
 }
 

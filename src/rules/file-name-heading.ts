@@ -5,7 +5,8 @@ import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {insert} from '../utils/strings';
 
 class FileNameHeadingOptions implements Options {
-  fileName: string;
+  @RuleBuilder.noSettingControl()
+    fileName: string;
 }
 
 @RuleBuilder.register

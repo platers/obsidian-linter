@@ -7,7 +7,9 @@ import {escapeDollarSigns} from '../utils/regex';
 import {insert} from '../utils/strings';
 
 class YamlTitleOptions implements Options {
-  fileName: string;
+  @RuleBuilder.noSettingControl()
+    fileName: string;
+
   titleKey?: string = 'title';
 }
 
