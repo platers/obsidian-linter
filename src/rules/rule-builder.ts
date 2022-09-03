@@ -222,7 +222,11 @@ export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuild
   setRuleOption(ruleOptions: TOptions, options: Options) {
     if (options[this.name] !== undefined) {
       // `as string[]` is not enough because of the https://github.com/microsoft/TypeScript/issues/48992
-      ruleOptions[this.optionsKey] = (options[this.name] as string).split(this.splitter) as TOptions[KeysOfObjectMatchingPropertyValueType<TOptions, string[]>];
+      // make sure to remove any empty strings as well as they are not valid values
+      const optionValue = ((options[this.name] as string).split(this.splitter) as TOptions[KeysOfObjectMatchingPropertyValueType<TOptions, string[]>]).filter(function(el: string) {
+        return el != '';
+      });
+      ruleOptions[this.optionsKey] = optionValue;
     }
   }
 }
