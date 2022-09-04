@@ -16,7 +16,7 @@ export default class SpaceBetweenChineseAndEnglishOrNumbers extends RuleBuilder<
     return 'Space between Chinese and English or numbers';
   }
   get description(): string {
-    return 'Ensures that Chinese and English or numbers are separated by a single space. Follow this [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)';
+    return 'Ensures that Chinese and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)';
   }
   get type(): RuleType {
     return RuleType.SPACING;
