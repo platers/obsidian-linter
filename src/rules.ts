@@ -20,6 +20,7 @@ export interface LinterSettings {
   foldersToIgnore: string[];
   linterLocale: string;
   logLevel: number;
+  lintCommands: string[];
 }
 /* eslint-disable no-unused-vars */
 export enum RuleType {

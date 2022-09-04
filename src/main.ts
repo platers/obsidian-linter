@@ -14,6 +14,7 @@ import YamlKeySort from './rules/yaml-key-sort';
 import {RuleBuilderBase} from './rules/rule-builder';
 import {iconInfo} from './icons';
 import {YAMLException} from 'js-yaml';
+import CommandSuggester from './suggesters/command-suggester';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -31,12 +32,12 @@ declare module 'obsidian' {
   // eslint-disable-next-line no-unused-vars
   interface App {
     commands: {
-        executeCommandById(id: string): void;
-        commands: {
-            'editor:save-file': {
-                callback(): void;
-            };
+      executeCommandById(id: string): void;
+      commands: {
+        'editor:save-file': {
+          callback(): void;
         };
+      };
     };
   }
 }
@@ -106,7 +107,7 @@ export default class LinterPlugin extends Plugin {
         const startMessage = 'This will edit all of your files and may introduce errors.';
         const submitBtnText = 'Lint All';
         const submitBtnNoticeText = 'Linting all files...';
-        new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () =>{
+        new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => {
           return this.runLinterAllFiles(this.app);
         }).open();
       },
@@ -188,6 +189,7 @@ export default class LinterPlugin extends Plugin {
       foldersToIgnore: [],
       linterLocale: 'system-default',
       logLevel: log.levels.ERROR,
+      lintCommands: [],
     };
     const data = await this.loadData();
     const storedSettings = data || {};
@@ -325,14 +327,14 @@ export default class LinterPlugin extends Plugin {
         } catch (error) {
           this.handleLintError(file, error, 'There is an error in the yaml of file \'${file.path}\': ', 'Lint All Files Error in File \'${file.path}\'');
 
-          numberOfErrors+=1;
+          numberOfErrors += 1;
         }
       }
     }));
     if (numberOfErrors === 0) {
       new Notice('Linted all files');
     } else {
-      const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error': 'were ' + numberOfErrors + ' errors';
+      const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error' : 'were ' + numberOfErrors + ' errors';
       new Notice('Linted all files and there ' + amountOfErrorsMessage + '.');
     }
   }
@@ -350,7 +352,7 @@ export default class LinterPlugin extends Plugin {
         } catch (error) {
           this.handleLintError(file, error, 'There is an error in the yaml of file \'${file.path}\': ', 'Lint All Files in Folder Error in File \'${file.path}\'');
 
-          numberOfErrors+=1;
+          numberOfErrors += 1;
         }
 
         lintedFiles++;
@@ -359,7 +361,7 @@ export default class LinterPlugin extends Plugin {
     if (numberOfErrors === 0) {
       new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + '.');
     } else {
-      const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error': 'were ' + numberOfErrors + ' errors';
+      const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error' : 'were ' + numberOfErrors + ' errors';
       new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + ' and there ' + amountOfErrorsMessage + '.');
     }
   }
@@ -522,7 +524,7 @@ class SettingTab extends PluginSettingTab {
         prevSection = rule.type;
       }
 
-      containerEl.createEl('h3', {}, (el) =>{
+      containerEl.createEl('h3', {}, (el) => {
         el.innerHTML = `<a href="${rule.getURL()}">${rule.name}</a>`;
       });
 
@@ -530,6 +532,8 @@ class SettingTab extends PluginSettingTab {
         option.display(containerEl, this.plugin.settings, this.plugin);
       }
     }
+
+    this.addCustomCommandsSetting();
   }
 
   addLocaleOverrideSetting(): void {
@@ -552,6 +556,71 @@ class SettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
         });
+  }
+
+  addCustomCommandsSetting(): void {
+    this.containerEl.createEl('h2', {text: 'Custom Commands Settings'});
+    function arrayMove(arr:string[], fromIndex:number, toIndex:number):void {
+      if (toIndex < 0 || toIndex === arr.length) {
+        return;
+      }
+      const element = arr[fromIndex];
+      arr[fromIndex] = arr[toIndex];
+      arr[toIndex] = element;
+    }
+    new Setting(this.containerEl)
+        .addButton((cb)=>{
+          cb.setButtonText('Add new command')
+              .setCta()
+              .onClick(()=>{
+                this.plugin.settings.lintCommands.push('');
+                this.plugin.saveSettings();
+                this.display();
+              });
+        });
+
+    this.plugin.settings.lintCommands.forEach((command, index) => {
+      new Setting(this.containerEl)
+          .addSearch((cb) => {
+            new CommandSuggester(this.app, cb.inputEl);
+            cb.setPlaceholder('Example: folder1/template_file')
+                .setValue(command)
+                .onChange((newCommand) => {
+                  if (newCommand && this.plugin.settings.lintCommands.contains(newCommand)) {
+                    logError('This command is already exist!', new Error('This command is already exist!'));
+                  }
+                  this.plugin.settings.lintCommands[index] = newCommand;
+                  this.plugin.saveSettings();
+                });
+          })
+          .addExtraButton((cb) => {
+            cb.setIcon('up-chevron-glyph')
+                .setTooltip('Move up')
+                .onClick(() => {
+                  arrayMove(this.plugin.settings.lintCommands, index, index-1);
+                  this.plugin.saveSettings();
+                  this.display();
+                });
+          })
+          .addExtraButton((cb) => {
+            cb.setIcon('down-chevron-glyph')
+                .setTooltip('Move down')
+                .onClick(() => {
+                  arrayMove(this.plugin.settings.lintCommands, index, index+1);
+                  this.plugin.saveSettings();
+                  this.display();
+                });
+          })
+          .addExtraButton((cb)=>{
+            cb.setIcon('cross')
+                .setTooltip('Delete')
+                .onClick(()=>{
+                  this.plugin.settings.lintCommands.splice(index, 1);
+                  this.plugin.saveSettings();
+                  this.display();
+                });
+          });
+    });
   }
 }
 
