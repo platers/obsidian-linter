@@ -155,6 +155,24 @@ ruleTest({
         [^2]: footnote B (last in document)
       `,
     },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/389
+      testName: 'Make sure that links that are the footnote text get moved to the bottom correctly',
+      before: dedent`
+        xxx[^1]
+
+        [^1]:[b](http://b.com)
+
+        - [a](http://a.com)
+      `,
+      after: dedent`
+        xxx[^1]
+
+        - [a](http://a.com)
+
+        [^1]:[b](http://b.com)
+      `,
+    },
   ],
 });
 
