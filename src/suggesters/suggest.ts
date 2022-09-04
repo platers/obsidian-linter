@@ -123,6 +123,7 @@ export abstract class TextInputSuggest<T> implements ISuggestOwner<T> {
     this.inputEl = inputEl;
     this.scope = new Scope();
 
+    // eslint-disable-next-line no-undef
     this.suggestEl = createDiv('suggestion-container');
     const suggestion = this.suggestEl.createDiv('suggestion');
     this.suggest = new Suggest(this, suggestion, this.scope);
