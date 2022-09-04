@@ -241,7 +241,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       new MomentFormatOptionBuilder({
         OptionsClass: YamlTimestampOptions,
         name: 'Format',
-        description: 'Date format',
+        description: 'Moment date format to use (see [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
         optionsKey: 'format',
       }),
     ];

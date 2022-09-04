@@ -1,6 +1,7 @@
 import {Setting} from 'obsidian';
 import LinterPlugin from './main';
 import {LinterSettings} from './rules';
+import {convertRegularMarkdownLinksToHTMLLinks} from './utils/mdast';
 
 /** Class representing an option of a rule */
 
@@ -50,6 +51,7 @@ export class BooleanOption extends Option {
           });
         });
 
+    makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting);
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
   }
@@ -71,6 +73,7 @@ export class TextOption extends Option {
           });
         });
 
+    makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting);
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
   }
@@ -92,6 +95,7 @@ export class TextAreaOption extends Option {
           });
         });
 
+    makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting);
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
   }
@@ -114,6 +118,7 @@ export class MomentFormatOption extends Option {
           });
         });
 
+    makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting);
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
   }
@@ -158,7 +163,13 @@ export class DropdownOption extends Option {
           });
         });
 
+    makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting);
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
   }
+}
+
+function makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting: Setting) {
+  setting.nameEl.innerHTML = convertRegularMarkdownLinksToHTMLLinks(setting.nameEl.innerHTML);
+  setting.descEl.innerHTML = convertRegularMarkdownLinksToHTMLLinks(setting.descEl.innerHTML);
 }

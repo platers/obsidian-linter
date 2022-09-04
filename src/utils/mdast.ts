@@ -290,7 +290,7 @@ export function removeSpacesInLinkText(text: string): string {
       continue;
     }
 
-    const endLinkTextPosition = regularLink.lastIndexOf(']');
+    const endLinkTextPosition = regularLink.indexOf(']');
     const newLink = regularLink.substring(0, 1) + regularLink.substring(1, endLinkTextPosition).trim() + regularLink.substring(endLinkTextPosition);
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, newLink);
   }
@@ -444,6 +444,28 @@ export function ensureEmptyLinesAroundTables(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Table, text);
   for (const position of positions) {
     text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+  }
+
+  return text;
+}
+
+export function convertRegularMarkdownLinksToHTMLLinks(text: string): string {
+  const positions: Position[] = getPositions(MDAstTypes.Link, text);
+
+  for (const position of positions) {
+    if (position == null) {
+      continue;
+    }
+
+    const regularLink = text.substring(position.start.offset, position.end.offset);
+    // skip links that are not are not in markdown format
+    if (!regularLink.match(genericLinkRegex)) {
+      continue;
+    }
+
+    const endLinkTextPosition = regularLink.indexOf(']');
+    const htmlLink = '<a href="' + regularLink.substring(endLinkTextPosition+2, regularLink.length - 1)+ '">' + regularLink.substring(1, endLinkTextPosition) + '</a>';
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, htmlLink);
   }
 
   return text;

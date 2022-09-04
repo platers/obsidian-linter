@@ -507,7 +507,7 @@ Options:
 	- Default: `true`
 - Date Modified Key: Which YAML key to use for modification date
 	- Default: `date modified`
-- Format: Date format
+- Format: Moment date format to use (see [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))
 	- Default: `dddd, MMMM Do YYYY, h:mm:ss a`
 
 Example: Adds a header with the date.
@@ -2563,7 +2563,7 @@ After:
 
 Alias: `space-between-chinese-and-english-or-numbers`
 
-Ensures that Chinese and English or numbers are separated by a single space. Follow this [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)
+Ensures that Chinese and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)
 
 
 
