@@ -1,4 +1,4 @@
-import {Example, Options, Rule, RuleType, registerRule, LinterSettings} from '../rules';
+import {Example, Options, Rule, RuleType, registerRule, LinterSettings, wrapLintError} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
 import {logDebug} from '../logger';
 
@@ -23,7 +23,13 @@ export abstract class RuleBuilderBase {
     if (optionsFromSettings[rule.enabledOptionName()]) {
       const options = Object.assign({}, optionsFromSettings, extraOptions) as Options;
       logDebug(`Running ${rule.name}`);
-      return [rule.apply(text, options), true];
+
+      try {
+        return [rule.apply(text, options), true];
+      } catch (error) {
+        console.log(error);
+        wrapLintError(error, rule.name);
+      }
     } else {
       return [text, false];
     }

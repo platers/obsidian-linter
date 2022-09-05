@@ -1,4 +1,4 @@
-import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder, addIcon, Command} from 'obsidian';
+import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder, addIcon} from 'obsidian';
 import {LinterSettings, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -11,6 +11,7 @@ import {iconInfo} from './icons';
 import {YAMLException} from 'js-yaml';
 import CommandSuggester from './suggesters/command-suggester';
 import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
+import {LinterError} from './linter-error';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -240,7 +241,7 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          this.handleLintError(file, error, 'There is an error in the yaml of file \'${file.path}\': ', 'Lint All Files Error in File \'${file.path}\'');
+          this.handleLintError(file, error, 'Lint All Files Error in File \'${file.path}\'');
 
           numberOfErrors += 1;
         }
@@ -267,7 +268,7 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          this.handleLintError(file, error, 'There is an error in the yaml of file \'${file.path}\': ', 'Lint All Files in Folder Error in File \'${file.path}\'');
+          this.handleLintError(file, error, 'Lint All Files in Folder Error in File \'${file.path}\'');
 
           numberOfErrors += 1;
         }
@@ -302,7 +303,7 @@ export default class LinterPlugin extends Plugin {
     try {
       newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.app.commands));
     } catch (error) {
-      this.handleLintError(file, error, 'There is an error in the yaml: ', 'Lint File Error in File \'${file.path}\'');
+      this.handleLintError(file, error, 'Lint File Error in File \'${file.path}\'', false);
     }
 
     // Replace changed lines
@@ -368,17 +369,19 @@ export default class LinterPlugin extends Plugin {
     }
   }
 
-  private handleLintError(file: TFile, error: Error, yamlErrorStringTemplate: string, logErrorStringTemplate: string) {
-    if (error instanceof YAMLException) {
-      let errorMessage = error.toString();
-      errorMessage = errorMessage.substring(errorMessage.indexOf(':') + 1);
-
-      new Notice(yamlErrorStringTemplate.replace('${file.path}', file.path) + errorMessage);
+  private handleLintError(file: TFile, error: Error, logErrorStringTemplate: string, useLogTemplateInNotice: boolean = true) {
+    const errorMessage = logErrorStringTemplate.replace('${file.path}', file.path);
+    if (error instanceof LinterError) {
+      if (useLogTemplateInNotice) {
+        new Notice(`${errorMessage} ${error.message}.\nSee console for more details.`);
+      } else {
+        new Notice(`${error.message}.\nSee console for more details.`);
+      }
     } else {
-      new Notice('An error occurred during linting. See console for details');
+      new Notice('An unknown error occurred during linting. See console for details');
     }
 
-    logError(logErrorStringTemplate.replace('${file.path}', file.path), error);
+    logError(errorMessage, error);
   }
 }
 

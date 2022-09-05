@@ -7,6 +7,8 @@ import {
   BooleanOption,
 } from './option';
 import {yamlRegex} from './utils/regex';
+import {YAMLException} from 'js-yaml';
+import {LinterError} from './linter-error';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
@@ -185,4 +187,16 @@ export function registerRule(rule: Rule): void {
   rules.push(rule);
   rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.name.localeCompare(b.name)));
   rulesDict[rule.alias()] = rule;
+}
+
+export function wrapLintError(error: Error, ruleName: string) {
+  let errorMessage: string;
+  if (error instanceof YAMLException) {
+    errorMessage = error.toString();
+    errorMessage =`error in the yaml: ${errorMessage.substring(errorMessage.indexOf(':') + 1)}`;
+  } else {
+    errorMessage = `unknown error: ${error.message}`;
+  }
+
+  throw new LinterError(`"${ruleName}" encountered an ${errorMessage}`, error);
 }

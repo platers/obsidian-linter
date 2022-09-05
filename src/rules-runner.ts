@@ -1,12 +1,12 @@
-import { TFile, moment, App } from "obsidian";
-import { logDebug } from "./logger";
-import { getDisabledRules, LinterSettings, rules } from "./rules";
-import EscapeYamlSpecialCharacters from "./rules/escape-yaml-special-characters";
-import FormatTagsInYaml from "./rules/format-tags-in-yaml";
-import { RuleBuilderBase } from "./rules/rule-builder";
-import YamlKeySort from "./rules/yaml-key-sort";
-import YamlTimestamp from "./rules/yaml-timestamp";
-import { ObsidianCommandInterface } from "./typings/obsidian-ex";
+import {TFile, moment} from 'obsidian';
+import {logDebug} from './logger';
+import {getDisabledRules, LinterSettings, rules} from './rules';
+import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
+import FormatTagsInYaml from './rules/format-tags-in-yaml';
+import {RuleBuilderBase} from './rules/rule-builder';
+import YamlKeySort from './rules/yaml-key-sort';
+import YamlTimestamp from './rules/yaml-timestamp';
+import {ObsidianCommandInterface} from './typings/obsidian-ex';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -24,12 +24,12 @@ type FileInfo = {
 }
 
 export class RulesRunner {
-  private disabledRules: string[] = []
+  private disabledRules: string[] = [];
 
   lintText(runOptions: RunLinterRulesOptions): string {
     const originalText = runOptions.oldText;
     this.disabledRules = getDisabledRules(originalText);
-    
+
     let newText = this.runBeforeRegularRules(runOptions);
 
     for (const rule of rules) {
@@ -40,7 +40,7 @@ export class RulesRunner {
       } else if (rule.hasSpecialExecutionOrder) {
         continue;
       }
-  
+
       [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, runOptions.settings, {
         fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
         fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
@@ -50,7 +50,7 @@ export class RulesRunner {
     }
 
     runOptions.oldText = newText;
-  
+
     return this.runAfterRegularRules(originalText, runOptions);
   }
 
@@ -58,7 +58,7 @@ export class RulesRunner {
     let newText = runOptions.oldText;
     // remove hashtags from tags before parsing yaml
     [newText] = FormatTagsInYaml.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
-  
+
     // escape YAML where possible before parsing yaml
     [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
@@ -70,7 +70,7 @@ export class RulesRunner {
 
     // execute custom commands after regular rules, but before the timestamp rules
     for (const commandId of runOptions.settings.lintCommands) {
-      app.commands.executeCommandById(commandId);
+      runOptions.app.executeCommandById(commandId);
     }
 
     let currentTime = runOptions.getCurrentTime();
@@ -83,9 +83,9 @@ export class RulesRunner {
       alreadyModified: originalText != newText,
       locale: runOptions.momentLocale,
     });
-  
+
     const yamlTimestampOptions = YamlTimestamp.getRuleOptions(runOptions.settings);
-  
+
     currentTime = runOptions.getCurrentTime();
     [newText] = YamlKeySort.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       currentTimeFormatted: currentTime.format(yamlTimestampOptions.format),
@@ -97,7 +97,7 @@ export class RulesRunner {
   }
 }
 
-export function createRunLinterRulesOptions(text: string, file: TFile, momentLocale: string, settings: LinterSettings, app: App): RunLinterRulesOptions {
+export function createRunLinterRulesOptions(text: string, file: TFile, momentLocale: string, settings: LinterSettings, obsidianCommands: ObsidianCommandInterface): RunLinterRulesOptions {
   const createdAt = moment(file.stat.ctime);
   createdAt.locale(momentLocale);
   const modifiedAt = moment(file.stat.mtime);
@@ -115,12 +115,12 @@ export function createRunLinterRulesOptions(text: string, file: TFile, momentLoc
     },
     settings: settings,
     momentLocale: momentLocale,
-    app: app,
+    app: obsidianCommands,
     getCurrentTime: () => {
       const currentTime = moment();
       currentTime.locale(momentLocale);
 
       return currentTime;
-    }
-  }
+    },
+  };
 }
