@@ -1,4 +1,4 @@
-import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder, addIcon} from 'obsidian';
+import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder, addIcon, Command} from 'obsidian';
 import {LinterSettings, getDisabledRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -38,6 +38,7 @@ declare module 'obsidian' {
           callback(): void;
         };
       };
+      listCommands(): Command[];
     };
   }
 }
@@ -275,6 +276,11 @@ export default class LinterPlugin extends Plugin {
         fileName: file.basename,
         locale: this.momentLocale,
       });
+    }
+
+    // execute custom commands after regular rules, but before the timestamp rules
+    for (const commandId of this.settings.lintCommands) {
+      this.app.commands.executeCommandById(commandId);
     }
 
     let currentTime = moment();

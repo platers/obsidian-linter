@@ -10,7 +10,6 @@ export default class CommandSuggester extends TextInputSuggest<Command> {
   }
 
   getSuggestions(input_str: string): Command[] {
-    // @ts-ignore
     const all_commands = this.app.commands.listCommands();
     if (!all_commands) {
       return [];
