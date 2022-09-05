@@ -5,6 +5,7 @@ export default class CommandSuggester extends TextInputSuggest<Command> {
   constructor(
     public app: App,
     public inputEl: HTMLInputElement,
+    public valuesToExclude: string[] = [],
   ) {
     super(app, inputEl);
   }
@@ -15,10 +16,14 @@ export default class CommandSuggester extends TextInputSuggest<Command> {
       return [];
     }
 
+    const nonSelectedCommands = all_commands.filter((el: Command) => {
+      return !this.valuesToExclude.includes(el.id);
+    });
+
     const commands:Command[] = [];
     const lower_input_str = input_str.toLowerCase();
-    all_commands.forEach((command:Command) => {
-      if (command.id.contains(lower_input_str)) {
+    nonSelectedCommands.forEach((command:Command) => {
+      if (command.id.contains(lower_input_str) || command.name.contains(lower_input_str)) {
         commands.push(command);
       }
     });
