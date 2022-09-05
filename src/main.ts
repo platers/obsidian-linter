@@ -1,5 +1,5 @@
 import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder, addIcon} from 'obsidian';
-import {LinterSettings, rules} from './rules';
+import {LintCommand, LinterSettings, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
@@ -481,7 +481,8 @@ class SettingTab extends PluginSettingTab {
 
   addCustomCommandsSetting(): void {
     this.containerEl.createEl('h2', {text: 'Custom Commands Settings'});
-    function arrayMove(arr:string[], fromIndex:number, toIndex:number):void {
+
+    function arrayMove(arr: LintCommand[], fromIndex: number, toIndex: number):void {
       if (toIndex < 0 || toIndex === arr.length) {
         return;
       }
@@ -489,12 +490,13 @@ class SettingTab extends PluginSettingTab {
       arr[fromIndex] = arr[toIndex];
       arr[toIndex] = element;
     }
+
     new Setting(this.containerEl)
         .addButton((cb)=>{
           cb.setButtonText('Add new command')
               .setCta()
               .onClick(()=>{
-                this.plugin.settings.lintCommands.push('');
+                this.plugin.settings.lintCommands.push({id: '', name: ''});
                 this.plugin.saveSettings();
                 this.display();
               });
@@ -505,13 +507,24 @@ class SettingTab extends PluginSettingTab {
           .addSearch((cb) => {
             new CommandSuggester(this.app, cb.inputEl, this.plugin.settings.lintCommands);
             cb.setPlaceholder('Example: folder1/template_file')
-                .setValue(command)
-                .onChange((newCommand) => {
-                  if (newCommand && this.plugin.settings.lintCommands.contains(newCommand)) {
-                    logError('You cannot add the same command to the list of custom lint rules twice.', new Error('this command already exists in the lint command list.'));
+                .setValue(command.name)
+                .onChange((newCommandName) => {
+                  const newCommand = {id: cb.inputEl.getAttribute('commandId'), name: newCommandName};
+
+                  // make sure that the command is valid before making any attempt to save the value
+                  if (newCommand.name && newCommand.id) {
+                    this.plugin.settings.lintCommands.forEach((command, i) => {
+                      if (command.id == newCommand.id && i != index ) {
+                        logError('You cannot add the same command to the list of custom lint rules twice.', new Error('this command already exists in the lint command list.'));
+                      }
+                    });
+
+                    this.plugin.settings.lintCommands[index] = newCommand;
+                    this.plugin.saveSettings();
+                  } else if (!newCommand.name && !newCommand.id) { // the value has been cleared out
+                    this.plugin.settings.lintCommands[index] = newCommand;
+                    this.plugin.saveSettings();
                   }
-                  this.plugin.settings.lintCommands[index] = newCommand;
-                  this.plugin.saveSettings();
                 });
           })
           .addExtraButton((cb) => {

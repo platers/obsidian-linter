@@ -1,6 +1,6 @@
 import {TFile, moment} from 'obsidian';
 import {logDebug} from './logger';
-import {getDisabledRules, LinterSettings, rules} from './rules';
+import {getDisabledRules, LinterSettings, rules, wrapLintError} from './rules';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
 import {RuleBuilderBase} from './rules/rule-builder';
@@ -69,8 +69,17 @@ export class RulesRunner {
     let newText = runOptions.oldText;
 
     // execute custom commands after regular rules, but before the timestamp rules
-    for (const commandId of runOptions.settings.lintCommands) {
-      runOptions.commands.executeCommandById(commandId);
+    logDebug(`Running Custom Lint Commands`);
+    for (const commandInfo of runOptions.settings.lintCommands) {
+      if (!commandInfo.id) {
+        continue;
+      }
+
+      try {
+        runOptions.commands.executeCommandById(commandInfo.id);
+      } catch (error) {
+        wrapLintError(error, `Custom Lint Command ${commandInfo.id}`);
+      }
     }
 
     let currentTime = runOptions.getCurrentTime();

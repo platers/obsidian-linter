@@ -13,6 +13,8 @@ import {LinterError} from './linter-error';
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
 
+export type LintCommand = {id: string, name: string};
+
 export interface LinterSettings {
   ruleConfigs: {
     [ruleName: string]: Options;
@@ -22,9 +24,9 @@ export interface LinterSettings {
   foldersToIgnore: string[];
   linterLocale: string;
   logLevel: number;
-  lintCommands: string[];
+  lintCommands: LintCommand[];
 }
-/* eslint-disable no-unused-vars */
+
 export enum RuleType {
   YAML = 'YAML',
   HEADING = 'Heading',
@@ -32,7 +34,6 @@ export enum RuleType {
   CONTENT = 'Content',
   SPACING = 'Spacing',
 }
-/* eslint-enable no-unused-vars */
 
 /** Class representing a rule */
 export class Rule {

@@ -7,7 +7,6 @@ import {remark} from 'remark';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 
-/* eslint-disable no-unused-vars */
 export enum MDAstTypes {
   Link = 'link',
   Footnote = 'footnoteDefinition',
@@ -26,7 +25,6 @@ export enum MDAstTypes {
   Math = 'math',
   InlineMath = 'inlineMath',
 }
-/* eslint-enable no-unused-vars */
 
 function parseTextToAST(text: string): Root {
   const ast = remark().use(remarkGfm).use(remarkMath).parse(text);

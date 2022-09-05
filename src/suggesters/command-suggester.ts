@@ -1,11 +1,12 @@
 import {TextInputSuggest} from './suggest';
 import type {App, Command} from 'obsidian';
+import {LintCommand} from 'src/rules';
 
 export default class CommandSuggester extends TextInputSuggest<Command> {
   constructor(
     public app: App,
     public inputEl: HTMLInputElement,
-    public valuesToExclude: string[] = [],
+    public valuesToExclude: LintCommand[] = [],
   ) {
     super(app, inputEl);
   }
@@ -17,7 +18,15 @@ export default class CommandSuggester extends TextInputSuggest<Command> {
     }
 
     const nonSelectedCommands = all_commands.filter((el: Command) => {
-      return !this.valuesToExclude.includes(el.id);
+      for (const selectedCommandInfo of this.valuesToExclude) {
+        if (selectedCommandInfo.id == el.id &&
+          !(this.inputEl.hasAttribute('commandId') && this.inputEl.getAttribute('commandId') == el.id)
+        ) {
+          return false;
+        }
+      }
+
+      return true;
     });
 
     const commands:Command[] = [];
@@ -35,7 +44,8 @@ export default class CommandSuggester extends TextInputSuggest<Command> {
   }
 
   selectSuggestion(command: Command): void {
-    this.inputEl.value = command.id;
+    this.inputEl.value = command.name;
+    this.inputEl.setAttribute('commandId', command.id);
     this.inputEl.trigger('input');
     this.close();
   }
