@@ -1,6 +1,6 @@
 import {TFile, moment} from 'obsidian';
 import {logDebug} from './logger';
-import {getDisabledRules, LinterSettings, rules, wrapLintError} from './rules';
+import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand} from './rules';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
 import {RuleBuilderBase} from './rules/rule-builder';
@@ -13,7 +13,6 @@ export type RunLinterRulesOptions = {
   fileInfo: FileInfo,
   settings: LinterSettings,
   momentLocale: string,
-  commands: ObsidianCommandInterface,
   getCurrentTime: () => moment.Moment
 }
 
@@ -68,20 +67,6 @@ export class RulesRunner {
   private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
     let newText = runOptions.oldText;
 
-    // execute custom commands after regular rules, but before the timestamp rules
-    logDebug(`Running Custom Lint Commands`);
-    for (const commandInfo of runOptions.settings.lintCommands) {
-      if (!commandInfo.id) {
-        continue;
-      }
-
-      try {
-        runOptions.commands.executeCommandById(commandInfo.id);
-      } catch (error) {
-        wrapLintError(error, `Custom Lint Command ${commandInfo.id}`);
-      }
-    }
-
     let currentTime = runOptions.getCurrentTime();
     // run yaml timestamp at the end to help determine if something has changed
     let isYamlTimestampEnabled;
@@ -104,16 +89,31 @@ export class RulesRunner {
 
     return newText;
   }
+
+  runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
+    // execute custom commands after regular rules, but before the timestamp rules
+    logDebug(`Running Custom Lint Commands`);
+    for (const commandInfo of lintCommands) {
+      if (!commandInfo.id) {
+        continue;
+      }
+
+      try {
+        commands.executeCommandById(commandInfo.id);
+      } catch (error) {
+        wrapLintError(error, `Custom Lint Command ${commandInfo.id}`);
+      }
+    }
+  }
 }
 
-export function createRunLinterRulesOptions(text: string, file: TFile, momentLocale: string, settings: LinterSettings, obsidianCommands: ObsidianCommandInterface): RunLinterRulesOptions {
+export function createRunLinterRulesOptions(text: string, file: TFile, momentLocale: string, settings: LinterSettings): RunLinterRulesOptions {
   const createdAt = moment(file.stat.ctime);
   createdAt.locale(momentLocale);
   const modifiedAt = moment(file.stat.mtime);
   modifiedAt.locale(momentLocale);
   const modifiedAtTime = modifiedAt.format();
   const createdAtTime = createdAt.format();
-
 
   return {
     oldText: text,
@@ -124,7 +124,6 @@ export function createRunLinterRulesOptions(text: string, file: TFile, momentLoc
     },
     settings: settings,
     momentLocale: momentLocale,
-    commands: obsidianCommands,
     getCurrentTime: () => {
       const currentTime = moment();
       currentTime.locale(momentLocale);

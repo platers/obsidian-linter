@@ -1,7 +1,5 @@
-import moment from 'moment';
 import {Command} from 'obsidian';
-import {RulesRunner, RunLinterRulesOptions} from '../src/rules-runner';
-import {LinterSettings, rules, LintCommand} from '../src/rules';
+import {RulesRunner} from '../src/rules-runner';
 
 const rulesRunner = new RulesRunner();
 const appCommandsMock = {
@@ -33,15 +31,9 @@ afterEach(() => {
   appCommandsMock.resetStats();
 });
 
-function setEmptyRuleConfig(settings: LinterSettings) {
-  for (const rule of rules) {
-    settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
-  }
-}
-
 describe('Rules Runner', () => {
   it('No app lint commands running should include no hits results for command lints run', () => {
-    rulesRunner.lintText(createTestLinterRulesOptions([]));
+    rulesRunner.runCustomCommands([], appCommandsMock);
 
     expect(appCommandsMock.numberOfCommands).toEqual(0);
   });
@@ -51,7 +43,7 @@ describe('Rules Runner', () => {
       {id: 'first id', name: 'command name'},
       {id: 'second id', name: 'command name 2'},
     ];
-    rulesRunner.lintText(createTestLinterRulesOptions(listOfCommands));
+    rulesRunner.runCustomCommands(listOfCommands, appCommandsMock);
 
     expect(appCommandsMock.numberOfCommands).toEqual(2);
     expect(appCommandsMock.numberOfHitsPerId.get('first id') ?? 0).toEqual(1);
@@ -62,37 +54,9 @@ describe('Rules Runner', () => {
     const listOfCommands = [
       {id: '', name: ''},
     ];
-    rulesRunner.lintText(createTestLinterRulesOptions(listOfCommands));
+    rulesRunner.runCustomCommands(listOfCommands, appCommandsMock);
 
     expect(appCommandsMock.numberOfCommands).toEqual(0);
     expect(appCommandsMock.numberOfHitsPerId.get('') ?? 0).toEqual(0);
   });
 });
-
-function createTestLinterRulesOptions(lintCommands: LintCommand[]): RunLinterRulesOptions {
-  const settings = {
-    ruleConfigs: {},
-    lintOnSave: false,
-    displayChanged: false,
-    foldersToIgnore: [] as string[],
-    linterLocale: 'en',
-    logLevel: 1,
-    lintCommands: lintCommands,
-  };
-  setEmptyRuleConfig(settings);
-
-  return {
-    oldText: '',
-    fileInfo: {
-      name: 'file name',
-      createdAtFormatted: 'Wednesday, January 1st 2020, 12:00:00 am',
-      modifiedAtFormatted: 'Thursday, January 2nd 2020, 12:00:00 am',
-    },
-    settings: settings,
-    momentLocale: 'en',
-    commands: appCommandsMock,
-    getCurrentTime: () => {
-      return moment();
-    },
-  };
-}

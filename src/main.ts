@@ -228,9 +228,11 @@ export default class LinterPlugin extends Plugin {
 
   async runLinterFile(file: TFile) {
     const oldText = stripCr(await this.app.vault.read(file));
-    const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.app.commands));
+    const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
 
     await this.app.vault.modify(file, newText);
+
+    this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
   }
 
   async runLinterAllFiles(app: App) {
@@ -300,7 +302,7 @@ export default class LinterPlugin extends Plugin {
     const oldText = editor.getValue();
     let newText: string;
     try {
-      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.app.commands));
+      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
     } catch (error) {
       this.handleLintError(file, error, 'Lint File Error in File \'${file.path}\'', false);
     }
@@ -334,6 +336,12 @@ export default class LinterPlugin extends Plugin {
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
     this.displayChangedMessage(charsAdded, charsRemoved);
+
+    try {
+      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+    } catch (error) {
+      this.handleLintError(file, error, 'Lint File Error in File \'${file.path}\'', false);
+    }
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
