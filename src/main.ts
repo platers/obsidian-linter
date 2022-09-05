@@ -8,7 +8,6 @@ import {logInfo, logError, logDebug, setLogLevel} from './logger';
 import {moment} from 'obsidian';
 import './rules-registry';
 import {iconInfo} from './icons';
-import {YAMLException} from 'js-yaml';
 import CommandSuggester from './suggesters/command-suggester';
 import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';

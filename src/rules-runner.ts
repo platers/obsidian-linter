@@ -13,7 +13,7 @@ export type RunLinterRulesOptions = {
   fileInfo: FileInfo,
   settings: LinterSettings,
   momentLocale: string,
-  app: ObsidianCommandInterface,
+  commands: ObsidianCommandInterface,
   getCurrentTime: () => moment.Moment
 }
 
@@ -70,7 +70,7 @@ export class RulesRunner {
 
     // execute custom commands after regular rules, but before the timestamp rules
     for (const commandId of runOptions.settings.lintCommands) {
-      runOptions.app.executeCommandById(commandId);
+      runOptions.commands.executeCommandById(commandId);
     }
 
     let currentTime = runOptions.getCurrentTime();
@@ -115,7 +115,7 @@ export function createRunLinterRulesOptions(text: string, file: TFile, momentLoc
     },
     settings: settings,
     momentLocale: momentLocale,
-    app: obsidianCommands,
+    commands: obsidianCommands,
     getCurrentTime: () => {
       const currentTime = moment();
       currentTime.locale(momentLocale);
