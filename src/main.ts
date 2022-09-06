@@ -205,12 +205,12 @@ export default class LinterPlugin extends Plugin {
     await this.saveData(this.settings);
   }
 
-  onMenuOpenCallback(menu: Menu, file: TAbstractFile, source: string) {
+  onMenuOpenCallback(menu: Menu, file: TAbstractFile, _source: string) {
     if (file instanceof TFile && file.extension === 'md') {
       menu.addItem((item) => {
         item.setIcon(iconInfo.file.id);
         item.setTitle('Lint file');
-        item.onClick(async (evt) => {
+        item.onClick(async (_evt) => {
           this.runLinterFile(file);
         });
       });
@@ -524,12 +524,6 @@ class SettingTab extends PluginSettingTab {
 
                   // make sure that the command is valid before making any attempt to save the value
                   if (newCommand.name && newCommand.id) {
-                    this.plugin.settings.lintCommands.forEach((command, i) => {
-                      if (command.id == newCommand.id && i != index ) {
-                        logError('You cannot add the same command to the list of custom lint rules twice.', new Error('this command already exists in the lint command list.'));
-                      }
-                    });
-
                     this.plugin.settings.lintCommands[index] = newCommand;
                     this.plugin.saveSettings();
                   } else if (!newCommand.name && !newCommand.id) { // the value has been cleared out
@@ -592,7 +586,7 @@ class LintConfirmationModal extends Modal {
         cls: 'mod-cta',
         text: submitBtnText,
       });
-      btnSubmit.addEventListener('click', async (e) => {
+      btnSubmit.addEventListener('click', async (_e) => {
         new Notice(submitBtnNoticeText);
         this.close();
         await btnSubmitAction();

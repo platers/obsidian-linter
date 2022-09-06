@@ -59,4 +59,15 @@ describe('Rules Runner', () => {
     expect(appCommandsMock.numberOfCommands).toEqual(0);
     expect(appCommandsMock.numberOfHitsPerId.get('') ?? 0).toEqual(0);
   });
+
+  it('When custom commands are run with two of the same command, the second command instance is skipped', () => {
+    const listOfCommands = [
+      {id: 'first id', name: 'command name'},
+      {id: 'first id', name: 'command name'},
+    ];
+    rulesRunner.runCustomCommands(listOfCommands, appCommandsMock);
+
+    expect(appCommandsMock.numberOfCommands).toEqual(1);
+    expect(appCommandsMock.numberOfHitsPerId.get('first id') ?? 0).toEqual(1);
+  });
 });

@@ -1,5 +1,5 @@
 import {TFile, moment} from 'obsidian';
-import {logDebug} from './logger';
+import {logDebug, logWarn} from './logger';
 import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand} from './rules';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
@@ -93,12 +93,17 @@ export class RulesRunner {
   runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
     // execute custom commands after regular rules, but before the timestamp rules
     logDebug(`Running Custom Lint Commands`);
+    const commandsRun = new Set<string>();
     for (const commandInfo of lintCommands) {
       if (!commandInfo.id) {
+        continue;
+      } else if (commandsRun.has(commandInfo.id)) {
+        logWarn(`You cannot run the same command ("${commandInfo.name}") as a custom lint rule twice.`);
         continue;
       }
 
       try {
+        commandsRun.add(commandInfo.id);
         commands.executeCommandById(commandInfo.id);
       } catch (error) {
         wrapLintError(error, `Custom Lint Command ${commandInfo.id}`);
