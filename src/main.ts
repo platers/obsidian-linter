@@ -489,6 +489,11 @@ class SettingTab extends PluginSettingTab {
 
   addCustomCommandsSetting(): void {
     this.containerEl.createEl('h2', {text: 'Custom Commands Settings'});
+    this.containerEl.createEl('p', {text: `Custom commands are Obsidian commands that get run after the linter is finished running its regular rules.
+    This means that they do not run before the yaml timestamp logic runs, so they can cause yaml timestamp to be triggered on the next run of the linter.
+    You may only select an Obsidian command once.`});
+    this.containerEl.createEl('p', {text: `When selecting an option, make sure to select the option either by using the mouse or by hitting the enter key.
+    Other selection methods may not work and only selections of an actual Obsidian command or an empty string will be saved.`}).style.color = '#EED202';
 
     function arrayMove(arr: LintCommand[], fromIndex: number, toIndex: number):void {
       if (toIndex < 0 || toIndex === arr.length) {

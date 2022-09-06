@@ -32,7 +32,7 @@ export default class CommandSuggester extends TextInputSuggest<Command> {
     const commands:Command[] = [];
     const lower_input_str = input_str.toLowerCase();
     nonSelectedCommands.forEach((command:Command) => {
-      if (command.id.contains(lower_input_str) || command.name.contains(lower_input_str)) {
+      if (command.id.contains(lower_input_str) || command.name.toLowerCase().contains(lower_input_str)) {
         commands.push(command);
       }
     });
