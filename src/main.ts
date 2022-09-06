@@ -507,6 +507,9 @@ class SettingTab extends PluginSettingTab {
                 this.plugin.settings.lintCommands.push({id: '', name: ''});
                 this.plugin.saveSettings();
                 this.display();
+                const customCommandInputBox = document.getElementsByClassName('linter-custom-command');
+                // @ts-ignore
+                customCommandInputBox[customCommandInputBox.length-1].focus();
               });
         });
 
@@ -534,6 +537,8 @@ class SettingTab extends PluginSettingTab {
                     this.plugin.saveSettings();
                   }
                 });
+            cb.inputEl.setAttr('tabIndex', index);
+            cb.inputEl.addClass('linter-custom-command');
           })
           .addExtraButton((cb) => {
             cb.setIcon('up-chevron-glyph')
