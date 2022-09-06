@@ -517,7 +517,7 @@ class SettingTab extends PluginSettingTab {
       new Setting(this.containerEl)
           .addSearch((cb) => {
             new CommandSuggester(this.app, cb.inputEl, this.plugin.settings.lintCommands);
-            cb.setPlaceholder('Example: folder1/template_file')
+            cb.setPlaceholder('obsidian command')
                 .setValue(command.name)
                 .onChange((newCommandName) => {
                   const newCommand = {id: cb.inputEl.getAttribute('commandId'), name: newCommandName};
