@@ -18,6 +18,8 @@ Options:
 	- `'`: Use a single quote to escape if no single or double quote is present
 - Try to Escape Single Line Arrays: Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".
 	- Default: `false`
+- Force Yaml Escape on Keys: Uses the Yaml escape character on the specified Yaml keys separated by a new line character if it is not already escaped. Do not use on Yaml arrays.
+	- Default: ``
 
 Example: YAML without anything to escape
 
@@ -120,6 +122,33 @@ nestedArray2: [["value: with colon in the middle"], "value with ' a single quote
 ---
 
 _Note that escaped commas in a YAML array will be treated as a separator._
+``````
+Example: Force YAML keys to be escaped with double quotes where not already escaped with `Force Yaml Escape on Keys = ['key', 'title', 'bool']`
+
+Before:
+
+``````markdown
+---
+key: 'Already escaped value'
+title: This is a title
+bool: false
+unaffected: value
+---
+
+_Note that the force Yaml key option should not be used with arrays._
+``````
+
+After:
+
+``````markdown
+---
+key: 'Already escaped value'
+title: "This is a title"
+bool: "false"
+unaffected: value
+---
+
+_Note that the force Yaml key option should not be used with arrays._
 ``````
 
 ### Format Tags in YAML
@@ -585,11 +614,6 @@ Inserts the title of the file into the YAML frontmatter. Gets the title from the
 Options:
 - Title Key: Which YAML key to use for title
 	- Default: `title`
-- Yaml Escape Character: Specifies what character to put around the Title Key Yaml value if it has not already been escaped
-	- Default: `None`
-	- `None`: title: Title Here
-	- `Single Quote`: title: 'Title Here'
-	- `Double Quote`: title: "Title Here"
 
 Example: Adds a header with the title from heading.
 

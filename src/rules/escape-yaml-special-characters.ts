@@ -1,13 +1,14 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {formatYAML} from '../utils/yaml';
+import {formatYAML, getYamlSectionValue, setYamlSection} from '../utils/yaml';
 
 type DefaultEscapeCharacter = '"' | '\'';
 
 class EscapeYamlSpecialCharactersOptions implements Options {
   defaultEscapeCharacter?: DefaultEscapeCharacter = '"';
   tryToEscapeSingleLineArrays?: boolean = false;
+  forceYamlEscape?: string[] = [];
 }
 
 @RuleBuilder.register
@@ -117,7 +118,22 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
         yamlLines[i] = escapeSubstringIfNecessary(yamlLines[i], value);
       }
 
-      return yamlLines.join('\n');
+      let newYaml = yamlLines.join('\n');
+
+      for (const yamlKeyToEscape of options.forceYamlEscape) {
+        const keyValue = getYamlSectionValue(newYaml, yamlKeyToEscape);
+
+        if (keyValue != null) {
+          // skip yaml array values or already escaped values
+          if (keyValue.includes('\n') || keyValue.startsWith(' [') || isValueEscapedAlready(keyValue)) {
+            continue;
+          }
+
+          newYaml = setYamlSection(newYaml, yamlKeyToEscape, ` ${options.defaultEscapeCharacter}${keyValue}${options.defaultEscapeCharacter}`);
+        }
+      }
+
+      return newYaml;
     });
   }
   get exampleBuilders(): ExampleBuilder<EscapeYamlSpecialCharactersOptions>[] {
@@ -214,6 +230,33 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
           tryToEscapeSingleLineArrays: true,
         },
       }),
+      new ExampleBuilder({
+        description: 'Force YAML keys to be escaped with double quotes where not already escaped with `Force Yaml Escape on Keys = [\'key\', \'title\', \'bool\']`',
+        before: dedent`
+          ---
+          key: 'Already escaped value'
+          title: This is a title
+          bool: false
+          unaffected: value
+          ---
+          ${''}
+          _Note that the force Yaml key option should not be used with arrays._
+        `,
+        after: dedent`
+          ---
+          key: 'Already escaped value'
+          title: "This is a title"
+          bool: "false"
+          unaffected: value
+          ---
+          ${''}
+          _Note that the force Yaml key option should not be used with arrays._
+        `,
+        options: {
+          forceYamlEscape: ['key', 'title', 'bool'],
+          defaultEscapeCharacter: '"',
+        },
+      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<EscapeYamlSpecialCharactersOptions>[] {
@@ -239,6 +282,12 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
         name: 'Try to Escape Single Line Arrays',
         description: 'Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".',
         optionsKey: 'tryToEscapeSingleLineArrays',
+      }),
+      new TextAreaOptionBuilder({
+        OptionsClass: EscapeYamlSpecialCharactersOptions,
+        name: 'Force Yaml Escape on Keys',
+        description: 'Uses the Yaml escape character on the specified Yaml keys separated by a new line character if it is not already escaped. Do not use on Yaml arrays.',
+        optionsKey: 'forceYamlEscape',
       }),
     ];
   }
