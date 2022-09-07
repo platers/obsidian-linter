@@ -41,7 +41,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 
 ### Custom Lint Commands
 
-These are special lint rules that the user may specify. They are Obsidian commands. If you would like to create a custom command that you can run, you can use the [QuickAdd](https://github.com/chhoumann/quickadd) plugin in order to add a JavaScript script to make modifications to a file. **This will require some level of knowledge about the Obsidian API and Javascript.** To use a custom user script, you will want to follow these steps:
+These are special lint rules that the user may specify. They are Obsidian commands. If you would like to create a custom command that you can run, you can use the [QuickAdd](https://github.com/chhoumann/quickadd) plugin in order to add a JavaScript script to make modifications to a file. **This will require some level of knowledge about the Obsidian API and JavaScript.** To use a custom user script, you will want to follow these steps:
 
 1. Install the QuickAdd plugin
 2. Go ahead and go to the settings for QuickAdd and select "Manage Macros"
