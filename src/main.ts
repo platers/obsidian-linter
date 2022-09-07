@@ -1,5 +1,5 @@
 import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder, addIcon} from 'obsidian';
-import {LinterSettings, getDisabledRules, rules} from './rules';
+import {LintCommand, LinterSettings, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
@@ -7,39 +7,10 @@ import log from 'loglevel';
 import {logInfo, logError, logDebug, setLogLevel} from './logger';
 import {moment} from 'obsidian';
 import './rules-registry';
-import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
-import FormatTagsInYaml from './rules/format-tags-in-yaml';
-import YamlTimestamp from './rules/yaml-timestamp';
-import YamlKeySort from './rules/yaml-key-sort';
-import {RuleBuilderBase} from './rules/rule-builder';
 import {iconInfo} from './icons';
-import {YAMLException} from 'js-yaml';
-
-declare global {
-  // eslint-disable-next-line no-unused-vars
-  interface Window {
-    CodeMirrorAdapter: {
-      commands: {
-        save(): void;
-      }
-    };
-  }
-}
-
-// allows for the removal of the any cast by defining some extra properties for Typescript so it knows these properties exist
-declare module 'obsidian' {
-  // eslint-disable-next-line no-unused-vars
-  interface App {
-    commands: {
-        executeCommandById(id: string): void;
-        commands: {
-            'editor:save-file': {
-                callback(): void;
-            };
-        };
-    };
-  }
-}
+import CommandSuggester from './suggesters/command-suggester';
+import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
+import {LinterError} from './linter-error';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -72,6 +43,7 @@ export default class LinterPlugin extends Plugin {
   private eventRef: EventRef;
   private momentLocale: string;
   private isEnabled: boolean = true;
+  private rulesRunner = new RulesRunner();
 
   async onload() {
     logInfo('Loading plugin');
@@ -106,7 +78,7 @@ export default class LinterPlugin extends Plugin {
         const startMessage = 'This will edit all of your files and may introduce errors.';
         const submitBtnText = 'Lint All';
         const submitBtnNoticeText = 'Linting all files...';
-        new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () =>{
+        new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => {
           return this.runLinterAllFiles(this.app);
         }).open();
       },
@@ -188,6 +160,7 @@ export default class LinterPlugin extends Plugin {
       foldersToIgnore: [],
       linterLocale: 'system-default',
       logLevel: log.levels.ERROR,
+      lintCommands: [],
     };
     const data = await this.loadData();
     const storedSettings = data || {};
@@ -221,6 +194,9 @@ export default class LinterPlugin extends Plugin {
     if (Object.prototype.hasOwnProperty.call(storedSettings, 'logLevel')) {
       this.settings.logLevel = storedSettings.logLevel;
     }
+    if (Object.prototype.hasOwnProperty.call(storedSettings, 'lintCommands')) {
+      this.settings.lintCommands = storedSettings.lintCommands;
+    }
 
     setLogLevel(this.settings.logLevel);
     this.setOrUpdateMomentInstance();
@@ -229,75 +205,16 @@ export default class LinterPlugin extends Plugin {
     await this.saveData(this.settings);
   }
 
-  onMenuOpenCallback(menu: Menu, file: TAbstractFile, source: string) {
+  onMenuOpenCallback(menu: Menu, file: TAbstractFile, _source: string) {
     if (file instanceof TFile && file.extension === 'md') {
       menu.addItem((item) => {
         item.setIcon(iconInfo.file.id);
         item.setTitle('Lint file');
-        item.onClick(async (evt) => {
+        item.onClick(async (_evt) => {
           this.runLinterFile(file);
         });
       });
     }
-  }
-
-  lintText(oldText: string, file: TFile) {
-    let newText = oldText;
-
-    const disabledRules = getDisabledRules(newText);
-    // remove hashtags from tags before parsing yaml
-    [newText] = FormatTagsInYaml.applyIfEnabled(newText, this.settings, disabledRules);
-
-    // escape YAML where possible before parsing yaml
-    [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, this.settings, disabledRules);
-
-    const createdAt = moment(file.stat.ctime);
-    createdAt.locale(this.momentLocale);
-    const modifiedAt = moment(file.stat.mtime);
-    modifiedAt.locale(this.momentLocale);
-    const modifiedAtTime = modifiedAt.format();
-    const createdAtTime = createdAt.format();
-
-    for (const rule of rules) {
-      // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
-      if (disabledRules.includes(rule.alias())) {
-        logDebug(rule.alias() + ' is disabled');
-        continue;
-      } else if (rule.hasSpecialExecutionOrder) {
-        continue;
-      }
-
-      [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, this.settings, {
-        fileCreatedTime: createdAtTime,
-        fileModifiedTime: modifiedAtTime,
-        fileName: file.basename,
-        locale: this.momentLocale,
-      });
-    }
-
-    let currentTime = moment();
-    currentTime.locale(this.momentLocale);
-    // run yaml timestamp at the end to help determine if something has changed
-    let isYamlTimestampEnabled;
-    [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, this.settings, disabledRules, {
-      fileCreatedTime: createdAtTime,
-      fileModifiedTime: modifiedAtTime,
-      currentTime: currentTime,
-      alreadyModified: oldText != newText,
-      locale: this.momentLocale,
-    });
-
-    const yamlTimestampOptions = YamlTimestamp.getRuleOptions(this.settings);
-
-    currentTime = moment();
-    currentTime.locale(this.momentLocale);
-    [newText] = YamlKeySort.applyIfEnabled(newText, this.settings, disabledRules, {
-      currentTimeFormatted: currentTime.format(yamlTimestampOptions.format),
-      yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
-      dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
-    });
-
-    return newText;
   }
 
   shouldIgnoreFile(file: TFile) {
@@ -311,9 +228,11 @@ export default class LinterPlugin extends Plugin {
 
   async runLinterFile(file: TFile) {
     const oldText = stripCr(await this.app.vault.read(file));
-    const newText = this.lintText(oldText, file);
+    const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
 
     await this.app.vault.modify(file, newText);
+
+    this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
   }
 
   async runLinterAllFiles(app: App) {
@@ -323,17 +242,19 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          this.handleLintError(file, error, 'There is an error in the yaml of file \'${file.path}\': ', 'Lint All Files Error in File \'${file.path}\'');
+          this.handleLintError(file, error, 'Lint All Files Error in File \'${file.path}\'');
 
-          numberOfErrors+=1;
+          numberOfErrors += 1;
         }
       }
     }));
+
+    const userClickTimeout = 0;
     if (numberOfErrors === 0) {
-      new Notice('Linted all files');
+      new Notice('Linted all files', userClickTimeout);
     } else {
-      const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error': 'were ' + numberOfErrors + ' errors';
-      new Notice('Linted all files and there ' + amountOfErrorsMessage + '.');
+      const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error' : 'were ' + numberOfErrors + ' errors';
+      new Notice('Linted all files and there ' + amountOfErrorsMessage + '.', userClickTimeout);
     }
   }
 
@@ -348,19 +269,21 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          this.handleLintError(file, error, 'There is an error in the yaml of file \'${file.path}\': ', 'Lint All Files in Folder Error in File \'${file.path}\'');
+          this.handleLintError(file, error, 'Lint All Files in Folder Error in File \'${file.path}\'');
 
-          numberOfErrors+=1;
+          numberOfErrors += 1;
         }
 
         lintedFiles++;
       }
     }));
+
+    const userClickTimeout = 0;
     if (numberOfErrors === 0) {
-      new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + '.');
+      new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + '.', userClickTimeout);
     } else {
-      const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error': 'were ' + numberOfErrors + ' errors';
-      new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + ' and there ' + amountOfErrorsMessage + '.');
+      const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error' : 'were ' + numberOfErrors + ' errors';
+      new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + ' and there ' + amountOfErrorsMessage + '.', userClickTimeout);
     }
   }
 
@@ -379,9 +302,9 @@ export default class LinterPlugin extends Plugin {
     const oldText = editor.getValue();
     let newText: string;
     try {
-      newText = this.lintText(oldText, file);
+      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
     } catch (error) {
-      this.handleLintError(file, error, 'There is an error in the yaml: ', 'Lint File Error in File \'${file.path}\'');
+      this.handleLintError(file, error, 'Lint File Error in File \'${file.path}\'', false);
     }
 
     // Replace changed lines
@@ -413,6 +336,12 @@ export default class LinterPlugin extends Plugin {
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
     this.displayChangedMessage(charsAdded, charsRemoved);
+
+    try {
+      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+    } catch (error) {
+      this.handleLintError(file, error, 'Lint File Error in File \'${file.path}\'', false);
+    }
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
@@ -447,17 +376,19 @@ export default class LinterPlugin extends Plugin {
     }
   }
 
-  private handleLintError(file: TFile, error: Error, yamlErrorStringTemplate: string, logErrorStringTemplate: string) {
-    if (error instanceof YAMLException) {
-      let errorMessage = error.toString();
-      errorMessage = errorMessage.substring(errorMessage.indexOf(':') + 1);
-
-      new Notice(yamlErrorStringTemplate.replace('${file.path}', file.path) + errorMessage);
+  private handleLintError(file: TFile, error: Error, logErrorStringTemplate: string, useLogTemplateInNotice: boolean = true) {
+    const errorMessage = logErrorStringTemplate.replace('${file.path}', file.path);
+    if (error instanceof LinterError) {
+      if (useLogTemplateInNotice) {
+        new Notice(`${errorMessage} ${error.message}.\nSee console for more details.`);
+      } else {
+        new Notice(`${error.message}.\nSee console for more details.`);
+      }
     } else {
-      new Notice('An error occurred during linting. See console for details');
+      new Notice('An unknown error occurred during linting. See console for details');
     }
 
-    logError(logErrorStringTemplate.replace('${file.path}', file.path), error);
+    logError(errorMessage, error);
   }
 }
 
@@ -522,7 +453,7 @@ class SettingTab extends PluginSettingTab {
         prevSection = rule.type;
       }
 
-      containerEl.createEl('h3', {}, (el) =>{
+      containerEl.createEl('h3', {}, (el) => {
         el.innerHTML = `<a href="${rule.getURL()}">${rule.name}</a>`;
       });
 
@@ -530,6 +461,8 @@ class SettingTab extends PluginSettingTab {
         option.display(containerEl, this.plugin.settings, this.plugin);
       }
     }
+
+    this.addCustomCommandsSetting();
   }
 
   addLocaleOverrideSetting(): void {
@@ -552,6 +485,88 @@ class SettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
         });
+  }
+
+  addCustomCommandsSetting(): void {
+    this.containerEl.createEl('h2', {text: 'Custom Commands Settings'});
+    this.containerEl.createEl('p', {text: `Custom commands are Obsidian commands that get run after the linter is finished running its regular rules.
+    This means that they do not run before the yaml timestamp logic runs, so they can cause yaml timestamp to be triggered on the next run of the linter.
+    You may only select an Obsidian command once.`});
+    this.containerEl.createEl('p', {text: `When selecting an option, make sure to select the option either by using the mouse or by hitting the enter key.
+    Other selection methods may not work and only selections of an actual Obsidian command or an empty string will be saved.`}).style.color = '#EED202';
+
+    function arrayMove(arr: LintCommand[], fromIndex: number, toIndex: number):void {
+      if (toIndex < 0 || toIndex === arr.length) {
+        return;
+      }
+      const element = arr[fromIndex];
+      arr[fromIndex] = arr[toIndex];
+      arr[toIndex] = element;
+    }
+
+    new Setting(this.containerEl)
+        .addButton((cb)=>{
+          cb.setButtonText('Add new command')
+              .setCta()
+              .onClick(()=>{
+                this.plugin.settings.lintCommands.push({id: '', name: ''});
+                this.plugin.saveSettings();
+                this.display();
+                const customCommandInputBox = document.getElementsByClassName('linter-custom-command');
+                // @ts-ignore
+                customCommandInputBox[customCommandInputBox.length-1].focus();
+              });
+        });
+
+    this.plugin.settings.lintCommands.forEach((command, index) => {
+      new Setting(this.containerEl)
+          .addSearch((cb) => {
+            new CommandSuggester(this.app, cb.inputEl, this.plugin.settings.lintCommands);
+            cb.setPlaceholder('obsidian command')
+                .setValue(command.name)
+                .onChange((newCommandName) => {
+                  const newCommand = {id: cb.inputEl.getAttribute('commandId'), name: newCommandName};
+
+                  // make sure that the command is valid before making any attempt to save the value
+                  if (newCommand.name && newCommand.id) {
+                    this.plugin.settings.lintCommands[index] = newCommand;
+                    this.plugin.saveSettings();
+                  } else if (!newCommand.name && !newCommand.id) { // the value has been cleared out
+                    this.plugin.settings.lintCommands[index] = newCommand;
+                    this.plugin.saveSettings();
+                  }
+                });
+            cb.inputEl.setAttr('tabIndex', index);
+            cb.inputEl.addClass('linter-custom-command');
+          })
+          .addExtraButton((cb) => {
+            cb.setIcon('up-chevron-glyph')
+                .setTooltip('Move up')
+                .onClick(() => {
+                  arrayMove(this.plugin.settings.lintCommands, index, index-1);
+                  this.plugin.saveSettings();
+                  this.display();
+                });
+          })
+          .addExtraButton((cb) => {
+            cb.setIcon('down-chevron-glyph')
+                .setTooltip('Move down')
+                .onClick(() => {
+                  arrayMove(this.plugin.settings.lintCommands, index, index+1);
+                  this.plugin.saveSettings();
+                  this.display();
+                });
+          })
+          .addExtraButton((cb)=>{
+            cb.setIcon('cross')
+                .setTooltip('Delete')
+                .onClick(()=>{
+                  this.plugin.settings.lintCommands.splice(index, 1);
+                  this.plugin.saveSettings();
+                  this.display();
+                });
+          });
+    });
   }
 }
 
@@ -576,7 +591,7 @@ class LintConfirmationModal extends Modal {
         cls: 'mod-cta',
         text: submitBtnText,
       });
-      btnSubmit.addEventListener('click', async (e) => {
+      btnSubmit.addEventListener('click', async (_e) => {
         new Notice(submitBtnNoticeText);
         this.close();
         await btnSubmitAction();

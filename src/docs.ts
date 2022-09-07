@@ -15,7 +15,7 @@ generateReadme();
 generateDocs();
 
 function generateReadme() {
-  const readme_template = readFileSync('./docs/readme_template.md', 'utf8');
+  const readme_template = readFileSync('./docs/templates/readme_template.md', 'utf8');
 
   let rules_list = '';
   let prevSection = '';
@@ -33,7 +33,7 @@ function generateReadme() {
 }
 
 function generateDocs() {
-  const rules_template = readFileSync('./docs/rules_template.md', 'utf8');
+  const rules_template = readFileSync('./docs/templates/rules_template.md', 'utf8');
 
   let rules_docs = '';
   let prevSection = '';

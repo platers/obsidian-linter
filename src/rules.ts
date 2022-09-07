@@ -7,9 +7,13 @@ import {
   BooleanOption,
 } from './option';
 import {yamlRegex} from './utils/regex';
+import {YAMLException} from 'js-yaml';
+import {LinterError} from './linter-error';
 
 export type Options = { [optionName: string]: any };
 type ApplyFunction = (text: string, options?: Options) => string;
+
+export type LintCommand = {id: string, name: string};
 
 export interface LinterSettings {
   ruleConfigs: {
@@ -20,8 +24,9 @@ export interface LinterSettings {
   foldersToIgnore: string[];
   linterLocale: string;
   logLevel: number;
+  lintCommands: LintCommand[];
 }
-/* eslint-disable no-unused-vars */
+
 export enum RuleType {
   YAML = 'YAML',
   HEADING = 'Heading',
@@ -29,7 +34,6 @@ export enum RuleType {
   CONTENT = 'Content',
   SPACING = 'Spacing',
 }
-/* eslint-enable no-unused-vars */
 
 /** Class representing a rule */
 export class Rule {
@@ -184,4 +188,16 @@ export function registerRule(rule: Rule): void {
   rules.push(rule);
   rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.name.localeCompare(b.name)));
   rulesDict[rule.alias()] = rule;
+}
+
+export function wrapLintError(error: Error, ruleName: string) {
+  let errorMessage: string;
+  if (error instanceof YAMLException) {
+    errorMessage = error.toString();
+    errorMessage =`error in the yaml: ${errorMessage.substring(errorMessage.indexOf(':') + 1)}`;
+  } else {
+    errorMessage = `unknown error: ${error.message}`;
+  }
+
+  throw new LinterError(`"${ruleName}" encountered an ${errorMessage}`, error);
 }
