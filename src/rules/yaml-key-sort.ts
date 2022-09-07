@@ -31,7 +31,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     return 'YAML Key Sort';
   }
   get description(): string {
-    return 'Sorts the YAML keys based on the order and priority specified. Note: removes blank lines as well.';
+    return 'Sorts the YAML keys based on the order and priority specified. Note: may remove blank lines as well.';
   }
   get type(): RuleType {
     return RuleType.YAML;
