@@ -44,8 +44,8 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
 
     title = toYamlString(title);
 
-    const ensureSpecifiedCharacterStartsTitleIfNotAlreadyEscaped = function(title: string, characterToStartAndEndWith: string, characterToRemoveFromStartAndEnd: string) {
-      if ((title.startsWith(characterToRemoveFromStartAndEnd) && title.endsWith(characterToRemoveFromStartAndEnd)) ||
+    const ensureSpecifiedCharacterStartsTitleIfNotAlreadyEscaped = function(title: string, characterToStartAndEndWith: string, otherEscapeCharacter: string) {
+      if ((title.startsWith(otherEscapeCharacter) && title.endsWith(otherEscapeCharacter)) ||
       (title.startsWith(characterToStartAndEndWith) && title.endsWith(characterToStartAndEndWith))) {
         return title;
       }
