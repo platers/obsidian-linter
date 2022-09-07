@@ -94,6 +94,21 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [trailing-spaces](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#trailing-spaces)
 
 
+### Custom Lint Commands
+
+These are special lint rules that the user may specify. They are Obsidian commands. If you would like to create a custom command that you can run, you can use the [QuickAdd](https://github.com/chhoumann/quickadd) plugin in order to add a JavaScript script to make modifications to a file. **This will require some level of knowledge about the Obsidian API and Javascript.** To use a custom user script, you will want to follow these steps:
+
+1. Install the QuickAdd plugin
+2. Go ahead and go to the settings for QuickAdd and select "Manage Macros"
+3. You should see a modal popup. In that modal, make sure to type in a macro name and add the macro.
+4. Once the macro is added, go ahead and configure the macro making sure to add your user user script (this should be a JavaScript file in your Obsidian vault). [Here](https://github.com/chhoumann/quickadd/blob/master/docs/Examples/Macro_LogBookToDailyJournal.md) is an example from the QuickAdd repo with an explanation of what the code does.
+5. Once you have finished all changes to your macro that you would like, go ahead and exit out of configure macro modal and the macro manager modal.
+6. Then go ahead and select macro for the choice type and type in the name of the macro you just created (you may get suggestions or you may have to remember the name and type it in completely). Then add select "Add Choice".
+7. Once the choice has been added, go ahead and click the lightning bolt icon which is the option to add a command for a choice.
+8. Now you just need to search up this newly created command in the custom command settings for Obsidian Linter.
+
+Now the next time you run the linter, the custom lint commands should run.
+
 ## Installing
 
 As of version [0.9.7 of Obsidian](https://forum.obsidian.md/t/obsidian-release-v0-9-7-insider-build/7628), this plugin is available to be installed directly from within the app. The plugin can be found in the Community Plugins directory which can be accessed from the Settings pane under Third Party Plugins.

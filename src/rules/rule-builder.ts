@@ -27,7 +27,6 @@ export abstract class RuleBuilderBase {
       try {
         return [rule.apply(text, options), true];
       } catch (error) {
-        console.log(error);
         wrapLintError(error, rule.name);
       }
     } else {
