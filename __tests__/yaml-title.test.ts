@@ -65,5 +65,53 @@ ruleTest({
         # Very long title 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
       `,
     },
+    {
+      testName: 'Escaping with single quotes works',
+      before: dedent`
+        # This is a title
+      `,
+      after: dedent`
+        ---
+        title: 'This is a title'
+        ---
+        # This is a title
+      `,
+      options: {
+        fileName: 'testFile',
+        yamlEscapeCharacter: 'Single Quote',
+      },
+    },
+    {
+      testName: 'Escaping with double quotes works',
+      before: dedent`
+        # This is a title
+      `,
+      after: dedent`
+        ---
+        title: "This is a title"
+        ---
+        # This is a title
+      `,
+      options: {
+        fileName: 'testFile',
+        yamlEscapeCharacter: 'Double Quote',
+      },
+    },
+    {
+      testName: 'Escaping with double quotes does not come into affect when already escaped with single quotes',
+      before: dedent`
+        # "This is a title
+      `,
+      after: dedent`
+        ---
+        title: '"This is a title'
+        ---
+        # "This is a title
+      `,
+      options: {
+        fileName: 'testFile',
+        yamlEscapeCharacter: 'Double Quote',
+      },
+    },
   ],
 });

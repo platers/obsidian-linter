@@ -585,6 +585,11 @@ Inserts the title of the file into the YAML frontmatter. Gets the title from the
 Options:
 - Title Key: Which YAML key to use for title
 	- Default: `title`
+- Yaml Escape Character: Specifies what character to put around the Title Key Yaml value if it has not already been escaped
+	- Default: `None`
+	- `None`: title: Title Here
+	- `Single Quote`: title: 'Title Here'
+	- `Double Quote`: title: "Title Here"
 
 Example: Adds a header with the title from heading.
 
