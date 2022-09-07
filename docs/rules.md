@@ -369,7 +369,7 @@ Text
 
 Alias: `yaml-key-sort`
 
-Sorts the YAML keys based on the order and priority specified. Note: removes blank lines as well.
+Sorts the YAML keys based on the order and priority specified. Note: may remove blank lines as well.
 
 Options:
 - YAML Key Priority Sort Order: The order in which to sort keys with one on each line where it sorts in the order found in the list
