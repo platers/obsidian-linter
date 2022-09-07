@@ -1,19 +1,16 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML, initYAML, toYamlString} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {escapeDollarSigns} from '../utils/regex';
 import {insert} from '../utils/strings';
 
-type yamlTitleEscapeOptions = 'None' | 'Single Quote' | 'Double Quote';
-
 class YamlTitleOptions implements Options {
   @RuleBuilder.noSettingControl()
     fileName: string;
 
   titleKey?: string = 'title';
-  yamlEscapeCharacter?: yamlTitleEscapeOptions = 'None';
 }
 
 @RuleBuilder.register
@@ -39,25 +36,9 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
       }
       return '';
     });
-
     title = title || options.fileName;
 
     title = toYamlString(title);
-
-    const ensureSpecifiedCharacterStartsTitleIfNotAlreadyEscaped = function(title: string, characterToStartAndEndWith: string, characterToRemoveFromStartAndEnd: string) {
-      if ((title.startsWith(characterToRemoveFromStartAndEnd) && title.endsWith(characterToRemoveFromStartAndEnd)) ||
-      (title.startsWith(characterToStartAndEndWith) && title.endsWith(characterToStartAndEndWith))) {
-        return title;
-      }
-
-      return characterToStartAndEndWith + title + characterToStartAndEndWith;
-    };
-
-    if (options.yamlEscapeCharacter == 'Single Quote') {
-      title = ensureSpecifiedCharacterStartsTitleIfNotAlreadyEscaped(title, '\'', '"');
-    } else if (options.yamlEscapeCharacter == 'Double Quote') {
-      title = ensureSpecifiedCharacterStartsTitleIfNotAlreadyEscaped(title, '"', '\'');
-    }
 
     return formatYAML(text, (text) => {
       const title_match_str = `\n${options.titleKey}.*\n`;
@@ -116,26 +97,6 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
         name: 'Title Key',
         description: 'Which YAML key to use for title',
         optionsKey: 'titleKey',
-      }),
-      new DropdownOptionBuilder({
-        OptionsClass: YamlTitleOptions,
-        name: 'Yaml Escape Character',
-        description: 'Specifies what character to put around the Title Key Yaml value if it has not already been escaped',
-        optionsKey: 'yamlEscapeCharacter',
-        records: [
-          {
-            value: 'None',
-            description: 'title: Title Here',
-          },
-          {
-            value: 'Single Quote',
-            description: 'title: \'Title Here\'',
-          },
-          {
-            value: 'Double Quote',
-            description: 'title: "Title Here"',
-          },
-        ],
       }),
     ];
   }
