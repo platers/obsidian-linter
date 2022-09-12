@@ -22,7 +22,7 @@ export default class RemoveEmptyListMarkers extends RuleBuilder<RemoveEmptyListM
   }
   apply(text: string, options: RemoveEmptyListMarkersOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      const emptyListMarkerRegex = /^\s*(>\s*)*(-|\*|\+|\d+\D|- (\[( |x)\]))\s*?$/gm;
+      const emptyListMarkerRegex = /^\s*(>\s*)*(-|\*|\+|\d+[.)]|- (\[( |x)\]))\s*?$/gm;
       // remove all empty list markers followed by a new line
       text = text.replace(new RegExp(emptyListMarkerRegex.source + '\\n', 'gm'), '');
       // remove all empty list markers proceeded by a new line
