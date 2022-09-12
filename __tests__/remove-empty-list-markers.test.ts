@@ -25,7 +25,7 @@ ruleTest({
       `,
     },
     {
-      testName: 'Don\t remove number if it is the only content of the line',
+      testName: 'Don\'t remove number if it is the only content of the line',
       before: dedent`
         42
       `,
