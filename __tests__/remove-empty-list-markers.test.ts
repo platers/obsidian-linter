@@ -24,5 +24,41 @@ ruleTest({
         ${''}
       `,
     },
+    {
+      testName: 'Don\'t remove number if it is the only content of the line',
+      before: dedent`
+        42
+      `,
+      after: dedent`
+        42
+      `,
+    },
+    {
+      testName: 'Don\'t remove number if not followed by `.` or `)`',
+      before: dedent`
+        42z
+      `,
+      after: dedent`
+        42z
+      `,
+    },
+    {
+      testName: 'Remove number followed by `.`',
+      before: dedent`
+        42.
+      `,
+      after: dedent`
+        ${''}
+      `,
+    },
+    {
+      testName: 'Remove number followed by `)`',
+      before: dedent`
+        42)
+      `,
+      after: dedent`
+        ${''}
+      `,
+    },
   ],
 });
