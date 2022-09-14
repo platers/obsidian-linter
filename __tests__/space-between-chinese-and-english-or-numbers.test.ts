@@ -55,5 +55,19 @@ ruleTest({
         \`filepath = './知识_巴别图书馆.md'\`
       `,
     },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/407
+      testName: 'Make sure that inline math blocks are not affected',
+      before: dedent`
+        # Title Here
+
+        $M0 = 现金$
+      `,
+      after: dedent`
+        # Title Here
+
+        $M0 = 现金$
+      `,
+    },
   ],
 });
