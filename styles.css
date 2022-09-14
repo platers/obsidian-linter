@@ -1,0 +1,179 @@
+/**
+Based on https://github.com/Fevol/obsidian-translate/blob/master/src/ui/translator-components/SettingsPage.svelte 
+**/
+
+.linter-navigation-item {
+  cursor: pointer;
+  border-radius: 100px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px 8px 2px 2px;
+
+  font-weight: bold;
+  font-size: 16px;
+
+  padding: 4px 6px;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+
+  background-color: var(--background-primary-secondary-alt);
+  
+  transition: color 0.25s ease-in-out,
+        padding 0.25s ease-in-out,
+        background-color 0.35s cubic-bezier(0.45, 0.25, 0.83, 0.67),
+        max-width 0.35s cubic-bezier(0.57, 0.04, 0.58, 1);
+  height: 32px;
+}
+
+.linter-navigation-item:hover {
+  border-color: var(--interactive-accent-hover);
+  border-bottom: 0px;
+}
+
+.linter-navigation-item-selected {
+  background-color: var(--interactive-accent) !important;
+  color: var(--text-on-accent);
+  padding: 4px 9px !important;
+  max-width: 200px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px 8px 2px 2px;
+  border-bottom: 0px;
+  transition: color 0.25s ease-in-out,
+        padding 0.25s ease-in-out,
+        background-color 0.35s cubic-bezier(0.45, 0.25, 0.83, 0.67),
+        max-width 0.45s cubic-bezier(0.57, 0.04, 0.58, 1) 0.2s;
+}
+
+/**
+ * Based on https://github.com/phibr0/obsidian-commander/blob/main/src/styles.scss
+ */
+.linter {
+  transition: transform 400ms 0s;
+}
+
+.linter-setting-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 30px;
+}
+.linter-setting-title h1 {
+  font-weight: 900;
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+.linter-accordion {
+  margin-bottom: 16px;
+}
+.linter-accordion .linter-accordion-chevron {
+  margin-left: 0;
+  margin-right: 4px;
+  height: 24px;
+}
+.linter-accordion .linter-accordion-chevron > svg {
+  transition: all 0.25s ease;
+}
+.linter-accordion .linter-accordion-content {
+  max-height: 1000px;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  margin-left: 14px;
+  padding-left: 14px;
+}
+.linter-accordion .linter-accordion-content .setting-item {
+  padding-top: 12px;
+}
+.linter-accordion[aria-expanded="false"] .linter-accordion-chevron > svg {
+  transform: rotate(-90deg);
+}
+.linter-accordion[aria-expanded="false"] .linter-accordion-content {
+  max-height: 0;
+  transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+}
+.linter-accordion .linter-accordion-header {
+  display: flex;
+  cursor: var(--cursor);
+}
+.linter-accordion .linter-accordion-header span {
+  font-weight: 600;
+  margin-top: 0;
+  align-self: end;
+}
+
+.linter-setting-header {
+  margin-bottom: 24px;
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.linter-setting-header .linter-setting-tab-group {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.linter-setting-tab-group {
+  margin-top: 6px;
+  padding-left: 2px;
+  padding-right: 2px;
+  border-bottom: 2px solid var(--background-modifier-border);
+}
+
+.linter-setting-header.linter-mobile .linter-setting-tab-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: none;
+}
+.linter-setting-header.linter-mobile .linter-setting-tab-group .linter-tab {
+  border: none !important;
+  transform: none;
+  padding: 6px 0px;
+  transition: color 200ms ease;
+  width: 100%;
+  display: flex;
+  font-weight: 500;
+  justify-content: space-between;
+}
+.linter-setting-header.linter-mobile .linter-setting-tab-group .linter-tab:first-child {
+  margin-left: 0px;
+}
+.linter-setting-header.linter-mobile .linter-setting-tab-group .linter-tab.linter-tab-active {
+  transform: none;
+}
+.linter-setting-header .linter-tab {
+  padding: 6px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+}
+.linter-setting-header .linter-tab:first-child {
+  margin-left: 6px;
+}
+.linter-setting-header .linter-tab.linter-tab-active {
+  border-bottom: 2px solid var(--background-primary);
+  transform: translateY(2px);
+  border-radius: 2px;
+  border-left: 2px solid var(--background-modifier-border);
+  border-top: 2px solid var(--background-modifier-border);
+  border-right: 2px solid var(--background-modifier-border);
+}
+
+.linter-mobile-modify-grid {
+  padding: 22px;
+}
+.linter-mobile-modify-grid .linter-mobile-modify-option {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.linter-mobile-modify-grid .linter-mobile-modify-option > input {
+  max-width: 70%;
+}
+.linter-mobile-modify-grid .linter-mobile-modify-option .dropdown {
+  margin: auto;
+}

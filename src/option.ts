@@ -3,6 +3,8 @@ import LinterPlugin from './main';
 import {LinterSettings} from './rules';
 import {convertRegularMarkdownLinksToHTMLLinks} from './utils/mdast';
 
+export type SearchOptionInfo = {name: string, description: string, options?: DropdownRecord[]}
+
 /** Class representing an option of a rule */
 
 export abstract class Option {
@@ -10,6 +12,7 @@ export abstract class Option {
   public description: string;
   public ruleName: string;
   public defaultValue: any;
+  public searchInfo: SearchOptionInfo;
 
   /**
    * Create an option
@@ -22,6 +25,7 @@ export abstract class Option {
     this.name = name;
     this.description = description;
     this.defaultValue = defaultValue;
+    this.searchInfo = {name: name, description: description};
 
     if (ruleName) {
       this.ruleName = ruleName;
@@ -141,6 +145,7 @@ export class DropdownOption extends Option {
   constructor(name: string, description: string, defaultValue: string, options: DropdownRecord[], ruleName?: string | null) {
     super(name, description, defaultValue, ruleName);
     this.options = options;
+    this.searchInfo.options = options;
   }
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
