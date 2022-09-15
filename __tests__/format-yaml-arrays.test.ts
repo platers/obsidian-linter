@@ -1,6 +1,7 @@
 import FormatYamlArray from '../src/rules/format-yaml-arrays';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
+import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '../src/utils/yaml';
 
 ruleTest({
   RuleBuilderClass: FormatYamlArray,
@@ -23,7 +24,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'multi-line',
+        tagArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
     {
@@ -39,7 +40,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single-line',
+        tagArrayStyle: NormalArrayFormats.SingleLine,
       },
     },
     {
@@ -55,7 +56,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string comma delimited',
+        tagArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
       },
     },
     {
@@ -71,7 +72,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single-line space delimited',
+        tagArrayStyle: TagSpecificArrayFormats.SingleLineSpaceDelimited,
       },
     },
     {
@@ -87,7 +88,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string space delimited',
+        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
       },
     },
     {
@@ -103,7 +104,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string space delimited',
+        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
       },
     },
     {
@@ -120,7 +121,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string to single-line',
+        tagArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
       },
     },
     {
@@ -136,7 +137,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string to single-line',
+        tagArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
       },
     },
     {
@@ -156,7 +157,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string to multi-line',
+        tagArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
       },
     },
     {
@@ -176,7 +177,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string to multi-line',
+        tagArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
       },
     },
     {
@@ -192,7 +193,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string to multi-line',
+        tagArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
         formatTagKey: false,
       },
     },
@@ -214,7 +215,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: 'multi-line',
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
     {
@@ -233,7 +234,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: 'single string comma delimited',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
       },
     },
     {
@@ -250,7 +251,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: 'single string to single-line',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
       },
     },
     {
@@ -267,7 +268,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: 'single string to multi-line',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
       },
     },
     {
@@ -285,7 +286,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: 'single string to multi-line',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
       },
     },
     {
@@ -303,7 +304,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: 'single string to single-line',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
       },
     },
     {
@@ -323,7 +324,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: 'single string to single-line',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
         formatAliasKey: false,
       },
     },
@@ -344,7 +345,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'single-line',
+        defaultArrayStyle: NormalArrayFormats.SingleLine,
       },
     },
     {
@@ -362,7 +363,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'multi-line',
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
     {
@@ -378,7 +379,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'multi-line',
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
         formatArrayKeys: false,
       },
     },
@@ -395,7 +396,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'multi-line',
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
         forceSingleLineArrayStyle: ['key'],
       },
     },
@@ -416,7 +417,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'single-line',
+        defaultArrayStyle: NormalArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key'],
       },
     },
@@ -435,7 +436,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'multi-line',
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
 
@@ -455,7 +456,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'multi-line',
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
         forceSingleLineArrayStyle: ['key'],
       },
     },
@@ -476,7 +477,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'multi-line',
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
         forceSingleLineArrayStyle: ['key1'],
       },
     },
@@ -493,7 +494,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'multi-line',
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
         forceSingleLineArrayStyle: ['key'],
       },
     },
@@ -514,7 +515,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'single-line',
+        defaultArrayStyle: NormalArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key'],
       },
     },
@@ -531,7 +532,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'single-line',
+        defaultArrayStyle: NormalArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key1'],
       },
     },
@@ -548,7 +549,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'single-line',
+        defaultArrayStyle: NormalArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key1'],
       },
     },
@@ -566,7 +567,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: 'single-line',
+        defaultArrayStyle: NormalArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key'],
       },
     },
@@ -618,7 +619,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string to single-line',
+        tagArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
       },
     },
     {
@@ -635,7 +636,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'multi-line',
+        tagArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
     {
@@ -651,7 +652,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string comma delimited',
+        tagArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
       },
     },
     {
@@ -667,7 +668,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single string space delimited',
+        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
       },
     },
     {
@@ -683,7 +684,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: 'single-line space delimited',
+        tagArrayStyle: TagSpecificArrayFormats.SingleLineSpaceDelimited,
       },
     },
     {
@@ -699,7 +700,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: 'single-line',
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
       },
     },
     {

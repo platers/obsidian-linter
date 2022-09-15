@@ -7,18 +7,18 @@ import {convertAliasValueToStringOrStringArray,
   formatYamlArrayValue,
   getYamlSectionValue,
   loadYAML,
-  NormalYamlArrayFormats,
+  NormalArrayFormats,
   setYamlSection,
-  SpecialYamlArrayFormats,
+  SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
-  TagSpecificYamlArrayFormats} from '../utils/yaml';
+  TagSpecificArrayFormats} from '../utils/yaml';
 
 class FormatYamlArrayOptions implements Options {
-  aliasArrayStyle?: NormalYamlArrayFormats | SpecialYamlArrayFormats = 'single-line';
+  aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   formatAliasKey?: boolean = true;
-  tagArrayStyle?: TagSpecificYamlArrayFormats | NormalYamlArrayFormats | SpecialYamlArrayFormats = 'single-line';
+  tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   formatTagKey?: boolean = true;
-  defaultArrayStyle?: NormalYamlArrayFormats = 'single-line';
+  defaultArrayStyle?: NormalArrayFormats = NormalArrayFormats.SingleLine;
   formatArrayKeys?: boolean = true;
   forceSingleLineArrayStyle?: string[] = [];
   forceMultiLineArrayStyle?: string[] = [];
@@ -79,7 +79,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           continue;
         }
 
-        text = setYamlSection(text, singleLineArrayKey, formatYamlArrayValue(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, singleLineArrayKey)), 'single-line'));
+        text = setYamlSection(text, singleLineArrayKey, formatYamlArrayValue(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, singleLineArrayKey)), NormalArrayFormats.SingleLine));
       }
 
       for (const multiLineArrayKey of options.forceMultiLineArrayStyle) {
@@ -87,7 +87,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           continue;
         }
 
-        text = setYamlSection(text, multiLineArrayKey, formatYamlArrayValue(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, multiLineArrayKey)), 'multi-line'));
+        text = setYamlSection(text, multiLineArrayKey, formatYamlArrayValue(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, multiLineArrayKey)), NormalArrayFormats.MultiLine));
       }
 
       return text;
@@ -128,7 +128,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
         `,
         options: {
-          aliasArrayStyle: 'multi-line',
+          aliasArrayStyle: NormalArrayFormats.MultiLine,
           forceSingleLineArrayStyle: ['test'],
         },
       }),
@@ -152,7 +152,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         `,
         options: {
           formatAliasKey: false,
-          tagArrayStyle: 'single string space delimited',
+          tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
         },
       }),
     ];
@@ -165,24 +165,24 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         description: 'The style of the yaml aliases section',
         optionsKey: 'aliasArrayStyle',
         records: [
-          {
-            value: 'multi-line',
+          { // as types is needed to allow for the proper types as options otherwise it assumes it has to be the specific enum value
+            value: NormalArrayFormats.MultiLine as NormalArrayFormats | SpecialArrayFormats,
             description: '```aliases:\\n  - Title```',
           },
           {
-            value: 'single-line',
+            value: NormalArrayFormats.SingleLine,
             description: '```aliases: [Title]```',
           },
           {
-            value: 'single string comma delimited',
+            value: SpecialArrayFormats.SingleStringCommaDelimited,
             description: '```aliases: Title, Other Title```',
           },
           {
-            value: 'single string to single-line',
+            value: SpecialArrayFormats.SingleStringToSingleLine,
             description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a single-line array.',
           },
           {
-            value: 'single string to multi-line',
+            value: SpecialArrayFormats.SingleStringToMultiLine,
             description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a multi-line array.',
           },
         ],
@@ -200,31 +200,31 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         optionsKey: 'tagArrayStyle',
         records: [
           {
-            value: 'multi-line',
+            value: NormalArrayFormats.MultiLine as TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats,
             description: '```tags:\\n  - tag1```',
           },
           {
-            value: 'single-line',
+            value: NormalArrayFormats.SingleLine,
             description: '```tags: [tag1]```',
           },
           {
-            value: 'single string to single-line',
+            value: SpecialArrayFormats.SingleStringToSingleLine,
             description: 'Tags will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a single-line array.',
           },
           {
-            value: 'single string to multi-line',
+            value: SpecialArrayFormats.SingleStringToMultiLine,
             description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a multi-line array.',
           },
           {
-            value: 'single-line space delimited',
+            value: TagSpecificArrayFormats.SingleLineSpaceDelimited,
             description: '```tags: [tag1 tag2]```',
           },
           {
-            value: 'single string space delimited',
+            value: TagSpecificArrayFormats.SingleStringSpaceDelimited,
             description: '```tags: tag1 tag2```',
           },
           {
-            value: 'single string comma delimited',
+            value: SpecialArrayFormats.SingleStringCommaDelimited,
             description: '```tags: tag1, tag2```',
           },
         ],
@@ -242,11 +242,11 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         optionsKey: 'defaultArrayStyle',
         records: [
           {
-            value: 'multi-line',
+            value: NormalArrayFormats.MultiLine as NormalArrayFormats,
             description: '```key:\\n  - value```',
           },
           {
-            value: 'single-line',
+            value: NormalArrayFormats.SingleLine,
             description: '```key: [value]```',
           },
         ],

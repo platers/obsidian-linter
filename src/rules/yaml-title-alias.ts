@@ -21,6 +21,7 @@ class YamlTitleAliasOptions implements Options {
   yamlAliasesSectionStyle?: YamlAliasesSectionStyle = 'Multi-line array';
   preserveExistingAliasesSectionStyle?: boolean = true;
   keepAliasThatMatchesTheFilename?: boolean = false;
+  useYamlKeyToKeepTrackOfOldFilenameOrHeading?: boolean = true;
 
   @RuleBuilder.noSettingControl()
     fileName?: string;
@@ -54,16 +55,17 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     });
     title = title || options.fileName;
 
+    let requiresChanges = true;
+    let previousTitle: string = null;
+    let yaml = text.match(yamlRegex)[1];
     const shouldRemoveTitleAlias = !options.keepAliasThatMatchesTheFilename && title === options.fileName;
 
-    let yaml = text.match(yamlRegex)[1];
+    if (options.useYamlKeyToKeepTrackOfOldFilenameOrHeading) {
+      previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_NAME));
 
-    let previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_NAME));
-
-    let requiresChanges = true;
-
-    if (previousTitle === title && !shouldRemoveTitleAlias) {
-      requiresChanges = false;
+      if (previousTitle === title && !shouldRemoveTitleAlias) {
+        requiresChanges = false;
+      }
     }
 
     if (previousTitle === null && shouldRemoveTitleAlias) {
@@ -99,7 +101,9 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
       let newYaml = yaml;
       newYaml = setYamlSection(newYaml, ALIASES_YAML_SECTION_NAME, emptyValue);
-      newYaml = setYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME, ' \'\'');
+      if (options.useYamlKeyToKeepTrackOfOldFilenameOrHeading) {
+        newYaml = setYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME, ' \'\'');
+      }
 
       text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
       yaml = newYaml;
@@ -109,11 +113,9 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     const isMultiline = aliasesValue.includes('\n');
     const parsedAliases = loadYAML(aliasesValue);
-
     const isSingleString = !isMultiline && aliasesValue.match(/^\[.*\]/) === null;
 
     let resultAliasesArray = isSingleString ? [parsedAliases] : [...parsedAliases];
-
     const previousTitleIndex = resultAliasesArray.indexOf(previousTitle);
     if (previousTitleIndex !== -1) {
       if (shouldRemoveTitleAlias) {
@@ -230,7 +232,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       newYaml = setYamlSection(newYaml, ALIASES_YAML_SECTION_NAME, newAliasesYaml);
     }
 
-    if (shouldRemoveTitleAlias) {
+    if (shouldRemoveTitleAlias || !options.useYamlKeyToKeepTrackOfOldFilenameOrHeading) {
       newYaml = removeYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME);
     } else {
       newYaml = setYamlSection(newYaml, LINTER_ALIASES_HELPER_NAME, ` ${toYamlString(title)}`);
@@ -257,6 +259,22 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         `,
       }),
       new ExampleBuilder({
+        description: 'Adds a header with the title from heading without YAML key when the use of the YAML key is set to false.',
+        before: dedent`
+          # Obsidian
+        `,
+        after: dedent`
+          ---
+          aliases:
+            - Obsidian
+          ---
+          # Obsidian
+        `,
+        options: {
+          useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+        },
+      }),
+      new ExampleBuilder({
         description: 'Adds a header with the title.',
         before: dedent`
           ${''}
@@ -265,6 +283,49 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
           ---
           aliases:
             - Filename
+          linter-yaml-title-alias: Filename
+          ---
+          ${''}
+        `,
+        options: {
+          fileName: 'Filename',
+          keepAliasThatMatchesTheFilename: true,
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Adds a header with the title without YAML key when the use of the YAML key is set to false.',
+        before: dedent`
+          ${''}
+        `,
+        after: dedent`
+          ---
+          aliases:
+            - Filename
+          ---
+          ${''}
+        `,
+        options: {
+          fileName: 'Filename',
+          keepAliasThatMatchesTheFilename: true,
+          useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Replaces old filename with new filename when no header is present and filename is different than the old one listed in `linter-yaml-title-alias`.',
+        before: dedent`
+          ---
+          aliases:
+            - Old Filename
+            - Alias 2
+          linter-yaml-title-alias: Old Filename
+          ---
+          ${''}
+        `,
+        after: dedent`
+          ---
+          aliases:
+            - Filename
+            - Alias 2
           linter-yaml-title-alias: Filename
           ---
           ${''}
@@ -313,6 +374,12 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         name: 'Keep alias that matches the filename',
         description: 'Such aliases are usually redundant',
         optionsKey: 'keepAliasThatMatchesTheFilename',
+      }),
+      new BooleanOptionBuilder({
+        OptionsClass: YamlTitleAliasOptions,
+        name: 'Use the YAML key `linter-yaml-title-alias` to help with filename and heading changes',
+        description: 'If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array',
+        optionsKey: 'useYamlKeyToKeepTrackOfOldFilenameOrHeading',
       }),
     ];
   }

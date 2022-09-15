@@ -76,36 +76,46 @@ export function loadYAML(yaml_text: string): any {
   return parsed_yaml;
 }
 
-export type TagSpecificYamlArrayFormats = 'single string space delimited' | 'single-line space delimited';
+export enum TagSpecificArrayFormats {
+  SingleStringSpaceDelimited = 'single string space delimited',
+  SingleLineSpaceDelimited = 'single-line space delimited',
+}
 
-export type SpecialYamlArrayFormats = 'single string to single-line' | 'single string to multi-line' | 'single string comma delimited';
+export enum SpecialArrayFormats {
+  SingleStringToSingleLine = 'single string to single-line',
+  SingleStringToMultiLine = 'single string to multi-line',
+  SingleStringCommaDelimited = 'single string comma delimited',
+}
 
-export type NormalYamlArrayFormats = 'single-line' | 'multi-line';
+export enum NormalArrayFormats {
+  SingleLine = 'single-line',
+  MultiLine = 'multi-line',
+}
 
 /**
  * Formats the yaml array value passed in with the specified format.
  * @param {string | string[]} value The value(s) that will be used as the parts of the array that is assumed to already be broken down into the appropriate format to be put in the array.
- * @param {NormalYamlArrayFormats | SpecialYamlArrayFormats | TagSpecificYamlArrayFormats} format The format that the array should be converted into.
+ * @param {NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats} format The format that the array should be converted into.
  * @return {string} The formatted array in the specified yaml/obsidian yaml format.
  */
-export function formatYamlArrayValue(value: string | string[], format: NormalYamlArrayFormats | SpecialYamlArrayFormats | TagSpecificYamlArrayFormats): string {
+export function formatYamlArrayValue(value: string | string[], format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats): string {
   if (typeof value === 'string') {
     value = [value];
   }
 
   switch (format) {
-    case 'single-line':
+    case NormalArrayFormats.SingleLine:
       if (value == null || value.length === 0) {
         return ' []';
       }
 
       return ' ' + convertStringArrayToSingleLineArray(value);
-    case 'multi-line':
+    case NormalArrayFormats.MultiLine:
       if (value == null || value.length === 0) {
         return '\n  - ';
       }
       return '\n  - ' + value.join('\n  - ');
-    case 'single string to single-line':
+    case SpecialArrayFormats.SingleStringToSingleLine:
       if (value == null || value.length === 0) {
         return ' ';
       } else if (value.length === 1) {
@@ -113,7 +123,7 @@ export function formatYamlArrayValue(value: string | string[], format: NormalYam
       }
 
       return ' ' + convertStringArrayToSingleLineArray(value);
-    case 'single string to multi-line':
+    case SpecialArrayFormats.SingleStringToMultiLine:
       if (value == null || value.length === 0) {
         return ' ';
       } else if (value.length === 1) {
@@ -121,7 +131,7 @@ export function formatYamlArrayValue(value: string | string[], format: NormalYam
       }
 
       return '\n  - ' + value.join('\n  - ');
-    case 'single string space delimited':
+    case TagSpecificArrayFormats.SingleStringSpaceDelimited:
       if (value == null || value.length === 0) {
         return ' ';
       } else if (value.length === 1) {
@@ -129,7 +139,7 @@ export function formatYamlArrayValue(value: string | string[], format: NormalYam
       }
 
       return ' ' +value.join(' ');
-    case 'single string comma delimited':
+    case SpecialArrayFormats.SingleStringCommaDelimited:
       if (value == null || value.length === 0) {
         return ' ';
       } else if (value.length === 1) {
@@ -137,7 +147,7 @@ export function formatYamlArrayValue(value: string | string[], format: NormalYam
       }
 
       return ' ' + value.join(', ');
-    case 'single-line space delimited':
+    case TagSpecificArrayFormats.SingleLineSpaceDelimited:
       if (value == null || value.length === 0) {
         return ' []';
       } else if (value.length === 1) {
