@@ -8,6 +8,8 @@ import {convertAliasValueToStringOrStringArray,
   getYamlSectionValue,
   loadYAML,
   NormalArrayFormats,
+  OBSIDIAN_ALIASES_KEY,
+  OBSIDIAN_TAG_KEY,
   setYamlSection,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
@@ -40,9 +42,6 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
   }
   apply(text: string, options: FormatYamlArrayOptions): string {
     return formatYAML(text, (text: string) => {
-      const obsidianTagKey = 'tags';
-      const obsidianAliasKey = 'aliases';
-
       const yaml = loadYAML(text.replace('---\n', '').replace('\n---', ''));
       if (!yaml) {
         return text;
@@ -53,16 +52,16 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         return date && Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date);
       };
 
-      if (options.formatAliasKey && Object.keys(yaml).includes(obsidianAliasKey)) {
-        text = setYamlSection(text, obsidianAliasKey, formatYamlArrayValue(convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, obsidianAliasKey))), options.aliasArrayStyle));
+      if (options.formatAliasKey && Object.keys(yaml).includes(OBSIDIAN_ALIASES_KEY)) {
+        text = setYamlSection(text, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, OBSIDIAN_ALIASES_KEY))), options.aliasArrayStyle));
       }
 
-      if (options.formatTagKey && Object.keys(yaml).includes(obsidianTagKey)) {
-        text = setYamlSection(text, obsidianTagKey, formatYamlArrayValue(convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, obsidianTagKey))), options.tagArrayStyle));
+      if (options.formatTagKey && Object.keys(yaml).includes(OBSIDIAN_TAG_KEY)) {
+        text = setYamlSection(text, OBSIDIAN_TAG_KEY, formatYamlArrayValue(convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, OBSIDIAN_TAG_KEY))), options.tagArrayStyle));
       }
 
       if (options.formatArrayKeys) {
-        const keysToIgnore = [obsidianAliasKey, obsidianTagKey, ...options.forceMultiLineArrayStyle, ...options.forceSingleLineArrayStyle];
+        const keysToIgnore = [OBSIDIAN_ALIASES_KEY, OBSIDIAN_TAG_KEY, ...options.forceMultiLineArrayStyle, ...options.forceSingleLineArrayStyle];
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays and already accounted for keys

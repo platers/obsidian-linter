@@ -1,6 +1,9 @@
 import {load, dump} from 'js-yaml';
 import {escapeDollarSigns, yamlRegex} from './regex';
 
+export const OBSIDIAN_TAG_KEY = 'tags';
+export const OBSIDIAN_ALIASES_KEY = 'aliases';
+
 /**
  * Adds an empty YAML block to the text if it doesn't already have one.
  * @param {string} text - The text to process
