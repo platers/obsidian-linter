@@ -20,6 +20,22 @@ ruleTest({
       `,
     },
     {
+      testName: 'Creates multi-line array aliases when missing without helper key',
+      before: dedent`
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Title
+        ---
+        # Title
+      `,
+      options: {
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
+    {
       testName: 'Creates single-line array aliases when missing',
       before: dedent`
         # Title
@@ -33,6 +49,22 @@ ruleTest({
       `,
       options: {
         yamlAliasesSectionStyle: 'Single-line array',
+      },
+    },
+    {
+      testName: 'Creates single-line array aliases when missing without helper key',
+      before: dedent`
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases: [Title]
+        ---
+        # Title
+      `,
+      options: {
+        yamlAliasesSectionStyle: 'Single-line array',
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
     {
@@ -52,6 +84,22 @@ ruleTest({
       },
     },
     {
+      testName: 'Creates single string alias when missing without helper key',
+      before: dedent`
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases: Title
+        ---
+        # Title
+      `,
+      options: {
+        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
+    {
       testName: 'Creates multi-line array aliases when empty',
       before: dedent`
         ---
@@ -67,6 +115,25 @@ ruleTest({
         ---
         # Title
       `,
+    },
+    {
+      testName: 'Creates multi-line array aliases when empty without helper key',
+      before: dedent`
+        ---
+        aliases: ${''}
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Title
+        ---
+        # Title
+      `,
+      options: {
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
     },
     {
       testName: 'Creates single-line array aliases when empty',
@@ -88,6 +155,25 @@ ruleTest({
       },
     },
     {
+      testName: 'Creates single-line array aliases when empty without helper key',
+      before: dedent`
+        ---
+        aliases: ${''}
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases: [Title]
+        ---
+        # Title
+      `,
+      options: {
+        yamlAliasesSectionStyle: 'Single-line array',
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
+    {
       testName: 'Creates single string alias when empty',
       before: dedent`
         ---
@@ -104,6 +190,25 @@ ruleTest({
       `,
       options: {
         yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+      },
+    },
+    {
+      testName: 'Creates single string alias when empty without helper key',
+      before: dedent`
+        ---
+        aliases: ${''}
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases: Title
+        ---
+        # Title
+      `,
+      options: {
+        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
     {
@@ -128,6 +233,31 @@ ruleTest({
         ---
         # Title
       `,
+    },
+    {
+      testName: 'Adds new value as first alias in multi-line array when there is no helper key and it is not on',
+      before: dedent`
+        ---
+        aliases:
+          - alias1
+          - alias2
+          - alias3
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Title
+          - alias1
+          - alias2
+          - alias3
+        ---
+        # Title
+      `,
+      options: {
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
     },
     {
       testName: 'Adds before first alias in multi-line array',
@@ -186,6 +316,24 @@ ruleTest({
       `,
     },
     {
+      testName: 'Adds before first alias in single-line array without helper key',
+      before: dedent`
+        ---
+        aliases: [alias1, alias2, alias3]
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases: [Title, alias1, alias2, alias3]
+        ---
+        # Title
+      `,
+      options: {
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
+    {
       testName: 'Updates single string alias',
       before: dedent`
         ---
@@ -224,6 +372,27 @@ ruleTest({
       },
     },
     {
+      testName: 'Changes single string aliases to multi-line array when adding without helper key',
+      before: dedent`
+        ---
+        aliases: other alias
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Title
+          - other alias
+        ---
+        # Title
+      `,
+      options: {
+        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
+    {
       testName: 'Changes single string aliases to single-line array when adding',
       before: dedent`
         ---
@@ -240,6 +409,25 @@ ruleTest({
       `,
       options: {
         yamlAliasesSectionStyle: 'Single string that expands to single-line array if needed',
+      },
+    },
+    {
+      testName: 'Changes single string aliases to single-line array when adding without helper key',
+      before: dedent`
+        ---
+        aliases: other alias
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases: [Title, other alias]
+        ---
+        # Title
+      `,
+      options: {
+        yamlAliasesSectionStyle: 'Single string that expands to single-line array if needed',
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
     {
@@ -447,6 +635,29 @@ ruleTest({
       },
     },
     {
+      testName: 'Adds alias that matches the filename for multi-line array style aliases section without helper key',
+      before: dedent`
+        ---
+        aliases:
+          - alias1
+        ---
+        # Filename
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Filename
+          - alias1
+        ---
+        # Filename
+      `,
+      options: {
+        keepAliasThatMatchesTheFilename: true,
+        fileName: 'Filename',
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
+    {
       testName: 'Adds alias that matches the filename for single-line array style aliases section',
       before: dedent`
         ---
@@ -464,6 +675,26 @@ ruleTest({
       options: {
         keepAliasThatMatchesTheFilename: true,
         fileName: 'Filename',
+      },
+    },
+    {
+      testName: 'Adds alias that matches the filename for single-line array style aliases section without helper key',
+      before: dedent`
+        ---
+        aliases: [alias1]
+        ---
+        # Filename
+      `,
+      after: dedent`
+        ---
+        aliases: [Filename, alias1]
+        ---
+        # Filename
+      `,
+      options: {
+        keepAliasThatMatchesTheFilename: true,
+        fileName: 'Filename',
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
     {
@@ -487,6 +718,29 @@ ruleTest({
         keepAliasThatMatchesTheFilename: true,
         fileName: 'Filename',
         yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+      },
+    },
+    {
+      testName: 'Adds alias that matches the filename for single string style aliases section',
+      before: dedent`
+        ---
+        aliases: alias1
+        ---
+        # Filename
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Filename
+          - alias1
+        ---
+        # Filename
+      `,
+      options: {
+        keepAliasThatMatchesTheFilename: true,
+        fileName: 'Filename',
+        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
     {

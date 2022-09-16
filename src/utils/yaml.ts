@@ -3,6 +3,7 @@ import {escapeDollarSigns, yamlRegex} from './regex';
 
 export const OBSIDIAN_TAG_KEY = 'tags';
 export const OBSIDIAN_ALIASES_KEY = 'aliases';
+export const LINTER_ALIASES_HELPER_KEY = 'linter-yaml-title-alias';
 
 /**
  * Adds an empty YAML block to the text if it doesn't already have one.
