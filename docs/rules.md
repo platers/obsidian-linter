@@ -655,7 +655,7 @@ Alias: `yaml-title-alias`
 Inserts the title of the file into the YAML frontmatter's aliases section. Gets the title from the first H1 or filename.
 
 Options:
-- YAML aliases section style: The style of the aliases YAML section
+- YAML aliases section style: The style of the aliases YAML section. It is recommended that the value here matches the aliases format for format YAML arrays if in use.
 	- Default: `Multi-line array`
 	- `Multi-line array`: ```aliases:\n  - Title```
 	- `Single-line array`: ```aliases: [Title]```
@@ -665,6 +665,8 @@ Options:
 	- Default: `true`
 - Keep alias that matches the filename: Such aliases are usually redundant
 	- Default: `false`
+- Use the YAML key `linter-yaml-title-alias` to help with filename and heading changes: If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array
+	- Default: `true`
 
 Example: Adds a header with the title from heading.
 
@@ -684,6 +686,23 @@ linter-yaml-title-alias: Obsidian
 ---
 # Obsidian
 ``````
+Example: Adds a header with the title from heading without YAML key when the use of the YAML key is set to false.
+
+Before:
+
+``````markdown
+# Obsidian
+``````
+
+After:
+
+``````markdown
+---
+aliases:
+  - Obsidian
+---
+# Obsidian
+``````
 Example: Adds a header with the title.
 
 Before:
@@ -698,6 +717,48 @@ After:
 ---
 aliases:
   - Filename
+linter-yaml-title-alias: Filename
+---
+
+``````
+Example: Adds a header with the title without YAML key when the use of the YAML key is set to false.
+
+Before:
+
+``````markdown
+
+``````
+
+After:
+
+``````markdown
+---
+aliases:
+  - Filename
+---
+
+``````
+Example: Replaces old filename with new filename when no header is present and filename is different than the old one listed in `linter-yaml-title-alias`.
+
+Before:
+
+``````markdown
+---
+aliases:
+  - Old Filename
+  - Alias 2
+linter-yaml-title-alias: Old Filename
+---
+
+``````
+
+After:
+
+``````markdown
+---
+aliases:
+  - Filename
+  - Alias 2
 linter-yaml-title-alias: Filename
 ---
 
