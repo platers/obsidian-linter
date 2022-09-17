@@ -26,6 +26,16 @@ export enum MDAstTypes {
   InlineMath = 'inlineMath',
 }
 
+export enum OrderListItemStyles {
+  Ascending = 'ascending',
+  Lazy = 'lazy',
+}
+
+export enum OrderListItemEndOfIndicatorStyles {
+  Period = '.',
+  Parenthesis = ')',
+}
+
 function parseTextToAST(text: string): Root {
   const ast = remark().use(remarkGfm).use(remarkMath).parse(text);
   return ast;
@@ -182,10 +192,10 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
 }
 
 /**
-   * Makes sure that paragraphs have a single new line before and after them.
-   * @param {string} text The text to make sure that paragraphs have only 1 new line before and after them
-   * @return {string} The text with paragraphs with a single new line before and after them.
-   */
+ * Makes sure that paragraphs have a single new line before and after them.
+ * @param {string} text The text to make sure that paragraphs have only 1 new line before and after them
+ * @return {string} The text with paragraphs with a single new line before and after them.
+ */
 export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: string): string {
   const hasTrailingLineBreak = text.endsWith('\n');
   const positions: Position[] = getPositions(MDAstTypes.Paragraph, text);
@@ -464,6 +474,40 @@ export function convertRegularMarkdownLinksToHTMLLinks(text: string): string {
     const endLinkTextPosition = regularLink.indexOf(']');
     const htmlLink = '<a href="' + regularLink.substring(endLinkTextPosition+2, regularLink.length - 1)+ '">' + regularLink.substring(1, endLinkTextPosition) + '</a>';
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, htmlLink);
+  }
+
+  return text;
+}
+
+export function updateOrderedListItemIndicators(text: string, orderedListStyle: OrderListItemStyles, orderedListEndStyle: OrderListItemEndOfIndicatorStyles): string {
+  const positions: Position[] = getPositions(MDAstTypes.List, text);
+  if (!positions) {
+    return text;
+  }
+
+  for (const position of positions) {
+    let start = position.start.offset;
+    while (start > 0 && text.charAt(start - 1) !== '\n') {
+      start--;
+    }
+    let listText = text.substring(start, position.end.offset);
+
+    const preListIndicatorsToIndicatorNumber = new Map<string, number>();
+    listText = listText.replace(/^(( |\t |>)*)(\d(\.|\)))([^\n]*)$/gm, (_listItem: string, $1: string = '', _$2: string, _$3: string, _$4: string, $5: string) => {
+      let listItemIndicatorNumber = 1;
+      if (preListIndicatorsToIndicatorNumber.has($1)) {
+        if (orderedListStyle === OrderListItemStyles.Ascending) {
+          listItemIndicatorNumber = preListIndicatorsToIndicatorNumber.get($1) + 1;
+          preListIndicatorsToIndicatorNumber.set($1, listItemIndicatorNumber);
+        }
+      } else {
+        preListIndicatorsToIndicatorNumber.set($1, 1);
+      }
+
+      return `${$1}${listItemIndicatorNumber}${orderedListEndStyle}${$5}`;
+    });
+
+    text = replaceTextBetweenStartAndEndWithNewValue(text, start, position.end.offset, listText);
   }
 
   return text;
