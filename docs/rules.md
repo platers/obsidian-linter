@@ -1363,6 +1363,140 @@ After:
 <https://gitlab.com>
 ``````
 
+### Ordered List Style
+
+Alias: `ordered-list-style`
+
+Makes sure that ordered lists follow the style specified.
+
+Options:
+- Number Style: The number style used in ordered list indicators
+	- Default: `ascending`
+	- `ascending`: Makes sure ordered list items are ascending (i.e. 1, 2, 3, etc.)
+	- `lazy`: Makes sure ordered list item indicators all are the number 1
+- Ordered List Indicator End Style: The ending character of an ordered list indicator
+	- Default: `.`
+	- `.`: Makes sure ordered list items indicators end in '.' (i.e `1.`)
+	- `)`: Makes sure ordered list item indicators end in ')' (i.e. `1)`)
+
+Example: Ordered lists have list items set to ascending numerical order when Number Style is `ascending`.
+
+Before:
+
+``````markdown
+1. Item 1
+2. Item 2
+4. Item 3
+
+Some text here
+
+1. Item 1
+1. Item 2
+1. Item 3
+``````
+
+After:
+
+``````markdown
+1. Item 1
+2. Item 2
+3. Item 3
+
+Some text here
+
+1. Item 1
+2. Item 2
+3. Item 3
+``````
+Example: Nested ordered lists have list items set to ascending numerical order when Number Style is `ascending`.
+
+Before:
+
+``````markdown
+1. Item 1
+2. Item 2
+  1. Subitem 1
+  5. Subitem 2
+  2. Subitem 3
+4. Item 3
+``````
+
+After:
+
+``````markdown
+1. Item 1
+2. Item 2
+  1. Subitem 1
+  2. Subitem 2
+  3. Subitem 3
+3. Item 3
+``````
+Example: Ordered list in blockquote has list items set to '1.' when Number Style is `lazy`.
+
+Before:
+
+``````markdown
+> 1. Item 1
+> 4. Item 2
+> > 1. Subitem 1
+> > 5. Subitem 2
+> > 2. Subitem 3
+``````
+
+After:
+
+``````markdown
+> 1. Item 1
+> 1. Item 2
+> > 1. Subitem 1
+> > 1. Subitem 2
+> > 1. Subitem 3
+``````
+Example: Ordered list in blockquote has list items set to ascending numerical order when Number Style is `ascending`.
+
+Before:
+
+``````markdown
+> 1. Item 1
+> 4. Item 2
+> > 1. Subitem 1
+> > 5. Subitem 2
+> > 2. Subitem 3
+``````
+
+After:
+
+``````markdown
+> 1. Item 1
+> 2. Item 2
+> > 1. Subitem 1
+> > 2. Subitem 2
+> > 3. Subitem 3
+``````
+Example: Nested ordered list has list items set to '1)' when Number Style is `lazy` and Ordered List Indicator End Style is `)`.
+
+Before:
+
+``````markdown
+1. Item 1
+2. Item 2
+  1. Subitem 1
+  5. Subitem 2
+  2. Subitem 3
+4. Item 3
+``````
+
+After:
+
+``````markdown
+1) Item 1
+1) Item 2
+  1) Subitem 1
+  1) Subitem 2
+  1) Subitem 3
+1) Item 3
+``````
+
 ### Proper Ellipsis
 
 Alias: `proper-ellipsis`
