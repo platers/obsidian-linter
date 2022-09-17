@@ -1370,14 +1370,14 @@ Alias: `ordered-list-style`
 Makes sure that ordered lists follow the style specified.
 
 Options:
-- Number Style: The number style used to denote emphasized content
+- Number Style: The number style used in ordered list indicators
 	- Default: `ascending`
 	- `ascending`: Makes sure ordered list items are ascending (i.e. 1, 2, 3, etc.)
 	- `lazy`: Makes sure ordered list item indicators all are the number 1
-- Ordered List Indicator End Style: The number style used to denote emphasized content
+- Ordered List Indicator End Style: The ending character of an ordered list indicator
 	- Default: `.`
-	- `.`: Makes sure ordered list items indicators end in '.'
-	- `)`: Makes sure ordered list item indicators end in ')'
+	- `.`: Makes sure ordered list items indicators end in '.' (i.e `1.`)
+	- `)`: Makes sure ordered list item indicators end in ')' (i.e. `1)`)
 
 Example: Ordered lists have list items set to ascending numerical order when Number Style is `ascending`.
 

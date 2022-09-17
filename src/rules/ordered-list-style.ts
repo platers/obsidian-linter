@@ -142,7 +142,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
       new DropdownOptionBuilder<OrderedListStyleOptions, OrderListItemStyles>({
         OptionsClass: OrderedListStyleOptions,
         name: 'Number Style',
-        description: 'The number style used to denote emphasized content',
+        description: 'The number style used in ordered list indicators',
         optionsKey: 'numberStyle',
         records: [
           {
@@ -158,16 +158,16 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
       new DropdownOptionBuilder<OrderedListStyleOptions, OrderListItemEndOfIndicatorStyles>({
         OptionsClass: OrderedListStyleOptions,
         name: 'Ordered List Indicator End Style',
-        description: 'The number style used to denote emphasized content',
+        description: 'The ending character of an ordered list indicator',
         optionsKey: 'listEndStyle',
         records: [
           {
             value: OrderListItemEndOfIndicatorStyles.Period,
-            description: 'Makes sure ordered list items indicators end in \'.\'',
+            description: 'Makes sure ordered list items indicators end in \'.\' (i.e `1.`)',
           },
           {
             value: OrderListItemEndOfIndicatorStyles.Parenthesis,
-            description: 'Makes sure ordered list item indicators end in \')\'',
+            description: 'Makes sure ordered list item indicators end in \')\' (i.e. `1)`)',
           },
         ],
       }),
