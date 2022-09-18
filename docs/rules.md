@@ -347,6 +347,96 @@ animal: cat
 ---
 ``````
 
+### Move Tags to Yaml
+
+Alias: `move-tags-to-yaml`
+
+Move all tags to Yaml frontmatter of the document.
+
+Options:
+- Yaml tags section style: The style of the Yaml tags section
+	- Default: `single-line`
+	- `multi-line`: ```tags:\n  - tag1```
+	- `single-line`: ```tags: [tag1]```
+	- `single string to single-line`: Tags will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a single-line array.
+	- `single string to multi-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a multi-line array.
+	- `single-line space delimited`: ```tags: [tag1 tag2]```
+	- `single string space delimited`: ```tags: tag1 tag2```
+	- `single string comma delimited`: ```tags: tag1, tag2```
+- Remove the hashtag from tags in content body: Removes `#` from tags in content body after moving them to the Yaml frontmatter
+	- Default: `false`
+
+Example: Move tags from body to Yaml
+
+Before:
+
+``````markdown
+Text has to do with #test and #markdown
+
+#test content here
+```
+#ignored
+Code block content is ignored
+```
+
+This inline code `#ignored content`
+``````
+
+After:
+
+``````markdown
+---
+tags: [test, markdown]
+---
+Text has to do with #test and #markdown
+
+#test content here
+```
+#ignored
+Code block content is ignored
+```
+
+This inline code `#ignored content`
+``````
+Example: Move tags from body to Yaml with existing tags retains the already existing ones and only adds new ones
+
+Before:
+
+``````markdown
+---
+tags: [test, tag2]
+---
+Text has to do with #test and #markdown
+``````
+
+After:
+
+``````markdown
+---
+tags: [test, tag2, markdown]
+---
+Text has to do with #test and #markdown
+``````
+Example: Move tags to Yaml frontmatter and then remove hashtags in body content tags `Remove the hashtag from tags in content body = true` 
+
+Before:
+
+``````markdown
+---
+tags: [test, tag2]
+---
+Text has to do with #test and #markdown
+``````
+
+After:
+
+``````markdown
+---
+tags: [test, tag2, markdown]
+---
+Text has to do with test and markdown
+``````
+
 ### Remove YAML Keys
 
 Alias: `remove-yaml-keys`
