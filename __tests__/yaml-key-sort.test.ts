@@ -40,5 +40,31 @@ ruleTest({
         yamlTimestampDateModifiedEnabled: true,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/415
+      testName: 'Sort works with dictionary Yaml value',
+      before: dedent`
+        ---
+        test_key: "Hello"
+        dictionary:
+          abc: "abc"
+          def: "def"
+        tags: 
+          - Test
+        ---
+      `,
+      after: dedent`
+        ---
+        dictionary:
+          abc: "abc"
+          def: "def"
+        tags:
+          - Test
+        test_key: "Hello"
+        ---
+      `,
+      options: {
+        yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
+      },
+    },
   ],
 });
