@@ -45,6 +45,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [format-tags-in-yaml](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#format-tags-in-yaml)
 - [format-yaml-array](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#format-yaml-array)
 - [insert-yaml-attributes](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#insert-yaml-attributes)
+- [move-tags-to-yaml](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#move-tags-to-yaml)
 - [remove-yaml-keys](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-yaml-keys)
 - [yaml-key-sort](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-key-sort)
 - [yaml-timestamp](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#yaml-timestamp)
