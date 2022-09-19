@@ -232,7 +232,8 @@ export default class LinterPlugin extends Plugin {
 
     await this.app.vault.modify(file, newText);
 
-    this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+    // Make sure this is disabled until we actually add something to let it work on folder and vault linting
+    // this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
   }
 
   async runLinterAllFiles(app: App) {
@@ -491,7 +492,7 @@ class SettingTab extends PluginSettingTab {
     this.containerEl.createEl('h2', {text: 'Custom Commands Settings'});
     this.containerEl.createEl('p', {text: `Custom commands are Obsidian commands that get run after the linter is finished running its regular rules.
     This means that they do not run before the yaml timestamp logic runs, so they can cause yaml timestamp to be triggered on the next run of the linter.
-    You may only select an Obsidian command once.`});
+    You may only select an Obsidian command once. Note that this currently only works on linting the current file.`});
     this.containerEl.createEl('p', {text: `When selecting an option, make sure to select the option either by using the mouse or by hitting the enter key.
     Other selection methods may not work and only selections of an actual Obsidian command or an empty string will be saved.`}).style.color = '#EED202';
 
