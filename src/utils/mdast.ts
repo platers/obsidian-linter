@@ -399,7 +399,7 @@ function textMatches(expectedText: string, actualText: string, requireSameTraili
   return actualText.match(new RegExp('^' + escapeRegExp(expectedText) + '( |\\t)*$', 'm')) != null;
 }
 
-function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number): string {
+function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number, isForBlockquote: boolean = false): string {
   const content = text.substring(start, end);
   let startOfLine = '';
   let requireSameTrailingWhitespace = true;
@@ -407,14 +407,25 @@ function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: nu
   if (contentPriorToContent.length > 0) {
     const contentLinesPriorToContent = contentPriorToContent.split('\n');
     startOfLine = contentLinesPriorToContent[contentLinesPriorToContent.length - 1] ?? '';
+
     requireSameTrailingWhitespace = startOfLine.trim() == '';
     if (!requireSameTrailingWhitespace) {
       startOfLine = startOfLine.trimEnd();
+
+      // if dealing with empty blank lines for blockquotes, then remove one level of nesting and use that as the empty line
+      if (isForBlockquote) {
+        const indexOfBlockquoteIndicator = startOfLine.indexOf('>');
+
+        if (indexOfBlockquoteIndicator !== -1) {
+          startOfLine = startOfLine.substring(0, indexOfBlockquoteIndicator).trimEnd();
+        }
+      }
     }
 
     let numberOfIndexesToRemove = 0;
     while (contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove) >= 0) {
-      if (!textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove)], requireSameTrailingWhitespace)) {
+      const lineContent = contentLinesPriorToContent[contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove)];
+      if (!textMatches(startOfLine, lineContent, requireSameTrailingWhitespace) && (!isForBlockquote || !textMatches('', lineContent, true))) {
         break;
       }
 
@@ -435,7 +446,8 @@ function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: nu
     const contentLinesAfterBlock = contentAfterContent.split('\n');
     let numberOfIndexesToRemove = 0;
     while (numberOfIndexesToRemove + 1 < contentLinesAfterBlock.length) {
-      if (!textMatches(startOfLine, contentLinesAfterBlock[1+numberOfIndexesToRemove], requireSameTrailingWhitespace)) {
+      const lineContent = contentLinesAfterBlock[1+numberOfIndexesToRemove];
+      if (!textMatches(startOfLine, lineContent, requireSameTrailingWhitespace) && (!isForBlockquote || !textMatches('', lineContent, true))) {
         break;
       }
 
@@ -474,6 +486,15 @@ export function ensureEmptyLinesAroundTables(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Table, text);
   for (const position of positions) {
     text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+  }
+
+  return text;
+}
+
+export function ensureEmptyLinesAroundBlockquotes(text: string): string {
+  const positions: Position[] = getPositions(MDAstTypes.Blockquote, text);
+  for (const position of positions) {
+    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset, true);
   }
 
   return text;
