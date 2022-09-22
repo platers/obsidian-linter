@@ -19,7 +19,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
     return 'Ordered List Style';
   }
   get description(): string {
-    return 'Makes sure that ordered lists follow the style specified.';
+    return 'Makes sure that ordered lists follow the style specified. Note that 2 spaces or 1 tab is considered to be an indentation level.';
   }
   get type(): RuleType {
     return RuleType.CONTENT;
