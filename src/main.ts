@@ -10,6 +10,8 @@ import './rules-registry';
 import {iconInfo} from './icons';
 import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
+import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
+import {SettingTab} from './ui/settings';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -99,7 +101,6 @@ export default class LinterPlugin extends Plugin {
     // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L239-L251
     this.registerEvent(
         this.app.workspace.on('file-menu', (menu, file: TFile) => {
-        // Add a menu item to the folder context menu to create a board
           if (file instanceof TFolder) {
             menu.addItem((item) => {
               item

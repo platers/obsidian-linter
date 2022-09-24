@@ -5,7 +5,7 @@ import {moment} from 'obsidian';
 import CommandSuggester from './suggesters/command-suggester';
 import {SearchOptionInfo} from 'src/option';
 
-type settingSearchInfo = {tabName: string, containerEl: HTMLDivElement, name: string, description: string, options: SearchOptionInfo[], alias?: string}
+type settingSearchInfo = {containerEl: HTMLDivElement, name: string, description: string, options: SearchOptionInfo[], alias?: string}
 type TabContentInfo = {content: HTMLDivElement, heading: HTMLElement, navButton: HTMLElement}
 
 // const yamlRuleTypeToIconName: Record<RuleType, string> = {
@@ -21,7 +21,8 @@ export class SettingTab extends PluginSettingTab {
   private tabContent: Map<string, TabContentInfo> = new Map<string, TabContentInfo>();
   private selectedTab: string = 'General';
   private search: SearchComponent;
-  private searchSettingInfo: settingSearchInfo[] = [];
+  private searchSettingInfo: Map<string, settingSearchInfo[]> = new Map();
+  private searchZeroState: HTMLDivElement;
 
   constructor(app: App, plugin: LinterPlugin) {
     super(app, plugin);
@@ -39,7 +40,7 @@ export class SettingTab extends PluginSettingTab {
     const navEl = containerEl.createEl('nav', {cls: 'linter-setting-header'}).createDiv('linter-setting-tab-group');
     const settingsEl = containerEl.createDiv('linter-setting-content');
 
-    this.createTabAndContent('General', navEl, settingsEl, !this.selectedTab || this.selectedTab === 'General', (el: HTMLElement) => this.generateGeneralSettings(el));
+    this.createTabAndContent('General', navEl, settingsEl, !this.selectedTab || this.selectedTab === 'General', (el: HTMLElement) => this.generateGeneralSettings('General', el));
 
     let prevSection = '';
     let tabTitle = '';
@@ -54,8 +55,9 @@ export class SettingTab extends PluginSettingTab {
       this.addRuleToTab(tabTitle, rule);
     }
 
-    this.createTabAndContent('Custom Commands', navEl, settingsEl, this.selectedTab === 'Custom Commands', (el: HTMLElement) => this.generateCustomCommandSettings(el));
+    this.createTabAndContent('Custom Commands', navEl, settingsEl, this.selectedTab === 'Custom Commands', (el: HTMLElement) => this.generateCustomCommandSettings('Custom Commands', el));
     this.generateSearchBar(linterHeader);
+    this.createSearchZeroState(settingsEl);
   }
 
   createTabAndContent(tabName: string, navEl: HTMLElement, containerEl: HTMLElement, displayTabContent: boolean = false, generateTabContent?: (el: HTMLElement) => void) {
@@ -67,16 +69,38 @@ export class SettingTab extends PluginSettingTab {
       }
 
       tabEl.addClass('linter-navigation-item-selected');
-      this.tabContent.get(tabName).content.style.display = 'block';
+      const tab = this.tabContent.get(tabName);
+      tab.content.style.display = 'block';
 
-      const tabInfo = this.tabContent.get(this.selectedTab);
-      tabInfo.navButton.removeClass('linter-navigation-item-selected');
-      tabInfo.content.style.display = 'none';
+      if (this.selectedTab != '') {
+        const tabInfo = this.tabContent.get(this.selectedTab);
+        tabInfo.navButton.removeClass('linter-navigation-item-selected');
+        tabInfo.content.style.display = 'none';
+      } else {
+        this.searchZeroState.style.display = 'none';
+
+        for (const settingTab of this.searchSettingInfo) {
+          for (const setting of settingTab[1]) {
+            setting.containerEl.style.display = 'block';
+          }
+        }
+
+        for (const tabInfo of this.tabContent) {
+          const tab = tabInfo[1];
+          tab.heading.style.display = 'none';
+          if (tabName !== tabInfo[0]) {
+            tab.content.style.display = 'none';
+          }
+        }
+      }
 
       this.selectedTab = tabName;
     };
 
     const tabContent = containerEl.createDiv('linter-tab-settings');
+    const tabHeader = tabContent.createEl('h2', {text: tabName + ' Settings'});
+    tabHeader.style.display = 'none';
+
     tabContent.id = tabName.toLowerCase().replace(' ', '-');
     if (!displayTabContent) {
       tabContent.style.display = 'none';
@@ -88,7 +112,7 @@ export class SettingTab extends PluginSettingTab {
       generateTabContent(tabContent);
     }
 
-    this.tabContent.set(tabName, {content: tabContent, heading: null, navButton: tabEl});
+    this.tabContent.set(tabName, {content: tabContent, heading: tabHeader, navButton: tabEl});
   }
 
   addRuleToTab(tabName: string, rule: Rule) {
@@ -109,15 +133,20 @@ export class SettingTab extends PluginSettingTab {
       optionInfo.push(option.searchInfo);
     }
 
-    this.searchSettingInfo.push({tabName: tabName, containerEl: ruleDiv, name: rule.name.toLowerCase(), description: rule.description.toLowerCase(), options: optionInfo ?? null, alias: ruleDiv.id});
+    this.addSettingToMasterSettingsList(tabName, ruleDiv, rule.name.toLowerCase(), rule.description.toLowerCase(), optionInfo, ruleDiv.id);
   }
 
-  generateCustomCommandSettings(containerEl: HTMLElement): void {
-    containerEl.createEl('p', {text: `Custom commands are Obsidian commands that get run after the linter is finished running its regular rules.
+  generateCustomCommandSettings(tabName: string, containerEl: HTMLElement): void {
+    const descriptionP1 = `Custom commands are Obsidian commands that get run after the linter is finished running its regular rules.
     This means that they do not run before the yaml timestamp logic runs, so they can cause yaml timestamp to be triggered on the next run of the linter.
-    You may only select an Obsidian command once. Note that this currently only works on linting the current file.`});
-    containerEl.createEl('p', {text: `When selecting an option, make sure to select the option either by using the mouse or by hitting the enter key.
-    Other selection methods may not work and only selections of an actual Obsidian command or an empty string will be saved.`}).style.color = '#EED202';
+    You may only select an Obsidian command once. Note that this currently only works on linting the current file.`;
+    const descriptionP2 = `When selecting an option, make sure to select the option either by using the mouse or by hitting the enter key.
+    Other selection methods may not work and only selections of an actual Obsidian command or an empty string will be saved.`;
+
+    this.addSettingToMasterSettingsList(tabName, containerEl as HTMLDivElement, tabName.toLowerCase(), descriptionP1.replaceAll('\n', ' ') + descriptionP2.replaceAll('\n', ' '));
+
+    containerEl.createEl('p', {text: descriptionP1});
+    containerEl.createEl('p', {text: descriptionP2}).style.color = '#EED202';
 
     function arrayMove(arr: LintCommand[], fromIndex: number, toIndex: number):void {
       if (toIndex < 0 || toIndex === arr.length) {
@@ -193,10 +222,13 @@ export class SettingTab extends PluginSettingTab {
     });
   }
 
-  generateGeneralSettings(containerEl: HTMLElement) {
-    new Setting(containerEl)
-        .setName('Lint on save')
-        .setDesc('Lint the file on manual save (when `Ctrl + S` is pressed or when `:w` is executed while using vim keybindings)')
+  generateGeneralSettings(tabName: string, containerEl: HTMLElement) {
+    let tempDiv = containerEl.createDiv();
+    let settingName = 'Lint on save';
+    let settingDesc = 'Lint the file on manual save (when `Ctrl + S` is pressed or when `:w` is executed while using vim keybindings)';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
         .addToggle((toggle) => {
           toggle
               .setValue(this.plugin.settings.lintOnSave)
@@ -206,9 +238,14 @@ export class SettingTab extends PluginSettingTab {
               });
         });
 
-    new Setting(containerEl)
-        .setName('Display message on lint')
-        .setDesc('Display the number of characters changed after linting')
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
+
+    tempDiv = containerEl.createDiv();
+    settingName = 'Display message on lint';
+    settingDesc = 'Display the number of characters changed after linting';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
         .addToggle((toggle) => {
           toggle
               .setValue(this.plugin.settings.displayChanged)
@@ -218,9 +255,14 @@ export class SettingTab extends PluginSettingTab {
               });
         });
 
-    new Setting(containerEl)
-        .setName('Folders to ignore')
-        .setDesc('Folders to ignore when linting all files or linting on save. Enter folder paths separated by newlines')
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
+
+    tempDiv = containerEl.createDiv();
+    settingName = 'Folders to ignore';
+    settingDesc = 'Folders to ignore when linting all files or linting on save. Enter folder paths separated by newlines';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
         .addTextArea((textArea) => {
           textArea
               .setValue(this.plugin.settings.foldersToIgnore.join('\n'))
@@ -230,13 +272,16 @@ export class SettingTab extends PluginSettingTab {
               });
         });
 
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
+
     const sysLocale = navigator.language?.toLowerCase();
 
-    new Setting(containerEl)
-        .setName('Override locale')
-        .setDesc(
-            'Set this if you want to use a locale different from the default',
-        )
+    tempDiv = containerEl.createDiv();
+    settingName = 'Override locale';
+    settingDesc = 'Set this if you want to use a locale different from the default';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
         .addDropdown((dropdown) => {
           dropdown.addOption('system-default', `Same as system (${sysLocale})`);
           moment.locales().forEach((locale) => {
@@ -249,6 +294,8 @@ export class SettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
         });
+
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
   }
 
   generateSearchBar(containerEl: HTMLElement) {
@@ -259,28 +306,104 @@ export class SettingTab extends PluginSettingTab {
       this.search = s;
     });
 
+    this.search.setPlaceholder('Search all settings');
+
+    this.search.inputEl.onfocus = () => {
+      for (const tabInfo of this.tabContent) {
+        const tab = tabInfo[1];
+        tab.navButton.removeClass('linter-navigation-item-selected');
+        tab.content.style.display = 'block';
+        tab.heading.style.display = 'block';
+
+        const searchVal = this.search.getValue();
+        if (this.selectedTab == '' && searchVal.trim() != '') {
+          this.searchSettings(searchVal.toLowerCase());
+        }
+
+        this.selectedTab = '';
+      }
+    };
+
     this.search.onChange((value: string) => {
-      const searchVal = value.toLowerCase();
-      for (const settingInfo of this.searchSettingInfo) {
+      this.searchSettings(value.toLowerCase());
+    });
+  }
+
+  private searchSettings(searchVal: string) {
+    const tabsWithSettings = new Set<string>();
+    for (const tabSettingInfo of this.searchSettingInfo) {
+      const tabName = tabSettingInfo[0];
+      const tabSettings = tabSettingInfo[1];
+      for (const settingInfo of tabSettings) {
         // check the more common things first and then make sure to search the options since it will be slower to do that
-        if (settingInfo?.alias.includes(searchVal) || settingInfo.description.includes(searchVal) || settingInfo.name.includes(searchVal)) {
-          console.log(settingInfo.alias);
+        // Note: we check for an empty string for searchVal to see if the search is essentially empty which will display all rules
+        if (searchVal.trim() === '' || settingInfo.alias?.includes(searchVal) || settingInfo.description.includes(searchVal) || settingInfo.name.includes(searchVal)) {
+          console.log(settingInfo.name);
+          settingInfo.containerEl.style.display = 'block';
+
+          if (!tabsWithSettings.has(tabName)) {
+            tabsWithSettings.add(tabName);
+          }
         } else if (settingInfo.options) {
           for (const optionInfo of settingInfo.options) {
             if (optionInfo.description.toLowerCase().includes(searchVal) || optionInfo.name.toLowerCase().includes(searchVal)) {
-              console.log(settingInfo.alias);
+              settingInfo.containerEl.style.display = 'block';
+
+              if (!tabsWithSettings.has(tabName)) {
+                tabsWithSettings.add(tabName);
+              }
               break;
             } else if (optionInfo.options) {
               for (const optionsForOption of optionInfo.options) {
                 if (optionsForOption.description.toLowerCase().includes(searchVal) || optionsForOption.value.toLowerCase().includes(searchVal)) {
-                  console.log(settingInfo.alias);
+                  settingInfo.containerEl.style.display = 'block';
+
+                  if (!tabsWithSettings.has(tabName)) {
+                    tabsWithSettings.add(tabName);
+                  }
                   break;
                 }
               }
             }
+
+            settingInfo.containerEl.style.display = 'none';
           }
+        } else {
+          settingInfo.containerEl.style.display = 'none';
         }
       }
-    });
+    }
+
+    // display any headings that have setting results and hide any that do not
+    for (const tabInfo of this.tabContent) {
+      let display = 'none';
+      if (tabsWithSettings.has(tabInfo[0])) {
+        display = 'block';
+      }
+
+      tabInfo[1].heading.style.display = display;
+    }
+
+    if (tabsWithSettings.size === 0) {
+      this.searchZeroState.style.display = 'block';
+    } else {
+      this.searchZeroState.style.display = 'none';
+    }
+  }
+
+  private createSearchZeroState(containerEl: HTMLElement) {
+    this.searchZeroState = containerEl.createDiv();
+    this.searchZeroState.style.display = 'none';
+    this.searchZeroState.createEl('h2', {text: 'No settings match search'}).style.textAlign = 'center';
+  }
+
+  private addSettingToMasterSettingsList(tabName: string, containerEl: HTMLDivElement, name: string = '', description: string = '', options: SearchOptionInfo[] = null, alias: string = null) {
+    const settingInfo = {containerEl: containerEl, name: name.toLowerCase(), description: description.toLowerCase(), options: options, alias: alias};
+
+    if (!this.searchSettingInfo.has(tabName)) {
+      this.searchSettingInfo.set(tabName, [settingInfo]);
+    } else {
+      this.searchSettingInfo.get(tabName).push(settingInfo);
+    }
   }
 }
