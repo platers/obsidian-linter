@@ -136,7 +136,7 @@ export class Example {
   }
 }
 
-const RuleTypeOrder = Object.values(RuleType);
+export const RuleTypeOrder = Object.values(RuleType);
 
 /**
  * Returns a list of ignored rules in the YAML frontmatter of the text.
