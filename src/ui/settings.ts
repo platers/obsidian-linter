@@ -1,4 +1,4 @@
-import {App, PluginSettingTab, SearchComponent, Setting} from 'obsidian';
+import {App, Platform, PluginSettingTab, SearchComponent, Setting} from 'obsidian';
 import LinterPlugin from 'src/main';
 import {LintCommand, Rule, rules} from 'src/rules';
 import {moment} from 'obsidian';
@@ -7,14 +7,6 @@ import {SearchOptionInfo} from 'src/option';
 
 type settingSearchInfo = {containerEl: HTMLDivElement, name: string, description: string, options: SearchOptionInfo[], alias?: string}
 type TabContentInfo = {content: HTMLDivElement, heading: HTMLElement, navButton: HTMLElement}
-
-// const yamlRuleTypeToIconName: Record<RuleType, string> = {
-//   [RuleType.YAML]: 'three-horizontal-bars',
-//   [RuleType.CONTENT]: 'lines-of-text',
-//   [RuleType.FOOTNOTE]: 'box-glyph',
-//   [RuleType.HEADING]: 'heading-glyph',
-//   [RuleType.SPACING]: 'up-and-down-arrows',
-// };
 
 export class SettingTab extends PluginSettingTab {
   plugin: LinterPlugin;
@@ -34,33 +26,32 @@ export class SettingTab extends PluginSettingTab {
 
     containerEl.empty();
 
-    const linterHeader = containerEl.createDiv('linter-setting-title');
-    linterHeader.createEl('h1').setText('Linter');
+    this.generateSettingsTitle(containerEl, Platform.isMobile);
 
-    const navEl = containerEl.createEl('nav', {cls: 'linter-setting-header'}).createDiv('linter-setting-tab-group');
+    const navContainer = containerEl.createEl('nav', {cls: 'linter-setting-header'});
+    const navEl = navContainer.createDiv('linter-setting-tab-group');
     const settingsEl = containerEl.createDiv('linter-setting-content');
 
-    this.createTabAndContent('General', navEl, settingsEl, !this.selectedTab || this.selectedTab === 'General', (el: HTMLElement) => this.generateGeneralSettings('General', el));
+    this.createTabAndContent('General', navEl, settingsEl, (el: HTMLElement, tabName: string) => this.generateGeneralSettings(tabName, el));
 
     let prevSection = '';
     let tabTitle = '';
-
     for (const rule of rules) {
       if (rule.type !== prevSection) {
         tabTitle = rule.type;
-        this.createTabAndContent(tabTitle, navEl, settingsEl, this.selectedTab === tabTitle);
+        this.createTabAndContent(tabTitle, navEl, settingsEl);
         prevSection = rule.type;
       }
 
       this.addRuleToTab(tabTitle, rule);
     }
 
-    this.createTabAndContent('Custom Commands', navEl, settingsEl, this.selectedTab === 'Custom Commands', (el: HTMLElement) => this.generateCustomCommandSettings('Custom Commands', el));
-    this.generateSearchBar(linterHeader);
+    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => this.generateCustomCommandSettings(tabName, el));
     this.createSearchZeroState(settingsEl);
   }
 
-  createTabAndContent(tabName: string, navEl: HTMLElement, containerEl: HTMLElement, displayTabContent: boolean = false, generateTabContent?: (el: HTMLElement) => void) {
+  createTabAndContent(tabName: string, navEl: HTMLElement, containerEl: HTMLElement, generateTabContent?: (el: HTMLElement, tabName: string) => void) {
+    const displayTabContent = this.selectedTab === tabName;
     const tabEl = navEl.createDiv('linter-navigation-item');
     tabEl.setText(tabName);
     tabEl.onclick = () => {
@@ -70,26 +61,27 @@ export class SettingTab extends PluginSettingTab {
 
       tabEl.addClass('linter-navigation-item-selected');
       const tab = this.tabContent.get(tabName);
-      tab.content.style.display = 'block';
+      this.unhideEl(tab.content);
 
       if (this.selectedTab != '') {
         const tabInfo = this.tabContent.get(this.selectedTab);
         tabInfo.navButton.removeClass('linter-navigation-item-selected');
-        tabInfo.content.style.display = 'none';
+        this.hideEl(tabInfo.content);
       } else {
-        this.searchZeroState.style.display = 'none';
+        this.hideEl(this.searchZeroState);
+
 
         for (const settingTab of this.searchSettingInfo) {
           for (const setting of settingTab[1]) {
-            setting.containerEl.style.display = 'block';
+            this.unhideEl(setting.containerEl);
           }
         }
 
         for (const tabInfo of this.tabContent) {
           const tab = tabInfo[1];
-          tab.heading.style.display = 'none';
+          this.hideEl(tab.heading);
           if (tabName !== tabInfo[0]) {
-            tab.content.style.display = 'none';
+            this.hideEl(tab.content);
           }
         }
       }
@@ -98,18 +90,19 @@ export class SettingTab extends PluginSettingTab {
     };
 
     const tabContent = containerEl.createDiv('linter-tab-settings');
+
     const tabHeader = tabContent.createEl('h2', {text: tabName + ' Settings'});
-    tabHeader.style.display = 'none';
+    this.hideEl(tabHeader);
 
     tabContent.id = tabName.toLowerCase().replace(' ', '-');
     if (!displayTabContent) {
-      tabContent.style.display = 'none';
+      this.hideEl(tabContent);
     } else {
       tabEl.addClass('linter-navigation-item-selected');
     }
 
     if (generateTabContent) {
-      generateTabContent(tabContent);
+      generateTabContent(tabContent, tabName);
     }
 
     this.tabContent.set(tabName, {content: tabContent, heading: tabHeader, navButton: tabEl});
@@ -123,7 +116,7 @@ export class SettingTab extends PluginSettingTab {
 
     const ruleDiv = containerEl.createDiv();
     ruleDiv.id = rule.alias();
-    ruleDiv.createEl('h3', {}, (el) => {
+    ruleDiv.createEl(Platform.isMobile ? 'h4' : 'h3', {}, (el) => {
       el.innerHTML = `<a href="${rule.getURL()}">${rule.name}</a>`;
     });
 
@@ -312,8 +305,8 @@ export class SettingTab extends PluginSettingTab {
       for (const tabInfo of this.tabContent) {
         const tab = tabInfo[1];
         tab.navButton.removeClass('linter-navigation-item-selected');
-        tab.content.style.display = 'block';
-        tab.heading.style.display = 'block';
+        this.unhideEl(tab.content);
+        this.unhideEl(tab.heading);
 
         const searchVal = this.search.getValue();
         if (this.selectedTab == '' && searchVal.trim() != '') {
@@ -329,8 +322,28 @@ export class SettingTab extends PluginSettingTab {
     });
   }
 
+  private generateSettingsTitle(containerEl: HTMLElement, isMobile: boolean) {
+    const linterHeader = containerEl.createDiv('linter-setting-title');
+    if (isMobile) {
+      linterHeader.addClass('linter-mobile');
+    } else {
+      linterHeader.createEl('h1').setText('Linter');
+    }
+
+    this.generateSearchBar(linterHeader);
+  }
+
   private searchSettings(searchVal: string) {
-    const tabsWithSettings = new Set<string>();
+    const tabsWithSettingsInSearchResults = new Set<string>();
+    const that = this;
+    const showSearchResultAndAddTabToResultList = function(settingContainer: HTMLElement, tabName: string) {
+      that.unhideEl(settingContainer);
+
+      if (!tabsWithSettingsInSearchResults.has(tabName)) {
+        tabsWithSettingsInSearchResults.add(tabName);
+      }
+    };
+
     for (const tabSettingInfo of this.searchSettingInfo) {
       const tabName = tabSettingInfo[0];
       const tabSettings = tabSettingInfo[1];
@@ -338,62 +351,50 @@ export class SettingTab extends PluginSettingTab {
         // check the more common things first and then make sure to search the options since it will be slower to do that
         // Note: we check for an empty string for searchVal to see if the search is essentially empty which will display all rules
         if (searchVal.trim() === '' || settingInfo.alias?.includes(searchVal) || settingInfo.description.includes(searchVal) || settingInfo.name.includes(searchVal)) {
-          console.log(settingInfo.name);
-          settingInfo.containerEl.style.display = 'block';
-
-          if (!tabsWithSettings.has(tabName)) {
-            tabsWithSettings.add(tabName);
-          }
+          showSearchResultAndAddTabToResultList(settingInfo.containerEl, tabName);
         } else if (settingInfo.options) {
           for (const optionInfo of settingInfo.options) {
             if (optionInfo.description.toLowerCase().includes(searchVal) || optionInfo.name.toLowerCase().includes(searchVal)) {
-              settingInfo.containerEl.style.display = 'block';
+              showSearchResultAndAddTabToResultList(settingInfo.containerEl, tabName);
 
-              if (!tabsWithSettings.has(tabName)) {
-                tabsWithSettings.add(tabName);
-              }
               break;
             } else if (optionInfo.options) {
               for (const optionsForOption of optionInfo.options) {
                 if (optionsForOption.description.toLowerCase().includes(searchVal) || optionsForOption.value.toLowerCase().includes(searchVal)) {
-                  settingInfo.containerEl.style.display = 'block';
+                  showSearchResultAndAddTabToResultList(settingInfo.containerEl, tabName);
 
-                  if (!tabsWithSettings.has(tabName)) {
-                    tabsWithSettings.add(tabName);
-                  }
                   break;
                 }
               }
             }
 
-            settingInfo.containerEl.style.display = 'none';
+            this.hideEl(settingInfo.containerEl);
           }
         } else {
-          settingInfo.containerEl.style.display = 'none';
+          this.hideEl(settingInfo.containerEl);
         }
       }
     }
 
     // display any headings that have setting results and hide any that do not
     for (const tabInfo of this.tabContent) {
-      let display = 'none';
-      if (tabsWithSettings.has(tabInfo[0])) {
-        display = 'block';
+      if (tabsWithSettingsInSearchResults.has(tabInfo[0])) {
+        this.unhideEl(tabInfo[1].heading);
+      } else {
+        this.hideEl(tabInfo[1].heading);
       }
-
-      tabInfo[1].heading.style.display = display;
     }
 
-    if (tabsWithSettings.size === 0) {
-      this.searchZeroState.style.display = 'block';
+    if (tabsWithSettingsInSearchResults.size === 0) {
+      this.unhideEl(this.searchZeroState);
     } else {
-      this.searchZeroState.style.display = 'none';
+      this.hideEl(this.searchZeroState);
     }
   }
 
   private createSearchZeroState(containerEl: HTMLElement) {
     this.searchZeroState = containerEl.createDiv();
-    this.searchZeroState.style.display = 'none';
+    this.hideEl(this.searchZeroState);
     this.searchZeroState.createEl('h2', {text: 'No settings match search'}).style.textAlign = 'center';
   }
 
@@ -405,5 +406,13 @@ export class SettingTab extends PluginSettingTab {
     } else {
       this.searchSettingInfo.get(tabName).push(settingInfo);
     }
+  }
+
+  private hideEl(el: HTMLElement) {
+    el.addClass('linter-visually-hidden');
+  }
+
+  private unhideEl(el: HTMLElement) {
+    el.removeClass('linter-visually-hidden');
   }
 }
