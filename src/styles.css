@@ -32,13 +32,13 @@
 @media screen and (max-width: 1325px) {
   .linter-navigation-item.linter-desktop {
 		max-width: 32px;
-	}
+  }
 }
 
 @media screen and (max-width: 800px) {
   .linter-navigation-item.linter-mobile {
 		max-width: 32px;
-	}
+  }
 }
 
 .linter-navigation-item-icon {
