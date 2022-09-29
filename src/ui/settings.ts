@@ -151,7 +151,7 @@ export class SettingTab extends PluginSettingTab {
   }
 
   generateCustomCommandSettings(tabName: string, containerEl: HTMLElement): void {
-    containerEl.createEl('h3', {text: 'Custom Commands'});
+    containerEl.createEl(Platform.isMobile ? 'h4' : 'h3', {text: 'Custom Commands'});
     const descriptionP1 = `Custom commands are Obsidian commands that get run after the linter is finished running its regular rules.
     This means that they do not run before the YAML timestamp logic runs, so they can cause YAML timestamp to be triggered on the next run of the linter.
     You may only select an Obsidian command once. **_Note that this currently only works on linting the current file._**`;
@@ -418,7 +418,7 @@ export class SettingTab extends PluginSettingTab {
   private createSearchZeroState(containerEl: HTMLElement) {
     this.searchZeroState = containerEl.createDiv();
     this.hideEl(this.searchZeroState);
-    this.searchZeroState.createEl('h2', {text: 'No settings match search'}).style.textAlign = 'center';
+    this.searchZeroState.createEl(Platform.isMobile ? 'h3' : 'h2', {text: 'No settings match search'}).style.textAlign = 'center';
   }
 
   private addSettingToMasterSettingsList(tabName: string, containerEl: HTMLDivElement, name: string = '', description: string = '', options: SearchOptionInfo[] = null, alias: string = null) {
