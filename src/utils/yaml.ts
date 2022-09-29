@@ -38,15 +38,15 @@ export function toSingleLineArrayYamlString<T>(arr: T[]): string {
 }
 
 function getYamlSectionRegExp(rawKey: string): RegExp {
-  return new RegExp(`${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`);
+  return new RegExp(`^([\\t ]*)${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm');
 }
 
 export function setYamlSection(yaml: string, rawKey: string, rawValue: string): string {
   const yamlSectionEscaped = `${rawKey}:${rawValue}\n`;
   let isReplaced = false;
-  let result = yaml.replace(getYamlSectionRegExp(rawKey), () => {
+  let result = yaml.replace(getYamlSectionRegExp(rawKey), (_, $1: string) => {
     isReplaced = true;
-    return yamlSectionEscaped;
+    return $1 + yamlSectionEscaped;
   });
   if (!isReplaced) {
     result = `${yaml}${yamlSectionEscaped}`;
@@ -56,7 +56,7 @@ export function setYamlSection(yaml: string, rawKey: string, rawValue: string): 
 
 export function getYamlSectionValue(yaml: string, rawKey: string): string | null {
   const match = yaml.match(getYamlSectionRegExp(rawKey));
-  const result = match == null ? null : match[1];
+  const result = match == null ? null : match[2];
   return result;
 }
 
