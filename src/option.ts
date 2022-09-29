@@ -1,7 +1,7 @@
 import {Setting} from 'obsidian';
 import LinterPlugin from './main';
 import {LinterSettings} from './rules';
-import {convertRegularMarkdownLinksToHTMLLinks} from './utils/mdast';
+import {parseTextToHTMLWithoutOuterParagraph} from './utils/mdast';
 
 export type SearchOptionInfo = {name: string, description: string, options?: DropdownRecord[]}
 
@@ -44,8 +44,6 @@ export class BooleanOption extends Option {
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
     const setting = new Setting(containerEl)
-        .setName(this.name)
-        .setDesc(this.description)
         .addToggle((toggle) => {
           toggle.setValue(settings.ruleConfigs[this.ruleName][this.name]);
           toggle.onChange((value) => {
@@ -55,7 +53,9 @@ export class BooleanOption extends Option {
           });
         });
 
-    makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting);
+    setting.nameEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.name);
+    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.description);
+
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
   }
@@ -66,8 +66,6 @@ export class TextOption extends Option {
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
     const setting = new Setting(containerEl)
-        .setName(this.name)
-        .setDesc(this.description)
         .addText((textbox) => {
           textbox.setValue(settings.ruleConfigs[this.ruleName][this.name]);
           textbox.onChange((value) => {
@@ -77,7 +75,9 @@ export class TextOption extends Option {
           });
         });
 
-    makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting);
+    setting.nameEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.name);
+    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.description);
+
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
   }
@@ -88,8 +88,6 @@ export class TextAreaOption extends Option {
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
     const setting = new Setting(containerEl)
-        .setName(this.name)
-        .setDesc(this.description)
         .addTextArea((textbox) => {
           textbox.setValue(settings.ruleConfigs[this.ruleName][this.name]);
           textbox.onChange((value) => {
@@ -99,7 +97,9 @@ export class TextAreaOption extends Option {
           });
         });
 
-    makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting);
+    setting.nameEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.name);
+    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.description);
+
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
   }
@@ -110,8 +110,6 @@ export class MomentFormatOption extends Option {
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
     const setting = new Setting(containerEl)
-        .setName(this.name)
-        .setDesc(this.description)
         .addMomentFormat((format) => {
           format.setValue(settings.ruleConfigs[this.ruleName][this.name]);
           format.setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a');
@@ -122,7 +120,9 @@ export class MomentFormatOption extends Option {
           });
         });
 
-    makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting);
+    setting.nameEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.name);
+    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.description);
+
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
   }
@@ -150,8 +150,6 @@ export class DropdownOption extends Option {
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
     const setting = new Setting(containerEl)
-        .setName(this.name)
-        .setDesc(this.description)
         .addDropdown((dropdown) => {
         // First, add all the available options
           for (const option of this.options) {
@@ -168,13 +166,10 @@ export class DropdownOption extends Option {
           });
         });
 
-    makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting);
+    setting.nameEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.name);
+    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.description);
+
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
   }
-}
-
-function makeSureSettingNameAndDescriptionHaveHTMlLinksInsteadOfMarkdownLinks(setting: Setting) {
-  setting.nameEl.innerHTML = convertRegularMarkdownLinksToHTMLLinks(setting.nameEl.innerHTML);
-  setting.descEl.innerHTML = convertRegularMarkdownLinksToHTMLLinks(setting.descEl.innerHTML);
 }

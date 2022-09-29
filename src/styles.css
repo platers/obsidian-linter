@@ -11,6 +11,10 @@
   font-weight: bold;
   font-size: 16px;
 
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+
   padding: 4px 6px;
   align-items: center;
   gap: 4px;
@@ -25,6 +29,22 @@
   height: 32px;
 }
 
+@media screen and (max-width: 1325px) {
+  .linter-navigation-item.linter-desktop {
+		max-width: 32px;
+	}
+}
+
+@media screen and (max-width: 800px) {
+  .linter-navigation-item.linter-mobile {
+		max-width: 32px;
+	}
+}
+
+.linter-navigation-item-icon {
+  padding-top: 5px;
+}
+
 .linter-navigation-item:hover {
   border-color: var(--interactive-accent-hover);
   border-bottom: 0px;
@@ -34,7 +54,7 @@
   background-color: var(--interactive-accent) !important;
   color: var(--text-on-accent);
   padding: 4px 9px !important;
-  max-width: 200px;
+  max-width: 200px !important;
   border: 1px solid var(--background-modifier-border);
   border-radius: 8px 8px 2px 2px;
   border-bottom: 0px;
@@ -83,12 +103,6 @@
   padding-left: 2px;
   padding-right: 2px;
   border-bottom: 2px solid var(--background-modifier-border);
-}
-
-@media screen and (max-width: 680px) {
-  .linter-setting-header .linter-setting-tab-group {
-    justify-content: space-evenly;
-  }
 }
 
 .linter-setting-header .linter-tab-settings {

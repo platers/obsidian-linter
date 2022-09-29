@@ -6,6 +6,8 @@ import {escapeRegExp, genericLinkRegex} from './regex';
 import {remark} from 'remark';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import rehypeStringify from 'rehype-stringify';
+import remarkRehype from 'remark-rehype';
 
 export enum MDAstTypes {
   Link = 'link',
@@ -39,6 +41,19 @@ export enum OrderListItemEndOfIndicatorStyles {
 function parseTextToAST(text: string): Root {
   const ast = remark().use(remarkGfm).use(remarkMath).parse(text);
   return ast;
+}
+
+export function parseTextToHTMLWithoutOuterParagraph(text: string): string {
+  let htmlString = String(remark().use(remarkGfm).use(remarkMath).use(remarkRehype).use(rehypeStringify).processSync(text)).trim();
+  if (htmlString.startsWith('<p>')) {
+    htmlString = htmlString.substring(3);
+  }
+
+  if (htmlString.endsWith('</p>')) {
+    htmlString = htmlString.substring(0, htmlString.length - 4);
+  }
+
+  return htmlString;
 }
 
 /**
@@ -452,28 +467,6 @@ export function ensureEmptyLinesAroundTables(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Table, text);
   for (const position of positions) {
     text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
-  }
-
-  return text;
-}
-
-export function convertRegularMarkdownLinksToHTMLLinks(text: string): string {
-  const positions: Position[] = getPositions(MDAstTypes.Link, text);
-
-  for (const position of positions) {
-    if (position == null) {
-      continue;
-    }
-
-    const regularLink = text.substring(position.start.offset, position.end.offset);
-    // skip links that are not are not in markdown format
-    if (!regularLink.match(genericLinkRegex)) {
-      continue;
-    }
-
-    const endLinkTextPosition = regularLink.indexOf(']');
-    const htmlLink = '<a href="' + regularLink.substring(endLinkTextPosition+2, regularLink.length - 1)+ '">' + regularLink.substring(1, endLinkTextPosition) + '</a>';
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, htmlLink);
   }
 
   return text;
