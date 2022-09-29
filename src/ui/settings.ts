@@ -1,12 +1,24 @@
-import {App, Platform, PluginSettingTab, SearchComponent, Setting} from 'obsidian';
+import {App, Platform, PluginSettingTab, SearchComponent, setIcon, Setting} from 'obsidian';
 import LinterPlugin from 'src/main';
-import {LintCommand, Rule, rules} from 'src/rules';
+import {LintCommand, Rule, rules, RuleType} from 'src/rules';
 import {moment} from 'obsidian';
 import CommandSuggester from './suggesters/command-suggester';
 import {SearchOptionInfo} from 'src/option';
+import {iconInfo} from 'src/icons';
+import {parseTextToHTMLWithoutOuterParagraph} from 'src/utils/mdast';
 
 type settingSearchInfo = {containerEl: HTMLDivElement, name: string, description: string, options: SearchOptionInfo[], alias?: string}
 type TabContentInfo = {content: HTMLDivElement, heading: HTMLElement, navButton: HTMLElement}
+
+const tabNameToTabIconId: Record<string | RuleType, string> = {
+  'General': iconInfo.general.id,
+  'Custom': iconInfo.custom.id,
+  'YAML': iconInfo.yaml.id,
+  'Heading': iconInfo.heading.id,
+  'Footnote': iconInfo.footer.id,
+  'Content': iconInfo.content.id,
+  'Spacing': iconInfo.whitespace.id,
+};
 
 export class SettingTab extends PluginSettingTab {
   plugin: LinterPlugin;
@@ -53,7 +65,16 @@ export class SettingTab extends PluginSettingTab {
   createTabAndContent(tabName: string, navEl: HTMLElement, containerEl: HTMLElement, generateTabContent?: (el: HTMLElement, tabName: string) => void) {
     const displayTabContent = this.selectedTab === tabName;
     const tabEl = navEl.createDiv('linter-navigation-item');
-    tabEl.setText(tabName);
+
+    let tabClass = 'linter-desktop';
+    if (Platform.isMobile) {
+      tabClass = 'linter-mobile';
+    }
+
+    tabEl.addClass(tabClass);
+    setIcon(tabEl.createSpan({cls: 'linter-navigation-item-icon'}), tabNameToTabIconId[tabName], 20);
+    tabEl.createSpan().setText(tabName);
+
     tabEl.onclick = () => {
       if (this.selectedTab == tabName) {
         return;
@@ -130,15 +151,16 @@ export class SettingTab extends PluginSettingTab {
   }
 
   generateCustomCommandSettings(tabName: string, containerEl: HTMLElement): void {
+    containerEl.createEl('h3', {text: 'Custom Commands'});
     const descriptionP1 = `Custom commands are Obsidian commands that get run after the linter is finished running its regular rules.
-    This means that they do not run before the yaml timestamp logic runs, so they can cause yaml timestamp to be triggered on the next run of the linter.
-    You may only select an Obsidian command once. Note that this currently only works on linting the current file.`;
+    This means that they do not run before the YAML timestamp logic runs, so they can cause YAML timestamp to be triggered on the next run of the linter.
+    You may only select an Obsidian command once. **_Note that this currently only works on linting the current file._**`;
     const descriptionP2 = `When selecting an option, make sure to select the option either by using the mouse or by hitting the enter key.
     Other selection methods may not work and only selections of an actual Obsidian command or an empty string will be saved.`;
 
     this.addSettingToMasterSettingsList(tabName, containerEl as HTMLDivElement, tabName.toLowerCase(), descriptionP1.replaceAll('\n', ' ') + descriptionP2.replaceAll('\n', ' '));
 
-    containerEl.createEl('p', {text: descriptionP1});
+    containerEl.createEl('p').innerHTML = parseTextToHTMLWithoutOuterParagraph(descriptionP1);
     containerEl.createEl('p', {text: descriptionP2}).style.color = '#EED202';
 
     function arrayMove(arr: LintCommand[], fromIndex: number, toIndex: number):void {
@@ -219,9 +241,8 @@ export class SettingTab extends PluginSettingTab {
     let tempDiv = containerEl.createDiv();
     let settingName = 'Lint on save';
     let settingDesc = 'Lint the file on manual save (when `Ctrl + S` is pressed or when `:w` is executed while using vim keybindings)';
-    new Setting(tempDiv)
+    const setting = new Setting(tempDiv)
         .setName(settingName)
-        .setDesc(settingDesc)
         .addToggle((toggle) => {
           toggle
               .setValue(this.plugin.settings.lintOnSave)
@@ -230,6 +251,8 @@ export class SettingTab extends PluginSettingTab {
                 await this.plugin.saveSettings();
               });
         });
+
+    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(settingDesc);
 
     this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
 
