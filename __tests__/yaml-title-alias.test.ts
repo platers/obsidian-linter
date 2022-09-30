@@ -1000,5 +1000,22 @@ ruleTest({
         preserveExistingAliasesSectionStyle: false,
       },
     },
+    {
+      testName: 'Removes empty alias section if title matches the filename',
+      before: dedent`
+        ---
+        aliases:
+        ---
+        # Filename
+      `,
+      after: dedent`
+        ---
+        ---
+        # Filename
+      `,
+      options: {
+        fileName: 'Filename',
+      },
+    },
   ],
 });

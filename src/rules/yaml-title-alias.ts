@@ -79,7 +79,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     const getNewAliasValue = function(originalValue: string |string[], shouldRemoveTitle: boolean): string |string[] {
       if (originalValue == null) {
-        return title;
+        return shouldRemoveTitle ? '' : title;
       }
 
       if (typeof originalValue === 'string') {
