@@ -12,10 +12,10 @@ export default class EmptyLineAroundBlockquotes extends RuleBuilder<EmptyLineAro
     return EmptyLineAroundBlockquotesOptions;
   }
   get name(): string {
-    return 'Empty Line Around Code Fences';
+    return 'Empty Line Around Blockquotes';
   }
   get description(): string {
-    return 'Ensures that there is an empty line around code fences unless they start or end a document.';
+    return 'Ensures that there is an empty line around blockquotes unless they start or end a document. **Note that an empty line is either one less level of indentation for blockquotes or a newline character and both are acceptable for blockquotes.**';
   }
   get type(): RuleType {
     return RuleType.SPACING;
@@ -54,7 +54,7 @@ export default class EmptyLineAroundBlockquotes extends RuleBuilder<EmptyLineAro
         `,
       }),
       new ExampleBuilder({
-        description: 'Blockquotes that are nested the proper empty line added',
+        description: 'Blockquotes that are nested have the proper empty line added',
         before: dedent`
           # Make sure that nested blockquotes are accounted for correctly
           > Quote content here

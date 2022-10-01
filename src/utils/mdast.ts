@@ -1,8 +1,8 @@
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
-import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
-import {escapeRegExp, genericLinkRegex} from './regex';
+import {makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue} from './strings';
+import {genericLinkRegex} from './regex';
 import {remark} from 'remark';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -389,82 +389,6 @@ export function updateListItemText(text: string, func:(text: string) => string):
   }
 
   return text;
-}
-
-function textMatches(expectedText: string, actualText: string, requireSameTrailingWhitespace: boolean): boolean {
-  if (requireSameTrailingWhitespace) {
-    return expectedText == actualText;
-  }
-
-  return actualText.match(new RegExp('^' + escapeRegExp(expectedText) + '( |\\t)*$', 'm')) != null;
-}
-
-function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number, isForBlockquote: boolean = false): string {
-  const content = text.substring(start, end);
-  let startOfLine = '';
-  let requireSameTrailingWhitespace = true;
-  let contentPriorToContent = text.substring(0, start);
-  if (contentPriorToContent.length > 0) {
-    const contentLinesPriorToContent = contentPriorToContent.split('\n');
-    startOfLine = contentLinesPriorToContent[contentLinesPriorToContent.length - 1] ?? '';
-
-    requireSameTrailingWhitespace = startOfLine.trim() == '';
-    if (!requireSameTrailingWhitespace) {
-      startOfLine = startOfLine.trimEnd();
-
-      // if dealing with empty blank lines for blockquotes, then remove one level of nesting and use that as the empty line
-      if (isForBlockquote) {
-        const indexOfBlockquoteIndicator = startOfLine.indexOf('>');
-
-        if (indexOfBlockquoteIndicator !== -1) {
-          startOfLine = startOfLine.substring(0, indexOfBlockquoteIndicator).trimEnd();
-        }
-      }
-    }
-
-    let numberOfIndexesToRemove = 0;
-    while (contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove) >= 0) {
-      const lineContent = contentLinesPriorToContent[contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove)];
-      if (!textMatches(startOfLine, lineContent, requireSameTrailingWhitespace) && (!isForBlockquote || !textMatches('', lineContent, true))) {
-        break;
-      }
-
-      numberOfIndexesToRemove++;
-    }
-
-    contentLinesPriorToContent.splice(contentLinesPriorToContent.length - (1 + numberOfIndexesToRemove), numberOfIndexesToRemove);
-
-    if (contentLinesPriorToContent.length > 1 && !textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - 2], requireSameTrailingWhitespace)) {
-      contentLinesPriorToContent.splice(contentLinesPriorToContent.length - 1, 0, startOfLine);
-    }
-
-    contentPriorToContent = contentLinesPriorToContent.join('\n');
-  }
-
-  let contentAfterContent = text.substring(end);
-  if (contentAfterContent.length > 0) {
-    const contentLinesAfterBlock = contentAfterContent.split('\n');
-    let numberOfIndexesToRemove = 0;
-    while (numberOfIndexesToRemove + 1 < contentLinesAfterBlock.length) {
-      const lineContent = contentLinesAfterBlock[1+numberOfIndexesToRemove];
-      if (!textMatches(startOfLine, lineContent, requireSameTrailingWhitespace) && (!isForBlockquote || !textMatches('', lineContent, true))) {
-        break;
-      }
-
-      numberOfIndexesToRemove++;
-    }
-
-    contentLinesAfterBlock.splice(1, numberOfIndexesToRemove);
-
-    if (contentLinesAfterBlock.length > 1 && !textMatches(startOfLine, contentLinesAfterBlock[1], requireSameTrailingWhitespace)) {
-      contentLinesAfterBlock.splice(1, 0, startOfLine);
-    }
-
-    contentAfterContent = contentLinesAfterBlock.join('\n');
-  }
-
-
-  return contentPriorToContent + content + contentAfterContent;
 }
 
 export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
