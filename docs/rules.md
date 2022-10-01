@@ -2372,6 +2372,88 @@ After:
 		- text indented with 6 spaces
 ``````
 
+### Empty Line Around Blockquotes
+
+Alias: `empty-line-around-blockquotes`
+
+Ensures that there is an empty line around blockquotes unless they start or end a document. **Note that an empty line is either one less level of nesting for blockquotes or a newline character.**
+
+
+
+Example: Blockquotes that start a document do not get an empty line before them.
+
+Before:
+
+``````markdown
+> Quote content here
+> quote content continued
+# Title here
+``````
+
+After:
+
+``````markdown
+> Quote content here
+> quote content continued
+
+# Title here
+``````
+Example: Blockquotes that end a document do not get an empty line after them.
+
+Before:
+
+``````markdown
+# Heading 1
+> Quote content here
+> quote content continued
+``````
+
+After:
+
+``````markdown
+# Heading 1
+
+> Quote content here
+> quote content continued
+``````
+Example: Blockquotes that are nested have the proper empty line added
+
+Before:
+
+``````markdown
+# Make sure that nested blockquotes are accounted for correctly
+> Quote content here
+> quote content continued
+> > Nested Blockquote
+> > content continued
+
+**Note that the empty line is either one less blockquote indicator if followed/proceeded by more blockquote content or it is an empty line**
+
+# Doubly nested code block
+
+> > Quote content here
+> > quote content continued
+``````
+
+After:
+
+``````markdown
+# Make sure that nested blockquotes are accounted for correctly
+
+> Quote content here
+> quote content continued
+>
+> > Nested Blockquote
+> > content continued
+
+**Note that the empty line is either one less blockquote indicator if followed/proceeded by more blockquote content or it is an empty line**
+
+# Doubly nested code block
+
+> > Quote content here
+> > quote content continued
+``````
+
 ### Empty Line Around Code Fences
 
 Alias: `empty-line-around-code-fences`

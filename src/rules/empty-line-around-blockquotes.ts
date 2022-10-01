@@ -15,7 +15,7 @@ export default class EmptyLineAroundBlockquotes extends RuleBuilder<EmptyLineAro
     return 'Empty Line Around Blockquotes';
   }
   get description(): string {
-    return 'Ensures that there is an empty line around blockquotes unless they start or end a document. **Note that an empty line is either one less level of indentation for blockquotes or a newline character and both are acceptable for blockquotes.**';
+    return 'Ensures that there is an empty line around blockquotes unless they start or end a document. **Note that an empty line is either one less level of nesting for blockquotes or a newline character.**';
   }
   get type(): RuleType {
     return RuleType.SPACING;
