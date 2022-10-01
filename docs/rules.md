@@ -2086,6 +2086,167 @@ Even more content here
 
 ``````
 
+### Unordered List Style
+
+Alias: `unordered-list-style`
+
+Makes sure that unordered lists follow the style specified..
+
+Options:
+- List item style: The list item style to use in unordered lists
+	- Default: `consistent`
+	- `consistent`: Makes sure unordered list items use a consistent list item indicator in the file which will be based on the first list item found
+	- `-`: Makes sure unordered list items use `-` as their indicator
+	- `*`: Makes sure unordered list items use `*` as their indicator
+	- `+`: Makes sure unordered list items use `+` as their indicator
+
+Example: Unordered lists have their indicator updated to `*` when `List item style = 'consistent'` and `*` is the first unordered list indicator
+
+Before:
+
+``````markdown
+1. ordered item 1
+2. ordered item 2
+
+Checklists should be ignored
+- [ ] Checklist item 1
+- [x] completed item
+
+* Item 1
+  - Sublist 1 item 1
+  - Sublist 1 item 2
+- Item 2
+  + Sublist 2 item 1
+  + Sublist 2 item 2
++ Item 3
+  * Sublist 3 item 1
+  * Sublist 3 item 2
+
+``````
+
+After:
+
+``````markdown
+1. ordered item 1
+2. ordered item 2
+
+Checklists should be ignored
+- [ ] Checklist item 1
+- [x] completed item
+
+* Item 1
+  * Sublist 1 item 1
+  * Sublist 1 item 2
+* Item 2
+  * Sublist 2 item 1
+  * Sublist 2 item 2
+* Item 3
+  * Sublist 3 item 1
+  * Sublist 3 item 2
+
+``````
+Example: Unordered lists have their indicator updated to `-` when `List item style = '-'`
+
+Before:
+
+``````markdown
+- Item 1
+  * Sublist 1 item 1
+  * Sublist 1 item 2
+* Item 2
+  + Sublist 2 item 1
+  + Sublist 2 item 2
++ Item 3
+  - Sublist 3 item 1
+  - Sublist 3 item 2
+
+See that the ordered list is ignored, but its sublist is not
+
+1. Item 1
+  - Sub item 1
+1. Item 2
+  * Sub item 2
+1. Item 3
+  + Sub item 3
+``````
+
+After:
+
+``````markdown
+- Item 1
+  - Sublist 1 item 1
+  - Sublist 1 item 2
+- Item 2
+  - Sublist 2 item 1
+  - Sublist 2 item 2
+- Item 3
+  - Sublist 3 item 1
+  - Sublist 3 item 2
+
+See that the ordered list is ignored, but its sublist is not
+
+1. Item 1
+  - Sub item 1
+1. Item 2
+  - Sub item 2
+1. Item 3
+  - Sub item 3
+``````
+Example: Unordered lists have their indicator updated to `*` when `List item style = '*'`
+
+Before:
+
+``````markdown
+- Item 1
+  * Sublist 1 item 1
+  * Sublist 1 item 2
+* Item 2
+  + Sublist 2 item 1
+  + Sublist 2 item 2
++ Item 3
+  - Sublist 3 item 1
+  - Sublist 3 item 2
+
+``````
+
+After:
+
+``````markdown
+* Item 1
+  * Sublist 1 item 1
+  * Sublist 1 item 2
+* Item 2
+  * Sublist 2 item 1
+  * Sublist 2 item 2
+* Item 3
+  * Sublist 3 item 1
+  * Sublist 3 item 2
+
+``````
+Example: Unordered list in blockquote has list item indicators set to `+` when `List item style = '-'`
+
+Before:
+
+``````markdown
+> - Item 1
+> + Item 2
+> > * Subitem 1
+> > + Subitem 2
+> >   - Sub sub item 1
+> > - Subitem 3
+``````
+
+After:
+
+``````markdown
+> + Item 1
+> + Item 2
+> > + Subitem 1
+> > + Subitem 2
+> >   + Sub sub item 1
+> > + Subitem 3
+``````
+
 ## Spacing
 ### Compact YAML
 
