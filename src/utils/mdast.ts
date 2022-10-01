@@ -42,6 +42,7 @@ export enum UnorderedListItemStyles {
   Plus = '+',
   Dash = '-',
   Asterisk = '*',
+  Consistent = 'consistent',
 }
 
 function parseTextToAST(text: string): Root {
@@ -542,14 +543,35 @@ export function updateUnorderedListItemIndicators(text: string, unorderedListSty
     return text;
   }
 
+  const orderedListAndCheckboxIndicatorRegex = /^((\d+[.)])|(- \[[ x]\]))/m;
+
+  let unorderedStyle: string = unorderedListStyle;
+  if (unorderedListStyle == UnorderedListItemStyles.Consistent) {
+    let i = positions.length - 1;
+    while (i >= 0) {
+      const listText = text.substring(positions[i].start.offset, positions[i].end.offset);
+      i--;
+      if (listText.match(orderedListAndCheckboxIndicatorRegex)) {
+        continue;
+      }
+
+      unorderedStyle = listText.charAt(0);
+      break;
+    }
+
+    if (i == -1) {
+      return text;
+    }
+  }
+
   for (const position of positions) {
     let listText = text.substring(position.start.offset, position.end.offset);
 
-    if (listText.match(/^\d+[.)]/)) {
+    if (listText.match(orderedListAndCheckboxIndicatorRegex)) {
       continue;
     }
 
-    listText = unorderedListStyle + listText.substring(1);
+    listText = unorderedStyle + listText.substring(1);
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, listText);
   }
