@@ -38,6 +38,12 @@ export enum OrderListItemEndOfIndicatorStyles {
   Parenthesis = ')',
 }
 
+export enum UnorderedListItemStyles {
+  Plus = '+',
+  Dash = '-',
+  Asterisk = '*',
+}
+
 function parseTextToAST(text: string): Root {
   const ast = remark().use(remarkGfm).use(remarkMath).parse(text);
   return ast;
@@ -498,7 +504,7 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
 
     const preListIndicatorLevelsToIndicatorNumber = new Map<number, number>();
     let lastItemListIndicatorLevel = -1;
-    listText = listText.replace(/^(( |\t|> )*)(\d(\.|\)))([^\n]*)$/gm, (_listItem: string, $1: string = '', _$2: string, _$3: string, _$4: string, $5: string) => {
+    listText = listText.replace(/^(( |\t|> )*)(\d+(\.|\)))([^\n]*)$/gm, (_listItem: string, $1: string = '', _$2: string, _$3: string, _$4: string, $5: string) => {
       let listItemIndicatorNumber = 1;
 
       const listItemIndicatorLevel = getListItemLevel($1);
@@ -525,6 +531,27 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
     });
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, start, position.end.offset, listText);
+  }
+
+  return text;
+}
+
+export function updateUnorderedListItemIndicators(text: string, unorderedListStyle: UnorderedListItemStyles): string {
+  const positions: Position[] = getPositions(MDAstTypes.ListItem, text);
+  if (!positions) {
+    return text;
+  }
+
+  for (const position of positions) {
+    let listText = text.substring(position.start.offset, position.end.offset);
+
+    if (listText.match(/^\d+[.)]/)) {
+      continue;
+    }
+
+    listText = unorderedListStyle + listText.substring(1);
+
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, listText);
   }
 
   return text;

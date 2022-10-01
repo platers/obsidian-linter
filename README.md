@@ -77,6 +77,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [remove-multiple-spaces](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-multiple-spaces)
 - [strong-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#strong-style)
 - [two-spaces-between-lines-with-content](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#two-spaces-between-lines-with-content)
+- [unordered-list-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#unordered-list-style)
 
 ### Spacing rules
 
