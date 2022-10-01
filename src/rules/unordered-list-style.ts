@@ -18,7 +18,7 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
     return 'Unordered List Style';
   }
   get description(): string {
-    return 'Makes sure that unordered lists follow the style specified..';
+    return 'Makes sure that unordered lists follow the style specified.';
   }
   get type(): RuleType {
     return RuleType.CONTENT;
