@@ -1,8 +1,8 @@
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
-import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
-import {escapeRegExp, genericLinkRegex} from './regex';
+import {makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue} from './strings';
+import {genericLinkRegex} from './regex';
 import {remark} from 'remark';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -391,70 +391,6 @@ export function updateListItemText(text: string, func:(text: string) => string):
   return text;
 }
 
-function textMatches(expectedText: string, actualText: string, requireSameTrailingWhitespace: boolean): boolean {
-  if (requireSameTrailingWhitespace) {
-    return expectedText == actualText;
-  }
-
-  return actualText.match(new RegExp('^' + escapeRegExp(expectedText) + '( |\\t)*$', 'm')) != null;
-}
-
-function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number): string {
-  const content = text.substring(start, end);
-  let startOfLine = '';
-  let requireSameTrailingWhitespace = true;
-  let contentPriorToContent = text.substring(0, start);
-  if (contentPriorToContent.length > 0) {
-    const contentLinesPriorToContent = contentPriorToContent.split('\n');
-    startOfLine = contentLinesPriorToContent[contentLinesPriorToContent.length - 1] ?? '';
-    requireSameTrailingWhitespace = startOfLine.trim() == '';
-    if (!requireSameTrailingWhitespace) {
-      startOfLine = startOfLine.trimEnd();
-    }
-
-    let numberOfIndexesToRemove = 0;
-    while (contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove) >= 0) {
-      if (!textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove)], requireSameTrailingWhitespace)) {
-        break;
-      }
-
-      numberOfIndexesToRemove++;
-    }
-
-    contentLinesPriorToContent.splice(contentLinesPriorToContent.length - (1 + numberOfIndexesToRemove), numberOfIndexesToRemove);
-
-    if (contentLinesPriorToContent.length > 1 && !textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - 2], requireSameTrailingWhitespace)) {
-      contentLinesPriorToContent.splice(contentLinesPriorToContent.length - 1, 0, startOfLine);
-    }
-
-    contentPriorToContent = contentLinesPriorToContent.join('\n');
-  }
-
-  let contentAfterContent = text.substring(end);
-  if (contentAfterContent.length > 0) {
-    const contentLinesAfterBlock = contentAfterContent.split('\n');
-    let numberOfIndexesToRemove = 0;
-    while (numberOfIndexesToRemove + 1 < contentLinesAfterBlock.length) {
-      if (!textMatches(startOfLine, contentLinesAfterBlock[1+numberOfIndexesToRemove], requireSameTrailingWhitespace)) {
-        break;
-      }
-
-      numberOfIndexesToRemove++;
-    }
-
-    contentLinesAfterBlock.splice(1, numberOfIndexesToRemove);
-
-    if (contentLinesAfterBlock.length > 1 && !textMatches(startOfLine, contentLinesAfterBlock[1], requireSameTrailingWhitespace)) {
-      contentLinesAfterBlock.splice(1, 0, startOfLine);
-    }
-
-    contentAfterContent = contentLinesAfterBlock.join('\n');
-  }
-
-
-  return contentPriorToContent + content + contentAfterContent;
-}
-
 export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Code, text);
 
@@ -474,6 +410,15 @@ export function ensureEmptyLinesAroundTables(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Table, text);
   for (const position of positions) {
     text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+  }
+
+  return text;
+}
+
+export function ensureEmptyLinesAroundBlockquotes(text: string): string {
+  const positions: Position[] = getPositions(MDAstTypes.Blockquote, text);
+  for (const position of positions) {
+    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset, true);
   }
 
   return text;
