@@ -2090,7 +2090,7 @@ Even more content here
 
 Alias: `unordered-list-style`
 
-Makes sure that unordered lists follow the style specified..
+Makes sure that unordered lists follow the style specified.
 
 Options:
 - List item style: The list item style to use in unordered lists
