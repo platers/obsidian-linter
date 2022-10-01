@@ -365,7 +365,7 @@ Options:
 	- `single string comma delimited`: ```tags: tag1, tag2```
 - Remove the hashtag from tags in content body: Removes `#` from tags in content body after moving them to the Yaml frontmatter
 	- Default: `false`
-- Tags to ignore: The tags that will not be moved to the tags array or removed from the body content if `Remove the hashtag from tags in content body` is enabled. **Make sure not to include the hashtag in the tag name.**
+- Tags to ignore: The tags that will not be moved to the tags array or removed from the body content if `Remove the hashtag from tags in content body` is enabled. Each tag should be on a new line and without the `#`. **Make sure not to include the hashtag in the tag name.**
 	- Default: ``
 
 Example: Move tags from body to Yaml with `Tags to ignore = 'ignored-tag'`

@@ -214,7 +214,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       new TextAreaOptionBuilder({
         OptionsClass: MoveTagsToYamlOptions,
         name: 'Tags to ignore',
-        description: 'The tags that will not be moved to the tags array or removed from the body content if `Remove the hashtag from tags in content body` is enabled. **Make sure not to include the hashtag in the tag name.**',
+        description: 'The tags that will not be moved to the tags array or removed from the body content if `Remove the hashtag from tags in content body` is enabled. Each tag should be on a new line and without the `#`. **Make sure not to include the hashtag in the tag name.**',
         optionsKey: 'tagsToIgnore',
       }),
     ];
