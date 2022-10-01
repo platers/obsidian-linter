@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {tagRegex} from '../utils/regex';
@@ -20,6 +20,7 @@ import {
 class MoveTagsToYamlOptions implements Options {
   tagArrayStyle? : TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   removeHashtagsFromTagsInBody?: boolean = false;
+  tagsToIgnore?: string[] = [];
 }
 
 @RuleBuilder.register
@@ -62,7 +63,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
 
         for (const tag of tags) {
           const tagContent = tag.trim().substring(1);
-          if (!existingTags.has(tagContent)) {
+          if (!existingTags.has(tagContent) && !options.tagsToIgnore.includes(tagContent)) {
             existingTags.add(tagContent);
             tagValue.push(tagContent);
           }
@@ -76,7 +77,13 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       if (options.removeHashtagsFromTagsInBody) {
         text = text.replace(tagRegex, (tag: string) => {
           const hashtagIndex = tag.indexOf('#');
-          return tag.substring(0, hashtagIndex) + tag.substring(hashtagIndex+1);
+
+          const tagContents = tag.substring(hashtagIndex+1);
+          if (options.tagsToIgnore.includes(tagContents)) {
+            return tag;
+          }
+
+          return tag.substring(0, hashtagIndex) + tagContents;
         });
       }
 
@@ -86,7 +93,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
   get exampleBuilders(): ExampleBuilder<MoveTagsToYamlOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Move tags from body to Yaml',
+        description: 'Move tags from body to Yaml with `Tags to ignore = \'ignored-tag\'`',
         before: dedent`
           Text has to do with #test and #markdown
           ${''}
@@ -97,6 +104,8 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
           \`\`\`
           ${''}
           This inline code \`#ignored content\`
+          ${''}
+          #ignored-tag is ignored since it is in the ignored list
         `,
         after: dedent`
           ---
@@ -111,7 +120,12 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
           \`\`\`
           ${''}
           This inline code \`#ignored content\`
+          ${''}
+          #ignored-tag is ignored since it is in the ignored list
         `,
+        options: {
+          tagsToIgnore: ['ignored-tag'],
+        },
       }),
       new ExampleBuilder({
         description: 'Move tags from body to Yaml with existing tags retains the already existing ones and only adds new ones',
@@ -129,21 +143,26 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         `,
       }),
       new ExampleBuilder({
-        description: 'Move tags to Yaml frontmatter and then remove hashtags in body content tags `Remove the hashtag from tags in content body = true` ',
+        description: 'Move tags to Yaml frontmatter and then remove hashtags in body content tags `Remove the hashtag from tags in content body = true` with `Tags to ignore = \'yet-another-ignored-tag\'`.',
         before: dedent`
           ---
           tags: [test, tag2]
           ---
           Text has to do with #test and #markdown
+          ${''}
+          The tag at the end of this line stays as a tag since it is ignored #yet-another-ignored-tag
         `,
         after: dedent`
           ---
           tags: [test, tag2, markdown]
           ---
           Text has to do with test and markdown
+          ${''}
+          The tag at the end of this line stays as a tag since it is ignored #yet-another-ignored-tag
         `,
         options: {
           removeHashtagsFromTagsInBody: true,
+          tagsToIgnore: ['yet-another-ignored-tag'],
         },
       }),
     ];
@@ -191,6 +210,12 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         name: 'Remove the hashtag from tags in content body',
         description: 'Removes `#` from tags in content body after moving them to the Yaml frontmatter',
         optionsKey: 'removeHashtagsFromTagsInBody',
+      }),
+      new TextAreaOptionBuilder({
+        OptionsClass: MoveTagsToYamlOptions,
+        name: 'Tags to ignore',
+        description: 'The tags that will not be moved to the tags array or removed from the body content if `Remove the hashtag from tags in content body` is enabled. **Make sure not to include the hashtag in the tag name.**',
+        optionsKey: 'tagsToIgnore',
       }),
     ];
   }
