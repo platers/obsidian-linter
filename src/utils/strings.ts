@@ -1,3 +1,5 @@
+import {escapeRegExp} from './regex';
+
 /**
  * Inserts a string at the given position in a string.
  * @param {string} str - The string to insert into
@@ -28,4 +30,94 @@ export function replaceTextBetweenStartAndEndWithNewValue(str: string, start: nu
  */
 export function stripCr(text: string): string {
   return text.replace(/\r/g, '');
+}
+
+/**
+ * Checks whether the expected text and actual text are the same allowing for requiring an exact match versus a close match on whitespace
+ * @param {string} expectedText - The expected text
+ * @param {string} actualText - The actual text
+ * @param {boolean} requireSameTrailingWhitespace - Whether or not to do an exact comparison or allow whitespace to differ
+ * @return {boolean} Whether or not the text matched the expected value
+ */
+function textMatches(expectedText: string, actualText: string, requireSameTrailingWhitespace: boolean): boolean {
+  if (requireSameTrailingWhitespace) {
+    return expectedText == actualText;
+  }
+
+  return actualText.match(new RegExp('^' + escapeRegExp(expectedText) + '( |\\t)*$', 'm')) != null;
+}
+
+/**
+ * Makes sure that the the specified content has an empty line around it so long as it does not start or end a file.
+ * @param {string} text - The entire file's contents
+ * @param {number} start - The starting index of the content to escape
+ * @param {number} end - The ending index of the content to escape
+ * @param {boolean} isForBlockquotes - Whether or not to apply logic to allow a blank line or one less nesting of blockquotes to be the empty line
+ * @return {string} The new file contents after the empty lines have been added
+ */
+export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number, isForBlockquotes: boolean = false): string {
+  const content = text.substring(start, end);
+  let startOfLine = '';
+  let requireSameTrailingWhitespace = true;
+  let contentPriorToContent = text.substring(0, start);
+  if (contentPriorToContent.length > 0) {
+    const contentLinesPriorToContent = contentPriorToContent.split('\n');
+    startOfLine = contentLinesPriorToContent[contentLinesPriorToContent.length - 1] ?? '';
+    requireSameTrailingWhitespace = startOfLine.trim() == '';
+    if (!requireSameTrailingWhitespace) {
+      startOfLine = startOfLine.trimEnd();
+    }
+
+    let numberOfIndexesToRemove = 0;
+    while (contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove) >= 0) {
+      const lineContent = contentLinesPriorToContent[contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove)];
+      if (!textMatches(startOfLine, lineContent, requireSameTrailingWhitespace) && (!isForBlockquotes || !textMatches('', lineContent, true))) {
+        break;
+      }
+
+      numberOfIndexesToRemove++;
+    }
+
+    contentLinesPriorToContent.splice(contentLinesPriorToContent.length - (1 + numberOfIndexesToRemove), numberOfIndexesToRemove);
+
+    if (contentLinesPriorToContent.length > 1) {
+      if ((isForBlockquotes && contentLinesPriorToContent[contentLinesPriorToContent.length - 2].match(/^> ?.*$/m)) ||
+      (!isForBlockquotes && !textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - 2], requireSameTrailingWhitespace))) {
+        contentLinesPriorToContent.splice(contentLinesPriorToContent.length - 1, 0, startOfLine);
+      } else if (!textMatches('', contentLinesPriorToContent[contentLinesPriorToContent.length - 2], true)) {
+        contentLinesPriorToContent.splice(contentLinesPriorToContent.length - 1, 0, '');
+      }
+    }
+
+    contentPriorToContent = contentLinesPriorToContent.join('\n');
+  }
+
+  let contentAfterContent = text.substring(end);
+  if (contentAfterContent.length > 0) {
+    const contentLinesAfterBlock = contentAfterContent.split('\n');
+    let numberOfIndexesToRemove = 0;
+    while (numberOfIndexesToRemove + 1 < contentLinesAfterBlock.length) {
+      const lineContent = contentLinesAfterBlock[1+numberOfIndexesToRemove];
+      if (!textMatches(startOfLine, lineContent, requireSameTrailingWhitespace) && (!isForBlockquotes || !textMatches('', lineContent, true))) {
+        break;
+      }
+
+      numberOfIndexesToRemove++;
+    }
+
+    contentLinesAfterBlock.splice(1, numberOfIndexesToRemove);
+
+    if (contentLinesAfterBlock.length > 1) {
+      if ((isForBlockquotes && contentLinesAfterBlock[1].match(/^> ?.*$/m)) ||
+      (!isForBlockquotes && !textMatches(startOfLine, contentLinesAfterBlock[1], requireSameTrailingWhitespace))) {
+        contentLinesAfterBlock.splice(1, 0, startOfLine);
+      } else if (isForBlockquotes && !textMatches('', contentLinesAfterBlock[1], requireSameTrailingWhitespace)) {
+        contentLinesAfterBlock.splice(1, 0, '');
+      }
+    }
+
+    contentAfterContent = contentLinesAfterBlock.join('\n');
+  }
+
+  return contentPriorToContent + content + contentAfterContent;
 }
