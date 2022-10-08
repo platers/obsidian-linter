@@ -12,6 +12,7 @@ import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
+import {NormalArrayFormats} from './utils/yaml';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -161,6 +162,11 @@ export default class LinterPlugin extends Plugin {
       linterLocale: 'system-default',
       logLevel: log.levels.ERROR,
       lintCommands: [],
+      commonStyles: {
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        tagArrayStyle: NormalArrayFormats.SingleLine,
+        minimumNumberOfDollarSignsToBeAMathBlock: 2,
+      },
     };
     const data = await this.loadData();
     const storedSettings = data || {};
@@ -196,6 +202,9 @@ export default class LinterPlugin extends Plugin {
     }
     if (Object.prototype.hasOwnProperty.call(storedSettings, 'lintCommands')) {
       this.settings.lintCommands = storedSettings.lintCommands;
+    }
+    if (Object.prototype.hasOwnProperty.call(storedSettings, 'commonStyles')) {
+      this.settings.commonStyles = storedSettings.commonStyles;
     }
 
     setLogLevel(this.settings.logLevel);

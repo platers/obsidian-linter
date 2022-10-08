@@ -2577,6 +2577,130 @@ var text = 'some string';
 ```
 ``````
 
+### Empty Line Around Math Blocks
+
+Alias: `empty-line-around-math-blocks`
+
+Ensures that there is an empty line around math blocks using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.
+
+
+
+Example: Math blocks that start a document do not get an empty line before them.
+
+Before:
+
+``````markdown
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+some more text
+``````
+
+After:
+
+``````markdown
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+
+some more text
+``````
+Example: Math blocks that are singe-line are updated based on the value of `Number of Dollar Signs to Indicate a Math Block` (in this case its value is 2)
+
+Before:
+
+``````markdown
+$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+some more text
+``````
+
+After:
+
+``````markdown
+$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+
+some more text
+``````
+Example: Math blocks that end a document do not get an empty line after them.
+
+Before:
+
+``````markdown
+Some text
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+``````
+
+After:
+
+``````markdown
+Some text
+
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+``````
+Example: Math blocks that are not at the start or the end of the document will have an empty line added before and after them
+
+Before:
+
+``````markdown
+Some text
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+some more text
+``````
+
+After:
+
+``````markdown
+Some text
+
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+
+some more text
+``````
+Example: Math blocks in callouts or blockquotes have the appropriately formatted blank lines added
+
+Before:
+
+``````markdown
+> Math block in blockquote
+> $$
+> \boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+> $$
+
+More content here
+
+> Math block doubly nested in blockquote
+> > $$
+> > \boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+> > $$
+``````
+
+After:
+
+``````markdown
+> Math block in blockquote
+>
+> $$
+> \boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+> $$
+>
+
+More content here
+
+> Math block doubly nested in blockquote
+> >
+> > $$
+> > \boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+> > $$
+``````
+
 ### Empty Line Around Tables
 
 Alias: `empty-line-around-tables`
@@ -2849,6 +2973,72 @@ After:
 ``````markdown
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
+``````
+
+### Move Math Block Indicators to Their Own Line
+
+Alias: `move-math-block-indicators-to-their-own-line`
+
+Move all starting and ending math block indicators to their own lines using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.
+
+
+
+Example: Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 2
+
+Before:
+
+``````markdown
+This is left alone:
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+The following is updated:
+$$L = \frac{1}{2} \rho v^2 S C_L$$
+``````
+
+After:
+
+``````markdown
+This is left alone:
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+The following is updated:
+$$
+L = \frac{1}{2} \rho v^2 S C_L
+$$
+``````
+Example: Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 3 and opening indicator is on the same line as the start of the content
+
+Before:
+
+``````markdown
+$$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$$
+``````
+
+After:
+
+``````markdown
+$$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$$
+``````
+Example: Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 2 and ending indicator is on the same line as the ending line of the content
+
+Before:
+
+``````markdown
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+``````
+
+After:
+
+``````markdown
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
 ``````
 
 ### Paragraph blank lines

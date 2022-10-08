@@ -45,6 +45,7 @@ export class RulesRunner {
         fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
         fileName: runOptions.fileInfo.name,
         locale: runOptions.momentLocale,
+        minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
       });
     }
 

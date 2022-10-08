@@ -312,6 +312,28 @@ export class SettingTab extends PluginSettingTab {
         });
 
     this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
+
+    tempDiv = containerEl.createDiv();
+    settingName = 'Number of Dollar Signs to Indicate Math Block';
+    settingDesc = 'The amount of dollar signs to consider the math content to be a math block instead of inline math';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addText((textbox) => {
+          textbox
+              .setValue(this.plugin.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock.toString())
+              .onChange(async (value) => {
+                let parsedInt = parseInt(value);
+                if (isNaN(parsedInt)) {
+                  parsedInt = 2;
+                }
+
+                this.plugin.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock = parsedInt;
+                await this.plugin.saveSettings();
+              });
+        });
+
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
   }
 
   generateSearchBar(containerEl: HTMLElement) {
