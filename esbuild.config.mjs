@@ -11,6 +11,12 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `;
 
+const dummyMocksForDocs = `
+document = {
+  createElement: function() {},
+};
+`;
+
 const prod = (process.argv[2] === 'production');
 
 esbuild.build({
@@ -36,7 +42,7 @@ esbuild.build({
 
 esbuild.build({
   banner: {
-    js: banner,
+    js: banner + dummyMocksForDocs,
   },
   entryPoints: ['src/docs.ts'],
   plugins: [
@@ -53,7 +59,6 @@ esbuild.build({
   ],
   bundle: true,
   external: [
-    'obsidian',
     ...builtins],
   format: 'cjs',
   watch: !prod,
