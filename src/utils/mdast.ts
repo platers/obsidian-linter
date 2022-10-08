@@ -541,3 +541,29 @@ export function updateUnorderedListItemIndicators(text: string, unorderedListSty
 
   return text;
 }
+
+export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numberOfDollarSignsForMathBlock: number): string {
+  let positions: Position[] = getPositions(MDAstTypes.Math, text);
+  const mathOpeningIndicatorRegex = new RegExp('^(\\${' + numberOfDollarSignsForMathBlock + ',})(\\n*)');
+  const mathEndingIndicatorRegex = new RegExp('(\\n*)(\\${' + numberOfDollarSignsForMathBlock + ',})([^\\$]*)$');
+  for (const position of positions) {
+    let mathBlock = text.substring(position.start.offset, position.end.offset);
+    mathBlock = mathBlock.replace(mathOpeningIndicatorRegex, '$1\n');
+    mathBlock= mathBlock.replace(mathEndingIndicatorRegex, '\n$2$3');
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, mathBlock);
+  }
+
+  positions = getPositions(MDAstTypes.InlineMath, text);
+  for (const position of positions) {
+    if (!text.substring(position.start.offset, position.end.offset).startsWith('$'.repeat(numberOfDollarSignsForMathBlock))) {
+      continue;
+    }
+
+    let mathBlock = text.substring(position.start.offset, position.end.offset);
+    mathBlock = mathBlock.replace(mathOpeningIndicatorRegex, '$1\n');
+    mathBlock= mathBlock.replace(mathEndingIndicatorRegex, '\n$2$3');
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, mathBlock);
+  }
+
+  return text;
+}

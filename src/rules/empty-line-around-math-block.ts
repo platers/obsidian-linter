@@ -18,7 +18,7 @@ export default class EmptyLineAroundMathBlock extends RuleBuilder<EmptyLineAroun
     return 'Empty Line Around Math Blocks';
   }
   get description(): string {
-    return 'Ensures that there is an empty line around math blocks.';
+    return 'Ensures that there is an empty line around math blocks using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.';
   }
   get type(): RuleType {
     return RuleType.SPACING;
