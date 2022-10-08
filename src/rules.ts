@@ -9,8 +9,21 @@ import {
 import {yamlRegex} from './utils/regex';
 import {YAMLException} from 'js-yaml';
 import {LinterError} from './linter-error';
+import {
+  NormalArrayFormats,
+  SpecialArrayFormats,
+  TagSpecificArrayFormats,
+} from './utils/yaml';
 
-export type Options = { [optionName: string]: any };
+// CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
+export type CommonStyles = {
+  aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats;
+  tagArrayStyle: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
+  minimumNumberOfDollarSignsToBeAMathBlock: number;
+}
+
+export type Options = { [optionName: string]: any};
+
 type ApplyFunction = (text: string, options?: Options) => string;
 
 export type LintCommand = {id: string, name: string};
@@ -25,6 +38,7 @@ export interface LinterSettings {
   linterLocale: string;
   logLevel: number;
   lintCommands: LintCommand[];
+  commonStyles: CommonStyles;
 }
 
 export enum RuleType {

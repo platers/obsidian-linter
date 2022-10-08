@@ -415,6 +415,24 @@ export function ensureEmptyLinesAroundTables(text: string): string {
   return text;
 }
 
+export function ensureEmptyLinesAroundMathBlock(text: string, numberOfDollarSignsForMathBlock: number): string {
+  let positions: Position[] = getPositions(MDAstTypes.Math, text);
+  for (const position of positions) {
+    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+  }
+
+  positions = getPositions(MDAstTypes.InlineMath, text);
+  for (const position of positions) {
+    if (!text.substring(position.start.offset, position.end.offset).startsWith('$'.repeat(numberOfDollarSignsForMathBlock))) {
+      continue;
+    }
+
+    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+  }
+
+  return text;
+}
+
 export function ensureEmptyLinesAroundBlockquotes(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Blockquote, text);
   for (const position of positions) {

@@ -22,5 +22,4 @@ yarn.lock
 
 !__mocks__/*.js
 !/.eslintrc.js
-!/babel.config.js
-!/rollup.config.js
+!babel.config.js

@@ -2577,6 +2577,94 @@ var text = 'some string';
 ```
 ``````
 
+### Empty Line Around Math Blocks
+
+Alias: `empty-line-around-math-blocks`
+
+Ensures that there is an empty line around latex math blocks.
+
+
+
+Example: Math blocks that start a document do not get an empty line before them.
+
+Before:
+
+``````markdown
+$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+some more text
+``````
+
+After:
+
+``````markdown
+$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+
+some more text
+``````
+Example: Math blocks that end a document do not get an empty line after them.
+
+Before:
+
+``````markdown
+Some text
+$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+``````
+
+After:
+
+``````markdown
+Some text
+
+$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+``````
+Example: Math blocks that are not at the start or the end of the document will have an empty line added before and after them
+
+Before:
+
+``````markdown
+Some text
+$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+some more text
+``````
+
+After:
+
+``````markdown
+Some text
+
+$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+
+some more text
+``````
+Example: Math blocks in callouts or blockquotes have the appropriately formatted blank lines added
+
+Before:
+
+``````markdown
+> Math block in blockquote
+> $$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+
+More content here
+
+> Math block doubly nested in blockquote
+> > $$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+``````
+
+After:
+
+``````markdown
+> Math block in blockquote
+>
+> $$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+>
+
+More content here
+
+> Math block doubly nested in blockquote
+> >
+> > $$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+``````
+
 ### Empty Line Around Tables
 
 Alias: `empty-line-around-tables`
