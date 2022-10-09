@@ -39,6 +39,10 @@ Each rule is its own set of logic and is designed to be run independently. This 
 
 {{RULES PLACEHOLDER}}
 
+Thanks [chrisgrieser](https://github.com/chrisgrieser) for doing all of the base work for and for suggesting that the paste logic should reside in the Linter!
+
+_Note: the paste rules will only run on an attempt to paste content into a Markdown file and they cannot be disabled on a file by file basis or by saying that a folder should not be linted. Please use the command for pasting text as is to not use the active pasting lint rules._
+
 ### Custom Lint Commands
 
 These are special lint rules that the user may specify. They are Obsidian commands. If you would like to create a custom command that you can run, you can use the [QuickAdd](https://github.com/chhoumann/quickadd) plugin in order to add a JavaScript script to make modifications to a file. **This will require some level of knowledge about the Obsidian API and JavaScript.** To use a custom user script, you will want to follow these steps:
