@@ -3461,3 +3461,341 @@ After:
 # H1
 Line with trailing spaces and tabs.  
 ``````
+
+## Paste
+### Add Blockquote Indentation on Paste
+
+Alias: `add-blockquote-indentation-on-paste`
+
+Adds blockquotes to all but the first line, when the cursor is in a blockquote/callout line during pasting
+
+
+
+Example: Line being pasted into regular text does not get blockquotified with current line being `Part 1 of the sentence`
+
+Before:
+
+``````markdown
+was much less likely to succeed, but they tried it anyway.
+Part 2 was much more interesting.
+``````
+
+After:
+
+``````markdown
+was much less likely to succeed, but they tried it anyway.
+Part 2 was much more interesting.
+``````
+Example: Line being pasted into a blockquote gets blockquotified with current line being `> > `
+
+Before:
+
+``````markdown
+
+This content is being added to a blockquote
+Note that the second line is indented and the surrounding blank lines were trimmed
+
+``````
+
+After:
+
+``````markdown
+This content is being added to a blockquote
+> > Note that the second line is indented and the surrounding blank lines were trimmed
+``````
+
+### Prevent Double Checklist Indicator on Paste
+
+Alias: `prevent-double-checklist-indicator-on-paste`
+
+Removes starting checklist indicator from the text to paste if the line the cursor is on in the file has a checklist indicator
+
+
+
+Example: Line being pasted is left alone when current line has no checklist indicator in it: `Regular text here`
+
+Before:
+
+``````markdown
+- [ ] Checklist item being pasted
+``````
+
+After:
+
+``````markdown
+- [ ] Checklist item being pasted
+``````
+Example: Line being pasted into a blockquote without a checklist indicator is left alone when it lacks a checklist indicator: `> > `
+
+Before:
+
+``````markdown
+- [ ] Checklist item contents here
+More content here
+``````
+
+After:
+
+``````markdown
+- [ ] Checklist item contents here
+More content here
+``````
+Example: Line being pasted into a blockquote with a checklist indicator is has its checklist indicator removed when current line is: `> - [x] `
+
+Before:
+
+``````markdown
+- [ ] Checklist item contents here
+More content here
+``````
+
+After:
+
+``````markdown
+Checklist item contents here
+More content here
+``````
+Example: Line being pasted with a checklist indicator is has its checklist indicator removed when current line is: `- [ ] `
+
+Before:
+
+``````markdown
+- [x] Checklist item 1
+- [ ] Checklist item 2
+``````
+
+After:
+
+``````markdown
+Checklist item 1
+- [ ] Checklist item 2
+``````
+
+### Prevent Double List Item Indicator on Paste
+
+Alias: `prevent-double-list-item-indicator-on-paste`
+
+Removes starting list indicator from the text to paste if the line the cursor is on in the file has a list indicator
+
+
+
+Example: Line being pasted is left alone when current line has no list indicator in it: `Regular text here`
+
+Before:
+
+``````markdown
+- List item being pasted
+``````
+
+After:
+
+``````markdown
+- List item being pasted
+``````
+Example: Line being pasted into a blockquote without a list indicator is left alone when it lacks a list indicator: `> > `
+
+Before:
+
+``````markdown
+* List item contents here
+More content here
+``````
+
+After:
+
+``````markdown
+* List item contents here
+More content here
+``````
+Example: Line being pasted into a blockquote with a list indicator is has its list indicator removed when current line is: `> * `
+
+Before:
+
+``````markdown
++ List item contents here
+More content here
+``````
+
+After:
+
+``````markdown
+List item contents here
+More content here
+``````
+Example: Line being pasted with a list indicator is has its list indicator removed when current line is: `+ `
+
+Before:
+
+``````markdown
+- List item 1
+- List item 2
+``````
+
+After:
+
+``````markdown
+List item 1
+- List item 2
+``````
+
+### Proper Ellipsis on Paste
+
+Alias: `proper-ellipsis-on-paste`
+
+Replaces three consecutive dots with an ellipsis even if they have a space between them in the text to paste
+
+
+
+Example: Replacing three consecutive dots with an ellipsis even if spaces are present
+
+Before:
+
+``````markdown
+Lorem (...) Impsum.
+Lorem (. ..) Impsum.
+Lorem (. . .) Impsum.
+``````
+
+After:
+
+``````markdown
+Lorem (…) Impsum.
+Lorem (…) Impsum.
+Lorem (…) Impsum.
+``````
+
+### Remove Hyphens on Paste
+
+Alias: `remove-hyphens-on-paste`
+
+Removes hyphens from the text to paste
+
+
+
+Example: Remove hyphen in content to paste
+
+Before:
+
+``````markdown
+Text that was cool but hyper-
+tension made it uncool.
+``````
+
+After:
+
+``````markdown
+Text that was cool but hypertension made it uncool.
+``````
+
+### Remove Leading or Trailing Whitespace on Paste
+
+Alias: `remove-leading-or-trailing-whitespace-on-paste`
+
+Removes any leading non-tab whitespace and all trailing whitespace for the text to paste
+
+
+
+Example: Removes leading spaces and newline characters
+
+Before:
+
+``````markdown
+
+
+         This text was really indented
+
+``````
+
+After:
+
+``````markdown
+This text was really indented
+``````
+Example: Leaves leading tabs alone
+
+Before:
+
+``````markdown
+
+
+		This text is really indented
+
+``````
+
+After:
+
+``````markdown
+		This text is really indented
+``````
+
+### Remove Leftover Footnotes from Quote on Paste
+
+Alias: `remove-leftover-footnotes-from-quote-on-paste`
+
+Removes any leftover footnote references for the text to paste
+
+
+
+Example: Footnote reference removed
+
+Before:
+
+``````markdown
+He was sure that he would get off without doing any time, but the cops had other plans.50
+
+_Note that the format for footnote references to move is a dot or comma followed by any number of digits_
+``````
+
+After:
+
+``````markdown
+He was sure that he would get off without doing any time, but the cops had other plans
+
+_Note that the format for footnote references to move is a dot or comma followed by any number of digits_
+``````
+
+### Remove Multiple Blank Lines on Paste
+
+Alias: `remove-multiple-blank-lines-on-paste`
+
+Condenses multiple blank lines down into one blank line for the text to paste
+
+
+
+Example: Multiple blanks lines condensed down to one
+
+Before:
+
+``````markdown
+Here is the first line.
+
+
+
+
+Here is some more text.
+``````
+
+After:
+
+``````markdown
+Here is the first line.
+
+Here is some more text.
+``````
+Example: Text with only one blank line in a row is left alone
+
+Before:
+
+``````markdown
+First line.
+
+Last line.
+``````
+
+After:
+
+``````markdown
+First line.
+
+Last line.
+``````

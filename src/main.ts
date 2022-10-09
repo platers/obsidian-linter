@@ -1,10 +1,10 @@
-import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon} from 'obsidian';
+import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown} from 'obsidian';
 import {LinterSettings, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
 import log from 'loglevel';
-import {logInfo, logError, logDebug, setLogLevel} from './logger';
+import {logInfo, logError, logDebug, setLogLevel, logWarn} from './logger';
 import {moment} from 'obsidian';
 import './rules-registry';
 import {iconInfo} from './icons';
@@ -99,6 +99,20 @@ export default class LinterPlugin extends Plugin {
       },
     });
 
+    this.addCommand({
+      id: 'paste-as-plain-text',
+      name: 'Paste as Plain Text & without Modifications',
+      editorCallback: (editor) => this.pasteAsPlainText(editor),
+    });
+
+    this.registerEvent(
+        this.app.workspace.on('editor-paste', (clipboardEv: ClipboardEvent) => {
+          if (this.isEnabled) {
+            this.modifyPasteEvent(clipboardEv);
+          }
+        }),
+    );
+
     // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L239-L251
     this.registerEvent(
         this.app.workspace.on('file-menu', (menu, file: TFile) => {
@@ -127,7 +141,11 @@ export default class LinterPlugin extends Plugin {
     if (typeof save === 'function') {
       saveCommandDefinition.callback = () => {
         if (this.settings.lintOnSave && this.isEnabled) {
-          const editor = this.app.workspace.getActiveViewOfType(MarkdownView).editor;
+          const editor = this.getEditor();
+          if (!editor) {
+            return;
+          }
+
           const file = this.app.workspace.getActiveFile();
 
           if (!this.shouldIgnoreFile(file)) {
@@ -399,5 +417,65 @@ export default class LinterPlugin extends Plugin {
     }
 
     logError(errorMessage, error);
+  }
+
+  // from https://github.com/chrisgrieser/obsidian-smarter-paste/blob/master/main.ts#L37-L41
+  private getEditor(): Editor {
+    const activeLeaf = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (!activeLeaf) return;
+    return activeLeaf.editor;
+  }
+
+  // based on https://github.com/chrisgrieser/obsidian-smarter-paste/blob/master/main.ts#L43-L79
+  // INFO: to inspect clipboard content types, use https://evercoder.github.io/clipboard-inspector/
+  async modifyPasteEvent(clipboardEv: ClipboardEvent): Promise<void> {
+    // abort when pane isn't markdown editor
+    const editor = this.getEditor();
+    if (!editor) return;
+
+    // abort when clipboard contains an image (or is empty)
+    // check for plain text, since 'getData("text/html")' ignores plain-text
+    const plainClipboard = clipboardEv.clipboardData.getData('text/plain');
+    if (!plainClipboard) return;
+
+    // Abort when clipboard has URL, to prevent conflict with the plugins
+    // Auto Title Link & Paste URL into Selection
+    // has to search the entire clipboard (not surrounding the regex with ^$),
+    // because otherwise having 2 URLs cause Obsidian-breaking conflict
+    const urlRegex = /((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()[\]{};:'".,<>?«»“”‘’]))/i;
+    if (urlRegex.test(plainClipboard.trim())) {
+      logWarn('aborted paste lint as the clipboard content is a link and doing so will avoid conflicts with other plugins that modify pasting.');
+      return;
+    }
+
+    // prevent default pasting & abort when not successful
+    clipboardEv.stopPropagation();
+    clipboardEv.preventDefault();
+    if (!clipboardEv.defaultPrevented) return;
+
+    // use Turndown via Obsidian API to emulate "Auto Convert HTML" setting
+    const convertHtmlEnabled = this.app.vault.getConfig('autoConvertHtml');
+    const htmlClipText = clipboardEv.clipboardData.getData('text/html');
+    let clipboardText = htmlClipText && convertHtmlEnabled ? htmlToMarkdown(htmlClipText) : plainClipboard;
+    // if everything went well, run clipboard modifications (passing in current line and and text to paste)
+    clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor), createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings));
+
+    editor.replaceSelection(clipboardText);
+  }
+
+  // if there is a selection, gets the content of the beginning of the selection
+  private getLineContent(editor: Editor) {
+    const currentLineNumber = editor.getCursor('from').line;
+    return editor.getLine(currentLineNumber);
+  }
+
+  async pasteAsPlainText(editor: Editor): Promise<void> {
+    const clipboardContent = await navigator.clipboard.readText();
+    if (!clipboardContent) {
+      new Notice('There is no clipboard content.');
+      return;
+    }
+
+    editor.replaceSelection(clipboardContent);
   }
 }

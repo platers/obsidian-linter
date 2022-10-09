@@ -18,6 +18,7 @@ const tabNameToTabIconId: Record<string | RuleType, string> = {
   'Footnote': iconInfo.footer.id,
   'Content': iconInfo.content.id,
   'Spacing': iconInfo.whitespace.id,
+  'Paste': iconInfo.paste.id,
 };
 
 export class SettingTab extends PluginSettingTab {

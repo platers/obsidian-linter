@@ -18,7 +18,12 @@ declare module 'obsidian' {
       appContainerEl: HTMLElement;
     };
   }
+
+  interface Vault {
+    getConfig(id: string): boolean;
+  }
 }
+
 
 declare global {
   interface Window {

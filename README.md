@@ -99,6 +99,21 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [space-between-chinese-and-english-or-numbers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#space-between-chinese-and-english-or-numbers)
 - [trailing-spaces](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#trailing-spaces)
 
+### Paste rules
+
+- [add-blockquote-indentation-on-paste](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#add-blockquote-indentation-on-paste)
+- [prevent-double-checklist-indicator-on-paste](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#prevent-double-checklist-indicator-on-paste)
+- [prevent-double-list-item-indicator-on-paste](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#prevent-double-list-item-indicator-on-paste)
+- [proper-ellipsis-on-paste](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#proper-ellipsis-on-paste)
+- [remove-hyphens-on-paste](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-hyphens-on-paste)
+- [remove-leading-or-trailing-whitespace-on-paste](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-leading-or-trailing-whitespace-on-paste)
+- [remove-leftover-footnotes-from-quote-on-paste](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-leftover-footnotes-from-quote-on-paste)
+- [remove-multiple-blank-lines-on-paste](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-multiple-blank-lines-on-paste)
+
+
+Thanks [chrisgrieser](https://github.com/chrisgrieser) for doing all of the base work for and for suggesting that the paste logic should reside in the Linter!
+
+_Note: the paste rules will only run on an attempt to paste content into a Markdown file and they cannot be disabled on a file by file basis or by saying that a folder should not be linted. Please use the command for pasting text as is to not use the active pasting lint rules._
 
 ### Custom Lint Commands
 
