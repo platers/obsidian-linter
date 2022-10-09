@@ -1,6 +1,6 @@
 import {TFile, moment} from 'obsidian';
 import {logDebug, logWarn} from './logger';
-import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand} from './rules';
+import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand, RuleType} from './rules';
 import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
@@ -44,7 +44,7 @@ export class RulesRunner {
       if (this.disabledRules.includes(rule.alias())) {
         logDebug(rule.alias() + ' is disabled');
         continue;
-      } else if (rule.hasSpecialExecutionOrder) {
+      } else if (rule.hasSpecialExecutionOrder || rule.type === RuleType.PASTE) {
         continue;
       }
 
