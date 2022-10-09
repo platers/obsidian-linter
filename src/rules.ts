@@ -47,6 +47,7 @@ export enum RuleType {
   FOOTNOTE = 'Footnote',
   CONTENT = 'Content',
   SPACING = 'Spacing',
+  PASTE = 'Paste',
 }
 
 /** Class representing a rule */

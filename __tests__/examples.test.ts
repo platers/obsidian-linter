@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {Example, rules} from '../src/rules';
+import {Example, rules, RuleType} from '../src/rules';
 import {yamlRegex, escapeRegExp} from '../src/utils/regex';
 import '../src/rules-registry';
 
@@ -17,8 +17,8 @@ describe('Augmented examples pass', () => {
   for (const rule of rules) {
     describe(rule.name, () => {
       test.each(rule.examples)('$description', (example: Example) => {
-        // Add a YAML
-        if (rule.type !== 'YAML' && !example.before.match(yamlRegex)) {
+        // Add YAML
+        if (rule.type !== RuleType.YAML && rule.type !== RuleType.PASTE && !example.before.match(yamlRegex)) {
           const yaml = dedent`
             ---
             foo: bar

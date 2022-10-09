@@ -2,6 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {ellipsisRegex} from '../utils/regex';
 
 class ProperEllipsisOptions implements Options {
 }
@@ -22,7 +23,7 @@ export default class ProperEllipsis extends RuleBuilder<ProperEllipsisOptions> {
   }
   apply(text: string, options: ProperEllipsisOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      return text.replaceAll('...', '…');
+      return text.replaceAll(ellipsisRegex, '…');
     });
   }
   get exampleBuilders(): ExampleBuilder<ProperEllipsisOptions>[] {

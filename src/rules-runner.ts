@@ -1,8 +1,16 @@
 import {TFile, moment} from 'obsidian';
 import {logDebug, logWarn} from './logger';
 import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand} from './rules';
+import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
+import PreventDoubleChecklistIndicatorOnPaste from './rules/prevent-double-checklist-indicator-on-paste';
+import PreventDoubleListItemIndicatorOnPaste from './rules/prevent-double-list-item-indicator-on-paste';
+import ProperEllipsisOnPaste from './rules/proper-ellipsis-on-paste';
+import RemoveHyphensOnPaste from './rules/remove-hyphens-on-paste';
+import RemoveLeadingOrTrailingWhitespaceOnPaste from './rules/remove-leading-or-trailing-whitespace-on-paste';
+import RemoveLeftoverFootnotesFromQuoteOnPaste from './rules/remove-leftover-footnotes-from-quote-on-paste';
+import RemoveMultipleBlankLinesOnPaste from './rules/remove-multiple-blank-lines-on-paste';
 import {RuleBuilderBase} from './rules/rule-builder';
 import YamlKeySort from './rules/yaml-key-sort';
 import YamlTimestamp from './rules/yaml-timestamp';
@@ -111,12 +119,34 @@ export class RulesRunner {
       }
     }
   }
+
+  runPasteLint(currentLine: string, runOptions: RunLinterRulesOptions): string {
+    let newText = runOptions.oldText;
+
+    [newText] = RemoveHyphensOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+
+    [newText] = RemoveMultipleBlankLinesOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+
+    [newText] = RemoveLeftoverFootnotesFromQuoteOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+
+    [newText] = ProperEllipsisOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+
+    [newText] = RemoveLeadingOrTrailingWhitespaceOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+
+    [newText] = PreventDoubleListItemIndicatorOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine});
+
+    [newText] = PreventDoubleChecklistIndicatorOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine});
+
+    [newText] = BlockquotifyOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine});
+
+    return newText;
+  }
 }
 
-export function createRunLinterRulesOptions(text: string, file: TFile, momentLocale: string, settings: LinterSettings): RunLinterRulesOptions {
-  const createdAt = moment(file.stat.ctime);
+export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings): RunLinterRulesOptions {
+  const createdAt = file ? moment(file.stat.ctime): moment();
   createdAt.locale(momentLocale);
-  const modifiedAt = moment(file.stat.mtime);
+  const modifiedAt = file ? moment(file.stat.mtime): moment();
   modifiedAt.locale(momentLocale);
   const modifiedAtTime = modifiedAt.format();
   const createdAtTime = createdAt.format();

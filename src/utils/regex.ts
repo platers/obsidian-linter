@@ -13,6 +13,8 @@ export const genericLinkRegex = /^!?\[.*\](.*)$/;
 export const tagRegex = /(?:\s|^)#[^\s#]{1,}/g;
 export const obsidianMultilineCommentRegex = /^%%\n[^%]*\n%%/gm;
 export const wordSplitterRegex = /[,\s]+/;
+export const ellipsisRegex = /(\. ?){2}\./g;
+export const lineStartingWithWhitespaceOrBlockquoteTemplate = `\\s*(>\\s*)*`;
 
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string
