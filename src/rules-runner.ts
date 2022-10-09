@@ -154,7 +154,7 @@ export function createRunLinterRulesOptions(text: string, file: TFile = null, mo
   return {
     oldText: text,
     fileInfo: {
-      name: file.basename,
+      name: file ? file.basename: '',
       createdAtFormatted: createdAtTime,
       modifiedAtFormatted: modifiedAtTime,
     },
