@@ -53,12 +53,15 @@ esbuild.build({
         'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
         // remove the use of obsidian in the options to allow for docs.js to run
         'import {Setting} from \'obsidian\';': '',
+        // remove the use of obsidian in settings helper to allow for dovs.js to run
+        'import {MarkdownRenderer} from \'obsidian\';': '',
       },
       delimiters: ['', ''],
     }),
   ],
   bundle: true,
   external: [
+    'obsidian',
     ...builtins],
   format: 'cjs',
   watch: !prod,

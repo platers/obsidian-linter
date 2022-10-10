@@ -1,7 +1,7 @@
 import {Setting} from 'obsidian';
 import LinterPlugin from './main';
 import {LinterSettings} from './rules';
-import {parseTextToHTMLWithoutOuterParagraph} from './utils/mdast';
+import {parseTextToHTMLWithoutOuterParagraph} from './ui/helpers';
 
 export type SearchOptionInfo = {name: string, description: string, options?: DropdownRecord[]}
 
@@ -53,8 +53,8 @@ export class BooleanOption extends Option {
           });
         });
 
-    setting.nameEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.name);
-    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.description);
+    parseTextToHTMLWithoutOuterParagraph(this.name, setting.nameEl);
+    parseTextToHTMLWithoutOuterParagraph(this.description, setting.descEl);
 
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
@@ -75,8 +75,8 @@ export class TextOption extends Option {
           });
         });
 
-    setting.nameEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.name);
-    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.description);
+    parseTextToHTMLWithoutOuterParagraph(this.name, setting.nameEl);
+    parseTextToHTMLWithoutOuterParagraph(this.description, setting.descEl);
 
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
@@ -97,8 +97,8 @@ export class TextAreaOption extends Option {
           });
         });
 
-    setting.nameEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.name);
-    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.description);
+    parseTextToHTMLWithoutOuterParagraph(this.name, setting.nameEl);
+    parseTextToHTMLWithoutOuterParagraph(this.description, setting.descEl);
 
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
@@ -120,8 +120,8 @@ export class MomentFormatOption extends Option {
           });
         });
 
-    setting.nameEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.name);
-    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.description);
+    parseTextToHTMLWithoutOuterParagraph(this.name, setting.nameEl);
+    parseTextToHTMLWithoutOuterParagraph(this.description, setting.descEl);
 
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
@@ -166,8 +166,8 @@ export class DropdownOption extends Option {
           });
         });
 
-    setting.nameEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.name);
-    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(this.description);
+    parseTextToHTMLWithoutOuterParagraph(this.name, setting.nameEl);
+    parseTextToHTMLWithoutOuterParagraph(this.description, setting.descEl);
 
     // remove border around every setting item
     setting.settingEl.style.border = 'none';

@@ -51,11 +51,9 @@
     "diff-match-patch": "^1.0.5",
     "js-yaml": "^4.1.0",
     "loglevel": "^1.8.0",
-    "rehype-stringify": "^9.0.3",
     "remark": "^14.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "remark-rehype": "^10.1.0",
     "ts-dedent": "^2.2.0"
   }
 }

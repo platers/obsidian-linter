@@ -5,7 +5,7 @@ import {moment} from 'obsidian';
 import CommandSuggester from './suggesters/command-suggester';
 import {SearchOptionInfo} from 'src/option';
 import {iconInfo} from 'src/icons';
-import {parseTextToHTMLWithoutOuterParagraph} from 'src/utils/mdast';
+import {parseTextToHTMLWithoutOuterParagraph} from './helpers';
 
 type settingSearchInfo = {containerEl: HTMLDivElement, name: string, description: string, options: SearchOptionInfo[], alias?: string}
 type TabContentInfo = {content: HTMLDivElement, heading: HTMLElement, navButton: HTMLElement}
@@ -161,7 +161,7 @@ export class SettingTab extends PluginSettingTab {
 
     this.addSettingToMasterSettingsList(tabName, containerEl as HTMLDivElement, tabName.toLowerCase(), descriptionP1.replaceAll('\n', ' ') + descriptionP2.replaceAll('\n', ' '));
 
-    containerEl.createEl('p').innerHTML = parseTextToHTMLWithoutOuterParagraph(descriptionP1);
+    parseTextToHTMLWithoutOuterParagraph(descriptionP1, containerEl.createEl('p'));
     containerEl.createEl('p', {text: descriptionP2}).style.color = '#EED202';
 
     function arrayMove(arr: LintCommand[], fromIndex: number, toIndex: number):void {
@@ -253,7 +253,7 @@ export class SettingTab extends PluginSettingTab {
               });
         });
 
-    setting.descEl.innerHTML = parseTextToHTMLWithoutOuterParagraph(settingDesc);
+    parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl);
 
     this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
 
