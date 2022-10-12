@@ -6,8 +6,6 @@ import {genericLinkRegex} from './regex';
 import {remark} from 'remark';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import rehypeStringify from 'rehype-stringify';
-import remarkRehype from 'remark-rehype';
 
 export enum MDAstTypes {
   Link = 'link',
@@ -48,19 +46,6 @@ export enum UnorderedListItemStyles {
 function parseTextToAST(text: string): Root {
   const ast = remark().use(remarkGfm).use(remarkMath).parse(text);
   return ast;
-}
-
-export function parseTextToHTMLWithoutOuterParagraph(text: string): string {
-  let htmlString = String(remark().use(remarkGfm).use(remarkMath).use(remarkRehype).use(rehypeStringify).processSync(text)).trim();
-  if (htmlString.startsWith('<p>')) {
-    htmlString = htmlString.substring(3);
-  }
-
-  if (htmlString.endsWith('</p>')) {
-    htmlString = htmlString.substring(0, htmlString.length - 4);
-  }
-
-  return htmlString;
 }
 
 /**

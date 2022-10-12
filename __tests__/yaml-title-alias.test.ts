@@ -1017,5 +1017,26 @@ ruleTest({
         fileName: 'Filename',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/449
+      testName: 'Make sure that links in headings are properly copied to the yaml when there is a link prior to the first H1',
+      before: dedent`
+        [[Link1]]
+
+        # [[Heading]]
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - '[[Heading]]'
+        linter-yaml-title-alias: '[[Heading]]'
+        ---
+        [[Link1]]
+
+        # [[Heading]]
+      `,
+      options: {
+        yamlAliasesSectionStyle: 'Multi-line array',
+      },
+    },
   ],
 });

@@ -7,6 +7,7 @@ module.exports = {
   plugins: [
     ['@babel/plugin-proposal-decorators', {version: 'legacy'}],
     ['@babel/plugin-proposal-class-properties'],
+    ['@babel/plugin-proposal-private-methods'],
     ['import-glob'],
   ],
 };
