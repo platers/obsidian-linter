@@ -37,7 +37,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   }
   apply(text: string, options: YamlTitleAliasOptions): string {
     text = initYAML(text);
-    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
       const result = text.match(/^#\s+(.*)/m);
       if (result) {
         return result[1];
