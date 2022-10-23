@@ -64,6 +64,10 @@
         max-width 0.45s cubic-bezier(0.57, 0.04, 0.58, 1) 0.2s;
 }
 
+.linter-navigation-item:not(.linter-navigation-item-selected) > span:nth-child(2) {
+	display: none;
+}
+
 /**
  * Based on https://github.com/phibr0/obsidian-commander/blob/main/src/styles.scss
  */
