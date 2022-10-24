@@ -65,7 +65,7 @@
 }
 
 .linter-navigation-item:not(.linter-navigation-item-selected) > span:nth-child(2) {
-	display: none;
+		visibility: hidden;
 }
 
 /**
