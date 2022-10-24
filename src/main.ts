@@ -180,6 +180,7 @@ export default class LinterPlugin extends Plugin {
       linterLocale: 'system-default',
       logLevel: log.levels.ERROR,
       lintCommands: [],
+      customRegexs: [],
       commonStyles: {
         aliasArrayStyle: NormalArrayFormats.SingleLine,
         tagArrayStyle: NormalArrayFormats.SingleLine,
@@ -220,6 +221,9 @@ export default class LinterPlugin extends Plugin {
     }
     if (Object.prototype.hasOwnProperty.call(storedSettings, 'lintCommands')) {
       this.settings.lintCommands = storedSettings.lintCommands;
+    }
+    if (Object.prototype.hasOwnProperty.call(storedSettings, 'customRegexs')) {
+      this.settings.customRegexs = storedSettings.customRegexs;
     }
     if (Object.prototype.hasOwnProperty.call(storedSettings, 'commonStyles')) {
       this.settings.commonStyles = storedSettings.commonStyles;
@@ -370,6 +374,8 @@ export default class LinterPlugin extends Plugin {
     } catch (error) {
       this.handleLintError(file, error, 'Lint File Error in File \'${file.path}\'', false);
     }
+
+    this.rulesRunner.runCustomRegexReplacement(this.settings.customRegexs, editor);
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109

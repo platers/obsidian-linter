@@ -28,6 +28,8 @@ type ApplyFunction = (text: string, options?: Options) => string;
 
 export type LintCommand = {id: string, name: string};
 
+export type CustomRegex = {find: string, replace: string};
+
 export interface LinterSettings {
   ruleConfigs: {
     [ruleName: string]: Options;
@@ -38,6 +40,7 @@ export interface LinterSettings {
   linterLocale: string;
   logLevel: number;
   lintCommands: LintCommand[];
+  customRegexs: CustomRegex[];
   commonStyles: CommonStyles;
 }
 

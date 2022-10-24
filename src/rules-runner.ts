@@ -1,6 +1,6 @@
-import {TFile, moment} from 'obsidian';
+import {TFile, moment, Editor} from 'obsidian';
 import {logDebug, logWarn} from './logger';
-import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand, RuleType} from './rules';
+import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand, CustomRegex, RuleType} from './rules';
 import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
@@ -117,6 +117,22 @@ export class RulesRunner {
       } catch (error) {
         wrapLintError(error, `Custom Lint Command ${commandInfo.id}`);
       }
+    }
+  }
+
+  runCustomRegexReplacement(customRegexs: CustomRegex[], editor: Editor) {
+    logDebug(`Running Custom Lint Commands`);
+    for (const eachRegex of customRegexs) {
+      if (!eachRegex.find || eachRegex.find.trim() == '' || !eachRegex.replace || eachRegex.replace.trim() == '') {
+        continue;
+      }
+      const regex = new RegExp(`${eachRegex.find}`, 'gm');
+      const oldText = editor.getValue();
+      const newText = oldText.replace(regex, eachRegex.replace);
+      const lines = oldText.split('\n');
+      const start = {line: 0, ch: 0};
+      const end = {line: lines.length - 1, ch: lines[lines.length - 1].length};
+      editor.replaceRange(newText, start, end, oldText);
     }
   }
 
