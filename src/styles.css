@@ -64,10 +64,6 @@
         max-width 0.45s cubic-bezier(0.57, 0.04, 0.58, 1) 0.2s;
 }
 
-.linter-navigation-item:not(.linter-navigation-item-selected) > span:nth-child(2) {
-		opacity: 0;
-}
-
 /**
  * Based on https://github.com/phibr0/obsidian-commander/blob/main/src/styles.scss
  */
@@ -132,6 +128,8 @@
 /** Hide linter element css 
  * Based on https://zellwk.com/blog/hide-content-accessibly/
  */
+
+.linter-navigation-item:not(.linter-navigation-item-selected) > span:nth-child(2),
 .linter-visually-hidden {
   border: 0;
   clip: rect(0 0 0 0);
