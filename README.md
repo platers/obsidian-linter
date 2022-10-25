@@ -42,6 +42,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 ### YAML rules
 
 - [escape-yaml-special-characters](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#escape-yaml-special-characters)
+- [force-yaml-escape](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#force-yaml-escape)
 - [format-tags-in-yaml](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#format-tags-in-yaml)
 - [format-yaml-array](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#format-yaml-array)
 - [insert-yaml-attributes](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#insert-yaml-attributes)
@@ -111,10 +112,6 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [remove-multiple-blank-lines-on-paste](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-multiple-blank-lines-on-paste)
 
 
-Thanks [chrisgrieser](https://github.com/chrisgrieser) for doing all of the base work for and for suggesting that the paste logic should reside in the Linter!
-
-_Note: the paste rules will only run on an attempt to paste content into a Markdown file and they cannot be disabled on a file by file basis or by saying that a folder should not be linted. Please use the command for pasting text as is to not use the active pasting lint rules._
-
 ### Custom Lint Commands
 
 These are special lint rules that the user may specify. They are Obsidian commands. If you would like to create a custom command that you can run, you can use the [QuickAdd](https://github.com/chhoumann/quickadd) plugin in order to add a JavaScript script to make modifications to a file. **This will require some level of knowledge about the Obsidian API and JavaScript.** To use a custom user script, you will want to follow these steps:
@@ -129,6 +126,11 @@ These are special lint rules that the user may specify. They are Obsidian comman
 8. Now you just need to search up this newly created command in the custom command settings for Obsidian Linter.
 
 Now the next time you run the linter, the custom lint commands should run.
+
+### Paste Limitations
+- The plugin only works with the standard pasting (`cmd/ctrl + v`) shortcut, and not with the `p` operator in vim. (Pasting with `cmd/ctrl + v` in normal or insert mode does work though.)
+- To avoid conflicts with Plugins like [Auto Link Title](https://obsidian.md/plugins?id=obsidian-auto-link-title) or [Paste URL into Selection](https://obsidian.md/plugins?id=url-into-selection), will not be triggered when an URL is detected in the clipboard.
+- On mobile, in order to paste the URL, ensure you perform the `Tap and Hold -> Paste` action to paste into your document and use the paste rules.
 
 ## Installing
 
@@ -146,3 +148,8 @@ Note: On some machines the `.obsidian` folder may be hidden. On MacOS you should
 
 Contributions are welcome, especially for new rules. If this is something you would like to do, take a look at the
 [contribution guidelines](CONTRIBUTING.md).
+
+## Credits
+
+Thanks to all of the different people who have contributed to this plugin!  
+A special thanks to [chrisgrieser](https://github.com/chrisgrieser) for doing all of the base work for and for suggesting that the paste logic should reside in the Linter!

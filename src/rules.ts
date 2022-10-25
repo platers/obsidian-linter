@@ -20,6 +20,7 @@ export type CommonStyles = {
   aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats;
   tagArrayStyle: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
   minimumNumberOfDollarSignsToBeAMathBlock: number;
+  escapeCharacter: string;
 }
 
 export type Options = { [optionName: string]: any};

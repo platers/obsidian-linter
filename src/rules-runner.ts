@@ -3,6 +3,7 @@ import {logDebug, logWarn} from './logger';
 import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand, RuleType} from './rules';
 import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
+import ForceYamlEscape from './rules/force-yaml-escape';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
 import PreventDoubleChecklistIndicatorOnPaste from './rules/prevent-double-checklist-indicator-on-paste';
 import PreventDoubleListItemIndicatorOnPaste from './rules/prevent-double-list-item-indicator-on-paste';
@@ -54,6 +55,9 @@ export class RulesRunner {
         fileName: runOptions.fileInfo.name,
         locale: runOptions.momentLocale,
         minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
+        aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
+        tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
+        defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
       });
     }
 
@@ -68,13 +72,19 @@ export class RulesRunner {
     [newText] = FormatTagsInYaml.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
     // escape YAML where possible before parsing yaml
-    [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+    [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+    });
 
     return newText;
   }
 
   private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
     let newText = runOptions.oldText;
+
+    [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+    });
 
     let currentTime = runOptions.getCurrentTime();
     // run yaml timestamp at the end to help determine if something has changed

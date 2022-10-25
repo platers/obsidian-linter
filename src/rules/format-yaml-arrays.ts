@@ -16,9 +16,11 @@ import {convertAliasValueToStringOrStringArray,
   TagSpecificArrayFormats} from '../utils/yaml';
 
 class FormatYamlArrayOptions implements Options {
-  aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  @RuleBuilder.noSettingControl()
+    aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   formatAliasKey?: boolean = true;
-  tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  @RuleBuilder.noSettingControl()
+    tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   formatTagKey?: boolean = true;
   defaultArrayStyle?: NormalArrayFormats = NormalArrayFormats.SingleLine;
   formatArrayKeys?: boolean = true;
@@ -158,75 +160,11 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
   }
   get optionBuilders(): OptionBuilderBase<FormatYamlArrayOptions>[] {
     return [
-      new DropdownOptionBuilder({
-        OptionsClass: FormatYamlArrayOptions,
-        name: 'Yaml aliases section style',
-        description: 'The style of the yaml aliases section',
-        optionsKey: 'aliasArrayStyle',
-        records: [
-          { // as types is needed to allow for the proper types as options otherwise it assumes it has to be the specific enum value
-            value: NormalArrayFormats.MultiLine as NormalArrayFormats | SpecialArrayFormats,
-            description: '```aliases:\\n  - Title```',
-          },
-          {
-            value: NormalArrayFormats.SingleLine,
-            description: '```aliases: [Title]```',
-          },
-          {
-            value: SpecialArrayFormats.SingleStringCommaDelimited,
-            description: '```aliases: Title, Other Title```',
-          },
-          {
-            value: SpecialArrayFormats.SingleStringToSingleLine,
-            description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a single-line array.',
-          },
-          {
-            value: SpecialArrayFormats.SingleStringToMultiLine,
-            description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a multi-line array.',
-          },
-        ],
-      }),
       new BooleanOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
         name: 'Format yaml aliases section',
         description: 'Turns on formatting for the yaml aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.',
         optionsKey: 'formatAliasKey',
-      }),
-      new DropdownOptionBuilder({
-        OptionsClass: FormatYamlArrayOptions,
-        name: 'Yaml tags section style',
-        description: 'The style of the yaml tags section',
-        optionsKey: 'tagArrayStyle',
-        records: [
-          {
-            value: NormalArrayFormats.MultiLine as TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats,
-            description: '```tags:\\n  - tag1```',
-          },
-          {
-            value: NormalArrayFormats.SingleLine,
-            description: '```tags: [tag1]```',
-          },
-          {
-            value: SpecialArrayFormats.SingleStringToSingleLine,
-            description: 'Tags will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a single-line array.',
-          },
-          {
-            value: SpecialArrayFormats.SingleStringToMultiLine,
-            description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a multi-line array.',
-          },
-          {
-            value: TagSpecificArrayFormats.SingleLineSpaceDelimited,
-            description: '```tags: [tag1 tag2]```',
-          },
-          {
-            value: TagSpecificArrayFormats.SingleStringSpaceDelimited,
-            description: '```tags: tag1 tag2```',
-          },
-          {
-            value: SpecialArrayFormats.SingleStringCommaDelimited,
-            description: '```tags: tag1, tag2```',
-          },
-        ],
       }),
       new BooleanOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,

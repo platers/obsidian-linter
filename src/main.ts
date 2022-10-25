@@ -12,7 +12,7 @@ import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
-import {NormalArrayFormats} from './utils/yaml';
+import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from './utils/yaml';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -40,9 +40,25 @@ const langToMomentLocale = {
   'ja': 'ja',
 };
 
+const DEFAULT_SETTINGS: Partial<LinterSettings> = {
+  ruleConfigs: {},
+  lintOnSave: false,
+  displayChanged: true,
+  foldersToIgnore: [],
+  linterLocale: 'system-default',
+  logLevel: log.levels.ERROR,
+  lintCommands: [],
+  commonStyles: {
+    aliasArrayStyle: NormalArrayFormats.SingleLine,
+    tagArrayStyle: NormalArrayFormats.SingleLine,
+    minimumNumberOfDollarSignsToBeAMathBlock: 2,
+    escapeCharacter: '"',
+  },
+};
+
 export default class LinterPlugin extends Plugin {
   settings: LinterSettings;
-  private eventRef: EventRef;
+  private eventRefs: EventRef[] = [];
   private momentLocale: string;
   private isEnabled: boolean = true;
   private rulesRunner = new RulesRunner();
@@ -59,6 +75,58 @@ export default class LinterPlugin extends Plugin {
 
     await this.loadSettings();
 
+    this.addCommands();
+
+    this.registerEventsAndSaveCallback();
+
+    this.addSettingTab(new SettingTab(this.app, this));
+  }
+
+  async onunload() {
+    logInfo('Unloading plugin');
+    this.isEnabled = false;
+
+    for (const eventRef of this.eventRefs) {
+      this.app.workspace.offref(eventRef);
+    }
+  }
+
+  async loadSettings() {
+    const data = await this.loadData();
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+
+    setLogLevel(this.settings.logLevel);
+    this.setOrUpdateMomentInstance();
+
+    const escapeYAMLSpecialCharactersRule = this.settings.ruleConfigs['Escape YAML Special Characters'];
+    if (escapeYAMLSpecialCharactersRule) {
+      const forceYamlEscapeKeys = escapeYAMLSpecialCharactersRule['Force Yaml Escape on Keys'];
+      if (forceYamlEscapeKeys) {
+        if (!this.settings.ruleConfigs['Force YAML Escape']) {
+          this.settings.ruleConfigs['Force YAML Escape'] = {};
+        }
+
+        this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'] = escapeYAMLSpecialCharactersRule['Force Yaml Escape on Keys'] ?? this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'];
+      }
+
+      delete this.settings.ruleConfigs['Escape YAML Special Characters']['Force Yaml Escape on Keys'];
+    }
+
+    this.moveSettingsToCommonSettings();
+
+    // make sure to load the defaults of any missing rules to make sure they do not cause issues on the settings page
+    for (const rule of rules) {
+      if (!this.settings.ruleConfigs[rule.name]) {
+        this.settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
+      }
+    }
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings);
+  }
+
+  addCommands() {
     this.addCommand({
       id: 'lint-file',
       name: 'Lint the current file',
@@ -104,32 +172,18 @@ export default class LinterPlugin extends Plugin {
       name: 'Paste as Plain Text & without Modifications',
       editorCallback: (editor) => this.pasteAsPlainText(editor),
     });
+  }
 
-    this.registerEvent(
-        this.app.workspace.on('editor-paste', (clipboardEv: ClipboardEvent) => {
-          if (this.isEnabled) {
-            this.modifyPasteEvent(clipboardEv);
-          }
-        }),
-    );
+  registerEventsAndSaveCallback() {
+    let eventRef = this.app.workspace.on('editor-paste', (clipboardEv: ClipboardEvent) => {
+      this.modifyPasteEvent(clipboardEv);
+    });
+    this.registerEvent(eventRef);
+    this.eventRefs.push(eventRef);
 
-    // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/main.ts#L239-L251
-    this.registerEvent(
-        this.app.workspace.on('file-menu', (menu, file: TFile) => {
-          if (file instanceof TFolder) {
-            menu.addItem((item) => {
-              item
-                  .setTitle('Lint folder')
-                  .setIcon(iconInfo.folder.id)
-                  .onClick(() => this.createFolderLintModal(file));
-            });
-          }
-        }),
-    );
-
-    this.eventRef = this.app.workspace.on('file-menu',
-        (menu, file, source) => this.onMenuOpenCallback(menu, file, source));
-    this.registerEvent(this.eventRef);
+    eventRef = this.app.workspace.on('file-menu', (menu, file, source) => this.onMenuOpenCallback(menu, file, source));
+    this.registerEvent(eventRef);
+    this.eventRefs.push(eventRef);
 
     // Source for save setting
     // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
@@ -161,85 +215,23 @@ export default class LinterPlugin extends Plugin {
     window.CodeMirrorAdapter.commands.save = () => {
       that.app.commands.executeCommandById('editor:save-file');
     };
-
-    this.addSettingTab(new SettingTab(this.app, this));
-  }
-
-  async onunload() {
-    logInfo('Unloading plugin');
-    this.isEnabled = false;
-    this.app.workspace.offref(this.eventRef);
-  }
-
-  async loadSettings() {
-    this.settings = {
-      ruleConfigs: {},
-      lintOnSave: false,
-      displayChanged: true,
-      foldersToIgnore: [],
-      linterLocale: 'system-default',
-      logLevel: log.levels.ERROR,
-      lintCommands: [],
-      commonStyles: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
-        tagArrayStyle: NormalArrayFormats.SingleLine,
-        minimumNumberOfDollarSignsToBeAMathBlock: 2,
-      },
-    };
-    const data = await this.loadData();
-    const storedSettings = data || {};
-
-    for (const rule of rules) {
-      this.settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
-      if (storedSettings?.ruleConfigs && storedSettings?.ruleConfigs[rule.name]) {
-        Object.assign(this.settings.ruleConfigs[rule.name], storedSettings.ruleConfigs[rule.name]);
-
-        // For backwards compatibility, if enabled is set, copy it to the new option and remove it
-        if (storedSettings.ruleConfigs[rule.name].Enabled !== undefined) {
-          const newEnabledOptionName = rule.enabledOptionName();
-          this.settings.ruleConfigs[rule.name][newEnabledOptionName] = storedSettings.ruleConfigs[rule.name].Enabled;
-          delete this.settings.ruleConfigs[rule.name].Enabled;
-        }
-      }
-    }
-
-    if (Object.prototype.hasOwnProperty.call(storedSettings, 'lintOnSave')) {
-      this.settings.lintOnSave = storedSettings.lintOnSave;
-    }
-    if (Object.prototype.hasOwnProperty.call(storedSettings, 'displayChanged')) {
-      this.settings.displayChanged = storedSettings.displayChanged;
-    }
-    if (Object.prototype.hasOwnProperty.call(storedSettings, 'foldersToIgnore')) {
-      this.settings.foldersToIgnore = storedSettings.foldersToIgnore;
-    }
-    if (Object.prototype.hasOwnProperty.call(storedSettings, 'linterLocale')) {
-      this.settings.linterLocale = storedSettings.linterLocale;
-    }
-    if (Object.prototype.hasOwnProperty.call(storedSettings, 'logLevel')) {
-      this.settings.logLevel = storedSettings.logLevel;
-    }
-    if (Object.prototype.hasOwnProperty.call(storedSettings, 'lintCommands')) {
-      this.settings.lintCommands = storedSettings.lintCommands;
-    }
-    if (Object.prototype.hasOwnProperty.call(storedSettings, 'commonStyles')) {
-      this.settings.commonStyles = storedSettings.commonStyles;
-    }
-
-    setLogLevel(this.settings.logLevel);
-    this.setOrUpdateMomentInstance();
-  }
-  async saveSettings() {
-    await this.saveData(this.settings);
   }
 
   onMenuOpenCallback(menu: Menu, file: TAbstractFile, _source: string) {
     if (file instanceof TFile && file.extension === 'md') {
       menu.addItem((item) => {
-        item.setIcon(iconInfo.file.id);
-        item.setTitle('Lint file');
-        item.onClick(async (_evt) => {
-          this.runLinterFile(file);
-        });
+        item.setIcon(iconInfo.file.id)
+            .setTitle('Lint file')
+            .onClick(async () => {
+              this.runLinterFile(file);
+            });
+      });
+    } else if (file instanceof TFolder) {
+      menu.addItem((item) => {
+        item
+            .setTitle('Lint folder')
+            .setIcon(iconInfo.folder.id)
+            .onClick(() => this.createFolderLintModal(file));
       });
     }
   }
@@ -419,13 +411,6 @@ export default class LinterPlugin extends Plugin {
     logError(errorMessage, error);
   }
 
-  // from https://github.com/chrisgrieser/obsidian-smarter-paste/blob/master/main.ts#L37-L41
-  private getEditor(): Editor {
-    const activeLeaf = this.app.workspace.getActiveViewOfType(MarkdownView);
-    if (!activeLeaf) return;
-    return activeLeaf.editor;
-  }
-
   // based on https://github.com/chrisgrieser/obsidian-smarter-paste/blob/master/main.ts#L43-L79
   // INFO: to inspect clipboard content types, use https://evercoder.github.io/clipboard-inspector/
   async modifyPasteEvent(clipboardEv: ClipboardEvent): Promise<void> {
@@ -463,12 +448,6 @@ export default class LinterPlugin extends Plugin {
     editor.replaceSelection(clipboardText);
   }
 
-  // if there is a selection, gets the content of the beginning of the selection
-  private getLineContent(editor: Editor) {
-    const currentLineNumber = editor.getCursor('from').line;
-    return editor.getLine(currentLineNumber);
-  }
-
   async pasteAsPlainText(editor: Editor): Promise<void> {
     const clipboardContent = await navigator.clipboard.readText();
     if (!clipboardContent) {
@@ -477,5 +456,165 @@ export default class LinterPlugin extends Plugin {
     }
 
     editor.replaceSelection(clipboardContent);
+  }
+
+  /**
+   * Gets the current markdown editor if it exists {@link https://github.com/chrisgrieser/obsidian-smarter-paste/blob/master/main.ts#L37-L41|Obsidian Smarter Paste Source}
+   * @return {Editor} Returns the current codemirror editor if there is an active view of type markdown or null if there is not one.
+   */
+  private getEditor(): Editor {
+    const activeLeaf = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (!activeLeaf) return null;
+    return activeLeaf.editor;
+  }
+
+  /**
+   * Makes sure to get the whole line where the cursor is at even if a selection is made.
+   * @param {Editor} editor - The codemirror editor where the content is located.
+   * @return {string} The current line contents in the editor (i.e. the line where the cursor is)
+   */
+  private getLineContent(editor: Editor): string {
+    const currentLineNumber = editor.getCursor('from').line;
+    return editor.getLine(currentLineNumber);
+  }
+
+  /**
+   * Moves settings to common settings in order to allow for better settings experience moving forward.
+   */
+  private moveSettingsToCommonSettings() {
+    let newAliasFormat: NormalArrayFormats | SpecialArrayFormats = undefined;
+    // alias format
+    const YamlTitleAliasRule = this.settings.ruleConfigs['YAML Title Alias'];
+    if (YamlTitleAliasRule) {
+      switch (YamlTitleAliasRule['YAML aliases section style']) {
+        case 'Multi-line array':
+          newAliasFormat = NormalArrayFormats.MultiLine;
+          break;
+        case 'Single-line array':
+          newAliasFormat = NormalArrayFormats.SingleLine;
+          break;
+        case 'Single string that expands to multi-line array if needed':
+          newAliasFormat = SpecialArrayFormats.SingleStringToMultiLine;
+          break;
+        case 'Single string that expands to single-line array if needed':
+          newAliasFormat = SpecialArrayFormats.SingleStringToSingleLine;
+          break;
+      }
+
+      delete this.settings.ruleConfigs['YAML Title Alias']['YAML aliases section style'];
+    }
+
+    const formatYamlRule = this.settings.ruleConfigs['Format Yaml Array'];
+    if (formatYamlRule) {
+      const tempYAMLAliasFormat = formatYamlRule['Yaml aliases section style'] as NormalArrayFormats | SpecialArrayFormats;
+      if (!newAliasFormat) {
+        newAliasFormat = tempYAMLAliasFormat;
+      } else {
+        switch (tempYAMLAliasFormat) {
+          case NormalArrayFormats.SingleLine:
+            newAliasFormat = NormalArrayFormats.SingleLine;
+            break;
+          case NormalArrayFormats.MultiLine:
+            if (newAliasFormat != NormalArrayFormats.SingleLine) {
+              newAliasFormat = NormalArrayFormats.SingleLine;
+            }
+            break;
+          case SpecialArrayFormats.SingleStringCommaDelimited:
+            if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
+              newAliasFormat = SpecialArrayFormats.SingleStringCommaDelimited;
+            }
+            break;
+          case SpecialArrayFormats.SingleStringToMultiLine:
+            if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
+              newAliasFormat = SpecialArrayFormats.SingleStringToMultiLine;
+            }
+            break;
+          case SpecialArrayFormats.SingleStringToSingleLine:
+            if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
+              newAliasFormat = SpecialArrayFormats.SingleStringToSingleLine;
+            }
+            break;
+        }
+      }
+
+      delete this.settings.ruleConfigs['Format Yaml Array']['Yaml aliases section style'];
+    }
+
+    if (newAliasFormat) {
+      this.settings.commonStyles.aliasArrayStyle = newAliasFormat;
+    }
+
+    // tags format
+    let newTagFormat: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats = undefined;
+
+    if (formatYamlRule) {
+      newTagFormat = formatYamlRule['Yaml tags section style'];
+
+      delete this.settings.ruleConfigs['Format Yaml Array']['Yaml tags section style'];
+    }
+
+    const moveTagsToYamlRule = this.settings.ruleConfigs['Move Tags to Yaml'];
+    if (moveTagsToYamlRule) {
+      const tempYAMLTagFormat = moveTagsToYamlRule['Yaml tags section style'];
+      if (!newTagFormat) {
+        newTagFormat = tempYAMLTagFormat;
+      } else {
+        switch (tempYAMLTagFormat) {
+          case NormalArrayFormats.SingleLine:
+            newTagFormat = NormalArrayFormats.SingleLine;
+            break;
+          case NormalArrayFormats.MultiLine:
+            if (newTagFormat != NormalArrayFormats.SingleLine) {
+              newTagFormat = NormalArrayFormats.SingleLine;
+            }
+            break;
+          case SpecialArrayFormats.SingleStringCommaDelimited:
+            if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
+              newTagFormat = SpecialArrayFormats.SingleStringCommaDelimited;
+            }
+            break;
+          case SpecialArrayFormats.SingleStringToMultiLine:
+            if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
+              newTagFormat = SpecialArrayFormats.SingleStringToMultiLine;
+            }
+            break;
+          case SpecialArrayFormats.SingleStringToSingleLine:
+            if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
+              newTagFormat = SpecialArrayFormats.SingleStringToSingleLine;
+            }
+            break;
+          case TagSpecificArrayFormats.SingleLineSpaceDelimited:
+            if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine &&
+                newTagFormat != SpecialArrayFormats.SingleStringCommaDelimited && newTagFormat != SpecialArrayFormats.SingleStringToSingleLine &&
+                newTagFormat != SpecialArrayFormats.SingleStringToMultiLine) {
+              newTagFormat = TagSpecificArrayFormats.SingleLineSpaceDelimited;
+            }
+            break;
+          case TagSpecificArrayFormats.SingleStringSpaceDelimited:
+            if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine &&
+                  newTagFormat != SpecialArrayFormats.SingleStringCommaDelimited && newTagFormat != SpecialArrayFormats.SingleStringToSingleLine &&
+                  newTagFormat != SpecialArrayFormats.SingleStringToMultiLine) {
+              newTagFormat = TagSpecificArrayFormats.SingleStringSpaceDelimited;
+            }
+            break;
+        }
+      }
+
+      delete this.settings.ruleConfigs['Move Tags to Yaml']['Yaml tags section style'];
+    }
+
+    if (newTagFormat) {
+      this.settings.commonStyles.tagArrayStyle = newTagFormat;
+    }
+
+    // escape character
+    const escapeYAMLSpecialCharactersRule = this.settings.ruleConfigs['Escape YAML Special Characters'];
+    if (escapeYAMLSpecialCharactersRule) {
+      this.settings.commonStyles.escapeCharacter = escapeYAMLSpecialCharactersRule['Default Escape Character'] ?? this.settings.commonStyles.escapeCharacter;
+
+      delete this.settings.ruleConfigs['Escape YAML Special Characters']['Default Escape Character'];
+    }
+
+    this.saveSettings();
   }
 }

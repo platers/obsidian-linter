@@ -249,3 +249,13 @@ export function convertAliasValueToStringOrStringArray(value: string | string[])
 
   return value;
 }
+
+/**
+ * Returns whether or not the YAML string value is already escaped
+ * @param {string} value The YAML string to check if it is already escaped
+ * @return {boolean} Whether or not the YAML string value is already escaped
+ */
+export function isValueEscapedAlready(value: string): boolean {
+  return value.length > 1 && ((value.startsWith('\'') && value.endsWith('\'')) ||
+    (value.startsWith('"') && value.endsWith('"')));
+}
