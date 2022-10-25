@@ -92,7 +92,7 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
       new TextAreaOptionBuilder({
         OptionsClass: ForceYamlEscapeOptions,
         name: 'Force YAML Escape on Keys',
-        description: 'Uses the Yaml escape character on the specified Yaml keys separated by a new line character if it is not already escaped. Do not use on Yaml arrays.',
+        description: 'Uses the YAML escape character on the specified YAML keys separated by a new line character if it is not already escaped. Do not use on YAML arrays.',
         optionsKey: 'forceYamlEscape',
       }),
     ];
