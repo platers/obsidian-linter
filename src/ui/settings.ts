@@ -6,6 +6,7 @@ import CommandSuggester from './suggesters/command-suggester';
 import {SearchOptionInfo} from 'src/option';
 import {iconInfo} from 'src/icons';
 import {parseTextToHTMLWithoutOuterParagraph} from './helpers';
+import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
 
 type settingSearchInfo = {containerEl: HTMLDivElement, name: string, description: string, options: SearchOptionInfo[], alias?: string}
 type TabContentInfo = {content: HTMLDivElement, heading: HTMLElement, navButton: HTMLElement}
@@ -308,6 +309,119 @@ export class SettingTab extends PluginSettingTab {
           dropdown.onChange(async (value) => {
             this.plugin.settings.linterLocale = value;
             await this.plugin.setOrUpdateMomentInstance();
+            await this.plugin.saveSettings();
+          });
+        });
+
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
+
+    const yamlAliasRecords = [
+      { // as types is needed to allow for the proper types as options otherwise it assumes it has to be the specific enum value
+        value: NormalArrayFormats.MultiLine as NormalArrayFormats | SpecialArrayFormats,
+        description: '```aliases:\\n  - Title```',
+      },
+      {
+        value: NormalArrayFormats.SingleLine,
+        description: '```aliases: [Title]```',
+      },
+      {
+        value: SpecialArrayFormats.SingleStringCommaDelimited,
+        description: '```aliases: Title, Other Title```',
+      },
+      {
+        value: SpecialArrayFormats.SingleStringToSingleLine,
+        description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a single-line array.',
+      },
+      {
+        value: SpecialArrayFormats.SingleStringToMultiLine,
+        description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a multi-line array.',
+      },
+    ];
+
+    tempDiv = containerEl.createDiv();
+    settingName = 'YAML aliases section style';
+    settingDesc = 'The style of the YAML aliases section';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addDropdown((dropdown) => {
+          yamlAliasRecords.forEach((tagRecord) => {
+            dropdown.addOption(tagRecord.value, tagRecord.value);
+          });
+          dropdown.setValue(this.plugin.settings.commonStyles.aliasArrayStyle);
+          dropdown.onChange(async (value) => {
+            this.plugin.settings.commonStyles.aliasArrayStyle = value as NormalArrayFormats | SpecialArrayFormats;
+            await this.plugin.saveSettings();
+          });
+        });
+
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
+
+    const yamlTagRecords = [
+      {
+        value: NormalArrayFormats.MultiLine as TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats,
+        description: '```tags:\\n  - tag1```',
+      },
+      {
+        value: NormalArrayFormats.SingleLine,
+        description: '```tags: [tag1]```',
+      },
+      {
+        value: SpecialArrayFormats.SingleStringToSingleLine,
+        description: 'Tags will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a single-line array.',
+      },
+      {
+        value: SpecialArrayFormats.SingleStringToMultiLine,
+        description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a multi-line array.',
+      },
+      {
+        value: TagSpecificArrayFormats.SingleLineSpaceDelimited,
+        description: '```tags: [tag1 tag2]```',
+      },
+      {
+        value: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+        description: '```tags: tag1 tag2```',
+      },
+      {
+        value: SpecialArrayFormats.SingleStringCommaDelimited,
+        description: '```tags: tag1, tag2```',
+      },
+    ];
+
+    tempDiv = containerEl.createDiv();
+    settingName = 'YAML tags section style';
+    settingDesc = 'The style of the YAML tags section';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addDropdown((dropdown) => {
+          yamlTagRecords.forEach((tagRecord) => {
+            dropdown.addOption(tagRecord.value, tagRecord.value);
+          });
+          dropdown.setValue(this.plugin.settings.commonStyles.tagArrayStyle);
+          dropdown.onChange(async (value) => {
+            this.plugin.settings.commonStyles.tagArrayStyle = value as TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
+            await this.plugin.saveSettings();
+          });
+        });
+
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
+
+    const escapeCharRecords = ['"', '\''];
+
+    tempDiv = containerEl.createDiv();
+    settingName = 'Default Escape Character';
+    settingDesc = 'The default character to use to escape YAML values when a single quote and double quote are not present.';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addDropdown((dropdown) => {
+          escapeCharRecords.forEach((escapeChar) => {
+            dropdown.addOption(escapeChar, escapeChar);
+          });
+          dropdown.setValue(this.plugin.settings.commonStyles.escapeCharacter);
+          dropdown.onChange(async (value) => {
+            this.plugin.settings.commonStyles.escapeCharacter = value;
             await this.plugin.saveSettings();
           });
         });

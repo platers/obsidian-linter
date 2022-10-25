@@ -1,6 +1,7 @@
 import YamlTitleAlias from '../src/rules/yaml-title-alias';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
+import {NormalArrayFormats, SpecialArrayFormats} from '../src/utils/yaml';
 
 ruleTest({
   RuleBuilderClass: YamlTitleAlias,
@@ -48,7 +49,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single-line array',
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
       },
     },
     {
@@ -63,7 +64,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single-line array',
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -80,7 +81,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
       },
     },
     {
@@ -95,7 +96,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -151,7 +152,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single-line array',
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
       },
     },
     {
@@ -169,7 +170,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single-line array',
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -189,7 +190,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
       },
     },
     {
@@ -207,7 +208,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -368,7 +369,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
       },
     },
     {
@@ -388,7 +389,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -408,7 +409,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to single-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
       },
     },
     {
@@ -426,7 +427,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to single-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -717,7 +718,7 @@ ruleTest({
       options: {
         keepAliasThatMatchesTheFilename: true,
         fileName: 'Filename',
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
       },
     },
     {
@@ -739,7 +740,7 @@ ruleTest({
       options: {
         keepAliasThatMatchesTheFilename: true,
         fileName: 'Filename',
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -842,7 +843,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Multi-line array',
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
@@ -865,7 +866,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
@@ -887,7 +888,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Multi-line array',
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
@@ -909,7 +910,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single-line array',
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
@@ -932,7 +933,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to single-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
@@ -953,7 +954,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single-line array',
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
@@ -975,7 +976,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
@@ -996,7 +997,7 @@ ruleTest({
         # Title
       `,
       options: {
-        yamlAliasesSectionStyle: 'Single string that expands to multi-line array if needed',
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
@@ -1035,7 +1036,7 @@ ruleTest({
         # [[Heading]]
       `,
       options: {
-        yamlAliasesSectionStyle: 'Multi-line array',
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
   ],
