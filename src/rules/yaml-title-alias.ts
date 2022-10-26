@@ -102,7 +102,6 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       return originalValue;
     };
 
-    // title = toYamlString(title);
     if (Object.keys(parsedYaml).includes(OBSIDIAN_ALIASES_KEY)) {
       const aliasesValue = getYamlSectionValue(newYaml, OBSIDIAN_ALIASES_KEY);
       let currentAliasStyle: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
