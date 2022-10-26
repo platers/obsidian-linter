@@ -1,4 +1,4 @@
-import {load, dump} from 'js-yaml';
+import {load} from 'js-yaml';
 import {escapeDollarSigns, yamlRegex} from './regex';
 
 export const OBSIDIAN_TAG_KEY = 'tags';
