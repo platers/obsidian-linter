@@ -432,17 +432,48 @@ ruleTest({
       },
     },
     {
-      testName: 'Titles with special characters are escaped',
+      testName: 'Titles with special a colon and then a space are escaped',
       before: dedent`
-        # Title with: colon, 'quote', "single quote"
+        # Title with: colon
       `,
       after: dedent`
         ---
         aliases:
-          - 'Title with: colon, ''quote'', "single quote"'
-        linter-yaml-title-alias: 'Title with: colon, ''quote'', "single quote"'
+          - 'Title with: colon'
+        linter-yaml-title-alias: 'Title with: colon'
         ---
-        # Title with: colon, 'quote', "single quote"
+        # Title with: colon
+      `,
+      options: {
+        defaultEscapeCharacter: '\'',
+      },
+    },
+    {
+      testName: 'Titles with double quote are escaped',
+      before: dedent`
+        # Title with "double quote"
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - 'Title with "double quote"'
+        linter-yaml-title-alias: 'Title with "double quote"'
+        ---
+        # Title with "double quote"
+      `,
+    },
+    {
+      testName: 'Titles with single quote are escaped',
+      before: dedent`
+        # Title with 'single quote'
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - "Title with 'single quote'"
+        linter-yaml-title-alias: "Title with 'single quote'"
+        ---
+        # Title with 'single quote'
       `,
     },
     {
@@ -1028,8 +1059,8 @@ ruleTest({
       after: dedent`
         ---
         aliases:
-          - '[[Heading]]'
-        linter-yaml-title-alias: '[[Heading]]'
+          - [[Heading]]
+        linter-yaml-title-alias: [[Heading]]
         ---
         [[Link1]]
 
@@ -1037,6 +1068,27 @@ ruleTest({
       `,
       options: {
         aliasArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/439
+      testName: 'Make sure escaped aliases that match the H1 do not get added back',
+      before: dedent`
+        ---
+        aliases:
+          - "It's strange"
+        ---
+        # It's strange
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - "It's strange"
+        ---
+        # It's strange
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
   ],

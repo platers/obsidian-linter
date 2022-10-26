@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {formatYAML, getYamlSectionValue, isValueEscapedAlready, setYamlSection} from '../utils/yaml';
+import {escapeStringIfNecessaryAndPossible, formatYAML, getYamlSectionValue, isValueEscapedAlready, setYamlSection} from '../utils/yaml';
 
 class ForceYamlEscapeOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -26,7 +26,7 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
   apply(text: string, options: ForceYamlEscapeOptions): string {
     return formatYAML(text, (text) => {
       for (const yamlKeyToEscape of options.forceYamlEscape) {
-        const keyValue = getYamlSectionValue(text, yamlKeyToEscape);
+        let keyValue = getYamlSectionValue(text, yamlKeyToEscape);
 
         if (keyValue != null) {
           // skip yaml array values or already escaped values
@@ -34,7 +34,8 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
             continue;
           }
 
-          text = setYamlSection(text, yamlKeyToEscape, ` ${options.defaultEscapeCharacter}${keyValue}${options.defaultEscapeCharacter}`);
+          keyValue = escapeStringIfNecessaryAndPossible(keyValue, options.defaultEscapeCharacter, true);
+          text = setYamlSection(text, yamlKeyToEscape, ' ' + keyValue);
         }
       }
 

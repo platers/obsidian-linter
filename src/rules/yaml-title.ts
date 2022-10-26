@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {formatYAML, initYAML, toYamlString} from '../utils/yaml';
+import {escapeStringIfNecessaryAndPossible, formatYAML, initYAML} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {escapeDollarSigns} from '../utils/regex';
 import {insert} from '../utils/strings';
@@ -9,6 +9,9 @@ import {insert} from '../utils/strings';
 class YamlTitleOptions implements Options {
   @RuleBuilder.noSettingControl()
     fileName: string;
+
+  @RuleBuilder.noSettingControl()
+    defaultEscapeCharacter?: string = '"';
 
   titleKey?: string = 'title';
 }
@@ -38,7 +41,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
     });
     title = title || options.fileName;
 
-    title = toYamlString(title);
+    title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter);
 
     return formatYAML(text, (text) => {
       const title_match_str = `\n${options.titleKey}.*\n`;
