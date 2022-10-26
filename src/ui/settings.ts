@@ -59,10 +59,8 @@ export class SettingTab extends PluginSettingTab {
       this.addRuleToTab(tabTitle, rule);
     }
 
-    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => {
-      this.generateCustomCommandSettings(tabName, el);
-      this.generateCustomRegexReplacementSettings(tabName, el);
-    });
+    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => this.generateCustomCommandSettings(tabName, el));
+    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => this.generateCustomRegexReplacementSettings(tabName, el));
     this.createSearchZeroState(settingsEl);
   }
 
@@ -258,7 +256,10 @@ export class SettingTab extends PluginSettingTab {
               });
         });
 
+    let searchInfo = '';
     this.plugin.settings.customRegexs.forEach((regex, index) => {
+      searchInfo += regex.find + ' ';
+      searchInfo += regex.replace + ' ';
       new Setting(containerEl)
           .addText((cb) => {
             cb.setPlaceholder('regex to find')
@@ -287,6 +288,8 @@ export class SettingTab extends PluginSettingTab {
                 });
           });
     });
+
+    this.addSettingToMasterSettingsList(tabName, containerEl as HTMLDivElement, tabName.toLowerCase(), searchInfo);
   }
 
   generateGeneralSettings(tabName: string, containerEl: HTMLElement) {
