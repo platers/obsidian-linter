@@ -8,7 +8,7 @@ export const LINTER_ALIASES_HELPER_KEY = 'linter-yaml-title-alias';
 /**
  * Adds an empty YAML block to the text if it doesn't already have one.
  * @param {string} text - The text to process
- * @return {string} The processed text with an YAML block
+ * @return {string} The processed text with a YAML block
  */
 export function initYAML(text: string): string {
   if (text.match(yamlRegex) === null) {
