@@ -39,7 +39,7 @@ export function stripCr(text: string): string {
  * @param {boolean} requireSameTrailingWhitespace - Whether or not to do an exact comparison or allow whitespace to differ
  * @return {boolean} Whether or not the text matched the expected value
  */
-function textMatches(expectedText: string, actualText: string, requireSameTrailingWhitespace: boolean): boolean {
+function textMatches(expectedText: string, actualText: string, requireSameTrailingWhitespace: boolean = false): boolean {
   if (requireSameTrailingWhitespace) {
     return expectedText == actualText;
   }
@@ -58,20 +58,17 @@ function textMatches(expectedText: string, actualText: string, requireSameTraili
 export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number, isForBlockquotes: boolean = false): string {
   const content = text.substring(start, end);
   let startOfLine = '';
-  let requireSameTrailingWhitespace = true;
   let contentPriorToContent = text.substring(0, start);
   if (contentPriorToContent.length > 0) {
     const contentLinesPriorToContent = contentPriorToContent.split('\n');
     startOfLine = contentLinesPriorToContent[contentLinesPriorToContent.length - 1] ?? '';
-    requireSameTrailingWhitespace = startOfLine.trim() == '';
-    if (!requireSameTrailingWhitespace) {
-      startOfLine = startOfLine.trimEnd();
-    }
+    startOfLine = startOfLine.trimEnd();
+
 
     let numberOfIndexesToRemove = 0;
     while (contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove) >= 0) {
       const lineContent = contentLinesPriorToContent[contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove)];
-      if (!textMatches(startOfLine, lineContent, requireSameTrailingWhitespace) && (!isForBlockquotes || !textMatches('', lineContent, true))) {
+      if (!textMatches(startOfLine, lineContent) && (!isForBlockquotes || !textMatches('', lineContent, true))) {
         break;
       }
 
@@ -82,7 +79,7 @@ export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, st
 
     if (contentLinesPriorToContent.length > 1) {
       if ((isForBlockquotes && contentLinesPriorToContent[contentLinesPriorToContent.length - 2].match(/^> ?.*$/m)) ||
-      (!isForBlockquotes && !textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - 2], requireSameTrailingWhitespace))) {
+      (!isForBlockquotes && !textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - 2]))) {
         contentLinesPriorToContent.splice(contentLinesPriorToContent.length - 1, 0, startOfLine);
       } else if (!textMatches('', contentLinesPriorToContent[contentLinesPriorToContent.length - 2], true)) {
         contentLinesPriorToContent.splice(contentLinesPriorToContent.length - 1, 0, '');
@@ -98,7 +95,7 @@ export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, st
     let numberOfIndexesToRemove = 0;
     while (numberOfIndexesToRemove + 1 < contentLinesAfterBlock.length) {
       const lineContent = contentLinesAfterBlock[1+numberOfIndexesToRemove];
-      if (!textMatches(startOfLine, lineContent, requireSameTrailingWhitespace) && (!isForBlockquotes || !textMatches('', lineContent, true))) {
+      if (!textMatches(startOfLine, lineContent) && (!isForBlockquotes || !textMatches('', lineContent, true))) {
         break;
       }
 
@@ -109,9 +106,9 @@ export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, st
 
     if (contentLinesAfterBlock.length > 1) {
       if ((isForBlockquotes && contentLinesAfterBlock[1].match(/^> ?.*$/m)) ||
-      (!isForBlockquotes && !textMatches(startOfLine, contentLinesAfterBlock[1], requireSameTrailingWhitespace))) {
+      (!isForBlockquotes && !textMatches(startOfLine, contentLinesAfterBlock[1]))) {
         contentLinesAfterBlock.splice(1, 0, startOfLine);
-      } else if (isForBlockquotes && !textMatches('', contentLinesAfterBlock[1], requireSameTrailingWhitespace)) {
+      } else if (isForBlockquotes && !textMatches('', contentLinesAfterBlock[1])) {
         contentLinesAfterBlock.splice(1, 0, '');
       }
     }
