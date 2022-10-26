@@ -1,20 +1,24 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {convertAliasValueToStringOrStringArray, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEY, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray, toYamlString} from '../utils/yaml';
+import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEY, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {yamlRegex} from '../utils/regex';
 
 
 class YamlTitleAliasOptions implements Options {
-  @RuleBuilder.noSettingControl()
-    aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
   preserveExistingAliasesSectionStyle?: boolean = true;
   keepAliasThatMatchesTheFilename?: boolean = false;
   useYamlKeyToKeepTrackOfOldFilenameOrHeading?: boolean = true;
 
   @RuleBuilder.noSettingControl()
+    aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
+
+  @RuleBuilder.noSettingControl()
     fileName?: string;
+
+  @RuleBuilder.noSettingControl()
+    defaultEscapeCharacter?: string = '"';
 }
 
 @RuleBuilder.register
@@ -55,6 +59,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_KEY));
 
+    title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter);
     const getNewAliasValue = function(originalValue: string |string[], shouldRemoveTitle: boolean): string |string[] {
       if (originalValue == null) {
         return shouldRemoveTitle ? '' : title;
@@ -97,7 +102,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       return originalValue;
     };
 
-    title = toYamlString(title);
+    // title = toYamlString(title);
     if (Object.keys(parsedYaml).includes(OBSIDIAN_ALIASES_KEY)) {
       const aliasesValue = getYamlSectionValue(newYaml, OBSIDIAN_ALIASES_KEY);
       let currentAliasStyle: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;

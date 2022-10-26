@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {formatYAML, isValueEscapedAlready} from '../utils/yaml';
+import {escapeStringIfNecessaryAndPossible, formatYAML} from '../utils/yaml';
 
 class EscapeYamlSpecialCharactersOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -31,36 +31,6 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
       if (yamlLineCount < 1) {
         return text;
       }
-
-      const escapeSubstringIfNecessary = function(fullText: string, substring: string): string {
-        if (isValueEscapedAlready(substring)) {
-          return fullText;
-        }
-
-        // if there is no single quote, double quote, or colon to escape, skip this substring
-        const substringHasSingleQuote = substring.includes('\'');
-        const substringHasDoubleQuote = substring.includes('"');
-        const substringHasColonWithSpaceAfterIt = substring.includes(': ');
-        if (!substringHasSingleQuote && !substringHasDoubleQuote && !substringHasColonWithSpaceAfterIt) {
-          return fullText;
-        }
-
-        // if the substring already has a single quote and a double quote, there is nothing that can be done to escape the substring
-        if (substringHasSingleQuote && substringHasDoubleQuote) {
-          return fullText;
-        }
-
-        let newText: string;
-        if (substringHasSingleQuote) {
-          newText = fullText.replace(substring, `"${substring}"`);
-        } else if (substringHasDoubleQuote) {
-          newText = fullText.replace(substring, `'${substring}'`);
-        } else { // the line must have a colon with a space
-          newText = fullText.replace(substring, `${options.defaultEscapeCharacter}${substring}${options.defaultEscapeCharacter}`);
-        }
-
-        return newText;
-      };
 
       for (let i = 0; i < yamlLineCount; i++) {
         const line = yamlLines[i].trim();
@@ -99,7 +69,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
                 arrayItem = arrayItem.substring(0, arrayItem.length - 1).trimEnd();
               }
 
-              arrayItems[j] = escapeSubstringIfNecessary(arrayItems[j], arrayItem);
+              arrayItems[j] = arrayItems[j].replace(arrayItem, escapeStringIfNecessaryAndPossible(arrayItem, options.defaultEscapeCharacter));
             }
 
             yamlLines[i] = yamlLines[i].replace(value, '[' + arrayItems.join(',') + ']');
@@ -108,7 +78,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
           continue;
         }
 
-        yamlLines[i] = escapeSubstringIfNecessary(yamlLines[i], value);
+        yamlLines[i] = yamlLines[i].replace(value, escapeStringIfNecessaryAndPossible(value, options.defaultEscapeCharacter));
       }
 
       return yamlLines.join('\n');

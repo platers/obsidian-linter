@@ -29,14 +29,6 @@ export function formatYAML(text: string, func: (text: string) => string): string
   return text;
 }
 
-export function toYamlString(obj: any): string {
-  return dump(obj, {lineWidth: -1}).slice(0, -1);
-}
-
-export function toSingleLineArrayYamlString<T>(arr: T[]): string {
-  return dump(arr, {flowLevel: 0}).slice(0, -1);
-}
-
 function getYamlSectionRegExp(rawKey: string): RegExp {
   return new RegExp(`^([\\t ]*)${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm');
 }
@@ -258,4 +250,40 @@ export function convertAliasValueToStringOrStringArray(value: string | string[])
 export function isValueEscapedAlready(value: string): boolean {
   return value.length > 1 && ((value.startsWith('\'') && value.endsWith('\'')) ||
     (value.startsWith('"') && value.endsWith('"')));
+}
+
+/**
+ * Escapes the provided string value if it has a colon with a space after it, a single quote, or a double quote, but not a single and double quote.
+ * @param {string} value The value to escape if possible
+ * @param {string} defaultEscapeCharacter The character escape to use around the value if a specific escape character is not needed.
+ * @param {boolean} forceEscape Whether or not to force the escaping of the value provided.
+ * @return {string} The escaped value if it is either necessary or forced and the provided value if it cannot be escaped, is escaped,
+ * or does not need escaping and the force escape is not used.
+ */
+export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeCharacter: string, forceEscape: boolean = false): string {
+  if (isValueEscapedAlready(value)) {
+    return value;
+  }
+
+  // if there is no single quote, double quote, or colon to escape, skip this substring
+  const substringHasSingleQuote = value.includes('\'');
+  const substringHasDoubleQuote = value.includes('"');
+  const substringHasColonWithSpaceAfterIt = value.includes(': ');
+  if (!substringHasSingleQuote && !substringHasDoubleQuote && !substringHasColonWithSpaceAfterIt && !forceEscape) {
+    return value;
+  }
+
+  // if the substring already has a single quote and a double quote, there is nothing that can be done to escape the substring
+  if (substringHasSingleQuote && substringHasDoubleQuote) {
+    return value;
+  }
+
+  if (substringHasSingleQuote) {
+    return `"${value}"`;
+  } else if (substringHasDoubleQuote) {
+    return `'${value}'`;
+  }
+
+  // the line must have a colon with a space
+  return `${defaultEscapeCharacter}${value}${defaultEscapeCharacter}`;
 }
