@@ -98,7 +98,7 @@ export default class LinterPlugin extends Plugin {
     setLogLevel(this.settings.logLevel);
     this.setOrUpdateMomentInstance();
 
-    const escapeYAMLSpecialCharactersRule = this.settings.ruleConfigs['Escape YAML Special Characters'];
+    const escapeYAMLSpecialCharactersRule = this.settings.ruleConfigs['Move Tags to Yaml'];
     if (escapeYAMLSpecialCharactersRule) {
       const forceYamlEscapeKeys = escapeYAMLSpecialCharactersRule['Force Yaml Escape on Keys'];
       if (forceYamlEscapeKeys) {
@@ -106,10 +106,20 @@ export default class LinterPlugin extends Plugin {
           this.settings.ruleConfigs['Force YAML Escape'] = {};
         }
 
-        this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'] = escapeYAMLSpecialCharactersRule['Force Yaml Escape on Keys'] ?? this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'];
+        this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'] = forceYamlEscapeKeys ?? this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'];
       }
 
       delete this.settings.ruleConfigs['Escape YAML Special Characters']['Force Yaml Escape on Keys'];
+    }
+
+    const moveTagsToYamlRule = this.settings.ruleConfigs['Move Tags to Yaml'];
+    if (moveTagsToYamlRule) {
+      const removeHashtag = moveTagsToYamlRule['Remove the hashtag from tags in content body'];
+      if (removeHashtag !== null && removeHashtag !== undefined) {
+        this.settings.ruleConfigs['Move Tags to Yaml']['Body tag operation'] = removeHashtag ? 'Remove hashtag' : 'Nothing';
+
+        delete this.settings.ruleConfigs['Move Tags to Yaml']['Remove the hashtag from tags in content body'];
+      }
     }
 
     this.moveSettingsToCommonSettings();
