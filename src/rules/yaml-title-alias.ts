@@ -1,24 +1,24 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {convertAliasValueToStringOrStringArray, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEY, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray, toYamlString} from '../utils/yaml';
+import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEY, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {yamlRegex} from '../utils/regex';
 
-type YamlAliasesSectionStyle =
-  'Multi-line array' |
-  'Single-line array' |
-  'Single string that expands to multi-line array if needed' |
-  'Single string that expands to single-line array if needed';
 
 class YamlTitleAliasOptions implements Options {
-  yamlAliasesSectionStyle?: YamlAliasesSectionStyle = 'Multi-line array';
   preserveExistingAliasesSectionStyle?: boolean = true;
   keepAliasThatMatchesTheFilename?: boolean = false;
   useYamlKeyToKeepTrackOfOldFilenameOrHeading?: boolean = true;
 
   @RuleBuilder.noSettingControl()
+    aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
+
+  @RuleBuilder.noSettingControl()
     fileName?: string;
+
+  @RuleBuilder.noSettingControl()
+    defaultEscapeCharacter?: string = '"';
 }
 
 @RuleBuilder.register
@@ -59,24 +59,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_KEY));
 
-    let newAliasStyle: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
-    switch (options.yamlAliasesSectionStyle) {
-      case 'Multi-line array':
-        newAliasStyle = NormalArrayFormats.MultiLine;
-        break;
-      case 'Single-line array':
-        newAliasStyle = NormalArrayFormats.SingleLine;
-        break;
-      case 'Single string that expands to multi-line array if needed':
-        newAliasStyle = SpecialArrayFormats.SingleStringToMultiLine;
-        break;
-      case 'Single string that expands to single-line array if needed':
-        newAliasStyle = SpecialArrayFormats.SingleStringToSingleLine;
-        break;
-      default:
-        throw new Error(`Unsupported setting 'YAML aliases section style': ${options.yamlAliasesSectionStyle}`);
-    }
-
+    title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter);
     const getNewAliasValue = function(originalValue: string |string[], shouldRemoveTitle: boolean): string |string[] {
       if (originalValue == null) {
         return shouldRemoveTitle ? '' : title;
@@ -119,7 +102,6 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       return originalValue;
     };
 
-    title = toYamlString(title);
     if (Object.keys(parsedYaml).includes(OBSIDIAN_ALIASES_KEY)) {
       const aliasesValue = getYamlSectionValue(newYaml, OBSIDIAN_ALIASES_KEY);
       let currentAliasStyle: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
@@ -144,13 +126,13 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         if (!isEmpty && ((isSingleString && title == newAliasValue) || !isSingleString || currentAliasValue == newAliasValue)) {
           newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(newAliasValue, currentAliasStyle));
         } else {
-          newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(newAliasValue, newAliasStyle));
+          newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle));
         }
       } else {
-        newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(newAliasValue, newAliasStyle));
+        newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle));
       }
     } else if (!shouldRemoveTitleAlias) {
-      newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(title, newAliasStyle));
+      newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(title, options.aliasArrayStyle));
     }
 
     if (!options.useYamlKeyToKeepTrackOfOldFilenameOrHeading || shouldRemoveTitleAlias) {
@@ -260,30 +242,6 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   }
   get optionBuilders(): OptionBuilderBase<YamlTitleAliasOptions>[] {
     return [
-      new DropdownOptionBuilder<YamlTitleAliasOptions, YamlAliasesSectionStyle>({
-        OptionsClass: YamlTitleAliasOptions,
-        name: 'YAML aliases section style',
-        description: 'The style of the aliases YAML section. It is recommended that the value here matches the aliases format for format YAML arrays if in use.',
-        optionsKey: 'yamlAliasesSectionStyle',
-        records: [
-          {
-            value: 'Multi-line array',
-            description: '```aliases:\\n  - Title```',
-          },
-          {
-            value: 'Single-line array',
-            description: '```aliases: [Title]```',
-          },
-          {
-            value: 'Single string that expands to multi-line array if needed',
-            description: '```aliases: Title```',
-          },
-          {
-            value: 'Single string that expands to single-line array if needed',
-            description: '```aliases: Title```',
-          },
-        ],
-      }),
       new BooleanOptionBuilder({
         OptionsClass: YamlTitleAliasOptions,
         name: 'Preserve existing aliases section style',

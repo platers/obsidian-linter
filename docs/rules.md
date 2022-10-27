@@ -3,6 +3,28 @@
 
 # Rules
 
+## General Settings
+
+### Default Escape Character
+
+The default character to use to escape YAML values when a single quote and double quote are not present.
+
+- Default: `"`
+- `"`: Use a double quote to escape if no single or double quote is present
+- `'`: Use a single quote to escape if no single or double quote is present
+
+### Yaml aliases section style
+
+The style of the YAML aliases section
+
+- Default: `single-line`
+- `multi-line`: ```aliases:\n  - Title```
+- `single-line`: ```aliases: [Title]```
+- `single string comma delimited`: ```aliases: Title, Other Title```
+- `single string to single-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a single-line array.
+- `single string to multi-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a multi-line array.
+
+
 
 ## YAML
 ### Escape YAML Special Characters
@@ -12,14 +34,8 @@ Alias: `escape-yaml-special-characters`
 Escapes colons with a space after them (: ), single quotes ('), and double quotes (") in YAML.
 
 Options:
-- Default Escape Character: The default character to use to escape YAML values when a single quote and double quote are not present.
-	- Default: `"`
-	- `"`: Use a double quote to escape if no single or double quote is present
-	- `'`: Use a single quote to escape if no single or double quote is present
 - Try to Escape Single Line Arrays: Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".
 	- Default: `false`
-- Force Yaml Escape on Keys: Uses the Yaml escape character on the specified Yaml keys separated by a new line character if it is not already escaped. Do not use on Yaml arrays.
-	- Default: ``
 
 Example: YAML without anything to escape
 
@@ -123,7 +139,37 @@ nestedArray2: [["value: with colon in the middle"], "value with ' a single quote
 
 _Note that escaped commas in a YAML array will be treated as a separator._
 ``````
-Example: Force YAML keys to be escaped with double quotes where not already escaped with `Force Yaml Escape on Keys = ['key', 'title', 'bool']`
+
+### Force YAML Escape
+
+Alias: `force-yaml-escape`
+
+Escapes the values for the specified YAML keys.
+
+Options:
+- Force YAML Escape on Keys: Uses the YAML escape character on the specified YAML keys separated by a new line character if it is not already escaped. Do not use on YAML arrays.
+	- Default: ``
+
+Example: YAML without anything to escape
+
+Before:
+
+``````markdown
+---
+key: value
+otherKey: []
+---
+``````
+
+After:
+
+``````markdown
+---
+key: value
+otherKey: []
+---
+``````
+Example: Force YAML keys to be escaped with double quotes where not already escaped with `Force Yaml Escape on Keys = 'key'\n'title'\n'bool'`
 
 Before:
 
@@ -222,24 +268,8 @@ Alias: `format-yaml-array`
 Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.
 
 Options:
-- Yaml aliases section style: The style of the yaml aliases section
-	- Default: `single-line`
-	- `multi-line`: ```aliases:\n  - Title```
-	- `single-line`: ```aliases: [Title]```
-	- `single string comma delimited`: ```aliases: Title, Other Title```
-	- `single string to single-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a single-line array.
-	- `single string to multi-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```aliases: Title```. If there is more than 1 element, it will be formatted like a multi-line array.
 - Format yaml aliases section: Turns on formatting for the yaml aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.
 	- Default: `true`
-- Yaml tags section style: The style of the yaml tags section
-	- Default: `single-line`
-	- `multi-line`: ```tags:\n  - tag1```
-	- `single-line`: ```tags: [tag1]```
-	- `single string to single-line`: Tags will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a single-line array.
-	- `single string to multi-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a multi-line array.
-	- `single-line space delimited`: ```tags: [tag1 tag2]```
-	- `single string space delimited`: ```tags: tag1 tag2```
-	- `single string comma delimited`: ```tags: tag1, tag2```
 - Format yaml tags section: Turns on formatting for the yaml tags section.
 	- Default: `true`
 - Default yaml array section style: The style of other yaml arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays`
@@ -354,15 +384,6 @@ Alias: `move-tags-to-yaml`
 Move all tags to Yaml frontmatter of the document.
 
 Options:
-- Yaml tags section style: The style of the Yaml tags section
-	- Default: `single-line`
-	- `multi-line`: ```tags:\n  - tag1```
-	- `single-line`: ```tags: [tag1]```
-	- `single string to single-line`: Tags will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a single-line array.
-	- `single string to multi-line`: Aliases will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a multi-line array.
-	- `single-line space delimited`: ```tags: [tag1 tag2]```
-	- `single string space delimited`: ```tags: tag1 tag2```
-	- `single string comma delimited`: ```tags: tag1, tag2```
 - Remove the hashtag from tags in content body: Removes `#` from tags in content body after moving them to the Yaml frontmatter
 	- Default: `false`
 - Tags to ignore: The tags that will not be moved to the tags array or removed from the body content if `Remove the hashtag from tags in content body` is enabled. Each tag should be on a new line and without the `#`. **Make sure not to include the hashtag in the tag name.**
@@ -755,12 +776,6 @@ Alias: `yaml-title-alias`
 Inserts the title of the file into the YAML frontmatter's aliases section. Gets the title from the first H1 or filename.
 
 Options:
-- YAML aliases section style: The style of the aliases YAML section. It is recommended that the value here matches the aliases format for format YAML arrays if in use.
-	- Default: `Multi-line array`
-	- `Multi-line array`: ```aliases:\n  - Title```
-	- `Single-line array`: ```aliases: [Title]```
-	- `Single string that expands to multi-line array if needed`: ```aliases: Title```
-	- `Single string that expands to single-line array if needed`: ```aliases: Title```
 - Preserve existing aliases section style: If set, the `YAML aliases section style` setting applies only to the newly created sections
 	- Default: `true`
 - Keep alias that matches the filename: Such aliases are usually redundant

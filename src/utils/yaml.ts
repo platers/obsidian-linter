@@ -1,4 +1,4 @@
-import {load, dump} from 'js-yaml';
+import {load} from 'js-yaml';
 import {escapeDollarSigns, yamlRegex} from './regex';
 
 export const OBSIDIAN_TAG_KEY = 'tags';
@@ -8,7 +8,7 @@ export const LINTER_ALIASES_HELPER_KEY = 'linter-yaml-title-alias';
 /**
  * Adds an empty YAML block to the text if it doesn't already have one.
  * @param {string} text - The text to process
- * @return {string} The processed text with an YAML block
+ * @return {string} The processed text with a YAML block
  */
 export function initYAML(text: string): string {
   if (text.match(yamlRegex) === null) {
@@ -27,14 +27,6 @@ export function formatYAML(text: string, func: (text: string) => string): string
   text = text.replace(oldYaml, escapeDollarSigns(newYaml));
 
   return text;
-}
-
-export function toYamlString(obj: any): string {
-  return dump(obj, {lineWidth: -1}).slice(0, -1);
-}
-
-export function toSingleLineArrayYamlString<T>(arr: T[]): string {
-  return dump(arr, {flowLevel: 0}).slice(0, -1);
 }
 
 function getYamlSectionRegExp(rawKey: string): RegExp {
@@ -248,4 +240,50 @@ export function convertAliasValueToStringOrStringArray(value: string | string[])
   }
 
   return value;
+}
+
+/**
+ * Returns whether or not the YAML string value is already escaped
+ * @param {string} value The YAML string to check if it is already escaped
+ * @return {boolean} Whether or not the YAML string value is already escaped
+ */
+export function isValueEscapedAlready(value: string): boolean {
+  return value.length > 1 && ((value.startsWith('\'') && value.endsWith('\'')) ||
+    (value.startsWith('"') && value.endsWith('"')));
+}
+
+/**
+ * Escapes the provided string value if it has a colon with a space after it, a single quote, or a double quote, but not a single and double quote.
+ * @param {string} value The value to escape if possible
+ * @param {string} defaultEscapeCharacter The character escape to use around the value if a specific escape character is not needed.
+ * @param {boolean} forceEscape Whether or not to force the escaping of the value provided.
+ * @return {string} The escaped value if it is either necessary or forced and the provided value if it cannot be escaped, is escaped,
+ * or does not need escaping and the force escape is not used.
+ */
+export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeCharacter: string, forceEscape: boolean = false): string {
+  if (isValueEscapedAlready(value)) {
+    return value;
+  }
+
+  // if there is no single quote, double quote, or colon to escape, skip this substring
+  const substringHasSingleQuote = value.includes('\'');
+  const substringHasDoubleQuote = value.includes('"');
+  const substringHasColonWithSpaceAfterIt = value.includes(': ');
+  if (!substringHasSingleQuote && !substringHasDoubleQuote && !substringHasColonWithSpaceAfterIt && !forceEscape) {
+    return value;
+  }
+
+  // if the substring already has a single quote and a double quote, there is nothing that can be done to escape the substring
+  if (substringHasSingleQuote && substringHasDoubleQuote) {
+    return value;
+  }
+
+  if (substringHasSingleQuote) {
+    return `"${value}"`;
+  } else if (substringHasDoubleQuote) {
+    return `'${value}'`;
+  }
+
+  // the line must have a colon with a space
+  return `${defaultEscapeCharacter}${value}${defaultEscapeCharacter}`;
 }

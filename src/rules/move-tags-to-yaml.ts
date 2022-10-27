@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {tagRegex} from '../utils/regex';
@@ -18,7 +18,8 @@ import {
 } from '../utils/yaml';
 
 class MoveTagsToYamlOptions implements Options {
-  tagArrayStyle? : TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  @RuleBuilder.noSettingControl()
+    tagArrayStyle? : TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   removeHashtagsFromTagsInBody?: boolean = false;
   tagsToIgnore?: string[] = [];
 }
@@ -169,42 +170,6 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
   }
   get optionBuilders(): OptionBuilderBase<MoveTagsToYamlOptions>[] {
     return [
-      new DropdownOptionBuilder({
-        OptionsClass: MoveTagsToYamlOptions,
-        name: 'Yaml tags section style',
-        description: 'The style of the Yaml tags section',
-        optionsKey: 'tagArrayStyle',
-        records: [
-          {
-            value: NormalArrayFormats.MultiLine as TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats,
-            description: '```tags:\\n  - tag1```',
-          },
-          {
-            value: NormalArrayFormats.SingleLine,
-            description: '```tags: [tag1]```',
-          },
-          {
-            value: SpecialArrayFormats.SingleStringToSingleLine,
-            description: 'Tags will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a single-line array.',
-          },
-          {
-            value: SpecialArrayFormats.SingleStringToMultiLine,
-            description: 'Aliases will be formatted as a string if there is 1 or fewer elements like so ```tags: tag1```. If there is more than 1 element, it will be formatted like a multi-line array.',
-          },
-          {
-            value: TagSpecificArrayFormats.SingleLineSpaceDelimited,
-            description: '```tags: [tag1 tag2]```',
-          },
-          {
-            value: TagSpecificArrayFormats.SingleStringSpaceDelimited,
-            description: '```tags: tag1 tag2```',
-          },
-          {
-            value: SpecialArrayFormats.SingleStringCommaDelimited,
-            description: '```tags: tag1, tag2```',
-          },
-        ],
-      }),
       new BooleanOptionBuilder({
         OptionsClass: MoveTagsToYamlOptions,
         name: 'Remove the hashtag from tags in content body',

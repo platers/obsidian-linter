@@ -6,6 +6,7 @@ import CommandSuggester from './suggesters/command-suggester';
 import {SearchOptionInfo} from 'src/option';
 import {iconInfo} from 'src/icons';
 import {parseTextToHTMLWithoutOuterParagraph} from './helpers';
+import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
 
 type settingSearchInfo = {containerEl: HTMLDivElement, name: string, description: string, options: SearchOptionInfo[], alias?: string}
 type TabContentInfo = {content: HTMLDivElement, heading: HTMLElement, navButton: HTMLElement}
@@ -59,8 +60,12 @@ export class SettingTab extends PluginSettingTab {
       this.addRuleToTab(tabTitle, rule);
     }
 
-    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => this.generateCustomCommandSettings(tabName, el));
-    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => this.generateCustomRegexReplacementSettings(tabName, el));
+    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => {
+      let tempContainer = el.createDiv();
+      this.generateCustomCommandSettings(tabName, tempContainer);
+      tempContainer = el.createDiv();
+      this.generateCustomRegexReplacementSettings(tabName, tempContainer);
+    });
     this.createSearchZeroState(settingsEl);
   }
 
@@ -240,8 +245,9 @@ export class SettingTab extends PluginSettingTab {
   }
 
   generateCustomRegexReplacementSettings(tabName: string, containerEl: HTMLElement): void {
-    containerEl.createEl(Platform.isMobile ? 'h4' : 'h3', {text: 'Custom Regex Replacement'});
-
+    const settingName = 'Custom Regex Replacement';
+    containerEl.createEl(Platform.isMobile ? 'h4' : 'h3', {text: settingName});
+    this.addSettingToMasterSettingsList(tabName, containerEl as HTMLDivElement, tabName.toLowerCase(), settingName);
     new Setting(containerEl)
         .addButton((cb)=>{
           cb.setButtonText('Add new regex')
@@ -256,10 +262,7 @@ export class SettingTab extends PluginSettingTab {
               });
         });
 
-    let searchInfo = '';
     this.plugin.settings.customRegexs.forEach((regex, index) => {
-      searchInfo += regex.find + ' ';
-      searchInfo += regex.replace + ' ';
       new Setting(containerEl)
           .addText((cb) => {
             cb.setPlaceholder('regex to find')
@@ -288,8 +291,6 @@ export class SettingTab extends PluginSettingTab {
                 });
           });
     });
-
-    this.addSettingToMasterSettingsList(tabName, containerEl as HTMLDivElement, tabName.toLowerCase(), searchInfo);
   }
 
   generateGeneralSettings(tabName: string, containerEl: HTMLElement) {
@@ -362,6 +363,84 @@ export class SettingTab extends PluginSettingTab {
           dropdown.onChange(async (value) => {
             this.plugin.settings.linterLocale = value;
             await this.plugin.setOrUpdateMomentInstance();
+            await this.plugin.saveSettings();
+          });
+        });
+
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
+
+    const yamlAliasRecords = [
+      // as types is needed to allow for the proper types as options otherwise it assumes it has to be the specific enum value
+      NormalArrayFormats.MultiLine as NormalArrayFormats | SpecialArrayFormats,
+      NormalArrayFormats.SingleLine,
+      SpecialArrayFormats.SingleStringCommaDelimited,
+      SpecialArrayFormats.SingleStringToSingleLine,
+      SpecialArrayFormats.SingleStringToMultiLine,
+    ];
+
+    tempDiv = containerEl.createDiv();
+    settingName = 'YAML aliases section style';
+    settingDesc = 'The style of the YAML aliases section';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addDropdown((dropdown) => {
+          yamlAliasRecords.forEach((aliasRecord) => {
+            dropdown.addOption(aliasRecord, aliasRecord);
+          });
+          dropdown.setValue(this.plugin.settings.commonStyles.aliasArrayStyle);
+          dropdown.onChange(async (value) => {
+            this.plugin.settings.commonStyles.aliasArrayStyle = value as NormalArrayFormats | SpecialArrayFormats;
+            await this.plugin.saveSettings();
+          });
+        });
+
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
+
+    const yamlTagRecords = [
+      NormalArrayFormats.MultiLine as TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats,
+      NormalArrayFormats.SingleLine,
+      SpecialArrayFormats.SingleStringToSingleLine,
+      SpecialArrayFormats.SingleStringToMultiLine,
+      TagSpecificArrayFormats.SingleLineSpaceDelimited,
+      TagSpecificArrayFormats.SingleStringSpaceDelimited,
+      SpecialArrayFormats.SingleStringCommaDelimited,
+    ];
+
+    tempDiv = containerEl.createDiv();
+    settingName = 'YAML tags section style';
+    settingDesc = 'The style of the YAML tags section';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addDropdown((dropdown) => {
+          yamlTagRecords.forEach((tagRecord) => {
+            dropdown.addOption(tagRecord, tagRecord);
+          });
+          dropdown.setValue(this.plugin.settings.commonStyles.tagArrayStyle);
+          dropdown.onChange(async (value) => {
+            this.plugin.settings.commonStyles.tagArrayStyle = value as TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
+            await this.plugin.saveSettings();
+          });
+        });
+
+    this.addSettingToMasterSettingsList(tabName, tempDiv, settingName, settingDesc);
+
+    const escapeCharRecords = ['"', '\''];
+
+    tempDiv = containerEl.createDiv();
+    settingName = 'Default Escape Character';
+    settingDesc = 'The default character to use to escape YAML values when a single quote and double quote are not present.';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addDropdown((dropdown) => {
+          escapeCharRecords.forEach((escapeChar) => {
+            dropdown.addOption(escapeChar, escapeChar);
+          });
+          dropdown.setValue(this.plugin.settings.commonStyles.escapeCharacter);
+          dropdown.onChange(async (value) => {
+            this.plugin.settings.commonStyles.escapeCharacter = value;
             await this.plugin.saveSettings();
           });
         });

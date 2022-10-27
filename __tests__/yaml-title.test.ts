@@ -24,7 +24,7 @@ ruleTest({
       `,
       after: dedent`
         ---
-        title: 'Hello: world'
+        title: "Hello: world"
         ---
         # Hello: world
       `,
@@ -36,7 +36,7 @@ ruleTest({
       `,
       after: dedent`
         ---
-        title: '''Hello world'
+        title: "'Hello world"
         ---
         # 'Hello world
       `,
@@ -74,7 +74,7 @@ ruleTest({
       `,
       after: dedent`
         ---
-        title: '[[Heading]]'
+        title: [[Heading]]
         ---
         [[Link1]]
 

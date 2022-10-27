@@ -1,8 +1,9 @@
-import {TFile, moment, Editor} from 'obsidian';
+import {TFile, moment} from 'obsidian';
 import {logDebug, logWarn} from './logger';
 import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand, CustomRegex, RuleType} from './rules';
 import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
+import ForceYamlEscape from './rules/force-yaml-escape';
 import FormatTagsInYaml from './rules/format-tags-in-yaml';
 import PreventDoubleChecklistIndicatorOnPaste from './rules/prevent-double-checklist-indicator-on-paste';
 import PreventDoubleListItemIndicatorOnPaste from './rules/prevent-double-list-item-indicator-on-paste';
@@ -54,6 +55,9 @@ export class RulesRunner {
         fileName: runOptions.fileInfo.name,
         locale: runOptions.momentLocale,
         minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
+        aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
+        tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
+        defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
       });
     }
 
@@ -68,13 +72,19 @@ export class RulesRunner {
     [newText] = FormatTagsInYaml.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
     // escape YAML where possible before parsing yaml
-    [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+    [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+    });
 
     return newText;
   }
 
   private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
     let newText = runOptions.oldText;
+
+    [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+    });
 
     let currentTime = runOptions.getCurrentTime();
     // run yaml timestamp at the end to help determine if something has changed
@@ -120,20 +130,17 @@ export class RulesRunner {
     }
   }
 
-  runCustomRegexReplacement(customRegexs: CustomRegex[], editor: Editor) {
-    logDebug(`Running Custom Lint Commands`);
+  runCustomRegexReplacement(customRegexs: CustomRegex[], oldText: string): string {
+    logDebug(`Running Custom Regex`);
+    let tempOldText = oldText;
     for (const eachRegex of customRegexs) {
       if (!eachRegex.find || eachRegex.find.trim() == '' || !eachRegex.replace || eachRegex.replace.trim() == '') {
         continue;
       }
       const regex = new RegExp(`${eachRegex.find}`, 'gm');
-      const oldText = editor.getValue();
-      const newText = oldText.replace(regex, eachRegex.replace);
-      const lines = oldText.split('\n');
-      const start = {line: 0, ch: 0};
-      const end = {line: lines.length - 1, ch: lines[lines.length - 1].length};
-      editor.replaceRange(newText, start, end, oldText);
+      tempOldText = tempOldText.replace(regex, eachRegex.replace);
     }
+    return tempOldText;
   }
 
   runPasteLint(currentLine: string, runOptions: RunLinterRulesOptions): string {
