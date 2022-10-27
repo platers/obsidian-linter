@@ -48,7 +48,7 @@ ruleTest({
             upload_max_filesize = 20M
             post_max_size = 20M
             \`\`\`
-          ${''}
+        ${''}
         2. 修改 Nginx 配置文件
         ${''}
             \`\`\`

@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {tagRegex} from '../utils/regex';
@@ -17,10 +17,12 @@ import {
   TagSpecificArrayFormats,
 } from '../utils/yaml';
 
+type tagOperations = 'Nothing' | 'Remove hashtag' | 'Remove whole tag';
+
 class MoveTagsToYamlOptions implements Options {
   @RuleBuilder.noSettingControl()
     tagArrayStyle? : TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
-  removeHashtagsFromTagsInBody?: boolean = false;
+  howToHandleExistingTags?: tagOperations = 'Nothing';
   tagsToIgnore?: string[] = [];
 }
 
@@ -75,7 +77,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         return `---\n${newYaml}---`;
       });
 
-      if (options.removeHashtagsFromTagsInBody) {
+      if (options.howToHandleExistingTags === 'Remove hashtag') {
         text = text.replace(tagRegex, (tag: string) => {
           const hashtagIndex = tag.indexOf('#');
 
@@ -86,6 +88,8 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
 
           return tag.substring(0, hashtagIndex) + tagContents;
         });
+      } else if (options.howToHandleExistingTags === 'Remove whole tag') {
+        text = text.replace(tagRegex, '');
       }
 
       return text;
@@ -129,7 +133,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Move tags from body to Yaml with existing tags retains the already existing ones and only adds new ones',
+        description: 'Move tags from body to YAML with existing tags retains the already existing ones and only adds new ones',
         before: dedent`
           ---
           tags: [test, tag2]
@@ -144,7 +148,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         `,
       }),
       new ExampleBuilder({
-        description: 'Move tags to Yaml frontmatter and then remove hashtags in body content tags `Remove the hashtag from tags in content body = true` with `Tags to ignore = \'yet-another-ignored-tag\'`.',
+        description: 'Move tags to YAML frontmatter and then remove hashtags in body content tags when `Body tag operation = \'Remove hashtag\'` and `Tags to ignore = \'yet-another-ignored-tag\'`.',
         before: dedent`
           ---
           tags: [test, tag2]
@@ -162,19 +166,51 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
           The tag at the end of this line stays as a tag since it is ignored #yet-another-ignored-tag
         `,
         options: {
-          removeHashtagsFromTagsInBody: true,
+          howToHandleExistingTags: 'Remove hashtag',
           tagsToIgnore: ['yet-another-ignored-tag'],
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Move tags to YAML frontmatter and then remove body content tags when `Body tag operation = \'Remove whole tag\'`.',
+        before: dedent`
+          ---
+          tags: [test, tag2]
+          ---
+          This document will have #tags removed and spacing around tags is left alone except for the space prior to the hashtag #warning
+        `,
+        after: dedent`
+          ---
+          tags: [test, tag2, tags, warning]
+          ---
+          This document will have removed and spacing around tags is left alone except for the space prior to the hashtag
+        `,
+        options: {
+          howToHandleExistingTags: 'Remove whole tag',
         },
       }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<MoveTagsToYamlOptions>[] {
     return [
-      new BooleanOptionBuilder({
+      new DropdownOptionBuilder({
         OptionsClass: MoveTagsToYamlOptions,
-        name: 'Remove the hashtag from tags in content body',
-        description: 'Removes `#` from tags in content body after moving them to the Yaml frontmatter',
-        optionsKey: 'removeHashtagsFromTagsInBody',
+        name: 'Body tag operation',
+        description: 'What to do with non-ignored tags in the body of the file once they have been moved to the frontmatter',
+        optionsKey: 'howToHandleExistingTags',
+        records: [
+          {
+            value: 'Nothing',
+            description: 'Leaves tags in the body of the file alone',
+          },
+          {
+            value: 'Remove hashtag',
+            description: 'Removes `#` from tags in content body after moving them to the YAML frontmatter',
+          },
+          {
+            value: 'Remove whole tag',
+            description: 'Removes the whole tag in content body after moving them to the YAML frontmatter. _Note that this removes the first space prior to the tag as well_',
+          },
+        ],
       }),
       new TextAreaOptionBuilder({
         OptionsClass: MoveTagsToYamlOptions,
