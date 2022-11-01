@@ -186,6 +186,12 @@ export default class LinterPlugin extends Plugin {
 
   registerEventsAndSaveCallback() {
     let eventRef = this.app.workspace.on('editor-paste', (clipboardEv: ClipboardEvent) => {
+      // do not paste if another handler has already handled pasting text as that would likely cause a
+      // double pasting of the clipboard contents
+      if (clipboardEv.defaultPrevented) {
+        return;
+      }
+
       this.modifyPasteEvent(clipboardEv);
     });
     this.registerEvent(eventRef);
