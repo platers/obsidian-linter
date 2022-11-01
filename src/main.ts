@@ -145,7 +145,7 @@ export default class LinterPlugin extends Plugin {
       hotkeys: [
         {
           modifiers: ['Mod', 'Alt'],
-          key: 'l',
+          key: 'L',
         },
       ],
     });
