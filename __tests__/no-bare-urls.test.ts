@@ -27,5 +27,25 @@ ruleTest({
         <https://google.com#hashtag>
       `,
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/469
+      testName: 'Urls that are surrounded by smart quotes should be left alone',
+      before: dedent`
+        “https://google.com”
+        ‘https://google.com’
+      `,
+      after: dedent`
+        “https://google.com”
+        ‘https://google.com’
+      `,
+    },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/469
+      testName: 'Urls that are in inline code should be left alone',
+      before: dedent`
+        \`http --headers --follow --all https://google.com\`
+      `,
+      after: dedent`
+        \`http --headers --follow --all https://google.com\`
+      `,
+    },
   ],
 });
