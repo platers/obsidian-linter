@@ -7,6 +7,8 @@ import {replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
 class NoBareUrlsOptions implements Options {
 }
 
+const specialCharsToNotEscapeContentsWithin = `'"‘’“”\`[]`;
+
 @RuleBuilder.register
 export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
   get OptionsClass(): new () => NoBareUrlsOptions {
@@ -22,8 +24,8 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
     return RuleType.CONTENT;
   }
   apply(text: string, options: NoBareUrlsOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image], text, (text) => {
-      const URLMatches = text.match(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'">]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'">]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'">]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'">]{2,})/gi);
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode], text, (text) => {
+      const URLMatches = text.match(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,})/gi);
 
       if (!URLMatches) {
         return text;
@@ -39,8 +41,8 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
 
         const previousChar = urlStart === 0 ? undefined : text.charAt(urlStart - 1);
         const nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
-        if (previousChar != undefined && (previousChar === '`' || previousChar === '"' || previousChar === '\'' || previousChar === '[') &&
-          nextChar != undefined && (nextChar === '`' || nextChar === '"' || nextChar === '\'' || nextChar === ']')) {
+        if (previousChar != undefined && specialCharsToNotEscapeContentsWithin.includes(previousChar) &&
+          nextChar != undefined && specialCharsToNotEscapeContentsWithin.includes(nextChar)) {
           startSearch = urlStart + urlMatch.length;
           continue;
         }
@@ -97,16 +99,16 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
         `,
       }),
       new ExampleBuilder({
-        description: 'Angle brackets are added if the url is not the only text in the single quotes(\'), double quotes("), or backticks(`)',
+        description: 'Angle brackets are added if the url is not the only text in the single quotes(\') or double quotes(")',
         before: dedent`
           [https://github.com some text here]
-          backticks around a url should stay the same, but only if the only contents of the backticks: \`https://github.com some text here\`
+          backticks around a url should stay the same: \`https://github.com some text here\`
           single quotes around a url should stay the same, but only if the contents of the single quotes is the url: 'https://github.com some text here'
           double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "https://github.com some text here"
         `,
         after: dedent`
           [<https://github.com> some text here]
-          backticks around a url should stay the same, but only if the only contents of the backticks: \`<https://github.com> some text here\`
+          backticks around a url should stay the same: \`https://github.com some text here\`
           single quotes around a url should stay the same, but only if the contents of the single quotes is the url: '<https://github.com> some text here'
           double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "<https://github.com> some text here"
         `,
