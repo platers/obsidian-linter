@@ -384,8 +384,11 @@ Alias: `move-tags-to-yaml`
 Move all tags to Yaml frontmatter of the document.
 
 Options:
-- Remove the hashtag from tags in content body: Removes `#` from tags in content body after moving them to the Yaml frontmatter
-	- Default: `false`
+- Body tag operation: What to do with non-ignored tags in the body of the file once they have been moved to the frontmatter
+	- Default: `Nothing`
+	- `Nothing`: Leaves tags in the body of the file alone
+	- `Remove hashtag`: Removes `#` from tags in content body after moving them to the YAML frontmatter
+	- `Remove whole tag`: Removes the whole tag in content body after moving them to the YAML frontmatter. _Note that this removes the first space prior to the tag as well_
 - Tags to ignore: The tags that will not be moved to the tags array or removed from the body content if `Remove the hashtag from tags in content body` is enabled. Each tag should be on a new line and without the `#`. **Make sure not to include the hashtag in the tag name.**
 	- Default: ``
 
@@ -425,7 +428,7 @@ This inline code `#ignored content`
 
 #ignored-tag is ignored since it is in the ignored list
 ``````
-Example: Move tags from body to Yaml with existing tags retains the already existing ones and only adds new ones
+Example: Move tags from body to YAML with existing tags retains the already existing ones and only adds new ones
 
 Before:
 
@@ -444,7 +447,7 @@ tags: [test, tag2, markdown]
 ---
 Text has to do with #test and #markdown
 ``````
-Example: Move tags to Yaml frontmatter and then remove hashtags in body content tags `Remove the hashtag from tags in content body = true` with `Tags to ignore = 'yet-another-ignored-tag'`.
+Example: Move tags to YAML frontmatter and then remove hashtags in body content tags when `Body tag operation = 'Remove hashtag'` and `Tags to ignore = 'yet-another-ignored-tag'`.
 
 Before:
 
@@ -466,6 +469,25 @@ tags: [test, tag2, markdown]
 Text has to do with test and markdown
 
 The tag at the end of this line stays as a tag since it is ignored #yet-another-ignored-tag
+``````
+Example: Move tags to YAML frontmatter and then remove body content tags when `Body tag operation = 'Remove whole tag'`.
+
+Before:
+
+``````markdown
+---
+tags: [test, tag2]
+---
+This document will have #tags removed and spacing around tags is left alone except for the space prior to the hashtag #warning
+``````
+
+After:
+
+``````markdown
+---
+tags: [test, tag2, tags, warning]
+---
+This document will have removed and spacing around tags is left alone except for the space prior to the hashtag
 ``````
 
 ### Remove YAML Keys

@@ -99,7 +99,7 @@ export default class LinterPlugin extends Plugin {
     setLogLevel(this.settings.logLevel);
     this.setOrUpdateMomentInstance();
 
-    const escapeYAMLSpecialCharactersRule = this.settings.ruleConfigs['Escape YAML Special Characters'];
+    const escapeYAMLSpecialCharactersRule = this.settings.ruleConfigs['Move Tags to Yaml'];
     if (escapeYAMLSpecialCharactersRule) {
       const forceYamlEscapeKeys = escapeYAMLSpecialCharactersRule['Force Yaml Escape on Keys'];
       if (forceYamlEscapeKeys) {
@@ -107,10 +107,20 @@ export default class LinterPlugin extends Plugin {
           this.settings.ruleConfigs['Force YAML Escape'] = {};
         }
 
-        this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'] = escapeYAMLSpecialCharactersRule['Force Yaml Escape on Keys'] ?? this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'];
+        this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'] = forceYamlEscapeKeys ?? this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'];
       }
 
       delete this.settings.ruleConfigs['Escape YAML Special Characters']['Force Yaml Escape on Keys'];
+    }
+
+    const moveTagsToYamlRule = this.settings.ruleConfigs['Move Tags to Yaml'];
+    if (moveTagsToYamlRule) {
+      const removeHashtag = moveTagsToYamlRule['Remove the hashtag from tags in content body'];
+      if (removeHashtag !== null && removeHashtag !== undefined) {
+        this.settings.ruleConfigs['Move Tags to Yaml']['Body tag operation'] = removeHashtag ? 'Remove hashtag' : 'Nothing';
+
+        delete this.settings.ruleConfigs['Move Tags to Yaml']['Remove the hashtag from tags in content body'];
+      }
     }
 
     this.moveSettingsToCommonSettings();
@@ -136,7 +146,7 @@ export default class LinterPlugin extends Plugin {
       hotkeys: [
         {
           modifiers: ['Mod', 'Alt'],
-          key: 'l',
+          key: 'L',
         },
       ],
     });
@@ -177,6 +187,12 @@ export default class LinterPlugin extends Plugin {
 
   registerEventsAndSaveCallback() {
     let eventRef = this.app.workspace.on('editor-paste', (clipboardEv: ClipboardEvent) => {
+      // do not paste if another handler has already handled pasting text as that would likely cause a
+      // double pasting of the clipboard contents
+      if (clipboardEv.defaultPrevented) {
+        return;
+      }
+
       this.modifyPasteEvent(clipboardEv);
     });
     this.registerEvent(eventRef);
@@ -493,57 +509,65 @@ export default class LinterPlugin extends Plugin {
     let newAliasFormat: NormalArrayFormats | SpecialArrayFormats = undefined;
     // alias format
     const YamlTitleAliasRule = this.settings.ruleConfigs['YAML Title Alias'];
-    if (YamlTitleAliasRule) {
-      switch (YamlTitleAliasRule['YAML aliases section style']) {
-        case 'Multi-line array':
-          newAliasFormat = NormalArrayFormats.MultiLine;
-          break;
-        case 'Single-line array':
-          newAliasFormat = NormalArrayFormats.SingleLine;
-          break;
-        case 'Single string that expands to multi-line array if needed':
-          newAliasFormat = SpecialArrayFormats.SingleStringToMultiLine;
-          break;
-        case 'Single string that expands to single-line array if needed':
-          newAliasFormat = SpecialArrayFormats.SingleStringToSingleLine;
-          break;
+    if (YamlTitleAliasRule && YamlTitleAliasRule['YAML aliases section style']) {
+      // if the rule is not enabled it does not matter what the format for the aliases is for copying over the value
+      if (YamlTitleAliasRule['Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.']) {
+        switch (YamlTitleAliasRule['YAML aliases section style']) {
+          case 'Multi-line array':
+            newAliasFormat = NormalArrayFormats.MultiLine;
+            break;
+          case 'Single-line array':
+            newAliasFormat = NormalArrayFormats.SingleLine;
+            break;
+          case 'Single string that expands to multi-line array if needed':
+            newAliasFormat = SpecialArrayFormats.SingleStringToMultiLine;
+            break;
+          case 'Single string that expands to single-line array if needed':
+            newAliasFormat = SpecialArrayFormats.SingleStringToSingleLine;
+            break;
+        }
       }
 
       delete this.settings.ruleConfigs['YAML Title Alias']['YAML aliases section style'];
     }
 
     const formatYamlRule = this.settings.ruleConfigs['Format Yaml Array'];
-    if (formatYamlRule) {
-      const tempYAMLAliasFormat = formatYamlRule['Yaml aliases section style'] as NormalArrayFormats | SpecialArrayFormats;
-      if (!newAliasFormat) {
-        newAliasFormat = tempYAMLAliasFormat;
-      } else {
-        switch (tempYAMLAliasFormat) {
-          case NormalArrayFormats.SingleLine:
-            newAliasFormat = NormalArrayFormats.SingleLine;
-            break;
-          case NormalArrayFormats.MultiLine:
-            if (newAliasFormat != NormalArrayFormats.SingleLine) {
+    if (formatYamlRule && formatYamlRule['Yaml aliases section style']) {
+      // if the rule is enabled and the actual format for aliases is enabled then check the value
+      if (formatYamlRule['Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.'] &&
+        formatYamlRule['Format yaml aliases section']) {
+        const tempYAMLAliasFormat = formatYamlRule['Yaml aliases section style'] as NormalArrayFormats | SpecialArrayFormats;
+        if (!newAliasFormat) {
+          newAliasFormat = tempYAMLAliasFormat;
+        } else {
+          switch (tempYAMLAliasFormat) {
+            case NormalArrayFormats.SingleLine:
               newAliasFormat = NormalArrayFormats.SingleLine;
-            }
-            break;
-          case SpecialArrayFormats.SingleStringCommaDelimited:
-            if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
-              newAliasFormat = SpecialArrayFormats.SingleStringCommaDelimited;
-            }
-            break;
-          case SpecialArrayFormats.SingleStringToMultiLine:
-            if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
-              newAliasFormat = SpecialArrayFormats.SingleStringToMultiLine;
-            }
-            break;
-          case SpecialArrayFormats.SingleStringToSingleLine:
-            if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
-              newAliasFormat = SpecialArrayFormats.SingleStringToSingleLine;
-            }
-            break;
+              break;
+            case NormalArrayFormats.MultiLine:
+              if (newAliasFormat != NormalArrayFormats.SingleLine) {
+                newAliasFormat = NormalArrayFormats.SingleLine;
+              }
+              break;
+            case SpecialArrayFormats.SingleStringCommaDelimited:
+              if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
+                newAliasFormat = SpecialArrayFormats.SingleStringCommaDelimited;
+              }
+              break;
+            case SpecialArrayFormats.SingleStringToMultiLine:
+              if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
+                newAliasFormat = SpecialArrayFormats.SingleStringToMultiLine;
+              }
+              break;
+            case SpecialArrayFormats.SingleStringToSingleLine:
+              if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
+                newAliasFormat = SpecialArrayFormats.SingleStringToSingleLine;
+              }
+              break;
+          }
         }
       }
+
 
       delete this.settings.ruleConfigs['Format Yaml Array']['Yaml aliases section style'];
     }
@@ -555,56 +579,63 @@ export default class LinterPlugin extends Plugin {
     // tags format
     let newTagFormat: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats = undefined;
 
-    if (formatYamlRule) {
-      newTagFormat = formatYamlRule['Yaml tags section style'];
+    if (formatYamlRule && formatYamlRule['Yaml tags section style']) {
+      // if the rule is enabled and the actual format for aliases is enabled then check the value
+      if (formatYamlRule['Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.'] &&
+       formatYamlRule['Format yaml tags section']) {
+        newTagFormat = formatYamlRule['Yaml tags section style'];
+      }
 
       delete this.settings.ruleConfigs['Format Yaml Array']['Yaml tags section style'];
     }
 
     const moveTagsToYamlRule = this.settings.ruleConfigs['Move Tags to Yaml'];
-    if (moveTagsToYamlRule) {
-      const tempYAMLTagFormat = moveTagsToYamlRule['Yaml tags section style'];
-      if (!newTagFormat) {
-        newTagFormat = tempYAMLTagFormat;
-      } else {
-        switch (tempYAMLTagFormat) {
-          case NormalArrayFormats.SingleLine:
-            newTagFormat = NormalArrayFormats.SingleLine;
-            break;
-          case NormalArrayFormats.MultiLine:
-            if (newTagFormat != NormalArrayFormats.SingleLine) {
+    if (moveTagsToYamlRule && moveTagsToYamlRule['Yaml tags section style']) {
+      // only check the value if the rule is enabled
+      if (moveTagsToYamlRule['Move all tags to Yaml frontmatter of the document.']) {
+        const tempYAMLTagFormat = moveTagsToYamlRule['Yaml tags section style'];
+        if (!newTagFormat) {
+          newTagFormat = tempYAMLTagFormat;
+        } else {
+          switch (tempYAMLTagFormat) {
+            case NormalArrayFormats.SingleLine:
               newTagFormat = NormalArrayFormats.SingleLine;
-            }
-            break;
-          case SpecialArrayFormats.SingleStringCommaDelimited:
-            if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
-              newTagFormat = SpecialArrayFormats.SingleStringCommaDelimited;
-            }
-            break;
-          case SpecialArrayFormats.SingleStringToMultiLine:
-            if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
-              newTagFormat = SpecialArrayFormats.SingleStringToMultiLine;
-            }
-            break;
-          case SpecialArrayFormats.SingleStringToSingleLine:
-            if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
-              newTagFormat = SpecialArrayFormats.SingleStringToSingleLine;
-            }
-            break;
-          case TagSpecificArrayFormats.SingleLineSpaceDelimited:
-            if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine &&
-                newTagFormat != SpecialArrayFormats.SingleStringCommaDelimited && newTagFormat != SpecialArrayFormats.SingleStringToSingleLine &&
-                newTagFormat != SpecialArrayFormats.SingleStringToMultiLine) {
-              newTagFormat = TagSpecificArrayFormats.SingleLineSpaceDelimited;
-            }
-            break;
-          case TagSpecificArrayFormats.SingleStringSpaceDelimited:
-            if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine &&
+              break;
+            case NormalArrayFormats.MultiLine:
+              if (newTagFormat != NormalArrayFormats.SingleLine) {
+                newTagFormat = NormalArrayFormats.SingleLine;
+              }
+              break;
+            case SpecialArrayFormats.SingleStringCommaDelimited:
+              if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
+                newTagFormat = SpecialArrayFormats.SingleStringCommaDelimited;
+              }
+              break;
+            case SpecialArrayFormats.SingleStringToMultiLine:
+              if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
+                newTagFormat = SpecialArrayFormats.SingleStringToMultiLine;
+              }
+              break;
+            case SpecialArrayFormats.SingleStringToSingleLine:
+              if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
+                newTagFormat = SpecialArrayFormats.SingleStringToSingleLine;
+              }
+              break;
+            case TagSpecificArrayFormats.SingleLineSpaceDelimited:
+              if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine &&
                   newTagFormat != SpecialArrayFormats.SingleStringCommaDelimited && newTagFormat != SpecialArrayFormats.SingleStringToSingleLine &&
                   newTagFormat != SpecialArrayFormats.SingleStringToMultiLine) {
-              newTagFormat = TagSpecificArrayFormats.SingleStringSpaceDelimited;
-            }
-            break;
+                newTagFormat = TagSpecificArrayFormats.SingleLineSpaceDelimited;
+              }
+              break;
+            case TagSpecificArrayFormats.SingleStringSpaceDelimited:
+              if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine &&
+                    newTagFormat != SpecialArrayFormats.SingleStringCommaDelimited && newTagFormat != SpecialArrayFormats.SingleStringToSingleLine &&
+                    newTagFormat != SpecialArrayFormats.SingleStringToMultiLine) {
+                newTagFormat = TagSpecificArrayFormats.SingleStringSpaceDelimited;
+              }
+              break;
+          }
         }
       }
 
