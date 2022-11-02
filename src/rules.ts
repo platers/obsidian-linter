@@ -29,7 +29,7 @@ type ApplyFunction = (text: string, options?: Options) => string;
 
 export type LintCommand = {id: string, name: string};
 
-export type CustomRegex = {find: string, replace: string};
+export type CustomRegex = {find: string, replace: string, flags: string};
 
 export interface LinterSettings {
   ruleConfigs: {

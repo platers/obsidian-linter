@@ -61,6 +61,8 @@ export class RulesRunner {
       });
     }
 
+    newText = this.runCustomRegexReplacement(runOptions.settings.customRegexs, newText);
+
     runOptions.oldText = newText;
 
     return this.runAfterRegularRules(originalText, runOptions);
@@ -137,7 +139,7 @@ export class RulesRunner {
       if (!eachRegex.find || eachRegex.find.trim() == '' || !eachRegex.replace || eachRegex.replace.trim() == '') {
         continue;
       }
-      const regex = new RegExp(`${eachRegex.find}`, 'gm');
+      const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
       tempOldText = tempOldText.replace(regex, eachRegex.replace);
     }
     return tempOldText;

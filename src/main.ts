@@ -336,7 +336,7 @@ export default class LinterPlugin extends Plugin {
     logInfo('Running linter');
 
     const file = this.app.workspace.getActiveFile();
-    let oldText = editor.getValue();
+    const oldText = editor.getValue();
     let newText: string;
     try {
       newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
@@ -379,13 +379,6 @@ export default class LinterPlugin extends Plugin {
     } catch (error) {
       this.handleLintError(file, error, 'Lint File Error in File \'${file.path}\'', false);
     }
-
-    oldText = editor.getValue();
-    newText = this.rulesRunner.runCustomRegexReplacement(this.settings.customRegexs, oldText);
-    const lines = oldText.split('\n');
-    const start = {line: 0, ch: 0};
-    const end = {line: lines.length - 1, ch: lines[lines.length - 1].length};
-    editor.replaceRange(newText, start, end, oldText);
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
