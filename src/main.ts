@@ -341,6 +341,7 @@ export default class LinterPlugin extends Plugin {
       newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
     } catch (error) {
       this.handleLintError(file, error, 'Lint File Error in File \'${file.path}\'', false);
+      return;
     }
 
     // Replace changed lines
