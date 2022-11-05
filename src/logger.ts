@@ -9,10 +9,9 @@ const logPrefix: string = '[Obsidian Linter]';
  */
 export function logError(labelForError: string, error: Error) {
   let message = `${logPrefix} ${labelForError}:` + '\n';
+  message += `${error.name} ${error.message}`;
   if (error.stack) {
-    message += error.stack;
-  } else {
-    message += `${error.name} ${error.message}`;
+    message += '\n' + error.stack;
   }
 
   log.error(message);
