@@ -3474,6 +3474,25 @@ After:
 [这是一个数学公式english](这是一个数学公式english.md)
 ![这是一个数学公式english](这是一个数学公式english.jpg)
 ``````
+Example: Space between CJK and English
+
+Before:
+
+``````markdown
+日本語englishひらがな
+カタカナenglishカタカナ
+ﾊﾝｶｸｶﾀｶﾅenglish１２３全角数字
+한글english한글
+``````
+
+After:
+
+``````markdown
+日本語 english ひらがな
+カタカナ english カタカナ
+ﾊﾝｶｸｶﾀｶﾅ english１２３全角数字
+한글 english 한글
+``````
 
 ### Trailing spaces
 
