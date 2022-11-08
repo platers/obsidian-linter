@@ -785,5 +785,29 @@ ruleTest({
         ---
       `,
     },
+    {
+      testName: 'Nested objects are preserved',
+      before: dedent`
+        ---
+        key1:
+          key2: value2
+          key3:
+            - item1
+            - item2
+        ---
+      `,
+      after: dedent`
+        ---
+        key1:
+          key2: value2
+          key3:
+            - item1
+            - item2
+        ---
+      `,
+      options: {
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
   ],
 });
