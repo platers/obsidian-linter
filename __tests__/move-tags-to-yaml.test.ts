@@ -110,5 +110,27 @@ ruleTest({
         tagArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/472
+      testName: 'If yaml tag has space after or before the tag, it should not affect the tag comparison',
+      before: dedent`
+        ---
+        tags: [ space-before-tag, space-after-tag ]
+        ---
+        #space-before-tag
+        #space-after-tag
+        #test
+      `,
+      after: dedent`
+        ---
+        tags: [space-before-tag, space-after-tag, test]
+        ---
+        #space-before-tag
+        #space-after-tag
+        #test
+      `,
+      options: {
+        tagArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
+      },
+    },
   ],
 });
