@@ -218,15 +218,25 @@ export function splitValueIfSingleOrMultilineArray(value: string): string | stri
  * @return {string} The converted tag key value that should account for its obsidian formats.
  */
 export function convertTagValueToStringOrStringArray(value: string | string[]): string[] {
-  if (typeof value === 'string') {
-    if (value.includes(',')) {
-      return value.split(', ');
-    }
-
-    return value.split(' ');
+  if (value == null) {
+    return [];
   }
 
-  return value;
+  const tags: string[] = [];
+  let originalTagValues: string[] = [];
+  if (Array.isArray(value)) {
+    originalTagValues = value;
+  } else if (value.includes(',')) {
+    originalTagValues = value.split(', ');
+  } else {
+    originalTagValues = value.split(' ');
+  }
+
+  for (const tagValue of originalTagValues) {
+    tags.push(tagValue.trim());
+  }
+
+  return tags;
 }
 
 /**
