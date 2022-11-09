@@ -1032,6 +1032,27 @@ ruleTest({
         preserveExistingAliasesSectionStyle: false,
       },
     },
+    { // relates to https://github.com/platers/obsidian-linter/issues/441
+      testName: 'Converts from single-line array to single string for key `alias`',
+      before: dedent`
+        ---
+        alias: [Title]
+        linter-yaml-title-alias: Title
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        alias: Title
+        linter-yaml-title-alias: Title
+        ---
+        # Title
+      `,
+      options: {
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
+        preserveExistingAliasesSectionStyle: false,
+      },
+    },
     {
       testName: 'Removes empty alias section if title matches the filename',
       before: dedent`

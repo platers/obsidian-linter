@@ -1,8 +1,13 @@
 import {load} from 'js-yaml';
 import {escapeDollarSigns, yamlRegex} from './regex';
 
-export const OBSIDIAN_TAG_KEY = 'tags';
-export const OBSIDIAN_ALIASES_KEY = 'aliases';
+
+export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
+export const OBSIDIAN_TAG_KEY_PLURAL = 'tags';
+export const OBSIDIAN_TAG_KEYS = [OBSIDIAN_TAG_KEY_SINGULAR, OBSIDIAN_TAG_KEY_PLURAL];
+export const OBSIDIAN_ALIAS_KEY_SINGULAR = 'alias';
+export const OBSIDIAN_ALIAS_KEY_PLURAL = 'aliases';
+export const OBSIDIAN_ALIASES_KEYS = [OBSIDIAN_ALIAS_KEY_SINGULAR, OBSIDIAN_ALIAS_KEY_PLURAL];
 export const LINTER_ALIASES_HELPER_KEY = 'linter-yaml-title-alias';
 
 /**

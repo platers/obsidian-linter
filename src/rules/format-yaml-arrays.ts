@@ -8,8 +8,8 @@ import {convertAliasValueToStringOrStringArray,
   getYamlSectionValue,
   loadYAML,
   NormalArrayFormats,
-  OBSIDIAN_ALIASES_KEY,
-  OBSIDIAN_TAG_KEY,
+  OBSIDIAN_ALIASES_KEYS,
+  OBSIDIAN_TAG_KEYS,
   setYamlSection,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
@@ -49,16 +49,24 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         return text;
       }
 
-      if (options.formatAliasKey && Object.keys(yaml).includes(OBSIDIAN_ALIASES_KEY)) {
-        text = setYamlSection(text, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, OBSIDIAN_ALIASES_KEY))), options.aliasArrayStyle));
+      for (const aliasKey of OBSIDIAN_ALIASES_KEYS) {
+        if (options.formatAliasKey && Object.keys(yaml).includes(aliasKey)) {
+          text = setYamlSection(text, aliasKey, formatYamlArrayValue(convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, aliasKey))), options.aliasArrayStyle));
+
+          break;
+        }
       }
 
-      if (options.formatTagKey && Object.keys(yaml).includes(OBSIDIAN_TAG_KEY)) {
-        text = setYamlSection(text, OBSIDIAN_TAG_KEY, formatYamlArrayValue(convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, OBSIDIAN_TAG_KEY))), options.tagArrayStyle));
+      for (const tagKey of OBSIDIAN_TAG_KEYS) {
+        if (options.formatTagKey && Object.keys(yaml).includes(tagKey)) {
+          text = setYamlSection(text, tagKey, formatYamlArrayValue(convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, tagKey))), options.tagArrayStyle));
+
+          break;
+        }
       }
 
       if (options.formatArrayKeys) {
-        const keysToIgnore = [OBSIDIAN_ALIASES_KEY, OBSIDIAN_TAG_KEY, ...options.forceMultiLineArrayStyle, ...options.forceSingleLineArrayStyle];
+        const keysToIgnore = [...OBSIDIAN_ALIASES_KEYS, ...OBSIDIAN_TAG_KEYS, ...options.forceMultiLineArrayStyle, ...options.forceSingleLineArrayStyle];
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays and already accounted for keys

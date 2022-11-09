@@ -132,5 +132,20 @@ ruleTest({
         tagArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
       },
     },
+    { // relates to https://github.com/platers/obsidian-linter/issues/441
+      testName: 'Creates single-line array tags when empty and the existing tags key is `tag`',
+      before: dedent`
+        ---
+        tag: ${''}
+        ---
+        #test
+      `,
+      after: dedent`
+        ---
+        tag: [test]
+        ---
+        #test
+      `,
+    },
   ],
 });
