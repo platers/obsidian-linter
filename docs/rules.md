@@ -239,6 +239,23 @@ After:
 tags: [one two three]
 ---
 ``````
+Example: Format tags in array with `tag` as the tags key
+
+Before:
+
+``````markdown
+---
+tag: [#one #two #three]
+---
+``````
+
+After:
+
+``````markdown
+---
+tag: [one two three]
+---
+``````
 Example: Format tags in list
 
 Before:
@@ -1463,13 +1480,13 @@ Links mid-sentence should be updated like <https://google.com> will be.
 links should stay the same: [](https://github.com)
 <https://gitlab.com>
 ``````
-Example: Angle brackets are added if the url is not the only text in the single quotes('), double quotes("), or backticks(`)
+Example: Angle brackets are added if the url is not the only text in the single quotes(') or double quotes(")
 
 Before:
 
 ``````markdown
 [https://github.com some text here]
-backticks around a url should stay the same, but only if the only contents of the backticks: `https://github.com some text here`
+backticks around a url should stay the same: `https://github.com some text here`
 single quotes around a url should stay the same, but only if the contents of the single quotes is the url: 'https://github.com some text here'
 double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "https://github.com some text here"
 ``````
@@ -1478,7 +1495,7 @@ After:
 
 ``````markdown
 [<https://github.com> some text here]
-backticks around a url should stay the same, but only if the only contents of the backticks: `<https://github.com> some text here`
+backticks around a url should stay the same: `https://github.com some text here`
 single quotes around a url should stay the same, but only if the contents of the single quotes is the url: '<https://github.com> some text here'
 double quotes around a url should stay the same, but only if the contents of the double quotes is the url: "<https://github.com> some text here"
 ``````
