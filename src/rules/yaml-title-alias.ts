@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEY, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
+import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {yamlRegex} from '../utils/regex';
 
@@ -102,8 +102,19 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       return originalValue;
     };
 
-    if (Object.keys(parsedYaml).includes(OBSIDIAN_ALIASES_KEY)) {
-      const aliasesValue = getYamlSectionValue(newYaml, OBSIDIAN_ALIASES_KEY);
+    let aliasKeyForFile: string = null;
+    const yamlKeys = Object.keys(parsedYaml);
+    for (const aliasKey of OBSIDIAN_ALIASES_KEYS) {
+      if (yamlKeys.includes(aliasKey)) {
+        aliasKeyForFile = aliasKey;
+
+        break;
+      }
+    }
+
+
+    if (aliasKeyForFile != null) {
+      const aliasesValue = getYamlSectionValue(newYaml, aliasKeyForFile);
       let currentAliasStyle: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
       const isEmpty = aliasesValue === '';
       let isSingleString = false;
@@ -121,18 +132,18 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       const newAliasValue = getNewAliasValue(currentAliasValue, shouldRemoveTitleAlias);
 
       if (newAliasValue === '') {
-        newYaml = removeYamlSection(newYaml, OBSIDIAN_ALIASES_KEY);
+        newYaml = removeYamlSection(newYaml, aliasKeyForFile);
       } else if (options.preserveExistingAliasesSectionStyle) {
         if (!isEmpty && ((isSingleString && title == newAliasValue) || !isSingleString || currentAliasValue == newAliasValue)) {
-          newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(newAliasValue, currentAliasStyle));
+          newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, currentAliasStyle));
         } else {
-          newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle));
+          newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle));
         }
       } else {
-        newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle));
+        newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle));
       }
     } else if (!shouldRemoveTitleAlias) {
-      newYaml = setYamlSection(newYaml, OBSIDIAN_ALIASES_KEY, formatYamlArrayValue(title, options.aliasArrayStyle));
+      newYaml = setYamlSection(newYaml, OBSIDIAN_ALIAS_KEY_PLURAL, formatYamlArrayValue(title, options.aliasArrayStyle));
     }
 
     if (!options.useYamlKeyToKeepTrackOfOldFilenameOrHeading || shouldRemoveTitleAlias) {

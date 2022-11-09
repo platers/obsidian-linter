@@ -197,6 +197,26 @@ ruleTest({
         formatTagKey: false,
       },
     },
+    { // relates to https://github.com/platers/obsidian-linter/issues/441
+      testName: 'Convert tags from single-line string to single-line string when there is only 1 element and the style is single string to multi-line and existing key is `tag`',
+      before: dedent`
+        ---
+        tag: tag1, tag2, tag3, tag4
+        ---
+      `,
+      after: dedent`
+        ---
+        tag:
+          - tag1
+          - tag2
+          - tag3
+          - tag4
+        ---
+      `,
+      options: {
+        tagArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
+      },
+    },
 
     // aliases
     {
@@ -209,6 +229,25 @@ ruleTest({
       after: dedent`
         ---
         aliases:
+          - title1
+          - title2
+          - title3
+        ---
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/441
+      testName: 'Convert aliases from single-line to multi-line array when exisiting key is `alias`',
+      before: dedent`
+        ---
+        alias: [title1, title2, title3]
+        ---
+      `,
+      after: dedent`
+        ---
+        alias:
           - title1
           - title2
           - title3

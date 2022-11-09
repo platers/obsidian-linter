@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {formatYAML} from '../utils/yaml';
+import {formatYAML, OBSIDIAN_TAG_KEY_SINGULAR, OBSIDIAN_TAG_KEY_PLURAL} from '../utils/yaml';
 
 class FormatTagsInYamlOptions implements Options {
 }
@@ -23,7 +23,7 @@ export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOption
   apply(text: string, options: FormatTagsInYamlOptions): string {
     return formatYAML(text, (text) => {
       return text.replace(
-          /\ntags:(.*?)(?=\n(?:[A-Za-z-]+?:|---))/s,
+          new RegExp(`\\n(${OBSIDIAN_TAG_KEY_PLURAL}|${OBSIDIAN_TAG_KEY_SINGULAR}):(.*?)(?=\\n(?:[A-Za-z-]+?:|---))`, 's'),
           function(tagsYAML) {
             return tagsYAML.replaceAll('#', '');
           },
@@ -55,6 +55,19 @@ export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOption
         after: dedent`
           ---
           tags: [one two three]
+          ---
+        `,
+      }),
+      new ExampleBuilder({ // relates to https://github.com/platers/obsidian-linter/issues/441
+        description: 'Format tags in array with `tag` as the tags key',
+        before: dedent`
+          ---
+          tag: [#one #two #three]
+          ---
+        `,
+        after: dedent`
+          ---
+          tag: [one two three]
           ---
         `,
       }),
