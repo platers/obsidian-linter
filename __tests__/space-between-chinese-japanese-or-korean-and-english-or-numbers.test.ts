@@ -1,9 +1,9 @@
-import SpaceBetweenChineseAndEnglishOrNumbers from '../src/rules/space-between-chinese-and-english-or-numbers';
+import SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers from '../src/rules/space-between-chinese-japanese-or-korean-and-english-or-numbers';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 
 ruleTest({
-  RuleBuilderClass: SpaceBetweenChineseAndEnglishOrNumbers,
+  RuleBuilderClass: SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers,
   testCases: [
     {
       // accounts for https://github.com/platers/obsidian-linter/issues/303
