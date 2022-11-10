@@ -22,7 +22,7 @@ export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLines
     return RuleType.SPACING;
   }
   apply(text: string, options: ParagraphBlankLinesOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml], text, makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs);
+    return ignoreListOfTypes([IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table], text, makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs);
   }
   get exampleBuilders(): ExampleBuilder<ParagraphBlankLinesOptions>[] {
     return [
