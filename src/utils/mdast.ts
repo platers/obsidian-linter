@@ -3,9 +3,14 @@ import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import {makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue} from './strings';
 import {genericLinkRegex} from './regex';
-import {remark} from 'remark';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
+import {gfmFootnote} from 'micromark-extension-gfm-footnote';
+import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
+import {combineExtensions} from 'micromark-util-combine-extensions';
+import {math} from 'micromark-extension-math';
+import {mathFromMarkdown} from 'mdast-util-math';
+import {fromMarkdown} from 'mdast-util-from-markdown';
+import {gfmFootnoteFromMarkdown} from 'mdast-util-gfm-footnote';
+import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
 
 export enum MDAstTypes {
   Link = 'link',
@@ -16,7 +21,6 @@ export enum MDAstTypes {
   ListItem = 'listItem',
   Code = 'code',
   InlineCode = 'inlineCode',
-  Table = 'table',
   Image = 'image',
   List = 'list',
   Blockquote = 'blockquote',
@@ -44,7 +48,16 @@ export enum UnorderedListItemStyles {
 }
 
 function parseTextToAST(text: string): Root {
-  const ast = remark().use(remarkGfm).use(remarkMath).parse(text);
+  const ast = fromMarkdown(text, {
+    extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem]), math()],
+    mdastExtensions: [[
+      gfmFootnoteFromMarkdown(),
+      gfmTaskListItemFromMarkdown,
+    ],
+    mathFromMarkdown(),
+    ],
+  });
+
   return ast;
 }
 
@@ -385,15 +398,6 @@ export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
       continue;
     }
 
-    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
-  }
-
-  return text;
-}
-
-export function ensureEmptyLinesAroundTables(text: string): string {
-  const positions: Position[] = getPositions(MDAstTypes.Table, text);
-  for (const position of positions) {
     text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
   }
 

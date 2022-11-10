@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes, ignoreListOfTypes} from '../utils/ignore-types';
-import {ensureEmptyLinesAroundTables} from '../utils/mdast';
+import {ensureEmptyLinesAroundTables} from '../utils/regex';
 
 class EmptyLineAroundTablesOptions implements Options {
 }
@@ -47,8 +47,8 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
           | foo      | bar      |
           | baz      | qux      |
           | quux     | quuz     |
-          More text.
           ${''}
+          More text.
           # Heading
           ${''}
           **Note that text directly following a table is considered part of a table according to github markdown**

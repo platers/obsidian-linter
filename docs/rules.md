@@ -2787,8 +2787,8 @@ After:
 | foo      | bar      |
 | baz      | qux      |
 | quux     | quuz     |
-More text.
 
+More text.
 # Heading
 
 **Note that text directly following a table is considered part of a table according to github markdown**
