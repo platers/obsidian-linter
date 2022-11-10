@@ -1,4 +1,4 @@
-import {obsidianMultilineCommentRegex, tagRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex} from './regex';
+import {obsidianMultilineCommentRegex, tagRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex, tableRegex} from './regex';
 import {getPositions, MDAstTypes} from './mdast';
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
@@ -18,7 +18,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   bold: {replaceAction: MDAstTypes.Bold, placeholder: '{STRONG_PLACEHOLDER}'},
   list: {replaceAction: MDAstTypes.List, placeholder: '{LIST_PLACEHOLDER}'},
   blockquote: {replaceAction: MDAstTypes.Blockquote, placeholder: '{BLOCKQUOTE_PLACEHOLDER}'},
-  table: {replaceAction: MDAstTypes.Table, placeholder: '{TABLE_PLACEHOLDER}'},
+  table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}'},
   math: {replaceAction: MDAstTypes.Math, placeholder: '{MATH_PLACEHOLDER}'},
   inlineMath: {replaceAction: MDAstTypes.InlineMath, placeholder: '{INLINE_MATH_PLACEHOLDER}'},
   // RegExp

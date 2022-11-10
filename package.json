@@ -51,9 +51,14 @@
     "diff-match-patch": "^1.0.5",
     "js-yaml": "^4.1.0",
     "loglevel": "^1.8.0",
-    "remark": "^14.0.2",
-    "remark-gfm": "^3.0.1",
-    "remark-math": "^5.1.1",
+    "mdast-util-from-markdown": "^1.2.0",
+    "mdast-util-gfm-footnote": "^1.0.1",
+    "mdast-util-gfm-task-list-item": "^1.0.1",
+    "mdast-util-math": "^2.0.1",
+    "micromark-extension-gfm-footnote": "^1.0.4",
+    "micromark-extension-gfm-task-list-item": "^1.0.3",
+    "micromark-extension-math": "^2.0.2",
+    "micromark-util-combine-extensions": "^1.0.0",
     "ts-dedent": "^2.2.0"
   }
 }
