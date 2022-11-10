@@ -18,14 +18,15 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   bold: {replaceAction: MDAstTypes.Bold, placeholder: '{STRONG_PLACEHOLDER}'},
   list: {replaceAction: MDAstTypes.List, placeholder: '{LIST_PLACEHOLDER}'},
   blockquote: {replaceAction: MDAstTypes.Blockquote, placeholder: '{BLOCKQUOTE_PLACEHOLDER}'},
-  table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}'},
   math: {replaceAction: MDAstTypes.Math, placeholder: '{MATH_PLACEHOLDER}'},
   inlineMath: {replaceAction: MDAstTypes.InlineMath, placeholder: '{INLINE_MATH_PLACEHOLDER}'},
+  html: {replaceAction: MDAstTypes.Html, placeholder: '{HTML_PLACEHOLDER}'},
   // RegExp
   yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---')},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}'},
   tag: {replaceAction: tagRegex, placeholder: '#tag-placeholder'},
   obsidianMultiLineComments: {replaceAction: obsidianMultilineCommentRegex, placeholder: '{OBSIDIAN_COMMENT_PLACEHOLDER}'},
+  table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}'},
   // custom functions
   link: {replaceAction: replaceMarkdownLinks, placeholder: '{REGULAR_LINK_PLACEHOLDER}'},
 } as const;

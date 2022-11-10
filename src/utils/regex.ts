@@ -11,7 +11,7 @@ export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
 export const wikiLinkRegex = /(!?)(\[{2}[^[\n\]]*\]{2})/g;
 export const genericLinkRegex = /^!?\[.*\](.*)$/;
-export const tagRegex = /(?:\s|^)#[^\s#]{1,}/g;
+export const tagRegex = /(?:\s|^)#[^\s#;.,><?!=+]+/g;
 export const obsidianMultilineCommentRegex = /^%%\n[^%]*\n%%/gm;
 export const wordSplitterRegex = /[,\s]+/;
 export const ellipsisRegex = /(\. ?){2}\./g;

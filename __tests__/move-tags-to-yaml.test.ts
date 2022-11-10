@@ -147,5 +147,22 @@ ruleTest({
         #test
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/489
+      testName: 'CSS styles are not included in tags',
+      before: dedent`
+        ---
+        tag: ${''}
+        ---
+        <mark style="background: #FFB8EBA6;">some text</mark>
+      `,
+      after: dedent`
+        ---
+        tag: ${''}
+        ---
+        <mark style="background: #FFB8EBA6;">some text</mark>
+      `,
+    },
+
+
   ],
 });
