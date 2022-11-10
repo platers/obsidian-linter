@@ -42,7 +42,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
     return RuleType.YAML;
   }
   apply(text: string, options: MoveTagsToYamlOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.html], text, (text) => {
       const tags = text.match(tagRegex);
       if (!tags) {
         return text;

@@ -25,6 +25,7 @@ export enum MDAstTypes {
   List = 'list',
   Blockquote = 'blockquote',
   HorizontalRule = 'thematicBreak',
+  Html = 'html',
   // math types
   Math = 'math',
   InlineMath = 'inlineMath',
