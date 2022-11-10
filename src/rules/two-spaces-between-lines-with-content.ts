@@ -22,7 +22,7 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
     return RuleType.CONTENT;
   }
   apply(text: string, options: TwoSpacesBetweenLinesWithContentOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml], text, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent);
+    return ignoreListOfTypes([IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table], text, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent);
   }
   get exampleBuilders(): ExampleBuilder<TwoSpacesBetweenLinesWithContentOptions>[] {
     return [
