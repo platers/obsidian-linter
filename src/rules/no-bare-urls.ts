@@ -3,6 +3,7 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
+import {urlRegex} from '../utils/regex';
 
 class NoBareUrlsOptions implements Options {
 }
@@ -25,7 +26,7 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
   }
   apply(text: string, options: NoBareUrlsOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode], text, (text) => {
-      const URLMatches = text.match(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,})/gi);
+      const URLMatches = text.match(urlRegex);
 
       if (!URLMatches) {
         return text;
