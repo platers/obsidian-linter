@@ -13,6 +13,7 @@ import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
 import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from './utils/yaml';
+import {urlRegex} from './utils/regex';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -444,7 +445,6 @@ export default class LinterPlugin extends Plugin {
     // Auto Title Link & Paste URL into Selection
     // has to search the entire clipboard (not surrounding the regex with ^$),
     // because otherwise having 2 URLs cause Obsidian-breaking conflict
-    const urlRegex = /((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()[\]{};:'".,<>?«»“”‘’]))/i;
     if (urlRegex.test(plainClipboard.trim())) {
       logWarn('aborted paste lint as the clipboard content is a link and doing so will avoid conflicts with other plugins that modify pasting.');
       return;
