@@ -82,7 +82,7 @@ ruleTest({
         ### H3
       `,
     },
-    {
+    { // accounts for https://github.com/platers/obsidian-linter/issues/501
       testName: 'Make sure a tag after a header still only has 1 blank line when bottom is set to true',
       before: dedent`
         ## diary
