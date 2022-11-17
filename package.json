@@ -59,6 +59,7 @@
     "micromark-extension-gfm-task-list-item": "^1.0.3",
     "micromark-extension-math": "^2.0.2",
     "micromark-util-combine-extensions": "^1.0.0",
+    "quick-lru": "^6.1.1",
     "ts-dedent": "^2.2.0"
   }
 }
