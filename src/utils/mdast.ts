@@ -1,7 +1,7 @@
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
-import {makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue} from './strings';
+import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue} from './strings';
 import {genericLinkRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
@@ -11,6 +11,9 @@ import {mathFromMarkdown} from 'mdast-util-math';
 import {fromMarkdown} from 'mdast-util-from-markdown';
 import {gfmFootnoteFromMarkdown} from 'mdast-util-gfm-footnote';
 import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
+import QuickLRU from 'quick-lru';
+
+const LRU = new QuickLRU({maxSize: 200});
 
 export enum MDAstTypes {
   Link = 'link',
@@ -49,6 +52,11 @@ export enum UnorderedListItemStyles {
 }
 
 function parseTextToAST(text: string): Root {
+  const textHash = hashString53Bit(text);
+  if (LRU.has(textHash)) {
+    return LRU.get(textHash) as Root;
+  }
+
   const ast = fromMarkdown(text, {
     extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem]), math()],
     mdastExtensions: [[
@@ -58,6 +66,8 @@ function parseTextToAST(text: string): Root {
     mathFromMarkdown(),
     ],
   });
+
+  LRU.set(textHash, ast);
 
   return ast;
 }
