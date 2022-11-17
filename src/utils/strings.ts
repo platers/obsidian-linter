@@ -119,6 +119,7 @@ export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, st
   return contentPriorToContent + content + contentAfterContent;
 }
 
+// from https://stackoverflow.com/a/52171480/8353749
 export function hashString53Bit(str: string, seed: number = 0): number {
   let h1 = 0xdeadbeef ^ seed;
   let h2 = 0x41c6ce57 ^ seed;

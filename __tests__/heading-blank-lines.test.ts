@@ -82,5 +82,26 @@ ruleTest({
         ### H3
       `,
     },
+    {
+      testName: 'Make sure a tag after a header still only has 1 blank line when bottom is set to true',
+      before: dedent`
+        ## diary
+
+        #study
+        blah blah blah
+
+        #life
+        blah blah blah
+      `,
+      after: dedent`
+        ## diary
+
+        #study
+        blah blah blah
+
+        #life
+        blah blah blah
+      `,
+    },
   ],
 });
