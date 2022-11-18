@@ -110,7 +110,7 @@ ruleTest({
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/484
-      testName: 'Make sure that first letter ot be capitalized by `First Letter` is preceded by a space',
+      testName: 'Make sure that first letter ot be capitalized by `First Letter` is preceded by a space or tab',
       before: dedent`
         ### 1.0.0-b.4
         ### b
@@ -125,6 +125,5 @@ ruleTest({
         style: 'First letter',
       },
     },
-    // ### 1.0.0-b.4
   ],
 });
