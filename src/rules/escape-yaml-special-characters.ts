@@ -46,6 +46,22 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
         let valueStartIndex = 1;
         if (!startsWithDash) {
           valueStartIndex += firstColonIndex;
+        } else if (firstColonIndex !== -1 && i + 1 < yamlLineCount) { // account for arrays of dictionaries
+          const fullLine = yamlLines[i];
+          let expectedIndentationToBeAnArrayOfDictionaries = fullLine.indexOf('-') + 1;
+          while (expectedIndentationToBeAnArrayOfDictionaries < fullLine.length && fullLine.charAt(expectedIndentationToBeAnArrayOfDictionaries) === ' ') {
+            expectedIndentationToBeAnArrayOfDictionaries++;
+          }
+
+          let actualIndentationOfNextLine = 0;
+          const nextLine = yamlLines[i+1];
+          while (actualIndentationOfNextLine < nextLine.length && nextLine.charAt(actualIndentationOfNextLine) === ' ') {
+            actualIndentationOfNextLine++;
+          }
+
+          if (expectedIndentationToBeAnArrayOfDictionaries <= actualIndentationOfNextLine) {
+            valueStartIndex += firstColonIndex;
+          }
         }
 
         const value = line.substring(valueStartIndex).trim();
