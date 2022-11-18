@@ -69,8 +69,8 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         const keysToIgnore = [...OBSIDIAN_ALIASES_KEYS, ...OBSIDIAN_TAG_KEYS, ...options.forceMultiLineArrayStyle, ...options.forceSingleLineArrayStyle];
 
         for (const key of Object.keys(yaml)) {
-          // skip non-arrays and already accounted for keys
-          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key])) {
+          // skip non-arrays, arrays of objects, ignored keys, and already accounted for keys
+          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || typeof yaml[key][0] === 'object') {
             continue;
           }
 
@@ -157,6 +157,31 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         options: {
           formatAliasKey: false,
           tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Arrays with dictionaries in them are ignored',
+        before: dedent`
+          ---
+          gists:
+            - id: test123
+              url: 'some_url'
+              filename: file.md
+              isPublic: true
+          ---
+        `,
+        after: dedent`
+          ---
+          gists:
+            - id: test123
+              url: 'some_url'
+              filename: file.md
+              isPublic: true
+          ---
+        `,
+        options: {
+          formatArrayKeys: true,
+          defaultArrayStyle: NormalArrayFormats.SingleLine,
         },
       }),
     ];

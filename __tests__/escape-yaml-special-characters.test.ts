@@ -10,22 +10,22 @@ ruleTest({
       before: dedent`
         ---
         gists:
-          - id: 4d06d592f0b0ae1771c0012de3562d8d
-            url: 'https://gist.github.com/4d06d592f0b0ae1771c0012de3562d8d'
+          - id: testing123
+            url: 'https://gist.github.com/testing123'
             createdAt: '2022-11-01T16:07:48Z'
             updatedAt: '2022-11-01T16:35:11Z'
-            filename: Stochastic P1.md
+            filename: file1.md
             isPublic: true
         ---
       `,
       after: dedent`
         ---
         gists:
-          - id: 4d06d592f0b0ae1771c0012de3562d8d
-            url: 'https://gist.github.com/4d06d592f0b0ae1771c0012de3562d8d'
+          - id: testing123
+            url: 'https://gist.github.com/testing123'
             createdAt: '2022-11-01T16:07:48Z'
             updatedAt: '2022-11-01T16:35:11Z'
-            filename: Stochastic P1.md
+            filename: file1.md
             isPublic: true
         ---
       `,
@@ -35,15 +35,15 @@ ruleTest({
       before: dedent`
         ---
         gists:
-          - id: 4d06d592f0b0ae1771c0012de3562d8d
-        url: 'https://gist.github.com/4d06d592f0b0ae1771c0012de3562d8d'
+          - id: testing123
+        url: 'https://gist.github.com/testing123'
         ---
       `,
       after: dedent`
         ---
         gists:
-          - "id: 4d06d592f0b0ae1771c0012de3562d8d"
-        url: 'https://gist.github.com/4d06d592f0b0ae1771c0012de3562d8d'
+          - "id: testing123"
+        url: 'https://gist.github.com/testing123'
         ---
       `,
     },
@@ -52,13 +52,13 @@ ruleTest({
       before: dedent`
         ---
         gists:
-          - id: 4d06d592f0b0ae1771c0012de3562d8d
+          - id: testing123
         ---
       `,
       after: dedent`
         ---
         gists:
-          - "id: 4d06d592f0b0ae1771c0012de3562d8d"
+          - "id: testing123"
         ---
       `,
     },
