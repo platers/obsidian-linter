@@ -97,8 +97,7 @@ ruleTest({
         style: 'First letter',
       },
     },
-    {
-      // accounts for https://github.com/platers/obsidian-linter/issues/321
+    { // accounts for https://github.com/platers/obsidian-linter/issues/321
       testName: 'Make sure non-english letters get capitalized when they are the first letter and the rule is set to capitalize the first letter',
       before: dedent`
         # état
@@ -110,5 +109,22 @@ ruleTest({
         style: 'First letter',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/484
+      testName: 'Make sure that first letter ot be capitalized by `First Letter` is preceded by a space',
+      before: dedent`
+        ### 1.0.0-b.4
+        ### b
+        # 1.0-b this is a heading
+      `,
+      after: dedent`
+        ### 1.0.0-b.4
+        ### B
+        # 1.0-b This is a heading
+      `,
+      options: {
+        style: 'First letter',
+      },
+    },
+    // ### 1.0.0-b.4
   ],
 });

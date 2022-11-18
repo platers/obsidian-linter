@@ -117,7 +117,9 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
             // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
             lines[i] = lines[i]
                 .toLowerCase()
-                .replace(/^#*\s+([^\p{L}])*([\p{L}])/u, (string) => string.toUpperCase()); // capitalize first letter of heading
+                .replace(/\s+([\p{L}])/u, (lowerCaseMatch: string) => {
+                  return lowerCaseMatch.toUpperCase();
+                }); // capitalize first letter of heading
             break;
         }
       }
