@@ -1,4 +1,4 @@
-import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown} from 'obsidian';
+import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange} from 'obsidian';
 import {LinterSettings, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -435,7 +435,6 @@ export default class LinterPlugin extends Plugin {
     // abort when pane isn't markdown editor
     const editor = this.getEditor();
     if (!editor) return;
-
     // abort when clipboard contains an image (or is empty)
     // check for plain text, since 'getData("text/html")' ignores plain-text
     const plainClipboard = clipboardEv.clipboardData.getData('text/plain');
@@ -459,10 +458,72 @@ export default class LinterPlugin extends Plugin {
     const convertHtmlEnabled = this.app.vault.getConfig('autoConvertHtml');
     const htmlClipText = clipboardEv.clipboardData.getData('text/html');
     let clipboardText = htmlClipText && convertHtmlEnabled ? htmlToMarkdown(htmlClipText) : plainClipboard;
-    // if everything went well, run clipboard modifications (passing in current line and and text to paste)
-    clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor), createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings));
 
-    editor.replaceSelection(clipboardText);
+    // if everything went well, run clipboard modifications (passing in current line and and text to paste)
+    const cursorSelections = editor.listSelections();
+    if (cursorSelections.length === 1) {
+      const cursorSelection = cursorSelections[0];
+      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection), createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings));
+      editor.replaceSelection(clipboardText);
+    } else {
+      this.handleMultiCursorPaste(editor, cursorSelections, clipboardText);
+    }
+  }
+
+  /**
+   * Goes ahead and makes sure that each cursor has the proper paste value and only gets that text pasted there instead of at each cursor.
+   * @param {Editor} editor - The codemirror editor where the content is located.
+   * @param {EditorSelection[]} cursorSelections - The cursor selections made by the user.
+   * @param {string} clipboardText - The clipboard text that is to be pasted, but first needs to be converted to the proper paste value for each cursor.
+   */
+  handleMultiCursorPaste(editor: Editor, cursorSelections: EditorSelection[], clipboardText: string) {
+    const pasteContentPerCursor = this.convertContentIntoProperPasteContent(cursorSelections, clipboardText);
+    const editorChange: EditorChange[] = [];
+
+    cursorSelections.forEach((cursorSelection: EditorSelection, index: number) => {
+      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection), createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings));
+      editorChange.push({
+        text: clipboardText,
+        from: cursorSelection.anchor,
+        to: cursorSelection.head,
+      });
+    });
+
+    // make sure that they are considered one change so that undo will only need to happen once for a multicursor paste
+    editor.transaction({
+      changes: editorChange,
+    });
+  }
+
+  /**
+   * Divvies up the clipboard text between the multiple cursors and makes sure they either have the whole clipboard text or an even amount of lines from the the clipboard text.
+   * @param {EditorSelection[]} cursorSelections - The cursor selections made by the user.
+   * @param {string} clipboardText - The clipboard text that is to be pasted, but first needs to be converted to the proper paste value for each cursor.
+   * @return {string[]} The content to paste at each cursor which is either the clipboard text or an even division of the clipboard text if there is a multiple
+   * of the amount of cursors that is equal to the amount of lines clipboard text.
+   */
+  convertContentIntoProperPasteContent(cursorSelections: EditorSelection[], clipboardText: string): string[] {
+    const clipboardLines = clipboardText.split('\n');
+    const contentToPasteForEachCursor: string[] = [];
+    if (clipboardLines.length % cursorSelections.length !== 0) {
+      for (let index = 0; index < cursorSelections.length; index++) {
+        contentToPasteForEachCursor.push(clipboardText);
+      }
+    } else {
+      const numberOfLinesPerCursorSelection = clipboardLines.length / cursorSelections.length;
+      let contentToPasteForCursorSelection = '';
+      for (let index = 0; index < clipboardLines.length; index++) {
+        contentToPasteForCursorSelection += clipboardLines[index];
+
+        // if we are the last index or if the next index should start the next cursor selection paste content, add the cursor selection content to its proper location
+        if (index + 1 === cursorSelections.length || ((index + 1) % numberOfLinesPerCursorSelection === 0)) {
+          contentToPasteForEachCursor.push(contentToPasteForCursorSelection);
+          contentToPasteForCursorSelection = '';
+        }
+      }
+    }
+
+    return contentToPasteForEachCursor;
   }
 
   async pasteAsPlainText(editor: Editor): Promise<void> {
@@ -488,11 +549,11 @@ export default class LinterPlugin extends Plugin {
   /**
    * Makes sure to get the whole line where the cursor is at even if a selection is made.
    * @param {Editor} editor - The codemirror editor where the content is located.
+   * @param {EditorSelection} selection - The codemirror editor selection where a cursor is at.
    * @return {string} The current line contents in the editor (i.e. the line where the cursor is)
    */
-  private getLineContent(editor: Editor): string {
-    const currentLineNumber = editor.getCursor('from').line;
-    return editor.getLine(currentLineNumber);
+  private getLineContent(editor:Editor, selection: EditorSelection): string {
+    return editor.getLine(selection.anchor.line);
   }
 
   /**
