@@ -70,7 +70,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays, arrays of objects, ignored keys, and already accounted for keys
-          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || typeof yaml[key][0] === 'object') {
+          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || (yaml[key].length !== 0 && typeof yaml[key][0] === 'object' && yaml[key][0] !== null)) {
             continue;
           }
 
