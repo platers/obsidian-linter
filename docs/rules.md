@@ -360,6 +360,31 @@ types: [thought provoking, peer reviewed]
 tags: computer science trajectory
 ---
 ``````
+Example: Arrays with dictionaries in them are ignored
+
+Before:
+
+``````markdown
+---
+gists:
+  - id: test123
+    url: 'some_url'
+    filename: file.md
+    isPublic: true
+---
+``````
+
+After:
+
+``````markdown
+---
+gists:
+  - id: test123
+    url: 'some_url'
+    filename: file.md
+    isPublic: true
+---
+``````
 
 ### Insert YAML attributes
 
@@ -3370,9 +3395,9 @@ After:
 	- [ ] Item 3
 ``````
 
-### Space between Chinese Japanese or Korean and English or numbers
+### Space between Chinese, Japanese, or Korean and English or numbers
 
-Alias: `space-between-chinese-japanese-or-korean-and-english-or-numbers`
+Alias: `space-between-chinese,-japanese,-or-korean-and-english-or-numbers`
 
 Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)
 
