@@ -4,39 +4,68 @@ import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {updateBoldText, updateItalicsText} from '../utils/mdast';
 
-class SpaceBetweenChineseAndEnglishOrNumbersOptions implements Options {
-}
+class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions
+implements Options {}
 
 @RuleBuilder.register
-export default class SpaceBetweenChineseAndEnglishOrNumbers extends RuleBuilder<SpaceBetweenChineseAndEnglishOrNumbersOptions> {
-  get OptionsClass(): new () => SpaceBetweenChineseAndEnglishOrNumbersOptions {
-    return SpaceBetweenChineseAndEnglishOrNumbersOptions;
+export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers extends RuleBuilder<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions> {
+  get OptionsClass(): new () => SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions {
+    return SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions;
   }
   get name(): string {
-    return 'Space between Chinese and English or numbers';
+    return 'Space between Chinese, Japanese, or Korean and English or numbers';
   }
   get description(): string {
-    return 'Ensures that Chinese and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)';
+    return 'Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)';
   }
   get type(): RuleType {
     return RuleType.SPACING;
   }
-  apply(text: string, options: SpaceBetweenChineseAndEnglishOrNumbersOptions): string {
-    const head = /([\u4e00-\u9fa5])( *)(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+'"([{¥$]|\*[^*])/gm;
-    const tail = /(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+;:'"°%$)\]}]|[^*]\*)( *)([\u4e00-\u9fa5])/gm;
-    const addSpaceAroundChineseAndEnglish = function(text: string): string {
+  apply(
+      text: string,
+      options: SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions,
+  ): string {
+    const head =
+      /(\p{sc=Han}|\p{sc=Katakana}|\p{sc=Hiragana}|\p{sc=Hangul})( *)(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+'"([{¥$]|\*[^*])/gmu;
+    const tail =
+      /(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+;:'"°%$)\]}]|[^*]\*)( *)(\p{sc=Han}|\p{sc=Katakana}|\p{sc=Hiragana}|\p{sc=Hangul})/gmu;
+    const addSpaceAroundChineseJapaneseKoreanAndEnglish = function(
+        text: string,
+    ): string {
       return text.replace(head, '$1 $3').replace(tail, '$1 $3');
     };
 
-    let newText = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.yaml, IgnoreTypes.image, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.italics, IgnoreTypes.bold, IgnoreTypes.math, IgnoreTypes.inlineMath], text, addSpaceAroundChineseAndEnglish);
+    let newText = ignoreListOfTypes(
+        [
+          IgnoreTypes.code,
+          IgnoreTypes.inlineCode,
+          IgnoreTypes.yaml,
+          IgnoreTypes.image,
+          IgnoreTypes.link,
+          IgnoreTypes.wikiLink,
+          IgnoreTypes.tag,
+          IgnoreTypes.italics,
+          IgnoreTypes.bold,
+          IgnoreTypes.math,
+          IgnoreTypes.inlineMath,
+        ],
+        text,
+        addSpaceAroundChineseJapaneseKoreanAndEnglish,
+    );
 
-    newText = updateItalicsText(newText, addSpaceAroundChineseAndEnglish);
+    newText = updateItalicsText(
+        newText,
+        addSpaceAroundChineseJapaneseKoreanAndEnglish,
+    );
 
-    newText = updateBoldText(newText, addSpaceAroundChineseAndEnglish);
+    newText = updateBoldText(
+        newText,
+        addSpaceAroundChineseJapaneseKoreanAndEnglish,
+    );
 
     return newText;
   }
-  get exampleBuilders(): ExampleBuilder<SpaceBetweenChineseAndEnglishOrNumbersOptions>[] {
+  get exampleBuilders(): ExampleBuilder<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions>[] {
     return [
       new ExampleBuilder({
         description: 'Space between Chinese and English',
@@ -77,7 +106,8 @@ export default class SpaceBetweenChineseAndEnglishOrNumbers extends RuleBuilder<
       }),
       new ExampleBuilder({
         // accounts for https://github.com/platers/obsidian-linter/issues/301
-        description: 'Make sure that spaces are not added between italics and chinese characters to preserve markdown syntax',
+        description:
+          'Make sure that spaces are not added between italics and chinese characters to preserve markdown syntax',
         before: dedent`
           _这是一个数学公式_
           *这是一个数学公式english*
@@ -113,9 +143,24 @@ export default class SpaceBetweenChineseAndEnglishOrNumbers extends RuleBuilder<
           ![这是一个数学公式english](这是一个数学公式english.jpg)
         `,
       }),
+      new ExampleBuilder({
+        description: 'Space between CJK and English',
+        before: dedent`
+          日本語englishひらがな
+          カタカナenglishカタカナ
+          ﾊﾝｶｸｶﾀｶﾅenglish１２３全角数字
+          한글english한글
+        `,
+        after: dedent`
+          日本語 english ひらがな
+          カタカナ english カタカナ
+          ﾊﾝｶｸｶﾀｶﾅ english１２３全角数字
+          한글 english 한글
+        `,
+      }),
     ];
   }
-  get optionBuilders(): OptionBuilderBase<SpaceBetweenChineseAndEnglishOrNumbersOptions>[] {
+  get optionBuilders(): OptionBuilderBase<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions>[] {
     return [];
   }
 }

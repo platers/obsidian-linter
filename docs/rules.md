@@ -3370,11 +3370,11 @@ After:
 	- [ ] Item 3
 ``````
 
-### Space between Chinese and English or numbers
+### Space between Chinese Japanese or Korean and English or numbers
 
-Alias: `space-between-chinese-and-english-or-numbers`
+Alias: `space-between-chinese-japanese-or-korean-and-english-or-numbers`
 
-Ensures that Chinese and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)
+Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)
 
 
 
@@ -3473,6 +3473,25 @@ After:
 ![[这是一个数学公式english.jpg]]
 [这是一个数学公式english](这是一个数学公式english.md)
 ![这是一个数学公式english](这是一个数学公式english.jpg)
+``````
+Example: Space between CJK and English
+
+Before:
+
+``````markdown
+日本語englishひらがな
+カタカナenglishカタカナ
+ﾊﾝｶｸｶﾀｶﾅenglish１２３全角数字
+한글english한글
+``````
+
+After:
+
+``````markdown
+日本語 english ひらがな
+カタカナ english カタカナ
+ﾊﾝｶｸｶﾀｶﾅ english１２３全角数字
+한글 english 한글
 ``````
 
 ### Trailing spaces
