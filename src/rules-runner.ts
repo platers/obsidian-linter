@@ -1,6 +1,6 @@
 import {TFile, moment} from 'obsidian';
 import {logDebug, logWarn} from './logger';
-import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand, RuleType} from './rules';
+import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand, CustomRegex, RuleType} from './rules';
 import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import ForceYamlEscape from './rules/force-yaml-escape';
@@ -60,6 +60,8 @@ export class RulesRunner {
         defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
       });
     }
+
+    newText = this.runCustomRegexReplacement(runOptions.settings.customRegexs, newText);
 
     runOptions.oldText = newText;
 
@@ -128,6 +130,19 @@ export class RulesRunner {
         wrapLintError(error, `Custom Lint Command ${commandInfo.id}`);
       }
     }
+  }
+
+  runCustomRegexReplacement(customRegexs: CustomRegex[], oldText: string): string {
+    logDebug(`Running Custom Regex`);
+    let tempOldText = oldText;
+    for (const eachRegex of customRegexs) {
+      if (!eachRegex.find || eachRegex.find.trim() == '' || !eachRegex.replace || eachRegex.replace.trim() == '') {
+        continue;
+      }
+      const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
+      tempOldText = tempOldText.replace(regex, eachRegex.replace);
+    }
+    return tempOldText;
   }
 
   runPasteLint(currentLine: string, runOptions: RunLinterRulesOptions): string {

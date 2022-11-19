@@ -60,7 +60,12 @@ export class SettingTab extends PluginSettingTab {
       this.addRuleToTab(tabTitle, rule);
     }
 
-    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => this.generateCustomCommandSettings(tabName, el));
+    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => {
+      let tempContainer = el.createDiv();
+      this.generateCustomCommandSettings(tabName, tempContainer);
+      tempContainer = el.createDiv();
+      this.generateCustomRegexReplacementSettings(tabName, tempContainer);
+    });
     this.createSearchZeroState(settingsEl);
   }
 
@@ -236,6 +241,68 @@ export class SettingTab extends PluginSettingTab {
                   this.display();
                 });
           });
+    });
+  }
+
+  generateCustomRegexReplacementSettings(tabName: string, containerEl: HTMLElement): void {
+    const settingName = 'Custom Regex Replacement';
+    containerEl.createEl(Platform.isMobile ? 'h4' : 'h3', {text: settingName});
+    this.addSettingToMasterSettingsList(tabName, containerEl as HTMLDivElement, tabName.toLowerCase(), settingName);
+    new Setting(containerEl)
+        .addButton((cb)=>{
+          cb.setButtonText('Add new regex')
+              .setCta()
+              .onClick(()=>{
+                this.plugin.settings.customRegexs.push({find: '', replace: '', flags: ''});
+                this.plugin.saveSettings();
+                this.display();
+                const customRegexInputBox = document.getElementsByClassName('linter-custom-regex-replacement');
+                // @ts-ignore
+                customRegexInputBox[customRegexInputBox.length-1].focus();
+              });
+        });
+
+    this.plugin.settings.customRegexs.forEach((regex, index) => {
+      const setting = new Setting(containerEl);
+      setting.addText((cb) => {
+        cb.setPlaceholder('regex to find')
+            .setValue(regex.find)
+            .onChange((value) => {
+              this.plugin.settings.customRegexs[index].find = value;
+              this.plugin.saveSettings();
+            });
+        cb.inputEl.setAttr('inputIndex', index);
+        cb.inputEl.addClass('linter-custom-regex-replacement');
+      });
+
+      const defaultFlags = 'gm';
+      let flags = regex.flags;
+      if (!flags || flags.trim() == '') {
+        flags = defaultFlags;
+      }
+      setting.addText((cb) => {
+        cb.setPlaceholder('flags')
+            .setValue(flags)
+            .onChange((value) => {
+              this.plugin.settings.customRegexs[index].flags = value;
+              this.plugin.saveSettings();
+            });
+      }).addText((cb) => {
+        cb.setPlaceholder('regex to replace')
+            .setValue(regex.replace)
+            .onChange((value) => {
+              this.plugin.settings.customRegexs[index].replace = value;
+              this.plugin.saveSettings();
+            });
+      }).addExtraButton((cb)=>{
+        cb.setIcon('cross')
+            .setTooltip('Delete')
+            .onClick(()=>{
+              this.plugin.settings.customRegexs.splice(index, 1);
+              this.plugin.saveSettings();
+              this.display();
+            });
+      });
     });
   }
 

@@ -49,6 +49,7 @@ const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   linterLocale: 'system-default',
   logLevel: log.levels.ERROR,
   lintCommands: [],
+  customRegexs: [],
   commonStyles: {
     aliasArrayStyle: NormalArrayFormats.SingleLine,
     tagArrayStyle: NormalArrayFormats.SingleLine,
