@@ -360,6 +360,31 @@ types: [thought provoking, peer reviewed]
 tags: computer science trajectory
 ---
 ``````
+Example: Arrays with dictionaries in them are ignored
+
+Before:
+
+``````markdown
+---
+gists:
+  - id: test123
+    url: 'some_url'
+    filename: file.md
+    isPublic: true
+---
+``````
+
+After:
+
+``````markdown
+---
+gists:
+  - id: test123
+    url: 'some_url'
+    filename: file.md
+    isPublic: true
+---
+``````
 
 ### Insert YAML attributes
 
