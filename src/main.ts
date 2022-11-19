@@ -127,7 +127,7 @@ export default class LinterPlugin extends Plugin {
     const spaceBetweenChineseAndEnglishOrNumbers = this.settings.ruleConfigs['Space between Chinese and English or numbers'];
     if (spaceBetweenChineseAndEnglishOrNumbers) {
       const enabled = spaceBetweenChineseAndEnglishOrNumbers['Ensures that Chinese and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)'];
-      this.settings.ruleConfigs['Space between Chinese, Japanese, or Korean and English or numbers'] = {
+      this.settings.ruleConfigs['Space between Chinese Japanese or Korean and English or numbers'] = {
         'Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)': enabled,
       };
       delete this.settings.ruleConfigs['Space between Chinese and English or numbers'];

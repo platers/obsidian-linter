@@ -13,7 +13,7 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
     return SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions;
   }
   get name(): string {
-    return 'Space between Chinese, Japanese, or Korean and English or numbers';
+    return 'Space between Chinese Japanese or Korean and English or numbers';
   }
   get description(): string {
     return 'Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)';
