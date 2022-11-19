@@ -133,7 +133,6 @@ export default class LinterPlugin extends Plugin {
       delete this.settings.ruleConfigs['Space between Chinese and English or numbers'];
     }
 
-
     this.moveSettingsToCommonSettings();
 
     // make sure to load the defaults of any missing rules to make sure they do not cause issues on the settings page
