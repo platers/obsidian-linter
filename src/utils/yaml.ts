@@ -230,7 +230,7 @@ export function convertTagValueToStringOrStringArray(value: string | string[]): 
   if (Array.isArray(value)) {
     originalTagValues = value;
   } else if (value.includes(',')) {
-    originalTagValues = value.split(', ');
+    originalTagValues = value.split(',').map((val: string) => val.trim());
   } else {
     originalTagValues = value.split(' ');
   }
