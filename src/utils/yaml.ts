@@ -190,9 +190,7 @@ export function splitValueIfSingleOrMultilineArray(value: string): string | stri
       return null;
     }
 
-    let arrayItems = value.split(', ');
-
-    arrayItems = arrayItems.length > 1 ? arrayItems : arrayItems[0].split(',');
+    const arrayItems = value.split(',').map((val: string) => val.trim());
 
     return arrayItems.filter((el: string) => {
       return el != '';
