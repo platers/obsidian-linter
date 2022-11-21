@@ -217,6 +217,26 @@ ruleTest({
         tagArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/509
+      testName: 'Convert tags from single-line array to multi-line array when there is no space after one of the commas and the key for tags is `tag`',
+      before: dedent`
+        ---
+        tag: [tag1,tag2, tag3, tag4]
+        ---
+      `,
+      after: dedent`
+        ---
+        tag:
+          - tag1
+          - tag2
+          - tag3
+          - tag4
+        ---
+      `,
+      options: {
+        tagArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
 
     // aliases
     {
