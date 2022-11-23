@@ -2,15 +2,17 @@
 import {makeSureContentHasEmptyLinesAddedBeforeAndAfter} from './strings';
 
 // Useful regexes
-export const headerRegex = /^(\s*)(#+)(\s+)(.*)$/;
+export const headerRegex = /^(\s*)(#+)(\s+)(.*)$/m;
 export const fencedRegexTemplate = '^XXX\\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\\s|$)$';
 export const yamlRegex = /^---\n((?:(((?!---)(?:.|\n)*?)\n)?))---(?=\n|$)/;
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
-export const wikiLinkRegex = /(!?)(\[{2}[^[\n\]]*\]{2})/g;
-export const genericLinkRegex = /^!?\[.*\](.*)$/;
+// based on https://stackoverflow.com/a/26010910/8353749
+export const wikiLinkRegex = /(!?)\[{2}([^\][\n|]+)(\|([^\][\n|]+))?\]{2}/g;
+// based on https://davidwells.io/snippets/regex-match-markdown-links
+export const genericLinkRegex = /(!?)\[([^[]*)\](\(.*\))/g;
 export const tagRegex = /(?:\s|^)#[^\s#;.,><?!=+]+/g;
 export const obsidianMultilineCommentRegex = /^%%\n[^%]*\n%%/gm;
 export const wordSplitterRegex = /[,\s]+/;
@@ -78,4 +80,23 @@ export function ensureEmptyLinesAroundTables(text: string): string {
   }
 
   return text;
+}
+
+/**
+ * Gets the first header one's text from the string provided making sure to convert any links to their display text.
+ * @param {string} text - The text to have get the first header one's text from.
+ * @return {string} The text for the first header one if present or an empty string.
+ */
+export function getFirstHeaderOneText(text: string) {
+  const result = text.match(headerRegex);
+  if (result && result[4]) {
+    let headerText = result[4];
+    headerText = headerText.replaceAll(wikiLinkRegex, (_, _2, $2: string, $3: string) => {
+      return $3 ?? $2;
+    });
+
+    return headerText.replaceAll(genericLinkRegex, '$2');
+  }
+
+  return '';
 }

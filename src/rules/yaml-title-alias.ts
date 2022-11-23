@@ -3,7 +3,7 @@ import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} fr
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {yamlRegex} from '../utils/regex';
+import {getFirstHeaderOneText, yamlRegex} from '../utils/regex';
 
 
 class YamlTitleAliasOptions implements Options {
@@ -37,13 +37,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   }
   apply(text: string, options: YamlTitleAliasOptions): string {
     text = initYAML(text);
-    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
-      const result = text.match(/^#\s+(.*)/m);
-      if (result) {
-        return result[1];
-      }
-      return '';
-    });
+    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
     title = title || options.fileName;
 
     let previousTitle: string = null;
@@ -249,6 +243,24 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
           keepAliasThatMatchesTheFilename: true,
         },
       }),
+      new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/470
+        description: 'Make sure that markdown and wiki links in first H1 get their values converted to text',
+        before: dedent`
+          # This is a [Heading](markdown.md)
+        `,
+        after: dedent`
+          ---
+          aliases:
+            - This is a Heading
+          linter-yaml-title-alias: This is a Heading
+          ---
+          # This is a [Heading](markdown.md)
+        `,
+        options: {
+          aliasArrayStyle: NormalArrayFormats.MultiLine,
+        },
+      },
+      ),
     ];
   }
   get optionBuilders(): OptionBuilderBase<YamlTitleAliasOptions>[] {

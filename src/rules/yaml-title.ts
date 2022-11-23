@@ -3,7 +3,7 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from 
 import dedent from 'ts-dedent';
 import {escapeStringIfNecessaryAndPossible, formatYAML, initYAML} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {escapeDollarSigns} from '../utils/regex';
+import {escapeDollarSigns, getFirstHeaderOneText} from '../utils/regex';
 import {insert} from '../utils/strings';
 
 class YamlTitleOptions implements Options {
@@ -32,13 +32,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
   }
   apply(text: string, options: YamlTitleOptions): string {
     text = initYAML(text);
-    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
-      const result = text.match(/^#\s+(.*)/m);
-      if (result) {
-        return result[1];
-      }
-      return '';
-    });
+    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
     title = title || options.fileName;
 
     title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter);
@@ -90,6 +84,18 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
         options: {
           fileName: 'Filename',
         },
+      }),
+      new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/470
+        description: 'Make sure that markdown links in headings are properly copied to the yaml as just the text',
+        before: dedent`
+          # This is a [Heading](test heading.md)
+        `,
+        after: dedent`
+          ---
+          title: This is a Heading
+          ---
+          # This is a [Heading](test heading.md)
+        `,
       }),
     ];
   }

@@ -1080,12 +1080,56 @@ ruleTest({
       after: dedent`
         ---
         aliases:
-          - [[Heading]]
-        linter-yaml-title-alias: [[Heading]]
+          - Heading
+        linter-yaml-title-alias: Heading
         ---
         [[Link1]]
 
         # [[Heading]]
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/470
+      testName: 'Make sure that markdown links aliases and custom key are converted to text',
+      before: dedent`
+        ---
+        aliases:
+          - This is a [Heading](markdown.md)
+        linter-yaml-title-alias: This is a [Heading](markdown.md)
+        ---
+        # This is a [Heading](markdown.md)
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - This is a Heading
+        linter-yaml-title-alias: This is a Heading
+        ---
+        # This is a [Heading](markdown.md)
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/470
+      testName: 'Make sure that wiki links aliases and custom key are converted to text',
+      before: dedent`
+        ---
+        aliases:
+          - This is a [[Heading]]
+        linter-yaml-title-alias: This is a [[Heading]]
+        ---
+        # This is a [[Heading]]
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - This is a Heading
+        linter-yaml-title-alias: This is a Heading
+        ---
+        # This is a [[Heading]]
       `,
       options: {
         aliasArrayStyle: NormalArrayFormats.MultiLine,
