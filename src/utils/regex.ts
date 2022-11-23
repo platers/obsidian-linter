@@ -83,13 +83,20 @@ export function ensureEmptyLinesAroundTables(text: string): string {
 }
 
 /**
- * Converts text to no longer have any links in it.
- * @param {string} text - The text to have the regular and image links converted to their text.
- * @return {string} The text without any links in it.
+ * Gets the first header one's text from the string provided making sure to convert any links to their display text.
+ * @param {string} text - The text to have get the first header one's text from.
+ * @return {string} The text for the first header one if present or an empty string.
  */
-export function convertLinksAndImagesToDisplayText(text: string): string {
-  text = text.replaceAll(wikiLinkRegex, '$2');
-  text = text.replaceAll(genericLinkRegex, '$2');
+export function getFirstHeaderOneText(text: string) {
+  const result = text.match(headerRegex);
+  if (result && result[4]) {
+    let headerText = result[4];
+    headerText = headerText.replaceAll(wikiLinkRegex, (_, _2, $2: string, $3: string) => {
+      return $3 ?? $2;
+    });
 
-  return text;
+    return headerText.replaceAll(genericLinkRegex, '$2');
+  }
+
+  return '';
 }

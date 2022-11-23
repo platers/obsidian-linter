@@ -3,7 +3,7 @@ import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} fr
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {convertLinksAndImagesToDisplayText, headerRegex, yamlRegex} from '../utils/regex';
+import {convertLinksAndImagesToDisplayText, getFirstHeaderOneText, headerRegex, yamlRegex} from '../utils/regex';
 
 
 class YamlTitleAliasOptions implements Options {
@@ -37,13 +37,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   }
   apply(text: string, options: YamlTitleAliasOptions): string {
     text = initYAML(text);
-    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
-      const result = text.match(headerRegex);
-      if (result) {
-        return convertLinksAndImagesToDisplayText(result[4] ?? '');
-      }
-      return '';
-    });
+    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
     title = title || options.fileName;
 
     let previousTitle: string = null;

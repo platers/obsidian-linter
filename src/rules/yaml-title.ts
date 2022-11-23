@@ -3,7 +3,7 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from 
 import dedent from 'ts-dedent';
 import {escapeStringIfNecessaryAndPossible, formatYAML, initYAML} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {convertLinksAndImagesToDisplayText, escapeDollarSigns, headerRegex} from '../utils/regex';
+import {escapeDollarSigns, getFirstHeaderOneText} from '../utils/regex';
 import {insert} from '../utils/strings';
 
 class YamlTitleOptions implements Options {
@@ -32,13 +32,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
   }
   apply(text: string, options: YamlTitleOptions): string {
     text = initYAML(text);
-    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
-      const result = text.match(headerRegex);
-      if (result) {
-        return convertLinksAndImagesToDisplayText(result[4] ?? '');
-      }
-      return '';
-    });
+    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
     title = title || options.fileName;
 
     title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter);
