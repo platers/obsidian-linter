@@ -3,7 +3,7 @@ import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} fr
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {convertLinksAndImagesToDisplayText, getFirstHeaderOneText, headerRegex, yamlRegex} from '../utils/regex';
+import {getFirstHeaderOneText, yamlRegex} from '../utils/regex';
 
 
 class YamlTitleAliasOptions implements Options {
