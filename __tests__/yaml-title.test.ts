@@ -74,11 +74,41 @@ ruleTest({
       `,
       after: dedent`
         ---
-        title: [[Heading]]
+        title: Heading
         ---
         [[Link1]]
 
         # [[Heading]]
+      `,
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/470
+      testName: 'Make sure that markdown links in title get converted to text',
+      before: dedent`
+        ---
+        title: This is a [Heading](test heading.md)
+        ---
+        # This is a [Heading](test heading.md)
+      `,
+      after: dedent`
+        ---
+        title: This is a Heading
+        ---
+        # This is a [Heading](test heading.md)
+      `,
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/470
+      testName: 'Make sure that wiki links in title get converted to text',
+      before: dedent`
+        ---
+        title: This is a [[Heading]]
+        ---
+        # This is a [[Heading]]
+      `,
+      after: dedent`
+        ---
+        title: This is a Heading
+        ---
+        # This is a [[Heading]]
       `,
     },
   ],

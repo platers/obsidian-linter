@@ -2,15 +2,17 @@
 import {makeSureContentHasEmptyLinesAddedBeforeAndAfter} from './strings';
 
 // Useful regexes
-export const headerRegex = /^(\s*)(#+)(\s+)(.*)$/;
+export const headerRegex = /^(\s*)(#+)(\s+)(.*)$/m;
 export const fencedRegexTemplate = '^XXX\\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\\s|$)$';
 export const yamlRegex = /^---\n((?:(((?!---)(?:.|\n)*?)\n)?))---(?=\n|$)/;
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
 export const tildeBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '~');
 export const indentedBlockRegex = '^((\t|( {4})).*\n)+';
 export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeBlockRegexTemplate}|${indentedBlockRegex}`, 'gm');
-export const wikiLinkRegex = /(!?)(\[{2}[^[\n\]]*\]{2})/g;
-export const genericLinkRegex = /^!?\[.*\](.*)$/;
+// based on https://stackoverflow.com/a/26010910/8353749
+export const wikiLinkRegex = /(!?)\[{2}([^\][\n|]+)(\|([^\][\n|]+))?\]{2}/g;
+// based on https://davidwells.io/snippets/regex-match-markdown-links
+export const genericLinkRegex = /(!?)\[([^[]*)\](\(.*\))/g;
 export const tagRegex = /(?:\s|^)#[^\s#;.,><?!=+]+/g;
 export const obsidianMultilineCommentRegex = /^%%\n[^%]*\n%%/gm;
 export const wordSplitterRegex = /[,\s]+/;
@@ -76,6 +78,18 @@ export function ensureEmptyLinesAroundTables(text: string): string {
 
     text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, start, end);
   }
+
+  return text;
+}
+
+/**
+ * Converts text to no longer have any links in it.
+ * @param {string} text - The text to have the regular and image links converted to their text.
+ * @return {string} The text without any links in it.
+ */
+export function convertLinksAndImagesToDisplayText(text: string): string {
+  text = text.replaceAll(wikiLinkRegex, '$2');
+  text = text.replaceAll(genericLinkRegex, '$2');
 
   return text;
 }
