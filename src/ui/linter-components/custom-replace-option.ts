@@ -10,7 +10,7 @@ export class CustomReplaceOption extends AddCustomRow {
         containerEl,
         'Custom Regex Replacement',
         `Custom regex replacement can be used to replace anything that matches the find regex with the replacement value. The replace and find values will need to be valid regex values.`,
-        `Please make sure that you do not use lookbehinds in your regex on iOS mobile as that will cause linting to fail as that is not supported on that platform.`,
+        `Use this with caution if you do not know regex. Also, please make sure that you do not use lookbehinds in your regex on iOS mobile as that will cause linting to fail since that is not supported on that platform.`,
         'Add new regex replacement',
         isMobile,
         app,

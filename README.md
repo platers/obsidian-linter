@@ -127,6 +127,19 @@ These are special lint rules that the user may specify. They are Obsidian comman
 
 Now the next time you run the linter, the custom lint commands should run.
 
+### Custom Regex Replacements
+
+These are rules that run before the YAML timestamp rule, but after most of the other rules. These rules allow you to specify
+the regex to find, the flags to use with that regex, and the value to replace it with. **You may specify whitespace as
+the find and replace values, but please be careful as this can make a lot of unwanted changes if you are not careful.**
+These rules can be useful in swapping out certain tags, words, and formatting for others if you know what you are doing in regex.
+
+[Here](https://regexr.com/) is an online playground that you can test out regex at. It can let you know when regex is slow and you can use it to test if the text you want to replace is actually being selected by the find and flags portion of the regex.
+
+[Here](https://javascript.info/regexp-introduction#flags) is an explanation on what each flag means. Feel free to use them as needed. The default ones added are `g` (global) and `m` (multiline).
+
+_Note: lookbehinds do not work on iOS mobile and using them will cause linting to fail. So please **DO NOT** use them for iOS mobile._
+
 ### Paste Limitations
 - The plugin only works with the standard pasting (`cmd/ctrl + v`) shortcut, and not with the `p` operator in vim. (Pasting with `cmd/ctrl + v` in normal or insert mode does work though.)
 - To avoid conflicts with Plugins like [Auto Link Title](https://obsidian.md/plugins?id=obsidian-auto-link-title) or [Paste URL into Selection](https://obsidian.md/plugins?id=url-into-selection), will not be triggered when an URL is detected in the clipboard.

@@ -138,7 +138,7 @@ export class RulesRunner {
     logDebug(`Running Custom Regex`);
     let tempOldText = oldText;
     for (const eachRegex of customRegexs) {
-      if (!eachRegex.find || eachRegex.find.trim() == '' || !eachRegex.replace || eachRegex.replace.trim() == '') {
+      if (eachRegex.find == undefined || eachRegex.replace === undefined || eachRegex.replace === null ) {
         continue;
       }
       const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);

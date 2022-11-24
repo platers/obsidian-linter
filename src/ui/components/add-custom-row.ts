@@ -1,6 +1,10 @@
 import {App, Setting} from 'obsidian';
 import {parseTextToHTMLWithoutOuterParagraph} from '../helpers';
 
+/**
+ * AddCustomRow is meant to be used where you have a setting that needs a name a description, possibly a warning,
+ * and a button that allows the user to add another entry.
+ */
 export abstract class AddCustomRow {
   protected inputElDiv: HTMLDivElement;
 
