@@ -1,12 +1,13 @@
 import {App, Platform, PluginSettingTab, SearchComponent, setIcon, Setting} from 'obsidian';
 import LinterPlugin from 'src/main';
-import {LintCommand, Rule, rules, RuleType} from 'src/rules';
+import {Rule, rules, RuleType} from 'src/rules';
 import {moment} from 'obsidian';
-import CommandSuggester from './suggesters/command-suggester';
 import {SearchOptionInfo} from 'src/option';
-import {iconInfo} from 'src/icons';
+import {iconInfo} from 'src/ui/icons';
 import {parseTextToHTMLWithoutOuterParagraph} from './helpers';
 import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
+import {CustomCommandOption} from './linter-components/custom-command-option';
+import {CustomReplaceOption} from './linter-components/custom-replace-option';
 
 type settingSearchInfo = {containerEl: HTMLDivElement, name: string, description: string, options: SearchOptionInfo[], alias?: string}
 type TabContentInfo = {content: HTMLDivElement, heading: HTMLElement, navButton: HTMLElement}
@@ -60,12 +61,8 @@ export class SettingTab extends PluginSettingTab {
       this.addRuleToTab(tabTitle, rule);
     }
 
-    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => {
-      let tempContainer = el.createDiv();
-      this.generateCustomCommandSettings(tabName, tempContainer);
-      tempContainer = el.createDiv();
-      this.generateCustomRegexReplacementSettings(tabName, tempContainer);
-    });
+    this.createTabAndContent('Custom', navEl, settingsEl, (el: HTMLElement, tabName: string) => this.generateCustomSettings(tabName, el));
+
     this.createSearchZeroState(settingsEl);
   }
 
@@ -157,153 +154,22 @@ export class SettingTab extends PluginSettingTab {
     this.addSettingToMasterSettingsList(tabName, ruleDiv, rule.name.toLowerCase(), rule.description.toLowerCase(), optionInfo, ruleDiv.id);
   }
 
-  generateCustomCommandSettings(tabName: string, containerEl: HTMLElement): void {
-    containerEl.createEl(Platform.isMobile ? 'h4' : 'h3', {text: 'Custom Commands'});
-    const descriptionP1 = `Custom commands are Obsidian commands that get run after the linter is finished running its regular rules.
-    This means that they do not run before the YAML timestamp logic runs, so they can cause YAML timestamp to be triggered on the next run of the linter.
-    You may only select an Obsidian command once. **_Note that this currently only works on linting the current file._**`;
-    const descriptionP2 = `When selecting an option, make sure to select the option either by using the mouse or by hitting the enter key.
-    Other selection methods may not work and only selections of an actual Obsidian command or an empty string will be saved.`;
+  generateCustomSettings(tabName: string, containerEl: HTMLElement): void {
+    const customCommandEl = containerEl.createDiv();
 
-    this.addSettingToMasterSettingsList(tabName, containerEl as HTMLDivElement, tabName.toLowerCase(), descriptionP1.replaceAll('\n', ' ') + descriptionP2.replaceAll('\n', ' '));
-
-    parseTextToHTMLWithoutOuterParagraph(descriptionP1, containerEl.createEl('p'));
-    containerEl.createEl('p', {text: descriptionP2}).style.color = '#EED202';
-
-    function arrayMove(arr: LintCommand[], fromIndex: number, toIndex: number):void {
-      if (toIndex < 0 || toIndex === arr.length) {
-        return;
-      }
-      const element = arr[fromIndex];
-      arr[fromIndex] = arr[toIndex];
-      arr[toIndex] = element;
-    }
-
-    new Setting(containerEl)
-        .addButton((cb)=>{
-          cb.setButtonText('Add new command')
-              .setCta()
-              .onClick(()=>{
-                this.plugin.settings.lintCommands.push({id: '', name: ''});
-                this.plugin.saveSettings();
-                this.display();
-                const customCommandInputBox = document.getElementsByClassName('linter-custom-command');
-                // @ts-ignore
-                customCommandInputBox[customCommandInputBox.length-1].focus();
-              });
-        });
-
-    this.plugin.settings.lintCommands.forEach((command, index) => {
-      new Setting(containerEl)
-          .addSearch((cb) => {
-            new CommandSuggester(this.app, cb.inputEl, this.plugin.settings.lintCommands);
-            cb.setPlaceholder('Obsidian command')
-                .setValue(command.name)
-                .onChange((newCommandName) => {
-                  const newCommand = {id: cb.inputEl.getAttribute('commandId'), name: newCommandName};
-
-                  // make sure that the command is valid before making any attempt to save the value
-                  if (newCommand.name && newCommand.id) {
-                    this.plugin.settings.lintCommands[index] = newCommand;
-                    this.plugin.saveSettings();
-                  } else if (!newCommand.name && !newCommand.id) { // the value has been cleared out
-                    this.plugin.settings.lintCommands[index] = newCommand;
-                    this.plugin.saveSettings();
-                  }
-                });
-            cb.inputEl.setAttr('tabIndex', index);
-            cb.inputEl.addClass('linter-custom-command');
-          })
-          .addExtraButton((cb) => {
-            cb.setIcon('up-chevron-glyph')
-                .setTooltip('Move up')
-                .onClick(() => {
-                  arrayMove(this.plugin.settings.lintCommands, index, index-1);
-                  this.plugin.saveSettings();
-                  this.display();
-                });
-          })
-          .addExtraButton((cb) => {
-            cb.setIcon('down-chevron-glyph')
-                .setTooltip('Move down')
-                .onClick(() => {
-                  arrayMove(this.plugin.settings.lintCommands, index, index+1);
-                  this.plugin.saveSettings();
-                  this.display();
-                });
-          })
-          .addExtraButton((cb)=>{
-            cb.setIcon('cross')
-                .setTooltip('Delete')
-                .onClick(()=>{
-                  this.plugin.settings.lintCommands.splice(index, 1);
-                  this.plugin.saveSettings();
-                  this.display();
-                });
-          });
+    const customCommands = new CustomCommandOption(customCommandEl, this.plugin.settings.lintCommands, Platform.isMobile, this.app, () => {
+      this.plugin.saveSettings();
     });
-  }
+    1;
+    this.addSettingToMasterSettingsList(tabName, customCommandEl, customCommands.name, customCommands.description.replaceAll('\n', ' ') + customCommands.warning.replaceAll('\n', ' '));
 
-  generateCustomRegexReplacementSettings(tabName: string, containerEl: HTMLElement): void {
-    const settingName = 'Custom Regex Replacement';
-    containerEl.createEl(Platform.isMobile ? 'h4' : 'h3', {text: settingName});
-    this.addSettingToMasterSettingsList(tabName, containerEl as HTMLDivElement, tabName.toLowerCase(), settingName);
-    new Setting(containerEl)
-        .addButton((cb)=>{
-          cb.setButtonText('Add new regex')
-              .setCta()
-              .onClick(()=>{
-                this.plugin.settings.customRegexs.push({find: '', replace: '', flags: ''});
-                this.plugin.saveSettings();
-                this.display();
-                const customRegexInputBox = document.getElementsByClassName('linter-custom-regex-replacement');
-                // @ts-ignore
-                customRegexInputBox[customRegexInputBox.length-1].focus();
-              });
-        });
+    const customReplaceEl = containerEl.createDiv();
 
-    this.plugin.settings.customRegexs.forEach((regex, index) => {
-      const setting = new Setting(containerEl);
-      setting.addText((cb) => {
-        cb.setPlaceholder('regex to find')
-            .setValue(regex.find)
-            .onChange((value) => {
-              this.plugin.settings.customRegexs[index].find = value;
-              this.plugin.saveSettings();
-            });
-        cb.inputEl.setAttr('inputIndex', index);
-        cb.inputEl.addClass('linter-custom-regex-replacement');
-      });
-
-      const defaultFlags = 'gm';
-      let flags = regex.flags;
-      if (!flags || flags.trim() == '') {
-        flags = defaultFlags;
-      }
-      setting.addText((cb) => {
-        cb.setPlaceholder('flags')
-            .setValue(flags)
-            .onChange((value) => {
-              this.plugin.settings.customRegexs[index].flags = value;
-              this.plugin.saveSettings();
-            });
-      }).addText((cb) => {
-        cb.setPlaceholder('regex to replace')
-            .setValue(regex.replace)
-            .onChange((value) => {
-              this.plugin.settings.customRegexs[index].replace = value;
-              this.plugin.saveSettings();
-            });
-      }).addExtraButton((cb)=>{
-        cb.setIcon('cross')
-            .setTooltip('Delete')
-            .onClick(()=>{
-              this.plugin.settings.customRegexs.splice(index, 1);
-              this.plugin.saveSettings();
-              this.display();
-            });
-      });
+    const customRegexes = new CustomReplaceOption(customReplaceEl, this.plugin.settings.customRegexes, Platform.isMobile, this.app, () => {
+      this.plugin.saveSettings();
     });
+
+    this.addSettingToMasterSettingsList(tabName, customReplaceEl, customRegexes.name, customRegexes.description.replaceAll('\n', ' ') + customRegexes.warning.replaceAll('\n', ' '));
   }
 
   generateGeneralSettings(tabName: string, containerEl: HTMLElement) {

@@ -832,6 +832,22 @@ title: Filename
 ---
 
 ``````
+Example: Make sure that markdown links in headings are properly copied to the yaml as just the text
+
+Before:
+
+``````markdown
+# This is a [Heading](test heading.md)
+``````
+
+After:
+
+``````markdown
+---
+title: This is a Heading
+---
+# This is a [Heading](test heading.md)
+``````
 
 ### YAML Title Alias
 
@@ -941,6 +957,24 @@ aliases:
 linter-yaml-title-alias: Filename
 ---
 
+``````
+Example: Make sure that markdown and wiki links in first H1 get their values converted to text
+
+Before:
+
+``````markdown
+# This is a [Heading](markdown.md)
+``````
+
+After:
+
+``````markdown
+---
+aliases:
+  - This is a Heading
+linter-yaml-title-alias: This is a Heading
+---
+# This is a [Heading](markdown.md)
 ``````
 
 ## Heading

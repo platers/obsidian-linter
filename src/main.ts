@@ -4,10 +4,10 @@ import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
 import log from 'loglevel';
-import {logInfo, logError, logDebug, setLogLevel, logWarn} from './logger';
+import {logInfo, logError, logDebug, setLogLevel, logWarn} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
-import {iconInfo} from './icons';
+import {iconInfo} from './ui/icons';
 import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
@@ -49,7 +49,7 @@ const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   linterLocale: 'system-default',
   logLevel: log.levels.ERROR,
   lintCommands: [],
-  customRegexs: [],
+  customRegexes: [],
   commonStyles: {
     aliasArrayStyle: NormalArrayFormats.SingleLine,
     tagArrayStyle: NormalArrayFormats.SingleLine,

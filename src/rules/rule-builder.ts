@@ -1,6 +1,6 @@
 import {Example, Options, Rule, RuleType, registerRule, LinterSettings, wrapLintError} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
-import {logDebug} from '../logger';
+import {logDebug} from '../utils/logger';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();

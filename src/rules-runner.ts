@@ -1,6 +1,6 @@
 import {TFile, moment} from 'obsidian';
-import {logDebug, logWarn} from './logger';
-import {getDisabledRules, LinterSettings, rules, wrapLintError, LintCommand, CustomRegex, RuleType} from './rules';
+import {logDebug, logWarn} from './utils/logger';
+import {getDisabledRules, LinterSettings, rules, wrapLintError, RuleType} from './rules';
 import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import ForceYamlEscape from './rules/force-yaml-escape';
@@ -16,6 +16,8 @@ import {RuleBuilderBase} from './rules/rule-builder';
 import YamlKeySort from './rules/yaml-key-sort';
 import YamlTimestamp from './rules/yaml-timestamp';
 import {ObsidianCommandInterface} from './typings/obsidian-ex';
+import {CustomReplace} from './ui/linter-components/custom-replace-option';
+import {LintCommand} from './ui/linter-components/custom-command-option';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -61,7 +63,7 @@ export class RulesRunner {
       });
     }
 
-    newText = this.runCustomRegexReplacement(runOptions.settings.customRegexs, newText);
+    newText = this.runCustomRegexReplacement(runOptions.settings.customRegexes, newText);
 
     runOptions.oldText = newText;
 
@@ -132,11 +134,11 @@ export class RulesRunner {
     }
   }
 
-  runCustomRegexReplacement(customRegexs: CustomRegex[], oldText: string): string {
+  runCustomRegexReplacement(customRegexs: CustomReplace[], oldText: string): string {
     logDebug(`Running Custom Regex`);
     let tempOldText = oldText;
     for (const eachRegex of customRegexs) {
-      if (!eachRegex.find || eachRegex.find.trim() == '' || !eachRegex.replace || eachRegex.replace.trim() == '') {
+      if (eachRegex.find == undefined || eachRegex.replace === undefined || eachRegex.replace === null ) {
         continue;
       }
       const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
