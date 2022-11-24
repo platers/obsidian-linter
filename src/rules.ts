@@ -14,6 +14,8 @@ import {
   SpecialArrayFormats,
   TagSpecificArrayFormats,
 } from './utils/yaml';
+import {LintCommand} from './ui/linter-components/custom-command-option';
+import {CustomReplace} from './ui/linter-components/custom-replace-option';
 
 // CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
 export type CommonStyles = {
@@ -27,10 +29,6 @@ export type Options = { [optionName: string]: any};
 
 type ApplyFunction = (text: string, options?: Options) => string;
 
-export type LintCommand = {id: string, name: string};
-
-export type CustomRegex = {find: string, replace: string, flags: string};
-
 export interface LinterSettings {
   ruleConfigs: {
     [ruleName: string]: Options;
@@ -41,7 +39,7 @@ export interface LinterSettings {
   linterLocale: string;
   logLevel: number;
   lintCommands: LintCommand[];
-  customRegexs: CustomRegex[];
+  customRegexes: CustomReplace[];
   commonStyles: CommonStyles;
 }
 
