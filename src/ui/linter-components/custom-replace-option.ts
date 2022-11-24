@@ -1,48 +1,37 @@
 import {Setting, App} from 'obsidian';
-import {parseTextToHTMLWithoutOuterParagraph} from '../helpers';
+import {AddCustomRow} from '../components/add-custom-row';
 export type CustomReplace = {find: string, replace: string, flags: string};
 
 const defaultFlags = 'gm';
 
-export class CustomReplaceOption {
-  name = 'Custom Regex Replacement';
-  description = `Custom regex replacement can be used to replace anything that matches the find regex with the replacement value. The replace and find values will need to be valid regex values.`;
-  warning = `Please make sure that you do not use negative lookbehinds ("(?!*)") in your regex on iOS mobile as that will cause linting to fail as that is not supported on mobile.`;
-
-  constructor(public containerEl: HTMLElement, public regexes: CustomReplace[], private isMobile: boolean, private app: App, private saveSettings: () => void) {
+export class CustomReplaceOption extends AddCustomRow {
+  constructor(containerEl: HTMLElement, public regexes: CustomReplace[], isMobile: boolean, app: App, saveSettings: () => void) {
+    super(
+        containerEl,
+        'Custom Regex Replacement',
+        `Custom regex replacement can be used to replace anything that matches the find regex with the replacement value. The replace and find values will need to be valid regex values.`,
+        `Please make sure that you do not use lookbehinds in your regex on iOS mobile as that will cause linting to fail as that is not supported on that platform.`,
+        'Add new regex replacement',
+        isMobile,
+        app,
+        saveSettings,
+        ()=>{
+          const newRegex = {find: '', replace: '', flags: defaultFlags};
+          this.regexes.push(newRegex);
+          this.saveSettings();
+          this.addRegex(newRegex, this.regexes.length - 1, true);
+        });
     this.display();
   }
 
-  display() {
-    this.containerEl.createEl(this.isMobile ? 'h4' : 'h3', {text: this.name});
-
-    parseTextToHTMLWithoutOuterParagraph(this.description, this.containerEl);
-    this.containerEl.createEl('p', {text: this.warning}).style.color = '#EED202';
-
-    new Setting(this.containerEl)
-        .addButton((cb)=>{
-          cb.setButtonText('Add new regex replacement')
-              .setCta()
-              .onClick(()=>{
-                const newRegex = {find: '', replace: '', flags: ''};
-                this.regexes.push(newRegex);
-                this.saveSettings();
-                this.addRegex(newRegex, this.regexes.length - 1, true);
-              });
-        });
-
+  protected showInputEls(): void {
     this.regexes.forEach((regex, index) => {
       this.addRegex(regex, index);
     });
   }
 
   private addRegex(regex: CustomReplace, index: number, focusOnCommand: boolean = false) {
-    let flags = regex.flags;
-    if (!flags || flags.trim() == '') {
-      flags = defaultFlags;
-    }
-
-    new Setting(this.containerEl).addText((cb) => {
+    new Setting(this.inputElDiv).addText((cb) => {
       cb.setPlaceholder('regex to find')
           .setValue(regex.find)
           .onChange((value) => {
@@ -57,7 +46,7 @@ export class CustomReplaceOption {
       }
     }).addText((cb) => {
       cb.setPlaceholder('flags')
-          .setValue(flags)
+          .setValue(regex.flags)
           .onChange((value) => {
             this.regexes[index].flags = value;
             this.saveSettings();
@@ -75,13 +64,8 @@ export class CustomReplaceOption {
           .onClick(()=>{
             this.regexes.splice(index, 1);
             this.saveSettings();
-            this.resetDisplay();
+            this.resetInputEls();
           });
     });
-  }
-
-  private resetDisplay() {
-    this.containerEl.innerHTML = '';
-    this.display();
   }
 }
