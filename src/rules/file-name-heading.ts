@@ -36,7 +36,13 @@ export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions>
       let yaml_end = text.indexOf('\n---');
       yaml_end =
         yaml_end == -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
-      return insert(text, yaml_end, `# ${fileName}\n`);
+
+      let header = `# ${fileName}\n`;
+      if (text.length < yaml_end) {
+        header = '\n' + header;
+      }
+
+      return insert(text, yaml_end, header);
     });
   }
   get exampleBuilders(): ExampleBuilder<FileNameHeadingOptions>[] {
