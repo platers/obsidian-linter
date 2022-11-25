@@ -26,7 +26,7 @@ ruleTest({
         fileName: 'File Name',
       },
     },
-    {
+    { // accounts for https://github.com/platers/obsidian-linter/issues/513
       testName: 'Inserts the heading on the line after the frontmatter of the file when it is the only thing in the file',
       before: dedent`
         ---
