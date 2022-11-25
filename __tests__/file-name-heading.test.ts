@@ -26,5 +26,23 @@ ruleTest({
         fileName: 'File Name',
       },
     },
+    {
+      testName: 'Inserts the heading on the line after the frontmatter of the file when it is the only thing in the file',
+      before: dedent`
+        ---
+        hello: test
+        ---
+      `,
+      after: dedent`
+        ---
+        hello: test
+        ---
+        # Test note
+        ${''}
+      `,
+      options: {
+        fileName: 'Test note',
+      },
+    },
   ],
 });
