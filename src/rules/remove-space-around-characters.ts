@@ -1,29 +1,54 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {updateListItemText} from '../utils/mdast';
+import {escapeRegExp} from '../utils/regex';
 
-class RemoveSpaceAroundFullwidthCharactersOptions implements Options {
+class RemoveSpaceAroundCharactersOptions implements Options {
+  includeFullwidthForms: boolean = true;
+  includeCJKSymbolsAndPunctuation: boolean = true;
+  includeDashes: boolean = true;
+  otherSymbols: string = '';
 }
 
 @RuleBuilder.register
-export default class RemoveSpaceAroundFullwidthCharacters extends RuleBuilder<RemoveSpaceAroundFullwidthCharactersOptions> {
-  get OptionsClass(): new () => RemoveSpaceAroundFullwidthCharactersOptions {
-    return RemoveSpaceAroundFullwidthCharactersOptions;
+export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpaceAroundCharactersOptions> {
+  get OptionsClass(): new () => RemoveSpaceAroundCharactersOptions {
+    return RemoveSpaceAroundCharactersOptions;
   }
   get name(): string {
-    return 'Remove Space around Fullwidth Characters';
+    return 'Remove Space around Characters';
   }
   get description(): string {
-    return 'Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab). Note that this may causes issues with markdown format in some cases.';
+    return 'Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). Note that this may causes issues with markdown format in some cases.';
   }
   get type(): RuleType {
     return RuleType.SPACING;
   }
-  apply(text: string, options: RemoveSpaceAroundFullwidthCharactersOptions): string {
-    const fullwidthCharacterWithTextAtStart = /([ \t])+([\u2013\u2014\u2026\u3001\u3002\u300a\u300d-\u300f\u3014\u3015\u3008-\u3011\uff00-\uffff])/g;
-    const fullwidthCharacterWithTextAtEnd = /([\u2013\u2014\u2026\u3001\u3002\u300a\u300d-\u300f\u3014\u3015\u3008-\u3011\uff00-\uffff])([ \t])+/g;
+  apply(text: string, options: RemoveSpaceAroundCharactersOptions): string {
+    let symbolsRegExpBuilder = '';
+
+    if (options.includeFullwidthForms) {
+      symbolsRegExpBuilder += '\uff01-\uff5e';
+    }
+
+    if (options.includeCJKSymbolsAndPunctuation) {
+      symbolsRegExpBuilder += '\u3000-\u30ff';
+    }
+
+    if (options.includeDashes) {
+      symbolsRegExpBuilder += '\u2013\u2014';
+    }
+
+    symbolsRegExpBuilder += escapeRegExp(options.otherSymbols);
+
+    if (!symbolsRegExpBuilder) {
+      return text;
+    }
+
+    const fullwidthCharacterWithTextAtStart = new RegExp(`([ \t])+([${symbolsRegExpBuilder}])`, 'g');
+    const fullwidthCharacterWithTextAtEnd = new RegExp(`([${symbolsRegExpBuilder}])([ \t])+`, 'g');
 
     const replaceWhitespaceAroundFullwidthCharacters = function(text: string): string {
       return text.replace(fullwidthCharacterWithTextAtStart, '$2').replace(fullwidthCharacterWithTextAtEnd, '$1');
@@ -35,7 +60,7 @@ export default class RemoveSpaceAroundFullwidthCharacters extends RuleBuilder<Re
 
     return newText;
   }
-  get exampleBuilders(): ExampleBuilder<RemoveSpaceAroundFullwidthCharactersOptions>[] {
+  get exampleBuilders(): ExampleBuilder<RemoveSpaceAroundCharactersOptions>[] {
     return [
       new ExampleBuilder({
         description: 'Remove Spaces and Tabs around Fullwidth Characters',
@@ -111,7 +136,32 @@ export default class RemoveSpaceAroundFullwidthCharacters extends RuleBuilder<Re
       }),
     ];
   }
-  get optionBuilders(): OptionBuilderBase<RemoveSpaceAroundFullwidthCharactersOptions>[] {
-    return [];
+  get optionBuilders(): OptionBuilderBase<RemoveSpaceAroundCharactersOptions>[] {
+    return [
+      new BooleanOptionBuilder({
+        name: 'Include Fullwidth Forms',
+        description: 'Include <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Fullwidth Forms Unicode block</a>',
+        OptionsClass: RemoveSpaceAroundCharactersOptions,
+        optionsKey: 'includeFullwidthForms',
+      }),
+      new BooleanOptionBuilder({
+        name: 'Include CJK Symbols and Punctuation',
+        description: 'Include <a href="https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation">CJK Symbols and Punctuation Unicode block</a>',
+        OptionsClass: RemoveSpaceAroundCharactersOptions,
+        optionsKey: 'includeCJKSymbolsAndPunctuation',
+      }),
+      new BooleanOptionBuilder({
+        name: 'Include Dashes',
+        description: 'Include en dash (–) and em dash (—)',
+        OptionsClass: RemoveSpaceAroundCharactersOptions,
+        optionsKey: 'includeDashes',
+      }),
+      new TextOptionBuilder({
+        name: 'Other symbols',
+        description: 'Other symbols to include',
+        OptionsClass: RemoveSpaceAroundCharactersOptions,
+        optionsKey: 'otherSymbols',
+      }),
+    ];
   }
 }
