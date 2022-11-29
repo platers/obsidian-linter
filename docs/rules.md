@@ -3308,13 +3308,21 @@ After:
 [[link_here]]
 ``````
 
-### Remove Space around Fullwidth Characters
+### Remove Space around Characters
 
-Alias: `remove-space-around-fullwidth-characters`
+Alias: `remove-space-around-characters`
 
-Ensures that fullwidth characters are not followed by whitespace (either single spaces or a tab). Note that this may causes issues with markdown format in some cases.
+Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). Note that this may causes issues with markdown format in some cases.
 
-
+Options:
+- Include Fullwidth Forms: Include <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Fullwidth Forms Unicode block</a>
+	- Default: `true`
+- Include CJK Symbols and Punctuation: Include <a href="https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation">CJK Symbols and Punctuation Unicode block</a>
+	- Default: `true`
+- Include Dashes: Include en dash (–) and em dash (—)
+	- Default: `true`
+- Other symbols: Other symbols to include
+	- Default: ``
 
 Example: Remove Spaces and Tabs around Fullwidth Characters
 
