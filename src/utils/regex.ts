@@ -2,7 +2,8 @@
 import {makeSureContentHasEmptyLinesAddedBeforeAndAfter} from './strings';
 
 // Useful regexes
-export const headerRegex = /^(\s*)(#+)(\s+)(.*)$/m;
+export const headerRegex = /^([ \t]*)(#+)([ \t]+)([^#\n\r]*)([ \t]+#+)?$/m;
+export const allHeadersRegex = new RegExp(headerRegex.source, headerRegex.flags + 'g');
 export const fencedRegexTemplate = '^XXX\\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\\s|$)$';
 export const yamlRegex = /^---\n((?:(((?!---)(?:.|\n)*?)\n)?))---(?=\n|$)/;
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
@@ -88,9 +89,9 @@ export function ensureEmptyLinesAroundTables(text: string): string {
  * @return {string} The text for the first header one if present or an empty string.
  */
 export function getFirstHeaderOneText(text: string) {
-  const result = text.match(headerRegex);
-  if (result && result[4]) {
-    let headerText = result[4];
+  const result = text.match(/^#\s+(.*)/m);
+  if (result && result[1]) {
+    let headerText = result[1];
     headerText = headerText.replaceAll(wikiLinkRegex, (_, _2, $2: string, $3: string) => {
       return $3 ?? $2;
     });
