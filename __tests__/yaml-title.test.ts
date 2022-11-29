@@ -111,5 +111,21 @@ ruleTest({
         # This is a [[Heading]]
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/519
+      testName: 'Make sure that the first header is captured even if another header precedes it.',
+      before: dedent`
+        ### not the title
+
+        # Title
+      `,
+      after: dedent`
+        ---
+        title: Title
+        ---
+        ### not the title
+
+        # Title
+      `,
+    },
   ],
 });
