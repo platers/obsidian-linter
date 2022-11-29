@@ -1,5 +1,5 @@
 import MoveTagsToYaml from '../src/rules/move-tags-to-yaml';
-import {NormalArrayFormats, SpecialArrayFormats} from '../src/utils/yaml';
+import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '../src/utils/yaml';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 
@@ -162,7 +162,26 @@ ruleTest({
         <mark style="background: #FFB8EBA6;">some text</mark>
       `,
     },
-
-
+    { // accounts for https://github.com/platers/obsidian-linter/issues/521
+      testName: 'Make sure that removing tags respects ignore list',
+      before: dedent`
+        #tag1
+        #tag2
+        #ignored-tag test data
+        #ignored-tag/nested-tag more tested data
+      `,
+      after: dedent`
+        ---
+        tags: tag1 tag2
+        ---
+        #ignored-tag test data
+        #ignored-tag/nested-tag more tested data
+      `,
+      options: {
+        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+        howToHandleExistingTags: 'Remove whole tag',
+        tagsToIgnore: ['ignored-tag', 'ignored-tag/nested-tag'],
+      },
+    },
   ],
 });
