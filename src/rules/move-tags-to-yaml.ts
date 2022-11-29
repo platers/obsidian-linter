@@ -90,7 +90,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         return `---\n${newYaml}---`;
       });
 
-      if (options.howToHandleExistingTags === 'Remove hashtag') {
+      if (options.howToHandleExistingTags !== 'Nothing') {
         text = text.replace(tagRegex, (tag: string) => {
           const hashtagIndex = tag.indexOf('#');
 
@@ -99,10 +99,12 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
             return tag;
           }
 
-          return tag.substring(0, hashtagIndex) + tagContents;
+          if (options.howToHandleExistingTags === 'Remove hashtag') {
+            return tag.substring(0, hashtagIndex) + tagContents;
+          }
+
+          return '';
         });
-      } else if (options.howToHandleExistingTags === 'Remove whole tag') {
-        text = text.replace(tagRegex, '');
       }
 
       return text;
