@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {escapeDollarSigns, headerRegex, wordSplitterRegex} from '../utils/regex';
+import {allHeadersRegex, escapeDollarSigns, wordSplitterRegex} from '../utils/regex';
 
 type Style = 'Title Case' | 'ALL CAPS' | 'First letter';
 
@@ -16,6 +16,7 @@ class CapitalizeHeadingsOptions implements Options {
     'JavaScript',
     'TypeScript',
     'AppleScript',
+    'I',
   ];
   lowercaseWords?: string[] = [
     'via',
@@ -67,63 +68,41 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
   }
   apply(text: string, options: CapitalizeHeadingsOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      const lines = text.split('\n');
-      for (let i = 0; i < lines.length; i++) {
-        const match = lines[i].match(headerRegex); // match only headings
-        if (!match) {
-          continue;
+      return text.replace(allHeadersRegex, (headerText: string) => {
+        if (options.style === 'ALL CAPS') {
+          return headerText.toUpperCase(); // convert full heading to uppercase
         }
-        switch (options.style) {
-          case 'Title Case': {
-            const headerWords = lines[i].match(/\S+/g);
-            // split by comma or whitespace
-            const keepCasing = options.ignoreWords;
-            const ignoreShortWords = options.lowercaseWords;
-            let firstWord = true;
-            for (let j = 1; j < headerWords.length; j++) {
-              const isWord = headerWords[j].match(/^[\p{L}'-]+[.?!,:;]?$/u);
-              if (!isWord) {
-                continue;
-              }
 
-              const ignoreCasedWord =
-                options.ignoreCasedWords &&
-                headerWords[j] !== headerWords[j].toLowerCase();
-              const keepWordCasing =
-                ignoreCasedWord || keepCasing.includes(headerWords[j]);
-              if (!keepWordCasing) {
-                headerWords[j] = headerWords[j].toLowerCase();
-                const ignoreWord = ignoreShortWords.includes(headerWords[j]);
-                if (!ignoreWord || firstWord === true) {
-                  // ignore words that are not capitalized in titles except if they are the first word
-                  headerWords[j] =
-                    headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
-                }
-              }
-
-              firstWord = false;
-            }
-
-            lines[i] = lines[i].replace(
-                headerRegex,
-                escapeDollarSigns(`${headerWords.join(' ')}`),
-            );
-            break;
+        const capitalizeJustFirstLetter = options.style === 'First letter';
+        // split by whitespace
+        const headerWords = headerText.match(/\S+/g);
+        const keepCasing = options.ignoreWords;
+        const ignoreShortWords = options.lowercaseWords;
+        let firstWord = true;
+        for (let j = 1; j < headerWords.length; j++) {
+          // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
+          const isWord = headerWords[j].match(/^[\p{L}'-]{1,}[.?!,:;]?$/u);
+          if (!isWord) {
+            continue;
           }
-          case 'ALL CAPS':
-            lines[i] = lines[i].toUpperCase(); // convert full heading to uppercase
-            break;
-          case 'First letter':
-            // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
-            lines[i] = lines[i]
-                .toLowerCase()
-                .replace(/\s+([\p{L}])/u, (lowerCaseMatch: string) => {
-                  return lowerCaseMatch.toUpperCase();
-                }); // capitalize first letter of heading
-            break;
+
+          const ignoreCasedWord = (options.ignoreCasedWords && !capitalizeJustFirstLetter) && headerWords[j] !== headerWords[j].toLowerCase();
+          const keepWordCasing = ignoreCasedWord || keepCasing.includes(headerWords[j]);
+          if (!keepWordCasing) {
+            headerWords[j] = headerWords[j].toLowerCase();
+            const ignoreWord = ignoreShortWords.includes(headerWords[j]);
+            if ((!ignoreWord && !capitalizeJustFirstLetter) || firstWord === true) {
+              headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+            }
+          }
+
+          firstWord = false;
         }
-      }
-      return lines.join('\n');
+
+        headerText = escapeDollarSigns(`${headerWords.join(' ')}`);
+
+        return headerText;
+      });
     });
   }
   get exampleBuilders(): ExampleBuilder<CapitalizeHeadingsOptions>[] {

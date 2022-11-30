@@ -125,5 +125,17 @@ ruleTest({
         style: 'First letter',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/518
+      testName: `Make sure that 'I' is capitalized by default when First Letter is the style of the header `,
+      before: dedent`
+        ### It Is I
+      `,
+      after: dedent`
+        ### It is I
+      `,
+      options: {
+        style: 'First letter',
+      },
+    },
   ],
 });
