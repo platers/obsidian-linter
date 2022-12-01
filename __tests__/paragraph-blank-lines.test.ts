@@ -265,5 +265,36 @@ ruleTest({
         %%
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/517
+      testName: 'Table followed by header should only have 1 line after it',
+      before: dedent`
+        ### 常量
+
+        |  \`[[Link]]\`         |  A link to the file named "Link"  |
+        |:--------------------|:----------------------------------|
+        |  \`[[Link]]\`         |  A link to the file named "Link"  |
+        |  \`[1, 2, 3]\`        |  A list of numbers 1, 2, and 3    |
+        |  \`[[1, 2],[3, 4]]\`  |  A list of lists                  |
+        |  \`{ a: 1, b: 2 }\`   |  An object                        |
+        |  \`date()\`           |                                   |
+        |  \`dur()\`            |                                   |
+
+        ### 表达式
+      `,
+      after: dedent`
+        ### 常量
+
+        |  \`[[Link]]\`         |  A link to the file named "Link"  |
+        |:--------------------|:----------------------------------|
+        |  \`[[Link]]\`         |  A link to the file named "Link"  |
+        |  \`[1, 2, 3]\`        |  A list of numbers 1, 2, and 3    |
+        |  \`[[1, 2],[3, 4]]\`  |  A list of lists                  |
+        |  \`{ a: 1, b: 2 }\`   |  An object                        |
+        |  \`date()\`           |                                   |
+        |  \`dur()\`            |                                   |
+
+        ### 表达式
+      `,
+    },
   ],
 });
