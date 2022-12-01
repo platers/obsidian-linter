@@ -10,7 +10,8 @@
     "test-suite": "jest -t \"$1\"",
     "docs": "node docs.js",
     "compile": "npm run build && npm run docs && npm run lint && npm run test",
-    "lint": "eslint . --ext .ts --fix"
+    "lint": "eslint . --ext .ts --fix",
+    "clear-jest": "jest --clearCache"
   },
   "keywords": [],
   "author": "",
