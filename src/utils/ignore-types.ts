@@ -27,6 +27,8 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   tag: {replaceAction: tagRegex, placeholder: '#tag-placeholder'},
   obsidianMultiLineComments: {replaceAction: obsidianMultilineCommentRegex, placeholder: '{OBSIDIAN_COMMENT_PLACEHOLDER}'},
   table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}'},
+  footnoteAtStartOfLine: {replaceAction: /^(\[\^\w+\]) ?([,.;!:?])/gm, placeholder: '{FOOTNOTE_AT_START_OF_LINE_PLACEHOLDER}'},
+  footnoteAfterATask: {replaceAction: /- \[.] (\[\^\w+\]) ?([,.;!:?])/gm, placeholder: '{FOOTNOTE_AFTER_A_TASK_PLACEHOLDER}'},
   // custom functions
   link: {replaceAction: replaceMarkdownLinks, placeholder: '{REGULAR_LINK_PLACEHOLDER}'},
 } as const;

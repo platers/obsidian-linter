@@ -22,7 +22,8 @@ export default class ConsecutiveBlankLines extends RuleBuilder<ConsecutiveBlankL
   }
   apply(text: string, options: ConsecutiveBlankLinesOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      return text.replace(/\n{2,}/g, '\n\n');
+      // make sure to account for lines that are purely whitespace as well https://stackoverflow.com/a/3873354/8353749
+      return text.replace(/(\n([\t\v\f\r \u00a0\u2000-\u200b\u2028-\u2029\u3000]+)?){2,}/g, '\n\n');
     });
   }
   get exampleBuilders(): ExampleBuilder<ConsecutiveBlankLinesOptions>[] {

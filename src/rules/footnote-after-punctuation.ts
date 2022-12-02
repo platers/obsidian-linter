@@ -21,10 +21,8 @@ export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterP
     return RuleType.FOOTNOTE;
   }
   apply(text: string, options: FootnoteAfterPunctuationOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-    // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
-    // needed to ensure that no footnote text followed by ":" is matched
-      return text.replace(/(?!^)(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.footnoteAtStartOfLine, IgnoreTypes.footnoteAfterATask], text, (text) => {
+      return text.replace(/(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
     });
   }
   get exampleBuilders(): ExampleBuilder<FootnoteAfterPunctuationOptions>[] {
@@ -36,6 +34,19 @@ export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterP
         `,
         after: dedent`
           Lorem.[^1] Ipsum,[^2] doletes.
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'A footnote at the start of a task is not moved to after the punctuation',
+        before: dedent`
+          - [ ] [^1]: This is a footnote and a task.
+          - [ ] This is a footnote and a task that gets swapped with the punctuation[^2]!
+          [^2]: This footnote got modified
+        `,
+        after: dedent`
+          - [ ] [^1]: This is a footnote and a task.
+          - [ ] This is a footnote and a task that gets swapped with the punctuation![^2]
+          [^2]: This footnote got modified
         `,
       }),
     ];
