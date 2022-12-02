@@ -22,7 +22,6 @@ export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterP
   }
   apply(text: string, options: FootnoteAfterPunctuationOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.footnoteAtStartOfLine, IgnoreTypes.footnoteAfterATask], text, (text) => {
-      // needed to ensure that no footnote text followed by ":" is matched
       return text.replace(/(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
     });
   }
