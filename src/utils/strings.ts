@@ -134,3 +134,26 @@ export function hashString53Bit(str: string, seed: number = 0): number {
 
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
+
+/**
+ * Takes a string and converts string that have the string escaped form of escape characters such as new line, backspace,
+ * form feed, carriage return, horizontal tab, and vertical tab and makes sure they are their escaped character values.
+ * @param {string} val - The string to make sure has the escape characters as escape characters rather than a stringified form.
+ * @return {string} The string with the escape characters converted to their escape character form.
+ */
+export function convertStringVersionOfEscapeCharactersToEscapeCharacters(val: string): string {
+  // replace string version of backspace character with the actual backspace character
+  val = val.replace('\\b', '\b');
+  // replace string version of form feed character with the actual form feed character
+  val = val.replace('\\f', '\f');
+  // replace string version of new line character with the actual new line character
+  val = val.replace('\\n', '\n');
+  // replace string version of carriage return character with the actual carriage return character
+  val = val.replace('\\r', '\r');
+  // replace string version of horizontal tab character with the actual horizontal tab character
+  val = val.replace('\\t', '\t');
+  // replace string version of vertical tab character with the actual vertical tab character
+  val = val.replace('\\v', '\v');
+
+  return val;
+}

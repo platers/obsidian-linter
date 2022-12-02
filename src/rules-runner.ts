@@ -18,6 +18,7 @@ import YamlTimestamp from './rules/yaml-timestamp';
 import {ObsidianCommandInterface} from './typings/obsidian-ex';
 import {CustomReplace} from './ui/linter-components/custom-replace-option';
 import {LintCommand} from './ui/linter-components/custom-command-option';
+import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from './utils/strings';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -134,15 +135,17 @@ export class RulesRunner {
     }
   }
 
-  runCustomRegexReplacement(customRegexs: CustomReplace[], oldText: string): string {
+  runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
     logDebug(`Running Custom Regex`);
     let tempOldText = oldText;
-    for (const eachRegex of customRegexs) {
+    for (const eachRegex of customRegexes) {
       if (eachRegex.find == undefined || eachRegex.replace === undefined || eachRegex.replace === null ) {
         continue;
       }
+
       const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
-      tempOldText = tempOldText.replace(regex, eachRegex.replace);
+      // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
+      tempOldText = tempOldText.replace(regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace));
     }
     return tempOldText;
   }

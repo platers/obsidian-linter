@@ -137,5 +137,18 @@ ruleTest({
         style: 'First letter',
       },
     },
+    {
+      testName: `Make sure that 'First Letter' doesn't ignore cased words just because they are cased when ignore cased words is enabled`,
+      before: dedent`
+        ### This Header is Cased
+      `,
+      after: dedent`
+        ### This header is cased
+      `,
+      options: {
+        style: 'First letter',
+        ignoreCasedWords: true,
+      },
+    },
   ],
 });
