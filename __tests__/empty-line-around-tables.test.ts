@@ -47,5 +47,31 @@ ruleTest({
         > | quux     | quuz     |
       `,
     },
+    {
+      testName: 'Don\'t modify inline math',
+      before: dedent`
+        ${''}
+        $|a| + |b|$
+      `,
+      after: dedent`
+        ${''}
+        $|a| + |b|$
+      `,
+    },
+    {
+      testName: 'Don\'t modify math',
+      before: dedent`
+        ${''}
+        $$
+        |a| + |b|
+        $$
+      `,
+      after: dedent`
+        ${''}
+        $$
+        |a| + |b|
+        $$
+      `,
+    },
   ],
 });

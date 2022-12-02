@@ -22,7 +22,7 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
     return RuleType.SPACING;
   }
   apply(text: string, options: EmptyLineAroundTablesOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.code], text, (text: string) => {
+    return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.inlineMath], text, (text: string) => {
       return ensureEmptyLinesAroundTables(text);
     });
   }
