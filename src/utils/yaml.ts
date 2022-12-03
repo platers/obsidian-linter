@@ -190,7 +190,7 @@ export function splitValueIfSingleOrMultilineArray(value: string): string | stri
       return null;
     }
 
-    const arrayItems = value.split(',').map((val: string) => val.trim());
+    const arrayItems = convertYAMLStringToArray(value, ',');
 
     return arrayItems.filter((el: string) => {
       return el != '';
@@ -230,9 +230,9 @@ export function convertTagValueToStringOrStringArray(value: string | string[]): 
   if (Array.isArray(value)) {
     originalTagValues = value;
   } else if (value.includes(',')) {
-    originalTagValues = value.split(',').map((val: string) => val.trim());
+    originalTagValues = convertYAMLStringToArray(value, ',');
   } else {
-    originalTagValues = value.split(' ');
+    originalTagValues = convertYAMLStringToArray(value, ' ');
   }
 
   for (const tagValue of originalTagValues) {
@@ -249,10 +249,52 @@ export function convertTagValueToStringOrStringArray(value: string | string[]): 
  */
 export function convertAliasValueToStringOrStringArray(value: string | string[]): string[] {
   if (typeof value === 'string') {
-    return value.split(', ');
+    return convertYAMLStringToArray(value, ',');
   }
 
   return value;
+}
+
+export function convertYAMLStringToArray(value: string, delimiter: string = ','): string[] {
+  if (value == '' || value == null) {
+    return null;
+  }
+
+  if (delimiter.length > 1) {
+    throw new Error('delimiter is only allowed to be a single character');
+  }
+
+  const arrayItems: string[] = [];
+  let currentItem = '';
+  let index = 0;
+  while (index < value.length) {
+    const currentChar = value.charAt(index);
+
+    if (currentChar === delimiter) {
+      // case where you find a delimiter
+      arrayItems.push(currentItem.trim());
+      currentItem = '';
+    } else if (currentChar === '"' || currentChar === '\'') {
+      // if there is an escape character check to see if there is a closing escape character and if so, skip to it as the next part of the value
+      const endOfEscapedValue = value.indexOf(currentChar, index+1);
+      if (endOfEscapedValue != -1) {
+        currentItem += value.substring(index, endOfEscapedValue + 1);
+        index = endOfEscapedValue;
+      } else {
+        currentItem += currentChar;
+      }
+    } else {
+      currentItem += currentChar;
+    }
+
+    index++;
+  }
+
+  if (currentItem.trim() != '') {
+    arrayItems.push(currentItem.trim());
+  }
+
+  return arrayItems;
 }
 
 /**
