@@ -868,5 +868,24 @@ ruleTest({
         defaultArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/525
+      testName: 'Converting a single string comma separated array to a multi-line array should respect escaped entries',
+      before: dedent`
+        ---
+        aliases: Scott, "Scott, Jr."
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Scott
+          - "Scott, Jr."
+        ---
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
   ],
 });
