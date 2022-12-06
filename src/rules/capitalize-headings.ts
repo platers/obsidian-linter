@@ -86,7 +86,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
             continue;
           }
 
-          const ignoreCasedWord = (options.ignoreCasedWords && !capitalizeJustFirstLetter) && headerWords[j] !== headerWords[j].toLowerCase();
+          const ignoreCasedWord = options.ignoreCasedWords && headerWords[j] !== headerWords[j].toLowerCase();
           const keepWordCasing = ignoreCasedWord || keepCasing.includes(headerWords[j]);
           if (!keepWordCasing) {
             headerWords[j] = headerWords[j].toLowerCase();
@@ -97,6 +97,11 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
           }
 
           firstWord = false;
+
+          // if the user wants to keep casing and capitalize just the first letter then there is no need to lowercase any other word after the first word
+          if (options.ignoreCasedWords && capitalizeJustFirstLetter) {
+            break;
+          }
         }
 
         headerText = escapeDollarSigns(`${headerWords.join(' ')}`);
