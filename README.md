@@ -58,6 +58,8 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [capitalize-headings](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#capitalize-headings)
 - [file-name-heading](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#file-name-heading)
 - [header-increment](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#header-increment)
+- [headings-start-line](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#headings-start-line)
+- [remove-trailing-punctuation-in-heading](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-trailing-punctuation-in-heading)
 
 ### Footnote rules
 

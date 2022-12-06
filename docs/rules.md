@@ -993,7 +993,7 @@ Options:
 - Ignore Cased Words: Only apply title case style to words that are all lowercase
 	- Default: `true`
 - Ignore Words: A comma separated list of words to ignore when capitalizing
-	- Default: `macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript`
+	- Default: `macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript, I`
 - Lowercase Words: A comma separated list of words to keep lowercase
 	- Default: `via, a, an, the, and, or, but, for, nor, so, yet, at, by, in, of, on, to, up, as, is, if, it, for, to, with, without, into, onto, per`
 
@@ -1186,6 +1186,86 @@ This resets the decrement section so the H6 below is decremented to an H3
 ### H6
 ``````
 
+### Headings Start Line
+
+Alias: `headings-start-line`
+
+Headings that do not start a line will have their preceding whitespace removed to make sure they get recognized as headers.
+
+
+
+Example: Removes spaces prior to a heading
+
+Before:
+
+``````markdown
+   ## Other heading preceded by 2 spaces ##
+_Note that if the spacing is enough for the header to be considered to be part of a codeblock it will not be affected by this rule._
+``````
+
+After:
+
+``````markdown
+## Other heading preceded by 2 spaces ##
+_Note that if the spacing is enough for the header to be considered to be part of a codeblock it will not be affected by this rule._
+``````
+Example: Tags are not affected by this
+
+Before:
+
+``````markdown
+  #test
+  # Heading &amp;
+``````
+
+After:
+
+``````markdown
+  #test
+# Heading &amp;
+``````
+
+### Remove Trailing Punctuation in Heading
+
+Alias: `remove-trailing-punctuation-in-heading`
+
+Removes the specified punctuation from the end of headings making sure to ignore the semicolon at the end of [HTML entity references](https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references).
+
+Options:
+- Trailing Punctuation: The trailing punctuation to remove from the headings in the file.
+	- Default: `.,;:!。，；：！`
+
+Example: Removes punctuation from the end of a heading
+
+Before:
+
+``````markdown
+# Heading ends in a period.
+## Other heading ends in an exclamation mark! ##
+``````
+
+After:
+
+``````markdown
+# Heading ends in a period
+## Other heading ends in an exclamation mark ##
+``````
+Example: HTML Entities at the end of a heading is ignored
+
+Before:
+
+``````markdown
+# Heading 1
+## Heading &amp;
+``````
+
+After:
+
+``````markdown
+# Heading 1
+## Heading &amp;
+``````
+
 ## Footnote
 ### Footnote after Punctuation
 
@@ -1207,6 +1287,23 @@ After:
 
 ``````markdown
 Lorem.[^1] Ipsum,[^2] doletes.
+``````
+Example: A footnote at the start of a task is not moved to after the punctuation
+
+Before:
+
+``````markdown
+- [ ] [^1]: This is a footnote and a task.
+- [ ] This is a footnote and a task that gets swapped with the punctuation[^2]!
+[^2]: This footnote got modified
+``````
+
+After:
+
+``````markdown
+- [ ] [^1]: This is a footnote and a task.
+- [ ] This is a footnote and a task that gets swapped with the punctuation![^2]
+[^2]: This footnote got modified
 ``````
 
 ### Move Footnotes to the bottom
