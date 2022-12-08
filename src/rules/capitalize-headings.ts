@@ -104,7 +104,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
           }
         }
 
-        headerText = escapeDollarSigns(`${headerWords.join(' ')}`);
+        headerText = headerWords.join(' ');
 
         return headerText;
       });

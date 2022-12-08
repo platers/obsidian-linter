@@ -152,5 +152,18 @@ ruleTest({
         ignoreCasedWords: true,
       },
     },
+    {
+      testName: `Make sure that a heading with dollar signs does not have any added to it`,
+      before: dedent`
+        # Headline $LR(0)$ Set
+      `,
+      after: dedent`
+        # Headline $LR(0)$ Set
+      `,
+      options: {
+        style: 'First letter',
+        ignoreCasedWords: true,
+      },
+    },
   ],
 });
