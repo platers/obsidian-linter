@@ -2,8 +2,7 @@
 import {makeSureContentHasEmptyLinesAddedBeforeAndAfter} from './strings';
 
 // Useful regexes
-export const headerRegex = /^([ \t]*)(#+)([ \t]+)([^#\n\r]*)([ \t]+#+)?$/m;
-export const allHeadersRegex = new RegExp(headerRegex.source, headerRegex.flags + 'g');
+export const allHeadersRegex = /^([ \t]*)(#+)([ \t]+)([^#\n\r]*)([ \t]+#+)?$/gm;
 export const fencedRegexTemplate = '^XXX\\.*?\n(?:((?:.|\n)*?)\n)?XXX(?=\\s|$)$';
 export const yamlRegex = /^---\n((?:(((?!---)(?:.|\n)*?)\n)?))---(?=\n|$)/;
 export const backtickBlockRegexTemplate = fencedRegexTemplate.replaceAll('X', '`');
