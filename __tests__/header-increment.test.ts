@@ -66,5 +66,79 @@ ruleTest({
         ### H3
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/412
+      testName: 'When H1 starts file, header increment should act like normal',
+      before: dedent`
+        # H1
+        ### H3
+        #### H4
+        # H1
+        #### H4
+        ###### H6
+
+        H1 at beginning of file: same as existing behavior
+      `,
+      after: dedent`
+        # H1
+        ## H3
+        ### H4
+        # H1
+        ## H4
+        ### H6
+
+        H1 at beginning of file: same as existing behavior
+      `,
+      options: {
+        startAtH2: true,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/412
+      testName: 'When H1 does not start the file, H1s are left alone and minimum header is H2 for decremented headers',
+      before: dedent`
+        ### H3
+        #### H4
+        # H1
+        ##### H5
+        ###### H6
+
+        No H1 at beginning of file: No header promoted beyond H2; H1s left alone
+      `,
+      after: dedent`
+        ## H3
+        ### H4
+        # H1
+        ## H5
+        ### H6
+
+        No H1 at beginning of file: No header promoted beyond H2; H1s left alone
+      `,
+      options: {
+        startAtH2: true,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/412
+      testName: 'When H1 does not exist in the file, the minimum header is an H2 and incrementing starts from that level',
+      before: dedent`
+        ### H3
+        #### H4
+        ## H2
+        #### H4
+        ###### H6
+
+        Nothing gets promoted above H2
+      `,
+      after: dedent`
+        ## H3
+        ### H4
+        ## H2
+        ### H4
+        #### H6
+
+        Nothing gets promoted above H2
+      `,
+      options: {
+        startAtH2: true,
+      },
+    },
   ],
 });
