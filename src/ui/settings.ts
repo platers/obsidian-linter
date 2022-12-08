@@ -4,7 +4,7 @@ import {Rule, rules, RuleType} from 'src/rules';
 import {moment} from 'obsidian';
 import {SearchOptionInfo} from 'src/option';
 import {iconInfo} from 'src/ui/icons';
-import {parseTextToHTMLWithoutOuterParagraph} from './helpers';
+import {hideEl, parseTextToHTMLWithoutOuterParagraph, unhideEl} from './helpers';
 import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
 import {CustomCommandOption} from './linter-components/custom-command-option';
 import {CustomReplaceOption} from './linter-components/custom-replace-option';
@@ -43,9 +43,9 @@ export class SettingTab extends PluginSettingTab {
 
     this.generateSettingsTitle(containerEl, Platform.isMobile);
 
-    const navContainer = containerEl.createEl('nav', {cls: 'linter-setting-header'});
-    const navEl = navContainer.createDiv('linter-setting-tab-group');
-    const settingsEl = containerEl.createDiv('linter-setting-content');
+    // const navContainer = containerEl.createEl('nav', {cls: 'linter-setting-header'});
+    // const navEl = navContainer.createDiv('linter-setting-tab-group');
+    // const settingsEl = containerEl.createDiv('linter-setting-content');
 
     this.createTabAndContent('General', navEl, settingsEl, (el: HTMLElement, tabName: string) => this.generateGeneralSettings(tabName, el));
 
@@ -66,72 +66,72 @@ export class SettingTab extends PluginSettingTab {
     this.createSearchZeroState(settingsEl);
   }
 
-  createTabAndContent(tabName: string, navEl: HTMLElement, containerEl: HTMLElement, generateTabContent?: (el: HTMLElement, tabName: string) => void) {
-    const displayTabContent = this.selectedTab === tabName;
-    const tabEl = navEl.createDiv('linter-navigation-item');
+  // createTabAndContent(tabName: string, navEl: HTMLElement, containerEl: HTMLElement, generateTabContent?: (el: HTMLElement, tabName: string) => void) {
+  //   const displayTabContent = this.selectedTab === tabName;
+  //   const tabEl = navEl.createDiv('linter-navigation-item');
 
-    let tabClass = 'linter-desktop';
-    if (Platform.isMobile) {
-      tabClass = 'linter-mobile';
-    }
+  //   let tabClass = 'linter-desktop';
+  //   if (Platform.isMobile) {
+  //     tabClass = 'linter-mobile';
+  //   }
 
-    tabEl.addClass(tabClass);
-    setIcon(tabEl.createSpan({cls: 'linter-navigation-item-icon'}), tabNameToTabIconId[tabName], 20);
-    tabEl.createSpan().setText(tabName);
+  //   tabEl.addClass(tabClass);
+  //   setIcon(tabEl.createSpan({cls: 'linter-navigation-item-icon'}), tabNameToTabIconId[tabName], 20);
+  //   tabEl.createSpan().setText(tabName);
 
-    tabEl.onclick = () => {
-      if (this.selectedTab == tabName) {
-        return;
-      }
+  //   tabEl.onclick = () => {
+  //     if (this.selectedTab == tabName) {
+  //       return;
+  //     }
 
-      tabEl.addClass('linter-navigation-item-selected');
-      const tab = this.tabContent.get(tabName);
-      this.unhideEl(tab.content);
+  //     tabEl.addClass('linter-navigation-item-selected');
+  //     const tab = this.tabContent.get(tabName);
+  //     unhideEl(tab.content);
 
-      if (this.selectedTab != '') {
-        const tabInfo = this.tabContent.get(this.selectedTab);
-        tabInfo.navButton.removeClass('linter-navigation-item-selected');
-        this.hideEl(tabInfo.content);
-      } else {
-        this.hideEl(this.searchZeroState);
+  //     if (this.selectedTab != '') {
+  //       const tabInfo = this.tabContent.get(this.selectedTab);
+  //       tabInfo.navButton.removeClass('linter-navigation-item-selected');
+  //       hideEl(tabInfo.content);
+  //     } else {
+  //       hideEl(this.searchZeroState);
 
 
-        for (const settingTab of this.searchSettingInfo) {
-          for (const setting of settingTab[1]) {
-            this.unhideEl(setting.containerEl);
-          }
-        }
+  //       for (const settingTab of this.searchSettingInfo) {
+  //         for (const setting of settingTab[1]) {
+  //           unhideEl(setting.containerEl);
+  //         }
+  //       }
 
-        for (const tabInfo of this.tabContent) {
-          const tab = tabInfo[1];
-          this.hideEl(tab.heading);
-          if (tabName !== tabInfo[0]) {
-            this.hideEl(tab.content);
-          }
-        }
-      }
+  //       for (const tabInfo of this.tabContent) {
+  //         const tab = tabInfo[1];
+  //         hideEl(tab.heading);
+  //         if (tabName !== tabInfo[0]) {
+  //           hideEl(tab.content);
+  //         }
+  //       }
+  //     }
 
-      this.selectedTab = tabName;
-    };
+  //     this.selectedTab = tabName;
+  //   };
 
-    const tabContent = containerEl.createDiv('linter-tab-settings');
+  //   const tabContent = containerEl.createDiv('linter-tab-settings');
 
-    const tabHeader = tabContent.createEl('h2', {text: tabName + ' Settings'});
-    this.hideEl(tabHeader);
+  //   const tabHeader = tabContent.createEl('h2', {text: tabName + ' Settings'});
+  //   hideEl(tabHeader);
 
-    tabContent.id = tabName.toLowerCase().replace(' ', '-');
-    if (!displayTabContent) {
-      this.hideEl(tabContent);
-    } else {
-      tabEl.addClass('linter-navigation-item-selected');
-    }
+  //   tabContent.id = tabName.toLowerCase().replace(' ', '-');
+  //   if (!displayTabContent) {
+  //     hideEl(tabContent);
+  //   } else {
+  //     tabEl.addClass('linter-navigation-item-selected');
+  //   }
 
-    if (generateTabContent) {
-      generateTabContent(tabContent, tabName);
-    }
+  //   if (generateTabContent) {
+  //     generateTabContent(tabContent, tabName);
+  //   }
 
-    this.tabContent.set(tabName, {content: tabContent, heading: tabHeader, navButton: tabEl});
-  }
+  //   this.tabContent.set(tabName, {content: tabContent, heading: tabHeader, navButton: tabEl});
+  // }
 
   addRuleToTab(tabName: string, rule: Rule) {
     const containerEl = this.tabContent.get(tabName).content;
@@ -363,8 +363,8 @@ export class SettingTab extends PluginSettingTab {
       for (const tabInfo of this.tabContent) {
         const tab = tabInfo[1];
         tab.navButton.removeClass('linter-navigation-item-selected');
-        this.unhideEl(tab.content);
-        this.unhideEl(tab.heading);
+        unhideEl(tab.content);
+        unhideEl(tab.heading);
 
         const searchVal = this.search.getValue();
         if (this.selectedTab == '' && searchVal.trim() != '') {
@@ -426,10 +426,10 @@ export class SettingTab extends PluginSettingTab {
               }
             }
 
-            this.hideEl(settingInfo.containerEl);
+            hideEl(settingInfo.containerEl);
           }
         } else {
-          this.hideEl(settingInfo.containerEl);
+          hideEl(settingInfo.containerEl);
         }
       }
     }
@@ -437,22 +437,22 @@ export class SettingTab extends PluginSettingTab {
     // display any headings that have setting results and hide any that do not
     for (const tabInfo of this.tabContent) {
       if (tabsWithSettingsInSearchResults.has(tabInfo[0])) {
-        this.unhideEl(tabInfo[1].heading);
+        unhideEl(tabInfo[1].heading);
       } else {
-        this.hideEl(tabInfo[1].heading);
+        hideEl(tabInfo[1].heading);
       }
     }
 
     if (tabsWithSettingsInSearchResults.size === 0) {
-      this.unhideEl(this.searchZeroState);
+      unhideEl(this.searchZeroState);
     } else {
-      this.hideEl(this.searchZeroState);
+      hideEl(this.searchZeroState);
     }
   }
 
   private createSearchZeroState(containerEl: HTMLElement) {
     this.searchZeroState = containerEl.createDiv();
-    this.hideEl(this.searchZeroState);
+    hideEl(this.searchZeroState);
     this.searchZeroState.createEl(Platform.isMobile ? 'h3' : 'h2', {text: 'No settings match search'}).style.textAlign = 'center';
   }
 
@@ -464,13 +464,5 @@ export class SettingTab extends PluginSettingTab {
     } else {
       this.searchSettingInfo.get(tabName).push(settingInfo);
     }
-  }
-
-  private hideEl(el: HTMLElement) {
-    el.addClass('linter-visually-hidden');
-  }
-
-  private unhideEl(el: HTMLElement) {
-    el.removeClass('linter-visually-hidden');
   }
 }
