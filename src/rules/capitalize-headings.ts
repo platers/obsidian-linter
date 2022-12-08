@@ -104,9 +104,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
           }
         }
 
-        headerText = headerWords.join(' ');
-
-        return headerText;
+        return headerWords.join(' ');
       });
     });
   }
