@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {allHeadersRegex, escapeDollarSigns, wordSplitterRegex} from '../utils/regex';
+import {allHeadersRegex, wordSplitterRegex} from '../utils/regex';
 
 type Style = 'Title Case' | 'ALL CAPS' | 'First letter';
 
