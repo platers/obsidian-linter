@@ -27,15 +27,10 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
       let lastLevel = options.startAtH2 ? 1 : 0; // level of last header processed
       let decrement = 0; // number of levels to decrement following headers
       const minimumLevel = options.startAtH2 ? 2: 1;
+      const levelOffSet = options.startAtH2 ? 1: 0;
 
       return text.replace(allHeadersRegex, (headerText: string, $1: string = '', $2: string = '', $3: string = '', $4: string = '', $5: string = '') => {
-        // skip any headers with a header level less than the minimum
-        if ($2.length < minimumLevel) {
-          lastLevel = minimumLevel - 1; // makes sure that header increment starts off at the minimum level if the last level was greater than it
-          return headerText;
-        }
-
-        let level = $2.length - decrement;
+        let level = $2.length + levelOffSet - decrement;
         if (level > lastLevel + 1) {
           decrement += level - (lastLevel + 1);
           level = lastLevel + 1;
@@ -122,26 +117,26 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
         `,
       }),
       new ExampleBuilder({
-        description: 'When start at heading level 2 is set to true, H1s are left alone and the next header will be an H2',
+        description: 'When `Start Header Increment at Heading Level 2 = true`, H1s become H2s and the other headers are incremented accordingly',
         before: dedent`
-          # H1 stays the same
-          ### H3 becomes H2
+          # H1 becomes H2
+          #### H4 becomes H3
           ####### H7
           ###### H6
           ## H2
           ###### H6
           # H1
-          ####### H7
+          ## H2
         `,
         after: dedent`
-          # H1 stays the same
-          ## H3 becomes H2
-          ### H7
-          ## H6
+          ## H1 becomes H2
+          ### H4 becomes H3
+          #### H7
+          ### H6
           ## H2
           ### H6
-          # H1
-          ## H7
+          ## H1
+          ### H2
         `,
         options: {
           startAtH2: true,
@@ -154,7 +149,7 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
       new BooleanOptionBuilder({
         OptionsClass: HeaderIncrementOptions,
         name: 'Start Header Increment at Heading Level 2',
-        description: 'Ignores level 1 headings and makes sure that level 1 headings are followed by an level 2 heading',
+        description: 'Makes heading level 2 the minimum heading level in a file for header increment and shifts all headings accordingly so they increment starting with a level 2 heading.',
         optionsKey: 'startAtH2',
       }),
     ];
