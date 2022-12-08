@@ -67,7 +67,7 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/412
-      testName: 'When H1 starts file, header increment should act like normal',
+      testName: 'H1s become H2s and all other headers are shifted accordingly when an H1 starts a file',
       before: dedent`
         # H1
         ### H3
@@ -75,42 +75,34 @@ ruleTest({
         # H1
         #### H4
         ###### H6
-
-        H1 at beginning of file: same as existing behavior
       `,
       after: dedent`
-        # H1
-        ## H3
+        ## H1
+        ### H3
+        #### H4
+        ## H1
         ### H4
-        # H1
-        ## H4
-        ### H6
-
-        H1 at beginning of file: same as existing behavior
+        #### H6
       `,
       options: {
         startAtH2: true,
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/412
-      testName: 'When H1 does not start the file, H1s are left alone and minimum header is H2 for decremented headers',
+      testName: 'When H1 does not start the file, H1s are converted to H2 where they are and the next header is an H3',
       before: dedent`
         ### H3
         #### H4
         # H1
         ##### H5
         ###### H6
-
-        No H1 at beginning of file: No header promoted beyond H2; H1s left alone
       `,
       after: dedent`
         ## H3
         ### H4
-        # H1
-        ## H5
-        ### H6
-
-        No H1 at beginning of file: No header promoted beyond H2; H1s left alone
+        ## H1
+        ### H5
+        #### H6
       `,
       options: {
         startAtH2: true,
