@@ -1111,7 +1111,9 @@ Alias: `header-increment`
 
 Heading levels should only increment by one level at a time
 
-
+Options:
+- Start Header Increment at Heading Level 2: Makes heading level 2 the minimum heading level in a file for header increment and shifts all headings accordingly so they increment starting with a level 2 heading.
+	- Default: `false`
 
 Example: 
 
@@ -1184,6 +1186,33 @@ We skipped 6 previously so it will be treated the same as the H3 above since it 
 This resets the decrement section so the H6 below is decremented to an H3
 
 ### H6
+``````
+Example: When `Start Header Increment at Heading Level 2 = true`, H1s become H2s and the other headers are incremented accordingly
+
+Before:
+
+``````markdown
+# H1 becomes H2
+#### H4 becomes H3
+####### H7
+###### H6
+## H2
+###### H6
+# H1
+## H2
+``````
+
+After:
+
+``````markdown
+## H1 becomes H2
+### H4 becomes H3
+#### H7
+### H6
+## H2
+### H6
+## H1
+### H2
 ``````
 
 ### Headings Start Line
