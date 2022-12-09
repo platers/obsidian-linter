@@ -21,7 +21,6 @@ export class CustomTab extends Tab {
     const customRegexes = new CustomReplaceOption(customReplaceEl, this.plugin.settings.customRegexes, this.isMobile, () => {
       this.plugin.saveSettings();
     });
-
     this.addSettingSearchInfo(customReplaceEl, customRegexes.name, customRegexes.description.replaceAll('\n', ' ') + customRegexes.warning.replaceAll('\n', ' '));
   }
 }

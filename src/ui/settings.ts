@@ -1,6 +1,6 @@
 import {App, Platform, PluginSettingTab} from 'obsidian';
 import LinterPlugin from 'src/main';
-import {ruleTypeToRules} from 'src/rules';
+import {RuleType, ruleTypeToRules} from 'src/rules';
 import {hideEl} from './helpers';
 import {SearchStatus, Tab} from './linter-components/tab-components/tab';
 import {GeneralTab} from './linter-components/tab-components/general-tab';
@@ -50,9 +50,11 @@ export class SettingTab extends PluginSettingTab {
 
   private addTabs(isMobile: boolean) {
     this.addTab(new GeneralTab(this.navEl, this.settingsEl, isMobile, this.plugin));
-    for (const [ruleType, rules] of ruleTypeToRules) {
-      this.addTab(new RuleTab(this.navEl, this.settingsEl, ruleType, rules, isMobile, this.plugin));
+
+    for (const ruleType of Object.values(RuleType)) {
+      this.addTab(new RuleTab(this.navEl, this.settingsEl, ruleType, ruleTypeToRules.get(ruleType), isMobile, this.plugin));
     }
+
     this.addTab(new CustomTab(this.navEl, this.settingsEl, isMobile, this.app, this.plugin));
   }
 
