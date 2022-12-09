@@ -1,4 +1,4 @@
-import {App, Setting} from 'obsidian';
+import {Setting} from 'obsidian';
 import {parseTextToHTMLWithoutOuterParagraph} from '../helpers';
 
 /**
@@ -15,7 +15,6 @@ export abstract class AddCustomRow {
     public warning: string,
     private addInputBtnText: string,
     protected isMobile: boolean,
-    protected app: App,
     protected saveSettings: () => void,
     private onAddInput: () => void) {
   }

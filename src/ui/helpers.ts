@@ -14,3 +14,11 @@ export function parseTextToHTMLWithoutOuterParagraph(text: string, containerEl: 
 
   containerEl.innerHTML = htmlString;
 }
+
+export function hideEl(el: HTMLElement) {
+  el.addClass('linter-visually-hidden');
+}
+
+export function unhideEl(el: HTMLElement) {
+  el.removeClass('linter-visually-hidden');
+}
