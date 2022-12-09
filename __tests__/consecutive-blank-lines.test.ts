@@ -126,5 +126,59 @@ ruleTest({
         Line 2
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/538
+      testName: 'Make sure that lists with a blank line between them are not affected since there are not 2 or more blank lines',
+      before: dedent`
+        - Item 1
+        ${''}
+          - Subitem 1
+        ${''}
+          - Subitem 2
+        ${''}
+            - Sub sub item 1
+        ${''}
+            - Sub sub item 2
+      `,
+      after: dedent`
+        - Item 1
+        ${''}
+          - Subitem 1
+        ${''}
+          - Subitem 2
+        ${''}
+            - Sub sub item 1
+        ${''}
+            - Sub sub item 2
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/543
+      testName: 'Make sure that nested code blocks with a blank line between them are not affected since there are not 2 or more blank lines',
+      before: dedent`
+        1. \`aaa\` bbbb,
+        3. xxxxxxxxxxxxxxx
+
+            \`\`\`csharp
+            private IProcessor[] GetProcessors()
+            {
+                return returnedProcessors.ToArray();
+            }
+            \`\`\`
+
+        4. ccccccc,
+      `,
+      after: dedent`
+        1. \`aaa\` bbbb,
+        3. xxxxxxxxxxxxxxx
+
+            \`\`\`csharp
+            private IProcessor[] GetProcessors()
+            {
+                return returnedProcessors.ToArray();
+            }
+            \`\`\`
+
+        4. ccccccc,
+      `,
+    },
   ],
 });
