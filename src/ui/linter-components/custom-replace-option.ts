@@ -1,11 +1,11 @@
-import {Setting, App} from 'obsidian';
+import {Setting} from 'obsidian';
 import {AddCustomRow} from '../components/add-custom-row';
 export type CustomReplace = {find: string, replace: string, flags: string};
 
 const defaultFlags = 'gm';
 
 export class CustomReplaceOption extends AddCustomRow {
-  constructor(containerEl: HTMLElement, public regexes: CustomReplace[], isMobile: boolean, app: App, saveSettings: () => void) {
+  constructor(containerEl: HTMLElement, public regexes: CustomReplace[], isMobile: boolean, saveSettings: () => void) {
     super(
         containerEl,
         'Custom Regex Replacement',
@@ -13,7 +13,6 @@ export class CustomReplaceOption extends AddCustomRow {
         `Use this with caution if you do not know regex. Also, please make sure that you do not use lookbehinds in your regex on iOS mobile as that will cause linting to fail since that is not supported on that platform.`,
         'Add new regex replacement',
         isMobile,
-        app,
         saveSettings,
         ()=>{
           const newRegex = {find: '', replace: '', flags: defaultFlags};

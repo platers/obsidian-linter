@@ -196,15 +196,19 @@ export function getDisabledRules(text: string): string[] {
 
 export const rules: Rule[] = [];
 
-export const rulesDict = rules.reduce(
-    (dict, rule) => ((dict[rule.alias()] = rule), dict),
-  {} as Record<string, Rule>,
-);
+export const rulesDict = {} as Record<string, Rule>;
+export const ruleTypeToRules = new Map<RuleType, Rule[]>;
 
 export function registerRule(rule: Rule): void {
   rules.push(rule);
   rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.name.localeCompare(b.name)));
   rulesDict[rule.alias()] = rule;
+
+  if (ruleTypeToRules.has(rule.type)) {
+    ruleTypeToRules.get(rule.type).push(rule);
+  } else {
+    ruleTypeToRules.set(rule.type, [rule]);
+  }
 }
 
 export function wrapLintError(error: Error, ruleName: string) {
