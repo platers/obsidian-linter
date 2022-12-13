@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {tagRegex} from '../utils/regex';
+import {tagRegex, tagWithLeadingWhitespaceRegex} from '../utils/regex';
 import {
   convertTagValueToStringOrStringArray,
   getYamlSectionValue,
@@ -91,7 +91,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       });
 
       if (options.howToHandleExistingTags !== 'Nothing') {
-        text = text.replace(tagRegex, (tag: string) => {
+        text = text.replace(tagWithLeadingWhitespaceRegex, (tag: string) => {
           const hashtagIndex = tag.indexOf('#');
 
           const tagContents = tag.substring(hashtagIndex+1);
