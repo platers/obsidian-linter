@@ -127,5 +127,19 @@ ruleTest({
         # Title
       `,
     },
+    {
+      testName: 'Tag after first header is not considered as a part of the title',
+      before: dedent`
+        # title
+        #tag
+      `,
+      after: dedent`
+        ---
+        title: title
+        ---
+        # title
+        #tag
+      `,
+    },
   ],
 });
