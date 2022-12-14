@@ -1,4 +1,4 @@
-import {obsidianMultilineCommentRegex, tagRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex, tableRegex, urlRegex} from './regex';
+import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex, tableRegex, urlRegex} from './regex';
 import {getPositions, MDAstTypes} from './mdast';
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
@@ -24,7 +24,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   // RegExp
   yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---')},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}'},
-  tag: {replaceAction: tagRegex, placeholder: '#tag-placeholder'},
+  tag: {replaceAction: replaceTags, placeholder: '#tag-placeholder'},
   obsidianMultiLineComments: {replaceAction: obsidianMultilineCommentRegex, placeholder: '{OBSIDIAN_COMMENT_PLACEHOLDER}'},
   table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}'},
   footnoteAtStartOfLine: {replaceAction: /^(\[\^\w+\]) ?([,.;!:?])/gm, placeholder: '{FOOTNOTE_AT_START_OF_LINE_PLACEHOLDER}'},
@@ -154,4 +154,15 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): Ign
   replacedRegularLinks.reverse();
 
   return {newText: text, replacedValues: replacedRegularLinks};
+}
+
+function replaceTags(text: string, placeholder: string): IgnoreResults {
+  const replacedValues: string[] = [];
+
+  text = text.replace(tagWithLeadingWhitespaceRegex, (match, whitespace, tag) => {
+    replacedValues.push(tag);
+    return whitespace + placeholder;
+  });
+
+  return {newText: text, replacedValues: replacedValues};
 }
