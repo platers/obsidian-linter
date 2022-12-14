@@ -3,7 +3,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {misspellingToCorrection} from '../utils/auto-correct-misspellings';
-import {wordSplitterRegex} from 'src/utils/regex';
+import {wordSplitterRegex} from '../utils/regex';
 
 class AutoCorrectCommonMisspellingsOptions implements Options {
   ignoreWords?: string[] = [];
