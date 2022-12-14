@@ -162,6 +162,19 @@ export default class LinterPlugin extends Plugin {
     });
 
     this.addCommand({
+      id: 'lint-file-unless-ignored',
+      name: 'Lint the current file unless ignored',
+      editorCallback: (editor: Editor) => {
+        const file = this.app.workspace.getActiveFile();
+
+        if (!this.shouldIgnoreFile(file)) {
+          this.runLinterEditor(editor);
+        }
+      },
+      icon: iconInfo.file.id,
+    });
+
+    this.addCommand({
       id: 'lint-all-files',
       name: 'Lint all files in the vault',
       icon: iconInfo.vault.id,
