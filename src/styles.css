@@ -147,5 +147,7 @@
 */
 textarea.full-width {
   width: 100%;
-  min-height: 10%;
+  min-height: 10em;
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
 }

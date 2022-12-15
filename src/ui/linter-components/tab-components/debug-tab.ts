@@ -5,11 +5,9 @@ import {Setting} from 'obsidian';
 import {TextBoxFull} from 'src/ui/components/text-box-full';
 import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
 import {logsFromLastRun} from 'src/utils/logger';
-import {IssueReporter} from '../issue-reporter';
 
 const logLevels = Object.keys(log.levels);
 const logLevelInts = Object.values(log.levels);
-const baseIssueURL = 'https://github.com/plater/obsidian-linter/issues/new?';
 
 export class DebugTab extends Tab {
   constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin) {
@@ -78,33 +76,5 @@ export class DebugTab extends Tab {
     parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl);
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
-
-    tempDiv = this.contentEl.createDiv();
-    settingName = 'Linter Reporter';
-    settingDesc = 'Allows the user to report feature requests and bugs to github by generating a link that can be used to open an issue.';
-    new IssueReporter(tempDiv, configDisplay);
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
-  }
-
-  buildGithubIssueInfo(): string {
-    //     const issue_url = baseIssueURL + new URLSearchParams({
-    //     title: `Bug: `,
-    //     body: `# User report\n**Description:** \n\n\n\n---\n# Debug Data (no need to alter this)\n${Array.from(Object.entries({
-    //         service_version: $settings.service_settings[tab].version,
-    //         obsidian_version: navigator.userAgent,
-    //     })).map((x) => `**${x[0]}**: ${JSON.stringify(x[1])}`).join("\n")}`,
-    //     labels: `bug`
-    // })});
-
-    const issue_url = baseIssueURL + new URLSearchParams({
-      title: `Bug: `,
-      body: `## Describe the Bug\nTODO: ADD FORM INFO HERE \n## How to Reproduce\n\n\n---\n# Debug Data (no need to alter this)\n${Array.from(Object.entries({
-        service_version: this.plugin.manifest.version,
-        obsidian_version: navigator.userAgent,
-      })).map((x) => `**${x[0]}**: ${JSON.stringify(x[1])}`).join('\n')}`,
-      labels: `bug`,
-    });
-
-    return '';
   }
 }

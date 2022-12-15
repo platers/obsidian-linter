@@ -22,6 +22,6 @@ export class TextBoxFull {
   }
 
   getInput(): string {
-    return this.inputEl.getText();
+    return this.inputEl.value;
   }
 }
