@@ -1,6 +1,10 @@
 import log from 'loglevel';
 
 const logPrefix: string = '[Obsidian Linter]';
+const timingInfo = new Map<string, number>();
+let collectLogs = false;
+
+export let logsFromLastRun: string[] = [];
 
 /**
  * Allows for the logging of errors
@@ -15,6 +19,10 @@ export function logError(labelForError: string, error: Error) {
   }
 
   log.error(message);
+
+  if (collectLogs) {
+    addLogInfo(message.substring(message.indexOf(']')+2), log.levels.TRACE);
+  }
 }
 
 /**
@@ -23,6 +31,10 @@ export function logError(labelForError: string, error: Error) {
  */
 export function logInfo(message: string) {
   log.info(`${logPrefix} ${message}`);
+
+  if (collectLogs) {
+    addLogInfo(message, log.levels.INFO);
+  }
 }
 
 /**
@@ -31,6 +43,10 @@ export function logInfo(message: string) {
  */
 export function logTrace(message: string) {
   log.trace(`${logPrefix} ${message}`);
+
+  if (collectLogs) {
+    addLogInfo(message, log.levels.TRACE);
+  }
 }
 
 /**
@@ -39,6 +55,10 @@ export function logTrace(message: string) {
  */
 export function logDebug(message: string) {
   log.debug(`${logPrefix} ${message}`);
+
+  if (collectLogs) {
+    addLogInfo(message, log.levels.DEBUG);
+  }
 }
 
 /**
@@ -47,7 +67,49 @@ export function logDebug(message: string) {
  */
 export function logWarn(message: string) {
   log.warn(`${logPrefix} ${message}`);
+
+  if (collectLogs) {
+    addLogInfo(message, log.levels.WARN);
+  }
 }
+
+export function timingBegin(timingKey: string) {
+  if (log.getLevel() > log.levels.DEBUG) {
+    return;
+  }
+
+  timingInfo.set(timingKey, performance.now());
+}
+
+/**
+ * Logs the amount of time that has gone by since the original use of the timing key provided.
+ * @param {string} timingKey - The timing key for the start time that should end.
+ */
+export function timingEnd(timingKey: string) {
+  if (log.getLevel() > log.levels.DEBUG) {
+    return;
+  } else if (!timingInfo.has(timingKey)) {
+    logWarn(`timing key '${timingKey}' does not exist in the timing info list, so it was ignored`);
+  }
+
+  const totalTimeInMilliseconds = performance.now() - timingInfo.get(timingKey);
+  logDebug(`${timingKey}: ${totalTimeInMilliseconds} ms`);
+}
+
+function addLogInfo(logInfo: string, logLevel: number) {
+  if (log.getLevel() <= logLevel) {
+    logsFromLastRun.push(logInfo);
+  }
+}
+
+export function clearLogs() {
+  logsFromLastRun = [];
+}
+
+export function setCollectLogs(enabled: boolean) {
+  collectLogs = enabled;
+}
+
 
 /**
  * Allows the user to set the minimum logging level to display messages for

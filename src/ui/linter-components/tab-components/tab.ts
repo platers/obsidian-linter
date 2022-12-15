@@ -21,6 +21,7 @@ const tabNameToTabIconId: Record<string | RuleType, string> = {
   'Content': iconInfo.content.id,
   'Spacing': iconInfo.whitespace.id,
   'Paste': iconInfo.paste.id,
+  'Debug': iconInfo.debug.id,
 };
 
 export abstract class Tab {

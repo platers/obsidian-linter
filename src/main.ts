@@ -4,7 +4,7 @@ import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
 import log from 'loglevel';
-import {logInfo, logError, logDebug, setLogLevel, logWarn} from './utils/logger';
+import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
 import {iconInfo} from './ui/icons';
@@ -44,6 +44,7 @@ const langToMomentLocale = {
 const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   ruleConfigs: {},
   lintOnSave: false,
+  recordLintOnSaveLogs: false,
   displayChanged: true,
   foldersToIgnore: [],
   linterLocale: 'system-default',
@@ -151,7 +152,14 @@ export default class LinterPlugin extends Plugin {
     this.addCommand({
       id: 'lint-file',
       name: 'Lint the current file',
-      editorCallback: (editor) => this.runLinterEditor(editor),
+      editorCallback: (editor) => {
+        setCollectLogs(this.settings.recordLintOnSaveLogs);
+        clearLogs();
+
+        this.runLinterEditor(editor);
+
+        setCollectLogs(false);
+      },
       icon: iconInfo.file.id,
       hotkeys: [
         {
@@ -243,7 +251,12 @@ export default class LinterPlugin extends Plugin {
           const file = this.app.workspace.getActiveFile();
 
           if (!this.shouldIgnoreFile(file)) {
+            setCollectLogs(this.settings.recordLintOnSaveLogs);
+            clearLogs();
+
             this.runLinterEditor(editor);
+
+            setCollectLogs(false);
           }
         }
       };

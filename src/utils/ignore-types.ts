@@ -2,6 +2,7 @@ import {obsidianMultilineCommentRegex, tagRegex, wikiLinkRegex, yamlRegex, escap
 import {getPositions, MDAstTypes} from './mdast';
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
+import {timingBegin, timingEnd} from './logger';
 
 
 export type IgnoreResults = {replacedValues: string[], newText: string};
@@ -24,13 +25,13 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   // RegExp
   yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---')},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}'},
-  tag: {replaceAction: tagRegex, placeholder: '#tag-placeholder'},
   obsidianMultiLineComments: {replaceAction: obsidianMultilineCommentRegex, placeholder: '{OBSIDIAN_COMMENT_PLACEHOLDER}'},
   table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}'},
   footnoteAtStartOfLine: {replaceAction: /^(\[\^\w+\]) ?([,.;!:?])/gm, placeholder: '{FOOTNOTE_AT_START_OF_LINE_PLACEHOLDER}'},
   footnoteAfterATask: {replaceAction: /- \[.] (\[\^\w+\]) ?([,.;!:?])/gm, placeholder: '{FOOTNOTE_AFTER_A_TASK_PLACEHOLDER}'},
   url: {replaceAction: urlRegex, placeholder: '{URL_PLACEHOLDER}'},
   // custom functions
+  tag: {replaceAction: replaceTags, placeholder: '#tag-placeholder'},
   link: {replaceAction: replaceMarkdownLinks, placeholder: '{REGULAR_LINK_PLACEHOLDER}'},
 } as const;
 
@@ -43,7 +44,13 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
     if (typeof ignoreType.replaceAction === 'string') { // mdast
       ignoredResult = replaceMdastType(text, ignoreType.placeholder, ignoreType.replaceAction);
     } else if (ignoreType.replaceAction instanceof RegExp) {
+      if (ignoreType.replaceAction === tableRegex) {
+        timingBegin('table ignore');
+      }
       ignoredResult = replaceRegex(text, ignoreType.placeholder, ignoreType.replaceAction);
+      if (ignoreType.replaceAction === tableRegex) {
+        timingEnd('table ignore');
+      }
     } else if (typeof ignoreType.replaceAction === 'function') {
       const ignoreFunc: IgnoreFunction = ignoreType.replaceAction;
       ignoredResult = ignoreFunc(text, ignoreType.placeholder);
@@ -154,4 +161,24 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): Ign
   replacedRegularLinks.reverse();
 
   return {newText: text, replacedValues: replacedRegularLinks};
+}
+
+/**
+ * Replaces all obsidian tags in the given text with a placeholder.
+ * @param {string} text The text to replace tags in
+ * @param {string} tagPlaceholder The placeholder to use for obsidian tags
+ * @return {string} The text with tags replaced
+ * @return {string[]} The obsidian tags replaced
+ */
+function replaceTags(text: string, tagPlaceholder: string): IgnoreResults {
+  const tagMatches: string[] = [];
+  text = text.replaceAll(tagRegex, (tagPlusSpace: string) => {
+    const hashtagIndex = tagPlusSpace.indexOf('#');
+
+    tagMatches.push(tagPlusSpace.substring(hashtagIndex));
+
+    return tagPlusSpace.substring(0, hashtagIndex) + tagPlaceholder;
+  });
+
+  return {newText: text, replacedValues: tagMatches};
 }

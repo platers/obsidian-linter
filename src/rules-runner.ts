@@ -1,5 +1,5 @@
 import {TFile, moment} from 'obsidian';
-import {logDebug, logWarn} from './utils/logger';
+import {logDebug, logWarn, timingBegin, timingEnd} from './utils/logger';
 import {getDisabledRules, LinterSettings, rules, wrapLintError, RuleType} from './rules';
 import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
@@ -38,11 +38,13 @@ export class RulesRunner {
   private disabledRules: string[] = [];
 
   lintText(runOptions: RunLinterRulesOptions): string {
+    timingBegin('rule running');
     const originalText = runOptions.oldText;
     this.disabledRules = getDisabledRules(originalText);
 
+    timingBegin('pre rules');
     let newText = this.runBeforeRegularRules(runOptions);
-
+    timingEnd('pre rules');
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
       if (this.disabledRules.includes(rule.alias())) {
@@ -52,6 +54,7 @@ export class RulesRunner {
         continue;
       }
 
+      timingBegin(rule.alias());
       [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, runOptions.settings, {
         fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
         fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
@@ -62,9 +65,12 @@ export class RulesRunner {
         tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
         defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
       });
+      timingEnd(rule.alias());
     }
 
+    timingBegin('custom regex');
     newText = this.runCustomRegexReplacement(runOptions.settings.customRegexes, newText);
+    timingEnd('custom regex');
 
     runOptions.oldText = newText;
 
@@ -86,7 +92,7 @@ export class RulesRunner {
 
   private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
     let newText = runOptions.oldText;
-
+    timingBegin('post rules');
     [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
     });
@@ -110,7 +116,8 @@ export class RulesRunner {
       yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
       dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
     });
-
+    timingEnd('post rules');
+    timingEnd('rule running');
     return newText;
   }
 

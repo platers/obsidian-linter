@@ -141,3 +141,11 @@
   width: 1px;
   white-space: nowrap;
 }
+
+/**
+* Full-width text areas
+*/
+textarea.full-width {
+  width: 100%;
+  min-height: 10%;
+}

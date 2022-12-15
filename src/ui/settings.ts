@@ -7,6 +7,7 @@ import {GeneralTab} from './linter-components/tab-components/general-tab';
 import {RuleTab} from './linter-components/tab-components/rule-tab';
 import {CustomTab} from './linter-components/tab-components/custom-tab';
 import {TabSearcher} from './linter-components/tab-components/tab-searcher';
+import {DebugTab} from './linter-components/tab-components/debug-tab';
 
 export class SettingTab extends PluginSettingTab {
   plugin: LinterPlugin;
@@ -56,6 +57,7 @@ export class SettingTab extends PluginSettingTab {
     }
 
     this.addTab(new CustomTab(this.navEl, this.settingsEl, isMobile, this.app, this.plugin));
+    this.addTab(new DebugTab(this.navEl, this.settingsEl, isMobile, this.plugin));
   }
 
   private generateSearchBar(containerEl: HTMLDivElement) {

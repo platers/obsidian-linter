@@ -35,6 +35,7 @@ export interface LinterSettings {
   };
   lintOnSave: boolean;
   displayChanged: boolean;
+  recordLintOnSaveLogs: boolean;
   foldersToIgnore: string[];
   linterLocale: string;
   logLevel: number;
