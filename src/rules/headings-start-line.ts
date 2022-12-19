@@ -22,7 +22,7 @@ export default class HeadingStartLine extends RuleBuilder<HeadingStartLineOption
     return RuleType.HEADING;
   }
   apply(text: string, options: HeadingStartLineOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml], text, (text) => {
       return text.replaceAll(allHeadersRegex, (heading: string) => {
         return heading.trimStart();
       });

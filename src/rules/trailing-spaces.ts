@@ -22,7 +22,7 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
     return RuleType.SPACING;
   }
   apply(text: string, options: TrailingSpacesOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
       if (!options.twoSpaceLineBreak) {
         return text.replace(/[ \t]+$/gm, '');
       } else {

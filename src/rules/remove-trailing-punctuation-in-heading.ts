@@ -23,7 +23,7 @@ export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<Remo
     return RuleType.HEADING;
   }
   apply(text: string, options: RemoveTrailingPunctuationInHeadingOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml], text, (text) => {
       return text.replaceAll(allHeadersRegex,
           (heading: string, $1: string = '', $2: string = '', $3: string = '', $4: string = '', $5: string = '') => {
             // ignore the html entities and entries without any heading text

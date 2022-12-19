@@ -22,7 +22,7 @@ export default class ProperEllipsis extends RuleBuilder<ProperEllipsisOptions> {
     return RuleType.CONTENT;
   }
   apply(text: string, options: ProperEllipsisOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
       return text.replaceAll(ellipsisRegex, '…');
     });
   }

@@ -23,7 +23,7 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
     return RuleType.HEADING;
   }
   apply(text: string, options: HeaderIncrementOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
       let lastLevel = options.startAtH2 ? 1 : 0; // level of last header processed
       let decrement = 0; // number of levels to decrement following headers
       const minimumLevel = options.startAtH2 ? 2: 1;

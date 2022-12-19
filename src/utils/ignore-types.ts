@@ -2,8 +2,6 @@ import {obsidianMultilineCommentRegex, tagRegex, wikiLinkRegex, yamlRegex, escap
 import {getPositions, MDAstTypes} from './mdast';
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
-import {timingBegin, timingEnd} from './logger';
-
 
 export type IgnoreResults = {replacedValues: string[], newText: string};
 export type IgnoreFunction = ((text: string, placeholder: string) => IgnoreResults);
@@ -44,13 +42,7 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
     if (typeof ignoreType.replaceAction === 'string') { // mdast
       ignoredResult = replaceMdastType(text, ignoreType.placeholder, ignoreType.replaceAction);
     } else if (ignoreType.replaceAction instanceof RegExp) {
-      if (ignoreType.replaceAction === tableRegex) {
-        timingBegin('table ignore');
-      }
       ignoredResult = replaceRegex(text, ignoreType.placeholder, ignoreType.replaceAction);
-      if (ignoreType.replaceAction === tableRegex) {
-        timingEnd('table ignore');
-      }
     } else if (typeof ignoreType.replaceAction === 'function') {
       const ignoreFunc: IgnoreFunction = ignoreType.replaceAction;
       ignoredResult = ignoreFunc(text, ignoreType.placeholder);

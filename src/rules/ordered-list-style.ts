@@ -25,7 +25,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
     return RuleType.CONTENT;
   }
   apply(text: string, options: OrderedListStyleOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
       return updateOrderedListItemIndicators(text, options.numberStyle, options.listEndStyle);
     });
   }

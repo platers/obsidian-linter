@@ -21,7 +21,7 @@ export default class RemoveConsecutiveListMarkers extends RuleBuilder<RemoveCons
     return RuleType.CONTENT;
   }
   apply(text: string, options: RemoveConsecutiveListMarkersOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
       return text.replace(/^([ |\t]*)- - \b/gm, '$1- ');
     });
   }

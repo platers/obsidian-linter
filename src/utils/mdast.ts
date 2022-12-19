@@ -12,7 +12,6 @@ import {fromMarkdown} from 'mdast-util-from-markdown';
 import {gfmFootnoteFromMarkdown} from 'mdast-util-gfm-footnote';
 import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
 import QuickLRU from 'quick-lru';
-import {timingBegin, timingEnd} from './logger';
 
 const LRU = new QuickLRU({maxSize: 200});
 
@@ -194,7 +193,6 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
    * @return {string} The text with two spaces at the end of lines of paragraphs, list items, and blockquotes where there were consecutive lines of content.
    */
 export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text: string): string {
-  timingBegin('two spaces');
   const positions: Position[] = getPositions(MDAstTypes.Paragraph, text);
   if (positions.length === 0) {
     return text;
@@ -221,7 +219,6 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, paragraphLines.join('\n'));
   }
 
-  timingEnd('two spaces');
   return text;
 }
 

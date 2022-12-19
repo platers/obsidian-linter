@@ -21,7 +21,7 @@ export default class SpaceAfterListMarkers extends RuleBuilder<SpaceAfterListMar
     return RuleType.SPACING;
   }
   apply(text: string, options: SpaceAfterListMarkersOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
       // Space after marker
       text = text.replace(/^(\s*\d+\.|\s*[-+*])[^\S\r\n]+/gm, '$1 ');
       // Space after checkbox
