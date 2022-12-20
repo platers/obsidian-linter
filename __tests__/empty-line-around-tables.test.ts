@@ -73,5 +73,27 @@ ruleTest({
         $$
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/559
+      testName: 'Make sure that consecutive links are not affected',
+      before: dedent`
+        [[filename with dot . |alt name]] [[filename|alt name]]
+        ${''}
+      `,
+      after: dedent`
+        [[filename with dot . |alt name]] [[filename|alt name]]
+        ${''}
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/559
+      testName: 'More complex link scenario is not affected either',
+      before: dedent`
+        dolor sit amet [[filename with dot . |alt name]] lorem ipsum [[filename|alt name]] adipisci velit [[filename|alt name]]
+        ${''}
+      `,
+      after: dedent`
+        dolor sit amet [[filename with dot . |alt name]] lorem ipsum [[filename|alt name]] adipisci velit [[filename|alt name]]
+        ${''}
+      `,
+    },
   ],
 });
