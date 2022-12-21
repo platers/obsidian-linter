@@ -315,7 +315,7 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          this.handleLintError(file, error, 'Lint All Files Error in File \'${file.path}\'');
+          this.handleLintError(file, error, 'Lint All Files Error in File \'FILE_PATH\'');
 
           numberOfErrors += 1;
         }
@@ -342,7 +342,7 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          this.handleLintError(file, error, 'Lint All Files in Folder Error in File \'${file.path}\'');
+          this.handleLintError(file, error, 'Lint All Files in Folder Error in File \'FILE_PATH\'');
 
           numberOfErrors += 1;
         }
@@ -377,7 +377,7 @@ export default class LinterPlugin extends Plugin {
     try {
       newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
     } catch (error) {
-      this.handleLintError(file, error, 'Lint File Error in File \'${file.path}\'', false);
+      this.handleLintError(file, error, 'Lint File Error in File \'FILE_PATH\'', false);
       return;
     }
 
@@ -414,7 +414,7 @@ export default class LinterPlugin extends Plugin {
     try {
       this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
     } catch (error) {
-      this.handleLintError(file, error, 'Lint File Error in File \'${file.path}\'', false);
+      this.handleLintError(file, error, 'Lint File Error in File \'FILE_PATH\'', false);
     }
   }
 
@@ -451,7 +451,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   private handleLintError(file: TFile, error: Error, logErrorStringTemplate: string, useLogTemplateInNotice: boolean = true) {
-    const errorMessage = logErrorStringTemplate.replace('${file.path}', file.path);
+    const errorMessage = logErrorStringTemplate.replace('FILE_PATH', file.path);
     if (error instanceof LinterError) {
       if (useLogTemplateInNotice) {
         new Notice(`${errorMessage} ${error.message}.\nSee console for more details.`);
