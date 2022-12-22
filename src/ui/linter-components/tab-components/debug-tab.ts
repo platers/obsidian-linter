@@ -1,10 +1,10 @@
-import log from 'loglevel';
+import log, {LogLevel} from 'loglevel';
 import LinterPlugin from 'src/main';
 import {Tab} from './tab';
 import {Setting} from 'obsidian';
 import {TextBoxFull} from 'src/ui/components/text-box-full';
 import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
-import {logsFromLastRun} from 'src/utils/logger';
+import {logsFromLastRun, setLogLevel} from 'src/utils/logger';
 
 const logLevels = Object.keys(log.levels);
 const logLevelInts = Object.values(log.levels);
@@ -34,6 +34,7 @@ export class DebugTab extends Tab {
               parsedInt = log.levels.ERROR;
             }
 
+            setLogLevel(parsedInt);
             this.plugin.settings.logLevel = parsedInt;
             await this.plugin.saveSettings();
           });
