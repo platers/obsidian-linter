@@ -114,6 +114,7 @@ export class ExampleBuilder<TOptions extends Options> {
 
   // HACK to bypass the Typescript generics system flaw
   // https://github.com/microsoft/TypeScript/wiki/FAQ#why-is-astring-assignable-to-anumber-for-interface-at--
+  // eslint-disable-next-line no-unused-private-class-members
   #_: TOptions;
 
   constructor(args: {

@@ -28,7 +28,9 @@ Example to reproduce issue with
 example here
 ```
 
-Please make sure to include the rule(s) that cause the issue if applicable. If you are not sure which rule(s) may cause the issue, please attach the `data.json` file located at `<vault>/.obsidian/plugins/obsidian-linter/`.
+Please make sure to include logs and the rule(s) that cause the issue if applicable. You can include logs by going to the debug tab of the Linter and setting the log level to debug. Then enable the capturing of logs and either lint on save or lint the current file. Then go back to the debug tab and you can grab Linter logs from the last run.
+
+If you are not sure which rule(s) may cause the issue, please attach the `data.json` file located at `<vault>/.obsidian/plugins/obsidian-linter/` or copy the config from the debug tab.
 
 ## Expected Behavior
 

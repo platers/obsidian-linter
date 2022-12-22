@@ -21,8 +21,10 @@ export default class RemoveMultipleSpaces extends RuleBuilder<RemoveMultipleSpac
     return RuleType.CONTENT;
   }
   apply(text: string, options: RemoveMultipleSpacesOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.table, IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      return text.replace(/(?!^>)([^\s])( ){2,}([^\s])/gm, '$1 $3');
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.table], text, (text) => {
+      text = text.replace(/(?!^>)([^\s])( ){2,}([^\s])/gm, '$1 $3');
+
+      return text;
     });
   }
   get exampleBuilders(): ExampleBuilder<RemoveMultipleSpacesOptions>[] {

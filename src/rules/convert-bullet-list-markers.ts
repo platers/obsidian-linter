@@ -21,7 +21,7 @@ export default class ConvertBulletListMarkers extends RuleBuilder<ConvertBulletL
     return RuleType.CONTENT;
   }
   apply(text: string, options: ConvertBulletListMarkersOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
       // Convert [•, §] to - if it's the first non space character on the line
       return text.replace(/^([^\S\n]*)([•§])([^\S\n]*)/gm, '$1-$3');
     });

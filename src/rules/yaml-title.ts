@@ -32,7 +32,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
   }
   apply(text: string, options: YamlTitleOptions): string {
     text = initYAML(text);
-    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
+    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
     title = title || options.fileName;
 
     title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter);

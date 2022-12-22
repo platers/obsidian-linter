@@ -21,7 +21,7 @@ export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterP
     return RuleType.FOOTNOTE;
   }
   apply(text: string, options: FootnoteAfterPunctuationOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.footnoteAtStartOfLine, IgnoreTypes.footnoteAfterATask], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.footnoteAtStartOfLine, IgnoreTypes.footnoteAfterATask], text, (text) => {
       return text.replace(/(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
     });
   }

@@ -24,7 +24,7 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
     return RuleType.CONTENT;
   }
   apply(text: string, options: UnorderedListStyleOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
       return updateUnorderedListItemIndicators(text, options.listStyle);
     });
   }

@@ -21,7 +21,7 @@ export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphen
     return RuleType.CONTENT;
   }
   apply(text: string, options: RemoveHyphenatedLineBreaksOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
       return text.replace(/\b[-‐] \b/g, '');
     });
   }

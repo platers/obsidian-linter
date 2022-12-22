@@ -21,7 +21,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
     return RuleType.SPACING;
   }
   apply(text: string, options: RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.thematicBreak], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.thematicBreak], text, (text) => {
       const replaceEmptyLinesBetweenList = function(text: string, listIndicatorRegexText: string, replaceWith: string): string {
         const listRegex = new RegExp(`^${listIndicatorRegexText}\n{2,}${listIndicatorRegexText}$`, 'gm');
         let match;

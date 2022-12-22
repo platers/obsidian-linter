@@ -22,7 +22,7 @@ export default class MoveFootnotesToTheBottom extends RuleBuilder<MoveFootnotesT
     return RuleType.FOOTNOTE;
   }
   apply(text: string, options: MoveFootnotesToTheBottomOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml], text, (text) => {
       return moveFootnotesToEnd(text);
     });
   }

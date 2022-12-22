@@ -21,6 +21,11 @@ module.exports = {
   'rules': {
     'camelcase': 'off',
     'max-len': 'off',
+    'no-constant-binary-expression': 'error',
+    'no-template-curly-in-string': 'error',
+    'no-unmodified-loop-condition': 'error',
+    'no-unreachable-loop': 'error',
+    'no-unused-private-class-members': 'error',
     'require-jsdoc': 'off',
     'unicorn/template-indent': 'error',
     'no-unused-vars': 'off',

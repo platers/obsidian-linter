@@ -24,7 +24,7 @@ export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions>
     return RuleType.HEADING;
   }
   apply(text: string, options: FileNameHeadingOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
       // check if there is a H1 heading
       const hasH1 = text.match(/^#\s.*/m);
       if (hasH1) {

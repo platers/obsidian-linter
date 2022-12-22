@@ -180,5 +180,36 @@ ruleTest({
         Text > other text
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/558
+      testName: 'Multiple spaces are not removed in a math block',
+      before: dedent`
+        $$
+        x = \left \{ \begin{array}{ll}
+                         y   & \mbox{if $y>0$}   \\
+                         z+y & \mbox{otherwise}
+                     \end{array}
+            \right.
+        $$
+      `,
+      after: dedent`
+        $$
+        x = \left \{ \begin{array}{ll}
+                         y   & \mbox{if $y>0$}   \\
+                         z+y & \mbox{otherwise}
+                     \end{array}
+            \right.
+        $$
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/558
+      testName: 'Multiple spaces are not removed in inline math',
+      before: dedent`
+        $ x =  2y $
+      `,
+      after: dedent`
+        $ x =  2y $
+      `,
+    },
   ],
 });
+

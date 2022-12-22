@@ -3,7 +3,6 @@ import {getPositions, MDAstTypes} from './mdast';
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
-
 export type IgnoreResults = {replacedValues: string[], newText: string};
 export type IgnoreFunction = ((text: string, placeholder: string) => IgnoreResults);
 export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string};

@@ -21,7 +21,7 @@ export default class ConsecutiveBlankLines extends RuleBuilder<ConsecutiveBlankL
     return RuleType.SPACING;
   }
   apply(text: string, options: ConsecutiveBlankLinesOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
       // make sure to account for lines that are purely whitespace as well https://stackoverflow.com/a/3873354/8353749
       // make sure that the match ends in a newline
       return text.replace(/(\n([\t\v\f\r \u00a0\u2000-\u200b\u2028-\u2029\u3000]+)?){2,}\n/g, '\n\n');
