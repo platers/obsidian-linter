@@ -995,7 +995,7 @@ Options:
 - Ignore Words: A comma separated list of words to ignore when capitalizing
 	- Default: `macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript, I`
 - Lowercase Words: A comma separated list of words to keep lowercase
-	- Default: `via, a, an, the, and, or, but, for, nor, so, yet, at, by, in, of, on, to, up, as, is, if, it, for, to, with, without, into, onto, per`
+	- Default: `a, an, the, aboard, about, abt., above, abreast, absent, across, after, against, along, aloft, alongside, amid, amidst, mid, midst, among, amongst, anti, apropos, around, round, as, aslant, astride, at, atop, ontop, bar, barring, before, B4, behind, below, beneath, neath, beside, besides, between, 'tween, beyond, but, by, chez, circa, c., ca., come, concerning, contra, counting, cum, despite, spite, down, during, effective, ere, except, excepting, excluding, failing, following, for, from, in, including, inside, into, less, like, minus, modulo, mod, near, nearer, nearest, next, notwithstanding, of, o', off, offshore, on, onto, opposite, out, outside, over, o'er, pace, past, pending, per, plus, post, pre, pro, qua, re, regarding, respecting, sans, save, saving, short, since, sub, than, through, thru, throughout, thruout, till, times, to, t', touching, toward, towards, under, underneath, unlike, until, unto, up, upon, versus, vs., v., via, vice, vis-à-vis, wanting, with, w/, w., c̄, within, w/i, without, 'thout, w/o, abroad, adrift, aft, afterward, afterwards, ahead, apart, ashore, aside, away, back, backward, backwards, beforehand, downhill, downstage, downstairs, downstream, downward, downwards, downwind, east, eastward, eastwards, forth, forward, forwards, heavenward, heavenwards, hence, henceforth, here, hereby, herein, hereof, hereto, herewith, home, homeward, homewards, indoors, inward, inwards, leftward, leftwards, north, northeast, northward, northwards, northwest, now, onward, onwards, outdoors, outward, outwards, overboard, overhead, overland, overseas, rightward, rightwards, seaward, seawards, skywards, skyward, south, southeast, southwards, southward, southwest, then, thence, thenceforth, there, thereby, therein, thereof, thereto, therewith, together, underfoot, underground, uphill, upstage, upstairs, upstream, upward, upwards, upwind, west, westward, westwards, when, whence, where, whereby, wherein, whereto, wherewith, although, because, considering, given, granted, if, lest, once, provided, providing, seeing, so, supposing, though, unless, whenever, whereas, wherever, while, whilst, ago, according to, as regards, counter to, instead of, owing to, pertaining to, at the behest of, at the expense of, at the hands of, at risk of, at the risk of, at variance with, by dint of, by means of, by virtue of, by way of, for the sake of, for sake of, for lack of, for want of, from want of, in accordance with, in addition to, in case of, in charge of, in compliance with, in conformity with, in contact with, in exchange for, in favor of, in front of, in lieu of, in light of, in the light of, in line with, in place of, in point of, in quest of, in relation to, in regard to, with regard to, in respect to, with respect to, in return for, in search of, in step with, in touch with, in terms of, in the name of, in view of, on account of, on behalf of, on grounds of, on the grounds of, on the part of, on top of, with a view to, with the exception of, à la, a la, as soon as, as well as, close to, due to, far from, in case, other than, prior to, pursuant to, regardless of, subsequent to, as long as, as much as, as far as, by the time, in as much as, inasmuch, in order to, in order that, even, provide that, if only, whether, whose, whoever, why, how, or not, whatever, what, both, and, or, not only, but also, either, neither, nor, just, rather, no sooner, such, that, yet, is, it`
 
 Example: With `Title Case=true`, `Ignore Cased Words=false`
 
@@ -1439,6 +1439,92 @@ Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et 
 ``````
 
 ## Content
+### Auto-correct Common Misspellings
+
+Alias: `auto-correct-common-misspellings`
+
+Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words.
+
+Options:
+- Ignore Words: A comma separated list of lowercased words to ignore when auto-correcting
+	- Default: ``
+
+Example: Auto-correct misspellings in regular text, but not code blocks, math blocks, YAML, or tags
+
+Before:
+
+``````markdown
+---
+key: absoltely
+---
+
+I absoltely hate when my codeblocks get formatted when they should not be.
+
+```
+# comments absoltely can be helpful, but they can also be misleading
+```
+
+Note that inline code also has the applicable spelling errors ignored: `absoltely` 
+
+$$
+Math block absoltely does not get auto-corrected.
+$$
+
+The same $ defenately $ applies to inline math.
+
+#defenately stays the same
+``````
+
+After:
+
+``````markdown
+---
+key: absoltely
+---
+
+I absolutely hate when my codeblocks get formatted when they should not be.
+
+```
+# comments absoltely can be helpful, but they can also be misleading
+```
+
+Note that inline code also has the applicable spelling errors ignored: `absoltely` 
+
+$$
+Math block absoltely does not get auto-corrected.
+$$
+
+The same $ defenately $ applies to inline math.
+
+#defenately stays the same
+``````
+Example: Auto-correct misspellings keeps first letter's case
+
+Before:
+
+``````markdown
+Accodringly we made sure to update logic to make sure it would handle case sensitivity.
+``````
+
+After:
+
+``````markdown
+Accordingly we made sure to update logic to make sure it would handle case sensitivity.
+``````
+Example: Links should not be auto-corrected
+
+Before:
+
+``````markdown
+http://www.Absoltely.com should not be corrected
+``````
+
+After:
+
+``````markdown
+http://www.Absoltely.com should not be corrected
+``````
+
 ### Convert Bullet List Markers
 
 Alias: `convert-bullet-list-markers`

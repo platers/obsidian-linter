@@ -69,6 +69,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 
 ### Content rules
 
+- [auto-correct-common-misspellings](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#auto-correct-common-misspellings)
 - [convert-bullet-list-markers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#convert-bullet-list-markers)
 - [emphasis-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#emphasis-style)
 - [no-bare-urls](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#no-bare-urls)

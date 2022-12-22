@@ -95,5 +95,20 @@ ruleTest({
         ${''}
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/559
+      testName: 'Make sure that math blocks followed by a couple of wiki links are not affected',
+      before: dedent`
+        - $math1$ [[name1 .|alt name1]]  [[name2 |alt name2]]:
+        ${''}
+        - $math2$
+      `,
+      after: dedent`
+        - $math1$ [[name1 .|alt name1]]  [[name2 |alt name2]]:
+        ${''}
+        - $math2$
+      `,
+    },
+
+
   ],
 });
