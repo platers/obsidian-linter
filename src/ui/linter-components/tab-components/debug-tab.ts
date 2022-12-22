@@ -1,4 +1,4 @@
-import log, {LogLevel} from 'loglevel';
+import log from 'loglevel';
 import LinterPlugin from 'src/main';
 import {Tab} from './tab';
 import {Setting} from 'obsidian';
