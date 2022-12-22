@@ -69,7 +69,7 @@ export function ensureEmptyLinesAroundTables(text: string): string {
   }
 
   for (const table of tableMatches) {
-    let start = text.indexOf(table);
+    let start = text.indexOf(table.trimStart());
     const end = start + table.length;
     if (table.trim().startsWith('>')) {
       while (text.charAt(start).trim() === '' || text.charAt(start) === '>') {
