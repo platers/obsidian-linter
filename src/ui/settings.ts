@@ -12,8 +12,8 @@ import {DebugTab} from './linter-components/tab-components/debug-tab';
 export class SettingTab extends PluginSettingTab {
   plugin: LinterPlugin;
   navContainer: HTMLElement;
-  navEl: HTMLDivElement;
-  settingsEl: HTMLDivElement;
+  tabNavEl: HTMLDivElement;
+  settingsContentEl: HTMLDivElement;
   private tabNameToTab: Map<string, Tab> = new Map<string, Tab>();
   private selectedTab: string = 'General';
   private searchZeroState: HTMLDivElement;
@@ -28,7 +28,6 @@ export class SettingTab extends PluginSettingTab {
     const {containerEl} = this;
 
     containerEl.empty();
-
     const linterHeader = containerEl.createDiv('linter-setting-title');
     if (Platform.isMobile) {
       linterHeader.addClass('linter-mobile');
@@ -37,9 +36,8 @@ export class SettingTab extends PluginSettingTab {
     }
 
     this.navContainer = containerEl.createEl('nav', {cls: 'linter-setting-header'});
-    this.navEl = this.navContainer.createDiv('linter-setting-tab-group');
-    this.settingsEl = containerEl.createDiv('linter-setting-content');
-
+    this.tabNavEl = this.navContainer.createDiv('linter-setting-tab-group');
+    this.settingsContentEl = containerEl.createDiv('linter-setting-content');
     this.addTabs(Platform.isMobile);
     this.createSearchZeroState(Platform.isMobile);
     this.generateSearchBar(linterHeader);
@@ -50,14 +48,14 @@ export class SettingTab extends PluginSettingTab {
   }
 
   private addTabs(isMobile: boolean) {
-    this.addTab(new GeneralTab(this.navEl, this.settingsEl, isMobile, this.plugin));
+    this.addTab(new GeneralTab(this.tabNavEl, this.settingsContentEl, isMobile, this.plugin));
 
     for (const ruleType of Object.values(RuleType)) {
-      this.addTab(new RuleTab(this.navEl, this.settingsEl, ruleType, ruleTypeToRules.get(ruleType), isMobile, this.plugin));
+      this.addTab(new RuleTab(this.tabNavEl, this.settingsContentEl, ruleType, ruleTypeToRules.get(ruleType), isMobile, this.plugin));
     }
 
-    this.addTab(new CustomTab(this.navEl, this.settingsEl, isMobile, this.app, this.plugin));
-    this.addTab(new DebugTab(this.navEl, this.settingsEl, isMobile, this.plugin));
+    this.addTab(new CustomTab(this.tabNavEl, this.settingsContentEl, isMobile, this.app, this.plugin));
+    this.addTab(new DebugTab(this.tabNavEl, this.settingsContentEl, isMobile, this.plugin));
   }
 
   private generateSearchBar(containerEl: HTMLDivElement) {
@@ -76,7 +74,7 @@ export class SettingTab extends PluginSettingTab {
   }
 
   private createSearchZeroState(isMobile: boolean) {
-    this.searchZeroState = this.settingsEl.createDiv();
+    this.searchZeroState = this.settingsContentEl.createDiv();
     hideEl(this.searchZeroState);
     this.searchZeroState.createEl(isMobile ? 'h3' : 'h2', {text: 'No settings match search'}).style.textAlign = 'center';
   }
