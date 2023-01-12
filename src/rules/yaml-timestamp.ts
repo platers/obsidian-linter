@@ -59,7 +59,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         const created_date = moment(options.fileCreatedTime);
         created_date.locale(options.locale);
 
-        const formatted_date = created_date.format(options.format);
+        const formatted_date = created_date.format(options.format.trim());
         const created_date_line = `\n${options.dateCreatedKey}: ${formatted_date}`;
 
         const keyWithValueFound = created_match.test(text);
@@ -80,7 +80,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
           textModified = true;
         } else if (keyWithValueFound) {
-          const createdDateTime = moment(text.match(created_match)[0].replace(options.dateCreatedKey + ':', '').trim(), options.format, options.locale, true);
+          const createdDateTime = moment(text.match(created_match)[0].replace(options.dateCreatedKey + ':', '').trim(), options.format.trim(), options.locale, true);
           if (createdDateTime == undefined || !createdDateTime.isValid()) {
             text = text.replace(
                 created_match,
@@ -102,12 +102,12 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         modified_date.locale(options.locale);
         // using the current time helps prevent issues where the previous modified time was greater
         // than 5 seconds prior to the time the linter will finish with the file (i.e. helps prevent accidental infinite loops on updating the date modified value)
-        const formatted_modified_date = options.currentTime.format(options.format);
+        const formatted_modified_date = options.currentTime.format(options.format.trim());
         const modified_date_line = `\n${options.dateModifiedKey}: ${formatted_modified_date}`;
 
         const keyWithValueFound = modified_match.test(text);
         if (keyWithValueFound) {
-          const modifiedDateTime = moment(text.match(modified_match)[0].replace(options.dateModifiedKey + ':', '').trim(), options.format, options.locale, true);
+          const modifiedDateTime = moment(text.match(modified_match)[0].replace(options.dateModifiedKey + ':', '').trim(), options.format.trim(), options.locale, true);
           if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() ||
               Math.abs(modifiedDateTime.diff(modified_date, 'seconds')) > 5
           ) {

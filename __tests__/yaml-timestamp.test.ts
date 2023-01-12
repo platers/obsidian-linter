@@ -261,6 +261,30 @@ ruleTest({
       },
     },
     {
+      testName: 'Updates created value when format has extra spaces',
+      before: dedent`
+        ---
+        tag: tag1
+        created: Saturday, February 1st 2020 
+        location: "path"
+        ---
+      `,
+      after: dedent`
+        ---
+        tag: tag1
+        created: Saturday, February 1st 2020 
+        location: "path"
+        ---
+      `,
+      options: {
+        dateModified: false,
+        dateCreatedKey: 'created',
+        fileCreatedTime: '2020-02-08T00:00:00-00:00',
+        alreadyModified: false,
+        format: 'dddd, MMMM Do YYYY ',
+      },
+    },
+    {
       testName: 'Updates created value when locale has changed',
       before: dedent`
         ---
