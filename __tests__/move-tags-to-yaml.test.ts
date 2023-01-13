@@ -183,5 +183,19 @@ ruleTest({
         tagsToIgnore: ['ignored-tag', 'ignored-tag/nested-tag'],
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/579
+      testName: 'Make sure wiki link and markdown link text is ignored for this',
+      before: dedent`
+        [Issue #152 on Github](some_link.md)
+        [[some_link|Issue #152 on Github]]]
+      `,
+      after: dedent`
+        [Issue #152 on Github](some_link.md)
+        [[some_link|Issue #152 on Github]]]
+      `,
+      options: {
+        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+      },
+    },
   ],
 });
