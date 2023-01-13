@@ -143,17 +143,17 @@ export function hashString53Bit(str: string, seed: number = 0): number {
  */
 export function convertStringVersionOfEscapeCharactersToEscapeCharacters(val: string): string {
   // replace string version of backspace character with the actual backspace character
-  val = val.replace('\\b', '\b');
+  val = val.replaceAll('\\b', '\b');
   // replace string version of form feed character with the actual form feed character
-  val = val.replace('\\f', '\f');
+  val = val.replaceAll('\\f', '\f');
   // replace string version of new line character with the actual new line character
-  val = val.replace('\\n', '\n');
+  val = val.replaceAll('\\n', '\n');
   // replace string version of carriage return character with the actual carriage return character
-  val = val.replace('\\r', '\r');
+  val = val.replaceAll('\\r', '\r');
   // replace string version of horizontal tab character with the actual horizontal tab character
-  val = val.replace('\\t', '\t');
+  val = val.replaceAll('\\t', '\t');
   // replace string version of vertical tab character with the actual vertical tab character
-  val = val.replace('\\v', '\v');
+  val = val.replaceAll('\\v', '\v');
 
   return val;
 }
