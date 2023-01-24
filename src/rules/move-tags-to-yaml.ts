@@ -107,6 +107,10 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         });
       }
 
+      // Make sure that the yaml frontmatter does not have whitespace added after the end of the yaml frontmatter.
+      // This accounts for https://github.com/platers/obsidian-linter/issues/573
+      text = text.replace(/(\n---)( |\t)+/, '$1');
+
       return text;
     });
   }

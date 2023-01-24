@@ -197,5 +197,28 @@ ruleTest({
         tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/573
+      testName: 'Make sure that removing a tag after the yaml frontmatter does not leave whitespace on the same line as the frontmatter',
+      before: dedent`
+        ---
+        title: Move Tags to YAML Duplicates YAML
+        date: 2023-01-13
+        edit: 2023-01-231
+        ---
+        #tag-error${' '}
+      `,
+      after: dedent`
+        ---
+        title: Move Tags to YAML Duplicates YAML
+        date: 2023-01-13
+        edit: 2023-01-231
+        tags: tag-error
+        ---
+      `,
+      options: {
+        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+        howToHandleExistingTags: 'Remove whole tag',
+      },
+    },
   ],
 });
