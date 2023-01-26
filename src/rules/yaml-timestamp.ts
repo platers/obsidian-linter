@@ -109,7 +109,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         if (keyWithValueFound) {
           const modifiedDateTime = moment(text.match(modified_match)[0].replace(options.dateModifiedKey + ':', '').trim(), options.format, options.locale, true);
           if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() ||
-              Math.abs(modifiedDateTime.diff(modified_date, 'seconds')) > 5
+            this.getTimeDifferenceInSeconds(modifiedDateTime, modified_date, options) > 5
           ) {
             text = text.replace(
                 modified_match,
@@ -129,6 +129,14 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
       return text;
     });
+  }
+  getTimeDifferenceInSeconds(modifiedDateTimeMetadata: moment.Moment, yamlModifiedDateTime: moment.Moment, options: YamlTimestampOptions): number {
+    // the metadata value may not be in the correct format, so we need to convert it to the correct format
+    // and then do the time comparison otherwise we get erroneously large differences in seconds
+    // see https://github.com/platers/obsidian-linter/issues/568
+    const formattedDateModifiedDate = moment(yamlModifiedDateTime.format(options.format), options.format, options.locale, true);
+
+    return Math.abs(modifiedDateTimeMetadata.diff(formattedDateModifiedDate, 'seconds'));
   }
   get exampleBuilders(): ExampleBuilder<YamlTimestampOptions>[] {
     return [
