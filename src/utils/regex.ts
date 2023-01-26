@@ -20,7 +20,7 @@ export const ellipsisRegex = /(\. ?){2}\./g;
 export const lineStartingWithWhitespaceOrBlockquoteTemplate = `\\s*(>\\s*)*`;
 // Note that the following regex has an issue where if the table is followed by another table with only 1 blank line between them, it considers them to be one table
 // if this becomes an issue, we can address it then
-export const tableRegex = /((((>[ ]?)*)|([ ]{0,3}))\[.*?\][ \t]*\n)?((((>[ ]?)*)|([ ]{0,3}))\S+.*?\|.*?\n([^\n]*?\|[^\n]*?\n)*?)?(((>[ ]?)*)|([ ]{0,3}))[|\-+:.][ \-+|:.]*?\|[ \-+|:.]*(?:\n?[^\n]*?\|([^\n]*?)*)+/g;
+export const tableRegex = /^((((>[ ]?)*)|([ ]{0,3}))\[.*?\][ \t]*\n)?((((>[ ]?)*)|([ ]{0,3}))\S+.*?\|.*?\n([^\n]*?\|[^\n]*?\n)*?)?(((>[ ]?)*)|([ ]{0,3}))[|\-+:.][ \-+|:.]*?\|[ \-+|:.]*(?:\n?[^\n]*?\|([^\n]*?)*)+/gm;
 export const urlRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,})/gi;
 
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
