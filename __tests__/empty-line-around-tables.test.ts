@@ -108,7 +108,18 @@ ruleTest({
         - $math2$
       `,
     },
-
-
+    { // accounts for https://github.com/platers/obsidian-linter/issues/577
+      testName: 'Make sure that we prevent some erroneous table matches where the value is not at the start of a line',
+      before: dedent`
+        content
+        magneto - | maɡˈnedō |
+        content
+      `,
+      after: dedent`
+        content
+        magneto - | maɡˈnedō |
+        content
+      `,
+    },
   ],
 });
