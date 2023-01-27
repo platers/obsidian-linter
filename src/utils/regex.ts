@@ -92,7 +92,11 @@ export function getFirstHeaderOneText(text: string) {
   if (result && result[1]) {
     let headerText = result[1];
     headerText = headerText.replaceAll(wikiLinkRegex, (_, _2, $2: string, $3: string) => {
-      return $3 ?? $2;
+      if ($3 != null) {
+        return $3.replace('|', '');
+      }
+
+      return $2;
     });
 
     return headerText.replaceAll(genericLinkRegex, '$2');
