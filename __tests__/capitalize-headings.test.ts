@@ -18,7 +18,7 @@ ruleTest({
         ## this état
       `,
       after: dedent`
-        # h1
+        # H1
         ## A c++ Lan
         ## This is a Sentence.
         ## I Can't Do This
@@ -111,7 +111,7 @@ ruleTest({
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/484
-      testName: 'Make sure that first letter ot be capitalized by `First Letter` is preceded by a space or tab',
+      testName: 'Make sure that first letter to be capitalized by `First Letter` is preceded by a space or tab',
       before: dedent`
         ### 1.0.0-b.4
         ### b
@@ -159,6 +159,23 @@ ruleTest({
       `,
       after: dedent`
         # Headline $LR(0)$ Set
+      `,
+      options: {
+        style: 'First letter',
+        ignoreCasedWords: true,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/601
+      testName: `Make sure that if the 1st word has a number in it, it will still be considered to be a word and have its first letter capitalized`,
+      before: dedent`
+        # EC2 instance
+        ## EC2 lab05 load balancer
+        ### lab07 bread maker
+      `,
+      after: dedent`
+        # EC2 instance
+        ## EC2 lab05 load balancer
+        ### Lab07 bread maker
       `,
       options: {
         style: 'First letter',
