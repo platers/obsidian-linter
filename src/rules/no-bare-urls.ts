@@ -25,7 +25,7 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
     return RuleType.CONTENT;
   }
   apply(text: string, options: NoBareUrlsOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode], text, (text) => {
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode, IgnoreTypes.anchorTag], text, (text) => {
       const URLMatches = text.match(urlRegex);
 
       if (!URLMatches) {

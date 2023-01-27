@@ -47,5 +47,14 @@ ruleTest({
         \`http --headers --follow --all https://google.com\`
       `,
     },
+    {// https://github.com/platers/obsidian-linter/issues/588
+      testName: 'Make sure that anchor tags are not affected by the rule',
+      before: dedent`
+        <a href="https://www.google.com" class="tc-tiddlylink-external" rel="noopener noreferrer" target="_blank">https://www.google.com</a>
+      `,
+      after: dedent`
+        <a href="https://www.google.com" class="tc-tiddlylink-external" rel="noopener noreferrer" target="_blank">https://www.google.com</a>
+      `,
+    },
   ],
 });
