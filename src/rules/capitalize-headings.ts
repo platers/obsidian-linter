@@ -425,7 +425,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
         let firstWord = true;
         for (let j = 1; j < headerWords.length; j++) {
           // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
-          const isWord = headerWords[j].match(/^[\p{L}'-]{1,}[.?!,:;]?$/u);
+          const isWord = headerWords[j].match(/^[\p{L}'-]{1,}[.?!,:;\d]*$/u);
           if (!isWord) {
             continue;
           }
