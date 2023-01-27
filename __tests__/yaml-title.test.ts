@@ -141,5 +141,17 @@ ruleTest({
         #tag
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/604
+      testName: 'Make sure that aliased wiki links are properly converted to just the alias in the YAML',
+      before: dedent`
+        # [[Broken Linter|Broken]] Linter
+      `,
+      after: dedent`
+        ---
+        title: Broken Linter
+        ---
+        # [[Broken Linter|Broken]] Linter
+      `,
+    },
   ],
 });
