@@ -22,6 +22,7 @@ export const lineStartingWithWhitespaceOrBlockquoteTemplate = `\\s*(>\\s*)*`;
 // if this becomes an issue, we can address it then
 export const tableRegex = /^((((>[ ]?)*)|([ ]{0,3}))\[.*?\][ \t]*\n)?((((>[ ]?)*)|([ ]{0,3}))\S+.*?\|.*?\n([^\n]*?\|[^\n]*?\n)*?)?(((>[ ]?)*)|([ ]{0,3}))[|\-+:.][ \-+|:.]*?\|[ \-+|:.]*(?:\n?[^\n]*?\|([^\n]*?)*)+/gm;
 export const urlRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,})/gi;
+export const anchorTagRegex = /<a[\s]+([^>]+)>((?:.(?!<\/a>))*.)<\/a>/g;
 
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string

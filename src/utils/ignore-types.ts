@@ -1,4 +1,4 @@
-import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex, tableRegex, urlRegex} from './regex';
+import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex, tableRegex, urlRegex, anchorTagRegex} from './regex';
 import {getPositions, MDAstTypes} from './mdast';
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
@@ -29,6 +29,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   footnoteAtStartOfLine: {replaceAction: /^(\[\^\w+\]) ?([,.;!:?])/gm, placeholder: '{FOOTNOTE_AT_START_OF_LINE_PLACEHOLDER}'},
   footnoteAfterATask: {replaceAction: /- \[.] (\[\^\w+\]) ?([,.;!:?])/gm, placeholder: '{FOOTNOTE_AFTER_A_TASK_PLACEHOLDER}'},
   url: {replaceAction: urlRegex, placeholder: '{URL_PLACEHOLDER}'},
+  anchorTag: {replaceAction: anchorTagRegex, placeholder: '{ANCHOR_PLACEHOLDER}'},
   // custom functions
   link: {replaceAction: replaceMarkdownLinks, placeholder: '{REGULAR_LINK_PLACEHOLDER}'},
 } as const;
