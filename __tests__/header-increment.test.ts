@@ -189,5 +189,20 @@ ruleTest({
         startAtH2: true,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/598
+      testName: 'Make sure that headers with tags in them are incremented like normal',
+      before: dedent`
+        # Page Title
+        ## Foo #tag
+        ### Bar
+        ### Baz
+      `,
+      after: dedent`
+        # Page Title
+        ## Foo #tag
+        ### Bar
+        ### Baz
+      `,
+    },
   ],
 });
