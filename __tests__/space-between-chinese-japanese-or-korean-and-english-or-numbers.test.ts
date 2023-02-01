@@ -73,7 +73,7 @@ ruleTest({
         $M0 = 现金$
       `,
     },
-    { // accounts for https://github.com/platers/obsidian-linter/issues/407
+    { // accounts for https://github.com/platers/obsidian-linter/issues/583
       testName: 'Make sure that wiki link and markdown links are ignored in italics',
       before: dedent`
         *[[abs 接口]]*
@@ -84,6 +84,16 @@ ruleTest({
         *[abs 接口](abs 接口.md)*
       `,
     },
-    // accounts for https://github.com/platers/obsidian-linter/issues/583
+    { // relates for https://github.com/platers/obsidian-linter/issues/583
+      testName: 'Make sure that wiki link and markdown links are ignored in bold',
+      before: dedent`
+        **[[abs 接口]]**
+        **[abs 接口](abs 接口.md)**
+      `,
+      after: dedent`
+        **[[abs 接口]]**
+        **[abs 接口](abs 接口.md)**
+      `,
+    },
   ],
 });
