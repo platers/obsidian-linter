@@ -35,35 +35,23 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
       return text.replace(head, '$1 $3').replace(tail, '$1 $3');
     };
 
-    let newText = ignoreListOfTypes(
-        [
-          IgnoreTypes.code,
-          IgnoreTypes.inlineCode,
-          IgnoreTypes.yaml,
-          IgnoreTypes.image,
-          IgnoreTypes.link,
-          IgnoreTypes.wikiLink,
-          IgnoreTypes.tag,
-          IgnoreTypes.italics,
-          IgnoreTypes.bold,
-          IgnoreTypes.math,
-          IgnoreTypes.inlineMath,
-        ],
-        text,
-        addSpaceAroundChineseJapaneseKoreanAndEnglish,
-    );
 
-    newText = updateItalicsText(
-        newText,
-        addSpaceAroundChineseJapaneseKoreanAndEnglish,
-    );
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.yaml, IgnoreTypes.image, IgnoreTypes.link,
+      IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath], text, (text: string) => {
+      let newText = ignoreListOfTypes([IgnoreTypes.italics, IgnoreTypes.bold], text, addSpaceAroundChineseJapaneseKoreanAndEnglish);
 
-    newText = updateBoldText(
-        newText,
-        addSpaceAroundChineseJapaneseKoreanAndEnglish,
-    );
+      newText = updateItalicsText(
+          newText,
+          addSpaceAroundChineseJapaneseKoreanAndEnglish,
+      );
 
-    return newText;
+      newText = updateBoldText(
+          newText,
+          addSpaceAroundChineseJapaneseKoreanAndEnglish,
+      );
+
+      return newText;
+    });
   }
   get exampleBuilders(): ExampleBuilder<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions>[] {
     return [
