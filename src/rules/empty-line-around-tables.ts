@@ -4,22 +4,20 @@ import dedent from 'ts-dedent';
 import {IgnoreTypes, ignoreListOfTypes} from '../utils/ignore-types';
 import {ensureEmptyLinesAroundTables} from '../utils/regex';
 
-class EmptyLineAroundTablesOptions implements Options {
-}
+class EmptyLineAroundTablesOptions implements Options {}
 
 @RuleBuilder.register
 export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTablesOptions> {
+  constructor() {
+    super({
+      configKey: 'empty-line-around-tables',
+      nameTextKey: 'empty-line-around-tables-name',
+      descriptionTextKey: 'empty-line-around-tables-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => EmptyLineAroundTablesOptions {
     return EmptyLineAroundTablesOptions;
-  }
-  get name(): string {
-    return 'Empty Line Around Tables';
-  }
-  get description(): string {
-    return 'Ensures that there is an empty line around github flavored tables unless they start or end a document.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: EmptyLineAroundTablesOptions): string {
     return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.wikiLink, IgnoreTypes.link], text, (text: string) => {

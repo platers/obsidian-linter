@@ -10,17 +10,16 @@ class RemoveYamlKeysOptions implements Options {
 
 @RuleBuilder.register
 export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
+  constructor() {
+    super({
+      configKey: 'remove-yaml-keys',
+      nameTextKey: 'remove-yaml-keys-name',
+      descriptionTextKey: 'remove-yaml-keys-description',
+      type: RuleType.YAML,
+    });
+  }
   get OptionsClass(): new () => RemoveYamlKeysOptions {
     return RemoveYamlKeysOptions;
-  }
-  get name(): string {
-    return 'Remove YAML Keys';
-  }
-  get description(): string {
-    return 'Removes the YAML keys specified';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: RemoveYamlKeysOptions): string {
     const yamlKeysToRemove: string[] = options.yamlKeysToRemove;
@@ -85,8 +84,8 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
     return [
       new TextAreaOptionBuilder({
         OptionsClass: RemoveYamlKeysOptions,
-        name: 'YAML Keys to Remove',
-        description: 'The yaml keys to remove from the yaml frontmatter with or without colons',
+        nameTextKey: 'remove-yaml-keys-yaml-keys-to-remove-name',
+        descriptionTextKey: 'remove-yaml-keys-yaml-keys-to-remove-description',
         optionsKey: 'yamlKeysToRemove',
       }),
     ];

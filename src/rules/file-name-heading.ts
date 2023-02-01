@@ -11,17 +11,16 @@ class FileNameHeadingOptions implements Options {
 
 @RuleBuilder.register
 export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions> {
+  constructor() {
+    super({
+      configKey: 'file-name-heading',
+      nameTextKey: 'file-name-heading-name',
+      descriptionTextKey: 'file-name-heading-description',
+      type: RuleType.HEADING,
+    });
+  }
   get OptionsClass(): new () => FileNameHeadingOptions {
     return FileNameHeadingOptions;
-  }
-  get name(): string {
-    return 'File Name Heading';
-  }
-  get description(): string {
-    return 'Inserts the file name as a H1 heading if no H1 heading exists.';
-  }
-  get type(): RuleType {
-    return RuleType.HEADING;
   }
   apply(text: string, options: FileNameHeadingOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {

@@ -1,4 +1,5 @@
 import log from 'loglevel';
+import {getTextInLanguage} from '../lang/helpers';
 
 const logPrefix: string = '[Obsidian Linter]';
 const timingInfo = new Map<string, number>();
@@ -89,7 +90,7 @@ export function timingEnd(timingKey: string) {
   if (log.getLevel() <= log.levels.DEBUG) {
     return;
   } else if (!timingInfo.has(timingKey)) {
-    logWarn(`timing key '${timingKey}' does not exist in the timing info list, so it was ignored`);
+    logWarn(getTextInLanguage('timing-key-not-found').replace('{TIMING_KEY}', timingKey));
   }
 
   const totalTimeInMilliseconds = performance.now() - timingInfo.get(timingKey);

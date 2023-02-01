@@ -12,17 +12,16 @@ class StrongStyleOptions implements Options {
 
 @RuleBuilder.register
 export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
+  constructor() {
+    super({
+      configKey: 'strong-style',
+      nameTextKey: 'strong-style-name',
+      descriptionTextKey: 'strong-style-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => StrongStyleOptions {
     return StrongStyleOptions;
-  }
-  get name(): string {
-    return 'Strong Style';
-  }
-  get description(): string {
-    return 'Makes sure the strong style is consistent.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: StrongStyleOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath], text, (text) => {
@@ -167,8 +166,8 @@ export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
     return [
       new DropdownOptionBuilder<StrongStyleOptions, StrongStyleValues>({
         OptionsClass: StrongStyleOptions,
-        name: 'Style',
-        description: 'The style used to denote strong/bolded content',
+        nameTextKey: 'strong-style-style-name',
+        descriptionTextKey: 'strong-style-style-description',
         optionsKey: 'style',
         records: [
           {

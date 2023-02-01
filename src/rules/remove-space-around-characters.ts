@@ -14,17 +14,16 @@ class RemoveSpaceAroundCharactersOptions implements Options {
 
 @RuleBuilder.register
 export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpaceAroundCharactersOptions> {
+  constructor() {
+    super({
+      configKey: 'remove-space-around-characters',
+      nameTextKey: 'remove-space-around-characters-name',
+      descriptionTextKey: 'remove-space-around-characters-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => RemoveSpaceAroundCharactersOptions {
     return RemoveSpaceAroundCharactersOptions;
-  }
-  get name(): string {
-    return 'Remove Space around Characters';
-  }
-  get description(): string {
-    return 'Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). Note that this may causes issues with markdown format in some cases.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: RemoveSpaceAroundCharactersOptions): string {
     let symbolsRegExpBuilder = '';
@@ -139,26 +138,26 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
   get optionBuilders(): OptionBuilderBase<RemoveSpaceAroundCharactersOptions>[] {
     return [
       new BooleanOptionBuilder({
-        name: 'Include Fullwidth Forms',
-        description: 'Include <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Fullwidth Forms Unicode block</a>',
+        nameTextKey: 'remove-space-around-characters-include-fullwidth-forms-name',
+        descriptionTextKey: 'remove-space-around-characters-include-fullwidth-forms-description',
         OptionsClass: RemoveSpaceAroundCharactersOptions,
         optionsKey: 'includeFullwidthForms',
       }),
       new BooleanOptionBuilder({
-        name: 'Include CJK Symbols and Punctuation',
-        description: 'Include <a href="https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation">CJK Symbols and Punctuation Unicode block</a>',
+        nameTextKey: 'remove-space-around-characters-include-cjk-symbols-and-punctuation-name',
+        descriptionTextKey: 'remove-space-around-characters-include-cjk-symbols-and-punctuation-description',
         OptionsClass: RemoveSpaceAroundCharactersOptions,
         optionsKey: 'includeCJKSymbolsAndPunctuation',
       }),
       new BooleanOptionBuilder({
-        name: 'Include Dashes',
-        description: 'Include en dash (–) and em dash (—)',
+        nameTextKey: 'remove-space-around-characters-include-dashes-name',
+        descriptionTextKey: 'remove-space-around-characters-include-dashes-description',
         OptionsClass: RemoveSpaceAroundCharactersOptions,
         optionsKey: 'includeDashes',
       }),
       new TextOptionBuilder({
-        name: 'Other symbols',
-        description: 'Other symbols to include',
+        nameTextKey: 'remove-space-around-characters-other-symbols-name',
+        descriptionTextKey: 'remove-space-around-characters-other-symbols-description',
         OptionsClass: RemoveSpaceAroundCharactersOptions,
         optionsKey: 'otherSymbols',
       }),

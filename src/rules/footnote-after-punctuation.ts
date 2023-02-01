@@ -3,22 +3,20 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 
-class FootnoteAfterPunctuationOptions implements Options {
-}
+class FootnoteAfterPunctuationOptions implements Options {}
 
 @RuleBuilder.register
 export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterPunctuationOptions> {
+  constructor() {
+    super({
+      configKey: 'footnote-after-punctuation',
+      nameTextKey: 'footnote-after-punctuation-name',
+      descriptionTextKey: 'footnote-after-punctuation-description',
+      type: RuleType.FOOTNOTE,
+    });
+  }
   get OptionsClass(): new () => FootnoteAfterPunctuationOptions {
     return FootnoteAfterPunctuationOptions;
-  }
-  get name(): string {
-    return 'Footnote after Punctuation';
-  }
-  get description(): string {
-    return 'Ensures that footnote references are placed after punctuation, not before.';
-  }
-  get type(): RuleType {
-    return RuleType.FOOTNOTE;
   }
   apply(text: string, options: FootnoteAfterPunctuationOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.footnoteAtStartOfLine, IgnoreTypes.footnoteAfterATask], text, (text) => {

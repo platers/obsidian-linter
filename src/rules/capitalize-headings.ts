@@ -398,17 +398,16 @@ class CapitalizeHeadingsOptions implements Options {
 
 @RuleBuilder.register
 export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOptions> {
+  constructor() {
+    super({
+      configKey: 'capitalize-headings',
+      nameTextKey: 'capitalize-headings-name',
+      descriptionTextKey: 'capitalize-headings-description',
+      type: RuleType.HEADING,
+    });
+  }
   get OptionsClass(): new () => CapitalizeHeadingsOptions {
     return CapitalizeHeadingsOptions;
-  }
-  get name(): string {
-    return 'Capitalize Headings';
-  }
-  get description(): string {
-    return 'Headings should be formatted with capitalization';
-  }
-  get type(): RuleType {
-    return RuleType.HEADING;
   }
   apply(text: string, options: CapitalizeHeadingsOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
@@ -522,8 +521,8 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
     return [
       new DropdownOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
-        name: 'Style',
-        description: 'The style of capitalization to use',
+        nameTextKey: 'capitalize-headings-style-name',
+        descriptionTextKey: 'capitalize-headings-style-description',
         optionsKey: 'style',
         records: [
           {
@@ -542,22 +541,22 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       }),
       new BooleanOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
-        name: 'Ignore Cased Words',
-        description: 'Only apply title case style to words that are all lowercase',
+        nameTextKey: 'capitalize-headings-ignore-case-words-name',
+        descriptionTextKey: 'capitalize-headings-ignore-case-words-description',
         optionsKey: 'ignoreCasedWords',
       }),
       new TextAreaOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
-        name: 'Ignore Words',
-        description: 'A comma separated list of words to ignore when capitalizing',
+        nameTextKey: 'capitalize-headings-ignore-words-name',
+        descriptionTextKey: 'capitalize-headings-ignore-words-description',
         optionsKey: 'ignoreWords',
         splitter: wordSplitterRegex,
         separator: ', ',
       }),
       new TextAreaOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
-        name: 'Lowercase Words',
-        description: 'A comma separated list of words to keep lowercase',
+        nameTextKey: 'capitalize-headings-lowercase-words-name',
+        descriptionTextKey: 'capitalize-headings-lowercase-words-description',
         optionsKey: 'lowercaseWords',
         splitter: wordSplitterRegex,
         separator: ', ',

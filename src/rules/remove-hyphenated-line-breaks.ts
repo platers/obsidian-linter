@@ -3,22 +3,20 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 
-class RemoveHyphenatedLineBreaksOptions implements Options {
-}
+class RemoveHyphenatedLineBreaksOptions implements Options {}
 
 @RuleBuilder.register
 export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphenatedLineBreaksOptions> {
+  constructor() {
+    super({
+      configKey: 'remove-hyphenated-line-breaks',
+      nameTextKey: 'remove-hyphenated-line-breaks-name',
+      descriptionTextKey: 'remove-hyphenated-line-breaks-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => RemoveHyphenatedLineBreaksOptions {
     return RemoveHyphenatedLineBreaksOptions;
-  }
-  get name(): string {
-    return 'Remove Hyphenated Line Breaks';
-  }
-  get description(): string {
-    return 'Removes hyphenated line breaks. Useful when pasting text from textbooks.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: RemoveHyphenatedLineBreaksOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {

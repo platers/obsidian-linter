@@ -11,17 +11,16 @@ class ForceYamlEscapeOptions implements Options {
 
 @RuleBuilder.register
 export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions> {
+  constructor() {
+    super({
+      configKey: 'force-yaml-escape',
+      nameTextKey: 'force-yaml-escape-name',
+      descriptionTextKey: 'force-yaml-escape-description',
+      type: RuleType.YAML,
+    }, true);
+  }
   get OptionsClass(): new () => ForceYamlEscapeOptions {
     return ForceYamlEscapeOptions;
-  }
-  get name(): string {
-    return 'Force YAML Escape';
-  }
-  get description(): string {
-    return 'Escapes the values for the specified YAML keys.';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: ForceYamlEscapeOptions): string {
     return formatYAML(text, (text) => {
@@ -92,13 +91,10 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
     return [
       new TextAreaOptionBuilder({
         OptionsClass: ForceYamlEscapeOptions,
-        name: 'Force YAML Escape on Keys',
-        description: 'Uses the YAML escape character on the specified YAML keys separated by a new line character if it is not already escaped. Do not use on YAML arrays.',
+        nameTextKey: 'force-yaml-escape-force-yaml-escape-name',
+        descriptionTextKey: 'force-yaml-escape-force-yaml-escape-description',
         optionsKey: 'forceYamlEscape',
       }),
     ];
-  }
-  get hasSpecialExecutionOrder(): boolean {
-    return true;
   }
 }

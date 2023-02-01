@@ -11,17 +11,16 @@ class EmptyLineAroundMathBlockOptions implements Options {
 
 @RuleBuilder.register
 export default class EmptyLineAroundMathBlock extends RuleBuilder<EmptyLineAroundMathBlockOptions> {
+  constructor() {
+    super({
+      configKey: 'empty-line-around-math-block',
+      nameTextKey: 'empty-line-around-math-block-name',
+      descriptionTextKey: 'empty-line-around-math-block-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => EmptyLineAroundMathBlockOptions {
     return EmptyLineAroundMathBlockOptions;
-  }
-  get name(): string {
-    return 'Empty Line Around Math Blocks';
-  }
-  get description(): string {
-    return 'Ensures that there is an empty line around math blocks using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: EmptyLineAroundMathBlockOptions): string {
     return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.code], text, (text: string) => {

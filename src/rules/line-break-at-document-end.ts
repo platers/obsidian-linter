@@ -2,22 +2,20 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
-class LineBreakAtDocumentEndOptions implements Options {
-}
+class LineBreakAtDocumentEndOptions implements Options {}
 
 @RuleBuilder.register
 export default class LineBreakAtDocumentEnd extends RuleBuilder<LineBreakAtDocumentEndOptions> {
+  constructor() {
+    super({
+      configKey: 'line-break-at-document-end',
+      nameTextKey: 'line-break-at-document-end-name',
+      descriptionTextKey: 'line-break-at-document-end-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => LineBreakAtDocumentEndOptions {
     return LineBreakAtDocumentEndOptions;
-  }
-  get name(): string {
-    return 'Line Break at Document End';
-  }
-  get description(): string {
-    return 'Ensures that there is exactly one line break at the end of a document.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: LineBreakAtDocumentEndOptions): string {
     text = text.replace(/\n+$/g, '');

@@ -5,7 +5,6 @@ import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossib
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {getFirstHeaderOneText, yamlRegex} from '../utils/regex';
 
-
 class YamlTitleAliasOptions implements Options {
   preserveExistingAliasesSectionStyle?: boolean = true;
   keepAliasThatMatchesTheFilename?: boolean = false;
@@ -26,17 +25,16 @@ class YamlTitleAliasOptions implements Options {
 
 @RuleBuilder.register
 export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
+  constructor() {
+    super({
+      configKey: 'yaml-title-alias',
+      nameTextKey: 'yaml-title-alias-name',
+      descriptionTextKey: 'yaml-title-alias-description',
+      type: RuleType.YAML,
+    });
+  }
   get OptionsClass(): new () => YamlTitleAliasOptions {
     return YamlTitleAliasOptions;
-  }
-  get name(): string {
-    return 'YAML Title Alias';
-  }
-  get description(): string {
-    return 'Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: YamlTitleAliasOptions): string {
     text = initYAML(text);
@@ -270,20 +268,20 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: YamlTitleAliasOptions,
-        name: 'Preserve existing aliases section style',
-        description: 'If set, the `YAML aliases section style` setting applies only to the newly created sections',
+        nameTextKey: 'yaml-title-alias-preserve-existing-alias-section-style-name',
+        descriptionTextKey: 'yaml-title-alias-preserve-existing-alias-section-style-description',
         optionsKey: 'preserveExistingAliasesSectionStyle',
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlTitleAliasOptions,
-        name: 'Keep alias that matches the filename',
-        description: 'Such aliases are usually redundant',
+        nameTextKey: 'yaml-title-alias-keep-alias-that-matches-the-filename-name',
+        descriptionTextKey: 'yaml-title-alias-keep-alias-that-matches-the-filename-description',
         optionsKey: 'keepAliasThatMatchesTheFilename',
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlTitleAliasOptions,
-        name: 'Use the YAML key `linter-yaml-title-alias` to help with filename and heading changes',
-        description: 'If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array',
+        nameTextKey: 'yaml-title-alias-use-yaml-key-to-keep-track-of-old-filename-or-heading-name',
+        descriptionTextKey: 'yaml-title-alias-use-yaml-key-to-keep-track-of-old-filename-or-heading-description',
         optionsKey: 'useYamlKeyToKeepTrackOfOldFilenameOrHeading',
       }),
     ];

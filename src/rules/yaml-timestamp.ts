@@ -32,17 +32,16 @@ class YamlTimestampOptions implements Options {
 
 @RuleBuilder.register
 export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
+  constructor() {
+    super({
+      configKey: 'yaml-timestamp',
+      nameTextKey: 'yaml-timestamp-name',
+      descriptionTextKey: 'yaml-timestamp-description',
+      type: RuleType.YAML,
+    }, true);
+  }
   get OptionsClass(): new () => YamlTimestampOptions {
     return YamlTimestampOptions;
-  }
-  get name(): string {
-    return 'YAML Timestamp';
-  }
-  get description(): string {
-    return 'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: YamlTimestampOptions): string {
     let textModified = options.alreadyModified;
@@ -224,37 +223,34 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        name: 'Date Created',
-        description: 'Insert the file creation date',
+        nameTextKey: 'yaml-timestamp-date-created-name',
+        descriptionTextKey: 'yaml-timestamp-date-created-description',
         optionsKey: 'dateCreated',
       }),
       new TextOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        name: 'Date Created Key',
-        description: 'Which YAML key to use for creation date',
+        nameTextKey: 'yaml-timestamp-date-created-key-name',
+        descriptionTextKey: 'yaml-timestamp-date-created-key-description',
         optionsKey: 'dateCreatedKey',
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        name: 'Date Modified',
-        description: 'Insert the date the file was last modified',
+        nameTextKey: 'yaml-timestamp-date-modified-name',
+        descriptionTextKey: 'yaml-timestamp-date-modified-description',
         optionsKey: 'dateModified',
       }),
       new TextOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        name: 'Date Modified Key',
-        description: 'Which YAML key to use for modification date',
+        nameTextKey: 'yaml-timestamp-date-modified-key-name',
+        descriptionTextKey: 'yaml-timestamp-date-modified-key-description',
         optionsKey: 'dateModifiedKey',
       }),
       new MomentFormatOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        name: 'Format',
-        description: 'Moment date format to use (see [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
+        nameTextKey: 'yaml-timestamp-format-name',
+        descriptionTextKey: 'yaml-timestamp-format-description',
         optionsKey: 'format',
       }),
     ];
-  }
-  get hasSpecialExecutionOrder(): boolean {
-    return true;
   }
 }

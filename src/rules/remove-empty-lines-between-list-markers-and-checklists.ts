@@ -3,22 +3,20 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
-class RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions implements Options {
-}
+class RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions implements Options {}
 
 @RuleBuilder.register
 export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends RuleBuilder<RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions> {
+  constructor() {
+    super({
+      configKey: 'remove-empty-lines-between-list-markers-and-checklists',
+      nameTextKey: 'remove-empty-lines-between-list-markers-and-checklists-name',
+      descriptionTextKey: 'remove-empty-lines-between-list-markers-and-checklists-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions {
     return RemoveEmptyLinesBetweenListMarkersAndChecklists;
-  }
-  get name(): string {
-    return 'Remove Empty Lines Between List Markers and Checklists';
-  }
-  get description(): string {
-    return 'There should not be any empty lines between list markers and checklists.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.thematicBreak], text, (text) => {

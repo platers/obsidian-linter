@@ -3,22 +3,20 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ensureEmptyLinesAroundFencedCodeBlocks} from '../utils/mdast';
 
-class EmptyLineAroundCodeFencesOptions implements Options {
-}
+class EmptyLineAroundCodeFencesOptions implements Options {}
 
 @RuleBuilder.register
 export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineAroundCodeFencesOptions> {
+  constructor() {
+    super({
+      configKey: 'empty-line-around-code-fences',
+      nameTextKey: 'empty-line-around-code-fences-name',
+      descriptionTextKey: 'empty-line-around-code-fences-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => EmptyLineAroundCodeFencesOptions {
     return EmptyLineAroundCodeFencesOptions;
-  }
-  get name(): string {
-    return 'Empty Line Around Code Fences';
-  }
-  get description(): string {
-    return 'Ensures that there is an empty line around code fences unless they start or end a document.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: EmptyLineAroundCodeFencesOptions): string {
     return ensureEmptyLinesAroundFencedCodeBlocks(text);

@@ -4,22 +4,20 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {lineStartingWithWhitespaceOrBlockquoteTemplate} from '../utils/regex';
 
-class RemoveEmptyListMarkersOptions implements Options {
-}
+class RemoveEmptyListMarkersOptions implements Options {}
 
 @RuleBuilder.register
 export default class RemoveEmptyListMarkers extends RuleBuilder<RemoveEmptyListMarkersOptions> {
+  constructor() {
+    super({
+      configKey: 'remove-empty-list-markers',
+      nameTextKey: 'remove-empty-list-markers-name',
+      descriptionTextKey: 'remove-empty-list-markers-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => RemoveEmptyListMarkersOptions {
     return RemoveEmptyListMarkersOptions;
-  }
-  get name(): string {
-    return 'Remove Empty List Markers';
-  }
-  get description(): string {
-    return 'Removes empty list markers, i.e. list items without content.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: RemoveEmptyListMarkersOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {

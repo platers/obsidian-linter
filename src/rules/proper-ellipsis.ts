@@ -4,22 +4,20 @@ import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {ellipsisRegex} from '../utils/regex';
 
-class ProperEllipsisOptions implements Options {
-}
+class ProperEllipsisOptions implements Options {}
 
 @RuleBuilder.register
 export default class ProperEllipsis extends RuleBuilder<ProperEllipsisOptions> {
+  constructor() {
+    super({
+      configKey: 'proper-ellipsis',
+      nameTextKey: 'proper-ellipsis-name',
+      descriptionTextKey: 'proper-ellipsis-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => ProperEllipsisOptions {
     return ProperEllipsisOptions;
-  }
-  get name(): string {
-    return 'Proper Ellipsis';
-  }
-  get description(): string {
-    return 'Replaces three consecutive dots with an ellipsis.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: ProperEllipsisOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image], text, (text) => {

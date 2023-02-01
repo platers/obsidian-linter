@@ -4,22 +4,20 @@ import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent} from '../utils/mdast';
 
-class TwoSpacesBetweenLinesWithContentOptions implements Options {
-}
+class TwoSpacesBetweenLinesWithContentOptions implements Options {}
 
 @RuleBuilder.register
 export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpacesBetweenLinesWithContentOptions> {
+  constructor() {
+    super({
+      configKey: 'two-spaces-between-lines-with-content',
+      nameTextKey: 'two-spaces-between-lines-with-content-name',
+      descriptionTextKey: 'two-spaces-between-lines-with-content-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => TwoSpacesBetweenLinesWithContentOptions {
     return TwoSpacesBetweenLinesWithContentOptions;
-  }
-  get name(): string {
-    return 'Two Spaces Between Lines with Content';
-  }
-  get description(): string {
-    return 'Makes sure that two spaces are added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: TwoSpacesBetweenLinesWithContentOptions): string {
     return ignoreListOfTypes([IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table], text, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent);

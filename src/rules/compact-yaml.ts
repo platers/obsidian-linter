@@ -9,17 +9,11 @@ class CompactYamlOptions implements Options {
 
 @RuleBuilder.register
 export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
+  constructor() {
+    super('compact-yaml-name', 'compact-yaml-description', RuleType.SPACING);
+  }
   get OptionsClass(): new () => CompactYamlOptions {
     return CompactYamlOptions;
-  }
-  get name(): string {
-    return 'Compact YAML';
-  }
-  get description(): string {
-    return 'Removes leading and trailing blank lines in the YAML front matter.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: CompactYamlOptions): string {
     return formatYAML(text, (text) => {
@@ -91,8 +85,8 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: CompactYamlOptions,
-        name: 'Inner New Lines',
-        description: 'Remove new lines that are not at the start or the end of the YAML',
+        nameTextKey: 'compact-yaml-inner-new-lines-name',
+        descriptionTextKey: 'compact-yaml-inner-new-lines-description',
         optionsKey: 'innerNewLines',
       }),
     ];

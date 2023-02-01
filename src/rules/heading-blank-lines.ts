@@ -11,17 +11,16 @@ class HeadingBlankLinesOptions implements Options {
 
 @RuleBuilder.register
 export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOptions> {
+  constructor() {
+    super({
+      configKey: 'heading-blank-lines',
+      nameTextKey: 'heading-blank-lines-name',
+      descriptionTextKey: 'heading-blank-lines-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => HeadingBlankLinesOptions {
     return HeadingBlankLinesOptions;
-  }
-  get name(): string {
-    return 'Heading blank lines';
-  }
-  get description(): string {
-    return 'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: HeadingBlankLinesOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink], text, (text) => {
@@ -122,14 +121,14 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
     return [
       new BooleanOptionBuilder({
         OptionsClass: HeadingBlankLinesOptions,
-        name: 'Bottom',
-        description: 'Insert a blank line after headings',
+        nameTextKey: 'heading-blank-lines-bottom-name',
+        descriptionTextKey: 'heading-blank-lines-bottom-description',
         optionsKey: 'bottom',
       }),
       new BooleanOptionBuilder({
         OptionsClass: HeadingBlankLinesOptions,
-        name: 'Empty Line Between Yaml and Header',
-        description: 'Keep the empty line between the Yaml frontmatter and header',
+        nameTextKey: 'heading-blank-lines-empty-line-after-yaml-name',
+        descriptionTextKey: 'heading-blank-lines-empty-line-after-yaml-description',
         optionsKey: 'emptyLineAfterYaml',
       }),
     ];

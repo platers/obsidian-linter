@@ -11,17 +11,16 @@ class MoveMathBlockIndicatorsToOwnLineOptions implements Options {
 
 @RuleBuilder.register
 export default class MoveMathBlockIndicatorsToOwnLine extends RuleBuilder<MoveMathBlockIndicatorsToOwnLineOptions> {
+  constructor() {
+    super({
+      configKey: 'move-math-block-indicators-to-own-line',
+      nameTextKey: 'move-math-block-indicators-to-own-line-name',
+      descriptionTextKey: 'move-math-block-indicators-to-own-line-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => MoveMathBlockIndicatorsToOwnLineOptions {
     return MoveMathBlockIndicatorsToOwnLineOptions;
-  }
-  get name(): string {
-    return 'Move Math Block Indicators to Their Own Line';
-  }
-  get description(): string {
-    return 'Move all starting and ending math block indicators to their own lines using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: MoveMathBlockIndicatorsToOwnLineOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode], text, (text) => {

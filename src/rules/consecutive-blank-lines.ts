@@ -3,22 +3,20 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
-class ConsecutiveBlankLinesOptions implements Options {
-}
+class ConsecutiveBlankLinesOptions implements Options {}
 
 @RuleBuilder.register
 export default class ConsecutiveBlankLines extends RuleBuilder<ConsecutiveBlankLinesOptions> {
+  constructor() {
+    super({
+      configKey: 'consecutive-blank-lines',
+      nameTextKey: 'consecutive-blank-lines-name',
+      descriptionTextKey: 'consecutive-blank-lines-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => ConsecutiveBlankLinesOptions {
     return ConsecutiveBlankLinesOptions;
-  }
-  get name(): string {
-    return 'Consecutive blank lines';
-  }
-  get description(): string {
-    return 'There should be at most one consecutive blank line.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: ConsecutiveBlankLinesOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {

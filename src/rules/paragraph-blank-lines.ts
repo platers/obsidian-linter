@@ -4,22 +4,20 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
-class ParagraphBlankLinesOptions implements Options {
-}
+class ParagraphBlankLinesOptions implements Options {}
 
 @RuleBuilder.register
 export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLinesOptions> {
+  constructor() {
+    super({
+      configKey: 'paragraph-blank-lines',
+      nameTextKey: 'paragraph-blank-lines-name',
+      descriptionTextKey: 'paragraph-blank-lines-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => ParagraphBlankLinesOptions {
     return ParagraphBlankLinesOptions;
-  }
-  get name(): string {
-    return 'Paragraph blank lines';
-  }
-  get description(): string {
-    return 'All paragraphs should have exactly one blank line both before and after.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: ParagraphBlankLinesOptions): string {
     return ignoreListOfTypes([IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table], text, makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs);

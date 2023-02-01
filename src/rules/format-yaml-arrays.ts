@@ -34,17 +34,16 @@ class FormatYamlArrayOptions implements Options {
 
 @RuleBuilder.register
 export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
+  constructor() {
+    super({
+      configKey: 'format-yaml-arrays',
+      nameTextKey: 'format-yaml-arrays-name',
+      descriptionTextKey: 'format-yaml-arrays-description',
+      type: RuleType.YAML,
+    });
+  }
   get OptionsClass(): new () => FormatYamlArrayOptions {
     return FormatYamlArrayOptions;
-  }
-  get name(): string {
-    return 'Format Yaml Array';
-  }
-  get description(): string {
-    return 'Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: FormatYamlArrayOptions): string {
     return formatYAML(text, (text: string) => {
@@ -234,20 +233,20 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        name: 'Format yaml aliases section',
-        description: 'Turns on formatting for the yaml aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.',
+        nameTextKey: 'format-yaml-arrays-format-alias-key-name',
+        descriptionTextKey: 'format-yaml-arrays-format-alias-key-description',
         optionsKey: 'formatAliasKey',
       }),
       new BooleanOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        name: 'Format yaml tags section',
-        description: 'Turns on formatting for the yaml tags section.',
+        nameTextKey: 'format-yaml-arrays-format-tag-key-name',
+        descriptionTextKey: 'format-yaml-arrays-format-tag-key-description',
         optionsKey: 'formatTagKey',
       }),
       new DropdownOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        name: 'Default yaml array section style',
-        description: 'The style of other yaml arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays`',
+        nameTextKey: 'format-yaml-arrays-default-array-style-name',
+        descriptionTextKey: 'format-yaml-arrays-default-array-style-description',
         optionsKey: 'defaultArrayStyle',
         records: [
           {
@@ -262,20 +261,20 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
       }),
       new BooleanOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        name: 'Format yaml array sections',
-        description: 'Turns on formatting for regular yaml arrays',
+        nameTextKey: 'format-yaml-arrays-default-array-keys-name',
+        descriptionTextKey: 'format-yaml-arrays-default-array-keys-description',
         optionsKey: 'formatArrayKeys',
       }),
       new TextAreaOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        name: 'Force key values to be single-line arrays',
-        description: 'Forces the yaml array for the new line separated keys to be in single-line format (leave empty to disable this option)',
+        nameTextKey: 'format-yaml-arrays-force-single-line-array-style-name',
+        descriptionTextKey: 'format-yaml-arrays-force-single-line-array-style-description',
         optionsKey: 'forceSingleLineArrayStyle',
       }),
       new TextAreaOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        name: 'Force key values to be multi-line arrays',
-        description: 'Forces the yaml array for the new line separated keys to be in multi-line format (leave empty to disable this option)',
+        nameTextKey: 'format-yaml-arrays-force-multi-line-array-style-name',
+        descriptionTextKey: 'format-yaml-arrays-force-multi-line-array-style-description',
         optionsKey: 'forceMultiLineArrayStyle',
       }),
     ];

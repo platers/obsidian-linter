@@ -1,6 +1,7 @@
 import {Example, Options, Rule, RuleType, registerRule, LinterSettings, wrapLintError} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
 import {logDebug} from '../utils/logger';
+import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -22,7 +23,7 @@ export abstract class RuleBuilderBase {
     const optionsFromSettings = rule.getOptions(settings);
     if (optionsFromSettings[rule.enabledOptionName()]) {
       const options = Object.assign({}, optionsFromSettings, extraOptions) as Options;
-      logDebug(`Running ${rule.name}`);
+      logDebug(`${getTextInLanguage('run-rule-text')} ${rule.name}`);
 
       try {
         return [rule.apply(text, options), true];
@@ -50,7 +51,31 @@ export abstract class RuleBuilderBase {
   }
 }
 
+type RuleBuilderConstructorArgs = {
+  configKey: string,
+  nameTextKey: LanguageStringKey
+  descriptionTextKey: LanguageStringKey,
+  type: RuleType;
+};
+
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
+  public configKey: string;
+  public name: string;
+  public description: string;
+  public nameTextKey: LanguageStringKey;
+  public descriptionTextKey: LanguageStringKey;
+  public type: RuleType;
+  constructor(args: RuleBuilderConstructorArgs, public hasSpecialExecutionOrder: boolean = false) {
+    super();
+
+    this.configKey = args.configKey;
+    this.nameTextKey = args.nameTextKey;
+    this.descriptionTextKey = args.descriptionTextKey;
+    this.type = args.type;
+    this.name = getTextInLanguage(args.nameTextKey);
+    this.description = getTextInLanguage(args.descriptionTextKey);
+  }
+
   abstract get OptionsClass(): (new() => TOptions);
 
   static register<TOptions extends Options>(RuleBuilderClass: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>)): void {
@@ -74,20 +99,14 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     return ruleOptions;
   }
 
-  abstract get name(): string;
-  abstract get description(): string;
-  abstract get type(): RuleType;
   abstract apply(text: string, options: TOptions): string;
   abstract get exampleBuilders(): ExampleBuilder<TOptions>[];
   abstract get optionBuilders(): OptionBuilderBase<TOptions>[];
-  get hasSpecialExecutionOrder(): boolean {
-    return false;
-  }
 
   static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions): [result: string, isEnabled: boolean] {
     const rule = this.getRule();
     if (disabledRules.includes(rule.alias())) {
-      logDebug(rule.alias() + ' is disabled');
+      logDebug(rule.alias() + ' ' + getTextInLanguage('disabled-text'));
       return [text, false];
     }
 
@@ -131,8 +150,8 @@ type KeysOfObjectMatchingPropertyValueType<TObject, TValue> = {[TKey in keyof TO
 
 type OptionBuilderConstructorArgs<TOptions extends Options, TValue> = {
   OptionsClass: (new() => TOptions),
-  name: string
-  description: string,
+  nameTextKey: LanguageStringKey
+  descriptionTextKey: LanguageStringKey,
   optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
 };
 
@@ -145,13 +164,17 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
   readonly OptionsClass: (new() => TOptions);
   readonly name: string;
   readonly description: string;
+  readonly nameTextKey: LanguageStringKey;
+  readonly descriptionTextKey: LanguageStringKey;
   readonly optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
   #option: Option;
 
   constructor(args: OptionBuilderConstructorArgs<TOptions, TValue>) {
     this.OptionsClass = args.OptionsClass;
-    this.name = args.name;
-    this.description = args.description;
+    this.name = getTextInLanguage(args.nameTextKey);
+    this.description = getTextInLanguage(args.descriptionTextKey);
+    this.nameTextKey = args.nameTextKey;
+    this.descriptionTextKey = args.descriptionTextKey;
     this.optionsKey = args.optionsKey;
   }
 

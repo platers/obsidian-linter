@@ -4,22 +4,20 @@ import dedent from 'ts-dedent';
 import {removeSpacesInLinkText} from '../utils/mdast';
 import {removeSpacesInWikiLinkText} from '../utils/regex';
 
-class RemoveLinkSpacingOptions implements Options {
-}
+class RemoveLinkSpacingOptions implements Options {}
 
 @RuleBuilder.register
 export default class RemoveLinkSpacing extends RuleBuilder<RemoveLinkSpacingOptions> {
+  constructor() {
+    super({
+      configKey: 'remove-link-spacing',
+      nameTextKey: 'remove-link-spacing-name',
+      descriptionTextKey: 'remove-link-spacing-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => RemoveLinkSpacingOptions {
     return RemoveLinkSpacingOptions;
-  }
-  get name(): string {
-    return 'Remove link spacing';
-  }
-  get description(): string {
-    return 'Removes spacing around link text.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: RemoveLinkSpacingOptions): string {
     text = removeSpacesInLinkText(text);

@@ -1,4 +1,5 @@
 import {Notice, Modal, App} from 'obsidian';
+import {getTextInLanguage} from 'src/lang/helpers';
 
 // https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/src/modal.ts#L68
 export class LintConfirmationModal extends Modal {
@@ -7,10 +8,10 @@ export class LintConfirmationModal extends Modal {
     super(app);
     this.modalEl.addClass('confirm-modal');
 
-    this.contentEl.createEl('h3', {text: 'Warning'}).style.textAlign = 'center';
+    this.contentEl.createEl('h3', {text: getTextInLanguage('warning-text')}).style.textAlign = 'center';
 
     this.contentEl.createEl('p',
-        {text: startModalMessageText + ' Make sure you have backed up your files.'}).id = 'confirm-dialog';
+        {text: startModalMessageText + ' ' + getTextInLanguage('file-backup-text')}).id = 'confirm-dialog';
 
     this.contentEl.createDiv('modal-button-container', (buttonsEl) => {
       buttonsEl.createEl('button', {text: 'Cancel'}).addEventListener('click', () => this.close());

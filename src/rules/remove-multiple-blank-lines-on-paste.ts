@@ -3,22 +3,20 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
-class RemoveMultipleBlankLinesOnPasteOptions implements Options {
-}
+class RemoveMultipleBlankLinesOnPasteOptions implements Options {}
 
 @RuleBuilder.register
 export default class RemoveMultipleBlankLinesOnPaste extends RuleBuilder<RemoveMultipleBlankLinesOnPasteOptions> {
+  constructor() {
+    super({
+      configKey: 'remove-multiple-blank-lines-on-paste',
+      nameTextKey: 'remove-multiple-blank-lines-on-paste-name',
+      descriptionTextKey: 'remove-multiple-blank-lines-on-paste-description',
+      type: RuleType.PASTE,
+    });
+  }
   get OptionsClass(): new () => RemoveMultipleBlankLinesOnPasteOptions {
     return RemoveMultipleBlankLinesOnPasteOptions;
-  }
-  get name(): string {
-    return 'Remove Multiple Blank Lines on Paste';
-  }
-  get description(): string {
-    return 'Condenses multiple blank lines down into one blank line for the text to paste';
-  }
-  get type(): RuleType {
-    return RuleType.PASTE;
   }
   apply(text: string, options: RemoveMultipleBlankLinesOnPasteOptions): string {
     return text.replace(/\n{3,}/g, '\n\n');

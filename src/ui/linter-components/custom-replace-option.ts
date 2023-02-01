@@ -1,4 +1,5 @@
 import {Setting} from 'obsidian';
+import {getTextInLanguage} from 'src/lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 export type CustomReplace = {find: string, replace: string, flags: string};
 
@@ -8,10 +9,10 @@ export class CustomReplaceOption extends AddCustomRow {
   constructor(containerEl: HTMLElement, public regexes: CustomReplace[], isMobile: boolean, saveSettings: () => void) {
     super(
         containerEl,
-        'Custom Regex Replacement',
-        `Custom regex replacement can be used to replace anything that matches the find regex with the replacement value. The replace and find values will need to be valid regex values.`,
-        `Use this with caution if you do not know regex. Also, please make sure that you do not use lookbehinds in your regex on iOS mobile as that will cause linting to fail since that is not supported on that platform.`,
-        'Add new regex replacement',
+        getTextInLanguage('custom-replace-name'),
+        getTextInLanguage('custom-replace-description'),
+        getTextInLanguage('custom-replace-warning'),
+        getTextInLanguage('custom-replace-add-input-button-text'),
         isMobile,
         saveSettings,
         ()=>{
@@ -31,7 +32,7 @@ export class CustomReplaceOption extends AddCustomRow {
 
   private addRegex(regex: CustomReplace, index: number, focusOnCommand: boolean = false) {
     new Setting(this.inputElDiv).addText((cb) => {
-      cb.setPlaceholder('regex to find')
+      cb.setPlaceholder(getTextInLanguage('custom-replace-regex-to-find-placeholder-text'))
           .setValue(regex.find)
           .onChange((value) => {
             this.regexes[index].find = value;
@@ -44,14 +45,14 @@ export class CustomReplaceOption extends AddCustomRow {
         cb.inputEl.focus();
       }
     }).addText((cb) => {
-      cb.setPlaceholder('flags')
+      cb.setPlaceholder(getTextInLanguage('custom-replace-flags-placeholder-text'))
           .setValue(regex.flags)
           .onChange((value) => {
             this.regexes[index].flags = value;
             this.saveSettings();
           });
     }).addText((cb) => {
-      cb.setPlaceholder('regex to replace')
+      cb.setPlaceholder(getTextInLanguage('custom-replace-regex-to-replace-placeholder-text'))
           .setValue(regex.replace)
           .onChange((value) => {
             this.regexes[index].replace = value;
@@ -59,7 +60,7 @@ export class CustomReplaceOption extends AddCustomRow {
           });
     }).addExtraButton((cb)=>{
       cb.setIcon('cross')
-          .setTooltip('Delete')
+          .setTooltip(getTextInLanguage('custom-replace-delete-tooltip'))
           .onClick(()=>{
             this.regexes.splice(index, 1);
             this.saveSettings();

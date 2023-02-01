@@ -5,6 +5,7 @@ import {Setting} from 'obsidian';
 import {TextBoxFull} from 'src/ui/components/text-box-full';
 import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
 import {logsFromLastRun, setLogLevel} from 'src/utils/logger';
+import {getTextInLanguage} from 'src/lang/helpers';
 
 const logLevels = Object.keys(log.levels);
 const logLevelInts = Object.values(log.levels);
@@ -17,14 +18,14 @@ export class DebugTab extends Tab {
 
   display(): void {
     let tempDiv = this.contentEl.createDiv();
-    let settingName = 'Log Level';
-    let settingDesc = 'The types of logs that will be allowed to be logged by the service. The default is ERROR.';
+    let settingName = getTextInLanguage('log-level-name');
+    let settingDesc = getTextInLanguage('log-level-description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
         .addDropdown((dropdown) => {
           logLevels.forEach((logLevel, index) => {
-            dropdown.addOption(logLevelInts[index], logLevel);
+            dropdown.addOption(logLevelInts[index], logLevel); // todo: determine how to map this to text in the desired language
           });
           // set value only takes strings so I have to cast the log level to type string in order to get it to work properly
           dropdown.setValue(this.plugin.settings.logLevel + '');
@@ -43,16 +44,16 @@ export class DebugTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Linter Config';
-    settingDesc = 'The contents of the data.json for the Linter as of the setting page loading';
+    settingName = getTextInLanguage('linter-config-name');
+    settingDesc = getTextInLanguage('linter-config-description');
     const configDisplay = new TextBoxFull(tempDiv, settingName, settingDesc);
     configDisplay.inputEl.setText(JSON.stringify(this.plugin.settings, null, 2));
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Collect logs when linting on save and linting the current file';
-    settingDesc = 'Goes ahead and collects logs when you `Lint on save` and linting the current file. These logs can be helpful for debugging and create bug reports.';
+    settingName = getTextInLanguage('log-collection-name');
+    settingDesc = getTextInLanguage('log-collection-description');
     const setting = new Setting(tempDiv)
         .setName(settingName)
         .addToggle((toggle) => {
@@ -69,8 +70,8 @@ export class DebugTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Linter Logs';
-    settingDesc = 'The logs from the last `Lint on save` or the last lint current file run if enabled.';
+    settingName = getTextInLanguage('linter-logs-name');
+    settingDesc = getTextInLanguage('linter-logs-description');
     const logDisplay = new TextBoxFull(tempDiv, settingName, settingDesc);
     logDisplay.inputEl.setText(logsFromLastRun.join('\n'));
 

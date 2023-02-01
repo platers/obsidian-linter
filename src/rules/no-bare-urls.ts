@@ -5,24 +5,22 @@ import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
 import {urlRegex} from '../utils/regex';
 
-class NoBareUrlsOptions implements Options {
-}
+class NoBareUrlsOptions implements Options {}
 
 const specialCharsToNotEscapeContentsWithin = `'"‘’“”\`[]`;
 
 @RuleBuilder.register
 export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
+  constructor() {
+    super({
+      configKey: 'no-bare-urls',
+      nameTextKey: 'no-bare-urls-name',
+      descriptionTextKey: 'no-bare-urls-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => NoBareUrlsOptions {
     return NoBareUrlsOptions;
-  }
-  get name(): string {
-    return 'No Bare URLs';
-  }
-  get description(): string {
-    return 'Encloses bare URLs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: NoBareUrlsOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode, IgnoreTypes.anchorTag], text, (text) => {

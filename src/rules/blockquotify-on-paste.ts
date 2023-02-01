@@ -10,17 +10,16 @@ class BlockquotifyOnPasteOptions implements Options {
 
 @RuleBuilder.register
 export default class BlockquotifyOnPaste extends RuleBuilder<BlockquotifyOnPasteOptions> {
+  constructor() {
+    super({
+      configKey: 'blockquotify-on-past',
+      nameTextKey: 'blockquotify-on-paste-name',
+      descriptionTextKey: 'blockquotify-on-paste-description',
+      type: RuleType.PASTE,
+    });
+  }
   get OptionsClass(): new () => BlockquotifyOnPasteOptions {
     return BlockquotifyOnPasteOptions;
-  }
-  get name(): string {
-    return 'Add Blockquote Indentation on Paste';
-  }
-  get description(): string {
-    return 'Adds blockquotes to all but the first line, when the cursor is in a blockquote/callout line during pasting';
-  }
-  get type(): RuleType {
-    return RuleType.PASTE;
   }
   apply(text: string, options: BlockquotifyOnPasteOptions): string {
     const blockquoteRegex = /^(\s*)((> ?)+) .*/;

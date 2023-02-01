@@ -24,17 +24,16 @@ class YamlKeySortOptions implements Options {
 
 @RuleBuilder.register
 export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
+  constructor() {
+    super({
+      configKey: 'yaml-key-sort',
+      nameTextKey: 'yaml-key-sort-name',
+      descriptionTextKey: 'yaml-key-sort-description',
+      type: RuleType.YAML,
+    }, true);
+  }
   get OptionsClass(): new () => YamlKeySortOptions {
     return YamlKeySortOptions;
-  }
-  get name(): string {
-    return 'YAML Key Sort';
-  }
-  get description(): string {
-    return 'Sorts the YAML keys based on the order and priority specified. Note: may remove blank lines as well.';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: YamlKeySortOptions): string {
     const yaml = text.match(yamlRegex);
@@ -262,20 +261,20 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     return [
       new TextAreaOptionBuilder({
         OptionsClass: YamlKeySortOptions,
-        name: 'YAML Key Priority Sort Order',
-        description: 'The order in which to sort keys with one on each line where it sorts in the order found in the list',
+        nameTextKey: 'yaml-key-sort-yaml-key-priority-sort-order-name',
+        descriptionTextKey: 'yaml-key-sort-yaml-key-priority-sort-order-description',
         optionsKey: 'yamlKeyPrioritySortOrder',
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlKeySortOptions,
-        name: 'Priority Keys at Start of YAML',
-        description: 'YAML Key Priority Sort Order is placed at the start of the YAML frontmatter',
+        nameTextKey: 'yaml-key-sort-priority-keys-at-start-of-yaml-name',
+        descriptionTextKey: 'yaml-key-sort-priority-keys-at-start-of-yaml-description',
         optionsKey: 'priorityKeysAtStartOfYaml',
       }),
       new DropdownOptionBuilder<YamlKeySortOptions, YamlSortOrderForOtherKeys>({
         OptionsClass: YamlKeySortOptions,
-        name: 'YAML Sort Order for Other Keys',
-        description: 'The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area',
+        nameTextKey: 'yaml-key-sort-yaml-sort-order-for-other-keys-name',
+        descriptionTextKey: 'yaml-key-sort-yaml-sort-order-for-other-keys-description',
         optionsKey: 'yamlSortOrderForOtherKeys',
         records: [
           {
@@ -293,8 +292,5 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
         ],
       }),
     ];
-  }
-  get hasSpecialExecutionOrder(): boolean {
-    return true;
   }
 }

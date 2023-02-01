@@ -1,5 +1,6 @@
 // based on https://github.com/valentine195/obsidian-settings-search/blob/master/src/main.ts#L294-L308
 import {SearchComponent, Setting} from 'obsidian';
+import {getTextInLanguage} from 'src/lang/helpers';
 import {SearchOptionInfo} from 'src/option';
 import {hideEl, unhideEl} from '../../helpers';
 import {Tab} from './tab';
@@ -25,7 +26,7 @@ export class TabSearcher {
       this.search = s;
     });
 
-    this.search.setPlaceholder('Search all settings');
+    this.search.setPlaceholder(getTextInLanguage('default-search-bar-text'));
 
     this.search.inputEl.onfocus = () => {
       this.onFocus();

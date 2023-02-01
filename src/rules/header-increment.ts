@@ -10,17 +10,16 @@ class HeaderIncrementOptions implements Options {
 
 @RuleBuilder.register
 export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions> {
+  constructor() {
+    super({
+      configKey: 'header-increment',
+      nameTextKey: 'header-increment-name',
+      descriptionTextKey: 'header-increment-description',
+      type: RuleType.HEADING,
+    });
+  }
   get OptionsClass(): new () => HeaderIncrementOptions {
     return HeaderIncrementOptions;
-  }
-  get name(): string {
-    return 'Header Increment';
-  }
-  get description(): string {
-    return 'Heading levels should only increment by one level at a time';
-  }
-  get type(): RuleType {
-    return RuleType.HEADING;
   }
   apply(text: string, options: HeaderIncrementOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
@@ -169,8 +168,8 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
     return [
       new BooleanOptionBuilder({
         OptionsClass: HeaderIncrementOptions,
-        name: 'Start Header Increment at Heading Level 2',
-        description: 'Makes heading level 2 the minimum heading level in a file for header increment and shifts all headings accordingly so they increment starting with a level 2 heading.',
+        nameTextKey: 'header-increment-start-at-h2-name',
+        descriptionTextKey: 'header-increment-start-at-h2-description',
         optionsKey: 'startAtH2',
       }),
     ];

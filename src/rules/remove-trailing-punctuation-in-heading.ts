@@ -10,17 +10,16 @@ class RemoveTrailingPunctuationInHeadingOptions implements Options {
 
 @RuleBuilder.register
 export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<RemoveTrailingPunctuationInHeadingOptions> {
+  constructor() {
+    super({
+      configKey: 'remove-trailing-punctuation-in-heading',
+      nameTextKey: 'remove-trailing-punctuation-in-heading-name',
+      descriptionTextKey: 'remove-trailing-punctuation-in-heading-description',
+      type: RuleType.HEADING,
+    });
+  }
   get OptionsClass(): new () => RemoveTrailingPunctuationInHeadingOptions {
     return RemoveTrailingPunctuationInHeadingOptions;
-  }
-  get name(): string {
-    return 'Remove Trailing Punctuation in Heading';
-  }
-  get description(): string {
-    return 'Removes the specified punctuation from the end of headings making sure to ignore the semicolon at the end of [HTML entity references](https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references).';
-  }
-  get type(): RuleType {
-    return RuleType.HEADING;
   }
   apply(text: string, options: RemoveTrailingPunctuationInHeadingOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml], text, (text) => {
@@ -71,8 +70,8 @@ export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<Remo
     return [
       new TextOptionBuilder({
         OptionsClass: RemoveTrailingPunctuationInHeadingOptions,
-        name: 'Trailing Punctuation',
-        description: 'The trailing punctuation to remove from the headings in the file.',
+        nameTextKey: 'remove-trailing-punctuation-in-heading-punctuation-to-remove-name',
+        descriptionTextKey: 'remove-trailing-punctuation-in-heading-punctuation-to-remove-description',
         optionsKey: 'punctuationToRemove',
       }),
     ];
