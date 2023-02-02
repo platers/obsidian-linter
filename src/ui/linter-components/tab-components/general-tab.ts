@@ -170,6 +170,7 @@ export class GeneralTab extends Tab {
     settingDesc = 'Escape characters for multi-line YAML arrays don\'t need the same escaping as single-line arrays, so when in multi-line format remove extra escapes that are not necessary';
     new Setting(tempDiv)
         .setName(settingName)
+        .setDesc(settingDesc)
         .addToggle((toggle) => {
           toggle
               .setValue(this.plugin.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays)
