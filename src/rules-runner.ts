@@ -64,6 +64,7 @@ export class RulesRunner {
         aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
         tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
         defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+        removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
       });
       timingEnd(rule.alias());
     }

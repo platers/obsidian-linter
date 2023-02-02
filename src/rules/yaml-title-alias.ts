@@ -19,6 +19,9 @@ class YamlTitleAliasOptions implements Options {
 
   @RuleBuilder.noSettingControl()
     defaultEscapeCharacter?: string = '"';
+
+  @RuleBuilder.noSettingControl()
+    removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
 
 @RuleBuilder.register
@@ -129,15 +132,15 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         newYaml = removeYamlSection(newYaml, aliasKeyForFile);
       } else if (options.preserveExistingAliasesSectionStyle) {
         if (!isEmpty && ((isSingleString && title == newAliasValue) || !isSingleString || currentAliasValue == newAliasValue)) {
-          newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, currentAliasStyle));
+          newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, currentAliasStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
         } else {
-          newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle));
+          newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
         }
       } else {
-        newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle));
+        newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
       }
     } else if (!shouldRemoveTitleAlias) {
-      newYaml = setYamlSection(newYaml, OBSIDIAN_ALIAS_KEY_PLURAL, formatYamlArrayValue(title, options.aliasArrayStyle));
+      newYaml = setYamlSection(newYaml, OBSIDIAN_ALIAS_KEY_PLURAL, formatYamlArrayValue(title, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
     }
 
     if (!options.useYamlKeyToKeepTrackOfOldFilenameOrHeading || shouldRemoveTitleAlias) {

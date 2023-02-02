@@ -166,6 +166,23 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
+    settingName = 'Remove Unnecessary Escape Characters when in Multi-Line Array Format';
+    settingDesc = 'Escape characters for multi-line YAML arrays don\'t need the same escaping as single-line arrays, so when in multi-line format remove extra escapes that are not necessary';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addToggle((toggle) => {
+          toggle
+              .setValue(this.plugin.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays)
+              .onChange(async (value) => {
+                this.plugin.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays = value;
+                await this.plugin.saveSettings();
+              });
+        });
+
+    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+
+    tempDiv = this.contentEl.createDiv();
     settingName = 'Number of Dollar Signs to Indicate Math Block';
     settingDesc = 'The amount of dollar signs to consider the math content to be a math block instead of inline math';
     new Setting(tempDiv)

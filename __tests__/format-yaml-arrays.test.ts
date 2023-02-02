@@ -237,6 +237,47 @@ ruleTest({
         tagArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
+    {
+      testName: 'Convert tags from single-line array to multi-line array with no changes removes unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = true`',
+      before: dedent`
+        ---
+        tag: ["tag1", tag2, tag3, tag4]
+        ---
+      `,
+      after: dedent`
+        ---
+        tag:
+          - tag1
+          - tag2
+          - tag3
+          - tag4
+        ---
+      `,
+      options: {
+        tagArrayStyle: NormalArrayFormats.MultiLine,
+        removeUnnecessaryEscapeCharsForMultiLineArrays: true,
+      },
+    },
+    {
+      testName: 'Convert tags from single-line array to multi-line array with no changes doesn\'t remove unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = false`',
+      before: dedent`
+        ---
+        tag: ["tag1", tag2, tag3, tag4]
+        ---
+      `,
+      after: dedent`
+        ---
+        tag:
+          - "tag1"
+          - tag2
+          - tag3
+          - tag4
+        ---
+      `,
+      options: {
+        tagArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
 
     // aliases
     {
@@ -387,6 +428,47 @@ ruleTest({
         formatAliasKey: false,
       },
     },
+    {
+      testName: 'Convert aliases from single-line array to multi-line array with no changes removes unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = true`',
+      before: dedent`
+        ---
+        aliases: ["alias1", alias2, alias3, alias4]
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - alias1
+          - alias2
+          - alias3
+          - alias4
+        ---
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        removeUnnecessaryEscapeCharsForMultiLineArrays: true,
+      },
+    },
+    {
+      testName: 'Convert aliases from single-line array to multi-line array with no changes doesn\'t remove unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = false`',
+      before: dedent`
+        ---
+        aliases: ["alias1", alias2, alias3, alias4]
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - "alias1"
+          - alias2
+          - alias3
+          - alias4
+        ---
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
 
     // default array style
     {
@@ -496,6 +578,43 @@ ruleTest({
       `,
       options: {
         defaultArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    {
+      testName: 'Convert single-line to multi-line for regular yaml arrays doesn\'t remove unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = false`',
+      before: dedent`
+        ---
+        key: [val1, "other val"]
+        ---
+      `,
+      after: dedent`
+        ---
+        key:
+          - val1
+          - "other val"
+        ---
+      `,
+      options: {
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    {
+      testName: 'Convert single-line to multi-line for regular yaml arrays removes unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = true`',
+      before: dedent`
+        ---
+        key: [val1, "other val"]
+        ---
+      `,
+      after: dedent`
+        ---
+        key:
+          - val1
+          - other val
+        ---
+      `,
+      options: {
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        removeUnnecessaryEscapeCharsForMultiLineArrays: true,
       },
     },
 
@@ -628,6 +747,45 @@ ruleTest({
       options: {
         defaultArrayStyle: NormalArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key'],
+      },
+    },
+    {
+      testName: 'Forcing multi-line on a single-line array results in a multi-line array with existing unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = false`',
+      before: dedent`
+        ---
+        key: [val1, "other val"]
+        ---
+      `,
+      after: dedent`
+        ---
+        key:
+          - val1
+          - "other val"
+        ---
+      `,
+      options: {
+        defaultArrayStyle: NormalArrayFormats.SingleLine,
+        forceMultiLineArrayStyle: ['key'],
+      },
+    },
+    {
+      testName: 'Forcing multi-line on a single-line array results in a multi-line array without existing unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = true`',
+      before: dedent`
+        ---
+        key: [val1, "other val"]
+        ---
+      `,
+      after: dedent`
+        ---
+        key:
+          - val1
+          - other val
+        ---
+      `,
+      options: {
+        defaultArrayStyle: NormalArrayFormats.SingleLine,
+        forceMultiLineArrayStyle: ['key'],
+        removeUnnecessaryEscapeCharsForMultiLineArrays: true,
       },
     },
 

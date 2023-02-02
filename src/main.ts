@@ -56,6 +56,7 @@ const DEFAULT_SETTINGS: Partial<LinterSettings> = {
     tagArrayStyle: NormalArrayFormats.SingleLine,
     minimumNumberOfDollarSignsToBeAMathBlock: 2,
     escapeCharacter: '"',
+    removeUnnecessaryEscapeCharsForMultiLineArrays: false,
   },
 };
 
