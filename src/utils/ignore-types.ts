@@ -132,7 +132,7 @@ function replaceRegex(text: string, placeholder: string, regex: RegExp): IgnoreR
  * @return {string[]} The regular markdown links replaced
  */
 function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): IgnoreResults {
-  const positions: Position[] = getPositions(MDAstTypes.Link, text);
+  const positions: Position[] = getPositions([MDAstTypes.Link, MDAstTypes.Image], text);
   const replacedRegularLinks: string[] = [];
 
   for (const position of positions) {

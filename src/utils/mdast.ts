@@ -74,16 +74,21 @@ function parseTextToAST(text: string): Root {
 
 /**
  * Gets the positions of the given element type in the given text.
- * @param {string} type The element type to get positions for
+ * @param {string} types The element types to get positions for
  * @param {string} text The markdown text
  * @return {Position[]} The positions of the given element type in the given text
  */
-export function getPositions(type: MDAstTypes, text: string): Position[] {
+export function getPositions(types: MDAstTypes | MDAstTypes[], text: string): Position[] {
+  if (!Array.isArray(types)) {
+    types = [types];
+  }
   const ast = parseTextToAST(text);
   const positions: Position[] = [];
-  visit(ast, type as string, (node) => {
-    positions.push(node.position);
-  });
+  for (const type of types) {
+    visit(ast, type as string, (node) => {
+      positions.push(node.position);
+    });
+  }
 
   // Sort positions by start position in reverse order
   positions.sort((a, b) => b.start.offset - a.start.offset);
