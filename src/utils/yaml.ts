@@ -97,9 +97,11 @@ export enum NormalArrayFormats {
  * Formats the yaml array value passed in with the specified format.
  * @param {string | string[]} value The value(s) that will be used as the parts of the array that is assumed to already be broken down into the appropriate format to be put in the array.
  * @param {NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats} format The format that the array should be converted into.
+ * @param {string} defaultEscapeCharacter The character escape to use around the value if a specific escape character is not needed.
+ * @param {boolean} removeEscapeCharactersIfPossibleWhenGoingToMultiLine Whether or not to remove no longer needed escape values when converting to a multi-line format.
  * @return {string} The formatted array in the specified yaml/obsidian yaml format.
  */
-export function formatYamlArrayValue(value: string | string[], format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats): string {
+export function formatYamlArrayValue(value: string | string[], format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats, defaultEscapeCharacter: string, removeEscapeCharactersIfPossibleWhenGoingToMultiLine: boolean): string {
   if (typeof value === 'string') {
     value = [value];
   }
@@ -115,6 +117,16 @@ export function formatYamlArrayValue(value: string | string[], format: NormalArr
       if (value == null || value.length === 0) {
         return '\n  - ';
       }
+
+      if (removeEscapeCharactersIfPossibleWhenGoingToMultiLine) {
+        for (let i = 0; i < value.length; i++) {
+          const currentValue = value[i];
+          if (isValueEscapedAlready(currentValue)) {
+            value[i] = escapeStringIfNecessaryAndPossible(currentValue.substring(1, currentValue.length - 1), defaultEscapeCharacter);
+          }
+        }
+      }
+
       return '\n  - ' + value.join('\n  - ');
     case SpecialArrayFormats.SingleStringToSingleLine:
       if (value == null || value.length === 0) {

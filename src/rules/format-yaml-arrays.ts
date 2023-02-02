@@ -26,6 +26,10 @@ class FormatYamlArrayOptions implements Options {
   formatArrayKeys?: boolean = true;
   forceSingleLineArrayStyle?: string[] = [];
   forceMultiLineArrayStyle?: string[] = [];
+  @RuleBuilder.noSettingControl()
+    defaultEscapeCharacter?: string = '"';
+  @RuleBuilder.noSettingControl()
+    removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
 
 @RuleBuilder.register
@@ -51,7 +55,15 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
 
       for (const aliasKey of OBSIDIAN_ALIASES_KEYS) {
         if (options.formatAliasKey && Object.keys(yaml).includes(aliasKey)) {
-          text = setYamlSection(text, aliasKey, formatYamlArrayValue(convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, aliasKey))), options.aliasArrayStyle));
+          text = setYamlSection(text,
+              aliasKey,
+              formatYamlArrayValue(
+                  convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, aliasKey))),
+                  options.aliasArrayStyle,
+                  options.defaultEscapeCharacter,
+                  options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+              ),
+          );
 
           break;
         }
@@ -59,7 +71,15 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
 
       for (const tagKey of OBSIDIAN_TAG_KEYS) {
         if (options.formatTagKey && Object.keys(yaml).includes(tagKey)) {
-          text = setYamlSection(text, tagKey, formatYamlArrayValue(convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, tagKey))), options.tagArrayStyle));
+          text = setYamlSection(text,
+              tagKey,
+              formatYamlArrayValue(
+                  convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, tagKey))),
+                  options.tagArrayStyle,
+                  options.defaultEscapeCharacter,
+                  options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+              ),
+          );
 
           break;
         }
@@ -74,7 +94,15 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
             continue;
           }
 
-          text = setYamlSection(text, key, formatYamlArrayValue(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, key)), options.defaultArrayStyle));
+          text = setYamlSection(text,
+              key,
+              formatYamlArrayValue(
+                  splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, key)),
+                  options.defaultArrayStyle,
+                  options.defaultEscapeCharacter,
+                  options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+              ),
+          );
         }
       }
 
@@ -83,7 +111,15 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           continue;
         }
 
-        text = setYamlSection(text, singleLineArrayKey, formatYamlArrayValue(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, singleLineArrayKey)), NormalArrayFormats.SingleLine));
+        text = setYamlSection(text,
+            singleLineArrayKey,
+            formatYamlArrayValue(
+                splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, singleLineArrayKey)),
+                NormalArrayFormats.SingleLine,
+                options.defaultEscapeCharacter,
+                options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+            ),
+        );
       }
 
       for (const multiLineArrayKey of options.forceMultiLineArrayStyle) {
@@ -91,7 +127,15 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           continue;
         }
 
-        text = setYamlSection(text, multiLineArrayKey, formatYamlArrayValue(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, multiLineArrayKey)), NormalArrayFormats.MultiLine));
+        text = setYamlSection(text,
+            multiLineArrayKey,
+            formatYamlArrayValue(
+                splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, multiLineArrayKey)),
+                NormalArrayFormats.MultiLine,
+                options.defaultEscapeCharacter,
+                options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+            ),
+        );
       }
 
       return text;

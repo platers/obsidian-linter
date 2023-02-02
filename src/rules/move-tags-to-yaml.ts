@@ -25,6 +25,10 @@ class MoveTagsToYamlOptions implements Options {
     tagArrayStyle? : TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   howToHandleExistingTags?: tagOperations = 'Nothing';
   tagsToIgnore?: string[] = [];
+  @RuleBuilder.noSettingControl()
+    defaultEscapeCharacter?: string = '"';
+  @RuleBuilder.noSettingControl()
+    removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
 
 @RuleBuilder.register
@@ -85,7 +89,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
           }
         }
 
-        const newYaml = setYamlSection(text, existingTagKey, formatYamlArrayValue(tagValue, options.tagArrayStyle));
+        const newYaml = setYamlSection(text, existingTagKey, formatYamlArrayValue(tagValue, options.tagArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
 
         return `---\n${newYaml}---`;
       });

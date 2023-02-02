@@ -23,6 +23,7 @@ export type CommonStyles = {
   tagArrayStyle: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
   minimumNumberOfDollarSignsToBeAMathBlock: number;
   escapeCharacter: string;
+  removeUnnecessaryEscapeCharsForMultiLineArrays: boolean;
 }
 
 export type Options = { [optionName: string]: any};
