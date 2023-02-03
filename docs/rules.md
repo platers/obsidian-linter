@@ -1150,13 +1150,13 @@ Before:
 
 We skip from 1 to 3
 
-####### H7
-
-We skip from 3 to 7 leaving out 4, 5, and 6. Thus headings level 4, 5, and 6 will be treated like H3 above until another H2 or H1 is encountered
-
 ###### H6
 
-We skipped 6 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
+We skip from 3 to 6 leaving out 4, 5, and 6. Thus headings level 4 and 5 will be treated like H3 above until another H2 or H1 is encountered
+
+##### H5
+
+We skipped 5 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
 
 ## H2
 
@@ -1173,19 +1173,19 @@ After:
 
 We skip from 1 to 3
 
-### H7
+### H6
 
-We skip from 3 to 7 leaving out 4, 5, and 6. Thus headings level 4, 5, and 6 will be treated like H3 above until another H2 or H1 is encountered
+We skip from 3 to 6 leaving out 4, 5, and 6. Thus headings level 4 and 5 will be treated like H3 above until another H2 or H1 is encountered
 
-## H6
+## H5
 
-We skipped 6 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
+We skipped 5 previously so it will be treated the same as the H3 above since it was the next lowest header that was to be decremented
 
-## H2
+# H2
 
 This resets the decrement section so the H6 below is decremented to an H3
 
-### H6
+## H6
 ``````
 Example: When `Start Header Increment at Heading Level 2 = true`, H1s become H2s and the other headers are incremented accordingly
 
@@ -1194,7 +1194,6 @@ Before:
 ``````markdown
 # H1 becomes H2
 #### H4 becomes H3
-####### H7
 ###### H6
 ## H2
 ###### H6
@@ -1207,8 +1206,7 @@ After:
 ``````markdown
 ## H1 becomes H2
 ### H4 becomes H3
-#### H7
-### H6
+#### H6
 ## H2
 ### H6
 ## H1
