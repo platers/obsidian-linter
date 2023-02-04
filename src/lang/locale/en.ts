@@ -1,64 +1,81 @@
 // English
 
 export default {
-  // main.ts
-  // commands
-  'lint-file': 'Lint the current file',
-  'lint-file-error-message': 'Lint File Error in File',
-  'lint-file-unless-ignored': 'Lint the current file unless ignored',
-  'lint-all-files': 'Lint all files in the vault',
-  'lint-all-files-error-message': 'Lint All Files Error in File',
-  'lint-all-files-success-message': 'Linted all files',
-  'lint-all-files-errors-message-singular': 'Linted all files and there was 1 error.',
-  'lint-all-files-errors-message-plural': 'Linted all files and there were {NUM} errors.',
-  'lint-all-files-start-message': 'This will edit all of your files and may introduce errors.',
-  'lint-all-files-submit-button-text': 'Lint All',
-  'lint-all-files-submit-button-notice-text': 'Linting all files...',
-  'lint-all-files-in-folder': 'Lint all files in the current folder',
-  'lint-all-files-in-folder-start-message': 'This will edit all of your files in {FOLDER_NAME} including files in its subfolders which may introduce errors.',
-  'lint-all-files-in-folder-submit-button-text': 'Lint All Files in {FOLDER_NAME}',
-  'lint-all-files-in-folder-submit-button-notice-text': 'Lint all files in {FOLDER_NAME}...',
-  'lint-all-files-in-folder-error-message': 'Lint All Files in Folder Error in File',
-  'lint-all-files-in-folder-success-message': 'Linted all {NUM} files in {FOLDER_NAME}.',
-  'lint-all-files-in-folder-errors-message-singular': 'Linted all {NUM} files in {FOLDER_NAME} and there was 1 error.',
-  'lint-all-files-in-folder-errors-message-plural': 'Linted all {FILE_COUNT} files in {FOLDER_NAME} and there were {ERROR_COUNT} error.',
-  'paste-as-plain-text': 'Paste as Plain Text & without Modifications',
-  'lint-file-pop-up-menu-text': 'Lint file',
-  'lint-folder-pop-up-menu-text': 'Lint folder',
+  'commands': {
+    'lint-file': {
+      'name': 'Lint the current file',
+      'error-message': 'Lint File Error in File',
+    },
+    'lint-file-unless-ignored': {
+      'name': 'Lint the current file unless ignored',
+    },
+    'lint-all-files': {
+      'name': 'Lint all files in the vault',
+      'error-message': 'Lint All Files Error in File',
+      'success-message': 'Linted all files',
+      'errors-message-singular': 'Linted all files and there was 1 error.',
+      'errors-message-plural': 'Linted all files and there were {NUM} errors.',
+      'start-message': 'This will edit all of your files and may introduce errors.',
+      'submit-button-text': 'Lint All',
+      'submit-button-notice-text': 'Linting all files...',
+    },
+    'lint-all-files-in-folder': {
+      'name': 'Lint all files in the current folder',
+      'start-message': 'This will edit all of your files in {FOLDER_NAME} including files in its subfolders which may introduce errors.',
+      'submit-button-text': 'Lint All Files in {FOLDER_NAME}',
+      'submit-button-notice-text': 'Lint all files in {FOLDER_NAME}...',
+      'error-message': 'Lint All Files in Folder Error in File',
+      'success-message': 'Linted all {NUM} files in {FOLDER_NAME}.',
+      'message-singular': 'Linted all {NUM} files in {FOLDER_NAME} and there was 1 error.',
+      'message-plural': 'Linted all {FILE_COUNT} files in {FOLDER_NAME} and there were {ERROR_COUNT} error.',
+    },
+    'paste-as-plain-text': {
+      'name': 'Paste as Plain Text & without Modifications',
+    },
+    'lint-file-pop-up-menu-text': {
+      'name': 'Lint file',
+    },
+    'lint-folder-pop-up-menu-text': {
+      'name': 'Lint folder',
+    },
+  },
 
-  // logs
-  'plugin-load': 'Loading plugin',
-  'plugin-unload': 'Unloading plugin',
-  'folder-lint': 'Linting folder ',
-  'linter-run': 'Running linter',
-  'paste-link-warning': 'aborted paste lint as the clipboard content is a link and doing so will avoid conflicts with other plugins that modify pasting.',
-  'see-console': 'See console for more details.',
-  'unknown-error': 'An unknown error occurred during linting.',
-  'moment-locale-not-found': 'Trying to switch Moment.js locale to {MOMENT_LOCALE}, got {CURRENT_LOCALE}',
+  'logs': {
+    'plugin-load': 'Loading plugin',
+    'plugin-unload': 'Unloading plugin',
+    'folder-lint': 'Linting folder ',
+    'linter-run': 'Running linter',
+    'paste-link-warning': 'aborted paste lint as the clipboard content is a link and doing so will avoid conflicts with other plugins that modify pasting.',
+    'see-console': 'See console for more details.',
+    'unknown-error': 'An unknown error occurred during linting.',
+    'moment-locale-not-found': 'Trying to switch Moment.js locale to {MOMENT_LOCALE}, got {CURRENT_LOCALE}',
 
-  // general
-  'empty-clipboard': 'There is no clipboard content.',
-  'characters-added': 'characters added',
-  'characters-removed': 'characters removed',
+    // rules-runner.ts
+    'pre-rules': 'rules before regular rules',
+    'post-rules': 'rules after regular rules',
+    'rule-running': 'rules running',
+    'custom-regex': 'custom regex rules',
+    'running-custom-regex': 'Running Custom Regex',
+    'running-custom-lint-command': 'Running Custom Lint Commands',
+    'custom-lint-duplicate-warning': 'You cannot run the same command ("{COMMAND_NAME}") as a custom lint rule twice.',
+    'custom-lint-error-message': 'Custom Lint Command',
 
-  // rules-runner.ts
-  'pre-rules': 'rules before regular rules',
-  'post-rules': 'rules after regular rules',
-  'rule-running': 'rules running',
-  'custom-regex': 'custom regex rules',
-  'running-custom-regex': 'Running Custom Regex',
-  'running-custom-lint-command': 'Running Custom Lint Commands',
-  'custom-lint-duplicate-warning': 'You cannot run the same command ("{COMMAND_NAME}") as a custom lint rule twice.',
-  'custom-lint-error-message': 'Custom Lint Command',
+    // rules-runner.ts and rule-builder.ts
+    'disabled-text': 'is disabled',
 
-  // rules-runner.ts and rule-builder.ts
-  'disabled-text': 'is disabled',
+    // rule-builder.ts
+    'run-rule-text': 'Running',
 
-  // rule-builder.ts
-  'run-rule-text': 'Running',
 
-  // logger.ts
-  'timing-key-not-found': 'timing key \'{TIMING_KEY}\' does not exist in the timing info list, so it was ignored',
+    // logger.ts
+    'timing-key-not-found': 'timing key \'{TIMING_KEY}\' does not exist in the timing info list, so it was ignored',
+  },
+
+  'notice-text': {
+    'empty-clipboard': 'There is no clipboard content.',
+    'characters-added': 'characters added',
+    'characters-removed': 'characters removed',
+  },
 
   // settings.ts
   'linter-title': 'Linter',
@@ -146,28 +163,53 @@ export default {
   'invalid-delimiter-error-message': 'delimiter is only allowed to be a single character',
 
   // rules
-  // auto-correct-common-misspellings.ts
-  'auto-correct-common-misspellings-name': 'Auto-correct Common Misspellings',
-  'auto-correct-common-misspellings-description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words.',
-  'auto-correct-common-misspellings-ignore-words-name': 'Ignore Words',
-  'auto-correct-common-misspellings-ignore-words-description': 'A comma separated list of lowercased words to ignore when auto-correcting',
-  // blockquotify-on-paste.ts
-  'add-blockquote-indentation-on-paste-name': 'Add Blockquote Indentation on Paste',
-  'add-blockquote-indentation-on-paste-description': 'Adds blockquotes to all but the first line, when the cursor is in a blockquote/callout line during pasting',
-  // capitalize-headings.ts
-  'capitalize-headings-name': 'Capitalize Headings',
-  'capitalize-headings-description': 'Headings should be formatted with capitalization',
-  'capitalize-headings-style-name': 'Style',
-  'capitalize-headings-style-description': 'The style of capitalization to use',
-  'Title Case': 'Title Case',
-  'ALL CAPS': 'ALL CAPS',
-  'First letter': 'First letter',
-  'capitalize-headings-ignore-case-words-name': 'Ignore Cased Words',
-  'capitalize-headings-ignore-case-words-description': 'Only apply title case style to words that are all lowercase',
-  'capitalize-headings-ignore-words-name': 'Ignore Words',
-  'capitalize-headings-ignore-words-description': 'A comma separated list of words to ignore when capitalizing',
-  'capitalize-headings-lowercase-words-name': 'Lowercase Words',
-  'capitalize-headings-lowercase-words-description': 'A comma separated list of words to keep lowercase',
+  'rules': {
+    // auto-correct-common-misspellings.ts
+    'auto-correct-common-misspellings': {
+      'name': 'Auto-correct Common Misspellings',
+      'description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words.',
+      'ignore-words': {
+        'name': 'Ignore Words',
+        'description': 'A comma separated list of lowercased words to ignore when auto-correcting',
+      },
+      // blockquotify-on-paste.ts
+      'add-blockquote-indentation-on-paste': {
+        'name': 'Add Blockquote Indentation on Paste',
+        'description': 'Adds blockquotes to all but the first line, when the cursor is in a blockquote/callout line during pasting',
+      },
+      // capitalize-headings.ts
+      'capitalize-headings': {
+        'name': 'Capitalize Headings',
+        'description': 'Headings should be formatted with capitalization',
+        'style': {
+          'name': 'Style',
+          'description': 'The style of capitalization to use',
+        },
+        'ignore-case-words': {
+          'name': 'Ignore Cased Words',
+          'description': 'Only apply title case style to words that are all lowercase',
+        },
+        'ignore-words': {
+          'ame': 'Ignore Words',
+          'description': 'A comma separated list of words to ignore when capitalizing',
+        },
+        'lowercase-words': {
+          'name': 'Lowercase Words',
+          'description': 'A comma separated list of words to keep lowercase',
+        },
+      },
+    },
+  },
+
+  // These are the string values in the UI for enum values and thus they do not follow the key format as used above
+  'enums': {
+    'Title Case': 'Title Case',
+    'ALL CAPS': 'ALL CAPS',
+    'First letter': 'First letter',
+    '.': '.', // leave as is
+    ')': ')', // leave as is
+  },
+
   // compact-yaml.ts
   'compact-yaml-name': 'Compact YAML',
   'compact-yaml-description': 'Removes leading and trailing blank lines in the YAML front matter.',
@@ -286,8 +328,6 @@ export default {
   'lazy': 'lazy',
   'ordered-list-style-list-end-style-name': 'Ordered List Indicator End Style',
   'ordered-list-style-list-end-style-description': 'The ending character of an ordered list indicator',
-  '.': '.', // leave as is
-  ')': ')', // leave as is
   // paragraph-blank-lines.ts
   'paragraph-blank-lines-name': 'Paragraph blank lines',
   'paragraph-blank-lines-description': 'All paragraphs should have exactly one blank line both before and after.',
@@ -406,6 +446,8 @@ export default {
   'yaml-timestamp-date-created-description': 'Insert the file creation date',
   'yaml-timestamp-date-created-key-name': 'Date Created Key',
   'yaml-timestamp-date-created-key-description': 'Which YAML key to use for creation date',
+  'yaml-timestamp-force-retention-of-create-value-name': 'Force Date Created Key Value Retention',
+  'yaml-timestamp-force-retention-of-create-value-description': 'Reuses the value in the YAML frontmatter for date created instead of the file metadata which is useful for preventing file metadata changes from causing the value to change to a different value.',
   'yaml-timestamp-date-modified-name': 'Date Modified',
   'yaml-timestamp-date-modified-description': 'Insert the date the file was last modified',
   'yaml-timestamp-date-modified-key-name': 'Date Modified Key',
