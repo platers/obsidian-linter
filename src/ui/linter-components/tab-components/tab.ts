@@ -5,6 +5,7 @@ import {setIcon} from 'obsidian';
 import {settingSearchInfo} from './tab-searcher';
 import {SearchOptionInfo} from 'src/option';
 import {hideEl, unhideEl} from 'src/ui/helpers';
+import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
 
 export enum SearchStatus {
   LeavingSearchMode = 'leaving search mode by selecting a tab',
@@ -22,6 +23,18 @@ const tabNameToTabIconId: Record<string | RuleType, string> = {
   'Spacing': iconInfo.whitespace.id,
   'Paste': iconInfo.paste.id,
   'Debug': iconInfo.debug.id,
+};
+
+const tabNameToTextKey: Record<string | RuleType, LanguageStringKey> = {
+  'General': 'general-tab-name',
+  'Custom': 'custom-tab-name',
+  'YAML': 'yaml-tab-name',
+  'Heading': 'heading-tab-name',
+  'Footnote': 'footnote-tab-name',
+  'Content': 'content-tab-name',
+  'Spacing': 'spacing-tab-name',
+  'Paste': 'paste-tab-name',
+  'Debug': 'debug-tab-name',
 };
 
 export abstract class Tab {
@@ -43,7 +56,7 @@ export abstract class Tab {
     this.contentEl = settingsEl.createDiv('linter-tab-settings');
     this.contentEl.id = name.toLowerCase().replace(' ', '-');
 
-    this.headingEl = this.contentEl.createEl('h2', {text: name + ' Settings'});
+    this.headingEl = this.contentEl.createEl('h2', {text: getTextInLanguage(tabNameToTextKey[name])});
     hideEl(this.headingEl);
   }
 

@@ -9,17 +9,15 @@ class ConvertSpacesToTabsOptions implements Options {
 
 @RuleBuilder.register
 export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabsOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'convert-spaces-to-tabs-name',
+      descriptionTextKey: 'convert-spaces-to-tabs-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => ConvertSpacesToTabsOptions {
     return ConvertSpacesToTabsOptions;
-  }
-  get name(): string {
-    return 'Convert Spaces to Tabs';
-  }
-  get description(): string {
-    return 'Converts leading spaces to tabs.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: ConvertSpacesToTabsOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
@@ -63,8 +61,8 @@ export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabs
     return [
       new NumberOptionBuilder({
         OptionsClass: ConvertSpacesToTabsOptions,
-        name: 'Tabsize',
-        description: 'Number of spaces that will be converted to a tab',
+        nameTextKey: 'convert-spaces-to-tabs-tabsize-name',
+        descriptionTextKey: 'convert-spaces-to-tabs-tabsize-description',
         optionsKey: 'tabsize',
       }),
     ];

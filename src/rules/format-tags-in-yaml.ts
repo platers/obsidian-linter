@@ -3,22 +3,20 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML, OBSIDIAN_TAG_KEY_SINGULAR, OBSIDIAN_TAG_KEY_PLURAL} from '../utils/yaml';
 
-class FormatTagsInYamlOptions implements Options {
-}
+class FormatTagsInYamlOptions implements Options {}
 
 @RuleBuilder.register
 export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'format-tags-in-yaml-name',
+      descriptionTextKey: 'format-tags-in-yaml-description',
+      type: RuleType.YAML,
+      hasSpecialExecutionOrder: true,
+    });
+  }
   get OptionsClass(): new () => FormatTagsInYamlOptions {
     return FormatTagsInYamlOptions;
-  }
-  get name(): string {
-    return 'Format Tags in YAML';
-  }
-  get description(): string {
-    return 'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: FormatTagsInYamlOptions): string {
     return formatYAML(text, (text) => {
@@ -92,8 +90,5 @@ export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOption
   }
   get optionBuilders(): OptionBuilderBase<FormatTagsInYamlOptions>[] {
     return [];
-  }
-  get hasSpecialExecutionOrder(): boolean {
-    return true;
   }
 }

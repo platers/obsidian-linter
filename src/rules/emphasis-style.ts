@@ -12,17 +12,15 @@ class EmphasisStyleOptions implements Options {
 
 @RuleBuilder.register
 export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'emphasis-style-name',
+      descriptionTextKey: 'emphasis-style-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => EmphasisStyleOptions {
     return EmphasisStyleOptions;
-  }
-  get name(): string {
-    return 'Emphasis Style';
-  }
-  get description(): string {
-    return 'Makes sure the emphasis style is consistent.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: EmphasisStyleOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath], text, (text) => {
@@ -167,8 +165,8 @@ export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
     return [
       new DropdownOptionBuilder<EmphasisStyleOptions, EmphasisStyleValues>({
         OptionsClass: EmphasisStyleOptions,
-        name: 'Style',
-        description: 'The style used to denote emphasized content',
+        nameTextKey: 'emphasis-style-style-name',
+        descriptionTextKey: 'emphasis-style-style-description',
         optionsKey: 'style',
         records: [
           {

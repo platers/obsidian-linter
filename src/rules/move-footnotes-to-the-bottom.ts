@@ -4,22 +4,19 @@ import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {moveFootnotesToEnd} from '../utils/mdast';
 
-class MoveFootnotesToTheBottomOptions implements Options {
-}
+class MoveFootnotesToTheBottomOptions implements Options {}
 
 @RuleBuilder.register
 export default class MoveFootnotesToTheBottom extends RuleBuilder<MoveFootnotesToTheBottomOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'move-footnotes-to-the-bottom-name',
+      descriptionTextKey: 'move-footnotes-to-the-bottom-description',
+      type: RuleType.FOOTNOTE,
+    });
+  }
   get OptionsClass(): new () => MoveFootnotesToTheBottomOptions {
     return MoveFootnotesToTheBottomOptions;
-  }
-  get name(): string {
-    return 'Move Footnotes to the bottom';
-  }
-  get description(): string {
-    return 'Move all footnotes to the bottom of the document.';
-  }
-  get type(): RuleType {
-    return RuleType.FOOTNOTE;
   }
   apply(text: string, options: MoveFootnotesToTheBottomOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml], text, (text) => {

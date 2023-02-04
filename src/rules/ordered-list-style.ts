@@ -4,7 +4,6 @@ import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} f
 import dedent from 'ts-dedent';
 import {OrderListItemEndOfIndicatorStyles, OrderListItemStyles, updateOrderedListItemIndicators} from '../utils/mdast';
 
-
 class OrderedListStyleOptions implements Options {
   numberStyle?: OrderListItemStyles = OrderListItemStyles.Ascending;
   listEndStyle?: OrderListItemEndOfIndicatorStyles = OrderListItemEndOfIndicatorStyles.Period;
@@ -12,17 +11,15 @@ class OrderedListStyleOptions implements Options {
 
 @RuleBuilder.register
 export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'ordered-list-style-name',
+      descriptionTextKey: 'ordered-list-style-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => OrderedListStyleOptions {
     return OrderedListStyleOptions;
-  }
-  get name(): string {
-    return 'Ordered List Style';
-  }
-  get description(): string {
-    return 'Makes sure that ordered lists follow the style specified. Note that 2 spaces or 1 tab is considered to be an indentation level.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: OrderedListStyleOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
@@ -141,8 +138,8 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
     return [
       new DropdownOptionBuilder<OrderedListStyleOptions, OrderListItemStyles>({
         OptionsClass: OrderedListStyleOptions,
-        name: 'Number Style',
-        description: 'The number style used in ordered list indicators',
+        nameTextKey: 'ordered-list-style-number-style-name',
+        descriptionTextKey: 'ordered-list-style-number-style-description',
         optionsKey: 'numberStyle',
         records: [
           {
@@ -157,8 +154,8 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
       }),
       new DropdownOptionBuilder<OrderedListStyleOptions, OrderListItemEndOfIndicatorStyles>({
         OptionsClass: OrderedListStyleOptions,
-        name: 'Ordered List Indicator End Style',
-        description: 'The ending character of an ordered list indicator',
+        nameTextKey: 'ordered-list-style-list-end-style-name',
+        descriptionTextKey: 'ordered-list-style-list-end-style-description',
         optionsKey: 'listEndStyle',
         records: [
           {

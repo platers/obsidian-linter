@@ -1,4 +1,5 @@
 import {Setting, App} from 'obsidian';
+import {getTextInLanguage} from 'src/lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 import CommandSuggester from '../suggesters/command-suggester';
 
@@ -7,10 +8,10 @@ export type LintCommand = { id: string, name: string };
 export class CustomCommandOption extends AddCustomRow {
   constructor(containerEl: HTMLElement, public lintCommands: LintCommand[], isMobile: boolean, private app: App, saveSettings: () => void) {
     super(containerEl,
-        'Custom Commands',
-        `Custom commands are Obsidian commands that get run after the linter is finished running its regular rules. This means that they do not run before the YAML timestamp logic runs, so they can cause YAML timestamp to be triggered on the next run of the linter. You may only select an Obsidian command once. **_Note that this currently only works on linting the current file._**`,
-        `When selecting an option, make sure to select the option either by using the mouse or by hitting the enter key. Other selection methods may not work and only selections of an actual Obsidian command or an empty string will be saved.`,
-        'Add new command',
+        getTextInLanguage('custom-command-name'),
+        getTextInLanguage('custom-command-description'),
+        getTextInLanguage('custom-command-warning'),
+        getTextInLanguage('custom-command-add-input-button-text'),
         isMobile,
         saveSettings,
         () => {
@@ -33,7 +34,7 @@ export class CustomCommandOption extends AddCustomRow {
     new Setting(this.inputElDiv)
         .addSearch((cb) => {
           new CommandSuggester(this.app, cb.inputEl, this.lintCommands);
-          cb.setPlaceholder('Obsidian command')
+          cb.setPlaceholder(getTextInLanguage('custom-command-command-search-placeholder-text'))
               .setValue(command.name)
               .onChange((newCommandName) => {
                 const newCommand = {id: cb.inputEl.getAttribute('commandId'), name: newCommandName};
@@ -57,7 +58,7 @@ export class CustomCommandOption extends AddCustomRow {
         })
         .addExtraButton((cb) => {
           cb.setIcon('up-chevron-glyph')
-              .setTooltip('Move up')
+              .setTooltip(getTextInLanguage('custom-command-move-up-tooltip'))
               .onClick(() => {
                 this.arrayMove(index, index - 1);
                 this.saveSettings();
@@ -66,7 +67,7 @@ export class CustomCommandOption extends AddCustomRow {
         })
         .addExtraButton((cb) => {
           cb.setIcon('down-chevron-glyph')
-              .setTooltip('Move down')
+              .setTooltip(getTextInLanguage('custom-command-move-down-tooltip'))
               .onClick(() => {
                 this.arrayMove(index, index + 1);
                 this.saveSettings();
@@ -75,7 +76,7 @@ export class CustomCommandOption extends AddCustomRow {
         })
         .addExtraButton((cb) => {
           cb.setIcon('cross')
-              .setTooltip('Delete')
+              .setTooltip(getTextInLanguage('custom-command-delete-tooltip'))
               .onClick(() => {
                 this.lintCommands.splice(index, 1);
                 this.saveSettings();

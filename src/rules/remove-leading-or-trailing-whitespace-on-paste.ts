@@ -3,22 +3,19 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
-class RemoveLeadingOrTrailingWhitespaceOnPasteOptions implements Options {
-}
+class RemoveLeadingOrTrailingWhitespaceOnPasteOptions implements Options {}
 
 @RuleBuilder.register
 export default class RemoveLeadingOrTrailingWhitespaceOnPaste extends RuleBuilder<RemoveLeadingOrTrailingWhitespaceOnPasteOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'remove-leading-or-trailing-whitespace-on-paste-name',
+      descriptionTextKey: 'remove-leading-or-trailing-whitespace-on-paste-description',
+      type: RuleType.PASTE,
+    });
+  }
   get OptionsClass(): new () => RemoveLeadingOrTrailingWhitespaceOnPasteOptions {
     return RemoveLeadingOrTrailingWhitespaceOnPasteOptions;
-  }
-  get name(): string {
-    return 'Remove Leading or Trailing Whitespace on Paste';
-  }
-  get description(): string {
-    return 'Removes any leading non-tab whitespace and all trailing whitespace for the text to paste';
-  }
-  get type(): RuleType {
-    return RuleType.PASTE;
   }
   apply(text: string, options: RemoveLeadingOrTrailingWhitespaceOnPasteOptions): string {
     return text.replace(/^[\n ]+|\s+$/g, '');

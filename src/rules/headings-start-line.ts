@@ -4,22 +4,19 @@ import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex} from '../utils/regex';
 
-class HeadingStartLineOptions implements Options {
-}
+class HeadingStartLineOptions implements Options {}
 
 @RuleBuilder.register
 export default class HeadingStartLine extends RuleBuilder<HeadingStartLineOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'headings-start-line-name',
+      descriptionTextKey: 'headings-start-line-description',
+      type: RuleType.HEADING,
+    });
+  }
   get OptionsClass(): new () => HeadingStartLineOptions {
     return HeadingStartLineOptions;
-  }
-  get name(): string {
-    return 'Headings Start Line';
-  }
-  get description(): string {
-    return 'Headings that do not start a line will have their preceding whitespace removed to make sure they get recognized as headers.';
-  }
-  get type(): RuleType {
-    return RuleType.HEADING;
   }
   apply(text: string, options: HeadingStartLineOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml], text, (text) => {

@@ -3,22 +3,19 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ensureEmptyLinesAroundBlockquotes} from '../utils/mdast';
 
-class EmptyLineAroundBlockquotesOptions implements Options {
-}
+class EmptyLineAroundBlockquotesOptions implements Options {}
 
 @RuleBuilder.register
 export default class EmptyLineAroundBlockquotes extends RuleBuilder<EmptyLineAroundBlockquotesOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'empty-line-around-blockquotes-name',
+      descriptionTextKey: 'empty-line-around-blockquotes-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => EmptyLineAroundBlockquotesOptions {
     return EmptyLineAroundBlockquotesOptions;
-  }
-  get name(): string {
-    return 'Empty Line Around Blockquotes';
-  }
-  get description(): string {
-    return 'Ensures that there is an empty line around blockquotes unless they start or end a document. **Note that an empty line is either one less level of nesting for blockquotes or a newline character.**';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: EmptyLineAroundBlockquotesOptions): string {
     return ensureEmptyLinesAroundBlockquotes(text);

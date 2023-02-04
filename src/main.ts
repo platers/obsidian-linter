@@ -1,5 +1,5 @@
 import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange} from 'obsidian';
-import {LinterSettings, rules} from './rules';
+import {LinterSettings, Options, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
@@ -12,8 +12,9 @@ import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
-import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from './utils/yaml';
+import {NormalArrayFormats} from './utils/yaml';
 import {urlRegex} from './utils/regex';
+import {getTextInLanguage, setLanguage} from './lang/helpers';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -46,6 +47,7 @@ const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   lintOnSave: false,
   recordLintOnSaveLogs: false,
   displayChanged: true,
+  settingsConvertedToConfigKeyValues: false,
   foldersToIgnore: [],
   linterLocale: 'system-default',
   logLevel: log.levels.ERROR,
@@ -68,7 +70,8 @@ export default class LinterPlugin extends Plugin {
   private rulesRunner = new RulesRunner();
 
   async onload() {
-    logInfo('Loading plugin');
+    setLanguage(window.localStorage.getItem('language'));
+    logInfo(getTextInLanguage('plugin-load'));
 
     this.isEnabled = true;
     // eslint-disable-next-line guard-for-in
@@ -87,7 +90,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   async onunload() {
-    logInfo('Unloading plugin');
+    logInfo(getTextInLanguage('plugin-unload'));
     this.isEnabled = false;
 
     for (const eventRef of this.eventRefs) {
@@ -98,49 +101,17 @@ export default class LinterPlugin extends Plugin {
   async loadSettings() {
     const data = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
-
     setLogLevel(this.settings.logLevel);
     this.setOrUpdateMomentInstance();
 
-    const escapeYAMLSpecialCharactersRule = this.settings.ruleConfigs['Move Tags to Yaml'];
-    if (escapeYAMLSpecialCharactersRule) {
-      const forceYamlEscapeKeys = escapeYAMLSpecialCharactersRule['Force Yaml Escape on Keys'];
-      if (forceYamlEscapeKeys) {
-        if (!this.settings.ruleConfigs['Force YAML Escape']) {
-          this.settings.ruleConfigs['Force YAML Escape'] = {};
-        }
-
-        this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'] = forceYamlEscapeKeys ?? this.settings.ruleConfigs['Force YAML Escape']['Force YAML Escape on Keys'];
-      }
-
-      delete this.settings.ruleConfigs['Escape YAML Special Characters']['Force Yaml Escape on Keys'];
+    if (!this.settings.settingsConvertedToConfigKeyValues) {
+      this.moveConfigValuesToKeyBasedFormat();
     }
-
-    const moveTagsToYamlRule = this.settings.ruleConfigs['Move Tags to Yaml'];
-    if (moveTagsToYamlRule) {
-      const removeHashtag = moveTagsToYamlRule['Remove the hashtag from tags in content body'];
-      if (removeHashtag !== null && removeHashtag !== undefined) {
-        this.settings.ruleConfigs['Move Tags to Yaml']['Body tag operation'] = removeHashtag ? 'Remove hashtag' : 'Nothing';
-
-        delete this.settings.ruleConfigs['Move Tags to Yaml']['Remove the hashtag from tags in content body'];
-      }
-    }
-
-    const spaceBetweenChineseAndEnglishOrNumbers = this.settings.ruleConfigs['Space between Chinese and English or numbers'];
-    if (spaceBetweenChineseAndEnglishOrNumbers) {
-      const enabled = spaceBetweenChineseAndEnglishOrNumbers['Ensures that Chinese and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)'];
-      this.settings.ruleConfigs['Space between Chinese Japanese or Korean and English or numbers'] = {
-        'Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)': enabled,
-      };
-      delete this.settings.ruleConfigs['Space between Chinese and English or numbers'];
-    }
-
-    this.moveSettingsToCommonSettings();
 
     // make sure to load the defaults of any missing rules to make sure they do not cause issues on the settings page
     for (const rule of rules) {
-      if (!this.settings.ruleConfigs[rule.name]) {
-        this.settings.ruleConfigs[rule.name] = rule.getDefaultOptions();
+      if (!this.settings.ruleConfigs[rule.alias]) {
+        this.settings.ruleConfigs[rule.alias] = rule.getDefaultOptions();
       }
     }
   }
@@ -152,7 +123,7 @@ export default class LinterPlugin extends Plugin {
   addCommands() {
     this.addCommand({
       id: 'lint-file',
-      name: 'Lint the current file',
+      name: getTextInLanguage('lint-file'),
       editorCallback: (editor) => {
         setCollectLogs(this.settings.recordLintOnSaveLogs);
         clearLogs();
@@ -172,7 +143,7 @@ export default class LinterPlugin extends Plugin {
 
     this.addCommand({
       id: 'lint-file-unless-ignored',
-      name: 'Lint the current file unless ignored',
+      name: getTextInLanguage('lint-file-unless-ignored'),
       editorCallback: (editor: Editor) => {
         const file = this.app.workspace.getActiveFile();
 
@@ -185,12 +156,12 @@ export default class LinterPlugin extends Plugin {
 
     this.addCommand({
       id: 'lint-all-files',
-      name: 'Lint all files in the vault',
+      name: getTextInLanguage('lint-all-files'),
       icon: iconInfo.vault.id,
       callback: () => {
-        const startMessage = 'This will edit all of your files and may introduce errors.';
-        const submitBtnText = 'Lint All';
-        const submitBtnNoticeText = 'Linting all files...';
+        const startMessage = getTextInLanguage('lint-all-files-start-message');
+        const submitBtnText = getTextInLanguage('lint-all-files-submit-button-text');
+        const submitBtnNoticeText = getTextInLanguage('lint-all-files-submit-button-notice-text');
         new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => {
           return this.runLinterAllFiles(this.app);
         }).open();
@@ -199,7 +170,7 @@ export default class LinterPlugin extends Plugin {
 
     this.addCommand({
       id: 'lint-all-files-in-folder',
-      name: 'Lint all files in the current folder',
+      name: getTextInLanguage('lint-all-files-in-folder'),
       icon: iconInfo.folder.id,
       editorCheckCallback: (checking: Boolean, _) => {
         if (checking) {
@@ -212,7 +183,7 @@ export default class LinterPlugin extends Plugin {
 
     this.addCommand({
       id: 'paste-as-plain-text',
-      name: 'Paste as Plain Text & without Modifications',
+      name: getTextInLanguage('paste-as-plain-text'),
       editorCallback: (editor) => this.pasteAsPlainText(editor),
     });
   }
@@ -275,7 +246,7 @@ export default class LinterPlugin extends Plugin {
     if (file instanceof TFile && file.extension === 'md') {
       menu.addItem((item) => {
         item.setIcon(iconInfo.file.id)
-            .setTitle('Lint file')
+            .setTitle(getTextInLanguage('lint-file-pop-up-menu-text'))
             .onClick(async () => {
               this.runLinterFile(file);
             });
@@ -283,7 +254,7 @@ export default class LinterPlugin extends Plugin {
     } else if (file instanceof TFolder) {
       menu.addItem((item) => {
         item
-            .setTitle('Lint folder')
+            .setTitle(getTextInLanguage('lint-folder-pop-up-menu-text'))
             .setIcon(iconInfo.folder.id)
             .onClick(() => this.createFolderLintModal(file));
       });
@@ -316,7 +287,7 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          this.handleLintError(file, error, 'Lint All Files Error in File \'FILE_PATH\'');
+          this.handleLintError(file, error, getTextInLanguage('lint-all-files-error-message') + ' \'{FILE_PATH}\'');
 
           numberOfErrors += 1;
         }
@@ -325,15 +296,15 @@ export default class LinterPlugin extends Plugin {
 
     const userClickTimeout = 0;
     if (numberOfErrors === 0) {
-      new Notice('Linted all files', userClickTimeout);
+      new Notice(getTextInLanguage('lint-all-files-success-message'), userClickTimeout);
     } else {
-      const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error' : 'were ' + numberOfErrors + ' errors';
-      new Notice('Linted all files and there ' + amountOfErrorsMessage + '.', userClickTimeout);
+      const errorMessage = numberOfErrors === 1 ? getTextInLanguage('lint-all-files-errors-message-singular') : getTextInLanguage('lint-all-files-errors-message-plural').replace('{NUM}', numberOfErrors.toString());
+      new Notice(errorMessage, userClickTimeout);
     }
   }
 
   async runLinterAllFilesInFolder(folder: TFolder) {
-    logInfo('Linting folder ' + folder.name);
+    logInfo(getTextInLanguage('folder-lint') + folder.name);
 
     let numberOfErrors = 0;
     let lintedFiles = 0;
@@ -343,7 +314,7 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          this.handleLintError(file, error, 'Lint All Files in Folder Error in File \'FILE_PATH\'');
+          this.handleLintError(file, error, getTextInLanguage('lint-all-files-in-folder-error-message') + ' \'{FILE_PATH}\'');
 
           numberOfErrors += 1;
         }
@@ -354,23 +325,24 @@ export default class LinterPlugin extends Plugin {
 
     const userClickTimeout = 0;
     if (numberOfErrors === 0) {
-      new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + '.', userClickTimeout);
+      new Notice(getTextInLanguage('lint-all-files-in-folder-success-message').replace('{NUM}', lintedFiles.toString().replace('{FOLDER_NAME}', folder.name)), userClickTimeout);
     } else {
-      const amountOfErrorsMessage = numberOfErrors === 1 ? 'was 1 error' : 'were ' + numberOfErrors + ' errors';
-      new Notice('Linted all ' + lintedFiles + ' files in ' + folder.name + ' and there ' + amountOfErrorsMessage + '.', userClickTimeout);
+      const errorMessageText = numberOfErrors === 1 ? getTextInLanguage('lint-all-files-in-folder-errors-message-singular').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name):
+      getTextInLanguage('lint-all-files-in-folder-errors-message-plural').replace('{FILE_COUNT}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name).replace('{ERROR_COUNT}', numberOfErrors.toString());
+      new Notice(errorMessageText, userClickTimeout);
     }
   }
 
   // handles the creation of the folder linting modal since this happens in multiple places and it should be consistent
   createFolderLintModal(folder: TFolder) {
-    const startMessage = 'This will edit all of your files in ' + folder.name + ' including files in its subfolders which may introduce errors.';
-    const submitBtnText = 'Lint All Files in ' + folder.name;
-    const submitBtnNoticeText = 'Linting all files in ' + folder.name + '...';
+    const startMessage = getTextInLanguage('lint-all-files-in-folder-start-message').replace('{FOLDER_NAME}', folder.name);
+    const submitBtnText = getTextInLanguage('lint-all-files-in-folder-submit-button-text').replace('{FOLDER_NAME}', folder.name);
+    const submitBtnNoticeText = getTextInLanguage('lint-all-files-in-folder-submit-button-notice-text').replace('{FOLDER_NAME}', folder.name);
     new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder)).open();
   }
 
   runLinterEditor(editor: Editor) {
-    logInfo('Running linter');
+    logInfo(getTextInLanguage('linter-run'));
 
     const file = this.app.workspace.getActiveFile();
     const oldText = editor.getValue();
@@ -378,7 +350,7 @@ export default class LinterPlugin extends Plugin {
     try {
       newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
     } catch (error) {
-      this.handleLintError(file, error, 'Lint File Error in File \'FILE_PATH\'', false);
+      this.handleLintError(file, error, getTextInLanguage('lint-all-files-error-message') + ' \'{FILE_PATH}\'', false);
       return;
     }
 
@@ -415,7 +387,7 @@ export default class LinterPlugin extends Plugin {
     try {
       this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
     } catch (error) {
-      this.handleLintError(file, error, 'Lint File Error in File \'FILE_PATH\'', false);
+      this.handleLintError(file, error, getTextInLanguage('lint-all-files-error-message') + ' \'{FILE_PATH}\'', false);
     }
   }
 
@@ -436,7 +408,7 @@ export default class LinterPlugin extends Plugin {
     this.momentLocale = momentLocale;
     const oldLocale = moment.locale();
     const currentLocale = moment.locale(momentLocale);
-    logDebug(`Trying to switch Moment.js locale to ${momentLocale}, got ${currentLocale}`);
+    logDebug(getTextInLanguage('moment-locale-not-found').replace('{MOMENT_LOCALE}', momentLocale).replace('{CURRENT_LOCALE}', currentLocale));
 
     moment.locale(oldLocale);
   }
@@ -444,23 +416,25 @@ export default class LinterPlugin extends Plugin {
   private displayChangedMessage(charsAdded: number, charsRemoved: number) {
     if (this.settings.displayChanged) {
       const message = dedent`
-        ${charsAdded} characters added
-        ${charsRemoved} characters removed
+        ${charsAdded} ${getTextInLanguage('characters-added')}
+        ${charsRemoved} ${getTextInLanguage('characters-removed')}
       `;
       new Notice(message);
     }
   }
 
   private handleLintError(file: TFile, error: Error, logErrorStringTemplate: string, useLogTemplateInNotice: boolean = true) {
-    const errorMessage = logErrorStringTemplate.replace('FILE_PATH', file.path);
+    const errorMessage = logErrorStringTemplate.replace('{FILE_PATH}', file.path);
+    const seeConsoleText = getTextInLanguage('see-console');
+
     if (error instanceof LinterError) {
       if (useLogTemplateInNotice) {
-        new Notice(`${errorMessage} ${error.message}.\nSee console for more details.`);
+        new Notice(`${errorMessage} ${error.message}.\n${seeConsoleText}`);
       } else {
-        new Notice(`${error.message}.\nSee console for more details.`);
+        new Notice(`${error.message}.\nS${seeConsoleText}`);
       }
     } else {
-      new Notice('An unknown error occurred during linting. See console for details');
+      new Notice(`${getTextInLanguage('unknown-error')} ${seeConsoleText}`);
     }
 
     logError(errorMessage, error);
@@ -482,7 +456,7 @@ export default class LinterPlugin extends Plugin {
     // has to search the entire clipboard (not surrounding the regex with ^$),
     // because otherwise having 2 URLs cause Obsidian-breaking conflict
     if (urlRegex.test(plainClipboard.trim())) {
-      logWarn('aborted paste lint as the clipboard content is a link and doing so will avoid conflicts with other plugins that modify pasting.');
+      logWarn(getTextInLanguage('paste-link-warning'));
       return;
     }
 
@@ -566,7 +540,7 @@ export default class LinterPlugin extends Plugin {
   async pasteAsPlainText(editor: Editor): Promise<void> {
     const clipboardContent = await navigator.clipboard.readText();
     if (!clipboardContent) {
-      new Notice('There is no clipboard content.');
+      new Notice(getTextInLanguage('empty-clipboard'));
       return;
     }
 
@@ -593,158 +567,41 @@ export default class LinterPlugin extends Plugin {
     return editor.getLine(selection.anchor.line);
   }
 
-  /**
-   * Moves settings to common settings in order to allow for better settings experience moving forward.
-   */
-  private moveSettingsToCommonSettings() {
-    let newAliasFormat: NormalArrayFormats | SpecialArrayFormats = undefined;
-    // alias format
-    const YamlTitleAliasRule = this.settings.ruleConfigs['YAML Title Alias'];
-    if (YamlTitleAliasRule && YamlTitleAliasRule['YAML aliases section style']) {
-      // if the rule is not enabled it does not matter what the format for the aliases is for copying over the value
-      if (YamlTitleAliasRule['Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.']) {
-        switch (YamlTitleAliasRule['YAML aliases section style']) {
-          case 'Multi-line array':
-            newAliasFormat = NormalArrayFormats.MultiLine;
-            break;
-          case 'Single-line array':
-            newAliasFormat = NormalArrayFormats.SingleLine;
-            break;
-          case 'Single string that expands to multi-line array if needed':
-            newAliasFormat = SpecialArrayFormats.SingleStringToMultiLine;
-            break;
-          case 'Single string that expands to single-line array if needed':
-            newAliasFormat = SpecialArrayFormats.SingleStringToSingleLine;
-            break;
-        }
-      }
+  private moveConfigValuesToKeyBasedFormat() {
+    setLanguage('en');
 
-      delete this.settings.ruleConfigs['YAML Title Alias']['YAML aliases section style'];
-    }
+    for (const rule of rules) {
+      // @ts-ignore
+      const ruleName = getTextInLanguage(rule.alias + '-name');
+      const ruleSettings = this.settings.ruleConfigs[ruleName];
+      if (ruleSettings != undefined) {
+        // @ts-ignore
+        const ruleDescription = getTextInLanguage(rule.alias + '-description');
+        // move description config value to new setting location
+        const newSettingValues: Options = {
+          enabled: ruleSettings[ruleDescription] ?? false,
+        };
 
-    const formatYamlRule = this.settings.ruleConfigs['Format Yaml Array'];
-    if (formatYamlRule && formatYamlRule['Yaml aliases section style']) {
-      // if the rule is enabled and the actual format for aliases is enabled then check the value
-      if (formatYamlRule['Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.'] &&
-        formatYamlRule['Format yaml aliases section']) {
-        const tempYAMLAliasFormat = formatYamlRule['Yaml aliases section style'] as NormalArrayFormats | SpecialArrayFormats;
-        if (!newAliasFormat) {
-          newAliasFormat = tempYAMLAliasFormat;
-        } else {
-          switch (tempYAMLAliasFormat) {
-            case NormalArrayFormats.SingleLine:
-              newAliasFormat = NormalArrayFormats.SingleLine;
-              break;
-            case NormalArrayFormats.MultiLine:
-              if (newAliasFormat != NormalArrayFormats.SingleLine) {
-                newAliasFormat = NormalArrayFormats.SingleLine;
-              }
-              break;
-            case SpecialArrayFormats.SingleStringCommaDelimited:
-              if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
-                newAliasFormat = SpecialArrayFormats.SingleStringCommaDelimited;
-              }
-              break;
-            case SpecialArrayFormats.SingleStringToMultiLine:
-              if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
-                newAliasFormat = SpecialArrayFormats.SingleStringToMultiLine;
-              }
-              break;
-            case SpecialArrayFormats.SingleStringToSingleLine:
-              if (newAliasFormat != NormalArrayFormats.SingleLine && newAliasFormat != NormalArrayFormats.MultiLine) {
-                newAliasFormat = SpecialArrayFormats.SingleStringToSingleLine;
-              }
-              break;
+        // move option config values to new setting location
+        for (const option of rule.options) {
+          // skip the description of the setting
+          if (option.configKey === 'enabled') {
+            continue;
           }
+
+          // @ts-ignore
+          const configKeyName = getTextInLanguage(option.configKey + '-name');
+          newSettingValues[option.configKey] = ruleSettings[configKeyName] ?? option.defaultValue;
         }
+
+        this.settings.ruleConfigs[rule.alias] = newSettingValues;
+        delete this.settings.ruleConfigs[ruleName];
       }
-
-
-      delete this.settings.ruleConfigs['Format Yaml Array']['Yaml aliases section style'];
     }
 
-    if (newAliasFormat) {
-      this.settings.commonStyles.aliasArrayStyle = newAliasFormat;
-    }
-
-    // tags format
-    let newTagFormat: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats = undefined;
-
-    if (formatYamlRule && formatYamlRule['Yaml tags section style']) {
-      // if the rule is enabled and the actual format for aliases is enabled then check the value
-      if (formatYamlRule['Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.'] &&
-       formatYamlRule['Format yaml tags section']) {
-        newTagFormat = formatYamlRule['Yaml tags section style'];
-      }
-
-      delete this.settings.ruleConfigs['Format Yaml Array']['Yaml tags section style'];
-    }
-
-    const moveTagsToYamlRule = this.settings.ruleConfigs['Move Tags to Yaml'];
-    if (moveTagsToYamlRule && moveTagsToYamlRule['Yaml tags section style']) {
-      // only check the value if the rule is enabled
-      if (moveTagsToYamlRule['Move all tags to Yaml frontmatter of the document.']) {
-        const tempYAMLTagFormat = moveTagsToYamlRule['Yaml tags section style'];
-        if (!newTagFormat) {
-          newTagFormat = tempYAMLTagFormat;
-        } else {
-          switch (tempYAMLTagFormat) {
-            case NormalArrayFormats.SingleLine:
-              newTagFormat = NormalArrayFormats.SingleLine;
-              break;
-            case NormalArrayFormats.MultiLine:
-              if (newTagFormat != NormalArrayFormats.SingleLine) {
-                newTagFormat = NormalArrayFormats.SingleLine;
-              }
-              break;
-            case SpecialArrayFormats.SingleStringCommaDelimited:
-              if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
-                newTagFormat = SpecialArrayFormats.SingleStringCommaDelimited;
-              }
-              break;
-            case SpecialArrayFormats.SingleStringToMultiLine:
-              if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
-                newTagFormat = SpecialArrayFormats.SingleStringToMultiLine;
-              }
-              break;
-            case SpecialArrayFormats.SingleStringToSingleLine:
-              if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine) {
-                newTagFormat = SpecialArrayFormats.SingleStringToSingleLine;
-              }
-              break;
-            case TagSpecificArrayFormats.SingleLineSpaceDelimited:
-              if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine &&
-                  newTagFormat != SpecialArrayFormats.SingleStringCommaDelimited && newTagFormat != SpecialArrayFormats.SingleStringToSingleLine &&
-                  newTagFormat != SpecialArrayFormats.SingleStringToMultiLine) {
-                newTagFormat = TagSpecificArrayFormats.SingleLineSpaceDelimited;
-              }
-              break;
-            case TagSpecificArrayFormats.SingleStringSpaceDelimited:
-              if (newTagFormat != NormalArrayFormats.SingleLine && newTagFormat != NormalArrayFormats.MultiLine &&
-                    newTagFormat != SpecialArrayFormats.SingleStringCommaDelimited && newTagFormat != SpecialArrayFormats.SingleStringToSingleLine &&
-                    newTagFormat != SpecialArrayFormats.SingleStringToMultiLine) {
-                newTagFormat = TagSpecificArrayFormats.SingleStringSpaceDelimited;
-              }
-              break;
-          }
-        }
-      }
-
-      delete this.settings.ruleConfigs['Move Tags to Yaml']['Yaml tags section style'];
-    }
-
-    if (newTagFormat) {
-      this.settings.commonStyles.tagArrayStyle = newTagFormat;
-    }
-
-    // escape character
-    const escapeYAMLSpecialCharactersRule = this.settings.ruleConfigs['Escape YAML Special Characters'];
-    if (escapeYAMLSpecialCharactersRule) {
-      this.settings.commonStyles.escapeCharacter = escapeYAMLSpecialCharactersRule['Default Escape Character'] ?? this.settings.commonStyles.escapeCharacter;
-
-      delete this.settings.ruleConfigs['Escape YAML Special Characters']['Default Escape Character'];
-    }
-
+    this.settings.settingsConvertedToConfigKeyValues = true;
     this.saveSettings();
+
+    setLanguage(window.localStorage.getItem('language'));
   }
 }

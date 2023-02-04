@@ -3,22 +3,19 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
-class SpaceAfterListMarkersOptions implements Options {
-}
+class SpaceAfterListMarkersOptions implements Options {}
 
 @RuleBuilder.register
 export default class SpaceAfterListMarkers extends RuleBuilder<SpaceAfterListMarkersOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'space-after-list-markers-name',
+      descriptionTextKey: 'space-after-list-markers-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => SpaceAfterListMarkersOptions {
     return SpaceAfterListMarkersOptions;
-  }
-  get name(): string {
-    return 'Space after list markers';
-  }
-  get description(): string {
-    return 'There should be a single space after list markers and checkboxes.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: SpaceAfterListMarkersOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {

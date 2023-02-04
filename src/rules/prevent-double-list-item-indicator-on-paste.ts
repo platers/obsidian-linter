@@ -11,17 +11,15 @@ class PreventDoubleListItemIndicatorOnPasteOptions implements Options {
 
 @RuleBuilder.register
 export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<PreventDoubleListItemIndicatorOnPasteOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'prevent-double-list-item-indicator-on-paste-name',
+      descriptionTextKey: 'prevent-double-list-item-indicator-on-paste-description',
+      type: RuleType.PASTE,
+    });
+  }
   get OptionsClass(): new () => PreventDoubleListItemIndicatorOnPasteOptions {
     return PreventDoubleListItemIndicatorOnPasteOptions;
-  }
-  get name(): string {
-    return 'Prevent Double List Item Indicator on Paste';
-  }
-  get description(): string {
-    return 'Removes starting list indicator from the text to paste if the line the cursor is on in the file has a list indicator';
-  }
-  get type(): RuleType {
-    return RuleType.PASTE;
   }
   apply(text: string, options: PreventDoubleListItemIndicatorOnPasteOptions): string {
     const indentedOrBlockquoteNestedListIndicatorRegex = new RegExp(`^${lineStartingWithWhitespaceOrBlockquoteTemplate}[*+-] `);

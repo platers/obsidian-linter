@@ -3,22 +3,19 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 
-class RemoveConsecutiveListMarkersOptions implements Options {
-}
+class RemoveConsecutiveListMarkersOptions implements Options {}
 
 @RuleBuilder.register
 export default class RemoveConsecutiveListMarkers extends RuleBuilder<RemoveConsecutiveListMarkersOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'remove-consecutive-list-markers-name',
+      descriptionTextKey: 'remove-consecutive-list-markers-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => RemoveConsecutiveListMarkersOptions {
     return RemoveConsecutiveListMarkersOptions;
-  }
-  get name(): string {
-    return 'Remove Consecutive List Markers';
-  }
-  get description(): string {
-    return 'Removes consecutive list markers. Useful when copy-pasting list items.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: RemoveConsecutiveListMarkersOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {

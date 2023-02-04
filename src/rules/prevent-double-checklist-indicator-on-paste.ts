@@ -11,17 +11,15 @@ class PreventDoubleChecklistIndicatorOnPasteOptions implements Options {
 
 @RuleBuilder.register
 export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<PreventDoubleChecklistIndicatorOnPasteOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'prevent-double-checklist-indicator-on-paste-name',
+      descriptionTextKey: 'prevent-double-checklist-indicator-on-paste-description',
+      type: RuleType.PASTE,
+    });
+  }
   get OptionsClass(): new () => PreventDoubleChecklistIndicatorOnPasteOptions {
     return PreventDoubleChecklistIndicatorOnPasteOptions;
-  }
-  get name(): string {
-    return 'Prevent Double Checklist Indicator on Paste';
-  }
-  get description(): string {
-    return 'Removes starting checklist indicator from the text to paste if the line the cursor is on in the file has a checklist indicator';
-  }
-  get type(): RuleType {
-    return RuleType.PASTE;
   }
   apply(text: string, options: PreventDoubleChecklistIndicatorOnPasteOptions): string {
     const indentedOrBlockquoteNestedChecklistIndicatorRegex = new RegExp(`^${lineStartingWithWhitespaceOrBlockquoteTemplate}- \\[[ x]] `);

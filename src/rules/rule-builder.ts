@@ -1,6 +1,7 @@
 import {Example, Options, Rule, RuleType, registerRule, LinterSettings, wrapLintError} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
 import {logDebug} from '../utils/logger';
+import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -10,7 +11,7 @@ export abstract class RuleBuilderBase {
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
     if (!RuleBuilderBase.#ruleMap.has(this.name)) {
       const builder = new this();
-      const rule = new Rule(builder.name, builder.description, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder);
+      const rule = new Rule(builder.name, builder.description, builder.configKey, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder);
       RuleBuilderBase.#ruleMap.set(this.name, rule);
       RuleBuilderBase.#ruleBuilderMap.set(builder.name, builder);
     }
@@ -22,7 +23,7 @@ export abstract class RuleBuilderBase {
     const optionsFromSettings = rule.getOptions(settings);
     if (optionsFromSettings[rule.enabledOptionName()]) {
       const options = Object.assign({}, optionsFromSettings, extraOptions) as Options;
-      logDebug(`Running ${rule.name}`);
+      logDebug(`${getTextInLanguage('run-rule-text')} ${rule.name}`);
 
       try {
         return [rule.apply(text, options), true];
@@ -50,7 +51,33 @@ export abstract class RuleBuilderBase {
   }
 }
 
+type RuleBuilderConstructorArgs = {
+  nameTextKey: LanguageStringKey
+  descriptionTextKey: LanguageStringKey,
+  type: RuleType;
+  hasSpecialExecutionOrder?: boolean
+};
+
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
+  public configKey: string;
+  public name: string;
+  public description: string;
+  public nameTextKey: LanguageStringKey;
+  public descriptionTextKey: LanguageStringKey;
+  public type: RuleType;
+  public hasSpecialExecutionOrder: boolean;
+  constructor(args: RuleBuilderConstructorArgs) {
+    super();
+
+    this.configKey = args.nameTextKey.replace(/-name$/m, '');
+    this.nameTextKey = args.nameTextKey;
+    this.descriptionTextKey = args.descriptionTextKey;
+    this.type = args.type;
+    this.name = getTextInLanguage(args.nameTextKey);
+    this.description = getTextInLanguage(args.descriptionTextKey);
+    this.hasSpecialExecutionOrder = args.hasSpecialExecutionOrder ?? false;
+  }
+
   abstract get OptionsClass(): (new() => TOptions);
 
   static register<TOptions extends Options>(RuleBuilderClass: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>)): void {
@@ -74,20 +101,14 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     return ruleOptions;
   }
 
-  abstract get name(): string;
-  abstract get description(): string;
-  abstract get type(): RuleType;
   abstract apply(text: string, options: TOptions): string;
   abstract get exampleBuilders(): ExampleBuilder<TOptions>[];
   abstract get optionBuilders(): OptionBuilderBase<TOptions>[];
-  get hasSpecialExecutionOrder(): boolean {
-    return false;
-  }
 
   static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions): [result: string, isEnabled: boolean] {
     const rule = this.getRule();
-    if (disabledRules.includes(rule.alias())) {
-      logDebug(rule.alias() + ' is disabled');
+    if (disabledRules.includes(rule.alias)) {
+      logDebug(rule.alias + ' ' + getTextInLanguage('disabled-text'));
       return [text, false];
     }
 
@@ -131,8 +152,8 @@ type KeysOfObjectMatchingPropertyValueType<TObject, TValue> = {[TKey in keyof TO
 
 type OptionBuilderConstructorArgs<TOptions extends Options, TValue> = {
   OptionsClass: (new() => TOptions),
-  name: string
-  description: string,
+  nameTextKey: LanguageStringKey
+  descriptionTextKey: LanguageStringKey,
   optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
 };
 
@@ -143,15 +164,21 @@ export abstract class OptionBuilderBase<TOptions extends Options> {
 
 export abstract class OptionBuilder<TOptions extends Options, TValue> {
   readonly OptionsClass: (new() => TOptions);
+  readonly configKey: string;
   readonly name: string;
   readonly description: string;
+  readonly nameTextKey: LanguageStringKey;
+  readonly descriptionTextKey: LanguageStringKey;
   readonly optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
   #option: Option;
 
   constructor(args: OptionBuilderConstructorArgs<TOptions, TValue>) {
     this.OptionsClass = args.OptionsClass;
-    this.name = args.name;
-    this.description = args.description;
+    this.configKey = args.nameTextKey.replace(/-name$/m, '');
+    this.name = getTextInLanguage(args.nameTextKey);
+    this.description = getTextInLanguage(args.descriptionTextKey);
+    this.nameTextKey = args.nameTextKey;
+    this.descriptionTextKey = args.descriptionTextKey;
     this.optionsKey = args.optionsKey;
   }
 
@@ -180,13 +207,13 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
 
 export class BooleanOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, boolean> {
   protected buildOption(): Option {
-    return new BooleanOption(this.name, this.description, this.defaultValue);
+    return new BooleanOption(this.configKey, this.name, this.description, this.defaultValue);
   }
 }
 
 export class NumberOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, Number> {
   protected buildOption(): Option {
-    return new TextOption(this.name, this.description, this.defaultValue);
+    return new TextOption(this.configKey, this.name, this.description, this.defaultValue);
   }
 }
 
@@ -200,11 +227,11 @@ export class DropdownOptionBuilder<TOptions extends Options, TValue extends stri
     }[]
   }) {
     super(args);
-    this.records = args.records.map((record) => new DropdownRecord(record.value, record.description));
+    this.records = args.records.map((record) => new DropdownRecord(record.value as LanguageStringKey, record.description));
   }
 
   protected buildOption(): Option {
-    return new DropdownOption(this.name, this.description, this.defaultValue, this.records);
+    return new DropdownOption(this.configKey, this.name, this.description, this.defaultValue, this.records);
   }
 }
 
@@ -222,7 +249,7 @@ export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuild
 
 
   protected buildOption(): Option {
-    return new TextAreaOption(this.name, this.description, this.defaultValue.join(this.separator));
+    return new TextAreaOption(this.configKey, this.name, this.description, this.defaultValue.join(this.separator));
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
@@ -239,12 +266,12 @@ export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuild
 
 export class TextOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
   protected buildOption(): Option {
-    return new TextOption(this.name, this.description, this.defaultValue);
+    return new TextOption(this.configKey, this.name, this.description, this.defaultValue);
   }
 }
 
 export class MomentFormatOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
   protected buildOption(): Option {
-    return new MomentFormatOption(this.name, this.description, this.defaultValue);
+    return new MomentFormatOption(this.configKey, this.name, this.description, this.defaultValue);
   }
 }

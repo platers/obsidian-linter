@@ -3,22 +3,19 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
-class RemoveHyphensOnPasteOptions implements Options {
-}
+class RemoveHyphensOnPasteOptions implements Options {}
 
 @RuleBuilder.register
 export default class RemoveHyphensOnPaste extends RuleBuilder<RemoveHyphensOnPasteOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'remove-hyphens-on-paste-name',
+      descriptionTextKey: 'remove-hyphens-on-paste-description',
+      type: RuleType.PASTE,
+    });
+  }
   get OptionsClass(): new () => RemoveHyphensOnPasteOptions {
     return RemoveHyphensOnPasteOptions;
-  }
-  get name(): string {
-    return 'Remove Hyphens on Paste';
-  }
-  get description(): string {
-    return 'Removes hyphens from the text to paste';
-  }
-  get type(): RuleType {
-    return RuleType.PASTE;
   }
   apply(text: string, options: RemoveHyphensOnPasteOptions): string {
     return text.replace(/(\S)[-‐]\s+\n?(?=\w)/g, '$1');

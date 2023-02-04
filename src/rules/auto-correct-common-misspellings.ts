@@ -11,17 +11,16 @@ class AutoCorrectCommonMisspellingsOptions implements Options {
 
 @RuleBuilder.register
 export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorrectCommonMisspellingsOptions> {
+  constructor() {
+    super({
+      configKey: 'auto-correct-common-misspellings',
+      nameTextKey: 'auto-correct-common-misspellings-name',
+      descriptionTextKey: 'auto-correct-common-misspellings-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => AutoCorrectCommonMisspellingsOptions {
     return AutoCorrectCommonMisspellingsOptions;
-  }
-  get name(): string {
-    return 'Auto-correct Common Misspellings';
-  }
-  get description(): string {
-    return 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: AutoCorrectCommonMisspellingsOptions): string {
     return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.url], text, (text) => {
@@ -113,8 +112,8 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
     return [
       new TextAreaOptionBuilder({
         OptionsClass: AutoCorrectCommonMisspellingsOptions,
-        name: 'Ignore Words',
-        description: 'A comma separated list of lowercased words to ignore when auto-correcting',
+        nameTextKey: 'auto-correct-common-misspellings-ignore-words-name',
+        descriptionTextKey: 'auto-correct-common-misspellings-ignore-words-description',
         optionsKey: 'ignoreWords',
         splitter: wordSplitterRegex,
         separator: ', ',
