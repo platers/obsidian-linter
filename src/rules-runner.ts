@@ -19,6 +19,7 @@ import {ObsidianCommandInterface} from './typings/obsidian-ex';
 import {CustomReplace} from './ui/linter-components/custom-replace-option';
 import {LintCommand} from './ui/linter-components/custom-command-option';
 import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from './utils/strings';
+import {getTextInLanguage} from './lang/helpers';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -38,23 +39,26 @@ export class RulesRunner {
   private disabledRules: string[] = [];
 
   lintText(runOptions: RunLinterRulesOptions): string {
-    timingBegin('rule running');
+    timingBegin(getTextInLanguage('rule-running'));
     const originalText = runOptions.oldText;
     this.disabledRules = getDisabledRules(originalText);
 
-    timingBegin('pre rules');
+    const preRuleText = getTextInLanguage('pre-rules');
+    timingBegin(preRuleText);
     let newText = this.runBeforeRegularRules(runOptions);
-    timingEnd('pre rules');
+    timingEnd(preRuleText);
+
+    const disabledRuleText = getTextInLanguage('disabled-text');
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
-      if (this.disabledRules.includes(rule.alias())) {
-        logDebug(rule.alias() + ' is disabled');
+      if (this.disabledRules.includes(rule.alias)) {
+        logDebug(rule.alias + ' ' + disabledRuleText);
         continue;
       } else if (rule.hasSpecialExecutionOrder || rule.type === RuleType.PASTE) {
         continue;
       }
 
-      timingBegin(rule.alias());
+      timingBegin(rule.alias);
       [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, runOptions.settings, {
         fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
         fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
@@ -66,12 +70,13 @@ export class RulesRunner {
         defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
         removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
       });
-      timingEnd(rule.alias());
+      timingEnd(rule.alias);
     }
 
-    timingBegin('custom regex');
+    const customRegexLogText = getTextInLanguage('custom-regex');
+    timingBegin(customRegexLogText);
     newText = this.runCustomRegexReplacement(runOptions.settings.customRegexes, newText);
-    timingEnd('custom regex');
+    timingEnd(customRegexLogText);
 
     runOptions.oldText = newText;
 
@@ -93,7 +98,8 @@ export class RulesRunner {
 
   private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
     let newText = runOptions.oldText;
-    timingBegin('post rules');
+    const postRuleLogText = getTextInLanguage('post-rules');
+    timingBegin(postRuleLogText);
     [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
     });
@@ -117,20 +123,20 @@ export class RulesRunner {
       yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
       dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
     });
-    timingEnd('post rules');
-    timingEnd('rule running');
+    timingEnd(postRuleLogText);
+    timingEnd(getTextInLanguage('rule-running'));
     return newText;
   }
 
   runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
     // execute custom commands after regular rules, but before the timestamp rules
-    logDebug(`Running Custom Lint Commands`);
+    logDebug(getTextInLanguage('running-custom-lint-command'));
     const commandsRun = new Set<string>();
     for (const commandInfo of lintCommands) {
       if (!commandInfo.id) {
         continue;
       } else if (commandsRun.has(commandInfo.id)) {
-        logWarn(`You cannot run the same command ("${commandInfo.name}") as a custom lint rule twice.`);
+        logWarn(getTextInLanguage('custom-lint-duplicate-warning').replace('{COMMAND_NAME}', commandInfo.name));
         continue;
       }
 
@@ -138,13 +144,13 @@ export class RulesRunner {
         commandsRun.add(commandInfo.id);
         commands.executeCommandById(commandInfo.id);
       } catch (error) {
-        wrapLintError(error, `Custom Lint Command ${commandInfo.id}`);
+        wrapLintError(error, `${getTextInLanguage('custom-lint-error-message')} ${commandInfo.id}`);
       }
     }
   }
 
   runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
-    logDebug(`Running Custom Regex`);
+    logDebug(getTextInLanguage('running-custom-regex'));
     let tempOldText = oldText;
     for (const eachRegex of customRegexes) {
       if (eachRegex.find == undefined || eachRegex.replace === undefined || eachRegex.replace === null ) {

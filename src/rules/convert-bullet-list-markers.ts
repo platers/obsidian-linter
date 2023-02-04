@@ -3,22 +3,19 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 
-class ConvertBulletListMarkersOptions implements Options {
-}
+class ConvertBulletListMarkersOptions implements Options {}
 
 @RuleBuilder.register
 export default class ConvertBulletListMarkers extends RuleBuilder<ConvertBulletListMarkersOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'convert-bullet-list-markers-name',
+      descriptionTextKey: 'convert-bullet-list-markers-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => ConvertBulletListMarkersOptions {
     return ConvertBulletListMarkersOptions;
-  }
-  get name(): string {
-    return 'Convert Bullet List Markers';
-  }
-  get description(): string {
-    return 'Converts common bullet list marker symbols to markdown list markers.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: ConvertBulletListMarkersOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {

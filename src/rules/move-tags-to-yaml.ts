@@ -33,17 +33,15 @@ class MoveTagsToYamlOptions implements Options {
 
 @RuleBuilder.register
 export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'move-tags-to-yaml-name',
+      descriptionTextKey: 'move-tags-to-yaml-description',
+      type: RuleType.YAML,
+    });
+  }
   get OptionsClass(): new () => MoveTagsToYamlOptions {
     return MoveTagsToYamlOptions;
-  }
-  get name(): string {
-    return 'Move Tags to Yaml';
-  }
-  get description(): string {
-    return 'Move all tags to Yaml frontmatter of the document.';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: MoveTagsToYamlOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.html, IgnoreTypes.wikiLink, IgnoreTypes.link], text, (text) => {
@@ -217,8 +215,8 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
     return [
       new DropdownOptionBuilder({
         OptionsClass: MoveTagsToYamlOptions,
-        name: 'Body tag operation',
-        description: 'What to do with non-ignored tags in the body of the file once they have been moved to the frontmatter',
+        nameTextKey: 'move-tags-to-yaml-how-to-handle-existing-tags-name',
+        descriptionTextKey: 'move-tags-to-yaml-how-to-handle-existing-tags-description',
         optionsKey: 'howToHandleExistingTags',
         records: [
           {
@@ -237,8 +235,8 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       }),
       new TextAreaOptionBuilder({
         OptionsClass: MoveTagsToYamlOptions,
-        name: 'Tags to ignore',
-        description: 'The tags that will not be moved to the tags array or removed from the body content if `Remove the hashtag from tags in content body` is enabled. Each tag should be on a new line and without the `#`. **Make sure not to include the hashtag in the tag name.**',
+        nameTextKey: 'move-tags-to-yaml-tags-to-ignore-name',
+        descriptionTextKey: 'move-tags-to-yaml-tags-to-ignore-description',
         optionsKey: 'tagsToIgnore',
       }),
     ];

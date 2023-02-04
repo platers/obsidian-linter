@@ -24,7 +24,7 @@ function generateReadme() {
       rules_list += `\n### ${rule.type} rules\n\n`;
       prevSection = rule.type;
     }
-    rules_list += `- [${rule.alias()}](${rule.getURL()})\n`;
+    rules_list += `- [${rule.alias}](${rule.getURL()})\n`;
   }
 
   const readme = autogen_warning + readme_template.replace('{{RULES PLACEHOLDER}}', rules_list);
@@ -88,7 +88,7 @@ function generateDocs() {
       ${''}
       ### ${rule.name}
       ${''}
-      Alias: \`${rule.alias()}\`
+      Alias: \`${rule.alias}\`
       ${''}
       ${rule.description}
       ${''}

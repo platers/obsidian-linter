@@ -9,17 +9,15 @@ class TrailingSpacesOptions implements Options {
 
 @RuleBuilder.register
 export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'trailing-spaces-name',
+      descriptionTextKey: 'trailing-spaces-description',
+      type: RuleType.SPACING,
+    });
+  }
   get OptionsClass(): new () => TrailingSpacesOptions {
     return TrailingSpacesOptions;
-  }
-  get name(): string {
-    return 'Trailing spaces';
-  }
-  get description(): string {
-    return 'Removes extra spaces after every line.';
-  }
-  get type(): RuleType {
-    return RuleType.SPACING;
   }
   apply(text: string, options: TrailingSpacesOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
@@ -68,8 +66,8 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: TrailingSpacesOptions,
-        name: 'Two Space Linebreak',
-        description: 'Ignore two spaces followed by a line break ("Two Space Rule").',
+        nameTextKey: 'trailing-spaces-two-space-line-break-name',
+        descriptionTextKey: 'trailing-spaces-two-space-line-break-description',
         optionsKey: 'twoSpaceLineBreak',
       }),
     ];

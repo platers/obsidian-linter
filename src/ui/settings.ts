@@ -8,6 +8,7 @@ import {RuleTab} from './linter-components/tab-components/rule-tab';
 import {CustomTab} from './linter-components/tab-components/custom-tab';
 import {TabSearcher} from './linter-components/tab-components/tab-searcher';
 import {DebugTab} from './linter-components/tab-components/debug-tab';
+import {getTextInLanguage} from 'src/lang/helpers';
 
 export class SettingTab extends PluginSettingTab {
   plugin: LinterPlugin;
@@ -32,7 +33,7 @@ export class SettingTab extends PluginSettingTab {
     if (Platform.isMobile) {
       linterHeader.addClass('linter-mobile');
     } else {
-      linterHeader.createEl('h1').setText('Linter');
+      linterHeader.createEl('h1').setText(getTextInLanguage('linter-title'));
     }
 
     this.navContainer = containerEl.createEl('nav', {cls: 'linter-setting-header'});
@@ -76,7 +77,7 @@ export class SettingTab extends PluginSettingTab {
   private createSearchZeroState(isMobile: boolean) {
     this.searchZeroState = this.settingsContentEl.createDiv();
     hideEl(this.searchZeroState);
-    this.searchZeroState.createEl(isMobile ? 'h3' : 'h2', {text: 'No settings match search'}).style.textAlign = 'center';
+    this.searchZeroState.createEl(isMobile ? 'h3' : 'h2', {text: getTextInLanguage('empty-search-results-text')}).style.textAlign = 'center';
   }
 
   private addTab(tab: Tab) {

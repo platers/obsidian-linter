@@ -4,22 +4,19 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ellipsisRegex} from '../utils/regex';
 
-class ProperEllipsisOnPasteOptions implements Options {
-}
+class ProperEllipsisOnPasteOptions implements Options {}
 
 @RuleBuilder.register
 export default class ProperEllipsisOnPaste extends RuleBuilder<ProperEllipsisOnPasteOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'proper-ellipsis-on-paste-name',
+      descriptionTextKey: 'proper-ellipsis-on-paste-description',
+      type: RuleType.PASTE,
+    });
+  }
   get OptionsClass(): new () => ProperEllipsisOnPasteOptions {
     return ProperEllipsisOnPasteOptions;
-  }
-  get name(): string {
-    return 'Proper Ellipsis on Paste';
-  }
-  get description(): string {
-    return 'Replaces three consecutive dots with an ellipsis even if they have a space between them in the text to paste';
-  }
-  get type(): RuleType {
-    return RuleType.PASTE;
   }
   apply(text: string, options: ProperEllipsisOnPasteOptions): string {
     return text.replaceAll(ellipsisRegex, '…');

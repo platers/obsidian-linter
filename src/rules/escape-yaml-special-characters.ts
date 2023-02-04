@@ -11,17 +11,16 @@ class EscapeYamlSpecialCharactersOptions implements Options {
 
 @RuleBuilder.register
 export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlSpecialCharactersOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'escape-yaml-special-characters-name',
+      descriptionTextKey: 'escape-yaml-special-characters-description',
+      type: RuleType.YAML,
+      hasSpecialExecutionOrder: true,
+    });
+  }
   get OptionsClass(): new () => EscapeYamlSpecialCharactersOptions {
     return EscapeYamlSpecialCharactersOptions;
-  }
-  get name(): string {
-    return 'Escape YAML Special Characters';
-  }
-  get description(): string {
-    return 'Escapes colons with a space after them (: ), single quotes (\'), and double quotes (") in YAML.';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: EscapeYamlSpecialCharactersOptions): string {
     return formatYAML(text, (text) => {
@@ -200,13 +199,10 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
     return [
       new BooleanOptionBuilder({
         OptionsClass: EscapeYamlSpecialCharactersOptions,
-        name: 'Try to Escape Single Line Arrays',
-        description: 'Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".',
+        nameTextKey: 'escape-yaml-special-characters-try-to-escape-single-line-arrays-name',
+        descriptionTextKey: 'escape-yaml-special-characters-try-to-escape-single-line-arrays-description',
         optionsKey: 'tryToEscapeSingleLineArrays',
       }),
     ];
-  }
-  get hasSpecialExecutionOrder(): boolean {
-    return true;
   }
 }

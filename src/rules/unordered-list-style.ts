@@ -4,24 +4,21 @@ import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} f
 import dedent from 'ts-dedent';
 import {UnorderedListItemStyles, updateUnorderedListItemIndicators} from '../utils/mdast';
 
-
 class UnorderedListStyleOptions implements Options {
   listStyle?: UnorderedListItemStyles = UnorderedListItemStyles.Consistent;
 }
 
 @RuleBuilder.register
 export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'unordered-list-style-name',
+      descriptionTextKey: 'unordered-list-style-description',
+      type: RuleType.CONTENT,
+    });
+  }
   get OptionsClass(): new () => UnorderedListStyleOptions {
     return UnorderedListStyleOptions;
-  }
-  get name(): string {
-    return 'Unordered List Style';
-  }
-  get description(): string {
-    return 'Makes sure that unordered lists follow the style specified.';
-  }
-  get type(): RuleType {
-    return RuleType.CONTENT;
   }
   apply(text: string, options: UnorderedListStyleOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
@@ -175,8 +172,8 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
     return [
       new DropdownOptionBuilder<UnorderedListStyleOptions, UnorderedListItemStyles>({
         OptionsClass: UnorderedListStyleOptions,
-        name: 'List item style',
-        description: 'The list item style to use in unordered lists',
+        nameTextKey: 'unordered-list-style-list-style-name',
+        descriptionTextKey: 'unordered-list-style-list-style-description',
         optionsKey: 'listStyle',
         records: [
           {

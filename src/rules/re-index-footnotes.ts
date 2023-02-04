@@ -3,22 +3,19 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 
-class ReIndexFootnotesOptions implements Options {
-}
+class ReIndexFootnotesOptions implements Options {}
 
 @RuleBuilder.register
 export default class ReIndexFootnotes extends RuleBuilder<ReIndexFootnotesOptions> {
+  constructor() {
+    super({
+      nameTextKey: 're-index-footnotes-name',
+      descriptionTextKey: 're-index-footnotes-description',
+      type: RuleType.FOOTNOTE,
+    });
+  }
   get OptionsClass(): new () => ReIndexFootnotesOptions {
     return ReIndexFootnotesOptions;
-  }
-  get name(): string {
-    return 'Re-Index Footnotes';
-  }
-  get description(): string {
-    return 'Re-indexes footnote keys and footnote, based on the order of occurrence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)';
-  }
-  get type(): RuleType {
-    return RuleType.FOOTNOTE;
   }
   apply(text: string, options: ReIndexFootnotesOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {

@@ -18,17 +18,15 @@ class YamlTitleOptions implements Options {
 
 @RuleBuilder.register
 export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'yaml-title-name',
+      descriptionTextKey: 'yaml-title-description',
+      type: RuleType.YAML,
+    });
+  }
   get OptionsClass(): new () => YamlTitleOptions {
     return YamlTitleOptions;
-  }
-  get name(): string {
-    return 'YAML Title';
-  }
-  get description(): string {
-    return 'Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename if there is no H1.';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: YamlTitleOptions): string {
     text = initYAML(text);
@@ -103,8 +101,8 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
     return [
       new TextOptionBuilder({
         OptionsClass: YamlTitleOptions,
-        name: 'Title Key',
-        description: 'Which YAML key to use for title',
+        nameTextKey: 'yaml-title-title-key-name',
+        descriptionTextKey: 'yaml-title-title-key-description',
         optionsKey: 'titleKey',
       }),
     ];

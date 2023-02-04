@@ -13,17 +13,15 @@ class InsertYamlAttributesOptions implements Options {
 
 @RuleBuilder.register
 export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttributesOptions> {
+  constructor() {
+    super({
+      nameTextKey: 'insert-yaml-attributes-name',
+      descriptionTextKey: 'insert-yaml-attributes-description',
+      type: RuleType.YAML,
+    });
+  }
   get OptionsClass(): new () => InsertYamlAttributesOptions {
     return InsertYamlAttributesOptions;
-  }
-  get name(): string {
-    return 'Insert YAML attributes';
-  }
-  get description(): string {
-    return 'Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.';
-  }
-  get type(): RuleType {
-    return RuleType.YAML;
   }
   apply(text: string, options: InsertYamlAttributesOptions): string {
     text = initYAML(text);
@@ -71,8 +69,8 @@ export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttribut
     return [
       new TextAreaOptionBuilder({
         OptionsClass: InsertYamlAttributesOptions,
-        name: 'Text to insert',
-        description: 'Text to insert into the YAML frontmatter',
+        nameTextKey: 'insert-yaml-attributes-text-to-insert-name',
+        descriptionTextKey: 'insert-yaml-attributes-text-to-insert-description',
         optionsKey: 'textToInsert',
       }),
     ];

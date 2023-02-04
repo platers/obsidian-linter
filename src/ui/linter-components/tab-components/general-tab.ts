@@ -4,6 +4,7 @@ import {Setting} from 'obsidian';
 import {moment} from 'obsidian';
 import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
 import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
+import {getTextInLanguage} from 'src/lang/helpers';
 
 export class GeneralTab extends Tab {
   constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin) {
@@ -13,8 +14,8 @@ export class GeneralTab extends Tab {
 
   display(): void {
     let tempDiv = this.contentEl.createDiv();
-    let settingName = 'Lint on save';
-    let settingDesc = 'Lint the file on manual save (when `Ctrl + S` is pressed or when `:w` is executed while using vim keybindings)';
+    let settingName = getTextInLanguage('lint-on-save-name');
+    let settingDesc = getTextInLanguage('lint-on-save-description');
     const setting = new Setting(tempDiv)
         .setName(settingName)
         .addToggle((toggle) => {
@@ -31,8 +32,8 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Display message on lint';
-    settingDesc = 'Display the number of characters changed after linting';
+    settingName = getTextInLanguage('display-message-name');
+    settingDesc = getTextInLanguage('display-message-description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
@@ -48,8 +49,8 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Folders to ignore';
-    settingDesc = 'Folders to ignore when linting all files or linting on save. Enter folder paths separated by newlines';
+    settingName = getTextInLanguage('folders-to-ignore-name');
+    settingDesc = getTextInLanguage('folders-to-ignore-description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
@@ -67,13 +68,13 @@ export class GeneralTab extends Tab {
     const sysLocale = navigator.language?.toLowerCase();
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Override locale';
-    settingDesc = 'Set this if you want to use a locale different from the default';
+    settingName = getTextInLanguage('override-locale-name');
+    settingDesc = getTextInLanguage('override-locale-description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
         .addDropdown((dropdown) => {
-          dropdown.addOption('system-default', `Same as system (${sysLocale})`);
+          dropdown.addOption('system-default', getTextInLanguage('same-as-system-locale').replace('{SYS_LOCALE}', sysLocale));
           moment.locales().forEach((locale) => {
             dropdown.addOption(locale, locale);
           });
@@ -97,14 +98,14 @@ export class GeneralTab extends Tab {
     ];
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'YAML aliases section style';
-    settingDesc = 'The style of the YAML aliases section';
+    settingName = getTextInLanguage('yaml-aliases-section-style-name');
+    settingDesc = getTextInLanguage('yaml-aliases-section-style-description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
         .addDropdown((dropdown) => {
           yamlAliasRecords.forEach((aliasRecord) => {
-            dropdown.addOption(aliasRecord, aliasRecord);
+            dropdown.addOption(aliasRecord, getTextInLanguage(aliasRecord));
           });
           dropdown.setValue(this.plugin.settings.commonStyles.aliasArrayStyle);
           dropdown.onChange(async (value) => {
@@ -126,14 +127,14 @@ export class GeneralTab extends Tab {
     ];
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'YAML tags section style';
-    settingDesc = 'The style of the YAML tags section';
+    settingName = getTextInLanguage('yaml-tags-section-style-name');
+    settingDesc = getTextInLanguage('yaml-tags-section-style-description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
         .addDropdown((dropdown) => {
           yamlTagRecords.forEach((tagRecord) => {
-            dropdown.addOption(tagRecord, tagRecord);
+            dropdown.addOption(tagRecord, getTextInLanguage(tagRecord));
           });
           dropdown.setValue(this.plugin.settings.commonStyles.tagArrayStyle);
           dropdown.onChange(async (value) => {
@@ -147,8 +148,8 @@ export class GeneralTab extends Tab {
     const escapeCharRecords = ['"', '\''];
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Default Escape Character';
-    settingDesc = 'The default character to use to escape YAML values when a single quote and double quote are not present.';
+    settingName = getTextInLanguage('default-escape-character-name');
+    settingDesc = getTextInLanguage('default-escape-character-description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
@@ -166,8 +167,8 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Remove Unnecessary Escape Characters when in Multi-Line Array Format';
-    settingDesc = 'Escape characters for multi-line YAML arrays don\'t need the same escaping as single-line arrays, so when in multi-line format remove extra escapes that are not necessary';
+    settingName = getTextInLanguage('remove-unnecessary-escape-chars-in-multi-line-arrays-name');
+    settingDesc = getTextInLanguage('remove-unnecessary-escape-chars-in-multi-line-arrays-description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
@@ -183,8 +184,8 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Number of Dollar Signs to Indicate Math Block';
-    settingDesc = 'The amount of dollar signs to consider the math content to be a math block instead of inline math';
+    settingName = getTextInLanguage('number-of-dollar-signs-to-indicate-math-block-name');
+    settingDesc = getTextInLanguage('number-of-dollar-signs-to-indicate-math-block-description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
