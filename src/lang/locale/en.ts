@@ -323,7 +323,7 @@ export default {
   'remove-leftover-footnotes-from-quote-on-paste-description': 'Removes any leftover footnote references for the text to paste',
   // remove-link-spacing.ts
   'remove-link-spacing-name': 'Remove link spacing',
-  'remove-link-spacing-description': 'Removes spacing around link text,',
+  'remove-link-spacing-description': 'Removes spacing around link text.',
   // remove-multiple-blank-lines-on-paste.ts
   'remove-multiple-blank-lines-on-paste-name': 'Remove Multiple Blank Lines on Paste',
   'remove-multiple-blank-lines-on-paste-description': 'Condenses multiple blank lines down into one blank line for the text to paste',
