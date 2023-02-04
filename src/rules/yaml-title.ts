@@ -20,7 +20,6 @@ class YamlTitleOptions implements Options {
 export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
   constructor() {
     super({
-      configKey: 'yaml-title',
       nameTextKey: 'yaml-title-name',
       descriptionTextKey: 'yaml-title-description',
       type: RuleType.YAML,

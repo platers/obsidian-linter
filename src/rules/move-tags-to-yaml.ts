@@ -35,7 +35,6 @@ class MoveTagsToYamlOptions implements Options {
 export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
   constructor() {
     super({
-      configKey: 'move-tags-to-yaml',
       nameTextKey: 'move-tags-to-yaml-name',
       descriptionTextKey: 'move-tags-to-yaml-description',
       type: RuleType.YAML,

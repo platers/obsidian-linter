@@ -13,7 +13,6 @@ class FileNameHeadingOptions implements Options {
 export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions> {
   constructor() {
     super({
-      configKey: 'file-name-heading',
       nameTextKey: 'file-name-heading-name',
       descriptionTextKey: 'file-name-heading-description',
       type: RuleType.HEADING,

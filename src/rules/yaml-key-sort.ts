@@ -26,11 +26,11 @@ class YamlKeySortOptions implements Options {
 export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
   constructor() {
     super({
-      configKey: 'yaml-key-sort',
       nameTextKey: 'yaml-key-sort-name',
       descriptionTextKey: 'yaml-key-sort-description',
       type: RuleType.YAML,
-    }, true);
+      hasSpecialExecutionOrder: true,
+    });
   }
   get OptionsClass(): new () => YamlKeySortOptions {
     return YamlKeySortOptions;

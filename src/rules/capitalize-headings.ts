@@ -400,7 +400,6 @@ class CapitalizeHeadingsOptions implements Options {
 export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOptions> {
   constructor() {
     super({
-      configKey: 'capitalize-headings',
       nameTextKey: 'capitalize-headings-name',
       descriptionTextKey: 'capitalize-headings-description',
       type: RuleType.HEADING,

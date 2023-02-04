@@ -12,7 +12,7 @@ export class RuleTab extends Tab {
   display(): void {
     for (const rule of this.rules) {
       const ruleDiv = this.contentEl.createDiv();
-      ruleDiv.id = rule.alias();
+      ruleDiv.id = rule.alias;
       ruleDiv.createEl(this.isMobile ? 'h4' : 'h3', {}, (el) => {
         el.innerHTML = `<a href="${rule.getURL()}">${rule.name}</a>`;
       });

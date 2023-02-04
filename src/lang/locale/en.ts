@@ -112,6 +112,12 @@ export default {
   'log-collection-description': 'Goes ahead and collects logs when you `Lint on save` and linting the current file. These logs can be helpful for debugging and create bug reports.',
   'linter-logs-name': 'Linter Logs',
   'linter-logs-description': 'The logs from the last `Lint on save` or the last lint current file run if enabled.',
+  'ERROR': 'error',
+  'TRACE': 'trace',
+  'DEBUG': 'debug',
+  'INFO': 'info',
+  'WARN': 'warn',
+  'SILENT': 'silent',
 
   // custom-command-option.ts
   'custom-command-name': 'Custom Commands',
@@ -140,8 +146,8 @@ export default {
   'auto-correct-common-misspellings-ignore-words-name': 'Ignore Words',
   'auto-correct-common-misspellings-ignore-words-description': 'A comma separated list of lowercased words to ignore when auto-correcting',
   // blockquotify-on-paste.ts
-  'blockquotify-on-paste-name': 'Add Blockquote Indentation on Paste',
-  'blockquotify-on-paste-description': 'Adds blockquotes to all but the first line, when the cursor is in a blockquote/callout line during pasting',
+  'add-blockquote-indentation-on-paste-name': 'Add Blockquote Indentation on Paste',
+  'add-blockquote-indentation-on-paste-description': 'Adds blockquotes to all but the first line, when the cursor is in a blockquote/callout line during pasting',
   // capitalize-headings.ts
   'capitalize-headings-name': 'Capitalize Headings',
   'capitalize-headings-description': 'Headings should be formatted with capitalization',
@@ -184,8 +190,8 @@ export default {
   'empty-line-around-code-fences-name': 'Empty Line Around Code Fences',
   'empty-line-around-code-fences-description': 'Ensures that there is an empty line around code fences unless they start or end a document.',
   // empty-line-around-math-block.ts
-  'empty-line-around-math-block-name': 'Empty Line Around Math Blocks',
-  'empty-line-around-math-block-description': 'Ensures that there is an empty line around math blocks using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.',
+  'empty-line-around-math-blocks-name': 'Empty Line Around Math Blocks',
+  'empty-line-around-math-blocks-description': 'Ensures that there is an empty line around math blocks using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.',
   // empty-line-around-tables.ts
   'empty-line-around-tables-name': 'Empty Line Around Tables',
   'empty-line-around-tables-description': 'Ensures that there is an empty line around github flavored tables unless they start or end a document.',
@@ -207,24 +213,22 @@ export default {
   'force-yaml-escape-force-yaml-escape-description': 'Uses the YAML escape character on the specified YAML keys separated by a new line character if it is not already escaped. Do not use on YAML arrays.',
   // format-tags-in-yaml.ts
   'format-tags-in-yaml-name': 'Format Tags in YAML',
-  'format-tags-in-yaml.-description': 'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
-  // format-yaml-arrays.ts
-  'format-yaml-arrays-name': 'Format Yaml Array',
-  'format-yaml-arrays-description': 'Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.',
-  'format-yaml-arrays-format-alias-key-name': 'Format yaml aliases section',
-  'format-yaml-arrays-format-alias-key-description': 'Turns on formatting for the yaml aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.',
-  'format-yaml-arrays-format-tag-key-name': 'Format yaml tags section',
-  'format-yaml-arrays-format-tag-key-description': 'Turns on formatting for the yaml tags section.',
-  'format-yaml-arrays-default-array-style-name': 'Default yaml array section style',
-  'format-yaml-arrays-default-array-style-description': 'The style of other yaml arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays`',
-  'multi-line': 'multi-line',
-  'single-line': 'single-line',
-  'format-yaml-arrays-default-array-keys-name': 'Format yaml array sections',
-  'format-yaml-arrays-default-array-keys-description': 'Turns on formatting for regular yaml arrays',
-  'format-yaml-arrays-force-single-line-array-style-name': 'Force key values to be single-line arrays',
-  'format-yaml-arrays-force-single-line-array-style-description': 'Forces the yaml array for the new line separated keys to be in single-line format (leave empty to disable this option)',
-  'format-yaml-arrays-force-multi-line-array-style-name': 'Force key values to be multi-line arrays',
-  'format-yaml-arrays-force-multi-line-array-style-description': 'Forces the yaml array for the new line separated keys to be in multi-line format (leave empty to disable this option)',
+  'format-tags-in-yaml-description': 'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
+  // format-yaml-array.ts
+  'format-yaml-array-name': 'Format Yaml Array',
+  'format-yaml-array-description': 'Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.',
+  'format-yaml-array-format-alias-key-name': 'Format yaml aliases section',
+  'format-yaml-array-format-alias-key-description': 'Turns on formatting for the yaml aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.',
+  'format-yaml-array-format-tag-key-name': 'Format yaml tags section',
+  'format-yaml-array-format-tag-key-description': 'Turns on formatting for the yaml tags section.',
+  'format-yaml-array-default-array-style-name': 'Default yaml array section style',
+  'format-yaml-array-default-array-style-description': 'The style of other yaml arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays`',
+  'format-yaml-array-default-array-keys-name': 'Format yaml array sections',
+  'format-yaml-array-default-array-keys-description': 'Turns on formatting for regular yaml arrays',
+  'format-yaml-array-force-single-line-array-style-name': 'Force key values to be single-line arrays',
+  'format-yaml-array-force-single-line-array-style-description': 'Forces the yaml array for the new line separated keys to be in single-line format (leave empty to disable this option)',
+  'format-yaml-array-force-multi-line-array-style-name': 'Force key values to be multi-line arrays',
+  'format-yaml-array-force-multi-line-array-style-description': 'Forces the yaml array for the new line separated keys to be in multi-line format (leave empty to disable this option)',
   // header-increment.ts
   'header-increment-name': 'Header Increment',
   'header-increment-description': 'Heading levels should only increment by one level at a time',
@@ -251,9 +255,9 @@ export default {
   // move-footnotes-to-the-bottom.ts
   'move-footnotes-to-the-bottom-name': 'Move Footnotes to the bottom',
   'move-footnotes-to-the-bottom-description': 'Move all footnotes to the bottom of the document.',
-  // move-math-block-indicators-to-own-line.ts
-  'move-math-block-indicators-to-own-line-name': 'Move Math Block Indicators to Their Own Line',
-  'move-math-block-indicators-to-own-line-description': 'Move all starting and ending math block indicators to their own lines using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.',
+  // move-math-block-indicators-to-their-own-line.ts
+  'move-math-block-indicators-to-their-own-line-name': 'Move Math Block Indicators to Their Own Line',
+  'move-math-block-indicators-to-their-own-line-description': 'Move all starting and ending math block indicators to their own lines using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.',
   // move-tags-to-yaml.ts
   'move-tags-to-yaml-name': 'Move Tags to Yaml',
   'move-tags-to-yaml-description': 'Move all tags to Yaml frontmatter of the document.',
@@ -386,7 +390,6 @@ export default {
   'yaml-key-sort-priority-keys-at-start-of-yaml-description': 'YAML Key Priority Sort Order is placed at the start of the YAML frontmatter',
   'yaml-key-sort-yaml-sort-order-for-other-keys-name': 'YAML Sort Order for Other Keys',
   'yaml-key-sort-yaml-sort-order-for-other-keys-description': 'The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area',
-  // TODO: determine if we can do a less niave approach to enum values as they may overlap and add the description in to the values that are set
   'None': 'None',
   'Ascending Alphabetical': 'Ascending Alphabetical',
   'Descending Alphabetical': 'Descending Alphabetical',
@@ -417,4 +420,13 @@ export default {
   'yaml-title-description': 'Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename if there is no H1.',
   'yaml-title-title-key-name': 'Title Key',
   'yaml-title-title-key-description': 'Which YAML key to use for title',
+
+  // yaml.ts
+  'multi-line': 'multi-line',
+  'single-line': 'single-line',
+  'single string to single-line': 'single string to single-line',
+  'single string to multi-line': 'single string to multi-line',
+  'single string comma delimited': 'single string to multi-line',
+  'single string space delimited': 'single string space delimited',
+  'single-line space delimited': 'single-line space delimited',
 };

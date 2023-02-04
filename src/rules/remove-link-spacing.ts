@@ -10,7 +10,6 @@ class RemoveLinkSpacingOptions implements Options {}
 export default class RemoveLinkSpacing extends RuleBuilder<RemoveLinkSpacingOptions> {
   constructor() {
     super({
-      configKey: 'remove-link-spacing',
       nameTextKey: 'remove-link-spacing-name',
       descriptionTextKey: 'remove-link-spacing-description',
       type: RuleType.SPACING,

@@ -10,7 +10,11 @@ class CompactYamlOptions implements Options {
 @RuleBuilder.register
 export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
   constructor() {
-    super('compact-yaml-name', 'compact-yaml-description', RuleType.SPACING);
+    super({
+      nameTextKey: 'compact-yaml-name',
+      descriptionTextKey: 'compact-yaml-description',
+      type: RuleType.SPACING,
+    });
   }
   get OptionsClass(): new () => CompactYamlOptions {
     return CompactYamlOptions;

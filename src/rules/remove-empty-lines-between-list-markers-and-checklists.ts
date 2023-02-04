@@ -9,14 +9,13 @@ class RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions implements Options 
 export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends RuleBuilder<RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions> {
   constructor() {
     super({
-      configKey: 'remove-empty-lines-between-list-markers-and-checklists',
       nameTextKey: 'remove-empty-lines-between-list-markers-and-checklists-name',
       descriptionTextKey: 'remove-empty-lines-between-list-markers-and-checklists-description',
       type: RuleType.SPACING,
     });
   }
   get OptionsClass(): new () => RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions {
-    return RemoveEmptyLinesBetweenListMarkersAndChecklists;
+    return RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions;
   }
   apply(text: string, options: RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.thematicBreak], text, (text) => {

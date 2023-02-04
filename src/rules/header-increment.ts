@@ -12,7 +12,6 @@ class HeaderIncrementOptions implements Options {
 export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions> {
   constructor() {
     super({
-      configKey: 'header-increment',
       nameTextKey: 'header-increment-name',
       descriptionTextKey: 'header-increment-description',
       type: RuleType.HEADING,

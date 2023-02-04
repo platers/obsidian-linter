@@ -13,7 +13,6 @@ class OrderedListStyleOptions implements Options {
 export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOptions> {
   constructor() {
     super({
-      configKey: 'ordered-list-style',
       nameTextKey: 'ordered-list-style-name',
       descriptionTextKey: 'ordered-list-style-description',
       type: RuleType.CONTENT,

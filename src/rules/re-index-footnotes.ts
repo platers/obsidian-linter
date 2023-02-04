@@ -9,7 +9,6 @@ class ReIndexFootnotesOptions implements Options {}
 export default class ReIndexFootnotes extends RuleBuilder<ReIndexFootnotesOptions> {
   constructor() {
     super({
-      configKey: 're-index-footnotes',
       nameTextKey: 're-index-footnotes-name',
       descriptionTextKey: 're-index-footnotes-description',
       type: RuleType.FOOTNOTE,

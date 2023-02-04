@@ -13,7 +13,11 @@ class EmphasisStyleOptions implements Options {
 @RuleBuilder.register
 export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
   constructor() {
-    super('emphasis-style-name', 'emphasis-style-description', RuleType.CONTENT);
+    super({
+      nameTextKey: 'emphasis-style-name',
+      descriptionTextKey: 'emphasis-style-description',
+      type: RuleType.CONTENT,
+    });
   }
   get OptionsClass(): new () => EmphasisStyleOptions {
     return EmphasisStyleOptions;

@@ -9,7 +9,6 @@ class FootnoteAfterPunctuationOptions implements Options {}
 export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterPunctuationOptions> {
   constructor() {
     super({
-      configKey: 'footnote-after-punctuation',
       nameTextKey: 'footnote-after-punctuation-name',
       descriptionTextKey: 'footnote-after-punctuation-description',
       type: RuleType.FOOTNOTE,

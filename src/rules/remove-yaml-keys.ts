@@ -12,7 +12,6 @@ class RemoveYamlKeysOptions implements Options {
 export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
   constructor() {
     super({
-      configKey: 'remove-yaml-keys',
       nameTextKey: 'remove-yaml-keys-name',
       descriptionTextKey: 'remove-yaml-keys-description',
       type: RuleType.YAML,

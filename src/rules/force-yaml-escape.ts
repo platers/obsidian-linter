@@ -13,11 +13,11 @@ class ForceYamlEscapeOptions implements Options {
 export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions> {
   constructor() {
     super({
-      configKey: 'force-yaml-escape',
       nameTextKey: 'force-yaml-escape-name',
       descriptionTextKey: 'force-yaml-escape-description',
       type: RuleType.YAML,
-    }, true);
+      hasSpecialExecutionOrder: true,
+    });
   }
   get OptionsClass(): new () => ForceYamlEscapeOptions {
     return ForceYamlEscapeOptions;

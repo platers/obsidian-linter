@@ -36,6 +36,7 @@ export interface LinterSettings {
   };
   lintOnSave: boolean;
   displayChanged: boolean;
+  settingsConvertedToConfigKeyValues: boolean;
   recordLintOnSaveLogs: boolean;
   foldersToIgnore: string[];
   linterLocale: string;
@@ -56,19 +57,11 @@ export enum RuleType {
 
 /** Class representing a rule */
 export class Rule {
-  public name: string;
-  public description: string;
-  public type: RuleType;
-  public options: Array<Option>;
-  public apply: ApplyFunction;
-
-  public examples: Array<Example>;
-  public readonly hasSpecialExecutionOrder: boolean;
-
   /**
    * Create a rule
    * @param {string} name - The name of the rule
    * @param {string} description - The description of the rule
+   * @param {string} alias - The alias of the rule which also is the config key for the rule
    * @param {RuleType} type - The type of the rule
    * @param {ApplyFunction} apply - The function to apply the rule
    * @param {Array<Example>} examples - The examples to be displayed in the documentation
@@ -76,30 +69,19 @@ export class Rule {
    * @param {boolean} [hasSpecialExecutionOrder=false] - The rule has special execution order
    */
   constructor(
-      name: string,
-      description: string,
-      type: RuleType,
-      apply: ApplyFunction,
-      examples: Array<Example>,
-      options: Array<Option> = [],
-      hasSpecialExecutionOrder: boolean = false,
+      public name: string,
+      public description: string,
+      public alias: string,
+      public type: RuleType,
+      public apply: ApplyFunction,
+      public examples: Array<Example>,
+      public options: Array<Option> = [],
+      public readonly hasSpecialExecutionOrder: boolean = false,
   ) {
-    this.name = name;
-    this.description = description;
-    this.type = type;
-    this.apply = apply;
-    this.examples = examples;
-
-    options.unshift(new BooleanOption(this.description, '', false));
+    options.unshift(new BooleanOption('enabled', this.description, '', false));
     for (const option of options) {
-      option.ruleName = name;
+      option.ruleAlias = alias;
     }
-    this.options = options;
-    this.hasSpecialExecutionOrder = hasSpecialExecutionOrder;
-  }
-
-  public alias(): string {
-    return this.name.replace(/ /g, '-').toLowerCase();
   }
 
   public getDefaultOptions() {
@@ -119,7 +101,7 @@ export class Rule {
   public getURL(): string {
     const url =
       'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
-    return url + '#' + this.alias();
+    return url + '#' + this.alias;
   }
 
   public enabledOptionName(): string {
@@ -190,7 +172,7 @@ export function getDisabledRules(text: string): string[] {
   }
 
   if (disabled_rules.includes('all')) {
-    return rules.map((rule) => rule.alias());
+    return rules.map((rule) => rule.alias);
   }
 
   return disabled_rules;
@@ -204,7 +186,7 @@ export const ruleTypeToRules = new Map<RuleType, Rule[]>;
 export function registerRule(rule: Rule): void {
   rules.push(rule);
   rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.name.localeCompare(b.name)));
-  rulesDict[rule.alias()] = rule;
+  rulesDict[rule.alias] = rule;
 
   if (ruleTypeToRules.has(rule.type)) {
     ruleTypeToRules.get(rule.type).push(rule);

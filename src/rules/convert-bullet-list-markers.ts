@@ -9,7 +9,6 @@ class ConvertBulletListMarkersOptions implements Options {}
 export default class ConvertBulletListMarkers extends RuleBuilder<ConvertBulletListMarkersOptions> {
   constructor() {
     super({
-      configKey: 'convert-bullet-list-markers',
       nameTextKey: 'convert-bullet-list-markers-name',
       descriptionTextKey: 'convert-bullet-list-markers-description',
       type: RuleType.CONTENT,

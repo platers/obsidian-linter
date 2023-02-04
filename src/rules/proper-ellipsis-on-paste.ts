@@ -10,7 +10,6 @@ class ProperEllipsisOnPasteOptions implements Options {}
 export default class ProperEllipsisOnPaste extends RuleBuilder<ProperEllipsisOnPasteOptions> {
   constructor() {
     super({
-      configKey: 'proper-ellipsis-on-paste',
       nameTextKey: 'proper-ellipsis-on-paste-name',
       descriptionTextKey: 'proper-ellipsis-on-paste-description',
       type: RuleType.PASTE,

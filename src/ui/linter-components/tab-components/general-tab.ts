@@ -105,7 +105,7 @@ export class GeneralTab extends Tab {
         .setDesc(settingDesc)
         .addDropdown((dropdown) => {
           yamlAliasRecords.forEach((aliasRecord) => {
-            dropdown.addOption(aliasRecord, aliasRecord); // todo: come back to alias the record
+            dropdown.addOption(aliasRecord, getTextInLanguage(aliasRecord));
           });
           dropdown.setValue(this.plugin.settings.commonStyles.aliasArrayStyle);
           dropdown.onChange(async (value) => {
@@ -134,7 +134,7 @@ export class GeneralTab extends Tab {
         .setDesc(settingDesc)
         .addDropdown((dropdown) => {
           yamlTagRecords.forEach((tagRecord) => {
-            dropdown.addOption(tagRecord, tagRecord); // todo: come back to alias the record
+            dropdown.addOption(tagRecord, getTextInLanguage(tagRecord));
           });
           dropdown.setValue(this.plugin.settings.commonStyles.tagArrayStyle);
           dropdown.onChange(async (value) => {

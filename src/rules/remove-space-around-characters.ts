@@ -16,7 +16,6 @@ class RemoveSpaceAroundCharactersOptions implements Options {
 export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpaceAroundCharactersOptions> {
   constructor() {
     super({
-      configKey: 'remove-space-around-characters',
       nameTextKey: 'remove-space-around-characters-name',
       descriptionTextKey: 'remove-space-around-characters-description',
       type: RuleType.SPACING,

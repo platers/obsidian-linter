@@ -12,7 +12,6 @@ class RemoveTrailingPunctuationInHeadingOptions implements Options {
 export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<RemoveTrailingPunctuationInHeadingOptions> {
   constructor() {
     super({
-      configKey: 'remove-trailing-punctuation-in-heading',
       nameTextKey: 'remove-trailing-punctuation-in-heading-name',
       descriptionTextKey: 'remove-trailing-punctuation-in-heading-description',
       type: RuleType.HEADING,

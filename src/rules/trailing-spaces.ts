@@ -11,7 +11,6 @@ class TrailingSpacesOptions implements Options {
 export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
   constructor() {
     super({
-      configKey: 'trailing-spaces',
       nameTextKey: 'trailing-spaces-name',
       descriptionTextKey: 'trailing-spaces-description',
       type: RuleType.SPACING,

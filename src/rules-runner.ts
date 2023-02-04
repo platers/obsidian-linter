@@ -51,14 +51,14 @@ export class RulesRunner {
     const disabledRuleText = getTextInLanguage('disabled-text');
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
-      if (this.disabledRules.includes(rule.alias())) {
-        logDebug(rule.alias() + ' ' + disabledRuleText);
+      if (this.disabledRules.includes(rule.alias)) {
+        logDebug(rule.alias + ' ' + disabledRuleText);
         continue;
       } else if (rule.hasSpecialExecutionOrder || rule.type === RuleType.PASTE) {
         continue;
       }
 
-      timingBegin(rule.alias());
+      timingBegin(rule.alias);
       [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, runOptions.settings, {
         fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
         fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
@@ -70,7 +70,7 @@ export class RulesRunner {
         defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
         removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
       });
-      timingEnd(rule.alias());
+      timingEnd(rule.alias);
     }
 
     const customRegexLogText = getTextInLanguage('custom-regex');

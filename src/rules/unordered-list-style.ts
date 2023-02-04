@@ -12,7 +12,6 @@ class UnorderedListStyleOptions implements Options {
 export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOptions> {
   constructor() {
     super({
-      configKey: 'unordered-list-style',
       nameTextKey: 'unordered-list-style-name',
       descriptionTextKey: 'unordered-list-style-description',
       type: RuleType.CONTENT,

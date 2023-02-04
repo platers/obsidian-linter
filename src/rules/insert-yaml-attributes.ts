@@ -15,7 +15,6 @@ class InsertYamlAttributesOptions implements Options {
 export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttributesOptions> {
   constructor() {
     super({
-      configKey: 'insert-yaml-attributes',
       nameTextKey: 'insert-yaml-attributes-name',
       descriptionTextKey: 'insert-yaml-attributes-description',
       type: RuleType.YAML,

@@ -13,9 +13,8 @@ class MoveMathBlockIndicatorsToOwnLineOptions implements Options {
 export default class MoveMathBlockIndicatorsToOwnLine extends RuleBuilder<MoveMathBlockIndicatorsToOwnLineOptions> {
   constructor() {
     super({
-      configKey: 'move-math-block-indicators-to-own-line',
-      nameTextKey: 'move-math-block-indicators-to-own-line-name',
-      descriptionTextKey: 'move-math-block-indicators-to-own-line-description',
+      nameTextKey: 'move-math-block-indicators-to-their-own-line-name',
+      descriptionTextKey: 'move-math-block-indicators-to-their-own-line-description',
       type: RuleType.SPACING,
     });
   }

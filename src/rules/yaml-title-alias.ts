@@ -27,7 +27,6 @@ class YamlTitleAliasOptions implements Options {
 export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   constructor() {
     super({
-      configKey: 'yaml-title-alias',
       nameTextKey: 'yaml-title-alias-name',
       descriptionTextKey: 'yaml-title-alias-description',
       type: RuleType.YAML,

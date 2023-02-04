@@ -10,7 +10,11 @@ class ConvertSpacesToTabsOptions implements Options {
 @RuleBuilder.register
 export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabsOptions> {
   constructor() {
-    super('convert-spaces-to-tabs-name', 'convert-spaces-to-tabs-description', RuleType.SPACING);
+    super({
+      nameTextKey: 'convert-spaces-to-tabs-name',
+      descriptionTextKey: 'convert-spaces-to-tabs-description',
+      type: RuleType.SPACING,
+    });
   }
   get OptionsClass(): new () => ConvertSpacesToTabsOptions {
     return ConvertSpacesToTabsOptions;

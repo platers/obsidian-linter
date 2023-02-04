@@ -13,7 +13,6 @@ class HeadingBlankLinesOptions implements Options {
 export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOptions> {
   constructor() {
     super({
-      configKey: 'heading-blank-lines',
       nameTextKey: 'heading-blank-lines-name',
       descriptionTextKey: 'heading-blank-lines-description',
       type: RuleType.SPACING,

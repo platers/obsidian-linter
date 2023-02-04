@@ -34,11 +34,11 @@ class YamlTimestampOptions implements Options {
 export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
   constructor() {
     super({
-      configKey: 'yaml-timestamp',
       nameTextKey: 'yaml-timestamp-name',
       descriptionTextKey: 'yaml-timestamp-description',
       type: RuleType.YAML,
-    }, true);
+      hasSpecialExecutionOrder: true,
+    });
   }
   get OptionsClass(): new () => YamlTimestampOptions {
     return YamlTimestampOptions;

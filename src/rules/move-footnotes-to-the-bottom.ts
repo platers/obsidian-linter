@@ -10,7 +10,6 @@ class MoveFootnotesToTheBottomOptions implements Options {}
 export default class MoveFootnotesToTheBottom extends RuleBuilder<MoveFootnotesToTheBottomOptions> {
   constructor() {
     super({
-      configKey: 'move-footnotes-to-the-bottom',
       nameTextKey: 'move-footnotes-to-the-bottom-name',
       descriptionTextKey: 'move-footnotes-to-the-bottom-description',
       type: RuleType.FOOTNOTE,

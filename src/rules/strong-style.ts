@@ -14,7 +14,6 @@ class StrongStyleOptions implements Options {
 export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
   constructor() {
     super({
-      configKey: 'strong-style',
       nameTextKey: 'strong-style-name',
       descriptionTextKey: 'strong-style-description',
       type: RuleType.CONTENT,

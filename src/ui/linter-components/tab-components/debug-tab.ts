@@ -5,9 +5,9 @@ import {Setting} from 'obsidian';
 import {TextBoxFull} from 'src/ui/components/text-box-full';
 import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
 import {logsFromLastRun, setLogLevel} from 'src/utils/logger';
-import {getTextInLanguage} from 'src/lang/helpers';
+import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
 
-const logLevels = Object.keys(log.levels);
+const logLevels = Object.keys(log.levels) as LanguageStringKey[];
 const logLevelInts = Object.values(log.levels);
 
 export class DebugTab extends Tab {
@@ -25,7 +25,7 @@ export class DebugTab extends Tab {
         .setDesc(settingDesc)
         .addDropdown((dropdown) => {
           logLevels.forEach((logLevel, index) => {
-            dropdown.addOption(logLevelInts[index], logLevel); // todo: determine how to map this to text in the desired language
+            dropdown.addOption(logLevelInts[index], getTextInLanguage(logLevel));
           });
           // set value only takes strings so I have to cast the log level to type string in order to get it to work properly
           dropdown.setValue(this.plugin.settings.logLevel + '');

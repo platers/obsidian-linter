@@ -13,11 +13,11 @@ class EscapeYamlSpecialCharactersOptions implements Options {
 export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlSpecialCharactersOptions> {
   constructor() {
     super({
-      configKey: 'escape-yaml-special-characters',
       nameTextKey: 'escape-yaml-special-characters-name',
       descriptionTextKey: 'escape-yaml-special-characters-description',
       type: RuleType.YAML,
-    }, true);
+      hasSpecialExecutionOrder: true,
+    });
   }
   get OptionsClass(): new () => EscapeYamlSpecialCharactersOptions {
     return EscapeYamlSpecialCharactersOptions;

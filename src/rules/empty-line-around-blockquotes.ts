@@ -8,7 +8,11 @@ class EmptyLineAroundBlockquotesOptions implements Options {}
 @RuleBuilder.register
 export default class EmptyLineAroundBlockquotes extends RuleBuilder<EmptyLineAroundBlockquotesOptions> {
   constructor() {
-    super('empty-line-around-blockquotes-name', 'empty-line-around-blockquotes-description', RuleType.SPACING);
+    super({
+      nameTextKey: 'empty-line-around-blockquotes-name',
+      descriptionTextKey: 'empty-line-around-blockquotes-description',
+      type: RuleType.SPACING,
+    });
   }
   get OptionsClass(): new () => EmptyLineAroundBlockquotesOptions {
     return EmptyLineAroundBlockquotesOptions;

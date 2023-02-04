@@ -9,11 +9,11 @@ class FormatTagsInYamlOptions implements Options {}
 export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOptions> {
   constructor() {
     super({
-      configKey: 'remove-multiple-spaces',
-      nameTextKey: 'remove-multiple-spaces-name',
-      descriptionTextKey: 'remove-multiple-spaces-description',
+      nameTextKey: 'format-tags-in-yaml-name',
+      descriptionTextKey: 'format-tags-in-yaml-description',
       type: RuleType.YAML,
-    }, true);
+      hasSpecialExecutionOrder: true,
+    });
   }
   get OptionsClass(): new () => FormatTagsInYamlOptions {
     return FormatTagsInYamlOptions;
