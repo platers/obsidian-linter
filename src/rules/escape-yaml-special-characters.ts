@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {escapeStringIfNecessaryAndPossible, formatYAML, QuoteCharacter as QuoteCharacter} from '../utils/yaml';
+import {escapeStringIfNecessaryAndPossible, formatYAML, QuoteCharacter} from '../utils/yaml';
 
 class EscapeYamlSpecialCharactersOptions implements Options {
   @RuleBuilder.noSettingControl()
