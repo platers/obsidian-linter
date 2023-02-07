@@ -122,7 +122,7 @@ These are special lint rules that the user may specify. They are Obsidian comman
 1. Install the QuickAdd plugin
 2. Go ahead and go to the settings for QuickAdd and select "Manage Macros"
 3. You should see a modal popup. In that modal, make sure to type in a macro name and add the macro.
-4. Once the macro is added, go ahead and configure the macro making sure to add your user user script (this should be a JavaScript file in your Obsidian vault). [Here](https://github.com/chhoumann/quickadd/blob/master/docs/Examples/Macro_LogBookToDailyJournal.md) is an example from the QuickAdd repo with an explanation of what the code does.
+4. Once the macro is added, go ahead and configure the macro making sure to add your user user script (this should be a JavaScript file in your Obsidian vault). [Here](https://github.com/chhoumann/quickadd/blob/master/docs/docs/Examples/Macro_LogBookToDailyJournal.md) is an example from the QuickAdd repo with an explanation of what the code does.
 5. Once you have finished all changes to your macro that you would like, go ahead and exit out of configure macro modal and the macro manager modal.
 6. Then go ahead and select macro for the choice type and type in the name of the macro you just created (you may get suggestions or you may have to remember the name and type it in completely). Then add select "Add Choice".
 7. Once the choice has been added, go ahead and click the lightning bolt icon which is the option to add a command for a choice.
