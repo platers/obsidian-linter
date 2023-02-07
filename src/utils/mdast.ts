@@ -12,6 +12,7 @@ import {fromMarkdown} from 'mdast-util-from-markdown';
 import {gfmFootnoteFromMarkdown} from 'mdast-util-gfm-footnote';
 import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
 import QuickLRU from 'quick-lru';
+import {getTextInLanguage} from '../lang/helpers';
 
 const LRU = new QuickLRU({maxSize: 200});
 
@@ -112,13 +113,12 @@ export function moveFootnotesToEnd(text: string) {
     } while (alreadyUsedReferencePositions.has(footnoteReferenceLocation) && footnoteReferenceLocation !== -1 );
 
     if (footnoteReferenceLocation === -1) {
-      throw new Error(`Footnote '${footnote}' has no corresponding footnote reference before the footnote contents and cannot be processed. Please make sure that all footnotes have a corresponding reference before the content of the footnote.`);
+      throw new Error(getTextInLanguage('missing-footnote-error-message').replace('{FOOTNOTE}', footnote));
     }
 
     alreadyUsedReferencePositions.add(footnoteReferenceLocation);
     return footnoteReferenceLocation;
   };
-
 
   for (const position of positions) {
     const footnote = text.substring(position.start.offset, position.end.offset);

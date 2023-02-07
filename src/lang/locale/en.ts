@@ -139,6 +139,12 @@ export default {
   'custom-replace-regex-to-replace-placeholder-text': 'regex to replace',
   'custom-replace-delete-tooltip': 'Delete',
 
+  // mdast.ts
+  'missing-footnote-error-message': `Footnote '{FOOTNOTE}' has no corresponding footnote reference before the footnote contents and cannot be processed. Please make sure that all footnotes have a corresponding reference before the content of the footnote.`,
+
+  // yaml.ts
+  'invalid-delimiter-error-message': 'delimiter is only allowed to be a single character',
+
   // rules
   // auto-correct-common-misspellings.ts
   'auto-correct-common-misspellings-name': 'Auto-correct Common Misspellings',
@@ -406,6 +412,9 @@ export default {
   'yaml-timestamp-date-modified-key-description': 'Which YAML key to use for modification date',
   'yaml-timestamp-format-name': 'Format',
   'yaml-timestamp-format-description': 'Moment date format to use (see [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
+  'yaml-timestamp-force-retention-of-create-value-name': 'Force Retention of `Date Created Key`\'s Value',
+  'yaml-timestamp-force-retention-of-create-value-description': 'Forces the reuse of the value of `Date Created Key` in the YAML frontmatter if it exists instead of using the file metadata which helps preserve the created at timestamp when syncing a file between devices or after a file has lost its original creation date.',
+  'invalid-date-format-error': `The format of the created date '{DATE}' could not be parsed or determined so the created date was left alone in '{FILE_NAME}'`,
   // yaml-title-alias.ts
   'yaml-title-alias-name': 'YAML Title Alias',
   'yaml-title-alias-description': 'Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
