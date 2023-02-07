@@ -1,4 +1,5 @@
 import {load} from 'js-yaml';
+import {getTextInLanguage} from '../lang/helpers';
 import {escapeDollarSigns, yamlRegex} from './regex';
 
 
@@ -273,7 +274,7 @@ export function convertYAMLStringToArray(value: string, delimiter: string = ',')
   }
 
   if (delimiter.length > 1) {
-    throw new Error('delimiter is only allowed to be a single character');
+    throw new Error(getTextInLanguage('invalid-delimiter-error-message'));
   }
 
   const arrayItems: string[] = [];

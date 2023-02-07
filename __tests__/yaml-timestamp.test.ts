@@ -42,6 +42,26 @@ ruleTest({
       },
     },
     {
+      testName: 'When the date format changes and `forceRetentionOfCreatedValue = true`, date created value is based on the one in the YAML frontmatter.',
+      before: dedent`
+        ---
+        created: Wednesday, January 1st 2020, 12:00:00 am
+        ---
+      `,
+      after: dedent`
+        ---
+        created: 2020, 12:00:00 am
+        ---
+      `,
+      options: {
+        dateModified: false,
+        dateCreatedKey: 'created',
+        forceRetentionOfCreatedValue: true,
+        format: 'YYYY, h:mm:ss a',
+        locale: 'en',
+      },
+    },
+    {
       testName: 'Respects modified key when nothing has changed',
       before: dedent`
         ---
