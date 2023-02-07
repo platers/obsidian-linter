@@ -350,7 +350,7 @@ export default class LinterPlugin extends Plugin {
     try {
       newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
     } catch (error) {
-      this.handleLintError(file, error, getTextInLanguage('lint-all-files-error-message') + ' \'{FILE_PATH}\'', false);
+      this.handleLintError(file, error, getTextInLanguage('lint-file-error-message') + ' \'{FILE_PATH}\'', false);
       return;
     }
 
@@ -387,7 +387,7 @@ export default class LinterPlugin extends Plugin {
     try {
       this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
     } catch (error) {
-      this.handleLintError(file, error, getTextInLanguage('lint-all-files-error-message') + ' \'{FILE_PATH}\'', false);
+      this.handleLintError(file, error, getTextInLanguage('lint-file-error-message') + ' \'{FILE_PATH}\'', false);
     }
   }
 
