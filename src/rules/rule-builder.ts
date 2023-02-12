@@ -69,7 +69,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   constructor(args: RuleBuilderConstructorArgs) {
     super();
 
-    this.configKey = args.nameTextKey.replace(/-name$/m, '');
+    this.configKey = args.nameTextKey.replace(/^rules\./m, '').replace(/.name$/m, '');
     this.nameTextKey = args.nameTextKey;
     this.descriptionTextKey = args.descriptionTextKey;
     this.type = args.type;
