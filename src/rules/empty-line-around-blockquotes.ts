@@ -9,8 +9,8 @@ class EmptyLineAroundBlockquotesOptions implements Options {}
 export default class EmptyLineAroundBlockquotes extends RuleBuilder<EmptyLineAroundBlockquotesOptions> {
   constructor() {
     super({
-      nameTextKey: 'empty-line-around-blockquotes-name',
-      descriptionTextKey: 'empty-line-around-blockquotes-description',
+      nameTextKey: 'rules.empty-line-around-blockquotes.name',
+      descriptionTextKey: 'rules.empty-line-around-blockquotes.description',
       type: RuleType.SPACING,
     });
   }

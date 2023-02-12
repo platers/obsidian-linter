@@ -9,8 +9,8 @@ class RemoveMultipleBlankLinesOnPasteOptions implements Options {}
 export default class RemoveMultipleBlankLinesOnPaste extends RuleBuilder<RemoveMultipleBlankLinesOnPasteOptions> {
   constructor() {
     super({
-      nameTextKey: 'remove-multiple-blank-lines-on-paste-name',
-      descriptionTextKey: 'remove-multiple-blank-lines-on-paste-description',
+      nameTextKey: 'rules.remove-multiple-blank-lines-on-paste.name',
+      descriptionTextKey: 'rules.remove-multiple-blank-lines-on-paste.description',
       type: RuleType.PASTE,
     });
   }

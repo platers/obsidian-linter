@@ -10,8 +10,8 @@ class HeadingStartLineOptions implements Options {}
 export default class HeadingStartLine extends RuleBuilder<HeadingStartLineOptions> {
   constructor() {
     super({
-      nameTextKey: 'headings-start-line-name',
-      descriptionTextKey: 'headings-start-line-description',
+      nameTextKey: 'rules.headings-start-line.name',
+      descriptionTextKey: 'rules.headings-start-line.description',
       type: RuleType.HEADING,
     });
   }

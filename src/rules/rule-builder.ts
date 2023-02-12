@@ -23,7 +23,7 @@ export abstract class RuleBuilderBase {
     const optionsFromSettings = rule.getOptions(settings);
     if (optionsFromSettings[rule.enabledOptionName()]) {
       const options = Object.assign({}, optionsFromSettings, extraOptions) as Options;
-      logDebug(`${getTextInLanguage('run-rule-text')} ${rule.name}`);
+      logDebug(`${getTextInLanguage('logs.run-rule-text')} ${rule.name}`);
 
       try {
         return [rule.apply(text, options), true];
@@ -108,7 +108,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions): [result: string, isEnabled: boolean] {
     const rule = this.getRule();
     if (disabledRules.includes(rule.alias)) {
-      logDebug(rule.alias + ' ' + getTextInLanguage('disabled-text'));
+      logDebug(rule.alias + ' ' + getTextInLanguage('logs.disabled-text'));
       return [text, false];
     }
 

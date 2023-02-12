@@ -40,8 +40,8 @@ class YamlTimestampOptions implements Options {
 export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
   constructor() {
     super({
-      nameTextKey: 'yaml-timestamp-name',
-      descriptionTextKey: 'yaml-timestamp-description',
+      nameTextKey: 'rules.yaml-timestamp.name',
+      descriptionTextKey: 'rules.yaml-timestamp.description',
       type: RuleType.YAML,
       hasSpecialExecutionOrder: true,
     });
@@ -112,7 +112,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       } else if (options.forceRetentionOfCreatedValue) {
         const yamlCreatedDateTime = this.parseValueToCurrentFormatIfPossible(createdDateString, options.format, options.locale);
         if (yamlCreatedDateTime == null) {
-          throw new Error(getTextInLanguage('invalid-date-format-error').replace('{DATE}', createdDateString).replace('{FILE_NAME}', options.fileName));
+          throw new Error(getTextInLanguage('logs.invalid-date-format-error').replace('{DATE}', createdDateString).replace('{FILE_NAME}', options.fileName));
         }
 
         const created_date_yaml_line = `\n${options.dateCreatedKey}: ${yamlCreatedDateTime.format(options.format)}`;
@@ -283,38 +283,38 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        nameTextKey: 'yaml-timestamp-date-created-name',
-        descriptionTextKey: 'yaml-timestamp-date-created-description',
+        nameTextKey: 'rules.yaml-timestamp.date-created.name',
+        descriptionTextKey: 'rules.yaml-timestamp.date-created.description',
         optionsKey: 'dateCreated',
       }),
       new TextOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        nameTextKey: 'yaml-timestamp-date-created-key-name',
-        descriptionTextKey: 'yaml-timestamp-date-created-key-description',
+        nameTextKey: 'rules.yaml-timestamp.date-created-key.name',
+        descriptionTextKey: 'rules.yaml-timestamp.date-created-key.description',
         optionsKey: 'dateCreatedKey',
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        nameTextKey: 'yaml-timestamp-force-retention-of-create-value-name',
-        descriptionTextKey: 'yaml-timestamp-force-retention-of-create-value-description',
+        nameTextKey: 'rules.yaml-timestamp.force-retention-of-create-value.name',
+        descriptionTextKey: 'rules.yaml-timestamp.force-retention-of-create-value.description',
         optionsKey: 'forceRetentionOfCreatedValue',
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        nameTextKey: 'yaml-timestamp-date-modified-name',
-        descriptionTextKey: 'yaml-timestamp-date-modified-description',
+        nameTextKey: 'rules.yaml-timestamp.date-modified.name',
+        descriptionTextKey: 'rules.yaml-timestamp.date-modified.description',
         optionsKey: 'dateModified',
       }),
       new TextOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        nameTextKey: 'yaml-timestamp-date-modified-key-name',
-        descriptionTextKey: 'yaml-timestamp-date-modified-key-description',
+        nameTextKey: 'rules.yaml-timestamp.date-modified-key.name',
+        descriptionTextKey: 'rules.yaml-timestamp.date-modified-key.description',
         optionsKey: 'dateModifiedKey',
       }),
       new MomentFormatOptionBuilder({
         OptionsClass: YamlTimestampOptions,
-        nameTextKey: 'yaml-timestamp-format-name',
-        descriptionTextKey: 'yaml-timestamp-format-description',
+        nameTextKey: 'rules.yaml-timestamp.format.name',
+        descriptionTextKey: 'rules.yaml-timestamp.format.description',
         optionsKey: 'format',
       }),
     ];

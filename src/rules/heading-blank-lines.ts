@@ -13,8 +13,8 @@ class HeadingBlankLinesOptions implements Options {
 export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOptions> {
   constructor() {
     super({
-      nameTextKey: 'heading-blank-lines-name',
-      descriptionTextKey: 'heading-blank-lines-description',
+      nameTextKey: 'rules.heading-blank-lines.name',
+      descriptionTextKey: 'rules.heading-blank-lines.description',
       type: RuleType.SPACING,
     });
   }
@@ -120,14 +120,14 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
     return [
       new BooleanOptionBuilder({
         OptionsClass: HeadingBlankLinesOptions,
-        nameTextKey: 'heading-blank-lines-bottom-name',
-        descriptionTextKey: 'heading-blank-lines-bottom-description',
+        nameTextKey: 'rules.heading-blank-lines.bottom.name',
+        descriptionTextKey: 'rules.heading-blank-lines.bottom.description',
         optionsKey: 'bottom',
       }),
       new BooleanOptionBuilder({
         OptionsClass: HeadingBlankLinesOptions,
-        nameTextKey: 'heading-blank-lines-empty-line-after-yaml-name',
-        descriptionTextKey: 'heading-blank-lines-empty-line-after-yaml-description',
+        nameTextKey: 'rules.heading-blank-lines.empty-line-after-yaml.name',
+        descriptionTextKey: 'rules.heading-blank-lines.empty-line-after-yaml.description',
         optionsKey: 'emptyLineAfterYaml',
       }),
     ];

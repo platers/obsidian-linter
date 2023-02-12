@@ -11,8 +11,8 @@ class ConvertSpacesToTabsOptions implements Options {
 export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabsOptions> {
   constructor() {
     super({
-      nameTextKey: 'convert-spaces-to-tabs-name',
-      descriptionTextKey: 'convert-spaces-to-tabs-description',
+      nameTextKey: 'rules.convert-spaces-to-tabs.name',
+      descriptionTextKey: 'rules.convert-spaces-to-tabs.description',
       type: RuleType.SPACING,
     });
   }
@@ -61,8 +61,8 @@ export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabs
     return [
       new NumberOptionBuilder({
         OptionsClass: ConvertSpacesToTabsOptions,
-        nameTextKey: 'convert-spaces-to-tabs-tabsize-name',
-        descriptionTextKey: 'convert-spaces-to-tabs-tabsize-description',
+        nameTextKey: 'rules.convert-spaces-to-tabs.tabsize.name',
+        descriptionTextKey: 'rules.convert-spaces-to-tabs.tabsize.description',
         optionsKey: 'tabsize',
       }),
     ];

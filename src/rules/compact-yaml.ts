@@ -12,7 +12,7 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
   constructor() {
     super({
       nameTextKey: 'rules.compact-yaml.name',
-      descriptionTextKey: 'compact-yaml-description',
+      descriptionTextKey: 'rules.compact-yaml.description',
       type: RuleType.SPACING,
     });
   }
@@ -89,8 +89,8 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: CompactYamlOptions,
-        nameTextKey: 'compact-yaml-inner-new-lines-name',
-        descriptionTextKey: 'compact-yaml-inner-new-lines-description',
+        nameTextKey: 'rules.compact-yaml.inner-new-lines.name',
+        descriptionTextKey: 'rules.compact-yaml.inner-new-lines.description',
         optionsKey: 'innerNewLines',
       }),
     ];

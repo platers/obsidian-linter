@@ -13,8 +13,8 @@ class ForceYamlEscapeOptions implements Options {
 export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions> {
   constructor() {
     super({
-      nameTextKey: 'force-yaml-escape-name',
-      descriptionTextKey: 'force-yaml-escape-description',
+      nameTextKey: 'rules.force-yaml-escape.name',
+      descriptionTextKey: 'rules.force-yaml-escape.description',
       type: RuleType.YAML,
       hasSpecialExecutionOrder: true,
     });
@@ -91,8 +91,8 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
     return [
       new TextAreaOptionBuilder({
         OptionsClass: ForceYamlEscapeOptions,
-        nameTextKey: 'force-yaml-escape-force-yaml-escape-name',
-        descriptionTextKey: 'force-yaml-escape-force-yaml-escape-description',
+        nameTextKey: 'rules.force-yaml-escape.force-yaml-escape-keys.name',
+        descriptionTextKey: 'rules.force-yaml-escape.force-yaml-escape-keys.description',
         optionsKey: 'forceYamlEscape',
       }),
     ];

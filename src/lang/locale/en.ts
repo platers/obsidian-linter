@@ -236,8 +236,8 @@ export default {
       'name': 'Compact YAML',
       'description': 'Removes leading and trailing blank lines in the YAML front matter.',
       'inner-new-lines': {
-        'inner-new-lines-name': 'Inner New Lines',
-        'inner-new-lines-description': 'Remove new lines that are not at the start or the end of the YAML',
+        'name': 'Inner New Lines',
+        'description': 'Remove new lines that are not at the start or the end of the YAML',
       },
     },
     // consecutive-blank-lines.ts
@@ -382,7 +382,7 @@ export default {
     'insert-yaml-attributes': {
       'name': 'Insert YAML attributes',
       'description': 'Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.',
-      'text-to-insert-name': {
+      'text-to-insert': {
         'name': 'Text to insert',
         'description': 'Text to insert into the YAML frontmatter',
       },

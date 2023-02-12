@@ -71,7 +71,7 @@ export default class LinterPlugin extends Plugin {
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
-    logInfo(getTextInLanguage('plugin-load'));
+    logInfo(getTextInLanguage('logs.plugin-load'));
 
     this.isEnabled = true;
     // eslint-disable-next-line guard-for-in
@@ -90,7 +90,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   async onunload() {
-    logInfo(getTextInLanguage('plugin-unload'));
+    logInfo(getTextInLanguage('logs.plugin-unload'));
     this.isEnabled = false;
 
     for (const eventRef of this.eventRefs) {
@@ -123,7 +123,7 @@ export default class LinterPlugin extends Plugin {
   addCommands() {
     this.addCommand({
       id: 'lint-file',
-      name: getTextInLanguage('lint-file'),
+      name: getTextInLanguage('commands.lint-file.name'),
       editorCallback: (editor) => {
         setCollectLogs(this.settings.recordLintOnSaveLogs);
         clearLogs();
@@ -143,7 +143,7 @@ export default class LinterPlugin extends Plugin {
 
     this.addCommand({
       id: 'lint-file-unless-ignored',
-      name: getTextInLanguage('lint-file-unless-ignored'),
+      name: getTextInLanguage('commands.lint-file-unless-ignored.name'),
       editorCallback: (editor: Editor) => {
         const file = this.app.workspace.getActiveFile();
 
@@ -156,7 +156,7 @@ export default class LinterPlugin extends Plugin {
 
     this.addCommand({
       id: 'lint-all-files',
-      name: getTextInLanguage('lint-all-files'),
+      name: getTextInLanguage('commands.lint-all-files.name'),
       icon: iconInfo.vault.id,
       callback: () => {
         const startMessage = getTextInLanguage('lint-all-files-start-message');

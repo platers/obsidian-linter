@@ -12,8 +12,8 @@ class RemoveYamlKeysOptions implements Options {
 export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
   constructor() {
     super({
-      nameTextKey: 'remove-yaml-keys-name',
-      descriptionTextKey: 'remove-yaml-keys-description',
+      nameTextKey: 'rules.remove-yaml-keys.name',
+      descriptionTextKey: 'rules.remove-yaml-keys.description',
       type: RuleType.YAML,
     });
   }
@@ -83,8 +83,8 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
     return [
       new TextAreaOptionBuilder({
         OptionsClass: RemoveYamlKeysOptions,
-        nameTextKey: 'remove-yaml-keys-yaml-keys-to-remove-name',
-        descriptionTextKey: 'remove-yaml-keys-yaml-keys-to-remove-description',
+        nameTextKey: 'rules.remove-yaml-keys.yaml-keys-to-remove.name',
+        descriptionTextKey: 'rules.remove-yaml-keys.yaml-keys-to-remove.description',
         optionsKey: 'yamlKeysToRemove',
       }),
     ];

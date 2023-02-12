@@ -9,8 +9,8 @@ class RemoveHyphenatedLineBreaksOptions implements Options {}
 export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphenatedLineBreaksOptions> {
   constructor() {
     super({
-      nameTextKey: 'remove-hyphenated-line-breaks-name',
-      descriptionTextKey: 'remove-hyphenated-line-breaks-description',
+      nameTextKey: 'rules.remove-hyphenated-line-breaks.name',
+      descriptionTextKey: 'rules.remove-hyphenated-line-breaks.descriptions',
       type: RuleType.CONTENT,
     });
   }
