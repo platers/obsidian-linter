@@ -274,7 +274,7 @@ export function convertYAMLStringToArray(value: string, delimiter: string = ',')
   }
 
   if (delimiter.length > 1) {
-    throw new Error(getTextInLanguage('invalid-delimiter-error-message'));
+    throw new Error(getTextInLanguage('logs.invalid-delimiter-error-message'));
   }
 
   const arrayItems: string[] = [];

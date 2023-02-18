@@ -69,7 +69,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   constructor(args: RuleBuilderConstructorArgs) {
     super();
 
-    this.configKey = args.nameTextKey.replace(/^rules\./m, '').replace(/.name$/m, '');
+    this.configKey = args.nameTextKey.replace(/rules\.(.*)\.name/, '$1');
     this.nameTextKey = args.nameTextKey;
     this.descriptionTextKey = args.descriptionTextKey;
     this.type = args.type;
@@ -174,7 +174,7 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
 
   constructor(args: OptionBuilderConstructorArgs<TOptions, TValue>) {
     this.OptionsClass = args.OptionsClass;
-    this.configKey = args.nameTextKey.replace(/-name$/m, '');
+    this.configKey = args.nameTextKey.replace(/rules\.(.*)\.name/, '$1');
     this.name = getTextInLanguage(args.nameTextKey);
     this.description = getTextInLanguage(args.descriptionTextKey);
     this.nameTextKey = args.nameTextKey;
@@ -227,7 +227,7 @@ export class DropdownOptionBuilder<TOptions extends Options, TValue extends stri
     }[]
   }) {
     super(args);
-    this.records = args.records.map((record) => new DropdownRecord(record.value as LanguageStringKey, record.description));
+    this.records = args.records.map((record) => new DropdownRecord('enums.' + record.value as LanguageStringKey, record.description));
   }
 
   protected buildOption(): Option {

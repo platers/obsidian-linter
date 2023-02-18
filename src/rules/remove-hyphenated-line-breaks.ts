@@ -10,7 +10,7 @@ export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphen
   constructor() {
     super({
       nameTextKey: 'rules.remove-hyphenated-line-breaks.name',
-      descriptionTextKey: 'rules.remove-hyphenated-line-breaks.descriptions',
+      descriptionTextKey: 'rules.remove-hyphenated-line-breaks.description',
       type: RuleType.CONTENT,
     });
   }

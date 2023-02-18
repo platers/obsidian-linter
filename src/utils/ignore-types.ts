@@ -159,7 +159,7 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): Ign
 function replaceTags(text: string, placeholder: string): IgnoreResults {
   const replacedValues: string[] = [];
 
-  text = text.replace(tagWithLeadingWhitespaceRegex, (match, whitespace, tag) => {
+  text = text.replace(tagWithLeadingWhitespaceRegex, (_, whitespace, tag) => {
     replacedValues.push(tag);
     return whitespace + placeholder;
   });

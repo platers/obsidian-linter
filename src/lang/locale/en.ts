@@ -68,6 +68,7 @@ export default {
 
     // logger.ts
     'timing-key-not-found': 'timing key \'{TIMING_KEY}\' does not exist in the timing info list, so it was ignored',
+    'milliseconds-abbreviation': 'ms',
 
     'invalid-date-format-error': `The format of the created date '{DATE}' could not be parsed or determined so the created date was left alone in '{FILE_NAME}'`,
 
@@ -76,6 +77,10 @@ export default {
 
     // mdast.ts
     'missing-footnote-error-message': `Footnote '{FOOTNOTE}' has no corresponding footnote reference before the footnote contents and cannot be processed. Please make sure that all footnotes have a corresponding reference before the content of the footnote.`,
+
+    // rules.ts
+    'wrapper-yaml-error': 'error in the yaml: {ERROR_MESSAGE}',
+    'wrapper-unknown-error': 'unknown error: {ERROR_MESSAGE}',
   },
 
   'notice-text': {
@@ -128,7 +133,7 @@ export default {
       'same-as-system-locale': 'Same as system ({SYS_LOCALE})',
       'yaml-aliases-section-style': {
         'name': 'YAML aliases section style',
-        'descriptions': 'The style of the YAML aliases section',
+        'description': 'The style of the YAML aliases section',
       },
       'yaml-tags-section-style': {
         'name': 'YAML tags section style',
@@ -155,7 +160,7 @@ export default {
       },
       'linter-config': {
         'name': 'Linter Config',
-        'descriptions': 'The contents of the data.json for the Linter as of the setting page loading',
+        'description': 'The contents of the data.json for the Linter as of the setting page loading',
       },
       'log-collection': {
         'name': 'Collect logs when linting on save and linting the current file',
@@ -481,7 +486,7 @@ export default {
     // remove-hyphenated-line-breaks.ts
     'remove-hyphenated-line-breaks': {
       'name': 'Remove Hyphenated Line Breaks',
-      'descriptions': 'Removes hyphenated line breaks. Useful when pasting text from textbooks.',
+      'description': 'Removes hyphenated line breaks. Useful when pasting text from textbooks.',
     },
     // remove-hyphens-on-paste.ts
     'remove-hyphens-on-paste': {

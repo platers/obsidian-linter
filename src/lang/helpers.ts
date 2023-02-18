@@ -1,5 +1,5 @@
 // based on https://github.com/mgmeyers/obsidian-kanban/blob/main/src/lang/helpers.ts
-import {getString, NestedKeyOf} from 'src/utils/nested-keyof';
+import {getString, NestedKeyOf} from '../utils/nested-keyof';
 import {logWarn} from '../utils/logger';
 import ar from './locale/ar';
 import cz from './locale/cz';

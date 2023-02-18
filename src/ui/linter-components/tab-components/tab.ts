@@ -26,15 +26,15 @@ const tabNameToTabIconId: Record<string | RuleType, string> = {
 };
 
 const tabNameToTextKey: Record<string | RuleType, LanguageStringKey> = {
-  'General': 'general-tab-name',
-  'Custom': 'custom-tab-name',
-  'YAML': 'yaml-tab-name',
-  'Heading': 'heading-tab-name',
-  'Footnote': 'footnote-tab-name',
-  'Content': 'content-tab-name',
-  'Spacing': 'spacing-tab-name',
-  'Paste': 'paste-tab-name',
-  'Debug': 'debug-tab-name',
+  'General': 'tabs.names.general',
+  'Custom': 'tabs.names.custom',
+  'YAML': 'tabs.names.yaml',
+  'Heading': 'tabs.names.heading',
+  'Footnote': 'tabs.names.footnote',
+  'Content': 'tabs.names.content',
+  'Spacing': 'tabs.names.spacing',
+  'Paste': 'tabs.names.paste',
+  'Debug': 'tabs.names.debug',
 };
 
 export abstract class Tab {
