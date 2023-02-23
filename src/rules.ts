@@ -1,6 +1,7 @@
 import {
   getYamlSectionValue,
   loadYAML,
+  QuoteCharacter,
 } from './utils/yaml';
 import {
   Option,
@@ -22,7 +23,7 @@ export type CommonStyles = {
   aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats;
   tagArrayStyle: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
   minimumNumberOfDollarSignsToBeAMathBlock: number;
-  escapeCharacter: string;
+  escapeCharacter: QuoteCharacter;
   removeUnnecessaryEscapeCharsForMultiLineArrays: boolean;
 }
 

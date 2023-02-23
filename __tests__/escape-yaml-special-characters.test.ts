@@ -1,9 +1,9 @@
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
-import EscapeYamlSpecialCharactersOptions from '../src/rules/escape-yaml-special-characters';
+import EscapeYamlSpecialCharacters from '../src/rules/escape-yaml-special-characters';
 
 ruleTest({
-  RuleBuilderClass: EscapeYamlSpecialCharactersOptions,
+  RuleBuilderClass: EscapeYamlSpecialCharacters,
   testCases: [
     { // accounts for https://github.com/platers/obsidian-linter/issues/467
       testName: 'Make sure that dictionaries in a multiline array do not accidentally get escaped',
