@@ -3,7 +3,7 @@ import {Tab} from './tab';
 import {Setting} from 'obsidian';
 import {moment} from 'obsidian';
 import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
-import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
+import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
 import {getTextInLanguage} from 'src/lang/helpers';
 
 export class GeneralTab extends Tab {
@@ -145,7 +145,7 @@ export class GeneralTab extends Tab {
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
-    const escapeCharRecords = ['"', '\''];
+    const escapeCharRecords: QuoteCharacter[] = ['"', '\''];
 
     tempDiv = this.contentEl.createDiv();
     settingName = getTextInLanguage('default-escape-character-name');
@@ -159,7 +159,7 @@ export class GeneralTab extends Tab {
           });
           dropdown.setValue(this.plugin.settings.commonStyles.escapeCharacter);
           dropdown.onChange(async (value) => {
-            this.plugin.settings.commonStyles.escapeCharacter = value;
+            this.plugin.settings.commonStyles.escapeCharacter = value as QuoteCharacter;
             await this.plugin.saveSettings();
           });
         });
