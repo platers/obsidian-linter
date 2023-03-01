@@ -1,5 +1,5 @@
 import * as readline from 'readline';
-import {LanguageStringKey, localeHasKey, localeMap} from './lang/helpers';
+import {LanguageStringKey, setLanguage, getTextInLanguage, localeHasKey, localeMap} from './lang/helpers';
 // const rl = readline.createInterface({
 // input: process.stdin,
 // output: process.stdout,
@@ -7,6 +7,9 @@ import {LanguageStringKey, localeHasKey, localeMap} from './lang/helpers';
 
 const availableLanguages = Object.keys(localeMap).join(', ');
 const englishKeys = getObjectKeys(localeMap['en']);
+
+setLanguage('en');
+
 selectTranslationModeAndKickOffTheAssociatedLogic();
 
 
@@ -65,7 +68,7 @@ function selectTranslationModeAndKickOffTheAssociatedLogic() {
         console.log('Replace value with a new value...');
         break;
       case 't':
-        console.log('Translate all untranslated keys in a language to another one...');
+        translateAllKeysInALanguage()
         break;
       default:
         console.log('"' + mode + '" is not a valid translation mode.');
@@ -74,7 +77,7 @@ function selectTranslationModeAndKickOffTheAssociatedLogic() {
   });
 }
 
-function getUserInput(prompt: string, handleResponse: (string) => void) {
+function getUserInput(prompt: string, handleResponse: (answer: string) => void) {
   const ri = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -90,21 +93,56 @@ function listUntranslatedKeysInALanguage() {
   console.log('Valid languages:\n\t' + availableLanguages + '\n');
 
   getUserInput('Enter which language to list the untranslated keys for: ', (language) => {
-  // const text: unknown = (locale && getString<LanguageStrings>(locale, str)) || getString<LanguageStrings>(en, str);
     if (localeMap[language]) {
-      const indicatedLanguage = localeMap[language];
-      const missingKeys = [] as string[];
-      for (const nestedKey of englishKeys) {
-        if (!localeHasKey(indicatedLanguage, nestedKey as LanguageStringKey) && localeHasKey(localeMap['en'], nestedKey as LanguageStringKey)) {
-          missingKeys.push(nestedKey);
-        }
+      const missingKeys = getMissingKeysInLanguage(language);
+
+      if (missingKeys.length === 0) {
+        console.log('"' + language + '" has no values that need translating.');
+      } else {
+        const keyText = missingKeys.length > 1 ? 'keys' : 'key';
+        console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}:`);
+        missingKeys.forEach((element) => {
+          console.log(`${element}: ` + getTextInLanguage(element as LanguageStringKey) );
+        });
       }
-      console.log(missingKeys);
     } else {
       console.log('"' + language + '" is not in the language list. Please try rerun the program and enter another language.');
-      // process.exit(-1);
     }
   });
+}
+
+function translateAllKeysInALanguage() {
+  console.log('Valid languages:\n\t' + availableLanguages + '\n');
+
+  getUserInput('Enter which language to translate all keys from: ', (language) => {
+    if (localeMap[language]) {
+      const missingKeys = getMissingKeysInLanguage(language);
+
+      if (missingKeys.length === 0) {
+        console.log('"' + language + '" has no values that need translating.');
+      } else {
+        const keyText = missingKeys.length > 1 ? 'keys' : 'key';
+        console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}:`);
+        missingKeys.forEach((element) => {
+          console.log(`${element}: ` + getTextInLanguage(element as LanguageStringKey) );
+        });
+      }
+    } else {
+      console.log('"' + language + '" is not in the language list. Please try rerun the program and enter another language.');
+    }
+  }); 
+}
+
+function getMissingKeysInLanguage(language: string): string[] {
+  const indicatedLanguage = localeMap[language];
+  const missingKeys = [] as string[];
+  for (const nestedKey of englishKeys) {
+    if (!localeHasKey(indicatedLanguage, nestedKey as LanguageStringKey) && localeHasKey(localeMap['en'], nestedKey as LanguageStringKey)) {
+      missingKeys.push(nestedKey);
+    }
+  }
+
+  return missingKeys;
 }
 
 function getObjectKeys(obj: any, prefix: string = ''): string[] {
