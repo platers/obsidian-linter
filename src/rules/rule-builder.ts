@@ -174,7 +174,14 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
 
   constructor(args: OptionBuilderConstructorArgs<TOptions, TValue>) {
     this.OptionsClass = args.OptionsClass;
-    this.configKey = args.nameTextKey.replace(/rules\.(.*)\.name/, '$1');
+
+    const keyParts = args.nameTextKey.split('.');
+    if (keyParts.length == 1) {
+      this.configKey = keyParts[0];
+    } else {
+      this.configKey = keyParts[keyParts.length - 2];
+    }
+
     this.name = getTextInLanguage(args.nameTextKey);
     this.description = getTextInLanguage(args.descriptionTextKey);
     this.nameTextKey = args.nameTextKey;

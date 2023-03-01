@@ -27,7 +27,9 @@ import zhCN from './locale/zh-cn';
 import zhTW from './locale/zh-tw';
 
 
-const localeMap: { [k: string]: Partial<typeof en> } = {
+type LanguageStrings = typeof en;
+
+export const localeMap: { [k: string]: Partial<LanguageStrings> } = {
   ar,
   cz,
   da,
@@ -54,8 +56,6 @@ const localeMap: { [k: string]: Partial<typeof en> } = {
   'zh': zhCN,
 };
 
-// export type LanguageStringKey = keyof typeof en;
-type LanguageStrings = typeof en;
 export type LanguageStringKey = NestedKeyOf<LanguageStrings>
 
 let lang = 'en';
@@ -74,4 +74,8 @@ export function getTextInLanguage(str: LanguageStringKey): string {
   const text: unknown = (locale && getString<LanguageStrings>(locale, str)) || getString<LanguageStrings>(en, str);
 
   return text as string;
+}
+
+export function localeHasKey(locale: Partial<LanguageStrings>, key: LanguageStringKey): boolean {
+  return !!getString<LanguageStrings>(locale, key);
 }

@@ -14,7 +14,7 @@ import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
 import {NormalArrayFormats} from './utils/yaml';
 import {urlRegex} from './utils/regex';
-import {getTextInLanguage, setLanguage} from './lang/helpers';
+import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -571,12 +571,10 @@ export default class LinterPlugin extends Plugin {
     setLanguage('en');
 
     for (const rule of rules) {
-      // @ts-ignore
-      const ruleName = getTextInLanguage(rule.alias + '.name');
+      const ruleName = getTextInLanguage('rules.' + rule.alias + '.name' as LanguageStringKey);
       const ruleSettings = this.settings.ruleConfigs[ruleName];
       if (ruleSettings != undefined) {
-        // @ts-ignore
-        const ruleDescription = getTextInLanguage(rule.alias + '.description');
+        const ruleDescription = getTextInLanguage('rules.' + rule.alias + '.description' as LanguageStringKey);
         // move description config value to new setting location
         const newSettingValues: Options = {
           enabled: ruleSettings[ruleDescription] ?? false,
@@ -589,8 +587,7 @@ export default class LinterPlugin extends Plugin {
             continue;
           }
 
-          // @ts-ignore
-          const configKeyName = getTextInLanguage(option.configKey + '.name');
+          const configKeyName = getTextInLanguage('rules.' + rule.alias + '.' + option.configKey + '.name' as LanguageStringKey);
           newSettingValues[option.configKey] = ruleSettings[configKeyName] ?? option.defaultValue;
         }
 

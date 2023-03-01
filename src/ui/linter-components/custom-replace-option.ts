@@ -9,10 +9,10 @@ export class CustomReplaceOption extends AddCustomRow {
   constructor(containerEl: HTMLElement, public regexes: CustomReplace[], isMobile: boolean, saveSettings: () => void) {
     super(
         containerEl,
-        getTextInLanguage('custom-replace-name'),
-        getTextInLanguage('custom-replace-description'),
-        getTextInLanguage('custom-replace-warning'),
-        getTextInLanguage('custom-replace-add-input-button-text'),
+        getTextInLanguage('options.custom-replace.name'),
+        getTextInLanguage('options.custom-replace.description'),
+        getTextInLanguage('options.custom-replace.warning'),
+        getTextInLanguage('options.custom-replace.add-input-button-text'),
         isMobile,
         saveSettings,
         ()=>{
@@ -32,7 +32,7 @@ export class CustomReplaceOption extends AddCustomRow {
 
   private addRegex(regex: CustomReplace, index: number, focusOnCommand: boolean = false) {
     new Setting(this.inputElDiv).addText((cb) => {
-      cb.setPlaceholder(getTextInLanguage('custom-replace-regex-to-find-placeholder-text'))
+      cb.setPlaceholder(getTextInLanguage('options.custom-replace.regex-to-find-placeholder-text'))
           .setValue(regex.find)
           .onChange((value) => {
             this.regexes[index].find = value;
@@ -45,14 +45,14 @@ export class CustomReplaceOption extends AddCustomRow {
         cb.inputEl.focus();
       }
     }).addText((cb) => {
-      cb.setPlaceholder(getTextInLanguage('custom-replace-flags-placeholder-text'))
+      cb.setPlaceholder(getTextInLanguage('options.custom-replace.flags-placeholder-text'))
           .setValue(regex.flags)
           .onChange((value) => {
             this.regexes[index].flags = value;
             this.saveSettings();
           });
     }).addText((cb) => {
-      cb.setPlaceholder(getTextInLanguage('custom-replace-regex-to-replace-placeholder-text'))
+      cb.setPlaceholder(getTextInLanguage('options.custom-replace.regex-to-replace-placeholder-text'))
           .setValue(regex.replace)
           .onChange((value) => {
             this.regexes[index].replace = value;
@@ -60,7 +60,7 @@ export class CustomReplaceOption extends AddCustomRow {
           });
     }).addExtraButton((cb)=>{
       cb.setIcon('cross')
-          .setTooltip(getTextInLanguage('custom-replace-delete-tooltip'))
+          .setTooltip(getTextInLanguage('options.custom-replace.delete-tooltip'))
           .onClick(()=>{
             this.regexes.splice(index, 1);
             this.saveSettings();
