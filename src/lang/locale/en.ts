@@ -284,7 +284,7 @@ export default {
       'description': 'Ensures that there is an empty line around code fences unless they start or end a document.',
     },
     // empty-line-around-math-block.ts
-    'empty-line-around-math-block': {
+    'empty-line-around-math-blocks': {
       'name': 'Empty Line Around Math Blocks',
       'description': 'Ensures that there is an empty line around math blocks using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.',
     },

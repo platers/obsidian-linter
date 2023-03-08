@@ -62,7 +62,19 @@ function generateDocs() {
 
       if (option instanceof DropdownOption) {
         for (const record of option.options) {
-          text += `\n\t- \`${record.value}\`: ${record.description}`;
+          const nameParts = record.value.split('.');
+          let name = '';
+          if (nameParts.length === 1) {
+            name = nameParts[0];
+          } else {
+            name = nameParts[nameParts.length - 1];
+          }
+
+          if (name == '') {
+            name = '.';
+          }
+
+          text += `\n\t- \`${name}\`: ${record.description}`;
         }
       }
 
