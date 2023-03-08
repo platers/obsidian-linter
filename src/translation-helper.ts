@@ -230,7 +230,7 @@ function replaceTranslationValuesInFile(language: string) {
     const originalData = fs.readFileSync(filePath, 'utf8');
 
     const newData = originalData.substring(0, originalData.indexOf('export') - 1) + '\nexport default ' + JSON.stringify(localeMap[language], null, 2) + ';';
-    
+
     try {
       fs.writeFileSync(filePath, newData);
     } catch (err) {

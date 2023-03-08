@@ -5,7 +5,6 @@ import {moment} from 'obsidian';
 import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
 import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
 import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
-import {getTextInLanguage} from 'src/lang/helpers';
 
 export class GeneralTab extends Tab {
   constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin) {
