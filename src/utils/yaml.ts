@@ -1,4 +1,4 @@
-import {load} from 'js-yaml';
+import {load, dump} from 'js-yaml';
 import {getTextInLanguage} from '../lang/helpers';
 import {escapeDollarSigns, yamlRegex} from './regex';
 
@@ -94,6 +94,8 @@ export enum NormalArrayFormats {
   MultiLine = 'multi-line',
 }
 
+export type QuoteCharacter = '\'' | '"';
+
 /**
  * Formats the yaml array value passed in with the specified format.
  * @param {string | string[]} value The value(s) that will be used as the parts of the array that is assumed to already be broken down into the appropriate format to be put in the array.
@@ -102,7 +104,7 @@ export enum NormalArrayFormats {
  * @param {boolean} removeEscapeCharactersIfPossibleWhenGoingToMultiLine Whether or not to remove no longer needed escape values when converting to a multi-line format.
  * @return {string} The formatted array in the specified yaml/obsidian yaml format.
  */
-export function formatYamlArrayValue(value: string | string[], format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats, defaultEscapeCharacter: string, removeEscapeCharactersIfPossibleWhenGoingToMultiLine: boolean): string {
+export function formatYamlArrayValue(value: string | string[], format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats, defaultEscapeCharacter: QuoteCharacter, removeEscapeCharactersIfPossibleWhenGoingToMultiLine: boolean): string {
   if (typeof value === 'string') {
     value = [value];
   }
@@ -325,10 +327,45 @@ export function isValueEscapedAlready(value: string): boolean {
  * @param {string} value The value to escape if possible
  * @param {string} defaultEscapeCharacter The character escape to use around the value if a specific escape character is not needed.
  * @param {boolean} forceEscape Whether or not to force the escaping of the value provided.
+ * @param {boolean} skipValidation Whether or not to ensure that the result string could be unescaped back to the value.
  * @return {string} The escaped value if it is either necessary or forced and the provided value if it cannot be escaped, is escaped,
  * or does not need escaping and the force escape is not used.
  */
-export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeCharacter: string, forceEscape: boolean = false): string {
+export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeCharacter: QuoteCharacter, forceEscape: boolean = false, skipValidation: boolean = false): string {
+  const basicEscape = basicEscapeString(value, defaultEscapeCharacter, forceEscape);
+  if (skipValidation) {
+    return basicEscape;
+  }
+
+  try {
+    const unescaped = load(basicEscape) as string;
+    if (unescaped === value) {
+      return basicEscape;
+    }
+  } catch {
+    // invalid YAML
+  }
+
+  const escapeWithDefaultCharacter = dump(value, {
+    lineWidth: -1,
+    quotingType: defaultEscapeCharacter,
+    forceQuotes: forceEscape,
+  }).slice(0, -1);
+
+  const escapeWithOtherCharacter = dump(value, {
+    lineWidth: -1,
+    quotingType: defaultEscapeCharacter == '"' ? '\'' : '"',
+    forceQuotes: forceEscape,
+  }).slice(0, -1);
+
+  if (escapeWithOtherCharacter === value || escapeWithOtherCharacter.length < escapeWithDefaultCharacter.length) {
+    return escapeWithOtherCharacter;
+  }
+
+  return escapeWithDefaultCharacter;
+}
+
+function basicEscapeString(value: string, defaultEscapeCharacter: QuoteCharacter, forceEscape: boolean = false): string {
   if (isValueEscapedAlready(value)) {
     return value;
   }

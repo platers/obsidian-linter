@@ -1,11 +1,11 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {escapeStringIfNecessaryAndPossible, formatYAML} from '../utils/yaml';
+import {escapeStringIfNecessaryAndPossible, formatYAML, QuoteCharacter} from '../utils/yaml';
 
 class EscapeYamlSpecialCharactersOptions implements Options {
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: string = '"';
+    defaultEscapeCharacter?: QuoteCharacter = '"';
   tryToEscapeSingleLineArrays?: boolean = false;
 }
 
@@ -84,7 +84,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
                 arrayItem = arrayItem.substring(0, arrayItem.length - 1).trimEnd();
               }
 
-              arrayItems[j] = arrayItems[j].replace(arrayItem, escapeStringIfNecessaryAndPossible(arrayItem, options.defaultEscapeCharacter));
+              arrayItems[j] = arrayItems[j].replace(arrayItem, escapeStringIfNecessaryAndPossible(arrayItem, options.defaultEscapeCharacter, false, true));
             }
 
             yamlLines[i] = yamlLines[i].replace(value, '[' + arrayItems.join(',') + ']');
@@ -93,7 +93,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
           continue;
         }
 
-        yamlLines[i] = yamlLines[i].replace(value, escapeStringIfNecessaryAndPossible(value, options.defaultEscapeCharacter));
+        yamlLines[i] = yamlLines[i].replace(value, escapeStringIfNecessaryAndPossible(value, options.defaultEscapeCharacter, false, true));
       }
 
       return yamlLines.join('\n');

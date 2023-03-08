@@ -3,8 +3,9 @@ import {Tab} from './tab';
 import {Setting} from 'obsidian';
 import {moment} from 'obsidian';
 import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
-import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
 import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
+import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
+import {getTextInLanguage} from 'src/lang/helpers';
 
 export class GeneralTab extends Tab {
   constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin) {
@@ -147,7 +148,7 @@ export class GeneralTab extends Tab {
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
-    const escapeCharRecords = ['"', '\''];
+    const escapeCharRecords: QuoteCharacter[] = ['"', '\''];
 
     tempDiv = this.contentEl.createDiv();
     settingName = getTextInLanguage('tabs.general.default-escape-character.name');
@@ -161,7 +162,7 @@ export class GeneralTab extends Tab {
           });
           dropdown.setValue(this.plugin.settings.commonStyles.escapeCharacter);
           dropdown.onChange(async (value) => {
-            this.plugin.settings.commonStyles.escapeCharacter = value;
+            this.plugin.settings.commonStyles.escapeCharacter = value as QuoteCharacter;
             await this.plugin.saveSettings();
           });
         });

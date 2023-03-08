@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {escapeStringIfNecessaryAndPossible, formatYAML, initYAML} from '../utils/yaml';
+import {escapeStringIfNecessaryAndPossible, formatYAML, initYAML, QuoteCharacter} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {escapeDollarSigns, getFirstHeaderOneText} from '../utils/regex';
 import {insert} from '../utils/strings';
@@ -11,7 +11,7 @@ class YamlTitleOptions implements Options {
     fileName: string;
 
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: string = '"';
+    defaultEscapeCharacter?: QuoteCharacter = '"';
 
   titleKey?: string = 'title';
 }

@@ -1,11 +1,11 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {escapeStringIfNecessaryAndPossible, formatYAML, getYamlSectionValue, isValueEscapedAlready, setYamlSection} from '../utils/yaml';
+import {escapeStringIfNecessaryAndPossible, formatYAML, getYamlSectionValue, isValueEscapedAlready, QuoteCharacter, setYamlSection} from '../utils/yaml';
 
 class ForceYamlEscapeOptions implements Options {
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: string = '"';
+    defaultEscapeCharacter?: QuoteCharacter = '"';
   forceYamlEscape?: string[] = [];
 }
 

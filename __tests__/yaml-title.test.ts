@@ -18,7 +18,7 @@ ruleTest({
       `,
     },
     {
-      testName: 'Escapes title if it contains colon',
+      testName: 'Escapes title if it contains colon followed by space',
       before: dedent`
         # Hello: world
       `,
@@ -151,6 +151,162 @@ ruleTest({
         title: Broken Linter
         ---
         # [[Broken Linter|Broken]] Linter
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with exclamation mark',
+      before: dedent`
+        # !title
+      `,
+      after: dedent`
+        ---
+        title: "!title"
+        ---
+        # !title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with at sign',
+      before: dedent`
+        # @title
+      `,
+      after: dedent`
+        ---
+        title: "@title"
+        ---
+        # @title
+      `,
+    },
+    {
+      testName: 'Escapes title if it contains hash',
+      before: dedent`
+        # prefix #title
+      `,
+      after: dedent`
+        ---
+        title: "prefix #title"
+        ---
+        # prefix #title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with percent',
+      before: dedent`
+        # %title
+      `,
+      after: dedent`
+        ---
+        title: "%title"
+        ---
+        # %title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with ampersand',
+      before: dedent`
+        # &title
+      `,
+      after: dedent`
+        ---
+        title: "&title"
+        ---
+        # &title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with asterisk',
+      before: dedent`
+        # *title
+      `,
+      after: dedent`
+        ---
+        title: "*title"
+        ---
+        # *title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with hyphen followed by space',
+      before: dedent`
+        # - title
+      `,
+      after: dedent`
+        ---
+        title: "- title"
+        ---
+        # - title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with left square bracket',
+      before: dedent`
+        # [title
+      `,
+      after: dedent`
+        ---
+        title: "[title"
+        ---
+        # [title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with right square bracket',
+      before: dedent`
+        # ]title
+      `,
+      after: dedent`
+        ---
+        title: "]title"
+        ---
+        # ]title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with left curly bracket',
+      before: dedent`
+        # {title
+      `,
+      after: dedent`
+        ---
+        title: "{title"
+        ---
+        # {title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with right curly bracket',
+      before: dedent`
+        # }title
+      `,
+      after: dedent`
+        ---
+        title: "}title"
+        ---
+        # }title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with vertical bar',
+      before: dedent`
+        # |title
+      `,
+      after: dedent`
+        ---
+        title: "|title"
+        ---
+        # |title
+      `,
+    },
+    {
+      testName: 'Escapes title if it starts with greater-than sign',
+      before: dedent`
+        # >title
+      `,
+      after: dedent`
+        ---
+        title: ">title"
+        ---
+        # >title
       `,
     },
   ],
