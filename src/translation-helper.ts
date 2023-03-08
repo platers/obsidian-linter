@@ -13,8 +13,6 @@ const englishKeys = getObjectKeys(localeMap['en']);
 
 setLanguage('en');
 
-// replaceTranslationValuesInFile('en');
-
 selectTranslationModeAndKickOffTheAssociatedLogic();
 
 function selectTranslationModeAndKickOffTheAssociatedLogic() {
@@ -150,33 +148,36 @@ function translateAllKeysInALanguage() {
       } else {
         const keyText = missingKeys.length > 1 ? 'keys' : 'key';
         console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}:`);
-        let quit = false;
-        missingKeys.forEach((element) => {
-          getUserInput(`Enter 'q' for quit, 's' for skip, or a translation for '${getTextInLanguage(element as LanguageStringKey)}':`, (translatedValue: string) => {
-            switch (translatedValue) {
-              case 'q':
-                quit = true;
-                return;
-              case 's':
-                return;
-              default:
-                setValueInLanguage(language, element, translatedValue);
-            }
-          });
 
-          if (quit) {
-            console.log(`Stopping the translation of values for language '${language}'.`);
-            replaceTranslationValuesInFile(language);
-            endProgram();
-          }
-        });
-
-        replaceTranslationValuesInFile(language);
-        endProgram();
+        const firstElement = missingKeys.shift();
+        getNextTranslation(missingKeys, firstElement, language);
       }
     } else {
       console.log('"' + language + '" is not in the language list. Please try rerun the program and enter another language.');
       endProgram(true);
+    }
+  });
+}
+
+function getNextTranslation(missingKeys: string[], element: string, language: string) {
+  getUserInput(`Enter 'q' for quit, 's' for skip, or a translation for '${getTextInLanguage(element as LanguageStringKey)}':`, (translatedValue: string) => {
+    switch (translatedValue) {
+      case 'q':
+        console.log(`Stopping the translation of values for language '${language}'.`);
+        replaceTranslationValuesInFile(language);
+        endProgram();
+        return;
+      case 's':
+        break;
+      default:
+        setValueInLanguage(language, element, translatedValue);
+    }
+
+    const nextKey = missingKeys.shift();
+    getNextTranslation(missingKeys, nextKey, language);
+    if (missingKeys.length === 0) {
+      replaceTranslationValuesInFile(language);
+      endProgram();
     }
   });
 }
@@ -197,23 +198,6 @@ function setValueInLanguage(language: string, key: string, value: string) {
 
     object = object[keyPart];
   });
-}
-
-function getObjectKeyForValue(object: object, value: string, keyPrefix: string = ''): string|undefined {
-  const keys = Object.keys(object);
-  keys.forEach((key: string) => {
-    if (typeof object[key] === 'object') {
-      const possibleKey = getObjectKeyForValue(object[key], value, keyPrefix + key + '.');
-
-      if (possibleKey != undefined) {
-        return possibleKey;
-      }
-    } else if (object[key] === value) {
-      return keyPrefix + key;
-    }
-  });
-
-  return undefined;
 }
 
 function getMissingKeysInLanguage(language: string): string[] {
@@ -246,8 +230,7 @@ function replaceTranslationValuesInFile(language: string) {
     const originalData = fs.readFileSync(filePath, 'utf8');
 
     const newData = originalData.substring(0, originalData.indexOf('export') - 1) + '\nexport default ' + JSON.stringify(localeMap[language], null, 2) + ';';
-    // console.log(newData);
-
+    
     try {
       fs.writeFileSync(filePath, newData);
     } catch (err) {
@@ -266,4 +249,6 @@ function endProgram(withError: boolean = false) {
   if (withError === true) {
     exit(-1);
   }
+
+  exit();
 }
