@@ -10,8 +10,8 @@ class RemoveEmptyListMarkersOptions implements Options {}
 export default class RemoveEmptyListMarkers extends RuleBuilder<RemoveEmptyListMarkersOptions> {
   constructor() {
     super({
-      nameTextKey: 'remove-empty-list-markers-name',
-      descriptionTextKey: 'remove-empty-list-markers-description',
+      nameTextKey: 'rules.remove-empty-list-markers.name',
+      descriptionTextKey: 'rules.remove-empty-list-markers.description',
       type: RuleType.CONTENT,
     });
   }

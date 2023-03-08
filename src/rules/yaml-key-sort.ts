@@ -26,8 +26,8 @@ class YamlKeySortOptions implements Options {
 export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
   constructor() {
     super({
-      nameTextKey: 'yaml-key-sort-name',
-      descriptionTextKey: 'yaml-key-sort-description',
+      nameTextKey: 'rules.yaml-key-sort.name',
+      descriptionTextKey: 'rules.yaml-key-sort.description',
       type: RuleType.YAML,
       hasSpecialExecutionOrder: true,
     });
@@ -261,20 +261,20 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     return [
       new TextAreaOptionBuilder({
         OptionsClass: YamlKeySortOptions,
-        nameTextKey: 'yaml-key-sort-yaml-key-priority-sort-order-name',
-        descriptionTextKey: 'yaml-key-sort-yaml-key-priority-sort-order-description',
+        nameTextKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.name',
+        descriptionTextKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.description',
         optionsKey: 'yamlKeyPrioritySortOrder',
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlKeySortOptions,
-        nameTextKey: 'yaml-key-sort-priority-keys-at-start-of-yaml-name',
-        descriptionTextKey: 'yaml-key-sort-priority-keys-at-start-of-yaml-description',
+        nameTextKey: 'rules.yaml-key-sort.priority-keys-at-start-of-yaml.name',
+        descriptionTextKey: 'rules.yaml-key-sort.priority-keys-at-start-of-yaml.description',
         optionsKey: 'priorityKeysAtStartOfYaml',
       }),
       new DropdownOptionBuilder<YamlKeySortOptions, YamlSortOrderForOtherKeys>({
         OptionsClass: YamlKeySortOptions,
-        nameTextKey: 'yaml-key-sort-yaml-sort-order-for-other-keys-name',
-        descriptionTextKey: 'yaml-key-sort-yaml-sort-order-for-other-keys-description',
+        nameTextKey: 'rules.yaml-key-sort.yaml-sort-order-for-other-keys.name',
+        descriptionTextKey: 'rules.yaml-key-sort.yaml-sort-order-for-other-keys.description',
         optionsKey: 'yamlSortOrderForOtherKeys',
         records: [
           {

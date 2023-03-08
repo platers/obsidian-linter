@@ -17,6 +17,7 @@ import {
 } from './utils/yaml';
 import {LintCommand} from './ui/linter-components/custom-command-option';
 import {CustomReplace} from './ui/linter-components/custom-replace-option';
+import {getTextInLanguage} from './lang/helpers';
 
 // CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
 export type CommonStyles = {
@@ -200,9 +201,9 @@ export function wrapLintError(error: Error, ruleName: string) {
   let errorMessage: string;
   if (error instanceof YAMLException) {
     errorMessage = error.toString();
-    errorMessage =`error in the yaml: ${errorMessage.substring(errorMessage.indexOf(':') + 1)}`;
+    errorMessage = getTextInLanguage('logs.wrapper-yaml-error').replace('{ERROR_MESSAGE}', errorMessage.substring(errorMessage.indexOf(':') + 1));
   } else {
-    errorMessage = `unknown error: ${error.message}`;
+    errorMessage = getTextInLanguage('logs.wrapper-unknown-error').replace('{ERROR_MESSAGE}', error.message);
   }
 
   throw new LinterError(`"${ruleName}" encountered an ${errorMessage}`, error);

@@ -8,8 +8,8 @@ class LineBreakAtDocumentEndOptions implements Options {}
 export default class LineBreakAtDocumentEnd extends RuleBuilder<LineBreakAtDocumentEndOptions> {
   constructor() {
     super({
-      nameTextKey: 'line-break-at-document-end-name',
-      descriptionTextKey: 'line-break-at-document-end-description',
+      nameTextKey: 'rules.line-break-at-document-end.name',
+      descriptionTextKey: 'rules.line-break-at-document-end.description',
       type: RuleType.SPACING,
     });
   }

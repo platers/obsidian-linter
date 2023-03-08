@@ -88,7 +88,7 @@ export function ensureEmptyLinesAroundTables(text: string): string {
  * @param {string} text - The text to have get the first header one's text from.
  * @return {string} The text for the first header one if present or an empty string.
  */
-export function getFirstHeaderOneText(text: string) {
+export function getFirstHeaderOneText(text: string): string {
   const result = text.match(/^#\s+(.*)/m);
   if (result && result[1]) {
     let headerText = result[1];

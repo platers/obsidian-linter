@@ -18,8 +18,8 @@ export class DebugTab extends Tab {
 
   display(): void {
     let tempDiv = this.contentEl.createDiv();
-    let settingName = getTextInLanguage('log-level-name');
-    let settingDesc = getTextInLanguage('log-level-description');
+    let settingName = getTextInLanguage('tabs.debug.log-level.name');
+    let settingDesc = getTextInLanguage('tabs.debug.log-level.description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
@@ -44,16 +44,16 @@ export class DebugTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('linter-config-name');
-    settingDesc = getTextInLanguage('linter-config-description');
+    settingName = getTextInLanguage('tabs.debug.linter-config.name');
+    settingDesc = getTextInLanguage('tabs.debug.linter-config.description');
     const configDisplay = new TextBoxFull(tempDiv, settingName, settingDesc);
     configDisplay.inputEl.setText(JSON.stringify(this.plugin.settings, null, 2));
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('log-collection-name');
-    settingDesc = getTextInLanguage('log-collection-description');
+    settingName = getTextInLanguage('tabs.debug.log-collection.name');
+    settingDesc = getTextInLanguage('tabs.debug.log-collection.description');
     const setting = new Setting(tempDiv)
         .setName(settingName)
         .addToggle((toggle) => {
@@ -70,8 +70,8 @@ export class DebugTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('linter-logs-name');
-    settingDesc = getTextInLanguage('linter-logs-description');
+    settingName = getTextInLanguage('tabs.debug.linter-logs.name');
+    settingDesc = getTextInLanguage('tabs.debug.linter-logs.description');
     const logDisplay = new TextBoxFull(tempDiv, settingName, settingDesc);
     logDisplay.inputEl.setText(logsFromLastRun.join('\n'));
 

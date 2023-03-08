@@ -13,9 +13,8 @@ class AutoCorrectCommonMisspellingsOptions implements Options {
 export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorrectCommonMisspellingsOptions> {
   constructor() {
     super({
-      configKey: 'auto-correct-common-misspellings',
-      nameTextKey: 'auto-correct-common-misspellings-name',
-      descriptionTextKey: 'auto-correct-common-misspellings-description',
+      nameTextKey: 'rules.auto-correct-common-misspellings.name',
+      descriptionTextKey: 'rules.auto-correct-common-misspellings.description',
       type: RuleType.CONTENT,
     });
   }
@@ -112,8 +111,8 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
     return [
       new TextAreaOptionBuilder({
         OptionsClass: AutoCorrectCommonMisspellingsOptions,
-        nameTextKey: 'auto-correct-common-misspellings-ignore-words-name',
-        descriptionTextKey: 'auto-correct-common-misspellings-ignore-words-description',
+        nameTextKey: 'rules.auto-correct-common-misspellings.ignore-words.name',
+        descriptionTextKey: 'rules.auto-correct-common-misspellings.ignore-words.description',
         optionsKey: 'ignoreWords',
         splitter: wordSplitterRegex,
         separator: ', ',

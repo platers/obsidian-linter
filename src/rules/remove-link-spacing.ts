@@ -10,8 +10,8 @@ class RemoveLinkSpacingOptions implements Options {}
 export default class RemoveLinkSpacing extends RuleBuilder<RemoveLinkSpacingOptions> {
   constructor() {
     super({
-      nameTextKey: 'remove-link-spacing-name',
-      descriptionTextKey: 'remove-link-spacing-description',
+      nameTextKey: 'rules.remove-link-spacing.name',
+      descriptionTextKey: 'rules.remove-link-spacing.description',
       type: RuleType.SPACING,
     });
   }

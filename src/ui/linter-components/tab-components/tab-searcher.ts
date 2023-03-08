@@ -26,7 +26,7 @@ export class TabSearcher {
       this.search = s;
     });
 
-    this.search.setPlaceholder(getTextInLanguage('default-search-bar-text'));
+    this.search.setPlaceholder(getTextInLanguage('tabs.default-search-bar-text'));
 
     this.search.inputEl.onfocus = () => {
       this.onFocus();

@@ -110,4 +110,3 @@ function generateDocs() {
   writeFileSync('./docs/rules.md', rules_documentation);
   console.log('Rules documentation updated');
 }
-

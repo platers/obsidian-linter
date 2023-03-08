@@ -10,8 +10,8 @@ class ProperEllipsisOptions implements Options {}
 export default class ProperEllipsis extends RuleBuilder<ProperEllipsisOptions> {
   constructor() {
     super({
-      nameTextKey: 'proper-ellipsis-name',
-      descriptionTextKey: 'proper-ellipsis-description',
+      nameTextKey: 'rules.proper-ellipsis.name',
+      descriptionTextKey: 'rules.proper-ellipsis.description',
       type: RuleType.CONTENT,
     });
   }

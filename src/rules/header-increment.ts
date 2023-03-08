@@ -12,8 +12,8 @@ class HeaderIncrementOptions implements Options {
 export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions> {
   constructor() {
     super({
-      nameTextKey: 'header-increment-name',
-      descriptionTextKey: 'header-increment-description',
+      nameTextKey: 'rules.header-increment.name',
+      descriptionTextKey: 'rules.header-increment.description',
       type: RuleType.HEADING,
     });
   }
@@ -167,8 +167,8 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
     return [
       new BooleanOptionBuilder({
         OptionsClass: HeaderIncrementOptions,
-        nameTextKey: 'header-increment-start-at-h2-name',
-        descriptionTextKey: 'header-increment-start-at-h2-description',
+        nameTextKey: 'rules.header-increment.start-at-h2.name',
+        descriptionTextKey: 'rules.header-increment.start-at-h2.description',
         optionsKey: 'startAtH2',
       }),
     ];

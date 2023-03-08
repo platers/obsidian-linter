@@ -13,8 +13,8 @@ const specialCharsToNotEscapeContentsWithin = `'"‘’“”\`[]`;
 export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
   constructor() {
     super({
-      nameTextKey: 'no-bare-urls-name',
-      descriptionTextKey: 'no-bare-urls-description',
+      nameTextKey: 'rules.no-bare-urls.name',
+      descriptionTextKey: 'rules.no-bare-urls.description',
       type: RuleType.CONTENT,
     });
   }

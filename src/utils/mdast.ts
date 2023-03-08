@@ -113,7 +113,7 @@ export function moveFootnotesToEnd(text: string) {
     } while (alreadyUsedReferencePositions.has(footnoteReferenceLocation) && footnoteReferenceLocation !== -1 );
 
     if (footnoteReferenceLocation === -1) {
-      throw new Error(getTextInLanguage('missing-footnote-error-message').replace('{FOOTNOTE}', footnote));
+      throw new Error(getTextInLanguage('logs.missing-footnote-error-message').replace('{FOOTNOTE}', footnote));
     }
 
     alreadyUsedReferencePositions.add(footnoteReferenceLocation);

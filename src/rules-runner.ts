@@ -39,16 +39,16 @@ export class RulesRunner {
   private disabledRules: string[] = [];
 
   lintText(runOptions: RunLinterRulesOptions): string {
-    timingBegin(getTextInLanguage('rule-running'));
+    timingBegin(getTextInLanguage('logs.rule-running'));
     const originalText = runOptions.oldText;
     this.disabledRules = getDisabledRules(originalText);
 
-    const preRuleText = getTextInLanguage('pre-rules');
+    const preRuleText = getTextInLanguage('logs.pre-rules');
     timingBegin(preRuleText);
     let newText = this.runBeforeRegularRules(runOptions);
     timingEnd(preRuleText);
 
-    const disabledRuleText = getTextInLanguage('disabled-text');
+    const disabledRuleText = getTextInLanguage('logs.disabled-text');
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
       if (this.disabledRules.includes(rule.alias)) {
@@ -73,7 +73,7 @@ export class RulesRunner {
       timingEnd(rule.alias);
     }
 
-    const customRegexLogText = getTextInLanguage('custom-regex');
+    const customRegexLogText = getTextInLanguage('logs.custom-regex');
     timingBegin(customRegexLogText);
     newText = this.runCustomRegexReplacement(runOptions.settings.customRegexes, newText);
     timingEnd(customRegexLogText);
@@ -98,7 +98,7 @@ export class RulesRunner {
 
   private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
     let newText = runOptions.oldText;
-    const postRuleLogText = getTextInLanguage('post-rules');
+    const postRuleLogText = getTextInLanguage('logs.post-rules');
     timingBegin(postRuleLogText);
     [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
@@ -124,19 +124,19 @@ export class RulesRunner {
       dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
     });
     timingEnd(postRuleLogText);
-    timingEnd(getTextInLanguage('rule-running'));
+    timingEnd(getTextInLanguage('logs.rule-running'));
     return newText;
   }
 
   runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
     // execute custom commands after regular rules, but before the timestamp rules
-    logDebug(getTextInLanguage('running-custom-lint-command'));
+    logDebug(getTextInLanguage('logs.running-custom-lint-command'));
     const commandsRun = new Set<string>();
     for (const commandInfo of lintCommands) {
       if (!commandInfo.id) {
         continue;
       } else if (commandsRun.has(commandInfo.id)) {
-        logWarn(getTextInLanguage('custom-lint-duplicate-warning').replace('{COMMAND_NAME}', commandInfo.name));
+        logWarn(getTextInLanguage('logs.custom-lint-duplicate-warning').replace('{COMMAND_NAME}', commandInfo.name));
         continue;
       }
 
@@ -144,13 +144,13 @@ export class RulesRunner {
         commandsRun.add(commandInfo.id);
         commands.executeCommandById(commandInfo.id);
       } catch (error) {
-        wrapLintError(error, `${getTextInLanguage('custom-lint-error-message')} ${commandInfo.id}`);
+        wrapLintError(error, `${getTextInLanguage('logs.custom-lint-error-message')} ${commandInfo.id}`);
       }
     }
   }
 
   runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
-    logDebug(getTextInLanguage('running-custom-regex'));
+    logDebug(getTextInLanguage('logs.running-custom-regex'));
     let tempOldText = oldText;
     for (const eachRegex of customRegexes) {
       if (eachRegex.find == undefined || eachRegex.replace === undefined || eachRegex.replace === null ) {

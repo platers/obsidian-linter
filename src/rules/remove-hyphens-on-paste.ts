@@ -9,8 +9,8 @@ class RemoveHyphensOnPasteOptions implements Options {}
 export default class RemoveHyphensOnPaste extends RuleBuilder<RemoveHyphensOnPasteOptions> {
   constructor() {
     super({
-      nameTextKey: 'remove-hyphens-on-paste-name',
-      descriptionTextKey: 'remove-hyphens-on-paste-description',
+      nameTextKey: 'rules.remove-hyphens-on-paste.name',
+      descriptionTextKey: 'rules.remove-hyphens-on-paste.description',
       type: RuleType.PASTE,
     });
   }

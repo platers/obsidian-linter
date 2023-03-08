@@ -9,8 +9,8 @@ class FormatTagsInYamlOptions implements Options {}
 export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOptions> {
   constructor() {
     super({
-      nameTextKey: 'format-tags-in-yaml-name',
-      descriptionTextKey: 'format-tags-in-yaml-description',
+      nameTextKey: 'rules.format-tags-in-yaml.name',
+      descriptionTextKey: 'rules.format-tags-in-yaml.description',
       type: RuleType.YAML,
       hasSpecialExecutionOrder: true,
     });

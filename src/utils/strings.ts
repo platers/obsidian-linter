@@ -48,7 +48,7 @@ function textMatches(expectedText: string, actualText: string, requireSameTraili
 }
 
 /**
- * Makes sure that the the specified content has an empty line around it so long as it does not start or end a file.
+ * Makes sure that the specified content has an empty line around it so long as it does not start or end a file.
  * @param {string} text - The entire file's contents
  * @param {number} start - The starting index of the content to escape
  * @param {number} end - The ending index of the content to escape

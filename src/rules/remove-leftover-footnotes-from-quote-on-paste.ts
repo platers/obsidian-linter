@@ -9,8 +9,8 @@ class RemoveLeftoverFootnotesFromQuoteOnPasteOptions implements Options {}
 export default class RemoveLeftoverFootnotesFromQuoteOnPaste extends RuleBuilder<RemoveLeftoverFootnotesFromQuoteOnPasteOptions> {
   constructor() {
     super({
-      nameTextKey: 'remove-leftover-footnotes-from-quote-on-paste-name',
-      descriptionTextKey: 'remove-leftover-footnotes-from-quote-on-paste-description',
+      nameTextKey: 'rules.remove-leftover-footnotes-from-quote-on-paste.name',
+      descriptionTextKey: 'rules.remove-leftover-footnotes-from-quote-on-paste.description',
       type: RuleType.PASTE,
     });
   }

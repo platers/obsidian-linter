@@ -14,8 +14,8 @@ class StrongStyleOptions implements Options {
 export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
   constructor() {
     super({
-      nameTextKey: 'strong-style-name',
-      descriptionTextKey: 'strong-style-description',
+      nameTextKey: 'rules.strong-style.name',
+      descriptionTextKey: 'rules.strong-style.description',
       type: RuleType.CONTENT,
     });
   }
@@ -165,8 +165,8 @@ export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
     return [
       new DropdownOptionBuilder<StrongStyleOptions, StrongStyleValues>({
         OptionsClass: StrongStyleOptions,
-        nameTextKey: 'strong-style-style-name',
-        descriptionTextKey: 'strong-style-style-description',
+        nameTextKey: 'rules.strong-style.style.name',
+        descriptionTextKey: 'rules.strong-style.style.description',
         optionsKey: 'style',
         records: [
           {

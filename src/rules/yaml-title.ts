@@ -20,8 +20,8 @@ class YamlTitleOptions implements Options {
 export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
   constructor() {
     super({
-      nameTextKey: 'yaml-title-name',
-      descriptionTextKey: 'yaml-title-description',
+      nameTextKey: 'rules.yaml-title.name',
+      descriptionTextKey: 'rules.yaml-title.description',
       type: RuleType.YAML,
     });
   }
@@ -101,8 +101,8 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
     return [
       new TextOptionBuilder({
         OptionsClass: YamlTitleOptions,
-        nameTextKey: 'yaml-title-title-key-name',
-        descriptionTextKey: 'yaml-title-title-key-description',
+        nameTextKey: 'rules.yaml-title.title-key.name',
+        descriptionTextKey: 'rules.yaml-title.title-key.description',
         optionsKey: 'titleKey',
       }),
     ];

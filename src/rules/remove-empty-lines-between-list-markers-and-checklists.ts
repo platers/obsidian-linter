@@ -9,8 +9,8 @@ class RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions implements Options 
 export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends RuleBuilder<RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions> {
   constructor() {
     super({
-      nameTextKey: 'remove-empty-lines-between-list-markers-and-checklists-name',
-      descriptionTextKey: 'remove-empty-lines-between-list-markers-and-checklists-description',
+      nameTextKey: 'rules.remove-empty-lines-between-list-markers-and-checklists.name',
+      descriptionTextKey: 'rules.remove-empty-lines-between-list-markers-and-checklists.description',
       type: RuleType.SPACING,
     });
   }

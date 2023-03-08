@@ -23,7 +23,7 @@ export abstract class RuleBuilderBase {
     const optionsFromSettings = rule.getOptions(settings);
     if (optionsFromSettings[rule.enabledOptionName()]) {
       const options = Object.assign({}, optionsFromSettings, extraOptions) as Options;
-      logDebug(`${getTextInLanguage('run-rule-text')} ${rule.name}`);
+      logDebug(`${getTextInLanguage('logs.run-rule-text')} ${rule.name}`);
 
       try {
         return [rule.apply(text, options), true];
@@ -69,7 +69,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   constructor(args: RuleBuilderConstructorArgs) {
     super();
 
-    this.configKey = args.nameTextKey.replace(/-name$/m, '');
+    this.configKey = args.nameTextKey.replace(/rules\.(.*)\.name/, '$1');
     this.nameTextKey = args.nameTextKey;
     this.descriptionTextKey = args.descriptionTextKey;
     this.type = args.type;
@@ -108,7 +108,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions): [result: string, isEnabled: boolean] {
     const rule = this.getRule();
     if (disabledRules.includes(rule.alias)) {
-      logDebug(rule.alias + ' ' + getTextInLanguage('disabled-text'));
+      logDebug(rule.alias + ' ' + getTextInLanguage('logs.disabled-text'));
       return [text, false];
     }
 
@@ -174,7 +174,14 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
 
   constructor(args: OptionBuilderConstructorArgs<TOptions, TValue>) {
     this.OptionsClass = args.OptionsClass;
-    this.configKey = args.nameTextKey.replace(/-name$/m, '');
+
+    const keyParts = args.nameTextKey.split('.');
+    if (keyParts.length == 1) {
+      this.configKey = keyParts[0];
+    } else {
+      this.configKey = keyParts[keyParts.length - 2];
+    }
+
     this.name = getTextInLanguage(args.nameTextKey);
     this.description = getTextInLanguage(args.descriptionTextKey);
     this.nameTextKey = args.nameTextKey;
@@ -227,7 +234,7 @@ export class DropdownOptionBuilder<TOptions extends Options, TValue extends stri
     }[]
   }) {
     super(args);
-    this.records = args.records.map((record) => new DropdownRecord(record.value as LanguageStringKey, record.description));
+    this.records = args.records.map((record) => new DropdownRecord('enums.' + record.value as LanguageStringKey, record.description));
   }
 
   protected buildOption(): Option {

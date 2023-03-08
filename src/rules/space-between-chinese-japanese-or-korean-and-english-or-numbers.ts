@@ -10,8 +10,8 @@ class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions implements O
 export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers extends RuleBuilder<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions> {
   constructor() {
     super({
-      nameTextKey: 'space-between-chinese-japanese-or-korean-and-english-or-numbers-name',
-      descriptionTextKey: 'space-between-chinese-japanese-or-korean-and-english-or-numbers-description',
+      nameTextKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.name',
+      descriptionTextKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.description',
       type: RuleType.SPACING,
     });
   }

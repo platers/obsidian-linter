@@ -70,3 +70,34 @@ esbuild.build({
   treeShaking: true,
   outfile: 'docs.js',
 }).catch(() => process.exit(1));
+
+esbuild.build({
+  banner: {
+    js: banner + dummyMocksForDocs,
+  },
+  entryPoints: ['src/translation-helper.ts'],
+  plugins: [
+    importGlobPlugin.default(),
+    replace({
+      values: {
+        // update usage of moment from obsidian to the node implementation of moment we have
+        'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
+        // remove the use of obsidian in the options to allow for docs.js to run
+        'import {Setting} from \'obsidian\';': '',
+        // remove the use of obsidian in settings helper to allow for dovs.js to run
+        'import {MarkdownRenderer} from \'obsidian\';': '',
+      },
+      delimiters: ['', ''],
+    }),
+  ],
+  bundle: true,
+  external: [
+    'obsidian',
+    ...builtins],
+  format: 'cjs',
+  watch: !prod,
+  target: 'es2020',
+  sourcemap: prod ? false : 'inline',
+  treeShaking: true,
+  outfile: 'translation-helper.js',
+}).catch(() => process.exit(1));

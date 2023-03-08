@@ -9,8 +9,8 @@ class EmptyLineAroundCodeFencesOptions implements Options {}
 export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineAroundCodeFencesOptions> {
   constructor() {
     super({
-      nameTextKey: 'empty-line-around-code-fences-name',
-      descriptionTextKey: 'empty-line-around-code-fences-description',
+      nameTextKey: 'rules.empty-line-around-code-fences.name',
+      descriptionTextKey: 'rules.empty-line-around-code-fences.description',
       type: RuleType.SPACING,
     });
   }

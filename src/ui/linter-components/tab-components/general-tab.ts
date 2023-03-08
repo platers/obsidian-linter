@@ -3,6 +3,7 @@ import {Tab} from './tab';
 import {Setting} from 'obsidian';
 import {moment} from 'obsidian';
 import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
+import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
 import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
 import {getTextInLanguage} from 'src/lang/helpers';
 
@@ -14,8 +15,8 @@ export class GeneralTab extends Tab {
 
   display(): void {
     let tempDiv = this.contentEl.createDiv();
-    let settingName = getTextInLanguage('lint-on-save-name');
-    let settingDesc = getTextInLanguage('lint-on-save-description');
+    let settingName = getTextInLanguage('tabs.general.lint-on-save.name');
+    let settingDesc = getTextInLanguage('tabs.general.lint-on-save.description');
     const setting = new Setting(tempDiv)
         .setName(settingName)
         .addToggle((toggle) => {
@@ -32,8 +33,8 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('display-message-name');
-    settingDesc = getTextInLanguage('display-message-description');
+    settingName = getTextInLanguage('tabs.general.display-message.name');
+    settingDesc = getTextInLanguage('tabs.general.display-message.description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
@@ -49,8 +50,8 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('folders-to-ignore-name');
-    settingDesc = getTextInLanguage('folders-to-ignore-description');
+    settingName = getTextInLanguage('tabs.general.folders-to-ignore.name');
+    settingDesc = getTextInLanguage('tabs.general.folders-to-ignore.description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
@@ -68,13 +69,13 @@ export class GeneralTab extends Tab {
     const sysLocale = navigator.language?.toLowerCase();
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('override-locale-name');
-    settingDesc = getTextInLanguage('override-locale-description');
+    settingName = getTextInLanguage('tabs.general.override-locale.name');
+    settingDesc = getTextInLanguage('tabs.general.override-locale.description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
         .addDropdown((dropdown) => {
-          dropdown.addOption('system-default', getTextInLanguage('same-as-system-locale').replace('{SYS_LOCALE}', sysLocale));
+          dropdown.addOption('system-default', getTextInLanguage('tabs.general.same-as-system-locale').replace('{SYS_LOCALE}', sysLocale));
           moment.locales().forEach((locale) => {
             dropdown.addOption(locale, locale);
           });
@@ -98,14 +99,15 @@ export class GeneralTab extends Tab {
     ];
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('yaml-aliases-section-style-name');
-    settingDesc = getTextInLanguage('yaml-aliases-section-style-description');
+    settingName = getTextInLanguage('tabs.general.yaml-aliases-section-style.name');
+    settingDesc = getTextInLanguage('tabs.general.yaml-aliases-section-style.description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
         .addDropdown((dropdown) => {
           yamlAliasRecords.forEach((aliasRecord) => {
-            dropdown.addOption(aliasRecord, getTextInLanguage(aliasRecord));
+            const key = ('enums.' + aliasRecord) as LanguageStringKey;
+            dropdown.addOption(aliasRecord, getTextInLanguage(key));
           });
           dropdown.setValue(this.plugin.settings.commonStyles.aliasArrayStyle);
           dropdown.onChange(async (value) => {
@@ -127,14 +129,15 @@ export class GeneralTab extends Tab {
     ];
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('yaml-tags-section-style-name');
-    settingDesc = getTextInLanguage('yaml-tags-section-style-description');
+    settingName = getTextInLanguage('tabs.general.yaml-tags-section-style.name');
+    settingDesc = getTextInLanguage('tabs.general.yaml-tags-section-style.description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
         .addDropdown((dropdown) => {
           yamlTagRecords.forEach((tagRecord) => {
-            dropdown.addOption(tagRecord, getTextInLanguage(tagRecord));
+            const key = ('enums.' + tagRecord) as LanguageStringKey;
+            dropdown.addOption(tagRecord, getTextInLanguage(key));
           });
           dropdown.setValue(this.plugin.settings.commonStyles.tagArrayStyle);
           dropdown.onChange(async (value) => {
@@ -148,8 +151,8 @@ export class GeneralTab extends Tab {
     const escapeCharRecords: QuoteCharacter[] = ['"', '\''];
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('default-escape-character-name');
-    settingDesc = getTextInLanguage('default-escape-character-description');
+    settingName = getTextInLanguage('tabs.general.default-escape-character.name');
+    settingDesc = getTextInLanguage('tabs.general.default-escape-character.description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
@@ -167,8 +170,8 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('remove-unnecessary-escape-chars-in-multi-line-arrays-name');
-    settingDesc = getTextInLanguage('remove-unnecessary-escape-chars-in-multi-line-arrays-description');
+    settingName = getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.name');
+    settingDesc = getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
@@ -184,8 +187,8 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('number-of-dollar-signs-to-indicate-math-block-name');
-    settingDesc = getTextInLanguage('number-of-dollar-signs-to-indicate-math-block-description');
+    settingName = getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.name');
+    settingDesc = getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)

@@ -90,11 +90,11 @@ export function timingEnd(timingKey: string) {
   if (log.getLevel() <= log.levels.DEBUG) {
     return;
   } else if (!timingInfo.has(timingKey)) {
-    logWarn(getTextInLanguage('timing-key-not-found').replace('{TIMING_KEY}', timingKey));
+    logWarn(getTextInLanguage('logs.timing-key-not-found').replace('{TIMING_KEY}', timingKey));
   }
 
   const totalTimeInMilliseconds = performance.now() - timingInfo.get(timingKey);
-  logDebug(`${timingKey}: ${totalTimeInMilliseconds} ms`);
+  logDebug(`${timingKey}: ${totalTimeInMilliseconds} ` + getTextInLanguage('logs.milliseconds-abbreviation'));
 }
 
 function addLogInfo(logInfo: string, logLevel: number) {

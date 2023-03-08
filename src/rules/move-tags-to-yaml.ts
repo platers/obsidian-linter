@@ -35,8 +35,8 @@ class MoveTagsToYamlOptions implements Options {
 export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
   constructor() {
     super({
-      nameTextKey: 'move-tags-to-yaml-name',
-      descriptionTextKey: 'move-tags-to-yaml-description',
+      nameTextKey: 'rules.move-tags-to-yaml.name',
+      descriptionTextKey: 'rules.move-tags-to-yaml.description',
       type: RuleType.YAML,
     });
   }
@@ -215,8 +215,8 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
     return [
       new DropdownOptionBuilder({
         OptionsClass: MoveTagsToYamlOptions,
-        nameTextKey: 'move-tags-to-yaml-how-to-handle-existing-tags-name',
-        descriptionTextKey: 'move-tags-to-yaml-how-to-handle-existing-tags-description',
+        nameTextKey: 'rules.move-tags-to-yaml.how-to-handle-existing-tags.name',
+        descriptionTextKey: 'rules.move-tags-to-yaml.how-to-handle-existing-tags.description',
         optionsKey: 'howToHandleExistingTags',
         records: [
           {
@@ -235,8 +235,8 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       }),
       new TextAreaOptionBuilder({
         OptionsClass: MoveTagsToYamlOptions,
-        nameTextKey: 'move-tags-to-yaml-tags-to-ignore-name',
-        descriptionTextKey: 'move-tags-to-yaml-tags-to-ignore-description',
+        nameTextKey: 'rules.move-tags-to-yaml.tags-to-ignore.name',
+        descriptionTextKey: 'rules.move-tags-to-yaml.tags-to-ignore.description',
         optionsKey: 'tagsToIgnore',
       }),
     ];

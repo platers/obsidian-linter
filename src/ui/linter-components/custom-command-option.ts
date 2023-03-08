@@ -8,10 +8,10 @@ export type LintCommand = { id: string, name: string };
 export class CustomCommandOption extends AddCustomRow {
   constructor(containerEl: HTMLElement, public lintCommands: LintCommand[], isMobile: boolean, private app: App, saveSettings: () => void) {
     super(containerEl,
-        getTextInLanguage('custom-command-name'),
-        getTextInLanguage('custom-command-description'),
-        getTextInLanguage('custom-command-warning'),
-        getTextInLanguage('custom-command-add-input-button-text'),
+        getTextInLanguage('options.custom-command.name'),
+        getTextInLanguage('options.custom-command.description'),
+        getTextInLanguage('options.custom-command.warning'),
+        getTextInLanguage('options.custom-command.add-input-button-text'),
         isMobile,
         saveSettings,
         () => {
@@ -34,7 +34,7 @@ export class CustomCommandOption extends AddCustomRow {
     new Setting(this.inputElDiv)
         .addSearch((cb) => {
           new CommandSuggester(this.app, cb.inputEl, this.lintCommands);
-          cb.setPlaceholder(getTextInLanguage('custom-command-command-search-placeholder-text'))
+          cb.setPlaceholder(getTextInLanguage('options.custom-command.command-search-placeholder-text'))
               .setValue(command.name)
               .onChange((newCommandName) => {
                 const newCommand = {id: cb.inputEl.getAttribute('commandId'), name: newCommandName};
@@ -58,7 +58,7 @@ export class CustomCommandOption extends AddCustomRow {
         })
         .addExtraButton((cb) => {
           cb.setIcon('up-chevron-glyph')
-              .setTooltip(getTextInLanguage('custom-command-move-up-tooltip'))
+              .setTooltip(getTextInLanguage('options.custom-command.move-up-tooltip'))
               .onClick(() => {
                 this.arrayMove(index, index - 1);
                 this.saveSettings();
@@ -67,7 +67,7 @@ export class CustomCommandOption extends AddCustomRow {
         })
         .addExtraButton((cb) => {
           cb.setIcon('down-chevron-glyph')
-              .setTooltip(getTextInLanguage('custom-command-move-down-tooltip'))
+              .setTooltip(getTextInLanguage('options.custom-command.move-down-tooltip'))
               .onClick(() => {
                 this.arrayMove(index, index + 1);
                 this.saveSettings();
@@ -76,7 +76,7 @@ export class CustomCommandOption extends AddCustomRow {
         })
         .addExtraButton((cb) => {
           cb.setIcon('cross')
-              .setTooltip(getTextInLanguage('custom-command-delete-tooltip'))
+              .setTooltip(getTextInLanguage('options.custom-command.delete-tooltip'))
               .onClick(() => {
                 this.lintCommands.splice(index, 1);
                 this.saveSettings();
