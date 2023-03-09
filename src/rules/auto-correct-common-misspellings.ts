@@ -23,7 +23,7 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
   }
   apply(text: string, options: AutoCorrectCommonMisspellingsOptions): string {
     return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.url], text, (text) => {
-      const wordRegex = /[\w\-'’`]+/g;
+      const wordRegex = /[\p{L}\p{N}\p{Pc}\p{M}\-'’`]+/gu;
 
       return text.replaceAll(wordRegex, (word: string) => {
         const lowercasedWord = word.toLowerCase();
