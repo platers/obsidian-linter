@@ -27,5 +27,14 @@ ruleTest({
         ![absoltely not a changed](absoltely.not.changed.md)
       `,
     },
+    {
+      testName: 'Doesn\'t auto-correct words that start with unicode specific characters when not in correction list',
+      before: dedent`
+        être
+      `,
+      after: dedent`
+        être
+      `,
+    },
   ],
 });
