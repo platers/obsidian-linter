@@ -169,6 +169,26 @@ ruleTest({
         >   1. Sub1 1
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/631
+      testName: 'Ordered list item levels should be reset when a non-ordered item is encountered',
+      before: dedent`
+        - a
+          1. b
+          1. b
+        - c
+        - c
+          1. d
+          1. d
+      `,
+      after: dedent`
+        - a
+          1. b
+          2. b
+        - c
+        - c
+          1. d
+          2. d
+      `,
+    },
   ],
 });
-
