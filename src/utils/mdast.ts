@@ -467,11 +467,26 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
     };
 
     const preListIndicatorLevelsToIndicatorNumber = new Map<number, number>();
+    const removeListItemsItemIndicatorInfo = function(start: number, end: number) {
+      let i = end;
+      while (i > start) {
+        preListIndicatorLevelsToIndicatorNumber.delete(i--);
+      }
+    };
+
     let lastItemListIndicatorLevel = -1;
-    listText = listText.replace(/^(( |\t|> )*)(\d+(\.|\)))([^\n]*)$/gm, (_listItem: string, $1: string = '', _$2: string, _$3: string, _$4: string, $5: string) => {
+    listText = listText.replace(/^(( |\t|> )*)((\d+(\.|\)))|[-*+])([^\n]*)$/gm, (listItem: string, $1: string = '', _$2: string, $3: string, _$4: string, _$5: string, $6: string) => {
       let listItemIndicatorNumber = 1;
 
       const listItemIndicatorLevel = getListItemLevel($1);
+      // when dealing with a value that is not an int reset all values greater than or equal to the current list level
+      if (!/^\d/.test($3)) {
+        const highestCurretnValue = listItemIndicatorLevel > lastItemListIndicatorLevel ? listItemIndicatorLevel: lastItemListIndicatorLevel;
+        removeListItemsItemIndicatorInfo(listItemIndicatorLevel, highestCurretnValue);
+
+        return listItem; // skip to the next item if the current item is not an ordered list item
+      }
+
       if (preListIndicatorLevelsToIndicatorNumber.has(listItemIndicatorLevel)) {
         if (orderedListStyle === OrderListItemStyles.Ascending) {
           listItemIndicatorNumber = preListIndicatorLevelsToIndicatorNumber.get(listItemIndicatorLevel) + 1;
@@ -483,15 +498,12 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
 
       // if we have removed an indentation level then go ahead and remove the last set of sublist info for any levels between those two levels
       if (lastItemListIndicatorLevel > listItemIndicatorLevel) {
-        let i = lastItemListIndicatorLevel;
-        while (i > listItemIndicatorLevel) {
-          preListIndicatorLevelsToIndicatorNumber.delete(i--);
-        }
+        removeListItemsItemIndicatorInfo(listItemIndicatorLevel, lastItemListIndicatorLevel);
       }
 
       lastItemListIndicatorLevel = listItemIndicatorLevel;
 
-      return `${$1}${listItemIndicatorNumber}${orderedListEndStyle}${$5}`;
+      return `${$1}${listItemIndicatorNumber}${orderedListEndStyle}${$6}`;
     });
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, start, position.end.offset, listText);
