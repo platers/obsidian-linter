@@ -75,8 +75,6 @@ export class DebugTab extends Tab {
     const logDisplay = new TextBoxFull(tempDiv, settingName, settingDesc);
     logDisplay.inputEl.setText(logsFromLastRun.join('\n'));
 
-    parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl);
-
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
   }
 }
