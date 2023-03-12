@@ -13,7 +13,14 @@ export function getString<ObjectType>(object: Partial<ObjectType>, path: string)
     return null;
   }
 
+  path = path.replace('..', '.'); // convert 2 periods in a row to a single period so we can properly account for the blank key value later on
   const keys = path.split('.');
+
+  // the value of '.' is an actual key as well so I need to make sure that if the last value is blank that it is set to a period
+  if (keys != null && keys[keys.length - 1] == '') {
+    keys[keys.length - 1] = '.';
+  }
+
   let result = object;
   for (const key of keys) {
     // @ts-ignore ignore the fact that result is technically of type any

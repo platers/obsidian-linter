@@ -5,7 +5,7 @@ import '../src/rules-registry';
 
 describe('Examples pass', () => {
   for (const rule of rules) {
-    describe(rule.name, () => {
+    describe(rule.getName(), () => {
       test.each(rule.examples)('$description', (example: Example) => {
         expect(rule.apply(example.before, example.options)).toBe(example.after);
       });
@@ -15,7 +15,7 @@ describe('Examples pass', () => {
 
 describe('Augmented examples pass', () => {
   for (const rule of rules) {
-    describe(rule.name, () => {
+    describe(rule.getName(), () => {
       test.each(rule.examples)('$description', (example: Example) => {
         // Add YAML
         if (rule.type !== RuleType.YAML && rule.type !== RuleType.PASTE && !example.before.match(yamlRegex)) {

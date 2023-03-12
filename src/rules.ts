@@ -17,7 +17,7 @@ import {
 } from './utils/yaml';
 import {LintCommand} from './ui/linter-components/custom-command-option';
 import {CustomReplace} from './ui/linter-components/custom-replace-option';
-import {getTextInLanguage} from './lang/helpers';
+import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 
 // CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
 export type CommonStyles = {
@@ -61,8 +61,9 @@ export enum RuleType {
 export class Rule {
   /**
    * Create a rule
-   * @param {string} name - The name of the rule
-   * @param {string} description - The description of the rule
+   * @param {LanguageStringKey} nameKey - The name key of the rule
+   * @param {LanguageStringKey} descriptionKey - The description key of the rule
+   * @param {string} settingsKey - The settings key of the rule
    * @param {string} alias - The alias of the rule which also is the config key for the rule
    * @param {RuleType} type - The type of the rule
    * @param {ApplyFunction} apply - The function to apply the rule
@@ -71,8 +72,9 @@ export class Rule {
    * @param {boolean} [hasSpecialExecutionOrder=false] - The rule has special execution order
    */
   constructor(
-      public name: string,
-      public description: string,
+      private nameKey: LanguageStringKey,
+      private descriptionKey: LanguageStringKey,
+      public settingsKey: string,
       public alias: string,
       public type: RuleType,
       public apply: ApplyFunction,
@@ -80,7 +82,7 @@ export class Rule {
       public options: Array<Option> = [],
       public readonly hasSpecialExecutionOrder: boolean = false,
   ) {
-    options.unshift(new BooleanOption('enabled', this.description, '', false));
+    options.unshift(new BooleanOption('enabled', this.descriptionKey, '' as LanguageStringKey, false));
     for (const option of options) {
       option.ruleAlias = alias;
     }
@@ -90,14 +92,22 @@ export class Rule {
     const options: { [optionName: string]: any } = {};
 
     for (const option of this.options) {
-      options[option.name] = option.defaultValue;
+      options[option.configKey] = option.defaultValue;
     }
 
     return options;
   }
 
   public getOptions(settings: LinterSettings) {
-    return settings.ruleConfigs[this.name];
+    return settings.ruleConfigs[this.settingsKey];
+  }
+
+  public getName(): string {
+    return getTextInLanguage(this.nameKey);
+  }
+
+  public getDescription(): string {
+    return getTextInLanguage(this.descriptionKey);
   }
 
   public getURL(): string {
@@ -107,7 +117,7 @@ export class Rule {
   }
 
   public enabledOptionName(): string {
-    return this.options[0].name;
+    return this.options[0].configKey;
   }
 }
 
@@ -187,7 +197,7 @@ export const ruleTypeToRules = new Map<RuleType, Rule[]>;
 
 export function registerRule(rule: Rule): void {
   rules.push(rule);
-  rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.name.localeCompare(b.name)));
+  rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.settingsKey.localeCompare(b.settingsKey)));
   rulesDict[rule.alias] = rule;
 
   if (ruleTypeToRules.has(rule.type)) {

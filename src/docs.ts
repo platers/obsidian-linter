@@ -56,7 +56,7 @@ function generateDocs() {
 
     const options_list = rule.options.slice(1).map((option) => {
       let text = dedent`
-        - ${option.name}: ${option.description}
+        - ${option.getName()}: ${option.getDescription()}
         \t- Default: \`${option.defaultValue}\`
       `;
 
@@ -98,11 +98,11 @@ function generateDocs() {
 
     rules_docs += dedent`
       ${''}
-      ### ${rule.name}
+      ### ${rule.getName()}
       ${''}
       Alias: \`${rule.alias}\`
       ${''}
-      ${rule.description}
+      ${rule.getDescription()}
       ${''}
       ${options}
       ${''}

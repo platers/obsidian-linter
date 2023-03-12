@@ -14,16 +14,16 @@ export class RuleTab extends Tab {
       const ruleDiv = this.contentEl.createDiv();
       ruleDiv.id = rule.alias;
       ruleDiv.createEl(this.isMobile ? 'h4' : 'h3', {}, (el) => {
-        el.innerHTML = `<a href="${rule.getURL()}">${rule.name}</a>`;
+        el.innerHTML = `<a href="${rule.getURL()}">${rule.getName()}</a>`;
       });
 
       const optionInfo = [] as SearchOptionInfo[];
       for (const option of rule.options) {
         option.display(ruleDiv, this.plugin.settings, this.plugin);
-        optionInfo.push(option.searchInfo);
+        optionInfo.push(option.getSearchInfo());
       }
 
-      this.addSettingSearchInfo(ruleDiv, rule.name.toLowerCase(), rule.description.toLowerCase(), optionInfo, ruleDiv.id);
+      this.addSettingSearchInfo(ruleDiv, rule.getName().toLowerCase(), rule.getDescription().toLowerCase(), optionInfo, ruleDiv.id);
     }
   }
 }

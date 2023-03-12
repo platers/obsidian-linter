@@ -15,7 +15,7 @@ export function ruleTest<TOptions extends Options>(args: {
 }): void {
   const rule = args.RuleBuilderClass.getRule();
 
-  describe(rule.name, () => {
+  describe(rule.getName(), () => {
     for (const testCase of args.testCases) {
       it(testCase.testName, () => {
         const options = testCase.options instanceof Function ? testCase.options() : testCase.options;
