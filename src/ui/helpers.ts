@@ -3,7 +3,7 @@ import {MarkdownRenderer} from 'obsidian';
 export function parseTextToHTMLWithoutOuterParagraph(text: string, containerEl: HTMLElement) {
   MarkdownRenderer.renderMarkdown(text, containerEl, '', null);
 
-  let htmlString = containerEl.innerHTML.trim();
+  let htmlString = containerEl.innerHTML.trim().replace(text, '');
   if (htmlString.startsWith('<p>')) {
     htmlString = htmlString.substring(3);
   }
