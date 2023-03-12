@@ -70,8 +70,7 @@ export default class LinterPlugin extends Plugin {
   private rulesRunner = new RulesRunner();
 
   async onload() {
-    setLanguage('es');
-    // setLanguage(window.localStorage.getItem('language'));
+    setLanguage(window.localStorage.getItem('language'));
     logInfo(getTextInLanguage('logs.plugin-load'));
 
     this.isEnabled = true;
