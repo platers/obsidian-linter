@@ -69,7 +69,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     super();
 
     this.alias = args.nameKey.replace(/rules\.(.*)\.name/, '$1');
-    this.settingsKey = args.nameKey.replace(/(rules\..*)\.name/, '$1');
+    this.settingsKey = args.nameKey.replace(/rules\.(.*)\.name/, '$1');
     this.nameKey = args.nameKey;
     this.descriptionKey = args.descriptionKey;
     this.type = args.type;
