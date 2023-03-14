@@ -160,7 +160,6 @@ export class DropdownOption extends Option {
           }
 
           // Set currently selected value from existing settings
-          // dropdown.setValue(getTextInLanguage('enums.' + settings.ruleConfigs[this.ruleAlias][this.configKey]) ?? '');
           dropdown.setValue(settings.ruleConfigs[this.ruleAlias][this.configKey]);
 
           dropdown.onChange((value) => {

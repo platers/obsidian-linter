@@ -11,7 +11,7 @@ export abstract class RuleBuilderBase {
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
     if (!RuleBuilderBase.#ruleMap.has(this.name)) {
       const builder = new this();
-      const rule = new Rule(builder.nameTextKey, builder.descriptionTextKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder);
+      const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder);
       RuleBuilderBase.#ruleMap.set(this.name, rule);
       RuleBuilderBase.#ruleBuilderMap.set(builder.alias, builder);
     }
@@ -61,8 +61,8 @@ type RuleBuilderConstructorArgs = {
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
   public settingsKey: string;
   public alias: string;
-  public nameTextKey: LanguageStringKey;
-  public descriptionTextKey: LanguageStringKey;
+  public nameKey: LanguageStringKey;
+  public descriptionKey: LanguageStringKey;
   public type: RuleType;
   public hasSpecialExecutionOrder: boolean;
   constructor(args: RuleBuilderConstructorArgs) {
@@ -70,8 +70,8 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
 
     this.alias = args.nameTextKey.replace(/rules\.(.*)\.name/, '$1');
     this.settingsKey = args.nameTextKey.replace(/(rules\..*)\.name/, '$1');
-    this.nameTextKey = args.nameTextKey;
-    this.descriptionTextKey = args.descriptionTextKey;
+    this.nameKey = args.nameTextKey;
+    this.descriptionKey = args.descriptionTextKey;
     this.type = args.type;
     this.hasSpecialExecutionOrder = args.hasSpecialExecutionOrder ?? false;
   }
