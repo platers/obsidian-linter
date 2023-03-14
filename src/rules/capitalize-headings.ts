@@ -400,8 +400,8 @@ class CapitalizeHeadingsOptions implements Options {
 export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.capitalize-headings.name',
-      descriptionTextKey: 'rules.capitalize-headings.description',
+      nameKey: 'rules.capitalize-headings.name',
+      descriptionKey: 'rules.capitalize-headings.description',
       type: RuleType.HEADING,
     });
   }
@@ -520,8 +520,8 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
     return [
       new DropdownOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
-        nameTextKey: 'rules.capitalize-headings.style.name',
-        descriptionTextKey: 'rules.capitalize-headings.style.description',
+        nameKey: 'rules.capitalize-headings.style.name',
+        descriptionKey: 'rules.capitalize-headings.style.description',
         optionsKey: 'style',
         records: [
           {
@@ -540,22 +540,22 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       }),
       new BooleanOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
-        nameTextKey: 'rules.capitalize-headings.ignore-case-words.name',
-        descriptionTextKey: 'rules.capitalize-headings.ignore-case-words.description',
+        nameKey: 'rules.capitalize-headings.ignore-case-words.name',
+        descriptionKey: 'rules.capitalize-headings.ignore-case-words.description',
         optionsKey: 'ignoreCasedWords',
       }),
       new TextAreaOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
-        nameTextKey: 'rules.capitalize-headings.ignore-words.name',
-        descriptionTextKey: 'rules.capitalize-headings.ignore-words.description',
+        nameKey: 'rules.capitalize-headings.ignore-words.name',
+        descriptionKey: 'rules.capitalize-headings.ignore-words.description',
         optionsKey: 'ignoreWords',
         splitter: wordSplitterRegex,
         separator: ', ',
       }),
       new TextAreaOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
-        nameTextKey: 'rules.capitalize-headings.lowercase-words.name',
-        descriptionTextKey: 'rules.capitalize-headings.lowercase-words.description',
+        nameKey: 'rules.capitalize-headings.lowercase-words.name',
+        descriptionKey: 'rules.capitalize-headings.lowercase-words.description',
         optionsKey: 'lowercaseWords',
         splitter: wordSplitterRegex,
         separator: ', ',

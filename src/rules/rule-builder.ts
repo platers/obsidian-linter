@@ -52,8 +52,8 @@ export abstract class RuleBuilderBase {
 }
 
 type RuleBuilderConstructorArgs = {
-  nameTextKey: LanguageStringKey
-  descriptionTextKey: LanguageStringKey,
+  nameKey: LanguageStringKey
+  descriptionKey: LanguageStringKey,
   type: RuleType;
   hasSpecialExecutionOrder?: boolean
 };
@@ -68,10 +68,10 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   constructor(args: RuleBuilderConstructorArgs) {
     super();
 
-    this.alias = args.nameTextKey.replace(/rules\.(.*)\.name/, '$1');
-    this.settingsKey = args.nameTextKey.replace(/(rules\..*)\.name/, '$1');
-    this.nameKey = args.nameTextKey;
-    this.descriptionKey = args.descriptionTextKey;
+    this.alias = args.nameKey.replace(/rules\.(.*)\.name/, '$1');
+    this.settingsKey = args.nameKey.replace(/(rules\..*)\.name/, '$1');
+    this.nameKey = args.nameKey;
+    this.descriptionKey = args.descriptionKey;
     this.type = args.type;
     this.hasSpecialExecutionOrder = args.hasSpecialExecutionOrder ?? false;
   }
@@ -150,8 +150,8 @@ type KeysOfObjectMatchingPropertyValueType<TObject, TValue> = {[TKey in keyof TO
 
 type OptionBuilderConstructorArgs<TOptions extends Options, TValue> = {
   OptionsClass: (new() => TOptions),
-  nameTextKey: LanguageStringKey
-  descriptionTextKey: LanguageStringKey,
+  nameKey: LanguageStringKey
+  descriptionKey: LanguageStringKey,
   optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
 };
 
@@ -163,23 +163,23 @@ export abstract class OptionBuilderBase<TOptions extends Options> {
 export abstract class OptionBuilder<TOptions extends Options, TValue> {
   readonly OptionsClass: (new() => TOptions);
   readonly configKey: string;
-  readonly nameTextKey: LanguageStringKey;
-  readonly descriptionTextKey: LanguageStringKey;
+  readonly nameKey: LanguageStringKey;
+  readonly descriptionKey: LanguageStringKey;
   readonly optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
   #option: Option;
 
   constructor(args: OptionBuilderConstructorArgs<TOptions, TValue>) {
     this.OptionsClass = args.OptionsClass;
 
-    const keyParts = args.nameTextKey.split('.');
+    const keyParts = args.nameKey.split('.');
     if (keyParts.length == 1) {
       this.configKey = keyParts[0];
     } else {
       this.configKey = keyParts[keyParts.length - 2];
     }
 
-    this.nameTextKey = args.nameTextKey;
-    this.descriptionTextKey = args.descriptionTextKey;
+    this.nameKey = args.nameKey;
+    this.descriptionKey = args.descriptionKey;
     this.optionsKey = args.optionsKey;
   }
 
@@ -208,13 +208,13 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
 
 export class BooleanOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, boolean> {
   protected buildOption(): Option {
-    return new BooleanOption(this.configKey, this.nameTextKey, this.descriptionTextKey, this.defaultValue);
+    return new BooleanOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue);
   }
 }
 
 export class NumberOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, Number> {
   protected buildOption(): Option {
-    return new TextOption(this.configKey, this.nameTextKey, this.descriptionTextKey, this.defaultValue);
+    return new TextOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue);
   }
 }
 
@@ -232,7 +232,7 @@ export class DropdownOptionBuilder<TOptions extends Options, TValue extends stri
   }
 
   protected buildOption(): Option {
-    return new DropdownOption(this.configKey, this.nameTextKey, this.descriptionTextKey, this.defaultValue, this.records);
+    return new DropdownOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue, this.records);
   }
 }
 
@@ -250,7 +250,7 @@ export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuild
 
 
   protected buildOption(): Option {
-    return new TextAreaOption(this.configKey, this.nameTextKey, this.descriptionTextKey, this.defaultValue.join(this.separator));
+    return new TextAreaOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue.join(this.separator));
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
@@ -267,12 +267,12 @@ export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuild
 
 export class TextOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
   protected buildOption(): Option {
-    return new TextOption(this.configKey, this.nameTextKey, this.descriptionTextKey, this.defaultValue);
+    return new TextOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue);
   }
 }
 
 export class MomentFormatOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
   protected buildOption(): Option {
-    return new MomentFormatOption(this.configKey, this.nameTextKey, this.descriptionTextKey, this.defaultValue);
+    return new MomentFormatOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue);
   }
 }

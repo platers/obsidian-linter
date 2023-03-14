@@ -13,8 +13,8 @@ class OrderedListStyleOptions implements Options {
 export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.ordered-list-style.name',
-      descriptionTextKey: 'rules.unordered-list-style.description',
+      nameKey: 'rules.ordered-list-style.name',
+      descriptionKey: 'rules.unordered-list-style.description',
       type: RuleType.CONTENT,
     });
   }
@@ -138,8 +138,8 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
     return [
       new DropdownOptionBuilder<OrderedListStyleOptions, OrderListItemStyles>({
         OptionsClass: OrderedListStyleOptions,
-        nameTextKey: 'rules.ordered-list-style.number-style.name',
-        descriptionTextKey: 'rules.ordered-list-style.number-style.description',
+        nameKey: 'rules.ordered-list-style.number-style.name',
+        descriptionKey: 'rules.ordered-list-style.number-style.description',
         optionsKey: 'numberStyle',
         records: [
           {
@@ -154,8 +154,8 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
       }),
       new DropdownOptionBuilder<OrderedListStyleOptions, OrderListItemEndOfIndicatorStyles>({
         OptionsClass: OrderedListStyleOptions,
-        nameTextKey: 'rules.ordered-list-style.list-end-style.name',
-        descriptionTextKey: 'rules.ordered-list-style.list-end-style.description',
+        nameKey: 'rules.ordered-list-style.list-end-style.name',
+        descriptionKey: 'rules.ordered-list-style.list-end-style.description',
         optionsKey: 'listEndStyle',
         records: [
           {

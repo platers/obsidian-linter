@@ -13,8 +13,8 @@ class EmptyLineAroundMathBlockOptions implements Options {
 export default class EmptyLineAroundMathBlock extends RuleBuilder<EmptyLineAroundMathBlockOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.empty-line-around-math-blocks.name',
-      descriptionTextKey: 'rules.empty-line-around-math-blocks.description',
+      nameKey: 'rules.empty-line-around-math-blocks.name',
+      descriptionKey: 'rules.empty-line-around-math-blocks.description',
       type: RuleType.SPACING,
     });
   }

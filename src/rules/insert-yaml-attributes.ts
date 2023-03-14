@@ -15,8 +15,8 @@ class InsertYamlAttributesOptions implements Options {
 export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttributesOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.insert-yaml-attributes.name',
-      descriptionTextKey: 'rules.insert-yaml-attributes.description',
+      nameKey: 'rules.insert-yaml-attributes.name',
+      descriptionKey: 'rules.insert-yaml-attributes.description',
       type: RuleType.YAML,
     });
   }
@@ -69,8 +69,8 @@ export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttribut
     return [
       new TextAreaOptionBuilder({
         OptionsClass: InsertYamlAttributesOptions,
-        nameTextKey: 'rules.insert-yaml-attributes.text-to-insert.name',
-        descriptionTextKey: 'rules.insert-yaml-attributes.text-to-insert.description',
+        nameKey: 'rules.insert-yaml-attributes.text-to-insert.name',
+        descriptionKey: 'rules.insert-yaml-attributes.text-to-insert.description',
         optionsKey: 'textToInsert',
       }),
     ];

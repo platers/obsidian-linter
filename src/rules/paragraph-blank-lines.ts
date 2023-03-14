@@ -10,8 +10,8 @@ class ParagraphBlankLinesOptions implements Options {}
 export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLinesOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.paragraph-blank-lines.name',
-      descriptionTextKey: 'rules.paragraph-blank-lines.description',
+      nameKey: 'rules.paragraph-blank-lines.name',
+      descriptionKey: 'rules.paragraph-blank-lines.description',
       type: RuleType.SPACING,
     });
   }

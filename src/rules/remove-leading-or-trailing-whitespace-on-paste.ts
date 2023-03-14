@@ -9,8 +9,8 @@ class RemoveLeadingOrTrailingWhitespaceOnPasteOptions implements Options {}
 export default class RemoveLeadingOrTrailingWhitespaceOnPaste extends RuleBuilder<RemoveLeadingOrTrailingWhitespaceOnPasteOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.remove-leading-or-trailing-whitespace-on-paste.name',
-      descriptionTextKey: 'rules.remove-leading-or-trailing-whitespace-on-paste.description',
+      nameKey: 'rules.remove-leading-or-trailing-whitespace-on-paste.name',
+      descriptionKey: 'rules.remove-leading-or-trailing-whitespace-on-paste.description',
       type: RuleType.PASTE,
     });
   }

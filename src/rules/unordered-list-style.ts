@@ -12,8 +12,8 @@ class UnorderedListStyleOptions implements Options {
 export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.unordered-list-style.name',
-      descriptionTextKey: 'rules.unordered-list-style.description',
+      nameKey: 'rules.unordered-list-style.name',
+      descriptionKey: 'rules.unordered-list-style.description',
       type: RuleType.CONTENT,
     });
   }
@@ -172,8 +172,8 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
     return [
       new DropdownOptionBuilder<UnorderedListStyleOptions, UnorderedListItemStyles>({
         OptionsClass: UnorderedListStyleOptions,
-        nameTextKey: 'rules.unordered-list-style.list-style.name',
-        descriptionTextKey: 'rules.unordered-list-style.list-style.description',
+        nameKey: 'rules.unordered-list-style.list-style.name',
+        descriptionKey: 'rules.unordered-list-style.list-style.description',
         optionsKey: 'listStyle',
         records: [
           {

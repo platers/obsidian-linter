@@ -27,8 +27,8 @@ class YamlTitleAliasOptions implements Options {
 export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.yaml-title-alias.name',
-      descriptionTextKey: 'rules.yaml-title-alias.description',
+      nameKey: 'rules.yaml-title-alias.name',
+      descriptionKey: 'rules.yaml-title-alias.description',
       type: RuleType.YAML,
     });
   }
@@ -267,20 +267,20 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: YamlTitleAliasOptions,
-        nameTextKey: 'rules.yaml-title-alias.preserve-existing-alias-section-style.name',
-        descriptionTextKey: 'rules.yaml-title-alias.preserve-existing-alias-section-style.description',
+        nameKey: 'rules.yaml-title-alias.preserve-existing-alias-section-style.name',
+        descriptionKey: 'rules.yaml-title-alias.preserve-existing-alias-section-style.description',
         optionsKey: 'preserveExistingAliasesSectionStyle',
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlTitleAliasOptions,
-        nameTextKey: 'rules.yaml-title-alias.keep-alias-that-matches-the-filename.name',
-        descriptionTextKey: 'rules.yaml-title-alias.keep-alias-that-matches-the-filename.description',
+        nameKey: 'rules.yaml-title-alias.keep-alias-that-matches-the-filename.name',
+        descriptionKey: 'rules.yaml-title-alias.keep-alias-that-matches-the-filename.description',
         optionsKey: 'keepAliasThatMatchesTheFilename',
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlTitleAliasOptions,
-        nameTextKey: 'rules.yaml-title-alias.use-yaml-key-to-keep-track-of-old-filename-or-heading.name',
-        descriptionTextKey: 'rules.yaml-title-alias.use-yaml-key-to-keep-track-of-old-filename-or-heading.description',
+        nameKey: 'rules.yaml-title-alias.use-yaml-key-to-keep-track-of-old-filename-or-heading.name',
+        descriptionKey: 'rules.yaml-title-alias.use-yaml-key-to-keep-track-of-old-filename-or-heading.description',
         optionsKey: 'useYamlKeyToKeepTrackOfOldFilenameOrHeading',
       }),
     ];

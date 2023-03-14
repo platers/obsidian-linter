@@ -13,8 +13,8 @@ class EscapeYamlSpecialCharactersOptions implements Options {
 export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlSpecialCharactersOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.escape-yaml-special-characters.name',
-      descriptionTextKey: 'rules.escape-yaml-special-characters.description',
+      nameKey: 'rules.escape-yaml-special-characters.name',
+      descriptionKey: 'rules.escape-yaml-special-characters.description',
       type: RuleType.YAML,
       hasSpecialExecutionOrder: true,
     });
@@ -199,8 +199,8 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
     return [
       new BooleanOptionBuilder({
         OptionsClass: EscapeYamlSpecialCharactersOptions,
-        nameTextKey: 'rules.escape-yaml-special-characters.try-to-escape-single-line-arrays.description',
-        descriptionTextKey: 'rules.escape-yaml-special-characters.try-to-escape-single-line-arrays.name',
+        nameKey: 'rules.escape-yaml-special-characters.try-to-escape-single-line-arrays.description',
+        descriptionKey: 'rules.escape-yaml-special-characters.try-to-escape-single-line-arrays.name',
         optionsKey: 'tryToEscapeSingleLineArrays',
       }),
     ];

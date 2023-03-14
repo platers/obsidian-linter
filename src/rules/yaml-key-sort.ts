@@ -26,8 +26,8 @@ class YamlKeySortOptions implements Options {
 export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.yaml-key-sort.name',
-      descriptionTextKey: 'rules.yaml-key-sort.description',
+      nameKey: 'rules.yaml-key-sort.name',
+      descriptionKey: 'rules.yaml-key-sort.description',
       type: RuleType.YAML,
       hasSpecialExecutionOrder: true,
     });
@@ -261,20 +261,20 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     return [
       new TextAreaOptionBuilder({
         OptionsClass: YamlKeySortOptions,
-        nameTextKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.name',
-        descriptionTextKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.description',
+        nameKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.name',
+        descriptionKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.description',
         optionsKey: 'yamlKeyPrioritySortOrder',
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlKeySortOptions,
-        nameTextKey: 'rules.yaml-key-sort.priority-keys-at-start-of-yaml.name',
-        descriptionTextKey: 'rules.yaml-key-sort.priority-keys-at-start-of-yaml.description',
+        nameKey: 'rules.yaml-key-sort.priority-keys-at-start-of-yaml.name',
+        descriptionKey: 'rules.yaml-key-sort.priority-keys-at-start-of-yaml.description',
         optionsKey: 'priorityKeysAtStartOfYaml',
       }),
       new DropdownOptionBuilder<YamlKeySortOptions, YamlSortOrderForOtherKeys>({
         OptionsClass: YamlKeySortOptions,
-        nameTextKey: 'rules.yaml-key-sort.yaml-sort-order-for-other-keys.name',
-        descriptionTextKey: 'rules.yaml-key-sort.yaml-sort-order-for-other-keys.description',
+        nameKey: 'rules.yaml-key-sort.yaml-sort-order-for-other-keys.name',
+        descriptionKey: 'rules.yaml-key-sort.yaml-sort-order-for-other-keys.description',
         optionsKey: 'yamlSortOrderForOtherKeys',
         records: [
           {

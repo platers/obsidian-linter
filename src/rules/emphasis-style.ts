@@ -14,8 +14,8 @@ class EmphasisStyleOptions implements Options {
 export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.emphasis-style.name',
-      descriptionTextKey: 'rules.emphasis-style.description',
+      nameKey: 'rules.emphasis-style.name',
+      descriptionKey: 'rules.emphasis-style.description',
       type: RuleType.CONTENT,
     });
   }
@@ -165,8 +165,8 @@ export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
     return [
       new DropdownOptionBuilder<EmphasisStyleOptions, EmphasisStyleValues>({
         OptionsClass: EmphasisStyleOptions,
-        nameTextKey: 'rules.emphasis-style.style.name',
-        descriptionTextKey: 'rules.emphasis-style.style.description',
+        nameKey: 'rules.emphasis-style.style.name',
+        descriptionKey: 'rules.emphasis-style.style.description',
         optionsKey: 'style',
         records: [
           {

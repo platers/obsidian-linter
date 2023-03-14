@@ -9,8 +9,8 @@ class RemoveConsecutiveListMarkersOptions implements Options {}
 export default class RemoveConsecutiveListMarkers extends RuleBuilder<RemoveConsecutiveListMarkersOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.remove-consecutive-list-markers.name',
-      descriptionTextKey: 'rules.remove-consecutive-list-markers.description',
+      nameKey: 'rules.remove-consecutive-list-markers.name',
+      descriptionKey: 'rules.remove-consecutive-list-markers.description',
       type: RuleType.CONTENT,
     });
   }

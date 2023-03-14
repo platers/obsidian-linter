@@ -16,8 +16,8 @@ class RemoveSpaceAroundCharactersOptions implements Options {
 export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpaceAroundCharactersOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.remove-space-around-characters.name',
-      descriptionTextKey: 'rules.remove-space-around-characters.description',
+      nameKey: 'rules.remove-space-around-characters.name',
+      descriptionKey: 'rules.remove-space-around-characters.description',
       type: RuleType.SPACING,
     });
   }
@@ -137,26 +137,26 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
   get optionBuilders(): OptionBuilderBase<RemoveSpaceAroundCharactersOptions>[] {
     return [
       new BooleanOptionBuilder({
-        nameTextKey: 'rules.remove-space-around-characters.include-fullwidth-forms.name',
-        descriptionTextKey: 'rules.remove-space-around-characters.include-fullwidth-forms.description',
+        nameKey: 'rules.remove-space-around-characters.include-fullwidth-forms.name',
+        descriptionKey: 'rules.remove-space-around-characters.include-fullwidth-forms.description',
         OptionsClass: RemoveSpaceAroundCharactersOptions,
         optionsKey: 'includeFullwidthForms',
       }),
       new BooleanOptionBuilder({
-        nameTextKey: 'rules.remove-space-around-characters.include-cjk-symbols-and-punctuation.name',
-        descriptionTextKey: 'rules.remove-space-around-characters.include-cjk-symbols-and-punctuation.description',
+        nameKey: 'rules.remove-space-around-characters.include-cjk-symbols-and-punctuation.name',
+        descriptionKey: 'rules.remove-space-around-characters.include-cjk-symbols-and-punctuation.description',
         OptionsClass: RemoveSpaceAroundCharactersOptions,
         optionsKey: 'includeCJKSymbolsAndPunctuation',
       }),
       new BooleanOptionBuilder({
-        nameTextKey: 'rules.remove-space-around-characters.include-dashes.name',
-        descriptionTextKey: 'rules.remove-space-around-characters.include-dashes.description',
+        nameKey: 'rules.remove-space-around-characters.include-dashes.name',
+        descriptionKey: 'rules.remove-space-around-characters.include-dashes.description',
         OptionsClass: RemoveSpaceAroundCharactersOptions,
         optionsKey: 'includeDashes',
       }),
       new TextOptionBuilder({
-        nameTextKey: 'rules.remove-space-around-characters.other-symbols.name',
-        descriptionTextKey: 'rules.remove-space-around-characters.other-symbols.description',
+        nameKey: 'rules.remove-space-around-characters.other-symbols.name',
+        descriptionKey: 'rules.remove-space-around-characters.other-symbols.description',
         OptionsClass: RemoveSpaceAroundCharactersOptions,
         optionsKey: 'otherSymbols',
       }),

@@ -12,8 +12,8 @@ class RemoveTrailingPunctuationInHeadingOptions implements Options {
 export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<RemoveTrailingPunctuationInHeadingOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.remove-trailing-punctuation-in-heading.name',
-      descriptionTextKey: 'rules.remove-trailing-punctuation-in-heading.description',
+      nameKey: 'rules.remove-trailing-punctuation-in-heading.name',
+      descriptionKey: 'rules.remove-trailing-punctuation-in-heading.description',
       type: RuleType.HEADING,
     });
   }
@@ -69,8 +69,8 @@ export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<Remo
     return [
       new TextOptionBuilder({
         OptionsClass: RemoveTrailingPunctuationInHeadingOptions,
-        nameTextKey: 'rules.remove-trailing-punctuation-in-heading.punctuation-to-remove.name',
-        descriptionTextKey: 'rules.remove-trailing-punctuation-in-heading.punctuation-to-remove.description',
+        nameKey: 'rules.remove-trailing-punctuation-in-heading.punctuation-to-remove.name',
+        descriptionKey: 'rules.remove-trailing-punctuation-in-heading.punctuation-to-remove.description',
         optionsKey: 'punctuationToRemove',
       }),
     ];

@@ -10,8 +10,8 @@ class EmptyLineAroundTablesOptions implements Options {}
 export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTablesOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.empty-line-around-tables.name',
-      descriptionTextKey: 'rules.empty-line-around-tables.description',
+      nameKey: 'rules.empty-line-around-tables.name',
+      descriptionKey: 'rules.empty-line-around-tables.description',
       type: RuleType.SPACING,
     });
   }

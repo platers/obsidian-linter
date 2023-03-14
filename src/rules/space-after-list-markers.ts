@@ -9,8 +9,8 @@ class SpaceAfterListMarkersOptions implements Options {}
 export default class SpaceAfterListMarkers extends RuleBuilder<SpaceAfterListMarkersOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.space-after-list-markers.name',
-      descriptionTextKey: 'rules.space-after-list-markers.description',
+      nameKey: 'rules.space-after-list-markers.name',
+      descriptionKey: 'rules.space-after-list-markers.description',
       type: RuleType.SPACING,
     });
   }

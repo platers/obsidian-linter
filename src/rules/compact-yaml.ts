@@ -11,8 +11,8 @@ class CompactYamlOptions implements Options {
 export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.compact-yaml.name',
-      descriptionTextKey: 'rules.compact-yaml.description',
+      nameKey: 'rules.compact-yaml.name',
+      descriptionKey: 'rules.compact-yaml.description',
       type: RuleType.SPACING,
     });
   }
@@ -89,8 +89,8 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: CompactYamlOptions,
-        nameTextKey: 'rules.compact-yaml.inner-new-lines.name',
-        descriptionTextKey: 'rules.compact-yaml.inner-new-lines.description',
+        nameKey: 'rules.compact-yaml.inner-new-lines.name',
+        descriptionKey: 'rules.compact-yaml.inner-new-lines.description',
         optionsKey: 'innerNewLines',
       }),
     ];

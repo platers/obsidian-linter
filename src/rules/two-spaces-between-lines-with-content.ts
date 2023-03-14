@@ -10,8 +10,8 @@ class TwoSpacesBetweenLinesWithContentOptions implements Options {}
 export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpacesBetweenLinesWithContentOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.two-spaces-between-lines-with-content.name',
-      descriptionTextKey: 'rules.two-spaces-between-lines-with-content.description',
+      nameKey: 'rules.two-spaces-between-lines-with-content.name',
+      descriptionKey: 'rules.two-spaces-between-lines-with-content.description',
       type: RuleType.CONTENT,
     });
   }
