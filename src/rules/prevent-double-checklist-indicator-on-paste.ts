@@ -13,8 +13,8 @@ class PreventDoubleChecklistIndicatorOnPasteOptions implements Options {
 export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<PreventDoubleChecklistIndicatorOnPasteOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.prevent-double-checklist-indicator-on-paste.name',
-      descriptionTextKey: 'rules.prevent-double-checklist-indicator-on-paste.description',
+      nameKey: 'rules.prevent-double-checklist-indicator-on-paste.name',
+      descriptionKey: 'rules.prevent-double-checklist-indicator-on-paste.description',
       type: RuleType.PASTE,
     });
   }

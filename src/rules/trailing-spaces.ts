@@ -11,8 +11,8 @@ class TrailingSpacesOptions implements Options {
 export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.trailing-spaces.name',
-      descriptionTextKey: 'rules.trailing-spaces.description',
+      nameKey: 'rules.trailing-spaces.name',
+      descriptionKey: 'rules.trailing-spaces.description',
       type: RuleType.SPACING,
     });
   }
@@ -66,8 +66,8 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: TrailingSpacesOptions,
-        nameTextKey: 'rules.trailing-spaces.twp-space-line-break.name',
-        descriptionTextKey: 'rules.trailing-spaces.twp-space-line-break.description',
+        nameKey: 'rules.trailing-spaces.twp-space-line-break.name',
+        descriptionKey: 'rules.trailing-spaces.twp-space-line-break.description',
         optionsKey: 'twoSpaceLineBreak',
       }),
     ];

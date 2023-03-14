@@ -36,8 +36,8 @@ class FormatYamlArrayOptions implements Options {
 export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.format-yaml-array.name',
-      descriptionTextKey: 'rules.format-yaml-array.description',
+      nameKey: 'rules.format-yaml-array.name',
+      descriptionKey: 'rules.format-yaml-array.description',
       type: RuleType.YAML,
     });
   }
@@ -232,20 +232,20 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        nameTextKey: 'rules.format-yaml-array.alias-key.name',
-        descriptionTextKey: 'rules.format-yaml-array.alias-key.description',
+        nameKey: 'rules.format-yaml-array.alias-key.name',
+        descriptionKey: 'rules.format-yaml-array.alias-key.description',
         optionsKey: 'formatAliasKey',
       }),
       new BooleanOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        nameTextKey: 'rules.format-yaml-array.tag-key.name',
-        descriptionTextKey: 'rules.format-yaml-array.tag-key.description',
+        nameKey: 'rules.format-yaml-array.tag-key.name',
+        descriptionKey: 'rules.format-yaml-array.tag-key.description',
         optionsKey: 'formatTagKey',
       }),
       new DropdownOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        nameTextKey: 'rules.format-yaml-array.default-array-style.name',
-        descriptionTextKey: 'rules.format-yaml-array.default-array-style.description',
+        nameKey: 'rules.format-yaml-array.default-array-style.name',
+        descriptionKey: 'rules.format-yaml-array.default-array-style.description',
         optionsKey: 'defaultArrayStyle',
         records: [
           {
@@ -260,20 +260,20 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
       }),
       new BooleanOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        nameTextKey: 'rules.format-yaml-array.default-array-keys.name',
-        descriptionTextKey: 'rules.format-yaml-array.default-array-keys.description',
+        nameKey: 'rules.format-yaml-array.default-array-keys.name',
+        descriptionKey: 'rules.format-yaml-array.default-array-keys.description',
         optionsKey: 'formatArrayKeys',
       }),
       new TextAreaOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        nameTextKey: 'rules.format-yaml-array.force-single-line-array-style.name',
-        descriptionTextKey: 'rules.format-yaml-array.force-single-line-array-style.description',
+        nameKey: 'rules.format-yaml-array.force-single-line-array-style.name',
+        descriptionKey: 'rules.format-yaml-array.force-single-line-array-style.description',
         optionsKey: 'forceSingleLineArrayStyle',
       }),
       new TextAreaOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
-        nameTextKey: 'rules.format-yaml-array.force-multi-line-array-style.name',
-        descriptionTextKey: 'rules.format-yaml-array.force-multi-line-array-style.description',
+        nameKey: 'rules.format-yaml-array.force-multi-line-array-style.name',
+        descriptionKey: 'rules.format-yaml-array.force-multi-line-array-style.description',
         optionsKey: 'forceMultiLineArrayStyle',
       }),
     ];

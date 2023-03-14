@@ -13,8 +13,8 @@ class PreventDoubleListItemIndicatorOnPasteOptions implements Options {
 export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<PreventDoubleListItemIndicatorOnPasteOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.prevent-double-list-item-indicator-on-paste.name',
-      descriptionTextKey: 'rules.prevent-double-list-item-indicator-on-paste.description',
+      nameKey: 'rules.prevent-double-list-item-indicator-on-paste.name',
+      descriptionKey: 'rules.prevent-double-list-item-indicator-on-paste.description',
       type: RuleType.PASTE,
     });
   }

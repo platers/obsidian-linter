@@ -9,8 +9,8 @@ class RemoveMultipleSpacesOptions implements Options {}
 export default class RemoveMultipleSpaces extends RuleBuilder<RemoveMultipleSpacesOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.remove-multiple-spaces.name',
-      descriptionTextKey: 'rules.remove-multiple-spaces.description',
+      nameKey: 'rules.remove-multiple-spaces.name',
+      descriptionKey: 'rules.remove-multiple-spaces.description',
       type: RuleType.CONTENT,
     });
   }

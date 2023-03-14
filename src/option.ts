@@ -10,21 +10,30 @@ export type SearchOptionInfo = {name: string, description: string, options?: Dro
 
 export abstract class Option {
   public ruleAlias: string;
-  public searchInfo: SearchOptionInfo;
 
   /**
    * Create an option
-   * @param {string} name - The name of the option
-   * @param {string} description - The description of the option
+   * @param {LanguageStringKey} nameKey - The name key of the option
+   * @param {LanguageStringKey} descriptionKey - The description key of the option
    * @param {any} defaultValue - The default value of the option
    * @param {string?} ruleAlias - The alias of the rule this option belongs to
    */
-  constructor(public configKey: string, public name: string, public description: string, public defaultValue: any, ruleAlias?: string | null) {
-    this.searchInfo = {name: name, description: description};
-
+  constructor(public configKey: string, public nameKey: LanguageStringKey, public descriptionKey: LanguageStringKey, public defaultValue: any, ruleAlias?: string | null) {
     if (ruleAlias) {
       this.ruleAlias = ruleAlias;
     }
+  }
+
+  public getName(): string {
+    return getTextInLanguage(this.nameKey) ?? '';
+  }
+
+  public getDescription(): string {
+    return getTextInLanguage(this.descriptionKey) ?? '';
+  }
+
+  public getSearchInfo(): SearchOptionInfo {
+    return {name: this.getName(), description: this.getDescription()};
   }
 
   public abstract display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void;
@@ -34,8 +43,8 @@ export abstract class Option {
   }
 
   protected parseNameAndDescriptionAndRemoveSettingBorder(setting: Setting) {
-    parseTextToHTMLWithoutOuterParagraph(this.name, setting.nameEl);
-    parseTextToHTMLWithoutOuterParagraph(this.description, setting.descEl);
+    parseTextToHTMLWithoutOuterParagraph(this.getName(), setting.nameEl);
+    parseTextToHTMLWithoutOuterParagraph(this.getDescription(), setting.descEl);
 
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
@@ -116,14 +125,16 @@ export class MomentFormatOption extends Option {
 }
 
 export class DropdownRecord {
-  public value: string;
+  public value: LanguageStringKey;
   public description: string;
-  public displayValue: string;
 
   constructor(value: LanguageStringKey, description: string) {
     this.value = value;
     this.description = description;
-    this.displayValue = getTextInLanguage(value);
+  }
+
+  getDisplayValue(): string {
+    return getTextInLanguage(this.value) ?? '';
   }
 }
 
@@ -131,10 +142,13 @@ export class DropdownOption extends Option {
   public defaultValue: string;
   public options: DropdownRecord[];
 
-  constructor(configKey: string, name: string, description: string, defaultValue: string, options: DropdownRecord[], ruleAlias?: string | null) {
-    super(configKey, name, description, defaultValue, ruleAlias);
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: string, options: DropdownRecord[], ruleAlias?: string | null) {
+    super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
     this.options = options;
-    this.searchInfo.options = options;
+  }
+
+  public getSearchInfo(): SearchOptionInfo {
+    return {name: this.getName(), description: this.getDescription(), options: this.options};
   }
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
@@ -142,7 +156,7 @@ export class DropdownOption extends Option {
         .addDropdown((dropdown) => {
           // First, add all the available options
           for (const option of this.options) {
-            dropdown.addOption(option.value, option.displayValue);
+            dropdown.addOption(option.value.replace('enums.', ''), option.getDisplayValue());
           }
 
           // Set currently selected value from existing settings

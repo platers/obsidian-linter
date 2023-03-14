@@ -9,8 +9,8 @@ class ConsecutiveBlankLinesOptions implements Options {}
 export default class ConsecutiveBlankLines extends RuleBuilder<ConsecutiveBlankLinesOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.consecutive-blank-lines.name',
-      descriptionTextKey: 'rules.consecutive-blank-lines.description',
+      nameKey: 'rules.consecutive-blank-lines.name',
+      descriptionKey: 'rules.consecutive-blank-lines.description',
       type: RuleType.SPACING,
     });
   }

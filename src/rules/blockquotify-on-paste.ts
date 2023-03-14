@@ -12,8 +12,8 @@ class BlockquotifyOnPasteOptions implements Options {
 export default class BlockquotifyOnPaste extends RuleBuilder<BlockquotifyOnPasteOptions> {
   constructor() {
     super({
-      nameTextKey: 'rules.add-blockquote-indentation-on-paste.name',
-      descriptionTextKey: 'rules.add-blockquote-indentation-on-paste.description',
+      nameKey: 'rules.add-blockquote-indentation-on-paste.name',
+      descriptionKey: 'rules.add-blockquote-indentation-on-paste.description',
       type: RuleType.PASTE,
     });
   }
