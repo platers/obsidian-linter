@@ -300,7 +300,6 @@ export default {
       'try-to-escape-single-line-arrays': {
         'name': 'Try to Escape Single Line Arrays',
         'description': 'Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".',
-
       },
     },
     // file-name-heading.ts
