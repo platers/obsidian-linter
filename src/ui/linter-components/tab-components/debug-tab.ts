@@ -72,7 +72,7 @@ export class DebugTab extends Tab {
     tempDiv = this.contentEl.createDiv();
     settingName = getTextInLanguage('tabs.debug.linter-logs.name');
     settingDesc = getTextInLanguage('tabs.debug.linter-logs.description');
-    const logDisplay = new TextBoxFull(tempDiv, settingName, settingDesc);
+    const logDisplay = new TextBoxFull(tempDiv, settingName, '');
     logDisplay.inputEl.setText(logsFromLastRun.join('\n'));
 
     parseTextToHTMLWithoutOuterParagraph(settingDesc, logDisplay.descEl);
