@@ -1,5 +1,3 @@
-import {escapeRegExp} from './regex';
-
 /**
  * Inserts a string at the given position in a string.
  * @param {string} str - The string to insert into
@@ -32,19 +30,173 @@ export function stripCr(text: string): string {
   return text.replace(/\r/g, '');
 }
 
-/**
- * Checks whether the expected text and actual text are the same allowing for requiring an exact match versus a close match on whitespace
- * @param {string} expectedText - The expected text
- * @param {string} actualText - The actual text
- * @param {boolean} requireSameTrailingWhitespace - Whether or not to do an exact comparison or allow whitespace to differ
- * @return {boolean} Whether or not the text matched the expected value
- */
-function textMatches(expectedText: string, actualText: string, requireSameTrailingWhitespace: boolean = false): boolean {
-  if (requireSameTrailingWhitespace) {
-    return expectedText == actualText;
+function getStartOfLineWhitespaceOrBlockquoteLevel(text: string, startPosition: number): [string, number] {
+  if (startPosition === 0) {
+    return ['', 0];
   }
 
-  return actualText.match(new RegExp('^' + escapeRegExp(expectedText) + '( |\\t)*$', 'm')) != null;
+  let startOfLine = '';
+  let index = startPosition;
+  while (index >= 0) {
+    const char = text.charAt(index);
+    if (char === '\n') {
+      break;
+    } else if (char.trim() === '' || char === '>') {
+      startOfLine = char + startOfLine;
+    } else {
+      startOfLine = '';
+    }
+
+    index--;
+  }
+
+  return [startOfLine, index];
+}
+
+function getEmptyLine(startOfLine: string, priorLine: string = ''): string {
+  const [priorLineStart] = getStartOfLineWhitespaceOrBlockquoteLevel(priorLine, priorLine.length);
+
+  return '\n' + priorLineStart.trim();
+}
+
+function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFile(text: string, startOfContent: number): string {
+  if (startOfContent === 0) {
+    return text;
+  }
+
+  let index = startOfContent;
+  let startOfNewContent = startOfContent;
+  while (index >= 0) {
+    const currentChar = text.charAt(index);
+    if (currentChar.trim() !== '') {
+      break; // if non-whitespace is encountered, then the line has content
+    } else if (currentChar === '\n') {
+      startOfNewContent = index;
+    }
+    index--;
+  }
+
+  if (index < 0 || startOfNewContent === 0) {
+    return text.substring(startOfContent + 1);
+  }
+
+  return text.substring(0, startOfNewContent) + '\n' + text.substring(startOfContent);
+}
+
+function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockquote(text: string, startOfLine: string, startOfContent: number): string {
+  if (startOfContent === 0) {
+    return text;
+  }
+
+  const nestingLevel = startOfLine.split('>').length - 1;
+  let index = startOfContent;
+  let startOfNewContent = startOfContent;
+  let lineNestingLevel = 0;
+  while (index >= 0) {
+    const currentChar = text.charAt(index);
+    if (currentChar.trim() !== '' && currentChar !== '>') {
+      break; // if non-whitespace, non-gt-bracket is encountered, then the line has content
+    } else if (currentChar === '>') {
+      lineNestingLevel++;
+    } else if (currentChar === '\n') {
+      if (lineNestingLevel === 0 || lineNestingLevel === nestingLevel || (lineNestingLevel + 1) === nestingLevel) {
+        startOfNewContent = index;
+        lineNestingLevel = 0;
+      } else {
+        break;
+      }
+    }
+    index--;
+  }
+
+  if (index < 0 || startOfNewContent === 0) {
+    return text.substring(startOfContent + 1);
+  }
+
+  const indexOfLastNewLine = text.lastIndexOf('\n', startOfNewContent - 1);
+  let priorLine = '';
+  if (indexOfLastNewLine === -1) {
+    priorLine = text.substring(0, startOfNewContent);
+  } else {
+    priorLine = text.substring(indexOfLastNewLine, startOfNewContent);
+  }
+
+  return text.substring(0, startOfNewContent) + getEmptyLine(startOfLine, priorLine) + text.substring(startOfContent);
+}
+
+function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFile(text: string, endOfContent: number): string {
+  if (endOfContent === (text.length - 1)) {
+    return text;
+  }
+
+  let index = endOfContent;
+  let endOfNewContent = endOfContent;
+  let isFirstNewLine = true;
+  while (index < text.length) {
+    const currentChar = text.charAt(index);
+    if (currentChar.trim() !== '') {
+      break; // if non-whitespace is encountered, then the line has content
+    } else if (currentChar === '\n') {
+      if (isFirstNewLine) {
+        isFirstNewLine = false;
+      } else {
+        endOfNewContent = index;
+      }
+    }
+    index++;
+  }
+
+  if (index === text.length || endOfNewContent === text.length - 1) {
+    return text.substring(0, endOfContent);
+  }
+
+  return text.substring(0, endOfContent) + '\n' + text.substring(endOfNewContent);
+}
+
+function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text: string, startOfLine: string, endOfContent: number): string {
+  if (endOfContent === (text.length - 1)) {
+    return text;
+  }
+
+  const nestingLevel = startOfLine.split('>').length - 1;
+  let index = endOfContent;
+  let endOfNewContent = endOfContent;
+  let isFirstNewLine = true;
+  let lineNestingLevel = 0;
+  while (index < text.length) {
+    const currentChar = text.charAt(index);
+    if (currentChar.trim() !== '' && currentChar !== '>') {
+      break; // if non-whitespace is encountered, then the line has content
+    } else if (currentChar === '>') {
+      lineNestingLevel++;
+    } else if (currentChar === '\n') {
+      if (lineNestingLevel === 0 || lineNestingLevel === nestingLevel || (lineNestingLevel + 1) === nestingLevel) {
+        lineNestingLevel = 0;
+        if (isFirstNewLine) {
+          isFirstNewLine = false;
+        } else {
+          endOfNewContent = index;
+        }
+      } else {
+        break;
+      }
+    }
+    index++;
+  }
+
+  if (index === text.length || endOfNewContent === text.length - 1) {
+    return text.substring(0, endOfContent);
+  }
+
+  const indexOfSecondNewLineAfterContent = text.indexOf('\n', endOfNewContent + 1);
+  let nextLine = '';
+  if (indexOfSecondNewLineAfterContent === -1) {
+    nextLine = text.substring(endOfNewContent);
+  } else {
+    nextLine = text.substring(endOfNewContent + 1, indexOfSecondNewLineAfterContent);
+  }
+
+  return text.substring(0, endOfContent) + getEmptyLine(startOfLine, nextLine) + text.substring(endOfNewContent);
 }
 
 /**
@@ -52,71 +204,19 @@ function textMatches(expectedText: string, actualText: string, requireSameTraili
  * @param {string} text - The entire file's contents
  * @param {number} start - The starting index of the content to escape
  * @param {number} end - The ending index of the content to escape
- * @param {boolean} isForBlockquotes - Whether or not to apply logic to allow a blank line or one less nesting of blockquotes to be the empty line
  * @return {string} The new file contents after the empty lines have been added
  */
-export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number, isForBlockquotes: boolean = false): string {
-  const content = text.substring(start, end);
-  let startOfLine = '';
-  let contentPriorToContent = text.substring(0, start);
-  if (contentPriorToContent.length > 0) {
-    const contentLinesPriorToContent = contentPriorToContent.split('\n');
-    startOfLine = contentLinesPriorToContent[contentLinesPriorToContent.length - 1] ?? '';
-    startOfLine = startOfLine.trimEnd();
+export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number): string {
+  const [startOfLine, startOfLineIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(text, start);
+  if (startOfLine.trim() !== '') {
+    const newText = makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text, startOfLine, end);
 
-
-    let numberOfIndexesToRemove = 0;
-    while (contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove) >= 0) {
-      const lineContent = contentLinesPriorToContent[contentLinesPriorToContent.length - (2 + numberOfIndexesToRemove)];
-      if (!textMatches(startOfLine, lineContent) && (!isForBlockquotes || !textMatches('', lineContent, true))) {
-        break;
-      }
-
-      numberOfIndexesToRemove++;
-    }
-
-    contentLinesPriorToContent.splice(contentLinesPriorToContent.length - (1 + numberOfIndexesToRemove), numberOfIndexesToRemove);
-
-    if (contentLinesPriorToContent.length > 1) {
-      if ((isForBlockquotes && contentLinesPriorToContent[contentLinesPriorToContent.length - 2].match(/^> ?.*$/m)) ||
-      (!isForBlockquotes && !textMatches(startOfLine, contentLinesPriorToContent[contentLinesPriorToContent.length - 2]))) {
-        contentLinesPriorToContent.splice(contentLinesPriorToContent.length - 1, 0, startOfLine);
-      } else if (!textMatches('', contentLinesPriorToContent[contentLinesPriorToContent.length - 2], true)) {
-        contentLinesPriorToContent.splice(contentLinesPriorToContent.length - 1, 0, '');
-      }
-    }
-
-    contentPriorToContent = contentLinesPriorToContent.join('\n');
+    return makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockquote(newText, startOfLine, startOfLineIndex);
   }
 
-  let contentAfterContent = text.substring(end);
-  if (contentAfterContent.length > 0) {
-    const contentLinesAfterBlock = contentAfterContent.split('\n');
-    let numberOfIndexesToRemove = 0;
-    while (numberOfIndexesToRemove + 1 < contentLinesAfterBlock.length) {
-      const lineContent = contentLinesAfterBlock[1+numberOfIndexesToRemove];
-      if (!textMatches(startOfLine, lineContent) && (!isForBlockquotes || !textMatches('', lineContent, true))) {
-        break;
-      }
+  const newText = makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFile(text, end);
 
-      numberOfIndexesToRemove++;
-    }
-
-    contentLinesAfterBlock.splice(1, numberOfIndexesToRemove);
-
-    if (contentLinesAfterBlock.length > 1) {
-      if ((isForBlockquotes && contentLinesAfterBlock[1].match(/^> ?.*$/m)) ||
-      (!isForBlockquotes && !textMatches(startOfLine, contentLinesAfterBlock[1]))) {
-        contentLinesAfterBlock.splice(1, 0, startOfLine);
-      } else if (isForBlockquotes && !textMatches('', contentLinesAfterBlock[1])) {
-        contentLinesAfterBlock.splice(1, 0, '');
-      }
-    }
-
-    contentAfterContent = contentLinesAfterBlock.join('\n');
-  }
-
-  return contentPriorToContent + content + contentAfterContent;
+  return makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFile(newText, startOfLineIndex);
 }
 
 // from https://stackoverflow.com/a/52171480/8353749
