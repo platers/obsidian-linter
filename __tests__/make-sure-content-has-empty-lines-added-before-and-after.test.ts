@@ -170,7 +170,7 @@ const testCases: EmptyStringBeforeAndAfterTestCase[] = [
   },
   {
     startOfContent: 124, // start of the 2nd code block: "`"
-    endOfContent: 175, // end of the 2nd code block: "`"
+    endOfContent: 175, // end of the 2nd code block: "\n"
     testName: 'Fenced code blocks that are in a blockquote have the proper empty line added',
     before: dedent`
       # Make sure that code blocks in blockquotes are accounted for correctly
