@@ -157,3 +157,16 @@ export function convertStringVersionOfEscapeCharactersToEscapeCharacters(val: st
 
   return val;
 }
+
+export function getStartOfLineIndex(text: string, indexToStartFrom: number): number {
+  if (indexToStartFrom < 2) {
+    return indexToStartFrom;
+  }
+
+  let startOfLineIndex = indexToStartFrom;
+  while (startOfLineIndex > 0 && text.charAt(startOfLineIndex - 1) !== '\n') {
+    startOfLineIndex--;
+  }
+
+  return startOfLineIndex;
+}

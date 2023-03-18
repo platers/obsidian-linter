@@ -431,7 +431,7 @@ export default class LinterPlugin extends Plugin {
       if (useLogTemplateInNotice) {
         new Notice(`${errorMessage} ${error.message}.\n${seeConsoleText}`);
       } else {
-        new Notice(`${error.message}.\nS${seeConsoleText}`);
+        new Notice(`${error.message}.\n${seeConsoleText}`);
       }
     } else {
       new Notice(`${getTextInLanguage('logs.unknown-error')} ${seeConsoleText}`);
