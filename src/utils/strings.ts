@@ -32,21 +32,6 @@ export function stripCr(text: string): string {
   return text.replace(/\r/g, '');
 }
 
-/**
- * Checks whether the expected text and actual text are the same allowing for requiring an exact match versus a close match on whitespace
- * @param {string} expectedText - The expected text
- * @param {string} actualText - The actual text
- * @param {boolean} requireSameTrailingWhitespace - Whether or not to do an exact comparison or allow whitespace to differ
- * @return {boolean} Whether or not the text matched the expected value
- */
-function textMatches(expectedText: string, actualText: string, requireSameTrailingWhitespace: boolean = false): boolean {
-  if (requireSameTrailingWhitespace) {
-    return expectedText == actualText;
-  }
-
-  return actualText.match(new RegExp('^' + escapeRegExp(expectedText) + '( |\\t)*$', 'm')) != null;
-}
-
 function getStartOfLineWhitespaceOrBlockquoteLevel(text: string, startPosition: number): [string, number] {
   if (startPosition === 0) {
     return ['', 0];
@@ -72,14 +57,6 @@ function getStartOfLineWhitespaceOrBlockquoteLevel(text: string, startPosition: 
 
 function getEmptyLine(startOfLine: string, priorLine: string = ''): string {
   const [priorLineStart] = getStartOfLineWhitespaceOrBlockquoteLevel(priorLine, priorLine.length);
-
-  // let emptyLine = '\n';
-
-  // if (priorLineStart === startOfLine) {
-  //   emptyLine += startOfLine.trim();
-  // } else if (priorLineStart.trim() !== '') {
-  //   emptyLine += startOfLine.substring(0, startOfLine.lastIndexOf('>') - 1);
-  // }
 
   return '\n' + priorLineStart.trim();
 }
@@ -120,8 +97,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
   while (index >= 0) {
     const currentChar = text.charAt(index);
     if (currentChar.trim() !== '' && currentChar !== '>') {
-      // TODO: determine if bracket name is right
-      break; // if non-whitespace, non-lt-bracket is encountered, then the line has content
+      break; // if non-whitespace, non-gt-bracket is encountered, then the line has content
     } else if (currentChar === '>') {
       lineNestingLevel++;
     } else if (currentChar === '\n') {
@@ -219,7 +195,7 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
   if (indexOfSecondNewLineAfterContent === -1) {
     nextLine = text.substring(endOfNewContent);
   } else {
-    nextLine = text.substring(indexOfSecondNewLineAfterContent);
+    nextLine = text.substring(endOfNewContent + 1, indexOfSecondNewLineAfterContent);
   }
 
   return text.substring(0, endOfContent) + getEmptyLine(startOfLine, nextLine) + text.substring(endOfNewContent);
@@ -230,13 +206,10 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
  * @param {string} text - The entire file's contents
  * @param {number} start - The starting index of the content to escape
  * @param {number} end - The ending index of the content to escape
- * @param {boolean} isForBlockquotes - Whether or not to apply logic to allow a blank line or one less nesting of blockquotes to be the empty line
  * @return {string} The new file contents after the empty lines have been added
  */
-export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number, isForBlockquotes: boolean = false): string {
+export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number): string {
   const [startOfLine, startOfLineIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(text, start);
-
-  // handle content in blockquotes
   if (startOfLine.trim() !== '') {
     const newText = makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text, startOfLine, end);
 
