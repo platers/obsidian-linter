@@ -1,5 +1,3 @@
-import {escapeRegExp} from './regex';
-
 /**
  * Inserts a string at the given position in a string.
  * @param {string} str - The string to insert into
