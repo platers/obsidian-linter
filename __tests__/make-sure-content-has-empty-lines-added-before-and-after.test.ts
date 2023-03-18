@@ -29,7 +29,7 @@ const testCases: EmptyStringBeforeAndAfterTestCase[] = [
   },
   {
     testName: 'Content with multiple empty lines before it should have one added before and after',
-    isForBlockquote: false,
+    startOfContent: 13,
     endOfContent: 29,
     before: dedent`
       # Header
