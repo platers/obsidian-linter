@@ -1,7 +1,7 @@
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
-import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue} from './strings';
+import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex} from './strings';
 import {genericLinkRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
@@ -559,10 +559,7 @@ export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numb
   const mathOpeningIndicatorRegex = new RegExp('^(\\${' + numberOfDollarSignsForMathBlock + ',})(\\n*)');
   const mathEndingIndicatorRegex = new RegExp('(\\n*)(\\${' + numberOfDollarSignsForMathBlock + ',})([^\\$]*)$');
   for (const position of positions) {
-    let mathBlock = text.substring(position.start.offset, position.end.offset);
-    mathBlock = mathBlock.replace(mathOpeningIndicatorRegex, '$1\n');
-    mathBlock= mathBlock.replace(mathEndingIndicatorRegex, '\n$2$3');
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, mathBlock);
+    text = addBlankLinesAroundStartAndStopMathIndicators(text, position.start.offset, position.end.offset, mathOpeningIndicatorRegex, mathEndingIndicatorRegex);
   }
 
   positions = getPositions(MDAstTypes.InlineMath, text);
@@ -571,11 +568,31 @@ export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numb
       continue;
     }
 
-    let mathBlock = text.substring(position.start.offset, position.end.offset);
-    mathBlock = mathBlock.replace(mathOpeningIndicatorRegex, '$1\n');
-    mathBlock= mathBlock.replace(mathEndingIndicatorRegex, '\n$2$3');
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, mathBlock);
+    text = addBlankLinesAroundStartAndStopMathIndicators(text, position.start.offset, position.end.offset, mathOpeningIndicatorRegex, mathEndingIndicatorRegex);
   }
 
   return text;
+}
+
+function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockStartIndex: number, mathBlockEndIndex: number, mathOpeningIndicatorRegex: RegExp, mathEndingIndicatorRegex: RegExp): string {
+  const startOfLine = text.substring(getStartOfLineIndex(text, mathBlockStartIndex), mathBlockStartIndex) ?? '';
+  let mathBlock = text.substring(mathBlockStartIndex, mathBlockEndIndex);
+  mathBlock = mathBlock.replace(mathOpeningIndicatorRegex, (_: string, $1: string, $2: string = '') => {
+    // a new line is being added
+    if ($2 === '') {
+      return $1 + '\n' + startOfLine;
+    }
+
+    return $1 + '\n';
+  });
+  mathBlock= mathBlock.replace(mathEndingIndicatorRegex, (_: string, $1: string = '', $2: string, $3: string) => {
+    // a new line is being added
+    if ($1 === '') {
+      return '\n' + startOfLine + $2 + $3;
+    }
+
+    return '\n' + $2 + $3;
+  });
+
+  return replaceTextBetweenStartAndEndWithNewValue(text, mathBlockStartIndex, mathBlockEndIndex, mathBlock);
 }

@@ -19,5 +19,31 @@ ruleTest({
         text here
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/560
+      testName: 'Moving math block indicator to its own line when in a blockquote moves the content to lines with a blockquote indicator at their start for inline math',
+      before: dedent`
+        > $$math$$
+      `,
+      after: dedent`
+        > $$
+        > math
+        > $$
+      `,
+    },
+    {
+      testName: 'Moving math block indicator to its own line when in a blockquote moves the content to lines with a blockquote indicator at their start for math block',
+      before: dedent`
+        > $$
+        > \\boldsymbol{a}=\\begin{bmatrix}a_x \\\\ a_y\\end{bmatrix}$$
+        text here
+      `,
+      after: dedent`
+        > $$
+        > \\boldsymbol{a}=\\begin{bmatrix}a_x \\\\ a_y\\end{bmatrix}
+        > $$
+        text here
+      `,
+    },
+
   ],
 });
