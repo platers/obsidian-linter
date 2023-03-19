@@ -98,7 +98,7 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
           ---
           key: value
           ---
-          
+          ${''}
           # Header
           Paragraph here...
         `,
