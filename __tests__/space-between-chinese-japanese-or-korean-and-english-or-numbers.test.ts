@@ -95,5 +95,15 @@ ruleTest({
         **[abs 接口](abs 接口.md)**
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/662
+      testName: 'Make sure that html is ignored',
+      before: dedent`
+        <img src="中文small.png" />
+      `,
+      after: dedent`
+        <img src="中文small.png" />
+      `,
+    },
+
   ],
 });
