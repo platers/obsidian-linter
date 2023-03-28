@@ -18,7 +18,7 @@ export default class RemoveHyphensOnPaste extends RuleBuilder<RemoveHyphensOnPas
     return RemoveHyphensOnPasteOptions;
   }
   apply(text: string, options: RemoveHyphensOnPasteOptions): string {
-    return text.replace(/(\S)[-‐]\s+\n?(?=\w)/g, '$1');
+    return text.replace(/([^\s-])[-‐]\s+\n?(?=\w)/g, '$1');
   }
   get exampleBuilders(): ExampleBuilder<RemoveHyphensOnPasteOptions>[] {
     return [
