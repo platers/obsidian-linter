@@ -220,5 +220,33 @@ ruleTest({
         howToHandleExistingTags: 'Remove whole tag',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/661
+      testName: 'Make sure that moving tags to YAML does not affect values in the YAML beyond the tag values',
+      before: dedent`
+        ---
+        BC-dataview-note: "#tag1 and #tag2"
+        BC-dataview-note-field: parent
+        ---
+        ${''}
+        # Title
+        ${''}
+        #tag-body
+      `,
+      after: dedent`
+        ---
+        BC-dataview-note: "#tag1 and #tag2"
+        BC-dataview-note-field: parent
+        tags: tag-body
+        ---
+        ${''}
+        # Title
+        ${''}
+      `,
+      options: {
+        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+        howToHandleExistingTags: 'Remove whole tag',
+      },
+    },
+
   ],
 });

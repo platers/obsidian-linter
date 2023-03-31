@@ -45,7 +45,16 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
   }
   apply(text: string, options: MoveTagsToYamlOptions): string {
     return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.html, IgnoreTypes.wikiLink, IgnoreTypes.link], text, (text) => {
-      const tags = matchTagRegex(text);
+      let tags: string[];
+
+      // need to ignore YAML when getting regex matches to avoid improper matches with YAML contents
+      // https://github.com/platers/obsidian-linter/issues/661
+      ignoreListOfTypes([IgnoreTypes.yaml], text, (text) => {
+        tags = matchTagRegex(text);
+
+        return text;
+      });
+
       if (tags.length === 0) {
         return text;
       }
@@ -92,22 +101,26 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         return `---\n${newYaml}---`;
       });
 
-      if (options.howToHandleExistingTags !== 'Nothing') {
-        text = text.replace(tagWithLeadingWhitespaceRegex, (tag: string) => {
-          const hashtagIndex = tag.indexOf('#');
+      text = ignoreListOfTypes([IgnoreTypes.yaml], text, (text) => {
+        if (options.howToHandleExistingTags !== 'Nothing') {
+          text = text.replace(tagWithLeadingWhitespaceRegex, (tag: string) => {
+            const hashtagIndex = tag.indexOf('#');
 
-          const tagContents = tag.substring(hashtagIndex+1);
-          if (options.tagsToIgnore.includes(tagContents)) {
-            return tag;
-          }
+            const tagContents = tag.substring(hashtagIndex+1);
+            if (options.tagsToIgnore.includes(tagContents)) {
+              return tag;
+            }
 
-          if (options.howToHandleExistingTags === 'Remove hashtag') {
-            return tag.substring(0, hashtagIndex) + tagContents;
-          }
+            if (options.howToHandleExistingTags === 'Remove hashtag') {
+              return tag.substring(0, hashtagIndex) + tagContents;
+            }
 
-          return '';
-        });
-      }
+            return '';
+          });
+        }
+
+        return text;
+      });
 
       // Make sure that the yaml frontmatter does not have whitespace added after the end of the yaml frontmatter.
       // This accounts for https://github.com/platers/obsidian-linter/issues/573
