@@ -250,7 +250,7 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
 
     // exclude list items and blockquotes
     const firstLine = paragraphLines[0].trimStart();
-    if (firstLine.startsWith('> ') || firstLine.startsWith('>\t') || firstLine.startsWith('- ') || firstLine.startsWith('-\t') ||
+    if (firstLine.startsWith('>') || firstLine.startsWith('- ') || firstLine.startsWith('-\t') ||
       firstLine.match(/^[0-9]+\.( |\t)+/)) {
       continue;
     }

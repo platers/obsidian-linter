@@ -125,19 +125,34 @@ ruleTest({
         > blockquote line 2
       `,
     },
-    {
-      testName: 'Make sure lists are not affected',
+    { // accounts for https://github.com/platers/obsidian-linter/issues/669
+      testName: 'Make sure blockquotes that have a value starting with the blockquote indicator and no whitespace after are not affected',
       before: dedent`
         # Hello world
         ${''}
         > blockquote
-        > blockquote line 2
+        >blockquote line 2
       `,
       after: dedent`
         # Hello world
         ${''}
         > blockquote
-        > blockquote line 2
+        >blockquote line 2
+      `,
+    },
+    {
+      testName: 'Make sure lists are not affected',
+      before: dedent`
+        # Hello world
+        ${''}
+        - List item 1
+        - List item 2
+      `,
+      after: dedent`
+        # Hello world
+        ${''}
+        - List item 1
+        - List item 2
       `,
     },
     {
