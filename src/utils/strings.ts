@@ -53,7 +53,7 @@ function getStartOfLineWhitespaceOrBlockquoteLevel(text: string, startPosition: 
   return [startOfLine, index];
 }
 
-function getEmptyLine(startOfLine: string, priorLine: string = ''): string {
+function getEmptyLine(priorLine: string = ''): string {
   const [priorLineStart] = getStartOfLineWhitespaceOrBlockquoteLevel(priorLine, priorLine.length);
 
   return '\n' + priorLineStart.trim();
@@ -113,6 +113,12 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
     return text.substring(startOfContent + 1);
   }
 
+  const startingEmptyLines = text.substring(startOfNewContent, startOfContent);
+  const startsWithEmptyLine = startingEmptyLines === '\n' || startingEmptyLines.startsWith('\n\n');
+  if (startsWithEmptyLine) {
+    return text.substring(0, startOfNewContent) + '\n' + text.substring(startOfContent);
+  }
+
   const indexOfLastNewLine = text.lastIndexOf('\n', startOfNewContent - 1);
   let priorLine = '';
   if (indexOfLastNewLine === -1) {
@@ -121,7 +127,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
     priorLine = text.substring(indexOfLastNewLine, startOfNewContent);
   }
 
-  return text.substring(0, startOfNewContent) + getEmptyLine(startOfLine, priorLine) + text.substring(startOfContent);
+  return text.substring(0, startOfNewContent) + getEmptyLine(priorLine) + text.substring(startOfContent);
 }
 
 function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFile(text: string, endOfContent: number): string {
@@ -188,6 +194,12 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     return text.substring(0, endOfContent);
   }
 
+  const endingEmptyLines = text.substring(endOfContent, endOfNewContent);
+  const endsInEmptyLine = endingEmptyLines === '\n' || endingEmptyLines.endsWith('\n\n');
+  if (endsInEmptyLine) {
+    return text.substring(0, endOfContent) + '\n' + text.substring(endOfNewContent);
+  }
+
   const indexOfSecondNewLineAfterContent = text.indexOf('\n', endOfNewContent + 1);
   let nextLine = '';
   if (indexOfSecondNewLineAfterContent === -1) {
@@ -196,7 +208,8 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     nextLine = text.substring(endOfNewContent + 1, indexOfSecondNewLineAfterContent);
   }
 
-  return text.substring(0, endOfContent) + getEmptyLine(startOfLine, nextLine) + text.substring(endOfNewContent);
+
+  return text.substring(0, endOfContent) + getEmptyLine(nextLine) + text.substring(endOfNewContent);
 }
 
 /**

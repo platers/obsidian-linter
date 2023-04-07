@@ -436,7 +436,7 @@ export function ensureEmptyLinesAroundMathBlock(text: string, numberOfDollarSign
 export function ensureEmptyLinesAroundBlockquotes(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Blockquote, text);
   for (const position of positions) {
-    // make sure to shift end to the next new line character just in case blocquotes are nested which can cause changes to move content out of the original position expected
+    // make sure to shift end to the next new line character just in case blockquotes are nested which can cause changes to move content out of the original position expected
     let endIndex = position.end.offset;
     while (endIndex < text.length - 1 && text.charAt(endIndex) !== '\n') {
       endIndex++;
