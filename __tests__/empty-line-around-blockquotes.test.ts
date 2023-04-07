@@ -90,6 +90,5 @@ ruleTest({
         > The quote 3
       `,
     },
-
   ],
 });
