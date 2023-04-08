@@ -77,6 +77,7 @@ export default {
 
     // mdast.ts
     'missing-footnote-error-message': `Footnote '{FOOTNOTE}' has no corresponding footnote reference before the footnote contents and cannot be processed. Please make sure that all footnotes have a corresponding reference before the content of the footnote.`,
+    'too-many-footnotes-error-message': `Footnote key '{FOOTNOTE_KEY}' has more than 1 footnote referencing it. Please update the footnotes so that there is only one footnote per footnote key.`,
 
     // rules.ts
     'wrapper-yaml-error': 'error in the yaml: {ERROR_MESSAGE}',
@@ -465,7 +466,7 @@ export default {
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': 'Re-Index Footnotes',
-      'description': 'Re-indexes footnote keys and footnote, based on the order of occurrence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)',
+      'description': 'Re-indexes footnote keys and footnote, based on the order of occurrence (NOTE: This rule does *not* work if there is more than one footnote for a key.)',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {

@@ -13,7 +13,6 @@ import {gfmFootnoteFromMarkdown} from 'mdast-util-gfm-footnote';
 import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
 import QuickLRU from 'quick-lru';
 import {getTextInLanguage} from '../lang/helpers';
-import {match} from 'assert';
 
 const LRU = new QuickLRU({maxSize: 200});
 
@@ -99,7 +98,7 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
  * @param {string} text The text to move footnotes in
  * @return {string} The text with footnote declarations moved to the end
  */
-export function moveFootnotesToEnd(text: string) {
+export function moveFootnotesToEnd(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
   let footnotes: string[] = [];
 
@@ -147,21 +146,6 @@ export function moveFootnotesToEnd(text: string) {
   };
 
   text = removeFootnotesAndDoAnActionThem(positions, text, footnotes, getAllReferencePositionsForFootnote);
-
-  // for (const position of positions) {
-  //   const footnote = text.substring(position.start.offset, position.end.offset);
-  //   footnotes.push(footnote);
-  //   // Remove the newline after the footnote if it exists
-  //   if (position.end.offset < text.length && text[position.end.offset] === '\n') {
-  //     text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
-  //   }
-  //   // Remove the newline after the footnote if it exists
-  //   if (position.end.offset < text.length && text[position.end.offset] === '\n') {
-  //     text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
-  //   }
-  //   text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
-  //   getAllReferencePositionsForFootnote(footnote, position.start.offset);
-  // }
 
   for (const footnoteData of footnoteKeyToFootnoteKeyInfo) {
     const keyInfo = footnoteData[1];
@@ -218,8 +202,7 @@ export function reIndexFootnotes(text: string): string {
     if (footnoteKeyAlreadyUsed && mapOfFootnoteToFirstFootnoteReferenceIndex.has(footnote)) {
       return mapOfFootnoteToFirstFootnoteReferenceIndex.get(footnote);
     } else if (footnoteKeyAlreadyUsed) {
-      // TODO: throw an error since we cannot properly determine which reference is which
-      return -1;
+      throw new Error(getTextInLanguage('logs.too-many-footnotes-error-message').replace('{FOOTNOTE_KEY}', footnoteReference));
     }
 
     let footnoteReferenceLocation: number;
@@ -260,7 +243,13 @@ export function reIndexFootnotes(text: string): string {
   }
 
   let footnoteIndex = 1;
+  const footnotesAdded = new Set<string>();
   for (const footnote of footnotes) {
+    if (footnotesAdded.has(footnote)) {
+      continue;
+    }
+
+    footnotesAdded.add(footnote);
     const footnoteKey = footnoteToFootnoteKey.get(footnote);
     const newFootnoteKey = `[^${footnoteIndex++}]`;
     oldKeyToNewKey.set(footnoteKey, newFootnoteKey);
@@ -633,8 +622,8 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
       const listItemIndicatorLevel = getListItemLevel($1);
       // when dealing with a value that is not an int reset all values greater than or equal to the current list level
       if (!/^\d/.test($3)) {
-        const highestCurretnValue = listItemIndicatorLevel > lastItemListIndicatorLevel ? listItemIndicatorLevel: lastItemListIndicatorLevel;
-        removeListItemsItemIndicatorInfo(listItemIndicatorLevel, highestCurretnValue);
+        const highestCurrentValue = listItemIndicatorLevel > lastItemListIndicatorLevel ? listItemIndicatorLevel: lastItemListIndicatorLevel;
+        removeListItemsItemIndicatorInfo(listItemIndicatorLevel, highestCurrentValue);
 
         return listItem; // skip to the next item if the current item is not an ordered list item
       }

@@ -72,6 +72,21 @@ export default class ReIndexFootnotes extends RuleBuilder<ReIndexFootnotesOption
           [^3]: second footnotes
         `,
       }),
+      new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/466
+        description: 'Re-indexing footnotes condense duplicate footnotes into 1 when key and footnote are the same',
+        before: dedent`
+          bla[^1], bla[^1], bla[^2]
+          [^1]: bla
+          [^1]: bla
+          [^2]: bla
+        `,
+        after: dedent`
+          bla[^1], bla[^1], bla[^2]
+          ${''}
+          [^1]: bla
+          [^2]: bla
+        `,
+      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<ReIndexFootnotesOptions>[] {
