@@ -283,3 +283,20 @@ export function getStartOfLineIndex(text: string, indexToStartFrom: number): num
 
   return startOfLineIndex;
 }
+
+/**
+ * Replace the first instance of the matching search string in the text after the provided starting position.
+ * @param {string} text - The text in which to do the find and replace given the starting position.
+ * @param {string} search - The text to search for and replace in the provided string.
+ * @param {string} replace - The text to replace the search text with in the provided string.
+ * @param {number} start - The position to start the replace search at.
+ * @return {string} The new string after replacing the value if found.
+ */
+export function replaceAt(text: string, search: string, replace: string, start: number): string {
+  if (start > text.length - 1) {
+    return text;
+  }
+
+  return text.slice(0, start) +
+      text.slice(start, text.length).replace(search, replace);
+}
