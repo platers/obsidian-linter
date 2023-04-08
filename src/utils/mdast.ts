@@ -1,7 +1,7 @@
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
-import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex} from './strings';
+import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt} from './strings';
 import {genericLinkRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
@@ -98,7 +98,7 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
  * @param {string} text The text to move footnotes in
  * @return {string} The text with footnote declarations moved to the end
  */
-export function moveFootnotesToEnd(text: string) {
+export function moveFootnotesToEnd(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
   let footnotes: string[] = [];
 
@@ -111,7 +111,7 @@ export function moveFootnotesToEnd(text: string) {
   const footnoteKeyToFootnoteKeyInfo = new Map<string, footnoteKeyInfo>();
   const mapOfFootnoteToFootnoteReferenceIndex = new Map<string, number>();
 
-  const getAllReferencePositionsForFootnote = function(footnote: string, startOfFootnoteReferenceSearch: number): void {
+  const getAllReferencePositionsForFootnote = function(text: string, footnote: string, startOfFootnoteReferenceSearch: number): void {
     const footnoteReference = footnote.match(/\[\^.*?\]/)[0];
 
     if (footnoteKeyToFootnoteKeyInfo.has(footnoteReference)) {
@@ -145,20 +145,7 @@ export function moveFootnotesToEnd(text: string) {
     footnoteKeyToFootnoteKeyInfo.set(footnoteReference, keyInfo);
   };
 
-  for (const position of positions) {
-    const footnote = text.substring(position.start.offset, position.end.offset);
-    footnotes.push(footnote);
-    // Remove the newline after the footnote if it exists
-    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
-      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
-    }
-    // Remove the newline after the footnote if it exists
-    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
-      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
-    }
-    text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
-    getAllReferencePositionsForFootnote(footnote, position.start.offset);
-  }
+  text = removeFootnotesAndDoAnActionThem(positions, text, footnotes, getAllReferencePositionsForFootnote);
 
   for (const footnoteData of footnoteKeyToFootnoteKeyInfo) {
     const keyInfo = footnoteData[1];
@@ -186,6 +173,114 @@ export function moveFootnotesToEnd(text: string) {
   }
   for (const footnote of footnotes) {
     text += '\n' + footnote;
+  }
+
+  return text;
+}
+
+/**
+ * Re-indexes the footnotes in the document making sure that they increase in number from 1 on up
+ * and reorders the footnotes themselves as well.
+ * @param {string} text - The text to re-index the footnotes in.
+ * @return {string} The text with footnotes re-indexed.
+ */
+export function reIndexFootnotes(text: string): string {
+  const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
+  let footnotes: string[] = [];
+
+  const mapOfFootnoteToFirstFootnoteReferenceIndex = new Map<string, number>();
+  const footnoteToFootnoteKey = new Map<string, string>();
+  const oldKeyToNewKey = new Map<string, string>();
+  let footnoteReferenceLocationInfo: {key: string, position: number}[] = [];
+  const footnoteKeys = new Set<string>();
+
+  const getFirstReferenceToFootnote = function(text: string, footnote: string, startOfFootnoteReferenceSearch: number): number {
+    const footnoteReference = footnote.match(/\[\^.*?\]/)[0];
+    footnoteToFootnoteKey.set(footnote, footnoteReference);
+
+    const footnoteKeyAlreadyUsed = footnoteKeys.has(footnoteReference);
+    if (footnoteKeyAlreadyUsed && mapOfFootnoteToFirstFootnoteReferenceIndex.has(footnote)) {
+      return mapOfFootnoteToFirstFootnoteReferenceIndex.get(footnote);
+    } else if (footnoteKeyAlreadyUsed) {
+      throw new Error(getTextInLanguage('logs.too-many-footnotes-error-message').replace('{FOOTNOTE_KEY}', footnoteReference));
+    }
+
+    let footnoteReferenceLocation: number;
+    let firstFootnoteReferenceIndex: number = -1;
+    do {
+      footnoteReferenceLocation = text.lastIndexOf(footnoteReference, startOfFootnoteReferenceSearch);
+      if (footnoteReferenceLocation === -1) {
+        continue;
+      }
+
+      footnoteReferenceLocationInfo.push({key: footnoteReference, position: footnoteReferenceLocation});
+      firstFootnoteReferenceIndex = footnoteReferenceLocation;
+      startOfFootnoteReferenceSearch = footnoteReferenceLocation - 1;
+    } while (footnoteReferenceLocation > -1);
+
+    footnoteKeys.add(footnoteReference);
+
+    return firstFootnoteReferenceIndex;
+  };
+
+  text = removeFootnotesAndDoAnActionThem(positions, text, footnotes, (text: string, footnote: string, startOfFootnoteReferenceSearch: number) => {
+    mapOfFootnoteToFirstFootnoteReferenceIndex.set(footnote, getFirstReferenceToFootnote(text, footnote, startOfFootnoteReferenceSearch));
+  });
+
+  // Sort the footnotes into the order of their references in the text
+  footnotes = footnotes.sort((f1: string, f2: string) => {
+    return mapOfFootnoteToFirstFootnoteReferenceIndex.get(f1) - mapOfFootnoteToFirstFootnoteReferenceIndex.get(f2);
+  });
+
+  // Sort the footnote references from last to first to prevent issues when replacing the footnote references down the road
+  footnoteReferenceLocationInfo = footnoteReferenceLocationInfo.sort((f1: {key: string, position: number}, f2: {key: string, position: number}) => {
+    return f2.position - f1.position;
+  });
+
+  // Add the footnotes to the end of the document
+  if (footnotes.length > 0) {
+    text = text.trimEnd() + '\n';
+  }
+
+  let footnoteIndex = 1;
+  const footnotesAdded = new Set<string>();
+  for (const footnote of footnotes) {
+    if (footnotesAdded.has(footnote)) {
+      continue;
+    }
+
+    footnotesAdded.add(footnote);
+    const footnoteKey = footnoteToFootnoteKey.get(footnote);
+    const newFootnoteKey = `[^${footnoteIndex++}]`;
+    oldKeyToNewKey.set(footnoteKey, newFootnoteKey);
+
+    text += '\n' + footnote.replace(footnoteKey, newFootnoteKey);
+  }
+
+  for (const footnoteReference of footnoteReferenceLocationInfo) {
+    const newFootnoteKey = oldKeyToNewKey.get(footnoteReference.key);
+
+    text = replaceAt(text, footnoteReference.key, newFootnoteKey, footnoteReference.position);
+  }
+
+  return text;
+}
+
+function removeFootnotesAndDoAnActionThem(positions: Position[], text: string, footnotes: string[], action: (text: string, footnote: string, startOfFootnoteReferenceSearch: number) => void) {
+  for (const position of positions) {
+    const footnote = text.substring(position.start.offset, position.end.offset);
+    footnotes.push(footnote);
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
+
+    action(text, footnote, position.start.offset);
   }
 
   return text;
@@ -527,8 +622,8 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
       const listItemIndicatorLevel = getListItemLevel($1);
       // when dealing with a value that is not an int reset all values greater than or equal to the current list level
       if (!/^\d/.test($3)) {
-        const highestCurretnValue = listItemIndicatorLevel > lastItemListIndicatorLevel ? listItemIndicatorLevel: lastItemListIndicatorLevel;
-        removeListItemsItemIndicatorInfo(listItemIndicatorLevel, highestCurretnValue);
+        const highestCurrentValue = listItemIndicatorLevel > lastItemListIndicatorLevel ? listItemIndicatorLevel: lastItemListIndicatorLevel;
+        removeListItemsItemIndicatorInfo(listItemIndicatorLevel, highestCurrentValue);
 
         return listItem; // skip to the next item if the current item is not an ordered list item
       }

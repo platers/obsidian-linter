@@ -2,6 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {reIndexFootnotes} from '../utils/mdast';
 
 class ReIndexFootnotesOptions implements Options {}
 
@@ -18,23 +19,7 @@ export default class ReIndexFootnotes extends RuleBuilder<ReIndexFootnotesOption
     return ReIndexFootnotesOptions;
   }
   apply(text: string, options: ReIndexFootnotesOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      // re-index footnote-text
-      let ft_index = 0;
-      text = text.replace(/^\[\^\w+\]: /gm, function() {
-        ft_index++;
-        return '[^' + String(ft_index) + ']: ';
-      });
-
-      // re-index footnote-keys
-      // regex uses hack to treat lookahead as lookaround https://stackoverflow.com/a/43232659
-      ft_index = 0;
-      text = text.replace(/(?!^)\[\^\w+\]/gm, function() {
-        ft_index++;
-        return '[^' + String(ft_index) + ']';
-      });
-      return text;
-    });
+    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, reIndexFootnotes);
   }
   get exampleBuilders(): ExampleBuilder<ReIndexFootnotesOptions>[] {
     return [
@@ -71,18 +56,35 @@ export default class ReIndexFootnotes extends RuleBuilder<ReIndexFootnotesOption
         `,
       }),
       new ExampleBuilder({
-        description: 'Re-indexing duplicate footnote keys',
+        description: 'Re-indexing footnotes preserves multiple references to the same footnote index',
         before: dedent`
-          Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^1] et iaculis tortor condimentum.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^1a] Vestibulum nec blandit felis, vulputate finibus purus.[^2] Praesent quis iaculis diam.[^1]
           ${''}
           [^1]: first footnote
-          [^1]: second footnote
+          [^1a]: third footnote, inserted later
+          [^2]: second footnotes
         `,
         after: dedent`
-          Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^2] Vestibulum nec blandit felis, vulputate finibus purus.[^3] Praesent quis iaculis diam.[^1]
           ${''}
           [^1]: first footnote
-          [^2]: second footnote
+          [^2]: third footnote, inserted later
+          [^3]: second footnotes
+        `,
+      }),
+      new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/466
+        description: 'Re-indexing footnotes condense duplicate footnotes into 1 when key and footnote are the same',
+        before: dedent`
+          bla[^1], bla[^1], bla[^2]
+          [^1]: bla
+          [^1]: bla
+          [^2]: bla
+        `,
+        after: dedent`
+          bla[^1], bla[^1], bla[^2]
+          ${''}
+          [^1]: bla
+          [^2]: bla
         `,
       }),
     ];
