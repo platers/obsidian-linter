@@ -102,22 +102,47 @@ export function moveFootnotesToEnd(text: string) {
   const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
   let footnotes: string[] = [];
 
-  const alreadyUsedReferencePositions = new Set<number>();
-  const mapOfFootnoteToFootnoteReferenceIndex = new Map<string, number>();
-  const referencePosition = function(footnote: string, startOfFootnoteReferenceSearch: number): number {
-    const footnoteReference = footnote.match(/\[\^.*?\]/)[0];
-    let footnoteReferenceLocation: number;
-    do {
-      footnoteReferenceLocation = text.lastIndexOf(footnoteReference, startOfFootnoteReferenceSearch);
-      startOfFootnoteReferenceSearch = footnoteReferenceLocation;
-    } while (alreadyUsedReferencePositions.has(footnoteReferenceLocation) && footnoteReferenceLocation !== -1 );
+  type footnoteKeyInfo = {
+    key: string,
+    referencePositions: number[], // last instance to first instance in file
+    footnotesReferencingKey: string[], // last instance to first instance in file
+  };
 
-    if (footnoteReferenceLocation === -1) {
-      throw new Error(getTextInLanguage('logs.missing-footnote-error-message').replace('{FOOTNOTE}', footnote));
+  const footnoteKeyToFootnoteKeyInfo = new Map<string, footnoteKeyInfo>();
+  const mapOfFootnoteToFootnoteReferenceIndex = new Map<string, number>();
+
+  const getAllReferencePositionsForFootnote = function(footnote: string, startOfFootnoteReferenceSearch: number): void {
+    const footnoteReference = footnote.match(/\[\^.*?\]/)[0];
+
+    if (footnoteKeyToFootnoteKeyInfo.has(footnoteReference)) {
+      const keyInfo = footnoteKeyToFootnoteKeyInfo.get(footnoteReference);
+      keyInfo.footnotesReferencingKey.push(footnote);
+
+      footnoteKeyToFootnoteKeyInfo.set(footnoteReference, keyInfo);
+
+      return;
     }
 
-    alreadyUsedReferencePositions.add(footnoteReferenceLocation);
-    return footnoteReferenceLocation;
+    let footnoteReferenceLocation: number;
+    const footnoteReferenceLocations: number[] = [];
+    do {
+      footnoteReferenceLocation = text.lastIndexOf(footnoteReference, startOfFootnoteReferenceSearch);
+      if (footnoteReferenceLocation === -1) {
+        continue;
+      }
+
+      footnoteReferenceLocations.push(footnoteReferenceLocation);
+
+      startOfFootnoteReferenceSearch = footnoteReferenceLocation - 1;
+    } while (footnoteReferenceLocation > -1);
+
+    const keyInfo: footnoteKeyInfo = {
+      key: footnoteReference,
+      referencePositions: footnoteReferenceLocations,
+      footnotesReferencingKey: [footnote],
+    };
+
+    footnoteKeyToFootnoteKeyInfo.set(footnoteReference, keyInfo);
   };
 
   for (const position of positions) {
@@ -132,7 +157,22 @@ export function moveFootnotesToEnd(text: string) {
       text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
     }
     text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
-    mapOfFootnoteToFootnoteReferenceIndex.set(footnote, referencePosition(footnote, position.start.offset));
+    getAllReferencePositionsForFootnote(footnote, position.start.offset);
+  }
+
+  for (const footnoteData of footnoteKeyToFootnoteKeyInfo) {
+    const keyInfo = footnoteData[1];
+    // we need to offset the index to pull from for the footnote based on the difference in the amount of keys present, but make sure it is >= 0
+    let offset = keyInfo.referencePositions.length - keyInfo.footnotesReferencingKey.length;
+    offset = offset >= 0 ? offset: 0; // this allows us to properly hit not found error messages
+    let index = 0;
+    for (const footnote of keyInfo.footnotesReferencingKey) {
+      if (index + offset >= keyInfo.referencePositions.length) {
+        throw new Error(getTextInLanguage('logs.missing-footnote-error-message').replace('{FOOTNOTE}', footnote));
+      }
+
+      mapOfFootnoteToFootnoteReferenceIndex.set(footnote, keyInfo.referencePositions[offset + index++]);
+    }
   }
 
   // Sort the footnotes into the order of their references in the text

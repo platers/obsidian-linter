@@ -173,6 +173,20 @@ ruleTest({
         [^1]:[b](http://b.com)
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/626
+      testName: 'Make sure that footnote references are not accidentally reordered when there are multiple references to the same footnote where the first and last reference to the footnote have other footnote references in between them',
+      before: dedent`
+        First,[^1] followed by the Second,[^2] and then the First[^1] again.
+        ${''}
+        [^1]: First Reference
+        [^2]: Second reference
+      `,
+      after: dedent`
+        First,[^1] followed by the Second,[^2] and then the First[^1] again.
+        ${''}
+        [^1]: First Reference
+        [^2]: Second reference
+      `,
+    },
   ],
 });
-
