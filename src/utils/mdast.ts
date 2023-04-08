@@ -146,21 +146,20 @@ export function moveFootnotesToEnd(text: string) {
     footnoteKeyToFootnoteKeyInfo.set(footnoteReference, keyInfo);
   };
 
-  text = removeFootnotesAndDoActionForEachFootnote(positions, text, footnotes, getAllReferencePositionsForFootnote);
-  // for (const position of positions) {
-  //   const footnote = text.substring(position.start.offset, position.end.offset);
-  //   footnotes.push(footnote);
-  //   // Remove the newline after the footnote if it exists
-  //   if (position.end.offset < text.length && text[position.end.offset] === '\n') {
-  //     text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
-  //   }
-  //   // Remove the newline after the footnote if it exists
-  //   if (position.end.offset < text.length && text[position.end.offset] === '\n') {
-  //     text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
-  //   }
-  //   text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
-  //   getAllReferencePositionsForFootnote(footnote, position.start.offset);
-  // }
+  for (const position of positions) {
+    const footnote = text.substring(position.start.offset, position.end.offset);
+    footnotes.push(footnote);
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
+    getAllReferencePositionsForFootnote(footnote, position.start.offset);
+  }
 
   for (const footnoteData of footnoteKeyToFootnoteKeyInfo) {
     const keyInfo = footnoteData[1];
@@ -240,9 +239,20 @@ export function reIndexFootnotes(text: string) {
     return firstFootnoteReferenceIndex;
   };
 
-  text = removeFootnotesAndDoActionForEachFootnote(positions, text, footnotes, (footnote: string, startOfFootnoteReferenceSearch: number): void => {
-    mapOfFootnoteToFirstFootnoteReferenceIndex.set(footnote, getFirstReferenceToFootnote(footnote, startOfFootnoteReferenceSearch));
-  });
+  for (const position of positions) {
+    const footnote = text.substring(position.start.offset, position.end.offset);
+    footnotes.push(footnote);
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
+    mapOfFootnoteToFirstFootnoteReferenceIndex.set(footnote, getFirstReferenceToFootnote(footnote, position.start.offset));
+  }
 
   // Sort the footnotes into the order of their references in the text
   footnotes = footnotes.sort((f1: string, f2: string) => {
@@ -272,26 +282,6 @@ export function reIndexFootnotes(text: string) {
     const newFootnoteKey = oldKeyToNewKey.get(footnoteReference.key);
 
     text = replaceAt(text, footnoteReference.key, newFootnoteKey, footnoteReference.position);
-  }
-
-  return text;
-}
-
-function removeFootnotesAndDoActionForEachFootnote(positions: Position[], text: string, footnotes: string[], action: (footnote: string, startOfFootnoteReferenceSearch: number) => void) {
-  for (const position of positions) {
-    const footnote = text.substring(position.start.offset, position.end.offset);
-    footnotes.push(footnote);
-    // Remove the newline after the footnote if it exists
-    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
-      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
-    }
-    // Remove the newline after the footnote if it exists
-    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
-      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
-    }
-    text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
-    action(footnote, position.start.offset);
-    // mapOfFootnoteToFirstFootnoteReferenceIndex.set(footnote, action(footnote, position.start.offset));
   }
 
   return text;
