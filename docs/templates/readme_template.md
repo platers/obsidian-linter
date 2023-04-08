@@ -87,7 +87,7 @@ Note: On some machines the `.obsidian` folder may be hidden. On MacOS you should
 
 ## Contributing
 
-Contributions are welcome, especially for new rules. If this is something you would like to do, take a look at the
+Contributions are welcome, especially for new rules and new translations. If this is something you would like to do, take a look at the
 [contribution guidelines](CONTRIBUTING.md).
 
 ## Credits

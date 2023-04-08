@@ -717,6 +717,8 @@ Options:
 	- Default: `true`
 - Date Created Key: Which YAML key to use for creation date
 	- Default: `date created`
+- Force Date Created Key Value Retention: Reuses the value in the YAML frontmatter for date created instead of the file metadata which is useful for preventing file metadata changes from causing the value to change to a different value.
+	- Default: `false`
 - Date Modified: Insert the date the file was last modified
 	- Default: `true`
 - Date Modified Key: Which YAML key to use for modification date
@@ -1372,7 +1374,7 @@ Maecenas malesuada dignissim purus ac volutpat.
 
 Alias: `re-index-footnotes`
 
-Re-indexes footnote keys and footnote, based on the order of occurrence (NOTE: This rule deliberately does *not* preserve the relation between key and footnote, to be able to re-index duplicate keys.)
+Re-indexes footnote keys and footnote, based on the order of occurrence (NOTE: This rule does *not* work if there is more than one footnote for a key.)
 
 
 
@@ -1416,24 +1418,45 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet f
 [^2]: third footnote, inserted later
 [^3]: second footnotes
 ``````
-Example: Re-indexing duplicate footnote keys
+Example: Re-indexing footnotes preserves multiple references to the same footnote index
 
 Before:
 
 ``````markdown
-Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^1] et iaculis tortor condimentum.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^1a] Vestibulum nec blandit felis, vulputate finibus purus.[^2] Praesent quis iaculis diam.[^1]
 
 [^1]: first footnote
-[^1]: second footnote
+[^1a]: third footnote, inserted later
+[^2]: second footnotes
 ``````
 
 After:
 
 ``````markdown
-Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.[^1] Aenean at aliquet felis. Donec dictum turpis quis ipsum pellentesque, et iaculis tortor condimentum.[^2] Vestibulum nec blandit felis, vulputate finibus purus.[^3] Praesent quis iaculis diam.[^1]
 
 [^1]: first footnote
-[^2]: second footnote
+[^2]: third footnote, inserted later
+[^3]: second footnotes
+``````
+Example: Re-indexing footnotes condense duplicate footnotes into 1 when key and footnote are the same
+
+Before:
+
+``````markdown
+bla[^1], bla[^1], bla[^2]
+[^1]: bla
+[^1]: bla
+[^2]: bla
+``````
+
+After:
+
+``````markdown
+bla[^1], bla[^1], bla[^2]
+
+[^1]: bla
+[^2]: bla
 ``````
 
 ## Content
@@ -1809,7 +1832,7 @@ Before:
 ``````markdown
 1. Item 1
 2. Item 2
-4. Item 3
+3. Item 3
 
 Some text here
 
@@ -2854,7 +2877,7 @@ After:
 
 ``````markdown
 # Make sure that code blocks in blockquotes are accounted for correctly
->
+
 > ```js
 > var text = 'this is some text';
 > ```
@@ -2862,13 +2885,11 @@ After:
 > ```js
 > var other text = 'this is more text';
 > ```
->
 
 **Note that the blanks blockquote lines added do not have whitespace after them**
 
 # Doubly nested code block
 
-> >
 > > ```js
 > > var other text = 'this is more text';
 > > ```
@@ -3013,12 +3034,11 @@ After:
 > $$
 > \boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
 > $$
->
 
 More content here
 
 > Math block doubly nested in blockquote
-> >
+>
 > > $$
 > > \boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
 > > $$
@@ -3159,12 +3179,11 @@ After:
 > | foo      | bar      | blob     |
 > | baz      | qux      | trust    |
 > | quux     | quuz     | glob     |
->
 
 More content here
 
 > Table doubly nested in blockquote
-> >
+>
 > > | Column 1 | Column 2 | Column 3 |
 > > |----------|----------|----------|
 > > | foo      | bar      | blob     |
@@ -3235,7 +3254,7 @@ line
 # H1
 line
 ``````
-Example: Empty line before header and after Yaml is removed with `Empty Line Between Yaml and Header=true`
+Example: Empty line before header and after Yaml is removed with `Empty Line Between Yaml and Header=false`
 
 Before:
 
@@ -3243,6 +3262,7 @@ Before:
 ---
 key: value
 ---
+
 # Header
 Paragraph here...
 ``````
