@@ -104,6 +104,14 @@ ruleTest({
         <img src="中文small.png" />
       `,
     },
-
+    { // accounts for https://github.com/platers/obsidian-linter/issues/667
+      testName: 'Make sure that html elements do not affect the surrounding text',
+      before: dedent`
+        <u>自己想说的</u>
+      `,
+      after: dedent`
+        <u>自己想说的</u>
+      `,
+    },
   ],
 });
