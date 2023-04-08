@@ -44,6 +44,20 @@ ruleTest({
         text here
       `,
     },
-
+    { // accounts for an issue noticed when looking at https://github.com/platers/obsidian-linter/issues/597
+      testName: 'Math block in blockquote/callout should not get an empty blockquote line added',
+      before: dedent`
+        > [!note]
+        > $$
+        > \\frac{1}{2}
+        > $$
+      `,
+      after: dedent`
+        > [!note]
+        > $$
+        > \\frac{1}{2}
+        > $$
+      `,
+    },
   ],
 });

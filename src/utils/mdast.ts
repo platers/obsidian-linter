@@ -717,6 +717,8 @@ export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numb
 
 function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockStartIndex: number, mathBlockEndIndex: number, mathOpeningIndicatorRegex: RegExp, mathEndingIndicatorRegex: RegExp): string {
   const startOfLine = text.substring(getStartOfLineIndex(text, mathBlockStartIndex), mathBlockStartIndex) ?? '';
+  const startOfEndingLine = text.substring(getStartOfLineIndex(text, mathBlockEndIndex), mathBlockEndIndex) ?? '';
+  const emptyLineBlockquoteRegex = /^(>( |\t)*)+\$+$/m;
   let mathBlock = text.substring(mathBlockStartIndex, mathBlockEndIndex);
   mathBlock = mathBlock.replace(mathOpeningIndicatorRegex, (_: string, $1: string, $2: string = '') => {
     // a new line is being added
@@ -726,9 +728,13 @@ function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockSt
 
     return $1 + '\n';
   });
-  mathBlock= mathBlock.replace(mathEndingIndicatorRegex, (_: string, $1: string = '', $2: string, $3: string) => {
-    // a new line is being added
-    if ($1 === '') {
+  mathBlock= mathBlock.replace(mathEndingIndicatorRegex, (match: string, $1: string = '', $2: string, $3: string) => {
+    const groupOneIsEmpty = $1 === '';
+
+    // make sure that a blank blockquote line is checked for in order to determine if a change needs to happen just for blockquotes
+    if (groupOneIsEmpty && emptyLineBlockquoteRegex.test(startOfEndingLine.trim())) {
+      return match;
+    } else if (groupOneIsEmpty) { // a new line is being added
       return '\n' + startOfLine + $2 + $3;
     }
 
