@@ -13,6 +13,7 @@ import {gfmFootnoteFromMarkdown} from 'mdast-util-gfm-footnote';
 import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
 import QuickLRU from 'quick-lru';
 import {getTextInLanguage} from '../lang/helpers';
+import {match} from 'assert';
 
 const LRU = new QuickLRU({maxSize: 200});
 
@@ -186,6 +187,90 @@ export function moveFootnotesToEnd(text: string) {
   }
   for (const footnote of footnotes) {
     text += '\n' + footnote;
+  }
+
+  return text;
+}
+
+/**
+ * Moves footnote declarations to the end of the document.
+ * @param {string} text The text to move footnotes in
+ * @return {string} The text with footnote declarations moved to the end
+ */
+export function reIndexFootnotes(text: string) {
+  const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
+  let footnotes: string[] = [];
+
+  const mapOfFootnoteToFirstFootnoteReferenceIndex = new Map<string, number>();
+  const footnoteToFootnoteKey = new Map<string, string>();
+  const footnoteKeys = new Set<string>();
+
+  const getFirstReferenceToFootnote = function(footnote: string, startOfFootnoteReferenceSearch: number): number {
+    const footnoteReference = footnote.match(/\[\^.*?\]/)[0];
+    footnoteToFootnoteKey.set(footnote, footnoteReference);
+
+    const footnoteKeyAlreadyUsed = footnoteKeys.has(footnoteReference);
+    if (footnoteKeyAlreadyUsed && mapOfFootnoteToFirstFootnoteReferenceIndex.has(footnote)) {
+      return mapOfFootnoteToFirstFootnoteReferenceIndex.get(footnote);
+    } else if (footnoteKeyAlreadyUsed) {
+      // TODO: throw an error since we cannot properly determine which reference is which
+      return -1;
+    }
+
+    let footnoteReferenceLocation: number;
+    let firstFootnoteReferenceIndex: number = -1;
+    do {
+      footnoteReferenceLocation = text.lastIndexOf(footnoteReference, startOfFootnoteReferenceSearch);
+      if (footnoteReferenceLocation === -1) {
+        continue;
+      }
+
+      firstFootnoteReferenceIndex = footnoteReferenceLocation;
+      startOfFootnoteReferenceSearch = footnoteReferenceLocation - 1;
+    } while (footnoteReferenceLocation > -1);
+
+    footnoteKeys.add(footnoteReference);
+
+    return firstFootnoteReferenceIndex;
+  };
+
+  for (const position of positions) {
+    const footnote = text.substring(position.start.offset, position.end.offset);
+    footnotes.push(footnote);
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
+    mapOfFootnoteToFirstFootnoteReferenceIndex.set(footnote, getFirstReferenceToFootnote(footnote, position.start.offset));
+  }
+
+  // Sort the footnotes into the order of their references in the text
+  footnotes = footnotes.sort((f1: string, f2: string) => {
+    return mapOfFootnoteToFirstFootnoteReferenceIndex.get(f1) - mapOfFootnoteToFirstFootnoteReferenceIndex.get(f2);
+  });
+
+  // Add the footnotes to the end of the document
+  if (footnotes.length > 0) {
+    text = text.trimEnd() + '\n';
+  }
+
+  for (const footnote of footnotes) {
+    text += '\n' + footnote;
+  }
+
+  // re-index from last to first to make sure we don't accidentally move keys to other footnotes
+  let footnotesTraversed = 0;
+  for (const footnote of footnotes.reverse()) {
+    const footnoteKey = footnoteToFootnoteKey.get(footnote);
+    const newFootnoteKey = `[^${footnotes.length - footnotesTraversed++}]`;
+
+    console.log(footnote, footnoteKey, newFootnoteKey);
+    text = text.replaceAll(footnoteKey, newFootnoteKey);
   }
 
   return text;
