@@ -160,7 +160,8 @@ export function moveFootnotesToEnd(text: string) {
     getAllReferencePositionsForFootnote(footnote, position.start.offset);
   }
 
-  for (const [_, keyInfo] of footnoteKeyToFootnoteKeyInfo) {
+  for (const footnoteData of footnoteKeyToFootnoteKeyInfo) {
+    const keyInfo = footnoteData[1];
     // we need to offset the index to pull from for the footnote based on the difference in the amount of keys present, but make sure it is >= 0
     let offset = keyInfo.referencePositions.length - keyInfo.footnotesReferencingKey.length;
     offset = offset >= 0 ? offset: 0; // this allows us to properly hit not found error messages
