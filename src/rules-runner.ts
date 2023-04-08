@@ -20,6 +20,7 @@ import {CustomReplace} from './ui/linter-components/custom-replace-option';
 import {LintCommand} from './ui/linter-components/custom-command-option';
 import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from './utils/strings';
 import {getTextInLanguage} from './lang/helpers';
+import CapitalizeHeadings from './rules/capitalize-headings';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -100,6 +101,8 @@ export class RulesRunner {
     let newText = runOptions.oldText;
     const postRuleLogText = getTextInLanguage('logs.post-rules');
     timingBegin(postRuleLogText);
+    [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+
     [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
     });

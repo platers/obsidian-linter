@@ -403,6 +403,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       nameKey: 'rules.capitalize-headings.name',
       descriptionKey: 'rules.capitalize-headings.description',
       type: RuleType.HEADING,
+      hasSpecialExecutionOrder: true,
     });
   }
   get OptionsClass(): new () => CapitalizeHeadingsOptions {
