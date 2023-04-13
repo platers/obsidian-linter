@@ -1,3 +1,9 @@
 // 简体中文
 
-export default {};
+export default {
+  'commands': {
+    'lint-file': {
+      'name': '格式化当前文件',
+    },
+  },
+};

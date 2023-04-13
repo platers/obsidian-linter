@@ -53,7 +53,7 @@ export const localeMap: { [k: string]: Partial<LanguageStrings> } = {
   tr,
   uk,
   'zh-TW': zhTW,
-  'zh': zhCN,
+  'zh-cn': zhCN,
 };
 
 export type LanguageStringKey = NestedKeyOf<LanguageStrings>
