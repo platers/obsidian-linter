@@ -113,5 +113,14 @@ ruleTest({
         <u>自己想说的</u>
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/681
+      testName: 'Make sure that wiki links with their size specified are unaffected',
+      before: dedent`
+        ![[流浪地球-1.webp|image title|600]]
+      `,
+      after: dedent`
+        ![[流浪地球-1.webp|image title|600]]
+      `,
+    },
   ],
 });
