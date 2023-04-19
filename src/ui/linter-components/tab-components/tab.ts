@@ -51,12 +51,14 @@ export abstract class Tab {
 
     this.navButton.addClass(tabClass);
     setIcon(this.navButton.createSpan({cls: 'linter-navigation-item-icon'}), tabNameToTabIconId[name], 20);
-    this.navButton.createSpan().setText(name);
+
+    const nameInLanguage = getTextInLanguage(tabNameToTextKey[name]);
+    this.navButton.createSpan().setText(nameInLanguage);
 
     this.contentEl = settingsEl.createDiv('linter-tab-settings');
     this.contentEl.id = name.toLowerCase().replace(' ', '-');
 
-    this.headingEl = this.contentEl.createEl('h2', {text: getTextInLanguage(tabNameToTextKey[name])});
+    this.headingEl = this.contentEl.createEl('h2', {text: nameInLanguage});
     hideEl(this.headingEl);
   }
 
