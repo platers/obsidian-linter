@@ -192,6 +192,20 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
     expectedTablesInText: 0,
     expectedPositions: [],
   },
+  {
+    name: 'does not match yaml frontmatter',
+    text: dedent`
+      ---
+      date: 06/16/2022
+      type: topic
+      tags: 
+      keywords: []
+      status: WIP
+      ---
+    `,
+    expectedTablesInText: 0,
+    expectedPositions: [],
+  },
 ];
 
 describe('Get All Tables in Text', () => {

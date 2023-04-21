@@ -769,9 +769,9 @@ export function getAllTablesInText(text: string): {startIndex: number, endIndex:
 
     let start = startOfPreviousLine;
     let firstLine = text.substring(startOfPreviousLine, startOfCurrentLine - 1);
-    // if the table header and table separator are 3 dashes before striping any characters,
-    // we are likely dealing with the yaml placeholder or an empty yaml frontmatter, so skip it
-    if (firstLine === '---' && separatorRowMatch === '---') {
+    // if the separator row matches a yaml block indicator and the first line is missing
+    // a pipe, then we must assume that we are dealing with a header or yaml instead of a table
+    if (separatorRowMatch === '---' && !firstLine.includes('|')) {
       continue;
     }
 
