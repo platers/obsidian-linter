@@ -272,7 +272,7 @@ export function convertStringVersionOfEscapeCharactersToEscapeCharacters(val: st
 }
 
 export function getStartOfLineIndex(text: string, indexToStartFrom: number): number {
-  if (indexToStartFrom < 2) {
+  if (indexToStartFrom == 0) {
     return indexToStartFrom;
   }
 
