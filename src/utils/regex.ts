@@ -1,4 +1,5 @@
 
+import {getAllTablesInText} from './mdast';
 import {makeSureContentHasEmptyLinesAddedBeforeAndAfter} from './strings';
 
 // Useful regexes
@@ -18,9 +19,9 @@ export const obsidianMultilineCommentRegex = /^%%\n[^%]*\n%%/gm;
 export const wordSplitterRegex = /[,\s]+/;
 export const ellipsisRegex = /(\. ?){2}\./g;
 export const lineStartingWithWhitespaceOrBlockquoteTemplate = `\\s*(>\\s*)*`;
-// Note that the following regex has an issue where if the table is followed by another table with only 1 blank line between them, it considers them to be one table
-// if this becomes an issue, we can address it then
-export const tableRegex = /^((((>[ ]?)*)|([ ]{0,3}))\[.*?\][ \t]*\n)?((((>[ ]?)*)|([ ]{0,3}))\S+.*?\|.*?\n([^\n]*?\|[^\n]*?\n)*?)?(((>[ ]?)*)|([ ]{0,3}))[|\-+:.][ \-+|:.]*?\|[ \-+|:.]*(?:\n?[^\n]*?\|([^\n]*?)*)+/gm;
+export const tableSeparator = /(\|? *:?-{1,}:? *\|?)(\| *:?-{1,}:? *\|?)*( |\t)*$/gm;
+export const tableStartingPipe = /^(((>[ ]?)*)|([ ]{0,3}))\|/m;
+export const tableRow = /[^\n]*?\|[^\n]*?(\n|$)/m;
 export const urlRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,})/gi;
 export const anchorTagRegex = /<a[\s]+([^>]+)>((?:.(?!<\/a>))*.)<\/a>/g;
 
@@ -63,21 +64,13 @@ export function removeSpacesInWikiLinkText(text: string): string {
  * @return {string} The text with an empty line before and after tables unless the table starts off the file
  */
 export function ensureEmptyLinesAroundTables(text: string): string {
-  const tableMatches = text.match(tableRegex);
-  if (tableMatches == null) {
+  const tablePositions = getAllTablesInText(text);
+  if (tablePositions.length === 0) {
     return text;
   }
 
-  for (const table of tableMatches) {
-    let start = text.indexOf(table.trimStart());
-    const end = start + table.length;
-    if (table.trim().startsWith('>')) {
-      while (text.charAt(start).trim() === '' || text.charAt(start) === '>') {
-        start++;
-      }
-    }
-
-    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, start, end);
+  for (const tablePosition of tablePositions) {
+    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, tablePosition.startIndex, tablePosition.endIndex);
   }
 
   return text;

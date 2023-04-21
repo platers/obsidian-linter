@@ -1,5 +1,5 @@
-import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex, tableRegex, urlRegex, anchorTagRegex} from './regex';
-import {getPositions, MDAstTypes} from './mdast';
+import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex, urlRegex, anchorTagRegex} from './regex';
+import {getAllTablesInText, getPositions, MDAstTypes} from './mdast';
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
@@ -23,15 +23,15 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   // RegExp
   yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---')},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}'},
-  tag: {replaceAction: replaceTags, placeholder: '#tag-placeholder'},
   obsidianMultiLineComments: {replaceAction: obsidianMultilineCommentRegex, placeholder: '{OBSIDIAN_COMMENT_PLACEHOLDER}'},
-  table: {replaceAction: tableRegex, placeholder: '{TABLE_PLACEHOLDER}'},
   footnoteAtStartOfLine: {replaceAction: /^(\[\^\w+\]) ?([,.;!:?])/gm, placeholder: '{FOOTNOTE_AT_START_OF_LINE_PLACEHOLDER}'},
   footnoteAfterATask: {replaceAction: /- \[.] (\[\^\w+\]) ?([,.;!:?])/gm, placeholder: '{FOOTNOTE_AFTER_A_TASK_PLACEHOLDER}'},
   url: {replaceAction: urlRegex, placeholder: '{URL_PLACEHOLDER}'},
   anchorTag: {replaceAction: anchorTagRegex, placeholder: '{ANCHOR_PLACEHOLDER}'},
   // custom functions
   link: {replaceAction: replaceMarkdownLinks, placeholder: '{REGULAR_LINK_PLACEHOLDER}'},
+  tag: {replaceAction: replaceTags, placeholder: '#tag-placeholder'},
+  table: {replaceAction: replaceTables, placeholder: '{TABLE_PLACEHOLDER}'},
 } as const;
 
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
@@ -165,4 +165,18 @@ function replaceTags(text: string, placeholder: string): IgnoreResults {
   });
 
   return {newText: text, replacedValues: replacedValues};
+}
+
+function replaceTables(text: string, tablePlaceholder: string): IgnoreResults {
+  const tablePositions = getAllTablesInText(text);
+
+  const replacedTables: string[] = new Array(tablePositions.length);
+  let index = 0;
+  const length = replacedTables.length;
+  for (const tablePosition of tablePositions) {
+    replacedTables[length - 1 - index++] = text.substring(tablePosition.startIndex, tablePosition.endIndex);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, tablePosition.startIndex, tablePosition.endIndex, tablePlaceholder);
+  }
+
+  return {newText: text, replacedValues: replacedTables};
 }

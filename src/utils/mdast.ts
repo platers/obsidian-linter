@@ -2,7 +2,7 @@ import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt} from './strings';
-import {genericLinkRegex} from './regex';
+import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
 import {combineExtensions} from 'micromark-util-combine-extensions';
@@ -742,4 +742,106 @@ function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockSt
   });
 
   return replaceTextBetweenStartAndEndWithNewValue(text, mathBlockStartIndex, mathBlockEndIndex, mathBlock);
+}
+
+/**
+ * Gets a list of all tables in the provided text and returns a list of starting and ending positions from the
+ * last to first found based on index.
+ * @param {string} text - The text to get the list of table locations from.
+ * @return {{startIndex: number, endIndex: number}[]} An array of start and end indexes of each table found from last to earliest.
+ */
+export function getAllTablesInText(text: string): {startIndex: number, endIndex: number}[] {
+  const regexMatches = [...text.matchAll(tableSeparator)];
+  const positions: {startIndex: number, endIndex: number}[] = [];
+  for (const match of regexMatches) {
+    const startOfCurrentLine = getStartOfLineIndex(text, match.index);
+    if (startOfCurrentLine === 0) {
+      continue;
+    }
+
+    const startOfPreviousLine = getStartOfLineIndex(text, startOfCurrentLine - 1);
+
+    const separatorRowMatch = match[0];
+    const tableRowSeparator = text.substring(startOfCurrentLine, match.index + separatorRowMatch.length);
+    if (isInvalidTableSeparatorRow(tableRowSeparator, separatorRowMatch)) {
+      continue;
+    }
+
+    let start = startOfPreviousLine;
+    let firstLine = text.substring(startOfPreviousLine, startOfCurrentLine - 1);
+    // if the separator row matches a yaml block indicator and the first line is missing
+    // a pipe, then we must assume that we are dealing with a header or yaml instead of a table
+    if (separatorRowMatch === '---' && !firstLine.includes('|')) {
+      continue;
+    }
+
+    firstLine = firstLine.replace(tableStartingPipe, (match: string)=> {
+      // do nothing if the table only has whitespace or a pipe before it
+      const trimmedMatch = match.trim();
+      if (trimmedMatch === '' || trimmedMatch === '|') {
+        return '';
+      }
+
+      start += match.length - 1;
+
+      return '';
+    });
+    let delimiterLine = separatorRowMatch.replace(tableStartingPipe, '');
+    if (firstLine.endsWith('|')) {
+      firstLine = firstLine.slice(0, -1);
+    }
+
+    if (delimiterLine.endsWith('|')) {
+      delimiterLine = delimiterLine.slice(0, -1);
+    }
+
+    // if the delimiter row and the first row do not have the same amount of cells,
+    // we are not dealing with a table
+    if (firstLine.split('|').length !== delimiterLine.split('|').length) {
+      continue;
+    }
+
+    let end = match.index + match[0].length;
+
+    if (end >= text.length - 1) {
+      positions.push({
+        startIndex: start,
+        endIndex: text.length,
+      });
+
+      continue;
+    }
+
+    const remainingLines = text.substring(end + 1).split('\n');
+    let index = 0;
+    // grab rows as part of the table until empty line or it no longer matches row content
+    while (index < remainingLines.length && tableRow.test(remainingLines[index])) {
+      end += remainingLines[index].length + 1;
+      index++;
+    }
+
+    positions.push({
+      startIndex: start,
+      endIndex: end,
+    });
+  }
+
+  return positions.reverse();
+}
+
+function isInvalidTableSeparatorRow(fullRow: string, separatorMatch: string): boolean {
+  if (fullRow.trim() === '') {
+    return true;
+  }
+
+  // The regex for the separator allows for two back to back pipes in the middle of the row, so we need to filter those results out
+  // since they are not valid
+  if (separatorMatch.includes('||')) {
+    return true;
+  }
+
+  // handle a scenario where the regex fails to work as intended and matches the ending of an invalid table separator
+  // it could contain text or an invalid table cell for the separator
+  const nonSeparatorContent = fullRow.replace(separatorMatch, '');
+  return /[^\s>]/.test(nonSeparatorContent);
 }
