@@ -63,7 +63,7 @@ export default {
     "invalid-date-format-error": "No se pudo analizar ni identificar el formato de la fech de creación '{DATE}' entonces la fecha de creación se dejó sola en '{FILE_NAME}'",
     "invalid-delimiter-error-message": "El delimitador solo puede ser de un solo carácter",
     "missing-footnote-error-message": "La nota al pie '{FOOTNOTE}' no tiene ninguna referencia de nota al pie correspondiente antes del contenido de la nota al pie y no se puede procesar. Asegúrese de que todas las notas a pie de página tengan una referencia correspondiente antes del contenido de la nota al pie de página.",
-    "too-many-footnotes-error-message": "La tecla de nota al pie '{FOOTNOTE_KEY}' tiene más de 1 nota al pie que hace referencia a ella. Actualice las notas al pie para que solo haya una nota al pie por clave de nota al pie.",
+    "too-many-footnotes-error-message": "La clave de nota al pie '{FOOTNOTE_KEY}' tiene más de 1 nota al pie que hace referencia a ella. Actualice las notas al pie para que solo haya una nota al pie por clave de nota al pie.",
     "wrapper-yaml-error": "hubo un error en el yaml: {ERROR_MESSAGE}",
     "wrapper-unknown-error": "huno un error desconocido: {ERROR_MESSAGE}"
   },
@@ -91,8 +91,299 @@ export default {
     "default-search-bar-text": "Buscar en todos los ajustes",
     "general": {
       "lint-on-save": {
-        "name": "Analizar en guardar"
+        "name": "Analizar en guardar",
+        "description": "Analizar el archivo en el guardado manual (cuando se presiona 'Ctrl + S' o cuando se ejecuta ':w' mientras se usan combinaciones de claves de vim)"
+      },
+      "display-message": {
+        "name": "Mostrar mensaje en analizar",
+        "description": "Mostrar el número de caracteres modificados después de analizar"
+      },
+      "folders-to-ignore": {
+        "name": "Carpetas para omitir",
+        "description": "Carpetas que se deben omitir al analizar todos los archivos o al guardar en línea. Introducir rutas de carpeta separadas por nuevas líneas"
+      },
+      "override-locale": {
+        "name": "Anular configuración regional",
+        "description": "Establezca esta opción si desea utilizar una configuración regional diferente de la predeterminada"
+      },
+      "same-as-system-locale": "Igual que el sistema ({SYS_LOCALE})",
+      "yaml-aliases-section-style": {
+        "name": "Estilo de sección de alias YAML",
+        "description": "El estilo de la sección de alias YAML"
+      },
+      "yaml-tags-section-style": {
+        "name": "Estilo de sección de etiquetas YAML",
+        "description": "El estilo de la sección de etiquetas YAML"
+      },
+      "default-escape-character": {
+        "name": "Carácter de escape predeterminado",
+        "description": "El carácter predeterminado que se va a usar para escapar de los valores YAML cuando no hay comillas simples y comillas dobles."
+      },
+      "remove-unnecessary-escape-chars-in-multi-line-arrays": {
+        "name": "Eliminación de caracteres de escape innecesarios cuando está en formato de matriz multilínea",
+        "description": "Los caracteres de escape para matrices de YAML multilínea no necesitan el mismo escape que las matrices de una sola línea, por lo que cuando están en formato multilínea, elimine los escapes adicionales que no son necesarios"
+      },
+      "number-of-dollar-signs-to-indicate-math-block": {
+        "name": "Número de signos de dólar para indicar el bloque matemático",
+        "description": "La cantidad de signos de dólar para considerar el contenido matemático como un bloque matemático en lugar de matemáticas en línea"
       }
+    },
+    "debug": {
+      "log-level": {
+        "name": "Nivel de registro",
+        "description": "Los tipos de registros que el servicio permitirá registrar. El valor predeterminado es ERROR."
+      },
+      "linter-config": {
+        "name": "Configuración de Linter",
+        "description": "El contenido del archivo data.json para Linter a partir de la carga de la página de configuración"
+      },
+      "log-collection": {
+        "name": "Recopilar registros al activar y desactivar el archivo actual",
+        "description": "Continúa y recopila registros cuando 'Analizar en guardar' y analizar el archivo actual. Estos registros pueden ser útiles para depurar y crear informes de errores."
+      },
+      "linter-logs": {
+        "name": "Registros de Linter",
+        "description": "Los registros del último 'Analizar en guardar' o del último archivo actual de analizar se ejecutan si están habilitados."
+      }
+    }
+  },
+  "options": {
+    "custom-command": {
+      "name": "Comandos personalizados",
+      "description": "Los comandos personalizados son comandos de Obsidian que se ejecutan después de que Linter termina de ejecutar sus reglas regulares. Esto significa que no se ejecutan antes de que se ejecute la lógica de marca de tiempo YAML, por lo que pueden hacer que la marca de tiempo de YAML se active en la siguiente ejecución del Linter. Solo puede seleccionar un comando de Obsidian una vez. **_Note que esto actualmente solo funciona para analizar el archivo actual._**",
+      "warning": "Al seleccionar una opción, asegúrese de seleccionar la opción usando el ratón o presionando la clave Intro. Es posible que otros métodos de selección no funcionen y solo se guardarán las selecciones de un comando de Obsidian real o una cadena vacía.",
+      "add-input-button-text": "Agregar nuevo comando",
+      "command-search-placeholder-text": "Comando de Obsidian",
+      "move-up-tooltip": "Desplazar hacia arriba",
+      "move-down-tooltip": "Desplazar hacia abajo",
+      "delete-tooltip": "Borrar"
+    },
+    "custom-replace": {
+      "name": "Reemplazo regex personalizado",
+      "description": "El reemplazo de regex personalizado se puede usar para reemplazar cualquier cosa que coincida con el valor de búsqueda de regex con el valor de reemplazo. Los valores de reemplazo y búsqueda deberán ser valores regex válidos.",
+      "warning": "Use esto con precaución si no conoce regex. Además, asegúrese de no usar lookbehinds en su regex en dispositivos móviles iOS, ya que eso hará que falle analizar ya que no es compatible con esa plataforma.",
+      "add-input-button-text": "Agregar nuevo reemplazo de regex",
+      "regex-to-find-placeholder-text": "Regex para encontrar",
+      "flags-placeholder-text": "Marcas",
+      "regex-to-replace-placeholder-text": "Regex para reemplazar",
+      "delete-tooltip": "Borrar"
+    }
+  },
+  "rules": {
+    "auto-correct-common-misspellings": {
+      "name": "Corrección automática de errores ortográficos comunes",
+      "description": "Utiliza un diccionario de errores ortográficos comunes para convertirlos automáticamente a su ortografía correcta. Consulte [mapa de autocorrección](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) para obtener la lista completa de palabras corregidas automáticamente.",
+      "ignore-words": {
+        "name": "Ignorar palabras",
+        "description": "Una lista separada por comas de palabras en minúsculas para ignorar al corregir automáticamente"
+      }
+    },
+    "add-blockquote-indentation-on-paste": {
+      "name": "Agregar sangría de blockquote en pegar",
+      "description": "Agrega blockquotes a todas menos a la primera línea, cuando el cursor está en una línea blockquote/callout durante el pegado"
+    },
+    "capitalize-headings": {
+      "name": "Poner mayúsculas en los encabezados",
+      "description": "Los encabezados deben estar formateados con mayúsculas",
+      "style": {
+        "name": "Estilo",
+        "description": "El estilo de mayúsculas que se va a utilizar"
+      },
+      "ignore-case-words": {
+        "name": "Ignorar palabras en mayúsculas y minúsculas",
+        "description": "Solo aplique el estilo de mayúsculas y minúsculas a las palabras que estén todas en minúsculas"
+      },
+      "ignore-words": {
+        "name": "Ignorar palabras",
+        "description": "Una lista de palabras separadas por comas para ignorar al poner en mayúsculas"
+      },
+      "lowercase-words": {
+        "name": "Palabras en minúsculas",
+        "description": "Una lista de palabras separadas por comas para mantener minúsculas"
+      }
+    },
+    "compact-yaml": {
+      "name": "YAML compacto",
+      "description": "Elimina las líneas en blanco iniciales y finales en la materia frontal de YAML.",
+      "inner-new-lines": {
+        "name": "Nuevas líneas internas",
+        "description": "Quitar nuevas líneas que no estén al principio o al final del YAML"
+      }
+    },
+    "consecutive-blank-lines": {
+      "name": "Líneas en blanco consecutivas",
+      "description": "Debe haber como máximo una línea en blanco consecutiva."
+    },
+    "convert-bullet-list-markers": {
+      "name": "Convertir marcadores de lista de viñetas",
+      "description": "Convierte símbolos de marcador de lista de viñetas comunes en marcadores de lista de rebajas."
+    },
+    "convert-spaces-to-tabs": {
+      "name": "Convertir espacios en pestañas",
+      "description": "Convierte los espacios iniciales en pestañas.",
+      "tabsize": {
+        "name": "Tamaño de la pestaña",
+        "description": "Número de espacios que se convertirán en una pestaña"
+      }
+    },
+    "emphasis-style": {
+      "name": "Estilo de énfasis",
+      "description": "Se asegura de que el estilo de énfasis sea consistente.",
+      "style": {
+        "name": "Estilo",
+        "description": "El estilo utilizado para denotar el contenido enfatizado"
+      }
+    },
+    "empty-line-around-blockquotes": {
+      "name": "Línea vacía alrededor de blockquotes",
+      "description": "Asegura que haya una línea vacía alrededor de blockquotes a menos que inicien o finalicen un documento. **Tenga en cuenta que una línea vacía es un nivel menos de anidamiento para blockquotes o un carácter de nueva línea.**"
+    },
+    "empty-line-around-code-fences": {
+      "name": "Línea vacía alrededor de las vallas de código",
+      "description": "Garantiza que haya una línea vacía alrededor de las vallas de código a menos que inicien o finalicen un documento."
+    },
+    "empty-line-around-math-blocks": {
+      "name": "Línea vacía alrededor de los bloques matemáticos",
+      "description": "Asegura que haya una línea vacía alrededor de los bloques matemáticos usando `Número de signos de dólar para indicar un bloque matemático` para determinar cuántos signos de dólar indica un bloque matemático para matemáticas de una sola línea."
+    },
+    "empty-line-around-tables": {
+      "name": "Línea vacía alrededor de las tablas",
+      "description": "Asegura que haya una línea vacía alrededor de las tablas con sabor a github a menos que inicien o finalicen un documento."
+    },
+    "escape-yaml-special-characters": {
+      "name": "Evitar los caracteres especiales de YAML",
+      "description": "Escapa dos puntos con un espacio después de ellos (:), comillas simples (') y comillas dobles (\") en YAML.",
+      "try-to-escape-single-line-arrays": {
+        "name": "Intente escapar las matrices de una sola línea",
+        "description": "Intenta escapar de los valores de matriz suponiendo que una matriz comienza con \"[\", termina con \"]\" y tiene elementos que están delimitados por \",\"."
+      }
+    },
+    "file-name-heading": {
+      "name": "Encabezado de nombre de archivo",
+      "description": "Inserta el nombre de archivo como un encabezado H1 si no existe ningún encabezado H1."
+    },
+    "footnote-after-punctuation": {
+      "name": "Nota al pie después de la puntuación",
+      "description": "Asegura que las referencias de notas al pie se coloquen después de la puntuación, no antes."
+    },
+    "force-yaml-escape": {
+      "name": "Forzar escape de YAML",
+      "description": "Escapa los valores de las claves YAML especificadas.",
+      "force-yaml-escape-keys": {
+        "name": "Forzar escape de YAML en las claves",
+        "description": "Utiliza el carácter de escape de YAML en las claves de YAML especificadas separadas por un nuevo carácter de línea si aún no está escapado. No lo use en matrices de YAML."
+      }
+    },
+    "format-tags-in-yaml": {
+      "name": "Dar formato a las etiquetas de formato en YAML",
+      "description": "Elimine los hashtags de las etiquetas en el frontmatter de YAML, ya que hacen que las etiquetas no sean válidas."
+    },
+    "format-yaml-array": {
+      "name": "Dar formato a las matrices de YAML",
+      "description": "Permite el formato de matrices regulares de YAML como multilínea o de una sola línea y las `etiquetas` y `alias` pueden tener algunos formatos específicos de YAML de Obsidian. Tenga en cuenta que una sola cadena a una sola línea pasa de una sola entrada de cadena a una matriz de una sola línea si hay más de 1 entrada presente. Lo mismo es cierto para una sola cadena a multilínea, excepto que se convierte en una matriz multilínea.",
+      "alias-key": {
+        "name": "Dar formato a la sección de alias de YAML",
+        "description": "Activa el formato para la sección de alias yaml. No debe habilitar esta opción junto con la regla `Alias de título YAML`, ya que es posible que no funcionen bien juntos o que tengan diferentes estilos de formato seleccionados que causen resultados inesperados."
+      },
+      "tag-key": {
+        "name": "Dar formato a la sección de etiquetas de YAML",
+        "description": "Activa el formato para la sección de etiquetas de YAML."
+      },
+      "default-array-style": {
+        "name": "Estilo de sección de matriz predeterminado de YAML",
+        "description": "El estilo de otras matrices de YAML que no son `etiquetas`, `alias` o en `Forzar valores de clave para que sean matrices de una sola línea` y `Forzar valores de clave para que sean matrices multilínea`"
+      },
+      "default-array-keys": {
+        "name": "Dar formato a las secciones de matrices de YAML",
+        "description": "Activa el formato para matrices normales de YAML"
+      },
+      "force-single-line-array-style": {
+        "name": "Forzar que los valores de clave sean matrices de una sola línea",
+        "description": "Fuerza la matriz de YAML para que las nuevas claves separadas por línea estén en formato de una sola línea (deje vacío para deshabilitar esta opción)"
+      },
+      "force-multi-line-array-style": {
+        "name": "Forzar que los valores de las claves sean matrices multilíneas",
+        "description": "Fuerza la matriz de YAML para que las nuevas claves separadas por línea estén en formato multilínea (deje vacía para deshabilitar esta opción)"
+      }
+    },
+    "header-increment": {
+      "name": "Incremento de encabezado",
+      "description": "Los niveles de encabezado solo deben aumentar en un nivel a la vez",
+      "start-at-h2": {
+        "name": "Iniciar el incremento de encabezado en el nivel de encabezado 2",
+        "description": "Hace que el nivel de encabezado 2 sea el nivel de título mínimo en un archivo para el incremento de encabezado y desplaza todos los encabezados en consecuencia para que se incrementen a partir de un encabezado de nivel 2."
+      }
+    },
+    "heading-blank-lines": {
+      "name": "Líneas en blanco de encabezado",
+      "description": "Todos los encabezados tienen una línea en blanco antes y después (excepto cuando el encabezado está al principio o al final del documento).",
+      "bottom": {
+        "name": "Abajo",
+        "description": "Insertar una línea en blanco después de los encabezados"
+      },
+      "empty-line-after-yaml": {
+        "name": "Línea vacía entre el YAML y el encabezado",
+        "description": "Mantenga la línea vacía entre el frontmatter de YAML y el encabezado"
+      }
+    },
+    "headings-start-line": {
+      "name": "Comenzar los encabezados al principio de la línea",
+      "description": "Los encabezados que no inician una línea tendrán su espacio en blanco anterior eliminado para asegurarse de que se reconozcan como encabezados."
+    },
+    "insert-yaml-attributes": {
+      "name": "Insertar atributos de YAML",
+      "description": "Inserta los atributos especificados de YAML en el frontmatter de YAML. Coloque cada atributo en una sola línea.",
+      "text-to-insert": {
+        "name": "Texto a insertar",
+        "description": "Texto para insertar en el frontmatter de YAML"
+      }
+    },
+    "line-break-at-document-end": {
+      "name": "Salto de línea al final del documento",
+      "description": "Asegura que haya exactamente un salto de línea al final de un documento."
+    },
+    "move-footnotes-to-the-bottom": {
+      "name": "Mover las notas al pie a la parte inferior",
+      "description": "Mueva todas las notas al pie de página a la parte inferior del documento."
+    },
+    "move-math-block-indicators-to-their-own-line": {
+      "name": "Mover los indicadores de bloques matemáticos a su propia línea",
+      "description": "Mueva todos los indicadores de bloques matemáticos iniciales y finales a sus propias líneas usando `Número de signos de dólar para indicar un bloque matemático` para determinar cuántos signos de dólar indica un bloque matemático para matemáticas de una sola línea."
+    },
+    "move-tags-to-yaml": {
+      "name": "Mover etiquetas a YAML",
+      "description": "Mueva todas las etiquetas al frontmatter de YAML del documento.",
+      "how-to-handle-existing-tags": {
+        "name": "Operación de etiqueta corporal",
+        "description": "Lo qur se debe hacer con las etiquetas no ignoradas en el cuerpo del archivo una vez que se han movido al frontmatter"
+      },
+      "tags-to-ignore": {
+        "name": "Etiquetas para omitir",
+        "description": "Las etiquetas que no se moverán a la matriz de etiquetas ni se eliminarán del contenido del cuerpo si está habilitado `Eliminar el hashtag de las etiquetas en el cuerpo del contenido`. Cada etiqueta debe estar en una nueva línea y sin el '#'. **Asegúrese de no incluir el hashtag en el nombre de la etiqueta.**"
+      }
+    },
+    "no-bare-urls": {
+      "name": "Sin URL desnuda",
+      "description": "Encierra las direcciones URL desnudas con corchetes angulares, excepto cuando están encerradas en marcas traseras, llaves cuadradas o comillas simples o dobles."
+    },
+    "ordered-list-style": {
+      "name": "Estilo de lista ordenada",
+      "description": "Se asegura de que las listas ordenadas siguen el estilo especificado. Tenga en cuenta que 2 espacios o 1 tabulación se considera un nivel de sangría.",
+      "number-style": {
+        "name": "Estilo numérico",
+        "description": "El estilo numérico utilizado en los indicadores de lista ordenada"
+      },
+      "list-end-style": {
+        "name": "Estilo final del indicador de lista ordenada",
+        "description": "El carácter final de un indicador de lista ordenada"
+      }
+    },
+    "paragraph-blank-lines": {
+      "name": "Líneas en blanco del párrafo",
+      "description": "Todos los párrafos deben tener exactamente una línea en blanco antes y después."
+    },
+    "prevent-double-checklist-indicator-on-paste": {
+      "name": "Evitar el indicador de doble lista de verificación en pegar"
     }
   }
 };
