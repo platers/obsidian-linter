@@ -3,31 +3,31 @@
 export default {
   "commands": {
     "lint-file": {
-      "name": "Analizar este archivo",
-      "error-message": "Error Analizando un Archivooccurió en el Archivo"
+      "name": "Analizar el archivo actual",
+      "error-message": "Se ha producido un error analizando un archivo en el archivo"
     },
     "lint-file-unless-ignored": {
-      "name": "Analizar este archivo si no es ignorado"
+      "name": "Lint el archivo actual a menos que se omita"
     },
     "lint-all-files": {
-      "name": "Analizar todos los archivos en la cripta",
-      "error-message": "Error Analizando Todos los Archivos en Archivo",
+      "name": "Lint todos los archivos del almacén",
+      "error-message": "Se ha producido un error analizando todos los archivos en el archivo",
       "success-message": "Analizó todos los archivos",
-      "errors-message-singular": "Analizó todos los archivos y un error ocurrió.",
-      "errors-message-plural": "Analizó todos los archivos y {NUM} errores ocurrieron",
-      "start-message": "Esto editará todos de sus archivos y es possible que introduzca errores",
-      "submit-button-text": "Analizar Todo",
+      "errors-message-singular": "Analizó Linted todos los archivos y hubo 1 error.",
+      "errors-message-plural": "Analizó todos los archivos y hubieron {NUM} errores",
+      "start-message": "Esto editará todos sus archivos y puede introducir errores",
+      "submit-button-text": "Analizar todo",
       "submit-button-notice-text": "Analizando todos los archivos..."
     },
     "lint-all-files-in-folder": {
-      "name": "Analizar todos los archivos en esta carpeta",
-      "start-message": "Esto editará todos de sus archivos en {FOLDER_NAME} incluyendo los archivos que existen en las subcarpetas y es possible que introduzca errores.",
-      "submit-button-text": "Analizar Todos los Archivos en {FOLDER_NAME}",
+      "name": "Analizar todos los archivos en la carpeta actual",
+      "start-message": "Esto editará todos sus archivos en {FOLDER_NAME} incluyendo los archivos que existen en las subcarpetas y puede introducir errores.",
+      "submit-button-text": "Analizar todos los archivos en {FOLDER_NAME}",
       "submit-button-notice-text": "Analizando todos los archivos en {FOLDER_NAME}...",
-      "error-message": "Error Analizando Todos los Archivos en Carpeta en Archivo",
-      "success-message": "Analizó los {NUM} archivos en {FOLDER_NAME}.",
-      "message-singular": "Analizó los {NUM} archivos en {FOLDER_NAME} y un error ocurrió.",
-      "message-plural": "Analizó los {FILE_COUNT} archivos en {FOLDER_NAME} y {ERROR_COUNT} errores ocurrieron."
+      "error-message": "Se ha producido un error analizando todos los archivos en la carpeta en archivo",
+      "success-message": "Analizó todos los {NUM} archivos en {FOLDER_NAME}.",
+      "message-singular": "Analizó todos los {NUM} archivos en {FOLDER_NAME} y hubo un error.",
+      "message-plural": "Analizó los {FILE_COUNT} archivos en {FOLDER_NAME} y hubieron {ERROR_COUNT} errores."
     },
     "paste-as-plain-text": {
       "name": "Pegar como texto sin formato y sin modificaciones"
