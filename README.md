@@ -161,10 +161,20 @@ Note: On some machines the `.obsidian` folder may be hidden. On MacOS you should
 1. Reload Obsidian
 1. If prompted about Safe Mode, you can disable safe mode and enable the plugin.
 
-## Contributing
+## How You Can Help
 
-Contributions are welcome, especially for new rules and new translations. If this is something you would like to do, take a look at the
-[contribution guidelines](CONTRIBUTING.md).
+Contributions are welcome and appreciated. You can help in any of the following ways:
+
+No repo setup required:
+- [Reporting a bug](https://github.com/platers/obsidian-linter/issues/new?assignees=&labels=bug&template=bug_report.md&title=Bug%3A+)
+- [Requesting a feature](https://github.com/platers/obsidian-linter/issues/new?assignees=&labels=rule+suggestion&template=feature_request.md&title=FR%3A+)
+- [Suggesting documentation](https://github.com/platers/obsidian-linter/issues/new?assignees=&labels=documentation)
+
+Varying repo and development setup required:
+- [Updating or adding documentation](https://github.com/platers/obsidian-linter/blob/master/CONTRIBUTING.md#updating-documentation)
+- [Translating the plugin into a new language](https://github.com/platers/obsidian-linter/blob/master/CONTRIBUTING.md#adding-translations-for-a-language)
+- [Fixing a bug](https://github.com/platers/obsidian-linter/blob/master/CONTRIBUTING.md#bug-fixes)
+- [Adding a new rule](https://github.com/platers/obsidian-linter/blob/master/CONTRIBUTING.md#adding-a-rule)
 
 ## Credits
 
