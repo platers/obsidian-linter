@@ -108,12 +108,12 @@ export default {
       },
       'same-as-system-locale': 'Igual que el sistema ({SYS_LOCALE})',
       'yaml-aliases-section-style': {
-        'name': 'Estilo de sección de alias YAML',
-        'description': 'El estilo de la sección de alias YAML',
+        'name': 'Estilo de sección de alias de YAML',
+        'description': 'El estilo de la sección de alias de YAML',
       },
       'yaml-tags-section-style': {
-        'name': 'Estilo de sección de etiquetas YAML',
-        'description': 'El estilo de la sección de etiquetas YAML',
+        'name': 'Estilo de sección de etiquetas de YAML',
+        'description': 'El estilo de la sección de etiquetas de YAML',
       },
       'default-escape-character': {
         'name': 'Carácter de escape predeterminado',
@@ -131,7 +131,7 @@ export default {
     'debug': {
       'log-level': {
         'name': 'Nivel de registro',
-        'description': 'Los tipos de registros que el servicio permitirá registrar. El valor predeterminado es ERROR.',
+        'description': 'Los tipos de registros que el servicio permitirá registrar. El valor predeterminado es error.',
       },
       'linter-config': {
         'name': 'Configuración de Linter',
@@ -276,7 +276,7 @@ export default {
     },
     'format-tags-in-yaml': {
       'name': 'Dar formato a las etiquetas de formato en YAML',
-      'description': 'Elimine los hashtags de las etiquetas en el frontmatter de YAML, ya que hacen que las etiquetas no sean válidas.',
+      'description': 'Elimine los hashtags de las etiquetas en el frontmatter del YAML, ya que hacen que las etiquetas no sean válidas.',
     },
     'format-yaml-array': {
       'name': 'Dar formato a las matrices de YAML',
@@ -323,7 +323,7 @@ export default {
       },
       'empty-line-after-yaml': {
         'name': 'Línea vacía entre el YAML y el encabezado',
-        'description': 'Mantenga la línea vacía entre el frontmatter de YAML y el encabezado',
+        'description': 'Mantenga la línea vacía entre el frontmatter del YAML y el encabezado',
       },
     },
     'headings-start-line': {
@@ -332,10 +332,10 @@ export default {
     },
     'insert-yaml-attributes': {
       'name': 'Insertar atributos de YAML',
-      'description': 'Inserta los atributos especificados de YAML en el frontmatter de YAML. Coloque cada atributo en una sola línea.',
+      'description': 'Inserta los atributos especificados de YAML en el frontmatter del YAML. Coloque cada atributo en una sola línea.',
       'text-to-insert': {
         'name': 'Texto a insertar',
-        'description': 'Texto para insertar en el frontmatter de YAML',
+        'description': 'Texto para insertar en el frontmatter del YAML',
       },
     },
     'line-break-at-document-end': {
@@ -352,7 +352,7 @@ export default {
     },
     'move-tags-to-yaml': {
       'name': 'Mover etiquetas a YAML',
-      'description': 'Mueva todas las etiquetas al frontmatter de YAML del documento.',
+      'description': 'Mueva todas las etiquetas al frontmatter del YAML del documento.',
       'how-to-handle-existing-tags': {
         'name': 'Operación de etiqueta corporal',
         'description': 'Lo qur se debe hacer con las etiquetas no ignoradas en el cuerpo del archivo una vez que se han movido al frontmatter',
@@ -470,5 +470,151 @@ export default {
         'description': 'La puntuación final que se eliminará de los encabezados del archivo.',
       },
     },
+    'remove-yaml-keys': {
+      'name': 'Eliminar claves de YAML',
+      'description': 'Elimina las claves especificadas de YAML',
+      'yaml-keys-to-remove': {
+        'name': 'Claves de YAML para eliminar',
+        'description': 'Las claves de YAML para eliminar del frontmatter del YAML con o sin dos puntos',
+      },
+    },
+    'space-after-list-markers': {
+      'name': 'Espacio después de los marcadores de lista',
+      'description': 'Debe haber un solo espacio después de los marcadores de lista y las casillas de verificación.',
+    },
+    'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
+      'name': 'Espacio entre chino japonés o coreano e inglés o números',
+      'description': 'Garantiza que el chino, el japonés o el coreano y el inglés o los números estén separados por un solo espacio. Sigue estas [directrices] (https://github.com/sparanoid/chinese-copywriting-guidelines)',
+    },
+    'strong-style': {
+      'name': 'Estilo fuerte',
+      'description': 'Se asegura de que el estilo fuerte sea consistente.',
+      'style': {
+        'name': 'Estilo',
+        'description': 'El estilo utilizado para denotar contenido fuerte/en negrita',
+      },
+    },
+    'trailing-spaces': {
+      'name': 'Espacios finales',
+      'description': 'Elimina espacios adicionales después de cada línea.',
+      'twp-space-line-break': {
+        'name': 'Salto de línea de dos espacios',
+        'description': 'Ignore dos espacios seguidos de un salto de línea ("Regla de dos espacios").',
+      },
+    },
+    'two-spaces-between-lines-with-content': {
+      'name': 'Dos espacios entre líneas con contenido',
+      'description': 'Se asegura de que se agreguen dos espacios al final de las líneas con contenido que continúa en la siguiente línea para párrafos, comillas y elementos de lista',
+    },
+    'unordered-list-style': {
+      'name': 'Estilo de lista desordenada',
+      'description': 'Se asegura de que las listas desordenadas sigan el estilo especificado.',
+      'list-style': {
+        'name': 'Estilo de elemento de lista',
+        'description': 'El estilo de elemento de lista para usar en listas desordenadas',
+      },
+    },
+    'yaml-key-sort': {
+      'name': 'Clasificación de clave de YAML',
+      'description': 'Ordena las claves de YAML según el orden y la prioridad especificados. Nota: también puede eliminar las líneas en blanco.',
+      'yaml-key-priority-sort-order': {
+        'name': 'Orden de clasificación de prioridad de clave de YAML',
+        'description': 'El orden en el que se ordenan las claves con una en cada línea donde se ordena en el orden que se encuentra en la lista',
+      },
+      'priority-keys-at-start-of-yaml': {
+        'name': 'Claves de prioridad al inicio del YAML',
+        'description': 'El orden de clasificación de prioridad clave de YAML se coloca al comienzo del frontmatter del YAML',
+      },
+      'yaml-sort-order-for-other-keys': {
+        'name': 'Orden de clasificación de YAML para otras claves',
+        'description': 'La forma en que ordenar las claves que no se encuentran en el área de texto `Orden de clasificación de prioridad de clave de YAML`',
+      },
+    },
+    'yaml-timestamp': {
+      'name': 'Marca de tiempo de YAML',
+      'description': 'Lleve un registro de la fecha en que se editó el archivo por última vez en el frente del YAML. Obtiene las fechas de los metadatos del archivo.',
+      'date-created': {
+        'name': 'Fecha de creación',
+        'description': 'Inserte la fecha de creación del archivo',
+      },
+      'date-created-key': {
+        'name': 'Clave de fecha de creación',
+        'description': 'La clave de YAML para usar para la fecha de creación',
+      },
+      'force-retention-of-create-value': {
+        'name': 'Forzar la fecha de creación de la retención del valor clave',
+        'description': 'Reutiliza el valor en el frontmatter del YAML para la fecha de creación en lugar de los metadatos del archivo, lo que es útil para evitar que los cambios en los metadatos del archivo provoquen que el valor cambie a un valor diferente.',
+      },
+      'date-modified': {
+        'name': 'Fecha modificada',
+        'description': 'Inserte la fecha en que se modificó el archivo por última vez',
+      },
+      'date-modified-key': {
+        'name': 'Clave de fecha modificada',
+        'description': 'La clave de YAML para usar para la fecha de modificación',
+      },
+      'format': {
+        'name': 'Formato',
+        'description': 'Formato de fecha de Moment a usar (ver [Opciones de formato de Moment](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
+      },
+    },
+    'yaml-title-alias': {
+      'name': 'Alias de título de YAML',
+      'description': 'Inserta el título del archivo en la sección de alias de YAML frontmatter. Obtiene el título del primer H1 o nombre de archivo.',
+      'preserve-existing-alias-section-style': {
+        'name': 'Conservar el estilo de sección de alias existente',
+        'description': 'Si se establece, la configuración `Estilo de sección de alias de YAML` se aplica solo a las secciones recién creadas',
+      },
+      'keep-alias-that-matches-the-filename': {
+        'name': 'Mantenga el alias que coincida con el nombre del archivo',
+        'description': 'Estos alias suelen ser redundantes.',
+      },
+      'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
+        'name': 'Use la clave de YAML `linter-yaml-title-alias` para ayudar con los cambios de nombre de archivo y encabezado',
+        'description': 'Si se establece, cuando cambia el primer encabezado H1 o cambia el nombre de archivo si el primer H1 no está presente, el alias anterior almacenado en esta clave se reemplazará con el nuevo valor en lugar de simplemente insertar una nueva entrada en la matriz de alias.',
+      },
+    },
+    'yaml-title': {
+      'name': 'Título de YAML',
+      'description': 'Inserta el título del archivo en el frontmatter del YAML. Obtiene el título del primer H1 o nombre de archivo si no hay H1.',
+      'title-key': {
+        'name': 'Clave de título',
+        'description': 'La clave de YAML usar para el título',
+      },
+    },
+  },
+  'enums': {
+    'Title Case': 'Titulo del Caso',
+    'ALL CAPS': 'TODO MAYÚSCULAS',
+    'First letter': 'Primera letra',
+    '.': '.', // leave as is
+    ')': ')', // leave as is
+    'ERROR': 'error',
+    'TRACE': 'trazar',
+    'DEBUG': 'depurar',
+    'INFO': 'información',
+    'WARN': 'advertencia',
+    'SILENT': 'silencio',
+    'ascending': 'ascendente',
+    'lazy': 'perezoso',
+    'Nothing': 'nada',
+    'Remove hashtag': 'Remove hashtag',
+    'Remove whole tag': 'Remove whole tag',
+    'asterisk': 'asterisco',
+    'underscore': 'guion bajo',
+    'consistent': 'congruente',
+    '-': '-', // leave as is
+    '*': '*', // leave as is
+    '+': '+', // leave as is
+    'None': 'nada',
+    'Ascending Alphabetical': 'Ascendente alfabético',
+    'Descending Alphabetical': 'Descendiente alfabético',
+    'multi-line': 'multilínea',
+    'single-line': 'linea sola',
+    'single string to single-line': 'una sola cadena a una sola línea',
+    'single string to multi-line': 'cadena única a multilínea',
+    'single string comma delimited': 'cadena única delimitada por comas',
+    'single string space delimited': 'espacio de una sola cadena delimitado',
+    'single-line space delimited': 'espacio de una sola línea delimitado',
   },
 };
