@@ -199,8 +199,8 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
     return [
       new BooleanOptionBuilder({
         OptionsClass: EscapeYamlSpecialCharactersOptions,
-        nameKey: 'rules.escape-yaml-special-characters.try-to-escape-single-line-arrays.description',
-        descriptionKey: 'rules.escape-yaml-special-characters.try-to-escape-single-line-arrays.name',
+        nameKey: 'rules.escape-yaml-special-characters.try-to-escape-single-line-arrays.name',
+        descriptionKey: 'rules.escape-yaml-special-characters.try-to-escape-single-line-arrays.description',
         optionsKey: 'tryToEscapeSingleLineArrays',
       }),
     ];

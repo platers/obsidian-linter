@@ -14,7 +14,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
   constructor() {
     super({
       nameKey: 'rules.ordered-list-style.name',
-      descriptionKey: 'rules.unordered-list-style.description',
+      descriptionKey: 'rules.ordered-list-style.description',
       type: RuleType.CONTENT,
     });
   }
