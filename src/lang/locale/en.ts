@@ -23,7 +23,7 @@ export default {
       'name': 'Lint all files in the current folder',
       'start-message': 'This will edit all of your files in {FOLDER_NAME} including files in its subfolders which may introduce errors.',
       'submit-button-text': 'Lint All Files in {FOLDER_NAME}',
-      'submit-button-notice-text': 'Lint all files in {FOLDER_NAME}...',
+      'submit-button-notice-text': 'Linting all files in {FOLDER_NAME}...',
       'error-message': 'Lint All Files in Folder Error in File',
       'success-message': 'Linted all {NUM} files in {FOLDER_NAME}.',
       'message-singular': 'Linted all {NUM} files in {FOLDER_NAME} and there was 1 error.',
