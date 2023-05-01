@@ -60,10 +60,10 @@ export default {
     'run-rule-text': 'Usando',
     'timing-key-not-found': 'clave de ritmo \'{TIMING_KEY}\' no ya existe en la lista de claves de ritmo y fue ignorado por eso',
     'milliseconds-abbreviation': 'ms',
-    'invalid-date-format-error': 'No se pudo analizar ni identificar el formato de la fech de creación \'{DATE}\' entonces la fecha de creación se dejó sola en \'{FILE_NAME}\'',
+    'invalid-date-format-error': 'No se pudo analizar ni identificar el formato de la fech de creación `{DATE}` entonces la fecha de creación se dejó sola en `{FILE_NAME}`',
     'invalid-delimiter-error-message': 'El delimitador solo puede ser de un solo carácter',
-    'missing-footnote-error-message': 'La nota al pie \'{FOOTNOTE}\' no tiene ninguna referencia de nota al pie correspondiente antes del contenido de la nota al pie y no se puede procesar. Asegúrese de que todas las notas a pie de página tengan una referencia correspondiente antes del contenido de la nota al pie de página.',
-    'too-many-footnotes-error-message': 'La clave de nota al pie \'{FOOTNOTE_KEY}\' tiene más de 1 nota al pie que hace referencia a ella. Actualice las notas al pie para que solo haya una nota al pie por clave de nota al pie.',
+    'missing-footnote-error-message': 'La nota al pie `{FOOTNOTE}` no tiene ninguna referencia de nota al pie correspondiente antes del contenido de la nota al pie y no se puede procesar. Asegúrese de que todas las notas a pie de página tengan una referencia correspondiente antes del contenido de la nota al pie de página.',
+    'too-many-footnotes-error-message': `La clave de nota al pie '{FOOTNOTE_KEY}' tiene más de 1 nota al pie que hace referencia a ella. Actualice las notas al pie para que solo haya una nota al pie por clave de nota al pie.`,
     'wrapper-yaml-error': 'hubo un error en el yaml: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'huno un error desconocido: {ERROR_MESSAGE}',
   },
@@ -92,7 +92,7 @@ export default {
     'general': {
       'lint-on-save': {
         'name': 'Analizar en guardar',
-        'description': 'Analizar el archivo en el guardado manual (cuando se presiona \'Ctrl + S\' o cuando se ejecuta \':w\' mientras se usan combinaciones de claves de vim)',
+        'description': 'Analizar el archivo en el guardado manual (cuando se presiona `Ctrl + S` o cuando se ejecuta `:w` mientras se usan combinaciones de claves de vim)',
       },
       'display-message': {
         'name': 'Mostrar mensaje en analizar',
@@ -139,11 +139,11 @@ export default {
       },
       'log-collection': {
         'name': 'Recopilar registros al activar y desactivar el archivo actual',
-        'description': 'Continúa y recopila registros cuando \'Analizar en guardar\' y analizar el archivo actual. Estos registros pueden ser útiles para depurar y crear informes de errores.',
+        'description': 'Continúa y recopila registros cuando `Analizar en guardar` y analizar el archivo actual. Estos registros pueden ser útiles para depurar y crear informes de errores.',
       },
       'linter-logs': {
         'name': 'Registros de Linter',
-        'description': 'Los registros del último \'Analizar en guardar\' o del último archivo actual de analizar se ejecutan si están habilitados.',
+        'description': 'Los registros del último `Analizar en guardar` o del último archivo actual de analizar se ejecutan si están habilitados.',
       },
     },
   },
@@ -359,7 +359,7 @@ export default {
       },
       'tags-to-ignore': {
         'name': 'Etiquetas para omitir',
-        'description': 'Las etiquetas que no se moverán a la matriz de etiquetas ni se eliminarán del contenido del cuerpo si está habilitado `Eliminar el hashtag de las etiquetas en el cuerpo del contenido`. Cada etiqueta debe estar en una nueva línea y sin el \'#\'. **Asegúrese de no incluir el hashtag en el nombre de la etiqueta.**',
+        'description': 'Las etiquetas que no se moverán a la matriz de etiquetas ni se eliminarán del contenido del cuerpo si está habilitado `Eliminar el hashtag de las etiquetas en el cuerpo del contenido`. Cada etiqueta debe estar en una nueva línea y sin el `#`. **Asegúrese de no incluir el hashtag en el nombre de la etiqueta.**',
       },
     },
     'no-bare-urls': {
@@ -464,7 +464,7 @@ export default {
     },
     'remove-trailing-punctuation-in-heading': {
       'name': 'Eliminar la puntuación final en el encabezado',
-      'description': 'Elimina la puntuación especificada al final de los encabezados, asegurándose de ignorar el punto y coma al final de [referencias de entidades de HTML] (https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references).',
+      'description': 'Elimina la puntuación especificada al final de los encabezados, asegurándose de ignorar el punto y coma al final de [referencias de entidades de HTML](https://es.wikipedia.org/wiki/Anexo:Referencias_a_entidades_de_caracteres_XML_y_HTML).',
       'punctuation-to-remove': {
         'name': 'Puntuación final',
         'description': 'La puntuación final que se eliminará de los encabezados del archivo.',
@@ -484,7 +484,7 @@ export default {
     },
     'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
       'name': 'Espacio entre chino japonés o coreano e inglés o números',
-      'description': 'Garantiza que el chino, el japonés o el coreano y el inglés o los números estén separados por un solo espacio. Sigue estas [directrices] (https://github.com/sparanoid/chinese-copywriting-guidelines)',
+      'description': 'Garantiza que el chino, el japonés o el coreano y el inglés o los números estén separados por un solo espacio. Sigue estas [directrices](https://github.com/sparanoid/chinese-copywriting-guidelines)',
     },
     'strong-style': {
       'name': 'Estilo fuerte',
