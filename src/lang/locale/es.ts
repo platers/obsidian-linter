@@ -10,7 +10,7 @@ export default {
       'name': 'Analizar este archivo si no es ignorado',
     },
     'lint-all-files': {
-      'name': 'Analizar todos los archivos en la cripta',
+      'name': 'Analizar todos los archivos en la bóveda',
       'error-message': 'Error Analizando Todos los Archivos en Archivo',
       'success-message': 'Analizó todos los archivos',
       'errors-message-singular': 'Analizó todos los archivos y un error ocurrió.',
