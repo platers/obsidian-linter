@@ -705,7 +705,7 @@ export default {
     'single-line': 'single-line',
     'single string to single-line': 'single string to single-line',
     'single string to multi-line': 'single string to multi-line',
-    'single string comma delimited': 'single string to multi-line',
+    'single string comma delimited': 'single string comma delimited',
     'single string space delimited': 'single string space delimited',
     'single-line space delimited': 'single-line space delimited',
   },
