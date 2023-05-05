@@ -92,21 +92,33 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
   let index = startOfContent;
   let startOfNewContent = startOfContent;
   let lineNestingLevel = 0;
+  let foundABlankLine = false;
+  let previousChar = '';
   while (index >= 0) {
     const currentChar = text.charAt(index);
     if (currentChar.trim() !== '' && currentChar !== '>') {
       break; // if non-whitespace, non-gt-bracket is encountered, then the line has content
     } else if (currentChar === '>') {
+      // if we go from having a blank line at any point to then having more blockquote content we know we have encountered another blockquote
+      if (foundABlankLine) {
+        break;
+      }
+
       lineNestingLevel++;
     } else if (currentChar === '\n') {
       if (lineNestingLevel === 0 || lineNestingLevel === nestingLevel || (lineNestingLevel + 1) === nestingLevel) {
         startOfNewContent = index;
         lineNestingLevel = 0;
+
+        if (previousChar === '\n') {
+          foundABlankLine = true;
+        }
       } else {
         break;
       }
     }
     index--;
+    previousChar = currentChar;
   }
 
   if (index < 0 || startOfNewContent === 0) {
@@ -116,6 +128,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
   const startingEmptyLines = text.substring(startOfNewContent, startOfContent);
   const startsWithEmptyLine = startingEmptyLines === '\n' || startingEmptyLines.startsWith('\n\n');
   if (startsWithEmptyLine) {
+    console.log('starts with empty line');
     return text.substring(0, startOfNewContent) + '\n' + text.substring(startOfContent);
   }
 
@@ -127,6 +140,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
     priorLine = text.substring(indexOfLastNewLine, startOfNewContent);
   }
 
+  console.log('prior line', priorLine);
   return text.substring(0, startOfNewContent) + getEmptyLine(priorLine) + text.substring(startOfContent);
 }
 
@@ -223,7 +237,7 @@ export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, st
   const [startOfLine, startOfLineIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(text, start);
   if (startOfLine.trim() !== '') {
     const newText = makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text, startOfLine, end);
-
+    console.log('after end', newText);
     return makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockquote(newText, startOfLine, startOfLineIndex);
   }
 

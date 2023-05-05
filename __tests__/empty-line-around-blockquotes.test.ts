@@ -23,7 +23,7 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/668
-      testname: 'Make sure that consecutive blockquotes are not merged when multiple blank lines are between them',
+      testName: 'Make sure that consecutive blockquotes are not merged when multiple blank lines are between them',
       before: dedent`
         > [!quote] title 1
         > the quote 1
@@ -89,6 +89,23 @@ ruleTest({
         > [!quote] Title 3
         > The quote 3
       `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/684
+      testName: 'Make sure that consecutive blockquotes ends with empty blockquote line',
+      before: dedent`
+> [!FAQ] Title
+> 
+${''}
+> [!NOTES] Title
+> Content
+`,
+      after: dedent`
+> [!FAQ] Title
+> 
+
+> [!NOTES] Title
+> Content
+    `,
     },
   ],
 });
