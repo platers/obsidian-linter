@@ -92,21 +92,33 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
   let index = startOfContent;
   let startOfNewContent = startOfContent;
   let lineNestingLevel = 0;
+  let foundABlankLine = false;
+  let previousChar = '';
   while (index >= 0) {
     const currentChar = text.charAt(index);
     if (currentChar.trim() !== '' && currentChar !== '>') {
       break; // if non-whitespace, non-gt-bracket is encountered, then the line has content
     } else if (currentChar === '>') {
+      // if we go from having a blank line at any point to then having more blockquote content we know we have encountered another blockquote
+      if (foundABlankLine) {
+        break;
+      }
+
       lineNestingLevel++;
     } else if (currentChar === '\n') {
       if (lineNestingLevel === 0 || lineNestingLevel === nestingLevel || (lineNestingLevel + 1) === nestingLevel) {
         startOfNewContent = index;
         lineNestingLevel = 0;
+
+        if (previousChar === '\n') {
+          foundABlankLine = true;
+        }
       } else {
         break;
       }
     }
     index--;
+    previousChar = currentChar;
   }
 
   if (index < 0 || startOfNewContent === 0) {
@@ -169,11 +181,18 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
   let endOfNewContent = endOfContent;
   let isFirstNewLine = true;
   let lineNestingLevel = 0;
+  let foundABlankLine = false;
+  let previousChar = '';
   while (index < text.length) {
     const currentChar = text.charAt(index);
     if (currentChar.trim() !== '' && currentChar !== '>') {
       break; // if non-whitespace is encountered, then the line has content
     } else if (currentChar === '>') {
+      // if we go from having a blank line at any point to then having more blockquote content we know we have encountered another blockquote
+      if (foundABlankLine) {
+        break;
+      }
+
       lineNestingLevel++;
     } else if (currentChar === '\n') {
       if (lineNestingLevel === 0 || lineNestingLevel === nestingLevel || (lineNestingLevel + 1) === nestingLevel) {
@@ -183,11 +202,17 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
         } else {
           endOfNewContent = index;
         }
+
+        if (previousChar === '\n') {
+          foundABlankLine = true;
+        }
       } else {
         break;
       }
     }
     index++;
+
+    previousChar = currentChar;
   }
 
   if (index === text.length || endOfNewContent === text.length - 1) {
