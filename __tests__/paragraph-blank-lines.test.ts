@@ -284,7 +284,7 @@ ruleTest({
       testName: 'Table followed by header should only have 1 line after it',
       before: dedent`
         ### 常量
-
+        ${''}
         |  \`[[Link]]\`         |  A link to the file named "Link"  |
         |:--------------------|:----------------------------------|
         |  \`[[Link]]\`         |  A link to the file named "Link"  |
@@ -293,12 +293,12 @@ ruleTest({
         |  \`{ a: 1, b: 2 }\`   |  An object                        |
         |  \`date()\`           |                                   |
         |  \`dur()\`            |                                   |
-
+        ${''}
         ### 表达式
       `,
       after: dedent`
         ### 常量
-
+        ${''}
         |  \`[[Link]]\`         |  A link to the file named "Link"  |
         |:--------------------|:----------------------------------|
         |  \`[[Link]]\`         |  A link to the file named "Link"  |
@@ -307,8 +307,25 @@ ruleTest({
         |  \`{ a: 1, b: 2 }\`   |  An object                        |
         |  \`date()\`           |                                   |
         |  \`dur()\`            |                                   |
-
+        ${''}
         ### 表达式
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/704
+      testName: 'Make sure that an empty list indicator does not have an extra empty line added around it',
+      before: dedent`
+        ## Attendees
+        ${''}
+        - 
+        ${''}
+        ## Agenda
+      `,
+      after: dedent`
+        ## Attendees
+        ${''}
+        - 
+        ${''}
+        ## Agenda
       `,
     },
   ],

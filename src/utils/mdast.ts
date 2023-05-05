@@ -769,9 +769,8 @@ export function getAllTablesInText(text: string): {startIndex: number, endIndex:
 
     let start = startOfPreviousLine;
     let firstLine = text.substring(startOfPreviousLine, startOfCurrentLine - 1);
-    // if the separator row matches a yaml block indicator and the first line is missing
-    // a pipe, then we must assume that we are dealing with a header or yaml instead of a table
-    if (separatorRowMatch === '---' && !firstLine.includes('|')) {
+    // a table must have a pipe in either the header or the separator row
+    if (!separatorRowMatch.includes('|') && !firstLine.includes('|')) {
       continue;
     }
 

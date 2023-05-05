@@ -206,6 +206,18 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
     expectedTablesInText: 0,
     expectedPositions: [],
   },
+  {
+    name: 'does not match an empty list indicator with a blank line before it',
+    text: dedent`
+      ## Attendees
+      ${''}
+      - 
+      ${''}
+      ## Agenda
+    `,
+    expectedTablesInText: 0,
+    expectedPositions: [],
+  },
 ];
 
 describe('Get All Tables in Text', () => {
