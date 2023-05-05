@@ -316,14 +316,14 @@ ruleTest({
       before: dedent`
         ## Attendees
         ${''}
-        - 
+        -${' '}
         ${''}
         ## Agenda
       `,
       after: dedent`
         ## Attendees
         ${''}
-        - 
+        -${' '}
         ${''}
         ## Agenda
       `,

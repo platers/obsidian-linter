@@ -211,7 +211,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
     text: dedent`
       ## Attendees
       ${''}
-      - 
+      -${' '}
       ${''}
       ## Agenda
     `,
