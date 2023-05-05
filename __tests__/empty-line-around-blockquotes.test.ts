@@ -91,21 +91,40 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/684
-      testName: 'Make sure that consecutive blockquotes ends with empty blockquote line',
+      testName: 'Make sure that consecutive blockquotes do not get merged when the first one ends with an empty blockquote line',
       before: dedent`
-> [!FAQ] Title
-> 
-${''}
-> [!NOTES] Title
-> Content
-`,
+        > [!FAQ] Title
+        > 
+        ${''}
+        > [!NOTES] Title
+        > Content
+      `,
       after: dedent`
-> [!FAQ] Title
-> 
-
-> [!NOTES] Title
-> Content
-    `,
+        > [!FAQ] Title
+        > 
+        ${''}
+        > [!NOTES] Title
+        > Content
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/684
+      testName: 'Make sure that consecutive blockquotes do not get merged when the second one starts with an empty blockquote line',
+      before: dedent`
+        > [!FAQ] Title
+        > Content here
+        ${''}
+        >
+        > [!NOTES] Title
+        > Content
+      `,
+      after: dedent`
+        > [!FAQ] Title
+        > Content here
+        ${''}
+        >
+        > [!NOTES] Title
+        > Content
+      `,
     },
   ],
 });
