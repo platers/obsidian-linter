@@ -38,6 +38,30 @@ export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLines
           A paragraph is a line that starts with a letter.
         `,
       }),
+      new ExampleBuilder({
+        description: 'Paragraphs can be extended via the use of 2 or more spaces at the end of a line or line break html',
+        before: dedent`
+          # H1
+          Content${'  '}
+          Paragraph content continued <br>
+          Paragraph content continued once more <br/>
+          Last line of paragraph
+          A new paragraph
+          # H2
+        `,
+        after: dedent`
+          # H1
+          ${''}
+          Content${'  '}
+          Paragraph content continued <br>
+          Paragraph content continued once more <br/>
+          Last line of paragraph
+          ${''}
+          A new paragraph
+          ${''}
+          # H2
+        `,
+      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<ParagraphBlankLinesOptions>[] {
