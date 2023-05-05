@@ -248,7 +248,7 @@ export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, st
   const [startOfLine, startOfLineIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(text, start);
   if (startOfLine.trim() !== '') {
     const newText = makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text, startOfLine, end);
-  
+
     return makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockquote(newText, startOfLine, startOfLineIndex);
   }
 
