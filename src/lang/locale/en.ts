@@ -105,8 +105,8 @@ export default {
       'custom': 'Custom Settings',
       'yaml': 'YAML Settings',
       'heading': 'Heading Settings',
-      'content': 'Footnote Settings',
-      'footnote': 'Content Settings',
+      'content': 'Content Settings',
+      'footnote': 'Footnote Settings',
       'spacing': 'Spacing Settings',
       'paste': 'Paste Settings',
       'debug': 'Debug Settings',
@@ -537,6 +537,19 @@ export default {
       'other-symbols': {
         'name': 'Other symbols',
         'description': 'Other symbols to include',
+      },
+    },
+    // remove-space-before-or-after-characters.ts
+    'remove-space-before-or-after-characters': {
+      'name': 'Remove Space Before or After Characters',
+      'description': 'Removes space before the specified characters and after the specified characters. Note that this may causes issues with markdown format in some cases.',
+      'characters-to-remove-space-before': {
+        'name': 'Remove Space Before Characters',
+        'description': 'Removes space before the specified characters',
+      },
+      'characters-to-remove-space-after': {
+        'name': 'Remove Space After Characters',
+        'description': 'Removes space after the specified characters',
       },
     },
     // remove-trailing-punctuation-in-heading.ts
