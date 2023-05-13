@@ -539,19 +539,6 @@ export default {
         'description': 'Other symbols to include',
       },
     },
-    // remove-space-before-or-after-characters.ts
-    'remove-space-before-or-after-characters': {
-      'name': 'Remove Space Before or After Characters',
-      'description': 'Removes space before the specified characters and after the specified characters. Note that this may causes issues with markdown format in some cases.',
-      'characters-to-remove-space-before': {
-        'name': 'Remove Space Before Characters',
-        'description': 'Removes space before the specified characters',
-      },
-      'characters-to-remove-space-after': {
-        'name': 'Remove Space After Characters',
-        'description': 'Removes space after the specified characters',
-      },
-    },
     // remove-trailing-punctuation-in-heading.ts
     'remove-trailing-punctuation-in-heading': {
       'name': 'Remove Trailing Punctuation in Heading',
