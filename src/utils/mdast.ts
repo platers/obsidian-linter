@@ -504,7 +504,14 @@ export function updateListItemText(text: string, func:(text: string) => string):
   const positions: Position[] = getPositions(MDAstTypes.ListItem, text);
 
   for (const position of positions) {
+    let indicatorOffset = 2;
     let listText = text.substring(position.start.offset+2, position.end.offset);
+    const checklistIndicatorRegex = /^\[.\] /;
+    if (checklistIndicatorRegex.test(listText)) {
+      indicatorOffset += 4;
+      listText = listText.substring(4);
+    }
+
     // This helps account for a weird scenario where list items is pulling back multiple list items in one go sometimes
     const listIndicatorRegex = /\n(( |\t)*>?)*(\*|-|\+|- \[( | x)\]|\d+\.) /g;
     const matches = listText.match(listIndicatorRegex);
@@ -516,11 +523,17 @@ export function updateListItemText(text: string, func:(text: string) => string):
       let index = 0;
       // eslint-disable-next-line guard-for-in
       for (const listItem of listItems) {
+        let listItemText = listItem;
         if (index > 0) {
           newListText += matches[index - 1];
         }
 
-        newListText += func(listItem);
+        if (checklistIndicatorRegex.test(listItemText)) {
+          newListText += listItemText.substring(0, 4);
+          listItemText = listItemText.substring(4);
+        }
+
+        newListText += func(listItemText);
         index++;
       }
 
@@ -529,7 +542,7 @@ export function updateListItemText(text: string, func:(text: string) => string):
       listText = func(listText);
     }
 
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+2, position.end.offset, listText);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+indicatorOffset, position.end.offset, listText);
   }
 
   return text;
