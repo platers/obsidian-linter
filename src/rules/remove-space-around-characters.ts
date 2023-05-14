@@ -89,23 +89,23 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
           # List indicators should not have the space after them removed if they are followed by a fullwidth character
           ${''}
           - ［ contents here］
-            - \t［ more contents here］ more text here
-          + \t［ another item here］
+            -  ［ more contents here］ more text here
+          +   ［ another item here］
           * ［ one last item here］
           ${''}
           # Nested in a block quote
           ${''}
           > - ［ contents here］
-          >   - \t［ more contents here］ more text here
-          > + \t［ another item here］
+          >   -  ［ more contents here］ more text here
+          > +  ［ another item here］
           > * ［ one last item here］
           ${''}
           # Doubly nested in a block quote
           ${''}
           > The following is doubly nested
           > > - ［ contents here］
-          > >   - \t［ more contents here］ more text here
-          > > + \t［ another item here］
+          > >   -   ［ more contents here］ more text here
+          > > +  ［ another item here］
           > > * ［ one last item here］
         `,
         after: dedent`
