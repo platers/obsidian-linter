@@ -75,8 +75,8 @@ function parseTextToAST(text: string): Root {
 
 /**
  * Gets the positions of the given element type in the given text.
- * @param {string} type The element type to get positions for
- * @param {string} text The markdown text
+ * @param {string} type - The element type to get positions for
+ * @param {string} text - The markdown text
  * @return {Position[]} The positions of the given element type in the given text
  */
 export function getPositions(type: MDAstTypes, text: string): Position[] {
@@ -84,6 +84,33 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
   const positions: Position[] = [];
   visit(ast, type as string, (node) => {
     positions.push(node.position);
+  });
+
+  // Sort positions by start position in reverse order
+  positions.sort((a, b) => b.start.offset - a.start.offset);
+  return positions;
+}
+
+/**
+ * Gets the positions of the list item text in the given text.
+ * @param {string} text - The markdown text
+ * @return {Position[]} The positions of the list item text in the given text
+ */
+function getListItemTextPositions(text: string): Position[] {
+  const ast = parseTextToAST(text);
+  const positions: Position[] = [];
+  visit(ast, MDAstTypes.ListItem as string, (node) => {
+    // @ts-ignore the fact that not all nodes have a children property since I am skipping any that do not
+    if (!node.children) {
+      return;
+    }
+
+    // @ts-ignore the fact that not all nodes have a children property since I have already exited the function if that is the case
+    for (const childNode of node.children) {
+      if (childNode.type === (MDAstTypes.Paragraph as string)) {
+        positions.push(childNode.position);
+      }
+    }
   });
 
   // Sort positions by start position in reverse order
@@ -501,48 +528,23 @@ export function updateBoldText(text: string, func:(text: string) => string): str
 }
 
 export function updateListItemText(text: string, func:(text: string) => string): string {
-  const positions: Position[] = getPositions(MDAstTypes.ListItem, text);
+  const positions: Position[] = getListItemTextPositions(text);
 
   for (const position of positions) {
-    let indicatorOffset = 2;
-    let listText = text.substring(position.start.offset+2, position.end.offset);
-    const checklistIndicatorRegex = /^\[.\] /;
-    if (checklistIndicatorRegex.test(listText)) {
-      indicatorOffset += 4;
-      listText = listText.substring(4);
+    let startIndex = position.start.offset;
+    // get the actual start of the list item leaving only 1 whitespace between the indicator and the text
+    while (startIndex > 0 && text.charAt(startIndex - 1).trim() === '') {
+      startIndex--;
+    }
+    // keep a single space for the indicator
+    if (startIndex === 0 || text.charAt(startIndex - 1).trim() != '') {
+      startIndex++;
     }
 
-    // This helps account for a weird scenario where list items is pulling back multiple list items in one go sometimes
-    const listIndicatorRegex = /\n(( |\t)*>?)*(\*|-|\+|- \[( | x)\]|\d+\.) /g;
-    const matches = listText.match(listIndicatorRegex);
-    if (matches) {
-      // capturing groups get added back to the results of split so we need the capturing groups to be converted to non-capturing groups
-      // https://stackoverflow.com/questions/37838532/javascript-split-string-with-matchregex
-      const listItems = listText.split(new RegExp(listIndicatorRegex.source.replaceAll('(', '(?:')));
-      let newListText: string = '';
-      let index = 0;
-      // eslint-disable-next-line guard-for-in
-      for (const listItem of listItems) {
-        let listItemText = listItem;
-        if (index > 0) {
-          newListText += matches[index - 1];
-        }
+    let listText = text.substring(startIndex, position.end.offset);
 
-        if (checklistIndicatorRegex.test(listItemText)) {
-          newListText += listItemText.substring(0, 4);
-          listItemText = listItemText.substring(4);
-        }
-
-        newListText += func(listItemText);
-        index++;
-      }
-
-      listText = newListText;
-    } else {
-      listText = func(listText);
-    }
-
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+indicatorOffset, position.end.offset, listText);
+    listText = func(listText);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, position.end.offset, listText);
   }
 
   return text;
