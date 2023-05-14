@@ -1213,5 +1213,28 @@ ruleTest({
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
+    { // relates to https://github.com/platers/obsidian-linter/issues/630
+      testName: 'Make sure alias is not escaped when a comma is present and the array style is multi-line',
+      before: dedent`
+        ---
+        aliases:
+          - alias1
+        ---
+        # Header, with comma
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Header, with comma
+          - alias1
+        ---
+        # Header, with comma
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
+
   ],
 });
