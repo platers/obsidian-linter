@@ -216,6 +216,15 @@ export default {
       'name': 'Blockquote-Einrückung beim Einfügen hinzufügen',
       'description': 'Fügt Blockzitate zu allen außer der ersten Zeile hinzu, wenn sich der Cursor während des Einfügens in einer Blockquote/Callout-Zeile befindet',
     },
+    // blockquote-style.ts
+    'blockquote-style': {
+      'name': 'Blockquote-Stil',
+      'description': 'Stellt sicher, dass der Blockquote-Stil konsistent ist.',
+      'style': {
+        'name': 'Stil',
+        'description': 'Der für Blockquote-Indikatoren verwendete Stil',
+      },
+    },
     // capitalize-headings.ts
     'capitalize-headings': {
       'name': 'Überschriften groß schreiben',

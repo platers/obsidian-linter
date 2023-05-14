@@ -21,6 +21,7 @@ import {LintCommand} from './ui/linter-components/custom-command-option';
 import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from './utils/strings';
 import {getTextInLanguage} from './lang/helpers';
 import CapitalizeHeadings from './rules/capitalize-headings';
+import BlockquoteStyle from './rules/blockquote-style';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -102,6 +103,8 @@ export class RulesRunner {
     const postRuleLogText = getTextInLanguage('logs.post-rules');
     timingBegin(postRuleLogText);
     [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+
+    [newText] = BlockquoteStyle.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
     [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,

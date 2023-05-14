@@ -216,6 +216,15 @@ export default {
       'name': '粘贴时添加块引用(blockquote)缩进',
       'description': '在粘贴过程中光标位于块引用/标注行中时，将块引用添加到除第一行以外的所有行',
     },
+    // blockquote-style.ts
+    'blockquote-style': {
+      'name': '块引用样式',
+      'description': '确保块引用样式一致。',
+      'style': {
+        'name': '风格',
+        'description': '块引用指示器上使用的样式',
+      },
+    },
     // capitalize-headings.ts
     'capitalize-headings': {
       'name': '大写标题(Headdings)',

@@ -216,6 +216,15 @@ export default {
       'name': 'Add Blockquote Indentation on Paste',
       'description': 'Adds blockquotes to all but the first line, when the cursor is in a blockquote/callout line during pasting',
     },
+    // blockquote-style.ts
+    'blockquote-style': {
+      'name': 'Blockquote Style',
+      'description': 'Makes sure the blockquote style is consistent.',
+      'style': {
+        'name': 'Style',
+        'description': 'The style used on blockquote indicators',
+      },
+    },
     // capitalize-headings.ts
     'capitalize-headings': {
       'name': 'Capitalize Headings',
