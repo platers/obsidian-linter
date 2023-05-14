@@ -626,6 +626,8 @@ export default {
     '-': '-', // leave as is
     '*': '*', // leave as is
     '+': '+', // leave as is
+    'space': 'espacio',
+    'no space': 'sin espacio',
     'None': 'nada',
     'Ascending Alphabetical': 'Ascendente alfabético',
     'Descending Alphabetical': 'Descendiente alfabético',
