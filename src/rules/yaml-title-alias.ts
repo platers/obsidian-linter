@@ -53,7 +53,8 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_KEY));
 
-    title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter);
+    const forceEscape = title.includes(',') && (options.aliasArrayStyle === NormalArrayFormats.SingleLine || options.aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || options.aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited);
+    title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter, forceEscape);
     const getNewAliasValue = function(originalValue: string |string[], shouldRemoveTitle: boolean): string |string[] {
       if (originalValue == null) {
         return shouldRemoveTitle ? '' : title;
