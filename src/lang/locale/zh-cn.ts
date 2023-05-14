@@ -539,6 +539,19 @@ export default {
         'description': '要包括的其他符号',
       },
     },
+    // remove-space-before-or-after-characters.ts
+    'remove-space-before-or-after-characters': {
+      'name': '删除字符前后的空格',
+      'description': '删除指定字符之前和指定字符之后的空格。 请注意，在某些情况下，这可能会导致降价格式出现问题。',
+      'characters-to-remove-space-before': {
+        'name': '删除字符前的空格',
+        'description': '删除指定字符前的空格。 **注意：在字符列表中使用`{`或`}`会意外影响文件，因为它在幕后的忽略语法中使用。**',
+      },
+      'characters-to-remove-space-after': {
+        'name': '删除字符后的空格',
+        'description': '删除指定字符后的空格。 **注意：在字符列表中使用`{`或`}`会意外影响文件，因为它在幕后的忽略语法中使用。**',
+      },
+    },
     // remove-trailing-punctuation-in-heading.ts
     'remove-trailing-punctuation-in-heading': {
       'name': '移除标题中的结尾标点符号',

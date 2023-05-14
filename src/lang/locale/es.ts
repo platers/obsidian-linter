@@ -462,6 +462,19 @@ export default {
         'description': 'Otros símbolos para incluir',
       },
     },
+    // remove-space-before-or-after-characters.ts
+    'remove-space-before-or-after-characters': {
+      'name': 'Quitar el espacio antes o después de los caracteres',
+      'description': 'Elimina el espacio antes de los caracteres especificados y después de los caracteres especificados. Tenga en cuenta que esto puede causar problemas con el formato de descuento en algunos casos.',
+      'characters-to-remove-space-before': {
+        'name': 'Eliminar espacio antes de los caracteres',
+        'description': 'Elimina el espacio antes de los caracteres especificados. **Nota: el uso de `{` o `}` en la lista de caracteres afectará inesperadamente a los archivos, ya que se usa en la sintaxis de ignorar en segundo plano.**',
+      },
+      'characters-to-remove-space-after': {
+        'name': 'Eliminar espacio después de los caracteres',
+        'description': 'Elimina el espacio después de los caracteres especificados. **Nota: el uso de `{` o `}` en la lista de caracteres afectará inesperadamente a los archivos, ya que se usa en la sintaxis de ignorar en segundo plano.**',
+      },
+    },
     'remove-trailing-punctuation-in-heading': {
       'name': 'Eliminar la puntuación final en el encabezado',
       'description': 'Elimina la puntuación especificada al final de los encabezados, asegurándose de ignorar el punto y coma al final de [referencias de entidades de HTML](https://es.wikipedia.org/wiki/Anexo:Referencias_a_entidades_de_caracteres_XML_y_HTML).',
