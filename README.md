@@ -70,6 +70,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 ### Content rules
 
 - [auto-correct-common-misspellings](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#auto-correct-common-misspellings)
+- [blockquote-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#blockquote-style)
 - [convert-bullet-list-markers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#convert-bullet-list-markers)
 - [emphasis-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#emphasis-style)
 - [no-bare-urls](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#no-bare-urls)
@@ -99,6 +100,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [remove-empty-lines-between-list-markers-and-checklists](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-empty-lines-between-list-markers-and-checklists)
 - [remove-link-spacing](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-link-spacing)
 - [remove-space-around-characters](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-space-around-characters)
+- [remove-space-before-or-after-characters](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-space-before-or-after-characters)
 - [space-after-list-markers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#space-after-list-markers)
 - [space-between-chinese-japanese-or-korean-and-english-or-numbers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#space-between-chinese-japanese-or-korean-and-english-or-numbers)
 - [trailing-spaces](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#trailing-spaces)
