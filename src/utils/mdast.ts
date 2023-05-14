@@ -108,7 +108,25 @@ function getListItemTextPositions(text: string): Position[] {
     // @ts-ignore the fact that not all nodes have a children property since I have already exited the function if that is the case
     for (const childNode of node.children) {
       if (childNode.type === (MDAstTypes.Paragraph as string)) {
-        positions.push(childNode.position);
+        const position = { // make a deep copy of the value to prevent changing the generated AST
+          start: {
+            line: childNode.position.start.line,
+            column: childNode.position.start.column,
+            offset: childNode.position.start.offset,
+          },
+          end: {
+            line: childNode.position.end.line,
+            column: childNode.position.end.column,
+            offset: childNode.position.end.offset,
+          },
+        };
+        // tasks need a slight shift to account for the task completion indicator
+        // @ts-ignore the fact that not all nodes have a checked property since all list items should have it
+        if (node.checked !== null) {
+          position.start.offset += 4;
+        }
+
+        positions.push(position);
       }
     }
   });
@@ -529,8 +547,7 @@ export function updateBoldText(text: string, func:(text: string) => string): str
 
 export function updateListItemText(text: string, func:(text: string) => string): string {
   const positions: Position[] = getListItemTextPositions(text);
-  const checklistIndicatorRegex = /^\[.\] /;
-  
+
   for (const position of positions) {
     let startIndex = position.start.offset;
     // get the actual start of the list item leaving only 1 whitespace between the indicator and the text
@@ -543,12 +560,8 @@ export function updateListItemText(text: string, func:(text: string) => string):
     }
 
     let listText = text.substring(startIndex, position.end.offset);
-    if (checklistIndicatorRegex.test(listText)) {
-      startIndex += 4;
-      listText = listText.substring(4);
-    }
-
     listText = func(listText);
+
     text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, position.end.offset, listText);
   }
 
