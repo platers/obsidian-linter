@@ -539,6 +539,19 @@ export default {
         'description': 'Andere Symbole, die enthalten sind',
       },
     },
+    // remove-space-before-or-after-characters.ts
+    'remove-space-before-or-after-characters': {
+      'name': 'Entfernen Sie Leerzeichen vor oder nach Zeichen',
+      'description': 'Entfernt Leerzeichen vor und nach den angegebenen Zeichen. Beachten Sie, dass dies in einigen Fällen zu Problemen mit dem Markdown-Format führen kann.',
+      'characters-to-remove-space-before': {
+        'name': 'Leerzeichen vor Zeichen entfernen',
+        'description': 'Entfernt Leerzeichen vor den angegebenen Zeichen. **Hinweis: Die Verwendung von `{` oder `}` in der Zeichenliste wirkt sich unerwartet auf Dateien aus, da es in der Ignoriersyntax hinter den Kulissen verwendet wird.**',
+      },
+      'characters-to-remove-space-after': {
+        'name': 'Leerzeichen nach Zeichen entfernen',
+        'description': 'Entfernt Leerzeichen vor den angegebenen Zeichen. **Hinweis: Die Verwendung von `{` oder `}` in der Zeichenliste wirkt sich unerwartet auf Dateien aus, da es in der Ignoriersyntax hinter den Kulissen verwendet wird.**',
+      },
+    },
     // remove-trailing-punctuation-in-heading.ts
     'remove-trailing-punctuation-in-heading': {
       'name': 'Entfernen Sie nachgestellte Satzzeichen in der Überschrift',
