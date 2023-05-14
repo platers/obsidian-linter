@@ -1546,6 +1546,71 @@ After:
 http://www.Absoltely.com should not be corrected
 ``````
 
+### Blockquote Style
+
+Alias: `blockquote-style`
+
+Makes sure the blockquote style is consistent.
+
+Options:
+- Style: The style used on blockquote indicators
+	- Default: `space`
+	- `space`: > indicator is followed by a space
+	- `no space`: >indicator is not followed by a space
+
+Example: When style = `space`, a space is added to blockquotes missing a space after the indicator
+
+Before:
+
+``````markdown
+>Blockquotes will have a space added if one is not present
+> Will be left as is.
+
+> Nested blockquotes are also updated
+>>Nesting levels are handled correctly
+>> Even when only partially needing updates
+> >Updated as well
+>>>>>>> Is handled too
+> > >>> As well
+
+> <strong>Note that html is not affected in blockquotes</strong>
+``````
+
+After:
+
+``````markdown
+> Blockquotes will have a space added if one is not present
+> Will be left as is.
+
+> Nested blockquotes are also updated
+> > Nesting levels are handled correctly
+> > Even when only partially needing updates
+> > Updated as well
+> > > > > > > Is handled too
+> > > > > As well
+
+> <strong>Note that html is not affected in blockquotes</strong>
+``````
+Example: When style = `no space`, spaces are removed after a blockquote indicator
+
+Before:
+
+``````markdown
+>    Multiple spaces are removed
+> > Nesting is handled
+> > > > >  Especially when multiple levels are involved
+> >>> > Even when partially correct already, it is handled
+``````
+
+After:
+
+``````markdown
+>Multiple spaces are removed
+>>Nesting is handled
+>>>>>Especially when multiple levels are involved
+>>>>>Even when partially correct already, it is handled
+``````
+
 ### Convert Bullet List Markers
 
 Alias: `convert-bullet-list-markers`
@@ -3411,6 +3476,34 @@ Newlines are inserted.
 
 A paragraph is a line that starts with a letter.
 ``````
+Example: Paragraphs can be extended via the use of 2 or more spaces at the end of a line or line break html
+
+Before:
+
+``````markdown
+# H1
+Content  
+Paragraph content continued <br>
+Paragraph content continued once more <br/>
+Last line of paragraph
+A new paragraph
+# H2
+``````
+
+After:
+
+``````markdown
+# H1
+
+Content  
+Paragraph content continued <br>
+Paragraph content continued once more <br/>
+Last line of paragraph
+
+A new paragraph
+
+# H2
+``````
 
 ### Remove Empty Lines Between List Markers and Checklists
 
@@ -3589,23 +3682,23 @@ Before:
 # List indicators should not have the space after them removed if they are followed by a fullwidth character
 
 - ［ contents here］
-  - 	［ more contents here］ more text here
-+ 	［ another item here］
+  -  ［ more contents here］ more text here
++   ［ another item here］
 * ［ one last item here］
 
 # Nested in a block quote
 
 > - ［ contents here］
->   - 	［ more contents here］ more text here
-> + 	［ another item here］
+>   -  ［ more contents here］ more text here
+> +  ［ another item here］
 > * ［ one last item here］
 
 # Doubly nested in a block quote
 
 > The following is doubly nested
 > > - ［ contents here］
-> >   - 	［ more contents here］ more text here
-> > + 	［ another item here］
+> >   -   ［ more contents here］ more text here
+> > +  ［ another item here］
 > > * ［ one last item here］
 ``````
 
@@ -3633,6 +3726,46 @@ After:
 > >   - ［more contents here］more text here
 > > + ［another item here］
 > > * ［one last item here］
+``````
+
+### Remove Space Before or After Characters
+
+Alias: `remove-space-before-or-after-characters`
+
+Removes space before the specified characters and after the specified characters. Note that this may causes issues with markdown format in some cases.
+
+Options:
+- Remove Space Before Characters: Removes space before the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.**
+	- Default: `,!?;:).’”]`
+- Remove Space After Characters: Removes space after the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.**
+	- Default: `¿¡‘“([`
+
+Example: Remove Spaces and Tabs Before and After Default Symbol Set
+
+Before:
+
+``````markdown
+In the end , the space gets removed	 .
+The space before the question mark was removed right ?
+The space before the exclamation point gets removed !
+A semicolon ; and colon : have spaces removed before them
+‘ Text in single quotes ’
+“ Text in double quotes ”
+[ Text in square braces ]
+( Text in parenthesis )
+``````
+
+After:
+
+``````markdown
+In the end, the space gets removed.
+The space before the question mark was removed right?
+The space before the exclamation point gets removed!
+A semicolon; and colon: have spaces removed before them
+‘Text in single quotes’
+“Text in double quotes”
+[Text in square braces]
+(Text in parenthesis)
 ``````
 
 ### Space after list markers
