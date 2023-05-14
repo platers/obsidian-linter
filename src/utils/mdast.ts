@@ -529,7 +529,8 @@ export function updateBoldText(text: string, func:(text: string) => string): str
 
 export function updateListItemText(text: string, func:(text: string) => string): string {
   const positions: Position[] = getListItemTextPositions(text);
-
+  const checklistIndicatorRegex = /^\[.\] /;
+  
   for (const position of positions) {
     let startIndex = position.start.offset;
     // get the actual start of the list item leaving only 1 whitespace between the indicator and the text
@@ -542,6 +543,10 @@ export function updateListItemText(text: string, func:(text: string) => string):
     }
 
     let listText = text.substring(startIndex, position.end.offset);
+    if (checklistIndicatorRegex.test(listText)) {
+      startIndex += 4;
+      listText = listText.substring(4);
+    }
 
     listText = func(listText);
     text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, position.end.offset, listText);
