@@ -708,6 +708,31 @@ export function updateUnorderedListItemIndicators(text: string, unorderedListSty
   return text;
 }
 
+/**
+* Updates all blockquotes in the provided text based on the function provided.
+* @param {string} text - The text to update the blockquotes in.
+* @param {function(text: string): string} func - The operation to run on each blockquote to update them.
+* @return {string} The text with the blockquotes updated based on the provided function.
+*/
+export function updateBlockquotes(text: string, func: (text: string) => string): string {
+  const positions: Position[] = getPositions(MDAstTypes.Blockquote, text);
+  for (const position of positions) {
+    // make sure to shift end to the next new line character just in case blockquotes are nested which can cause changes to move content out of the original position expected
+    let endIndex = position.end.offset;
+    while (endIndex < text.length - 1 && text.charAt(endIndex) !== '\n') {
+      endIndex++;
+    }
+
+    let blockquoteContents = text.substring(position.start.offset, endIndex);
+    blockquoteContents = func(blockquoteContents);
+
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, endIndex, blockquoteContents);
+  }
+
+  return text;
+}
+
+
 export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numberOfDollarSignsForMathBlock: number): string {
   let positions: Position[] = getPositions(MDAstTypes.Math, text);
   const mathOpeningIndicatorRegex = new RegExp('^(\\${' + numberOfDollarSignsForMathBlock + ',})(\\n*)');

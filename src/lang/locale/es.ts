@@ -182,6 +182,14 @@ export default {
       'name': 'Agregar sangría de blockquote en pegar',
       'description': 'Agrega blockquotes a todas menos a la primera línea, cuando el cursor está en una línea blockquote/callout durante el pegado',
     },
+    'blockquote-style': {
+      'name': 'Estilo de cotización en bloque',
+      'description': 'Se asegura de que el estilo de la cita en bloque sea consistente.',
+      'style': {
+        'name': 'Estilo',
+        'description': 'El estilo utilizado en los indicadores de cotización en bloque',
+      },
+    },
     'capitalize-headings': {
       'name': 'Poner mayúsculas en los encabezados',
       'description': 'Los encabezados deben estar formateados con mayúsculas',
@@ -462,7 +470,6 @@ export default {
         'description': 'Otros símbolos para incluir',
       },
     },
-    // remove-space-before-or-after-characters.ts
     'remove-space-before-or-after-characters': {
       'name': 'Quitar el espacio antes o después de los caracteres',
       'description': 'Elimina el espacio antes de los caracteres especificados y después de los caracteres especificados. Tenga en cuenta que esto puede causar problemas con el formato de descuento en algunos casos.',
@@ -619,6 +626,8 @@ export default {
     '-': '-', // leave as is
     '*': '*', // leave as is
     '+': '+', // leave as is
+    'space': 'espacio',
+    'no space': 'sin espacio',
     'None': 'nada',
     'Ascending Alphabetical': 'Ascendente alfabético',
     'Descending Alphabetical': 'Descendiente alfabético',
