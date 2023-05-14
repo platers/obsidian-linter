@@ -1156,5 +1156,62 @@ ruleTest({
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/630
+      testName: 'Make sure alias is escaped when a comma is present and the array style is single-line',
+      before: dedent`
+        ---
+        aliases: [alias1]
+        ---
+        # Header, with comma
+      `,
+      after: dedent`
+        ---
+        aliases: ["Header, with comma", alias1]
+        ---
+        # Header, with comma
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/630
+      testName: 'Make sure alias is escaped when a comma is present and the array style is single string to single-line',
+      before: dedent`
+        ---
+        aliases: alias1
+        ---
+        # Header, with comma
+      `,
+      after: dedent`
+        ---
+        aliases: ["Header, with comma", alias1]
+        ---
+        # Header, with comma
+      `,
+      options: {
+        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/630
+      testName: 'Make sure alias is escaped when a comma is present and the array style is a comma delimited string',
+      before: dedent`
+        ---
+        aliases: alias1
+        ---
+        # Header, with comma
+      `,
+      after: dedent`
+        ---
+        aliases: "Header, with comma", alias1
+        ---
+        # Header, with comma
+      `,
+      options: {
+        aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
   ],
 });
