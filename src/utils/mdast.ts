@@ -902,3 +902,40 @@ function isInvalidTableSeparatorRow(fullRow: string, separatorMatch: string): bo
   const nonSeparatorContent = fullRow.replace(separatorMatch, '');
   return /[^\s>]/.test(nonSeparatorContent);
 }
+
+const customIgnoreStart = '<!-- linter-ignore-start -->';
+const customIgnoreEnd = '<!-- linter-ignore-end -->';
+
+export function getAllCustomIgnoreSectionsInText(text: string): {startIndex: number, endIndex: number}[] {
+  let iteratorIndex = 0;
+
+  const positions: {startIndex: number, endIndex: number}[] = [];
+  do {
+    iteratorIndex = text.indexOf(customIgnoreStart, iteratorIndex);
+    if (iteratorIndex === -1) {
+      break;
+    }
+
+    let endOfIgnoreSection = text.indexOf(customIgnoreEnd, iteratorIndex + customIgnoreStart.length);
+    if (endOfIgnoreSection === -1) {
+      positions.push({
+        startIndex: iteratorIndex,
+        endIndex: text.length - 1,
+      });
+
+      break;
+    }
+
+    endOfIgnoreSection += customIgnoreEnd.length;
+
+    positions.push({
+      startIndex: iteratorIndex,
+      endIndex: endOfIgnoreSection,
+    });
+
+    iteratorIndex = endOfIgnoreSection;
+  }
+  while (iteratorIndex !== -1 && iteratorIndex < text.length -1);
+
+  return positions;
+}
