@@ -16,7 +16,7 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
       nameKey: 'rules.force-yaml-escape.name',
       descriptionKey: 'rules.force-yaml-escape.description',
       type: RuleType.YAML,
-      hasSpecialExecutionOrder: true,
+      hasSpecialExecutionOrder: true, // runs before other rules to help cleanup the YAML before it can throw errors on it
     });
   }
   get OptionsClass(): new () => ForceYamlEscapeOptions {

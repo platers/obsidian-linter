@@ -12,7 +12,7 @@ export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOption
       nameKey: 'rules.format-tags-in-yaml.name',
       descriptionKey: 'rules.format-tags-in-yaml.description',
       type: RuleType.YAML,
-      hasSpecialExecutionOrder: true,
+      hasSpecialExecutionOrder: true, // runs before other rules to help cleanup the YAML before other rules try to have it parsed and hit errors
     });
   }
   get OptionsClass(): new () => FormatTagsInYamlOptions {

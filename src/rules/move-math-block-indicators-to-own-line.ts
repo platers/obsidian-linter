@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {makeSureMathBlockIndicatorsAreOnTheirOwnLines} from '../utils/mdast';
 
 class MoveMathBlockIndicatorsToOwnLineOptions implements Options {
@@ -16,15 +16,14 @@ export default class MoveMathBlockIndicatorsToOwnLine extends RuleBuilder<MoveMa
       nameKey: 'rules.move-math-block-indicators-to-their-own-line.name',
       descriptionKey: 'rules.move-math-block-indicators-to-their-own-line.description',
       type: RuleType.SPACING,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode],
     });
   }
   get OptionsClass(): new () => MoveMathBlockIndicatorsToOwnLineOptions {
     return MoveMathBlockIndicatorsToOwnLineOptions;
   }
   apply(text: string, options: MoveMathBlockIndicatorsToOwnLineOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode], text, (text) => {
-      return makeSureMathBlockIndicatorsAreOnTheirOwnLines(text, options.minimumNumberOfDollarSignsToBeAMathBlock);
-    });
+    return makeSureMathBlockIndicatorsAreOnTheirOwnLines(text, options.minimumNumberOfDollarSignsToBeAMathBlock);
   }
   get exampleBuilders(): ExampleBuilder<MoveMathBlockIndicatorsToOwnLineOptions>[] {
     return [

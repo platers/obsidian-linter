@@ -2,6 +2,7 @@ import {Example, Options, Rule, RuleType, registerRule, LinterSettings, wrapLint
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
 import {logDebug} from '../utils/logger';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
+import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -11,7 +12,7 @@ export abstract class RuleBuilderBase {
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
     if (!RuleBuilderBase.#ruleMap.has(this.name)) {
       const builder = new this();
-      const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder);
+      const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder, builder.ignoreTypes);
       RuleBuilderBase.#ruleMap.set(this.name, rule);
       RuleBuilderBase.#ruleBuilderMap.set(builder.alias, builder);
     }
@@ -52,10 +53,13 @@ export abstract class RuleBuilderBase {
 }
 
 type RuleBuilderConstructorArgs = {
-  nameKey: LanguageStringKey
+  nameKey: LanguageStringKey,
   descriptionKey: LanguageStringKey,
-  type: RuleType;
-  hasSpecialExecutionOrder?: boolean
+  type: RuleType,
+  hasSpecialExecutionOrder?: boolean,
+  // ignore types to use on the entirety of the rule and not just a part
+  // Note: this value should not contain custom ignore as that is added to all rules except Paste rules which do not use this property
+  ruleIgnoreTypes?: IgnoreType[],
 };
 
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
@@ -65,6 +69,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   public descriptionKey: LanguageStringKey;
   public type: RuleType;
   public hasSpecialExecutionOrder: boolean;
+  public ignoreTypes: IgnoreType[];
   constructor(args: RuleBuilderConstructorArgs) {
     super();
 
@@ -74,6 +79,16 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     this.descriptionKey = args.descriptionKey;
     this.type = args.type;
     this.hasSpecialExecutionOrder = args.hasSpecialExecutionOrder ?? false;
+
+    if (args.type === RuleType.PASTE) {
+      this.ignoreTypes = [];
+    } else {
+      if (args.ruleIgnoreTypes) {
+        this.ignoreTypes = [IgnoreTypes.customIgnore, ...args.ruleIgnoreTypes];
+      } else {
+        this.ignoreTypes = [IgnoreTypes.customIgnore];
+      }
+    }
   }
 
   abstract get OptionsClass(): (new() => TOptions);

@@ -1,4 +1,4 @@
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, NumberOptionBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
@@ -14,24 +14,24 @@ export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabs
       nameKey: 'rules.convert-spaces-to-tabs.name',
       descriptionKey: 'rules.convert-spaces-to-tabs.description',
       type: RuleType.SPACING,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => ConvertSpacesToTabsOptions {
     return ConvertSpacesToTabsOptions;
   }
   apply(text: string, options: ConvertSpacesToTabsOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      const tabsize = String(options.tabsize);
-      const tabsize_regex = new RegExp(
-          '^(\t*) {' + String(tabsize) + '}',
-          'gm',
-      );
+    const tabsize = String(options.tabsize);
+    const tabsize_regex = new RegExp(
+        '^(\t*) {' + String(tabsize) + '}',
+        'gm',
+    );
 
-      while (text.match(tabsize_regex) != null) {
-        text = text.replace(tabsize_regex, '$1\t');
-      }
-      return text;
-    });
+    while (text.match(tabsize_regex) != null) {
+      text = text.replace(tabsize_regex, '$1\t');
+    }
+
+    return text;
   }
   get exampleBuilders(): ExampleBuilder<ConvertSpacesToTabsOptions>[] {
     return [

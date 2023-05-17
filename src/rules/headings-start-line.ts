@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex} from '../utils/regex';
 
 class HeadingStartLineOptions implements Options {}
@@ -13,16 +13,15 @@ export default class HeadingStartLine extends RuleBuilder<HeadingStartLineOption
       nameKey: 'rules.headings-start-line.name',
       descriptionKey: 'rules.headings-start-line.description',
       type: RuleType.HEADING,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml],
     });
   }
   get OptionsClass(): new () => HeadingStartLineOptions {
     return HeadingStartLineOptions;
   }
   apply(text: string, options: HeadingStartLineOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml], text, (text) => {
-      return text.replaceAll(allHeadersRegex, (heading: string) => {
-        return heading.trimStart();
-      });
+    return text.replaceAll(allHeadersRegex, (heading: string) => {
+      return heading.trimStart();
     });
   }
   get exampleBuilders(): ExampleBuilder<HeadingStartLineOptions>[] {

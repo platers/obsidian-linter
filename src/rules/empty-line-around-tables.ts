@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {IgnoreTypes, ignoreListOfTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {ensureEmptyLinesAroundTables} from '../utils/regex';
 
 class EmptyLineAroundTablesOptions implements Options {}
@@ -13,15 +13,14 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
       nameKey: 'rules.empty-line-around-tables.name',
       descriptionKey: 'rules.empty-line-around-tables.description',
       type: RuleType.SPACING,
+      ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.wikiLink, IgnoreTypes.link],
     });
   }
   get OptionsClass(): new () => EmptyLineAroundTablesOptions {
     return EmptyLineAroundTablesOptions;
   }
   apply(text: string, options: EmptyLineAroundTablesOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.wikiLink, IgnoreTypes.link], text, (text: string) => {
-      return ensureEmptyLinesAroundTables(text);
-    });
+    return ensureEmptyLinesAroundTables(text);
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundTablesOptions>[] {
     return [

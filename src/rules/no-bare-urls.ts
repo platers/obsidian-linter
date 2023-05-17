@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
 import {urlRegex} from '../utils/regex';
 
@@ -16,58 +16,57 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       nameKey: 'rules.no-bare-urls.name',
       descriptionKey: 'rules.no-bare-urls.description',
       type: RuleType.CONTENT,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode, IgnoreTypes.anchorTag],
     });
   }
   get OptionsClass(): new () => NoBareUrlsOptions {
     return NoBareUrlsOptions;
   }
   apply(text: string, options: NoBareUrlsOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode, IgnoreTypes.anchorTag], text, (text) => {
-      const URLMatches = text.match(urlRegex);
+    const URLMatches = text.match(urlRegex);
 
-      if (!URLMatches) {
-        return text;
-      }
-
-      // make sure you do not match on the same thing more than once by keeping track of the last position you checked up to
-      let startSearch = 0;
-      const numMatches = URLMatches.length;
-      for (let i = 0; i < numMatches; i++) {
-        const urlMatch = URLMatches[i];
-        const urlStart = text.indexOf(urlMatch, startSearch);
-        const urlEnd = urlStart + urlMatch.length;
-
-        const previousChar = urlStart === 0 ? undefined : text.charAt(urlStart - 1);
-        const nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
-        if (previousChar != undefined && specialCharsToNotEscapeContentsWithin.includes(previousChar) &&
-          nextChar != undefined && specialCharsToNotEscapeContentsWithin.includes(nextChar)) {
-          startSearch = urlStart + urlMatch.length;
-          continue;
-        }
-
-        if (previousChar != undefined && previousChar === '<' && nextChar != undefined && nextChar === '>') {
-          let startOfOpeningChevrons = urlStart - 1;
-          while (startOfOpeningChevrons > 0 && text.charAt(startOfOpeningChevrons-1) === '<') {
-            startOfOpeningChevrons--;
-          }
-
-          let endOfClosingChevrons = urlEnd;
-          while (endOfClosingChevrons < text.length -1 && text.charAt(endOfClosingChevrons+1) === '>') {
-            endOfClosingChevrons++;
-          }
-
-          text = replaceTextBetweenStartAndEndWithNewValue(text, startOfOpeningChevrons, endOfClosingChevrons+1, '<' + urlMatch + '>');
-
-          startSearch = urlStart + urlMatch.length;
-          continue;
-        }
-
-        text = replaceTextBetweenStartAndEndWithNewValue(text, urlStart, urlStart + urlMatch.length, '<' + urlMatch + '>');
-        startSearch = urlStart + urlMatch.length + 2;
-      }
-
+    if (!URLMatches) {
       return text;
-    });
+    }
+
+    // make sure you do not match on the same thing more than once by keeping track of the last position you checked up to
+    let startSearch = 0;
+    const numMatches = URLMatches.length;
+    for (let i = 0; i < numMatches; i++) {
+      const urlMatch = URLMatches[i];
+      const urlStart = text.indexOf(urlMatch, startSearch);
+      const urlEnd = urlStart + urlMatch.length;
+
+      const previousChar = urlStart === 0 ? undefined : text.charAt(urlStart - 1);
+      const nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
+      if (previousChar != undefined && specialCharsToNotEscapeContentsWithin.includes(previousChar) &&
+          nextChar != undefined && specialCharsToNotEscapeContentsWithin.includes(nextChar)) {
+        startSearch = urlStart + urlMatch.length;
+        continue;
+      }
+
+      if (previousChar != undefined && previousChar === '<' && nextChar != undefined && nextChar === '>') {
+        let startOfOpeningChevrons = urlStart - 1;
+        while (startOfOpeningChevrons > 0 && text.charAt(startOfOpeningChevrons-1) === '<') {
+          startOfOpeningChevrons--;
+        }
+
+        let endOfClosingChevrons = urlEnd;
+        while (endOfClosingChevrons < text.length -1 && text.charAt(endOfClosingChevrons+1) === '>') {
+          endOfClosingChevrons++;
+        }
+
+        text = replaceTextBetweenStartAndEndWithNewValue(text, startOfOpeningChevrons, endOfClosingChevrons+1, '<' + urlMatch + '>');
+
+        startSearch = urlStart + urlMatch.length;
+        continue;
+      }
+
+      text = replaceTextBetweenStartAndEndWithNewValue(text, urlStart, urlStart + urlMatch.length, '<' + urlMatch + '>');
+      startSearch = urlStart + urlMatch.length + 2;
+    }
+
+    return text;
   }
   get exampleBuilders(): ExampleBuilder<NoBareUrlsOptions>[] {
     return [

@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 
 class FootnoteAfterPunctuationOptions implements Options {}
 
@@ -12,15 +12,14 @@ export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterP
       nameKey: 'rules.footnote-after-punctuation.name',
       descriptionKey: 'rules.footnote-after-punctuation.description',
       type: RuleType.FOOTNOTE,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.footnoteAtStartOfLine, IgnoreTypes.footnoteAfterATask],
     });
   }
   get OptionsClass(): new () => FootnoteAfterPunctuationOptions {
     return FootnoteAfterPunctuationOptions;
   }
   apply(text: string, options: FootnoteAfterPunctuationOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.footnoteAtStartOfLine, IgnoreTypes.footnoteAfterATask], text, (text) => {
-      return text.replace(/(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
-    });
+    return text.replace(/(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
   }
   get exampleBuilders(): ExampleBuilder<FootnoteAfterPunctuationOptions>[] {
     return [

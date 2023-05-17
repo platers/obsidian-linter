@@ -16,6 +16,7 @@ import {
   SpecialArrayFormats,
   TagSpecificArrayFormats,
   OBSIDIAN_TAG_KEY_PLURAL,
+  QuoteCharacter,
 } from '../utils/yaml';
 
 type tagOperations = 'Nothing' | 'Remove hashtag' | 'Remove whole tag';
@@ -26,7 +27,7 @@ class MoveTagsToYamlOptions implements Options {
   howToHandleExistingTags?: tagOperations = 'Nothing';
   tagsToIgnore?: string[] = [];
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: string = '"';
+    defaultEscapeCharacter?: QuoteCharacter = '"';
   @RuleBuilder.noSettingControl()
     removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
@@ -38,96 +39,95 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       nameKey: 'rules.move-tags-to-yaml.name',
       descriptionKey: 'rules.move-tags-to-yaml.description',
       type: RuleType.YAML,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.html, IgnoreTypes.wikiLink, IgnoreTypes.link],
     });
   }
   get OptionsClass(): new () => MoveTagsToYamlOptions {
     return MoveTagsToYamlOptions;
   }
   apply(text: string, options: MoveTagsToYamlOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.html, IgnoreTypes.wikiLink, IgnoreTypes.link], text, (text) => {
-      let tags: string[];
+    let tags: string[];
 
-      // need to ignore YAML when getting regex matches to avoid improper matches with YAML contents
-      // https://github.com/platers/obsidian-linter/issues/661
-      ignoreListOfTypes([IgnoreTypes.yaml], text, (text) => {
-        tags = matchTagRegex(text);
-
-        return text;
-      });
-
-      if (tags.length === 0) {
-        return text;
-      }
-
-      text = initYAML(text);
-      text = formatYAML(text, (text: string) => {
-        text = text.replace('---\n', '').replace('---', '');
-
-        let tagValue: string[] = [];
-        let existingTagKey = OBSIDIAN_TAG_KEY_PLURAL;
-
-        for (const tagKey of OBSIDIAN_TAG_KEYS) {
-          const tempTagValue = getYamlSectionValue(text, tagKey);
-          if (tempTagValue != null) {
-            tagValue = convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(tempTagValue));
-            existingTagKey = tagKey;
-
-            break;
-          }
-        }
-
-        const existingTags = new Set<string>();
-        if (typeof tagValue === 'string') {
-          existingTags.add(tagValue);
-          tagValue = [tagValue];
-        } else if (tagValue != undefined) {
-          for (const tag of tagValue) {
-            existingTags.add(tag);
-          }
-        } else {
-          tagValue = [];
-        }
-
-        for (const tag of tags) {
-          const tagContent = tag.trim().substring(1);
-          if (!existingTags.has(tagContent) && !options.tagsToIgnore.includes(tagContent)) {
-            existingTags.add(tagContent);
-            tagValue.push(tagContent);
-          }
-        }
-
-        const newYaml = setYamlSection(text, existingTagKey, formatYamlArrayValue(tagValue, options.tagArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
-
-        return `---\n${newYaml}---`;
-      });
-
-      text = ignoreListOfTypes([IgnoreTypes.yaml], text, (text) => {
-        if (options.howToHandleExistingTags !== 'Nothing') {
-          text = text.replace(tagWithLeadingWhitespaceRegex, (tag: string) => {
-            const hashtagIndex = tag.indexOf('#');
-
-            const tagContents = tag.substring(hashtagIndex+1);
-            if (options.tagsToIgnore.includes(tagContents)) {
-              return tag;
-            }
-
-            if (options.howToHandleExistingTags === 'Remove hashtag') {
-              return tag.substring(0, hashtagIndex) + tagContents;
-            }
-
-            return '';
-          });
-        }
-
-        return text;
-      });
-
-      // Make sure that the yaml frontmatter does not have whitespace added after the end of the yaml frontmatter.
-      // This accounts for https://github.com/platers/obsidian-linter/issues/573
-      text = text.replace(/(\n---)( |\t)+/, '$1');
+    // need to ignore YAML when getting regex matches to avoid improper matches with YAML contents
+    // https://github.com/platers/obsidian-linter/issues/661
+    ignoreListOfTypes([IgnoreTypes.yaml], text, (text) => {
+      tags = matchTagRegex(text);
 
       return text;
     });
+
+    if (tags.length === 0) {
+      return text;
+    }
+
+    text = initYAML(text);
+    text = formatYAML(text, (text: string) => {
+      text = text.replace('---\n', '').replace('---', '');
+
+      let tagValue: string[] = [];
+      let existingTagKey = OBSIDIAN_TAG_KEY_PLURAL;
+
+      for (const tagKey of OBSIDIAN_TAG_KEYS) {
+        const tempTagValue = getYamlSectionValue(text, tagKey);
+        if (tempTagValue != null) {
+          tagValue = convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(tempTagValue));
+          existingTagKey = tagKey;
+
+          break;
+        }
+      }
+
+      const existingTags = new Set<string>();
+      if (typeof tagValue === 'string') {
+        existingTags.add(tagValue);
+        tagValue = [tagValue];
+      } else if (tagValue != undefined) {
+        for (const tag of tagValue) {
+          existingTags.add(tag);
+        }
+      } else {
+        tagValue = [];
+      }
+
+      for (const tag of tags) {
+        const tagContent = tag.trim().substring(1);
+        if (!existingTags.has(tagContent) && !options.tagsToIgnore.includes(tagContent)) {
+          existingTags.add(tagContent);
+          tagValue.push(tagContent);
+        }
+      }
+
+      const newYaml = setYamlSection(text, existingTagKey, formatYamlArrayValue(tagValue, options.tagArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
+
+      return `---\n${newYaml}---`;
+    });
+
+    text = ignoreListOfTypes([IgnoreTypes.yaml], text, (text) => {
+      if (options.howToHandleExistingTags !== 'Nothing') {
+        text = text.replace(tagWithLeadingWhitespaceRegex, (tag: string) => {
+          const hashtagIndex = tag.indexOf('#');
+
+          const tagContents = tag.substring(hashtagIndex+1);
+          if (options.tagsToIgnore.includes(tagContents)) {
+            return tag;
+          }
+
+          if (options.howToHandleExistingTags === 'Remove hashtag') {
+            return tag.substring(0, hashtagIndex) + tagContents;
+          }
+
+          return '';
+        });
+      }
+
+      return text;
+    });
+
+    // Make sure that the yaml frontmatter does not have whitespace added after the end of the yaml frontmatter.
+    // This accounts for https://github.com/platers/obsidian-linter/issues/573
+    text = text.replace(/(\n---)( |\t)+/, '$1');
+
+    return text;
   }
   get exampleBuilders(): ExampleBuilder<MoveTagsToYamlOptions>[] {
     return [

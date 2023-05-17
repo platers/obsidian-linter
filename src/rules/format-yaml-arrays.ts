@@ -10,6 +10,7 @@ import {convertAliasValueToStringOrStringArray,
   NormalArrayFormats,
   OBSIDIAN_ALIASES_KEYS,
   OBSIDIAN_TAG_KEYS,
+  QuoteCharacter,
   setYamlSection,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
@@ -27,7 +28,7 @@ class FormatYamlArrayOptions implements Options {
   forceSingleLineArrayStyle?: string[] = [];
   forceMultiLineArrayStyle?: string[] = [];
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: string = '"';
+    defaultEscapeCharacter?: QuoteCharacter = '"';
   @RuleBuilder.noSettingControl()
     removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
