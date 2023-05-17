@@ -17,7 +17,7 @@ export default class RemoveSpaceBeforeOrAfterCharacters extends RuleBuilder<Remo
       nameKey: 'rules.remove-space-before-or-after-characters.name',
       descriptionKey: 'rules.remove-space-before-or-after-characters.description',
       type: RuleType.SPACING,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.html],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => RemoveSpaceBeforeOrAfterCharactersOptions {
@@ -34,12 +34,14 @@ export default class RemoveSpaceBeforeOrAfterCharacters extends RuleBuilder<Remo
 
     const removeWhitespaceBeforeCharacters = new RegExp(`([ \t])+([${symbolsBefore}])`, 'g');
     const removeWhitespaceAfterCharacters = new RegExp(`([${symbolsAfter}])([ \t])+`, 'g');
-
+    // console.log('before: "' + removeWhitespaceBeforeCharacters.source + '"');
+    // console.log('after: "' + removeWhitespaceAfterCharacters.source + '"');
     const replaceWhitespaceBeforeOrAfterCharacters = function(text: string): string {
+      // console.log(text);
       return text.replace(removeWhitespaceBeforeCharacters, '$2').replace(removeWhitespaceAfterCharacters, '$1');
     };
 
-    let newText = ignoreListOfTypes([IgnoreTypes.list], text, replaceWhitespaceBeforeOrAfterCharacters);
+    let newText = ignoreListOfTypes([IgnoreTypes.list, IgnoreTypes.html], text, replaceWhitespaceBeforeOrAfterCharacters);
 
     newText = updateListItemText(newText, replaceWhitespaceBeforeOrAfterCharacters);
 
