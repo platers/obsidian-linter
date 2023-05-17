@@ -21,6 +21,10 @@ When `Lint on save` is toggled on, the plugin will lint the current file on manu
 
 ### Disable rules
 
+#### YAML Frontmatter
+
+If you would like to disable all rules, one rule, or some set of rules for an entire file, you can add a key to the YAML frontmatter of the file. The expected key is `disabled rules`.
+
 ```markdown
 ---
 disabled rules: [capitalize-headings]
@@ -30,6 +34,25 @@ disabled rules: [capitalize-headings]
 Add `disabled rules: [ ... ]` to the YAML frontmatter of a file to disable those rules when linting that file.
 
 Add `disabled rules: [ all ]` to the YAML frontmatter of a file to disable all rules.
+
+#### Range Ignore
+
+If you are looking for a way to disable rules for a specific part of a file, that can be done with a ranged ignore. The syntax for a ranged ignore is `<!-- linter-ignore-start -->` with an optional `<!-- linter-ignore-end -->` where you want the Linter to start back up with its linting.
+Leaving off the ending of a range ignore will assume you want to ignore the file contents from the start of the range ignore to the end of the file. So be careful when not ending a range ignore.
+
+**Do note that this only prevents the values in the range ignore from being linted. It does not prevent whitespace or other additions around the ranged ignore.**
+
+``` markdown
+Here is some text
+<!-- linter-ignore-start -->
+                          This area will not be formatted
+<!-- linter-ignore-end -->
+More content goes here...
+```
+
+Things to note about range ignores:
+- Paste rules are not affected by range ignores as that would require the copied text to have a range ignore in them.
+- You need to use the exact values listed above at this time.
 
 ## Rules
 
