@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {reIndexFootnotes} from '../utils/mdast';
 
 class ReIndexFootnotesOptions implements Options {}
@@ -13,13 +13,14 @@ export default class ReIndexFootnotes extends RuleBuilder<ReIndexFootnotesOption
       nameKey: 'rules.re-index-footnotes.name',
       descriptionKey: 'rules.re-index-footnotes.description',
       type: RuleType.FOOTNOTE,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => ReIndexFootnotesOptions {
     return ReIndexFootnotesOptions;
   }
   apply(text: string, options: ReIndexFootnotesOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, reIndexFootnotes);
+    return reIndexFootnotes(text);
   }
   get exampleBuilders(): ExampleBuilder<ReIndexFootnotesOptions>[] {
     return [

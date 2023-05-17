@@ -41,89 +41,88 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
       return text;
     }
 
-    let yamlText = yaml[1];
+    const oldYaml = yaml[1];
+    let yamlText = oldYaml;
 
     const priorityAtStartOfYaml: boolean = options.priorityKeysAtStartOfYaml;
-    const updateDateModifiedIfYamlChanged = function(oldYaml: string, newYaml: string): string {
-      if (oldYaml == newYaml) {
-        return newYaml;
-      }
-
-      return setYamlSection(newYaml, options.dateModifiedKey, ' ' + options.currentTimeFormatted);
-    };
-    const getTextWithNewYamlFrontmatter = function(priorityKeysSorted: string, remainingKeys: string, priorityAtStart: boolean): string {
-      let newYaml = `${remainingKeys}${priorityKeysSorted}`;
-      if (priorityAtStart) {
-        newYaml = `${priorityKeysSorted}${remainingKeys}`;
-      }
-
-      if (options.yamlTimestampDateModifiedEnabled) {
-        newYaml = updateDateModifiedIfYamlChanged(yaml[1], newYaml);
-      }
-
-      return text.replace(yaml[1], newYaml);
-    };
-
-    const getYAMLKeysSorted = function(yaml: string, keys: string[]): {remainingYaml: string, sortedYamlKeyValues: string} {
-      let specifiedYamlKeysSorted = '';
-      for (const key of keys) {
-        const value = getYamlSectionValue(yaml, key);
-
-        if (value !== null) {
-          if (value.includes('\n')) {
-            specifiedYamlKeysSorted += `${key}:${value}\n`;
-          } else {
-            specifiedYamlKeysSorted += `${key}: ${value}\n`;
-          }
-
-          yaml = removeYamlSection(yaml, key);
-        }
-      }
-
-      return {
-        remainingYaml: yaml,
-        sortedYamlKeyValues: specifiedYamlKeysSorted,
-      };
-    };
 
     const yamlKeys: string[] = options.yamlKeyPrioritySortOrder;
-    const sortKeysResult = getYAMLKeysSorted(yamlText, yamlKeys);
+    const sortKeysResult = this.getYAMLKeysSorted(yamlText, yamlKeys);
     const priorityKeysSorted = sortKeysResult.sortedYamlKeyValues;
     yamlText = sortKeysResult.remainingYaml;
 
     const sortOrder = options.yamlSortOrderForOtherKeys;
     const yamlObject = loadYAML(yamlText);
     if (yamlObject == null) {
-      return getTextWithNewYamlFrontmatter(priorityKeysSorted, yamlText, priorityAtStartOfYaml);
+      return this.getTextWithNewYamlFrontmatter(text, oldYaml, priorityKeysSorted, yamlText, priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
     }
-
-    const sortAlphabeticallyDesc = function(previousKey: string, currentKey: string): number {
-      previousKey = previousKey.toLowerCase();
-      currentKey = currentKey.toLowerCase();
-
-      return previousKey > currentKey ? -1 : currentKey > previousKey ? 1 : 0;
-    };
-    const sortAlphabeticallyAsc = function(previousKey: string, currentKey: string): number {
-      previousKey = previousKey.toLowerCase();
-      currentKey = currentKey.toLowerCase();
-
-      return previousKey < currentKey ? -1 : currentKey < previousKey ? 1 : 0;
-    };
 
     let remainingKeys = Object.keys(yamlObject);
     let sortMethod: (previousKey: string, currentKey: string) => number;
     if (sortOrder === 'Ascending Alphabetical') {
-      sortMethod = sortAlphabeticallyAsc;
+      sortMethod = this.sortAlphabeticallyAsc;
     } else if (sortOrder === 'Descending Alphabetical') {
-      sortMethod = sortAlphabeticallyDesc;
+      sortMethod = this.sortAlphabeticallyDesc;
     } else {
-      return getTextWithNewYamlFrontmatter(priorityKeysSorted, yamlText, priorityAtStartOfYaml);
+      return this.getTextWithNewYamlFrontmatter(text, oldYaml, priorityKeysSorted, yamlText, priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
     }
 
     remainingKeys = remainingKeys.sort(sortMethod);
-    const remainingKeysSortResult = getYAMLKeysSorted(yamlText, remainingKeys);
+    const remainingKeysSortResult = this.getYAMLKeysSorted(yamlText, remainingKeys);
 
-    return getTextWithNewYamlFrontmatter(priorityKeysSorted, remainingKeysSortResult.sortedYamlKeyValues, priorityAtStartOfYaml);
+    return this.getTextWithNewYamlFrontmatter(text, oldYaml, priorityKeysSorted, remainingKeysSortResult.sortedYamlKeyValues, priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
+  }
+  getYAMLKeysSorted(yaml: string, keys: string[]): {remainingYaml: string, sortedYamlKeyValues: string} {
+    let specifiedYamlKeysSorted = '';
+    for (const key of keys) {
+      const value = getYamlSectionValue(yaml, key);
+
+      if (value !== null) {
+        if (value.includes('\n')) {
+          specifiedYamlKeysSorted += `${key}:${value}\n`;
+        } else {
+          specifiedYamlKeysSorted += `${key}: ${value}\n`;
+        }
+
+        yaml = removeYamlSection(yaml, key);
+      }
+    }
+
+    return {
+      remainingYaml: yaml,
+      sortedYamlKeyValues: specifiedYamlKeysSorted,
+    };
+  }
+  updateDateModifiedIfYamlChanged(oldYaml: string, newYaml: string, dateModifiedKey: string, currentTimeFormatted: string): string {
+    if (oldYaml == newYaml) {
+      return newYaml;
+    }
+
+    return setYamlSection(newYaml, dateModifiedKey, ' ' + currentTimeFormatted);
+  }
+  getTextWithNewYamlFrontmatter(text: string, oldYaml: string, priorityKeysSorted: string, remainingKeys: string, priorityAtStart: boolean, dateModifiedKey: string, currentTimeFormatted: string, yamlTimestampDateModifiedEnabled: boolean): string {
+    let newYaml = `${remainingKeys}${priorityKeysSorted}`;
+    if (priorityAtStart) {
+      newYaml = `${priorityKeysSorted}${remainingKeys}`;
+    }
+
+    if (yamlTimestampDateModifiedEnabled) {
+      newYaml = this.updateDateModifiedIfYamlChanged(oldYaml, newYaml, dateModifiedKey, currentTimeFormatted);
+    }
+
+    return text.replace(oldYaml, newYaml);
+  }
+  sortAlphabeticallyAsc(previousKey: string, currentKey: string): number {
+    previousKey = previousKey.toLowerCase();
+    currentKey = currentKey.toLowerCase();
+
+    return previousKey < currentKey ? -1 : currentKey < previousKey ? 1 : 0;
+  }
+  sortAlphabeticallyDesc(previousKey: string, currentKey: string): number {
+    previousKey = previousKey.toLowerCase();
+    currentKey = currentKey.toLowerCase();
+
+    return previousKey > currentKey ? -1 : currentKey > previousKey ? 1 : 0;
   }
   get exampleBuilders(): ExampleBuilder<YamlKeySortOptions>[] {
     return [

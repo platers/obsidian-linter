@@ -1,4 +1,4 @@
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
@@ -13,21 +13,20 @@ export default class RemoveEmptyListMarkers extends RuleBuilder<RemoveEmptyListM
       nameKey: 'rules.remove-empty-list-markers.name',
       descriptionKey: 'rules.remove-empty-list-markers.description',
       type: RuleType.CONTENT,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => RemoveEmptyListMarkersOptions {
     return RemoveEmptyListMarkersOptions;
   }
   apply(text: string, options: RemoveEmptyListMarkersOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      const emptyListMarkerRegex = new RegExp(`^${lineStartingWithWhitespaceOrBlockquoteTemplate}(-|\\*|\\+|\\d+[.)]|- (\\[( |x)\\]))\\s*?$`, 'gm');
-      // remove all empty list markers followed by a new line
-      text = text.replace(new RegExp(emptyListMarkerRegex.source + '\\n', 'gm'), '');
-      // remove all empty list markers proceeded by a new line
-      text = text.replace(new RegExp('\\n' + emptyListMarkerRegex.source, 'gm'), '');
-      // remove all empty list markers where they are the only line in the file
-      return text.replace(emptyListMarkerRegex, '');
-    });
+    const emptyListMarkerRegex = new RegExp(`^${lineStartingWithWhitespaceOrBlockquoteTemplate}(-|\\*|\\+|\\d+[.)]|- (\\[( |x)\\]))\\s*?$`, 'gm');
+    // remove all empty list markers followed by a new line
+    text = text.replace(new RegExp(emptyListMarkerRegex.source + '\\n', 'gm'), '');
+    // remove all empty list markers proceeded by a new line
+    text = text.replace(new RegExp('\\n' + emptyListMarkerRegex.source, 'gm'), '');
+    // remove all empty list markers where they are the only line in the file
+    return text.replace(emptyListMarkerRegex, '');
   }
   get exampleBuilders(): ExampleBuilder<RemoveEmptyListMarkersOptions>[] {
     return [

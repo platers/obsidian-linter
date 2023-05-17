@@ -1,4 +1,4 @@
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
@@ -17,15 +17,14 @@ export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
       nameKey: 'rules.strong-style.name',
       descriptionKey: 'rules.strong-style.description',
       type: RuleType.CONTENT,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath],
     });
   }
   get OptionsClass(): new () => StrongStyleOptions {
     return StrongStyleOptions;
   }
   apply(text: string, options: StrongStyleOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath], text, (text) => {
-      return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Bold);
-    });
+    return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Bold);
   }
   get exampleBuilders(): ExampleBuilder<StrongStyleOptions>[] {
     return [

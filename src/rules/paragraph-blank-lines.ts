@@ -1,4 +1,4 @@
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs} from '../utils/mdast';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
@@ -13,13 +13,14 @@ export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLines
       nameKey: 'rules.paragraph-blank-lines.name',
       descriptionKey: 'rules.paragraph-blank-lines.description',
       type: RuleType.SPACING,
+      ruleIgnoreTypes: [IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table],
     });
   }
   get OptionsClass(): new () => ParagraphBlankLinesOptions {
     return ParagraphBlankLinesOptions;
   }
   apply(text: string, options: ParagraphBlankLinesOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table], text, makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs);
+    return makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text);
   }
   get exampleBuilders(): ExampleBuilder<ParagraphBlankLinesOptions>[] {
     return [

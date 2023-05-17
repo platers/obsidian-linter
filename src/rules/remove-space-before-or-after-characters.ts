@@ -17,6 +17,7 @@ export default class RemoveSpaceBeforeOrAfterCharacters extends RuleBuilder<Remo
       nameKey: 'rules.remove-space-before-or-after-characters.name',
       descriptionKey: 'rules.remove-space-before-or-after-characters.description',
       type: RuleType.SPACING,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.html],
     });
   }
   get OptionsClass(): new () => RemoveSpaceBeforeOrAfterCharactersOptions {
@@ -38,7 +39,7 @@ export default class RemoveSpaceBeforeOrAfterCharacters extends RuleBuilder<Remo
       return text.replace(removeWhitespaceBeforeCharacters, '$2').replace(removeWhitespaceAfterCharacters, '$1');
     };
 
-    let newText = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.list, IgnoreTypes.html], text, replaceWhitespaceBeforeOrAfterCharacters);
+    let newText = ignoreListOfTypes([IgnoreTypes.list], text, replaceWhitespaceBeforeOrAfterCharacters);
 
     newText = updateListItemText(newText, replaceWhitespaceBeforeOrAfterCharacters);
 
