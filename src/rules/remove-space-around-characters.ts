@@ -6,10 +6,10 @@ import {updateListItemText} from '../utils/mdast';
 import {escapeRegExp} from '../utils/regex';
 
 class RemoveSpaceAroundCharactersOptions implements Options {
-  includeFullwidthForms: boolean = true;
-  includeCJKSymbolsAndPunctuation: boolean = true;
-  includeDashes: boolean = true;
-  otherSymbols: string = '';
+  includeFullwidthForms?: boolean = true;
+  includeCJKSymbolsAndPunctuation?: boolean = true;
+  includeDashes?: boolean = true;
+  otherSymbols?: string = '';
 }
 
 @RuleBuilder.register
