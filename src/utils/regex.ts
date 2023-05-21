@@ -24,6 +24,12 @@ export const tableStartingPipe = /^(((>[ ]?)*)|([ ]{0,3}))\|/m;
 export const tableRow = /[^\n]*?\|[^\n]*?(\n|$)/m;
 export const urlRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s`\]'"‘’“”>]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,}|www\.[a-zA-Z0-9]+\.[^\s`\]'"‘’“”>]{2,})/gi;
 export const anchorTagRegex = /<a[\s]+([^>]+)>((?:.(?!<\/a>))*.)<\/a>/g;
+export const wordRegex = /[\p{L}\p{N}\p{Pc}\p{M}\-'’`]+/gu;
+// regex from https://stackoverflow.com/a/26128757/8353749
+export const htmlEntitiesRegex = /&[^\s]+;$/mi;
+
+export const customIgnoreAllStartIndicator = generateHTMLLinterCommentWithSpecificTextAndWhitespaceRegexMatch(true);
+export const customIgnoreAllEndIndicator = generateHTMLLinterCommentWithSpecificTextAndWhitespaceRegexMatch(false);
 
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string
@@ -101,4 +107,17 @@ export function getFirstHeaderOneText(text: string): string {
 
 export function matchTagRegex(text: string): string[] {
   return [...text.matchAll(tagWithLeadingWhitespaceRegex)].map((match) => match[2]);
+}
+
+export function generateHTMLLinterCommentWithSpecificTextAndWhitespaceRegexMatch(isStart: boolean): RegExp {
+  const regexTemplate = '<!-{2,} *linter-{ENDING_TEXT} *-{2,}>';
+  let endingText = '';
+
+  if (isStart) {
+    endingText += 'disable';
+  } else {
+    endingText += 'enable';
+  }
+
+  return new RegExp(regexTemplate.replace('{ENDING_TEXT}', endingText), 'g');
 }

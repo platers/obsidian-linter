@@ -1,4 +1,4 @@
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
@@ -16,31 +16,30 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
       nameKey: 'rules.heading-blank-lines.name',
       descriptionKey: 'rules.heading-blank-lines.description',
       type: RuleType.SPACING,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink],
     });
   }
   get OptionsClass(): new () => HeadingBlankLinesOptions {
     return HeadingBlankLinesOptions;
   }
   apply(text: string, options: HeadingBlankLinesOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink], text, (text) => {
-      if (!options.bottom) {
-        text = text.replace(/(^#+\s.*)\n+/gm, '$1\n'); // trim blank lines after headings
-        text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
-      } else {
-        text = text.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings
-        text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
-        text = text.replace(/(^#+\s.*)\n+/gm, '$1\n\n'); // trim blank lines after headings
-      }
+    if (!options.bottom) {
+      text = text.replace(/(^#+\s.*)\n+/gm, '$1\n'); // trim blank lines after headings
+      text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
+    } else {
+      text = text.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings
+      text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
+      text = text.replace(/(^#+\s.*)\n+/gm, '$1\n\n'); // trim blank lines after headings
+    }
 
-      text = text.replace(/^\n+(#+\s.*)/, '$1'); // remove blank lines before first heading
-      text = text.replace(/(#+\s.*)\n+$/, '$1'); // remove blank lines after last heading
+    text = text.replace(/^\n+(#+\s.*)/, '$1'); // remove blank lines before first heading
+    text = text.replace(/(#+\s.*)\n+$/, '$1'); // remove blank lines after last heading
 
-      if (!options.emptyLineAfterYaml) {
-        text = text.replace(new RegExp('(' + yamlRegex.source + ')\\n+(#+\\s.*)'), '$1\n$5');
-      }
+    if (!options.emptyLineAfterYaml) {
+      text = text.replace(new RegExp('(' + yamlRegex.source + ')\\n+(#+\\s.*)'), '$1\n$5');
+    }
 
-      return text;
-    });
+    return text;
   }
   get exampleBuilders(): ExampleBuilder<HeadingBlankLinesOptions>[] {
     return [

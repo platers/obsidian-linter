@@ -2,7 +2,7 @@ import {updateBlockquotes} from '../utils/mdast';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {IgnoreTypes, ignoreListOfTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 
 type BlockquoteStyleValues = 'no space' | 'space';
 
@@ -18,19 +18,18 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
       descriptionKey: 'rules.blockquote-style.description',
       type: RuleType.CONTENT,
       hasSpecialExecutionOrder: true, // to make sure we run after the other rules to make sure all blockquotes are affected and follow the same style
+      ruleIgnoreTypes: [IgnoreTypes.html],
     });
   }
   get OptionsClass(): new () => BlockquoteStyleOptions {
     return BlockquoteStyleOptions;
   }
   apply(text: string, options: BlockquoteStyleOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.html], text, (text) => {
-      if (options.style === 'space') {
-        return updateBlockquotes(text, this.addSpaceToIndicator);
-      }
+    if (options.style === 'space') {
+      return updateBlockquotes(text, this.addSpaceToIndicator);
+    }
 
-      return updateBlockquotes(text, this.removeSpaceFromIndicator);
-    });
+    return updateBlockquotes(text, this.removeSpaceFromIndicator);
   }
   removeSpaceFromIndicator(blockquote: string): string {
     return blockquote.replace(/>( |\t)+/g, '>');

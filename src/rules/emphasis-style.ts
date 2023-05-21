@@ -1,4 +1,4 @@
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
@@ -17,15 +17,14 @@ export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
       nameKey: 'rules.emphasis-style.name',
       descriptionKey: 'rules.emphasis-style.description',
       type: RuleType.CONTENT,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath],
     });
   }
   get OptionsClass(): new () => EmphasisStyleOptions {
     return EmphasisStyleOptions;
   }
   apply(text: string, options: EmphasisStyleOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath], text, (text) => {
-      return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Italics);
-    });
+    return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Italics);
   }
   get exampleBuilders(): ExampleBuilder<EmphasisStyleOptions>[] {
     return [

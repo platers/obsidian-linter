@@ -13,6 +13,7 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
       nameKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.name',
       descriptionKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.description',
       type: RuleType.SPACING,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.yaml, IgnoreTypes.image, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html],
     });
   }
   get OptionsClass(): new () => SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions {
@@ -24,34 +25,23 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
   ): string {
     const head = /(\p{sc=Han}|\p{sc=Katakana}|\p{sc=Hiragana}|\p{sc=Hangul})( *)(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+'"([¥$]|\*[^*])/gmu;
     const tail = /(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+;:'"°%$)\]]|[^*]\*)( *)(\p{sc=Han}|\p{sc=Katakana}|\p{sc=Hiragana}|\p{sc=Hangul})/gmu;
-    // inline math, inline code, makrdown links, and wiki links are an exception in that even though they are to be ignored we want to keep a space around these types when surrounded by CJK characters
+    // inline math, inline code, markdown links, and wiki links are an exception in that even though they are to be ignored we want to keep a space around these types when surrounded by CJK characters
     const regexEscapedIgnoreExceptionPlaceHolders = `${IgnoreTypes.link.placeholder}|${IgnoreTypes.inlineMath.placeholder}|${IgnoreTypes.inlineCode.placeholder}|${IgnoreTypes.wikiLink.placeholder}`.replaceAll('{', '\\{').replaceAll('}', '\\}');
     const ignoreExceptionsHead = new RegExp(`(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})( *)(${regexEscapedIgnoreExceptionPlaceHolders})`, 'gmu');
     const ignoreExceptionsTail = new RegExp(`(${regexEscapedIgnoreExceptionPlaceHolders})( *)(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})`, 'gmu');
-    const addSpaceAroundChineseJapaneseKoreanAndEnglish = function(
-        text: string,
-    ): string {
+    const addSpaceAroundChineseJapaneseKoreanAndEnglish = function(text: string): string {
       return text.replace(head, '$1 $3').replace(tail, '$1 $3');
     };
 
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.yaml, IgnoreTypes.image, IgnoreTypes.link,
-      IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html], text, (text: string) => {
-      let newText = ignoreListOfTypes([IgnoreTypes.italics, IgnoreTypes.bold], text, addSpaceAroundChineseJapaneseKoreanAndEnglish);
+    let newText = ignoreListOfTypes([IgnoreTypes.italics, IgnoreTypes.bold], text, addSpaceAroundChineseJapaneseKoreanAndEnglish);
 
-      newText = newText.replace(ignoreExceptionsHead, '$1 $3').replace(ignoreExceptionsTail, '$1 $3');
+    newText = newText.replace(ignoreExceptionsHead, '$1 $3').replace(ignoreExceptionsTail, '$1 $3');
 
-      newText = updateItalicsText(
-          newText,
-          addSpaceAroundChineseJapaneseKoreanAndEnglish,
-      );
+    newText = updateItalicsText(newText, addSpaceAroundChineseJapaneseKoreanAndEnglish);
 
-      newText = updateBoldText(
-          newText,
-          addSpaceAroundChineseJapaneseKoreanAndEnglish,
-      );
+    newText = updateBoldText(newText, addSpaceAroundChineseJapaneseKoreanAndEnglish);
 
-      return newText;
-    });
+    return newText;
   }
   get exampleBuilders(): ExampleBuilder<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions>[] {
     return [

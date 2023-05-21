@@ -1,9 +1,9 @@
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {misspellingToCorrection} from '../utils/auto-correct-misspellings';
-import {wordSplitterRegex} from '../utils/regex';
+import {wordRegex, wordSplitterRegex} from '../utils/regex';
 
 class AutoCorrectCommonMisspellingsOptions implements Options {
   ignoreWords?: string[] = [];
@@ -16,29 +16,27 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
       nameKey: 'rules.auto-correct-common-misspellings.name',
       descriptionKey: 'rules.auto-correct-common-misspellings.description',
       type: RuleType.CONTENT,
+      ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.url],
     });
   }
   get OptionsClass(): new () => AutoCorrectCommonMisspellingsOptions {
     return AutoCorrectCommonMisspellingsOptions;
   }
   apply(text: string, options: AutoCorrectCommonMisspellingsOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.url], text, (text) => {
-      const wordRegex = /[\p{L}\p{N}\p{Pc}\p{M}\-'’`]+/gu;
+    return text.replaceAll(wordRegex, (word: string) => this.replaceWordWithCorrectCasing(word, options));
+  }
+  replaceWordWithCorrectCasing(word: string, options: AutoCorrectCommonMisspellingsOptions): string {
+    const lowercasedWord = word.toLowerCase();
+    if (!misspellingToCorrection.has(lowercasedWord) || options.ignoreWords.includes(lowercasedWord)) {
+      return word;
+    }
 
-      return text.replaceAll(wordRegex, (word: string) => {
-        const lowercasedWord = word.toLowerCase();
-        if (!misspellingToCorrection.has(lowercasedWord) || options.ignoreWords.includes(lowercasedWord)) {
-          return word;
-        }
+    let correctedWord = misspellingToCorrection.get(lowercasedWord);
+    if (word.charAt(0) == word.charAt(0).toUpperCase()) {
+      correctedWord = correctedWord.charAt(0).toUpperCase() + correctedWord.substring(1);
+    }
 
-        let correctedWord = misspellingToCorrection.get(lowercasedWord);
-        if (word.charAt(0) == word.charAt(0).toUpperCase()) {
-          correctedWord = correctedWord.charAt(0).toUpperCase() + correctedWord.substring(1);
-        }
-
-        return correctedWord;
-      });
-    });
+    return correctedWord;
   }
   get exampleBuilders(): ExampleBuilder<AutoCorrectCommonMisspellingsOptions>[] {
     return [

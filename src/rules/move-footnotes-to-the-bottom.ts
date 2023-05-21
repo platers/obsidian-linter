@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {moveFootnotesToEnd} from '../utils/mdast';
 
 class MoveFootnotesToTheBottomOptions implements Options {}
@@ -13,15 +13,14 @@ export default class MoveFootnotesToTheBottom extends RuleBuilder<MoveFootnotesT
       nameKey: 'rules.move-footnotes-to-the-bottom.name',
       descriptionKey: 'rules.move-footnotes-to-the-bottom.description',
       type: RuleType.FOOTNOTE,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml],
     });
   }
   get OptionsClass(): new () => MoveFootnotesToTheBottomOptions {
     return MoveFootnotesToTheBottomOptions;
   }
   apply(text: string, options: MoveFootnotesToTheBottomOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml], text, (text) => {
-      return moveFootnotesToEnd(text);
-    });
+    return moveFootnotesToEnd(text);
   }
   get exampleBuilders(): ExampleBuilder<MoveFootnotesToTheBottomOptions>[] {
     return [

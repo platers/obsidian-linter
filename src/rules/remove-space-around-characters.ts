@@ -6,10 +6,10 @@ import {updateListItemText} from '../utils/mdast';
 import {escapeRegExp} from '../utils/regex';
 
 class RemoveSpaceAroundCharactersOptions implements Options {
-  includeFullwidthForms: boolean = true;
-  includeCJKSymbolsAndPunctuation: boolean = true;
-  includeDashes: boolean = true;
-  otherSymbols: string = '';
+  includeFullwidthForms?: boolean = true;
+  includeCJKSymbolsAndPunctuation?: boolean = true;
+  includeDashes?: boolean = true;
+  otherSymbols?: string = '';
 }
 
 @RuleBuilder.register
@@ -19,6 +19,7 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
       nameKey: 'rules.remove-space-around-characters.name',
       descriptionKey: 'rules.remove-space-around-characters.description',
       type: RuleType.SPACING,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => RemoveSpaceAroundCharactersOptions {
@@ -52,7 +53,7 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
       return text.replace(fullwidthCharacterWithTextAtStart, '$2').replace(fullwidthCharacterWithTextAtEnd, '$1');
     };
 
-    let newText = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.list], text, replaceWhitespaceAroundFullwidthCharacters);
+    let newText = ignoreListOfTypes([IgnoreTypes.list], text, replaceWhitespaceAroundFullwidthCharacters);
 
     newText = updateListItemText(newText, replaceWhitespaceAroundFullwidthCharacters);
 

@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex, wordSplitterRegex} from '../utils/regex';
 
 type Style = 'Title Case' | 'ALL CAPS' | 'First letter';
@@ -403,52 +403,51 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       nameKey: 'rules.capitalize-headings.name',
       descriptionKey: 'rules.capitalize-headings.description',
       type: RuleType.HEADING,
-      hasSpecialExecutionOrder: true,
+      hasSpecialExecutionOrder: true, // this is meant to run at the end after all headers have been updated, added, or removed from the file
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => CapitalizeHeadingsOptions {
     return CapitalizeHeadingsOptions;
   }
   apply(text: string, options: CapitalizeHeadingsOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag], text, (text) => {
-      return text.replace(allHeadersRegex, (headerText: string) => {
-        if (options.style === 'ALL CAPS') {
-          return headerText.toUpperCase(); // convert full heading to uppercase
+    return text.replace(allHeadersRegex, (headerText: string) => {
+      if (options.style === 'ALL CAPS') {
+        return headerText.toUpperCase(); // convert full heading to uppercase
+      }
+
+      const capitalizeJustFirstLetter = options.style === 'First letter';
+      // split by whitespace
+      const headerWords = headerText.match(/\S+/g);
+      const keepCasing = options.ignoreWords;
+      const ignoreShortWords = options.lowercaseWords;
+      let firstWord = true;
+      for (let j = 1; j < headerWords.length; j++) {
+        // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
+        const isWord = headerWords[j].match(/^[\p{L}'-]{1,}[.?!,:;\d]*$/u);
+        if (!isWord) {
+          continue;
         }
 
-        const capitalizeJustFirstLetter = options.style === 'First letter';
-        // split by whitespace
-        const headerWords = headerText.match(/\S+/g);
-        const keepCasing = options.ignoreWords;
-        const ignoreShortWords = options.lowercaseWords;
-        let firstWord = true;
-        for (let j = 1; j < headerWords.length; j++) {
-          // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
-          const isWord = headerWords[j].match(/^[\p{L}'-]{1,}[.?!,:;\d]*$/u);
-          if (!isWord) {
-            continue;
-          }
-
-          const ignoreCasedWord = options.ignoreCasedWords && headerWords[j] !== headerWords[j].toLowerCase();
-          const keepWordCasing = ignoreCasedWord || keepCasing.includes(headerWords[j]);
-          if (!keepWordCasing) {
-            headerWords[j] = headerWords[j].toLowerCase();
-            const ignoreWord = ignoreShortWords.includes(headerWords[j]);
-            if ((!ignoreWord && !capitalizeJustFirstLetter) || firstWord === true) {
-              headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
-            }
-          }
-
-          firstWord = false;
-
-          // if the user wants to keep casing and capitalize just the first letter then there is no need to lowercase any other word after the first word
-          if (options.ignoreCasedWords && capitalizeJustFirstLetter) {
-            break;
+        const ignoreCasedWord = options.ignoreCasedWords && headerWords[j] !== headerWords[j].toLowerCase();
+        const keepWordCasing = ignoreCasedWord || keepCasing.includes(headerWords[j]);
+        if (!keepWordCasing) {
+          headerWords[j] = headerWords[j].toLowerCase();
+          const ignoreWord = ignoreShortWords.includes(headerWords[j]);
+          if ((!ignoreWord && !capitalizeJustFirstLetter) || firstWord === true) {
+            headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
           }
         }
 
-        return headerWords.join(' ');
-      });
+        firstWord = false;
+
+        // if the user wants to keep casing and capitalize just the first letter then there is no need to lowercase any other word after the first word
+        if (options.ignoreCasedWords && capitalizeJustFirstLetter) {
+          break;
+        }
+      }
+
+      return headerWords.join(' ');
     });
   }
   get exampleBuilders(): ExampleBuilder<CapitalizeHeadingsOptions>[] {

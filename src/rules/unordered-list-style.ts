@@ -1,4 +1,4 @@
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
@@ -15,15 +15,14 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
       nameKey: 'rules.unordered-list-style.name',
       descriptionKey: 'rules.unordered-list-style.description',
       type: RuleType.CONTENT,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => UnorderedListStyleOptions {
     return UnorderedListStyleOptions;
   }
   apply(text: string, options: UnorderedListStyleOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
-      return updateUnorderedListItemIndicators(text, options.listStyle);
-    });
+    return updateUnorderedListItemIndicators(text, options.listStyle);
   }
   get exampleBuilders(): ExampleBuilder<UnorderedListStyleOptions>[] {
     return [

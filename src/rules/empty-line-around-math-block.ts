@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {IgnoreTypes, ignoreListOfTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {ensureEmptyLinesAroundMathBlock} from '../utils/mdast';
 
 class EmptyLineAroundMathBlockOptions implements Options {
@@ -16,15 +16,14 @@ export default class EmptyLineAroundMathBlock extends RuleBuilder<EmptyLineAroun
       nameKey: 'rules.empty-line-around-math-blocks.name',
       descriptionKey: 'rules.empty-line-around-math-blocks.description',
       type: RuleType.SPACING,
+      ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.code],
     });
   }
   get OptionsClass(): new () => EmptyLineAroundMathBlockOptions {
     return EmptyLineAroundMathBlockOptions;
   }
   apply(text: string, options: EmptyLineAroundMathBlockOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.yaml, IgnoreTypes.code], text, (text: string) => {
-      return ensureEmptyLinesAroundMathBlock(text, options.minimumNumberOfDollarSignsToBeAMathBlock);
-    });
+    return ensureEmptyLinesAroundMathBlock(text, options.minimumNumberOfDollarSignsToBeAMathBlock);
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundMathBlockOptions>[] {
     return [

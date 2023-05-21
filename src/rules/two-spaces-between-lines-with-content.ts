@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent} from '../utils/mdast';
 
 class TwoSpacesBetweenLinesWithContentOptions implements Options {}
@@ -13,13 +13,14 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
       nameKey: 'rules.two-spaces-between-lines-with-content.name',
       descriptionKey: 'rules.two-spaces-between-lines-with-content.description',
       type: RuleType.CONTENT,
+      ruleIgnoreTypes: [IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table],
     });
   }
   get OptionsClass(): new () => TwoSpacesBetweenLinesWithContentOptions {
     return TwoSpacesBetweenLinesWithContentOptions;
   }
   apply(text: string, options: TwoSpacesBetweenLinesWithContentOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table], text, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent);
+    return addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text);
   }
   get exampleBuilders(): ExampleBuilder<TwoSpacesBetweenLinesWithContentOptions>[] {
     return [

@@ -2,7 +2,7 @@ import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt} from './strings';
-import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe} from './regex';
+import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
 import {combineExtensions} from 'micromark-util-combine-extensions';
@@ -108,25 +108,7 @@ function getListItemTextPositions(text: string): Position[] {
     // @ts-ignore the fact that not all nodes have a children property since I have already exited the function if that is the case
     for (const childNode of node.children) {
       if (childNode.type === (MDAstTypes.Paragraph as string)) {
-        const position = { // make a deep copy of the value to prevent changing the generated AST
-          start: {
-            line: childNode.position.start.line,
-            column: childNode.position.start.column,
-            offset: childNode.position.start.offset,
-          },
-          end: {
-            line: childNode.position.end.line,
-            column: childNode.position.end.column,
-            offset: childNode.position.end.offset,
-          },
-        };
-        // tasks need a slight shift to account for the task completion indicator
-        // @ts-ignore the fact that not all nodes have a checked property since all list items should have it
-        if (node.checked !== null) {
-          position.start.offset += 4;
-        }
-
-        positions.push(position);
+        positions.push(childNode.position);
       }
     }
   });
@@ -547,6 +529,7 @@ export function updateBoldText(text: string, func:(text: string) => string): str
 
 export function updateListItemText(text: string, func:(text: string) => string): string {
   const positions: Position[] = getListItemTextPositions(text);
+  const checklistIndicatorRegex = /^\[.\] /;
 
   for (const position of positions) {
     let startIndex = position.start.offset;
@@ -560,6 +543,11 @@ export function updateListItemText(text: string, func:(text: string) => string):
     }
 
     let listText = text.substring(startIndex, position.end.offset);
+    // for some reason some checklists are not getting treated as such and this causes the task indicator to be included in the text
+    if (checklistIndicatorRegex.test(listText)) {
+      startIndex += 4;
+      listText = listText.substring(4);
+    }
     listText = func(listText);
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, position.end.offset, listText);
@@ -901,4 +889,46 @@ function isInvalidTableSeparatorRow(fullRow: string, separatorMatch: string): bo
   // it could contain text or an invalid table cell for the separator
   const nonSeparatorContent = fullRow.replace(separatorMatch, '');
   return /[^\s>]/.test(nonSeparatorContent);
+}
+
+export function getAllCustomIgnoreSectionsInText(text: string): {startIndex: number, endIndex: number}[] {
+  let iteratorIndex = 0;
+
+  const positions: {startIndex: number, endIndex: number}[] = [];
+  const startMatches = [...text.matchAll(customIgnoreAllStartIndicator)];
+  console.log(customIgnoreAllStartIndicator.source);
+  if (!startMatches || startMatches.length === 0) {
+    return positions;
+  }
+
+  const endMatches = [...text.matchAll(customIgnoreAllEndIndicator)];
+
+  startMatches.forEach((startMatch) => {
+    iteratorIndex = startMatch.index;
+
+    let foundEndingIndicator = false;
+    let endingPosition = text.length - 1;
+    // eslint-disable-next-line no-unmodified-loop-condition -- endMatches does not need to be modified with regards to being undefined or null
+    while (endMatches && endMatches.length !== 0 && !foundEndingIndicator) {
+      if (endMatches[0].index <= iteratorIndex) {
+        endMatches.shift();
+      } else {
+        foundEndingIndicator = true;
+
+        const endingIndicator = endMatches[0];
+        endingPosition = endingIndicator.index + endingIndicator[0].length;
+      }
+    }
+
+    positions.push({
+      startIndex: iteratorIndex,
+      endIndex: endingPosition,
+    });
+
+    if (!endMatches || endMatches.length === 0) {
+      return;
+    }
+  });
+
+  return positions;
 }

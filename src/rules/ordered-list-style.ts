@@ -1,4 +1,4 @@
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
@@ -16,15 +16,14 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
       nameKey: 'rules.ordered-list-style.name',
       descriptionKey: 'rules.ordered-list-style.description',
       type: RuleType.CONTENT,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => OrderedListStyleOptions {
     return OrderedListStyleOptions;
   }
   apply(text: string, options: OrderedListStyleOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, (text) => {
-      return updateOrderedListItemIndicators(text, options.numberStyle, options.listEndStyle);
-    });
+    return updateOrderedListItemIndicators(text, options.numberStyle, options.listEndStyle);
   }
   get exampleBuilders(): ExampleBuilder<OrderedListStyleOptions>[] {
     return [

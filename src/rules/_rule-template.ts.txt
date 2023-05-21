@@ -1,6 +1,9 @@
 // Basic Rule template
 //
-// Simply perform text replace `RuleTemplate` with your rule, e.g. `MyNewRule`
+// Perform text replace `RuleTemplate` with your rule, e.g. `MyNewRule`
+// Then decided on the keys for the rule in the en.ts locale and add those values to it.
+// Once the values are present in the locale file, replace `RULE_NAME_IN_EN_LOCALE_FILE` with the key in the locale file.
+// Then do the same for any properties replacing `PROPERTY_NAME_IN_LOCALE_FILE` with the associated value.
 // And save the file as `my-new-rule.ts`
 
 import {Options, RuleType} from '../rules';
@@ -16,17 +19,15 @@ class RuleTemplateOptions implements Options {
 
 @RuleBuilder.register
 export default class RuleTemplate extends RuleBuilder<RuleTemplateOptions> {
+  constructor() {
+    super({
+      nameKey: 'rules.RULE_NAME_IN_EN_LOCALE_FILE.name',
+      descriptionKey: 'rules.RULE_NAME_IN_EN_LOCALE_FILE.description',
+      type: RuleType.TYPE_HERE,
+    });
+  }
   get OptionsClass(): new () => RuleTemplateOptions {
     return RuleTemplateOptions;
-  }
-  get name(): string {
-    return '{CHOOSE_PROPER_NAME}';
-  }
-  get description(): string {
-    return '{CHOOSE_PROPER_DESCRIPTION}';
-  }
-  get type(): RuleType {
-    return RuleType.CHOOSE_PROPER_TYPE;
   }
   apply(text: string, options: RuleTemplateOptions): string {
     return '{PUT_PROPER_IMPLEMENTATION}';
@@ -48,8 +49,8 @@ export default class RuleTemplate extends RuleBuilder<RuleTemplateOptions> {
     return [
       new TextOptionBuilder({
         OptionsClass: RuleTemplateOptions,
-        name: 'option 1',
-        description: 'description 1',
+        nameKey: 'rules.RULE_NAME_IN_EN_LOCALE_FILE.PROPERTY_NAME_IN_LOCALE_FILE.name',
+        descriptionKey: 'rules.RULE_NAME_IN_EN_LOCALE_FILE.PROPERTY_NAME_IN_LOCALE_FILE.description',
         optionsKey: 'someProperty'
       })
     ];

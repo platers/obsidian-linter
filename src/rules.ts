@@ -18,6 +18,7 @@ import {
 import {LintCommand} from './ui/linter-components/custom-command-option';
 import {CustomReplace} from './ui/linter-components/custom-replace-option';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
+import {ignoreListOfTypes, IgnoreType} from './utils/ignore-types';
 
 // CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
 export type CommonStyles = {
@@ -66,10 +67,11 @@ export class Rule {
    * @param {string} settingsKey - The settings key of the rule
    * @param {string} alias - The alias of the rule which also is the config key for the rule
    * @param {RuleType} type - The type of the rule
-   * @param {ApplyFunction} apply - The function to apply the rule
+   * @param {ApplyFunction} applyAfterIgnore - The function to apply the rule once everything has been ignored
    * @param {Array<Example>} examples - The examples to be displayed in the documentation
    * @param {Array<Option>} [options=[]] - The options of the rule to be displayed in the documentation
    * @param {boolean} [hasSpecialExecutionOrder=false] - The rule has special execution order
+   * @param {IgnoreType[]} [ignoreTypes=[]] - The types of elements to ignore for the rule
    */
   constructor(
       private nameKey: LanguageStringKey,
@@ -77,10 +79,11 @@ export class Rule {
       public settingsKey: string,
       public alias: string,
       public type: RuleType,
-      public apply: ApplyFunction,
+      public applyAfterIgnore: ApplyFunction,
       public examples: Array<Example>,
       public options: Array<Option> = [],
       public readonly hasSpecialExecutionOrder: boolean = false,
+      public readonly ignoreTypes: IgnoreType[] = [],
   ) {
     options.unshift(new BooleanOption('enabled', this.descriptionKey, '' as LanguageStringKey, false));
     for (const option of options) {
@@ -118,6 +121,12 @@ export class Rule {
 
   public enabledOptionName(): string {
     return this.options[0].configKey;
+  }
+
+  public apply(text: string, options?: Options): string {
+    return ignoreListOfTypes(this.ignoreTypes, text, (textAfterIgnore: string) => {
+      return this.applyAfterIgnore(textAfterIgnore, options);
+    });
   }
 }
 
