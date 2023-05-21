@@ -596,10 +596,14 @@ export default {
     },
     'yaml-title': {
       'name': 'Título de YAML',
-      'description': 'Inserta el título del archivo en el frontmatter del YAML. Obtiene el título del primer H1 o nombre de archivo si no hay H1.',
+      'description': 'Inserta el título del archivo en el frontmatter de YAML. Obtiene el título según el modo seleccionado.',
       'title-key': {
         'name': 'Clave de título',
-        'description': 'La clave de YAML usar para el título',
+        'description': 'La clave de YAML para usar para el título',
+      },
+      'mode': {
+        'name': 'Modo',
+        'description': 'El método a utilizar para obtener el título',
       },
     },
   },
@@ -638,5 +642,8 @@ export default {
     'single string comma delimited': 'cadena única delimitada por comas',
     'single string space delimited': 'espacio de una sola cadena delimitado',
     'single-line space delimited': 'espacio de una sola línea delimitado',
+    'first-h1': 'primer encabezado de nivel 1',
+    'first-h1-or-filename-if-h1-missing': 'primer encabezado de nivel 1 o nombre de archivo si falta el encabezado de primer nivel 1',
+    'filename': 'nombre del archivo',
   },
 };
