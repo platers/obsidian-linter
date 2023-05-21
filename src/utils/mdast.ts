@@ -2,7 +2,7 @@ import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt} from './strings';
-import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe} from './regex';
+import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
 import {combineExtensions} from 'micromark-util-combine-extensions';
@@ -891,39 +891,44 @@ function isInvalidTableSeparatorRow(fullRow: string, separatorMatch: string): bo
   return /[^\s>]/.test(nonSeparatorContent);
 }
 
-const customIgnoreStart = '<!-- linter-ignore-start -->';
-const customIgnoreEnd = '<!-- linter-ignore-end -->';
-
 export function getAllCustomIgnoreSectionsInText(text: string): {startIndex: number, endIndex: number}[] {
   let iteratorIndex = 0;
 
   const positions: {startIndex: number, endIndex: number}[] = [];
-  do {
-    iteratorIndex = text.indexOf(customIgnoreStart, iteratorIndex);
-    if (iteratorIndex === -1) {
-      break;
+  const startMatches = [...text.matchAll(customIgnoreAllStartIndicator)];
+  console.log(customIgnoreAllStartIndicator.source);
+  if (!startMatches || startMatches.length === 0) {
+    return positions;
+  }
+
+  const endMatches = [...text.matchAll(customIgnoreAllEndIndicator)];
+
+  startMatches.forEach((startMatch) => {
+    iteratorIndex = startMatch.index;
+
+    let foundEndingIndicator = false;
+    let endingPosition = text.length - 1;
+    // eslint-disable-next-line no-unmodified-loop-condition -- endMatches does not need to be modified with regards to being undefined or null
+    while (endMatches && endMatches.length !== 0 && !foundEndingIndicator) {
+      if (endMatches[0].index <= iteratorIndex) {
+        endMatches.shift();
+      } else {
+        foundEndingIndicator = true;
+
+        const endingIndicator = endMatches[0];
+        endingPosition = endingIndicator.index + endingIndicator[0].length;
+      }
     }
-
-    let endOfIgnoreSection = text.indexOf(customIgnoreEnd, iteratorIndex + customIgnoreStart.length);
-    if (endOfIgnoreSection === -1) {
-      positions.push({
-        startIndex: iteratorIndex,
-        endIndex: text.length - 1,
-      });
-
-      break;
-    }
-
-    endOfIgnoreSection += customIgnoreEnd.length;
 
     positions.push({
       startIndex: iteratorIndex,
-      endIndex: endOfIgnoreSection,
+      endIndex: endingPosition,
     });
 
-    iteratorIndex = endOfIgnoreSection;
-  }
-  while (iteratorIndex !== -1 && iteratorIndex < text.length -1);
+    if (!endMatches || endMatches.length === 0) {
+      return;
+    }
+  });
 
   return positions;
 }

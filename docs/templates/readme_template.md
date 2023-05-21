@@ -37,22 +37,21 @@ Add `disabled rules: [ all ]` to the YAML frontmatter of a file to disable all r
 
 #### Range Ignore
 
-If you are looking for a way to disable rules for a specific part of a file, that can be done with a ranged ignore. The syntax for a ranged ignore is `<!-- linter-ignore-start -->` with an optional `<!-- linter-ignore-end -->` where you want the Linter to start back up with its linting.
+If you are looking for a way to disable rules for a specific part of a file, that can be done with a ranged ignore. The syntax for a ranged ignore is `<!-- linter-disable -->` with an optional `<!-- linter-enable -->` where you want the Linter to start back up with its linting.
 Leaving off the ending of a range ignore will assume you want to ignore the file contents from the start of the range ignore to the end of the file. So be careful when not ending a range ignore.
 
 **Do note that this only prevents the values in the range ignore from being linted. It does not prevent whitespace or other additions around the ranged ignore.**
 
 ``` markdown
 Here is some text
-<!-- linter-ignore-start -->
+<!-- linter-disable -->
                           This area will not be formatted
-<!-- linter-ignore-end -->
+<!-- linter-enable -->
 More content goes here...
 ```
 
 Things to note about range ignores:
 - Paste rules are not affected by range ignores as that would require the copied text to have a range ignore in them.
-- You need to use the exact values listed above at this time.
 
 ## Rules
 

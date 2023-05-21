@@ -22,7 +22,7 @@ const getCustomIgnoreSectionsInTextTestCases: customIgnoresInTextTestCase[] = [
     name: 'when no custom ignore start indicator is present, no positions are returned even if custom ignore end indicator is present',
     text: dedent`
       Here is some text
-      <!-- linter-ignore-end -->
+      <!-- linter-enable -->
       Here is some more text
     `,
     expectedCustomIgnoresInText: 0,
@@ -32,58 +32,58 @@ const getCustomIgnoreSectionsInTextTestCases: customIgnoresInTextTestCase[] = [
     name: 'a simple example of a start and end custom ignore indicator results in the proper start and end positions for the ignore section',
     text: dedent`
       Here is some text
-      <!-- linter-ignore-start -->
+      <!-- linter-disable -->
       This content will be ignored
       So any format put here gets to stay as is
-      <!-- linter-ignore-end -->
+      <!-- linter-enable -->
       More text here...
     `,
     expectedCustomIgnoresInText: 1,
-    expectedPositions: [{startIndex: 18, endIndex: 144}],
+    expectedPositions: [{startIndex: 18, endIndex: 135}],
   },
   {
     name: 'when a custom ignore start indicator is not followed by a custom ignore end indicator in the text, the end is considered to be the end of the text',
     text: dedent`
       Here is some text
-      <!-- linter-ignore-start -->
+      <!-- linter-disable -->
       This content will be ignored
       So any format put here gets to stay as is
       More text here...
     `,
     expectedCustomIgnoresInText: 1,
-    expectedPositions: [{startIndex: 18, endIndex: 134}],
+    expectedPositions: [{startIndex: 18, endIndex: 129}],
   },
   {
     name: 'when a custom ignore start indicator shows up midline, it ignores the part in question',
     text: dedent`
-      Here is some text<!-- linter-ignore-start -->here is some ignored text<!-- linter-ignore-end -->
+      Here is some text<!-- linter-disable -->here is some ignored text<!-- linter-enable -->
       This content will be ignored
       So any format put here gets to stay as is
       More text here...
     `,
     expectedCustomIgnoresInText: 1,
-    expectedPositions: [{startIndex: 17, endIndex: 96}],
+    expectedPositions: [{startIndex: 17, endIndex: 87}],
   },
   {
-    name: 'when a custom ignore start indicator does not follow the exact syntax, it is not counted as existing',
+    name: 'when a custom ignore start indicator does not follow the exact syntax, it is counted as existing when it is a single-line comment',
     text: dedent`
-      Here is some text<!-- linter-ignore-start-->here is some ignored text<!-- linter-ignore-end -->
+      Here is some text<!-- linter-disable-->here is some ignored text<!-------------         linter-enable ------>
       This content will be ignored
       So any format put here gets to stay as is
       More text here...
     `,
-    expectedCustomIgnoresInText: 0,
-    expectedPositions: [],
+    expectedCustomIgnoresInText: 1,
+    expectedPositions: [{startIndex: 17, endIndex: 109}],
   },
   {
     name: 'multiple matches can be returned',
     text: dedent`
-      Here is some text<!-- linter-ignore-start -->here is some ignored text<!-- linter-ignore-end -->
+      Here is some text<!-- linter-disable -->here is some ignored text<!-- linter-enable -->
       This content will be ignored
       So any format put here gets to stay as is
       More text here...
       ${''}
-      <!-- linter-ignore-start -->
+      <!-- linter-disable -->
       We want to ignore the following as we want to preserve its format
         -> level 1
           -> level 1.3
@@ -91,7 +91,7 @@ const getCustomIgnoreSectionsInTextTestCases: customIgnoresInTextTestCase[] = [
       Finish
     `,
     expectedCustomIgnoresInText: 2,
-    expectedPositions: [{startIndex: 17, endIndex: 96}, {startIndex: 187, endIndex: 330}],
+    expectedPositions: [{startIndex: 17, endIndex: 87}, {startIndex: 178, endIndex: 316}],
   },
 ];
 
