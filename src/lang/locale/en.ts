@@ -687,7 +687,7 @@ export default {
     // yaml-title.ts
     'yaml-title': {
       'name': 'YAML Title',
-      'description': 'Fügt den Titel der Datei in das YAML-Frontmatter ein. Ruft den Titel basierend auf dem ausgewählten Modus ab.',
+      'description': 'Inserts the title of the file into the YAML frontmatter. Gets the title based on the selected mode.',
       'title-key': {
         'name': 'Title Key',
         'description': 'Which YAML key to use for title',
