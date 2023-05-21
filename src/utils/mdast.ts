@@ -896,7 +896,6 @@ export function getAllCustomIgnoreSectionsInText(text: string): {startIndex: num
 
   const positions: {startIndex: number, endIndex: number}[] = [];
   const startMatches = [...text.matchAll(customIgnoreAllStartIndicator)];
-  console.log(customIgnoreAllStartIndicator.source);
   if (!startMatches || startMatches.length === 0) {
     return positions;
   }

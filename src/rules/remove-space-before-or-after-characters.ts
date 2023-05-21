@@ -34,10 +34,7 @@ export default class RemoveSpaceBeforeOrAfterCharacters extends RuleBuilder<Remo
 
     const removeWhitespaceBeforeCharacters = new RegExp(`([ \t])+([${symbolsBefore}])`, 'g');
     const removeWhitespaceAfterCharacters = new RegExp(`([${symbolsAfter}])([ \t])+`, 'g');
-    // console.log('before: "' + removeWhitespaceBeforeCharacters.source + '"');
-    // console.log('after: "' + removeWhitespaceAfterCharacters.source + '"');
     const replaceWhitespaceBeforeOrAfterCharacters = function(text: string): string {
-      // console.log(text);
       return text.replace(removeWhitespaceBeforeCharacters, '$2').replace(removeWhitespaceAfterCharacters, '$1');
     };
 

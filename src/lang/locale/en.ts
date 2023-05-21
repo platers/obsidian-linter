@@ -687,10 +687,14 @@ export default {
     // yaml-title.ts
     'yaml-title': {
       'name': 'YAML Title',
-      'description': 'Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename if there is no H1.',
+      'description': 'Fügt den Titel der Datei in das YAML-Frontmatter ein. Ruft den Titel basierend auf dem ausgewählten Modus ab.',
       'title-key': {
         'name': 'Title Key',
         'description': 'Which YAML key to use for title',
+      },
+      'mode': {
+        'name': 'Mode',
+        'description': 'The method to use to get the title',
       },
     },
   },
@@ -732,5 +736,9 @@ export default {
     'single string comma delimited': 'single string comma delimited',
     'single string space delimited': 'single string space delimited',
     'single-line space delimited': 'single-line space delimited',
+    // yaml-title.ts
+    'first-h1': 'First H1',
+    'first-h1-or-filename-if-h1-missing': 'First H1 or Filename if H1 is Missing',
+    'filename': 'Filename',
   },
 };

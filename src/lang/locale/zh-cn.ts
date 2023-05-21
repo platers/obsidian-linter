@@ -687,10 +687,14 @@ export default {
     // yaml-title.ts
     'yaml-title': {
       'name': 'YAML 标题',
-      'description': '将文档的标题插入到 YAML frontmatter中。获取第一个 H1 或文档名（如果没有 H1）的标题。',
+      'description': '将文件的标题插入到 YAML frontmatter 中。 根据所选模式获取标题。',
       'title-key': {
         'name': '标题键',
         'description': '标题使用哪一个 YAML 键',
+      },
+      'mode': {
+        'name': '模式',
+        'description': '用于获取标题的方法',
       },
     },
   },
@@ -732,5 +736,9 @@ export default {
     'single string comma delimited': '字符串用逗号分隔',
     'single string space delimited': '字符串用空格分隔',
     'single-line space delimited': '单行空格分隔',
+    // yaml-title.ts
+    'first-h1': '第一级标题',
+    'first-h1-or-filename-if-h1-missing': '第一级 1 标题或文件名（如果缺少 1 级标题）',
+    'filename': '文件名',
   },
 };

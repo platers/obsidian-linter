@@ -687,10 +687,14 @@ export default {
     // yaml-title.ts
     'yaml-title': {
       'name': 'YAML-Titel',
-      'description': 'Fügt den Titel der Datei in die YAML-Frontmaterie ein. Ruft den Titel aus dem ersten H1 oder Dateinamen ab, wenn kein H1 vorhanden ist.',
+      'description': 'Fügt den Titel der Datei in das YAML-Frontmatter ein. Ruft den Titel basierend auf dem ausgewählten Modus ab.',
       'title-key': {
         'name': 'Titel-Schlüssel',
         'description': 'Der YAML-Schlüssel, der für den Titel verwendet werden soll',
+      },
+      'mode': {
+        'name': 'Modus',
+        'description': 'Die zum Abrufen des Titels zu verwendende Methode',
       },
     },
   },
@@ -732,5 +736,9 @@ export default {
     'single string comma delimited': 'Komma mit Trennzeichen für eine Zeichenfolge',
     'single string space delimited': 'Einzelzeichenfolgenabstand durch Trennzeichen',
     'single-line space delimited': 'einzeiliger Abstand durch Trennzeichen',
+    // yaml-title.ts
+    'first-h1': 'erste Überschrift der Ebene 1',
+    'first-h1-or-filename-if-h1-missing': 'Erste Überschrift der Ebene 1 oder Dateiname, wenn die Überschrift der Ebene 1 fehlt',
+    'filename': 'Dateinamen',
   },
 };
