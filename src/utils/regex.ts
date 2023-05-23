@@ -31,6 +31,9 @@ export const htmlEntitiesRegex = /&[^\s]+;$/mi;
 export const customIgnoreAllStartIndicator = generateHTMLLinterCommentWithSpecificTextAndWhitespaceRegexMatch(true);
 export const customIgnoreAllEndIndicator = generateHTMLLinterCommentWithSpecificTextAndWhitespaceRegexMatch(false);
 
+export const smartDoubleQuoteRegex = /[“”„«»]/g;
+export const smartSingleQuoteRegex = /[‘’‚‹›]/g;
+
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string
 // could have user constructed dollar signs in it

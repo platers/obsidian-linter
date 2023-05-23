@@ -82,6 +82,9 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'error in the yaml: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'unknown error: {ERROR_MESSAGE}',
+
+    // quote-style.ts
+    'uneven-amount-of-quotes': 'The instances of the `{QUOTE}` quote in the file is not even, so we cannot convert straight quotes to smart quotes',
   },
 
   'notice-text': {
@@ -472,6 +475,27 @@ export default {
       'name': 'Proper Ellipsis',
       'description': 'Replaces three consecutive dots with an ellipsis.',
     },
+    // quote-style.ts
+    'quote-style': {
+      'name': 'Quote Style',
+      'description': 'Updates the quotes in the body content to be updated to the specified single and double quote styles.',
+      'single-quote-enabled': {
+        'name': 'Enable `Single Quote Style`',
+        'description': 'Specifies that the selected single quote style should be used.',
+      },
+      'single-quote-style': {
+        'name': 'Single Quote Style',
+        'description': 'The style of single quotes to use.',
+      },
+      'double-quote-enabled': {
+        'name': 'Enable `Double Quote Style`',
+        'description': 'Specifies that the selected double quote style should be used.',
+      },
+      'double-quote-style': {
+        'name': 'Double Quote Style',
+        'description': 'The style of double quotes to use.',
+      },
+    },
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': 'Re-Index Footnotes',
@@ -740,5 +764,10 @@ export default {
     'first-h1': 'First H1',
     'first-h1-or-filename-if-h1-missing': 'First H1 or Filename if H1 is Missing',
     'filename': 'Filename',
+    // quote-style.ts
+    '\'\'': '\'\'', // leave as is
+    '‘’': '‘’', // leave as is
+    '""': '""', // leave as is
+    '“”': '“”', // leave as is
   },
 };
