@@ -1,12 +1,6 @@
 # Issuing PRs, Proof of Concept, and Creating a Release
 
-## Issuing a Pull Request
-
-Once all changes have been made, any applicable tests added, and the linter has applied formats and identified no issues, then it is time to create a pull request.
-
-When creating a pull request, please make sure that if it fixes a bug, adds a requested feature, or implements a suggested refactor, please make sure to include `Fixes #{ISSUE_NUMBER}`. This will help associate the change with the created issue and it will help make sure that issues are closed when their fixes are merged.
-
-Please include a little bit about what the pull request does in the description of the ticket to help give some context to the developers that review the pull request.
+TODO: update this content and maybe find a better structure for this
 
 ### Proof of Concept
 

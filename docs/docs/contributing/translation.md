@@ -1,5 +1,7 @@
 # Translating the Linter
 
+TODO: update this content especially with more code examples
+
 If you would like to help out by translating the Linter either into a new language, adding a new value to a language,
 or update an existing value for a language, these steps should help.
 

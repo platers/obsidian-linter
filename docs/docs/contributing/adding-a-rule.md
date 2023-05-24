@@ -1,7 +1,9 @@
 # Adding a Rule
 
-There are several steps in adding a new rule to the Linter that should be followed that will make your and our lives easier.
-Hopefully it will save you and us time in the long run.
+Before trying to add a rule, make sure that you have setup the Linter for local use as described in the [Setup Guide](getting-setup.md).
+
+Once the Linter is setup locally, there are several steps in adding a new rule to the Linter that should be followed
+that will make your and our lives easier by saving you and us time in the long run.
 
 ## 1. Create a Feature Request
 
@@ -360,12 +362,131 @@ newText = updateListItemText(newText, replaceWhitespaceAroundFullwidthCharacters
 
 ### Rule Examples
 
-TODO: add rule example docs
+Rule examples are pretty important for rules as they serve as both examples that people see in the documentation for
+rules, but also because they double as unit tests that are run in simple and advanced cases so long as they are not `YAML`
+or `PASTE` rules.
+
+**There must be at least 1 example per rule. The more complex the rule the more examples should be shown.**
+
+In the example above, the rule examples looked as follows:
+
+``` TypeScript
+get exampleBuilders(): ExampleBuilder<YamlKeySortOptions>[] {
+  return [
+    new ExampleBuilder({
+      description: 'Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language`',
+      before: dedent`
+        ---
+        language: Typescript
+        type: programming
+        tags: computer
+        keywords: []
+        status: WIP
+        date: 02/15/2022
+        ---
+      `,
+      after: dedent`
+        ---
+        date: 02/15/2022
+        type: programming
+        language: Typescript
+        tags: computer
+        keywords: []
+        status: WIP
+        ---
+      `,
+      options: { // only needed when using non-default values for rule options
+        yamlKeyPrioritySortOrder: [
+          'date',
+          'type',
+          'language',
+        ],
+        yamlSortOrderForOtherKeys: 'None',
+        priorityKeysAtStartOfYaml: true,
+      },
+    }),
+  ];
+}
+```
+
+Here are the properties of each example:
+
+| Name | Description | Is Required (Y/N) |
+| ---- | ----------- | ----------------- |
+| `description` | The name and description of the example which is meant to explain if any options are set that are not the default and give an overview of what the example shows | Y |
+| `before` | This is the file before changes are made by the rule or the clipboard contents before the changes made by the rule when the rule's type is `PASTE` | Y |
+| `after` | This is the file after changes are made by the rule or the clipboard contents after the changes made by the rule when the rule's type is `PASTE` | Y |
+| `options` | These are the options to use for the example. It should only be used for clarity around what options are being set or in order to set non-default values for options. | N |
+
 
 ### Rule Text
 
-TODO: add explanation of how to add rule text to language file(s)
+The text that displays for the rule and its settings is something that needs to be added as well.
+They were mentioned above in the sections talking about [Rule Settings](#rule-settings) and [Rule Constructor](#the-rule-constructor).
+
+At the very least, a new rule requires entries to be added for the rule name and description of the new rule in [en.ts](https://github.com/platers/obsidian-linter/blob/master/src/lang/locale/en.ts).
+
+If we `YAML Key Sort` did not already exist, I would need to navigate to [en.ts](https://github.com/platers/obsidian-linter/blob/master/src/lang/locale/en.ts).
+Once there I would need to find the  `rules` property of the file and determine where the alias for `YAML Key Sort` would go alphabetically or roughly alphabetically.
+That means I would either add the new properties at the start or the end of the rules that start with the letter y since the alias for `YAML Key Sort` is `yaml-key-sort`.
+Once it has been decided where `YAML Key Sort` will be added, we would add the following for the rule name and description:
+
+```TypeScript
+// yaml-key-sort.ts
+'yaml-key-sort': {
+  'name': 'YAML Key Sort',
+  'description': 'Sorts the YAML keys based on the order and priority specified. Note: may remove blank lines as well.',
+},
+```
+
+Then I would need to add entries for each and every rule setting making the final text for rule as follows:
+
+``` TypeScript
+// yaml-key-sort.ts
+'yaml-key-sort': {
+  'name': 'YAML Key Sort',
+  'description': 'Sorts the YAML keys based on the order and priority specified. Note: may remove blank lines as well.',
+  'yaml-key-priority-sort-order': {
+    'name': 'YAML Key Priority Sort Order',
+    'description': 'The order in which to sort keys with one on each line where it sorts in the order found in the list',
+  },
+  'priority-keys-at-start-of-yaml': {
+    'name': 'Priority Keys at Start of YAML',
+    'description': 'YAML Key Priority Sort Order is placed at the start of the YAML frontmatter',
+  },
+  'yaml-sort-order-for-other-keys': {
+    'name': 'YAML Sort Order for Other Keys',
+    'description': 'The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area',
+  },
+},
+```
+
+However we are not quite done. We also had dropdown records that were added, so we also need to navigate to the `enums`
+property in the file and add one value for each new record value text:
+
+``` TypeScript
+'enums': {
+  ...
+  'None': 'None',
+  'Ascending Alphabetical': 'Ascending Alphabetical',
+  'Descending Alphabetical': 'Descending Alphabetical',
+  ...
+},
+  
+```
+
+Once that is done feel free to repeat this change in any other language that is supported by the Linter.
+There is no need to add the values to any other supported languages since the value will come from the English
+text values if it is not found in the other languages. Generally Google Translate is acceptable for the values
+for the initial translation into a language. If someone sees that the value is not correct in the language they use,
+they can suggest a change to the wording.
 
 ## 4. Add Edge Case Tests if Applicable
 
-Once a rule has been created, see about adding tests for edge cases as described [below](#adding-tests).
+Once a rule has been created, see about adding tests for edge cases as described in [Adding Test](testing.md#adding-tests).
+
+## 5. Open a PR
+
+TODO: add open a PR link
+
+Once the tests are in place, the new rule should be ready for review. So go on ahead and [Open a PR]().

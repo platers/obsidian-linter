@@ -33,6 +33,7 @@ nav:
     - Making Code Changes: 'contributing/code-changes.md'
     - Translating the Linter: 'contributing/translation.md'
     - Documenting the Linter: 'contributing/documentation.md'
+    - Opening a PR: 'contributing/open-a-pr.md'
     - Issuing PRs, Proof of Concept, and Creating a Release: 'contributing/others.md'
 plugins:
     - search
