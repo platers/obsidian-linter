@@ -26,8 +26,10 @@ nav:
     - Paste Rules: 'settings/paste-rules.md'
     - Custom Rules: 'settings/custom-rules.md'
     # - Debug Settings: 'settings/debug-settings.md'
-  - Contributing Docs:
+  - Contributing:
     - Plugin Setup: 'contributing/getting-setup.md'
+    - Adding a Rule: 'contributing/adding-a-rule.md'
+    - Testing: 'contributing/testing.md'
     - Making Code Changes: 'contributing/code-changes.md'
     - Translating the Linter: 'contributing/translation.md'
     - Documenting the Linter: 'contributing/documentation.md'
