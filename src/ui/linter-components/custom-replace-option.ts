@@ -31,7 +31,7 @@ export class CustomReplaceOption extends AddCustomRow {
   }
 
   private addRegex(regex: CustomReplace, index: number, focusOnCommand: boolean = false) {
-    new Setting(this.inputElDiv).addText((cb) => {
+    const setting = new Setting(this.inputElDiv).addText((cb) => {
       cb.setPlaceholder(getTextInLanguage('options.custom-replace.regex-to-find-placeholder-text'))
           .setValue(regex.find)
           .onChange((value) => {
@@ -58,6 +58,22 @@ export class CustomReplaceOption extends AddCustomRow {
             this.regexes[index].replace = value;
             this.saveSettings();
           });
+    }).addExtraButton((cb) => {
+      cb.setIcon('up-chevron-glyph')
+          .setTooltip(getTextInLanguage('options.custom-replace.move-up-tooltip'))
+          .onClick(() => {
+            this.arrayMove(index, index - 1);
+            this.saveSettings();
+            this.resetInputEls();
+          });
+    }).addExtraButton((cb) => {
+      cb.setIcon('down-chevron-glyph')
+          .setTooltip(getTextInLanguage('options.custom-replace.move-down-tooltip'))
+          .onClick(() => {
+            this.arrayMove(index, index + 1);
+            this.saveSettings();
+            this.resetInputEls();
+          });
     }).addExtraButton((cb)=>{
       cb.setIcon('cross')
           .setTooltip(getTextInLanguage('options.custom-replace.delete-tooltip'))
@@ -67,5 +83,18 @@ export class CustomReplaceOption extends AddCustomRow {
             this.resetInputEls();
           });
     });
+
+    setting.settingEl.style.flexWrap = 'wrap';
+  }
+
+  // TODO: swap this out for something that actually swaps the values of the html elements as well to avoid the need for a refresh of these settings on swap and delete
+  private arrayMove(fromIndex: number, toIndex: number) {
+    if (toIndex < 0 || toIndex === this.regexes.length) {
+      return;
+    }
+
+    const element = this.regexes[fromIndex];
+    this.regexes[fromIndex] = this.regexes[toIndex];
+    this.regexes[toIndex] = element;
   }
 }

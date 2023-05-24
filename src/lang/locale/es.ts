@@ -167,6 +167,8 @@ export default {
       'regex-to-find-placeholder-text': 'Regex para encontrar',
       'flags-placeholder-text': 'Marcas',
       'regex-to-replace-placeholder-text': 'Regex para reemplazar',
+      'move-up-tooltip': 'Desplazar hacia arriba',
+      'move-down-tooltip': 'Desplazar hacia abajo',
       'delete-tooltip': 'Borrar',
     },
   },
