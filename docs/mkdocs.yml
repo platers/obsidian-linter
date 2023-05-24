@@ -24,8 +24,14 @@ nav:
     - Content Rules: 'settings/content-rules.md'
     - Spacing Rules: 'settings/spacing-rules.md'
     - Paste Rules: 'settings/paste-rules.md'
-    # - Custom Rules: 'settings/custom-rules.md'
+    - Custom Rules: 'settings/custom-rules.md'
     # - Debug Settings: 'settings/debug-settings.md'
+  - Contributing Docs:
+    - Plugin Setup: 'contributing/getting-setup.md'
+    - Making Code Changes: 'contributing/code-changes.md'
+    - Translating the Linter: 'contributing/translation.md'
+    - Documenting the Linter: 'contributing/documentation.md'
+    - Issuing PRs, Proof of Concept, and Creating a Release: 'contributing/others.md'
 plugins:
     - search
     - mermaid2
