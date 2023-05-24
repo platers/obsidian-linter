@@ -26,7 +26,7 @@ export default class ConsecutiveBlankLines extends RuleBuilder<ConsecutiveBlankL
   get exampleBuilders(): ExampleBuilder<ConsecutiveBlankLinesOptions>[] {
     return [
       new ExampleBuilder({
-        description: '',
+        description: 'Consecutive blank lines are removed',
         before: dedent`
           Some text
           ${''}

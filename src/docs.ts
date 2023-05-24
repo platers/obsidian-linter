@@ -1,7 +1,7 @@
 import {readFileSync, writeFileSync} from 'fs';
 import dedent from 'ts-dedent';
 import {DropdownOption} from './option';
-import {rules} from './rules';
+import {RuleType, rules} from './rules';
 import './rules-registry';
 
 const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->\n';
@@ -33,34 +33,32 @@ function generateReadme() {
 }
 
 function generateDocs() {
-  const rules_template = readFileSync('./docs/templates/rules_template.md', 'utf8');
+  // const rules_template = readFileSync('./docs/templates/rules_template.md', 'utf8');
 
   let rules_docs = '';
   let prevSection = '';
   for (const rule of rules) {
     const examples = rule.examples.map((test) => dedent`
-      Example: ${test.description}
+      <details><summary>${test.description}</summary>
       ${''}
       Before:
       ${''}
-      \`\`\`\`\`\`markdown
+      \`\`\`\`\`\` markdown
       ${test.before}
       \`\`\`\`\`\`
       ${''}
       After:
       ${''}
-      \`\`\`\`\`\`markdown
+      \`\`\`\`\`\` markdown
       ${test.after}
       \`\`\`\`\`\`
+      </details>
     `).join('\n');
 
     const options_list = rule.options.slice(1).map((option) => {
-      let text = dedent`
-        - ${option.getName()}: ${option.getDescription()}
-        \t- Default: \`${option.defaultValue}\`
-      `;
-
+      let listItems = '';
       if (option instanceof DropdownOption) {
+        let listItemNumber = 0;
         for (const record of option.options) {
           const nameParts = record.value.split('.');
           let name = '';
@@ -70,13 +68,28 @@ function generateDocs() {
             name = nameParts[nameParts.length - 1];
           }
 
+          // accounts for the fact that one of the rules has a period as its list value
           if (name == '') {
             name = '.';
           }
 
-          text += `\n\t- \`${name}\`: ${record.description}`;
+          if (listItemNumber > 0) {
+            listItems += '<br/><br/>';
+          }
+          listItems += `\`${name}\`: ${record.description}`;
+          listItemNumber++;
         }
       }
+      listItems = listItems || 'N/A';
+
+      let defaultValue = option.defaultValue;
+      if (defaultValue != '') {
+        defaultValue = `\`${defaultValue}\``;
+      }
+      const text = dedent`
+        | \`${option.getName()}\` | ${option.getDescription()} | ${listItems} | ${defaultValue} |
+      `;
+
 
       return text;
     }).join('\n');
@@ -84,15 +97,19 @@ function generateDocs() {
     if (options_list.length > 0) {
       options = dedent`
         Options:
+
+        | Name | Description | List Items | Default Value |
+        | ---- | ----------- | ---------- | ------------- |
         ${options_list}
       `;
     }
 
     if (rule.type !== prevSection) {
-      rules_docs += dedent`
-        ${''}
-        ## ${rule.type}
-      `;
+      if (prevSection !== '') {
+        writeRuleDocument(prevSection, rules_docs);
+      }
+
+      rules_docs = '';
       prevSection = rule.type;
     }
 
@@ -106,19 +123,34 @@ function generateDocs() {
       ${''}
       ${options}
       ${''}
+      Examples:
+      ${''}
       ${examples}
       ${''}
     `;
   }
 
+  writeRuleDocument(prevSection, rules_docs);
+
+  // const rules_documentation = dedent`
+  //   ${autogen_warning}
+  //   ${''}
+  //   ${rules_template}
+  //   ${''}
+  //   ${rules_docs}
+  // `;
+
+  // writeFileSync('./docs/rules.md', rules_documentation);
+  console.log('Rules documentation updated');
+}
+
+function writeRuleDocument(ruleTypeName: string, rules_docs: string) {
   const rules_documentation = dedent`
     ${autogen_warning}
     ${''}
-    ${rules_template}
-    ${''}
+    # ${ruleTypeName} Rules
     ${rules_docs}
   `;
 
-  writeFileSync('./docs/rules.md', rules_documentation);
-  console.log('Rules documentation updated');
+  writeFileSync(`./docs/docs/settings/${ruleTypeName.toLowerCase()}-rules.md`, rules_documentation);
 }
