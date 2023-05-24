@@ -34,6 +34,8 @@ export const customIgnoreAllEndIndicator = generateHTMLLinterCommentWithSpecific
 export const smartDoubleQuoteRegex = /[“”„«»]/g;
 export const smartSingleQuoteRegex = /[‘’‚‹›]/g;
 
+export const templaterCommandRegex = /<%[^]*?%>/g;
+
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string
 // could have user constructed dollar signs in it

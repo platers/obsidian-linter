@@ -211,7 +211,7 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
       nameKey: 'rules.quote-style.name',
       descriptionKey: 'rules.quote-style.description',
       type: RuleType.CONTENT,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html, IgnoreTypes.templaterCommand],
     });
   }
   get OptionsClass(): new () => QuoteStyleOptions {
@@ -348,6 +348,7 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
           "Nesting a quote in a quote like so: 'here I am' is handled correctly"
           'Single quotes by themselves are handled correctly'
           Possessives are handled correctly: Pam's dog is really cool!
+          Templater commands are ignored: <% tp.date.now("YYYY-MM-DD", 7) %>
           ${''}
           Be careful as converting straight quotes to smart quotes requires you to have an even amount of quotes
           once possessives and common contractions have been dealt with. If not, it will throw an error.
@@ -358,6 +359,7 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
           “Nesting a quote in a quote like so: ‘here I am’ is handled correctly”
           ‘Single quotes by themselves are handled correctly’
           Possessives are handled correctly: Pam’s dog is really cool!
+          Templater commands are ignored: <% tp.date.now("YYYY-MM-DD", 7) %>
           ${''}
           Be careful as converting straight quotes to smart quotes requires you to have an even amount of quotes
           once possessives and common contractions have been dealt with. If not, it will throw an error.
