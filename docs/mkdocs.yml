@@ -1,0 +1,31 @@
+site_name: Linter
+site_url: https://example.com/
+markdown_extensions:
+  - abbr
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist
+theme:
+  name: material
+  palette:
+    primary: deep purple
+nav:
+  - Overview: 'index.md'
+  - Usage:
+    - Running Rules: 'usage/running-rules.md'
+    - Disabling Rules: 'usage/disabling-rules.md'
+  - Settings and Rules:
+    - General Settings: settings/general-settings.md
+    - YAML Rules: 'settings/yaml-rules.md'
+    - Heading Rules: 'settings/heading-rules.md'
+    - Footnote Rules: 'settings/footnote-rules.md'
+    - Content Rules: 'settings/content-rules.md'
+    - Spacing Rules: 'settings/spacing-rules.md'
+    - Paste Rules: 'settings/paste-rules.md'
+    # - Custom Rules: 'settings/custom-rules.md'
+    # - Debug Settings: 'settings/debug-settings.md'
+plugins:
+    - search
+    - mermaid2
