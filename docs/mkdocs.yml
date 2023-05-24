@@ -1,12 +1,10 @@
 site_name: Linter
 site_url: https://example.com/
 markdown_extensions:
-  - abbr
   - admonition
   - pymdownx.highlight
   - pymdownx.superfences
   - pymdownx.tabbed
-  - pymdownx.tasklist
 theme:
   name: material
   palette:
@@ -25,16 +23,16 @@ nav:
     - Spacing Rules: 'settings/spacing-rules.md'
     - Paste Rules: 'settings/paste-rules.md'
     - Custom Rules: 'settings/custom-rules.md'
-    # - Debug Settings: 'settings/debug-settings.md'
   - Contributing:
     - Plugin Setup: 'contributing/getting-setup.md'
     - Adding a Rule: 'contributing/adding-a-rule.md'
+    - Bug Fixes: 'contributing/bug-fix.md'
+    - Refactoring Code: 'contributing/refactoring.md'
     - Testing: 'contributing/testing.md'
-    - Making Code Changes: 'contributing/code-changes.md'
     - Translating the Linter: 'contributing/translation.md'
     - Documenting the Linter: 'contributing/documentation.md'
-    - Opening a PR: 'contributing/open-a-pr.md'
-    - Issuing PRs, Proof of Concept, and Creating a Release: 'contributing/others.md'
+    - Opening a Pull Request: 'contributing/open-a-pr.md'
+    - Creating a Release: 'contributing/releasing.md'
+  - Credits: 'credits.md'
 plugins:
-    - search
-    - mermaid2
+  - search

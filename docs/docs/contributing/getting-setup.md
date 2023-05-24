@@ -2,6 +2,7 @@
 
 You will want to start by forking this repository. Once that is done, you will want to clone your fork of the repository.
 The command should look something like the following:
+
 ``` sh
 git clone https://github.com/{USERNAME_HERE}/obsidian-linter/
 ```

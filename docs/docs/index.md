@@ -6,3 +6,10 @@ their notes as uniform as possible. This includes, but is not limited to, rules 
 markdown headings, github flavored footnotes, general markdown content, spacing, and pasting content within the app.
 
 ## How it Works
+
+```mermaid
+graph LR
+    hello --> world
+    world --> again
+    again --> hello
+```

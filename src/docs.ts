@@ -1,7 +1,7 @@
 import {readFileSync, writeFileSync} from 'fs';
 import dedent from 'ts-dedent';
 import {DropdownOption} from './option';
-import {RuleType, rules} from './rules';
+import {rules} from './rules';
 import './rules-registry';
 
 const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->\n';
@@ -33,8 +33,6 @@ function generateReadme() {
 }
 
 function generateDocs() {
-  // const rules_template = readFileSync('./docs/templates/rules_template.md', 'utf8');
-
   let rules_docs = '';
   let prevSection = '';
   for (const rule of rules) {
@@ -115,7 +113,7 @@ function generateDocs() {
 
     rules_docs += dedent`
       ${''}
-      ### ${rule.getName()}
+      ## ${rule.getName()}
       ${''}
       Alias: \`${rule.alias}\`
       ${''}
@@ -132,15 +130,6 @@ function generateDocs() {
 
   writeRuleDocument(prevSection, rules_docs);
 
-  // const rules_documentation = dedent`
-  //   ${autogen_warning}
-  //   ${''}
-  //   ${rules_template}
-  //   ${''}
-  //   ${rules_docs}
-  // `;
-
-  // writeFileSync('./docs/rules.md', rules_documentation);
   console.log('Rules documentation updated');
 }
 

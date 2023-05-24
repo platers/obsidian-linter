@@ -485,8 +485,6 @@ they can suggest a change to the wording.
 
 Once a rule has been created, see about adding tests for edge cases as described in [Adding Test](testing.md#adding-tests).
 
-## 5. Open a PR
+## 5. Open a Pull Request
 
-TODO: add open a PR link
-
-Once the tests are in place, the new rule should be ready for review. So go on ahead and [Open a PR]().
+Once the tests are in place, the new rule should be ready for review. So go on ahead and [open a pull request](open-a-pr.md).
