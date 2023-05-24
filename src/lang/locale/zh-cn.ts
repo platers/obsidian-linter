@@ -82,6 +82,9 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'yaml出现错误: {ERROR_MESSAGE}',
     'wrapper-unknown-error': '未知错误: {ERROR_MESSAGE}',
+
+    // quote-style.ts
+    'uneven-amount-of-quotes': '`{QUOTE}` 引号在文件中的实例不是偶数，所以我们无法将直引号转换为弯引号',
   },
 
   'notice-text': {
@@ -472,6 +475,27 @@ export default {
       'name': '正确的省略号',
       'description': '用省略号替换三个连续的点。',
     },
+    // quote-style.ts
+    'quote-style': {
+      'name': '报价风格',
+      'description': '更新正文内容中的引号以更新为指定的单引号和双引号样式。',
+      'single-quote-enabled': {
+        'name': '启用`单引号样式`',
+        'description': '指定应使用选定的单引号样式。',
+      },
+      'single-quote-style': {
+        'name': '单引号样式',
+        'description': '要使用的单引号样式。',
+      },
+      'double-quote-enabled': {
+        'name': '启用`双引号样式`',
+        'description': '指定应使用选定的双引号样式。',
+      },
+      'double-quote-style': {
+        'name': '双引号样式',
+        'description': '要使用的双引号样式。',
+      },
+    },
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': '重新索引脚注',
@@ -740,5 +764,9 @@ export default {
     'first-h1': '第一级标题',
     'first-h1-or-filename-if-h1-missing': '第一级 1 标题或文件名（如果缺少 1 级标题）',
     'filename': '文件名',
+    '\'\'': '\'\'', // leave as is
+    '‘’': '‘’', // leave as is
+    '""': '""', // leave as is
+    '“”': '“”', // leave as is
   },
 };
