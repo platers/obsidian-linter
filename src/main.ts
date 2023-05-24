@@ -42,6 +42,8 @@ const langToMomentLocale = {
   'ja': 'ja',
 };
 
+const userClickTimeout = 0;
+
 const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   ruleConfigs: {},
   lintOnSave: false,
@@ -294,7 +296,6 @@ export default class LinterPlugin extends Plugin {
       }
     }));
 
-    const userClickTimeout = 0;
     if (numberOfErrors === 0) {
       new Notice(getTextInLanguage('commands.lint-all-files.success-message'), userClickTimeout);
     } else {
@@ -323,7 +324,6 @@ export default class LinterPlugin extends Plugin {
       }
     }));
 
-    const userClickTimeout = 0;
     if (numberOfErrors === 0) {
       new Notice(getTextInLanguage('commands.lint-all-files-in-folder.success-message').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name), userClickTimeout);
     } else {
@@ -419,7 +419,7 @@ export default class LinterPlugin extends Plugin {
         ${charsAdded} ${getTextInLanguage('notice-text.characters-added')}
         ${charsRemoved} ${getTextInLanguage('notice-text.characters-removed')}
       `;
-      new Notice(message);
+      new Notice(message, userClickTimeout);
     }
   }
 
@@ -429,12 +429,12 @@ export default class LinterPlugin extends Plugin {
 
     if (error instanceof LinterError) {
       if (useLogTemplateInNotice) {
-        new Notice(`${errorMessage} ${error.message}.\n${seeConsoleText}`);
+        new Notice(`${errorMessage} ${error.message}.\n${seeConsoleText}`, userClickTimeout);
       } else {
-        new Notice(`${error.message}.\n${seeConsoleText}`);
+        new Notice(`${error.message}.\n${seeConsoleText}`, userClickTimeout);
       }
     } else {
-      new Notice(`${getTextInLanguage('logs.unknown-error')} ${seeConsoleText}`);
+      new Notice(`${getTextInLanguage('logs.unknown-error')} ${seeConsoleText}`, userClickTimeout);
     }
 
     logError(errorMessage, error);
@@ -540,7 +540,7 @@ export default class LinterPlugin extends Plugin {
   async pasteAsPlainText(editor: Editor): Promise<void> {
     const clipboardContent = await navigator.clipboard.readText();
     if (!clipboardContent) {
-      new Notice(getTextInLanguage('notice-text.empty-clipboard'));
+      new Notice(getTextInLanguage('notice-text.empty-clipboard'), userClickTimeout);
       return;
     }
 

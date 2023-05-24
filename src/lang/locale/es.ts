@@ -66,6 +66,7 @@ export default {
     'too-many-footnotes-error-message': `La clave de nota al pie '{FOOTNOTE_KEY}' tiene más de 1 nota al pie que hace referencia a ella. Actualice las notas al pie para que solo haya una nota al pie por clave de nota al pie.`,
     'wrapper-yaml-error': 'hubo un error en el yaml: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'huno un error desconocido: {ERROR_MESSAGE}',
+    'uneven-amount-of-quotes': 'Las instancias de la cita `{QUOTE}` en el archivo no son pares, por lo que no podemos convertir las comillas rectas en comillas tipográficas.',
   },
   'notice-text': {
     'empty-clipboard': 'No hay contenido del portapapeles.',
@@ -406,6 +407,26 @@ export default {
       'name': 'Puntos suspensivos propios',
       'description': 'Reemplaza tres puntos consecutivos con puntos suspensivos.',
     },
+    'quote-style': {
+      'name': 'Estilo de cotización',
+      'description': 'Actualiza las comillas en el contenido del cuerpo para que se actualicen a los estilos de comillas simples y dobles especificados.',
+      'single-quote-enabled': {
+        'name': 'Habilitar `Estilo de comillas simples`',
+        'description': 'Especifica que se debe utilizar el estilo de comillas simples seleccionado.',
+      },
+      'single-quote-style': {
+        'name': 'Estilo de comillas simples',
+        'description': 'El estilo de las comillas simples a utilizar.',
+      },
+      'double-quote-enabled': {
+        'name': 'Habilitar `Estilo de comillas dobles`',
+        'description': 'Especifica que se debe utilizar el estilo de comillas dobles seleccionado.',
+      },
+      'double-quote-style': {
+        'name': 'Estilo de comillas dobles',
+        'description': 'El estilo de comillas dobles a utilizar.',
+      },
+    },
     're-index-footnotes': {
       'name': 'Volver a indexar notas al pie',
       'description': 'Vuelve a indexar las notas al pie de página y las notas al pie, según el orden de aparición (NOTA: esta regla *no* funciona si hay más de una nota al pie para una clave).',
@@ -645,5 +666,9 @@ export default {
     'first-h1': 'primer encabezado de nivel 1',
     'first-h1-or-filename-if-h1-missing': 'primer encabezado de nivel 1 o nombre de archivo si falta el encabezado de primer nivel 1',
     'filename': 'nombre del archivo',
+    '\'\'': '\'\'', // leave as is
+    '‘’': '‘’', // leave as is
+    '""': '""', // leave as is
+    '“”': '“”', // leave as is
   },
 };

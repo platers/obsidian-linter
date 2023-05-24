@@ -82,6 +82,9 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'Fehler in der YAML: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'Unbekannter Fehler: {ERROR_MESSAGE}',
+
+    // quote-style.ts
+    'uneven-amount-of-quotes': 'Die Vorkommen des Anführungszeichens `{QUOTE}` in der Datei sind nicht gerade, daher können wir gerade Anführungszeichen nicht in intelligente Anführungszeichen umwandeln',
   },
 
   'notice-text': {
@@ -472,6 +475,27 @@ export default {
       'name': 'Richtige Auslassungspunkte',
       'description': 'Ersetzt drei aufeinanderfolgende Punkte durch Auslassungspunkte.',
     },
+    // quote-style.ts
+    'quote-style': {
+      'name': 'Zitatstil',
+      'description': 'Aktualisiert die Anführungszeichen im Textkörperinhalt, sodass sie auf die angegebenen einfachen und doppelten Anführungszeichenstile aktualisiert werden.',
+      'single-quote-enabled': {
+        'name': 'Aktivieren Sie `Stil für einfache Anführungszeichen`',
+        'description': 'Gibt an, dass der ausgewählte einfache Anführungszeichenstil verwendet werden soll.',
+      },
+      'single-quote-style': {
+        'name': 'Stil für einfache Anführungszeichen',
+        'description': 'Der Stil der zu verwendenden einfachen Anführungszeichen.',
+      },
+      'double-quote-enabled': {
+        'name': 'Aktivieren Sie `Stil für doppelte Anführungszeichen`',
+        'description': 'Gibt an, dass der ausgewählte doppelte Anführungszeichenstil verwendet werden soll.',
+      },
+      'double-quote-style': {
+        'name': 'Stil für doppelte Anführungszeichen',
+        'description': 'Der zu verwendende Stil der doppelten Anführungszeichen.',
+      },
+    },
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': 'Fußnoten neu indizieren',
@@ -740,5 +764,10 @@ export default {
     'first-h1': 'erste Überschrift der Ebene 1',
     'first-h1-or-filename-if-h1-missing': 'Erste Überschrift der Ebene 1 oder Dateiname, wenn die Überschrift der Ebene 1 fehlt',
     'filename': 'Dateinamen',
+    // quote-style.ts
+    '\'\'': '\'\'', // leave as is
+    '‘’': '‘’', // leave as is
+    '""': '""', // leave as is
+    '“”': '“”', // leave as is
   },
 };

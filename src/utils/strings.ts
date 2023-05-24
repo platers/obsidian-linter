@@ -325,3 +325,19 @@ export function replaceAt(text: string, search: string, replace: string, start: 
   return text.slice(0, start) +
       text.slice(start, text.length).replace(search, replace);
 }
+
+// based on https://stackoverflow.com/a/21730166/8353749
+export function countInstances(text: string, instancesOf: string): number {
+  let counter = 0;
+
+  for (let i = 0, input_length = text.length; i < input_length; i++) {
+    const index_of_sub = text.indexOf(instancesOf, i);
+
+    if (index_of_sub > -1) {
+      counter++;
+      i = index_of_sub;
+    }
+  }
+
+  return counter;
+}
