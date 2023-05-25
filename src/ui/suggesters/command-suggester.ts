@@ -1,6 +1,6 @@
+import {LintCommand} from '../linter-components/custom-command-option';
 import {TextInputSuggest} from './suggest';
 import type {App, Command} from 'obsidian';
-import {LintCommand} from 'src/rules';
 
 export default class CommandSuggester extends TextInputSuggest<Command> {
   constructor(

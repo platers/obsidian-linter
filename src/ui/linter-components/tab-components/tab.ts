@@ -50,7 +50,7 @@ export abstract class Tab {
     }
 
     this.navButton.addClass(tabClass);
-    setIcon(this.navButton.createSpan({cls: 'linter-navigation-item-icon'}), tabNameToTabIconId[name], 20);
+    setIcon(this.navButton.createSpan({cls: 'linter-navigation-item-icon'}), tabNameToTabIconId[name]);
 
     const nameInLanguage = getTextInLanguage(tabNameToTextKey[name]);
     this.navButton.createSpan().setText(nameInLanguage);
