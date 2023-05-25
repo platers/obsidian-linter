@@ -27,7 +27,7 @@ export class GeneralTab extends Tab {
               });
         });
 
-    parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl);
+    parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl, this.plugin.settingsTab.component);
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 

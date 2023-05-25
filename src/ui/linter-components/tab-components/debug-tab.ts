@@ -65,7 +65,7 @@ export class DebugTab extends Tab {
               });
         });
 
-    parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl);
+    parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl, this.plugin.settingsTab.component);
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
@@ -75,7 +75,7 @@ export class DebugTab extends Tab {
     const logDisplay = new TextBoxFull(tempDiv, settingName, '');
     logDisplay.inputEl.setText(logsFromLastRun.join('\n'));
 
-    parseTextToHTMLWithoutOuterParagraph(settingDesc, logDisplay.descEl);
+    parseTextToHTMLWithoutOuterParagraph(settingDesc, logDisplay.descEl, this.plugin.settingsTab.component);
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
   }

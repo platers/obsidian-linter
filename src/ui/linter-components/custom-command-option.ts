@@ -1,4 +1,4 @@
-import {Setting, App} from 'obsidian';
+import {Setting, App, Component} from 'obsidian';
 import {getTextInLanguage} from 'src/lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 import CommandSuggester from '../suggesters/command-suggester';
@@ -6,8 +6,9 @@ import CommandSuggester from '../suggesters/command-suggester';
 export type LintCommand = { id: string, name: string };
 
 export class CustomCommandOption extends AddCustomRow {
-  constructor(containerEl: HTMLElement, public lintCommands: LintCommand[], isMobile: boolean, private app: App, saveSettings: () => void) {
+  constructor(containerEl: HTMLElement, parentComponent: Component, public lintCommands: LintCommand[], isMobile: boolean, private app: App, saveSettings: () => void) {
     super(containerEl,
+        parentComponent,
         getTextInLanguage('options.custom-command.name'),
         getTextInLanguage('options.custom-command.description'),
         getTextInLanguage('options.custom-command.warning'),

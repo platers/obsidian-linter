@@ -66,6 +66,7 @@ const DEFAULT_SETTINGS: Partial<LinterSettings> = {
 
 export default class LinterPlugin extends Plugin {
   settings: LinterSettings;
+  settingsTab: SettingTab;
   private eventRefs: EventRef[] = [];
   private momentLocale: string;
   private isEnabled: boolean = true;
@@ -88,7 +89,8 @@ export default class LinterPlugin extends Plugin {
 
     this.registerEventsAndSaveCallback();
 
-    this.addSettingTab(new SettingTab(this.app, this));
+    this.settingsTab = new SettingTab(this.app, this);
+    this.addSettingTab(this.settingsTab);
   }
 
   async onunload() {
