@@ -796,13 +796,18 @@ modified: Wednesday, January 1st 2020, 4:00:00 pm
 
 Alias: `yaml-title`
 
-Inserts the title of the file into the YAML frontmatter. Gets the title from the first H1 or filename if there is no H1.
+Inserts the title of the file into the YAML frontmatter. Gets the title based on the selected mode.
 
 Options:
 - Title Key: Which YAML key to use for title
 	- Default: `title`
+- Mode: The method to use to get the title
+	- Default: `first-h1-or-filename-if-h1-missing`
+	- `first-h1-or-filename-if-h1-missing`: Uses the first H1 in the file or the filename of the file if there is not H1
+	- `filename`: Uses the filename as the title
+	- `first-h1`: Uses the first H1 in the file as the title
 
-Example: Adds a header with the title from heading.
+Example: Adds a header with the title from heading when `mode = 'First H1 or Filename if H1 Missing'`.
 
 Before:
 
@@ -818,7 +823,7 @@ title: Obsidian
 ---
 # Obsidian
 ``````
-Example: Adds a header with the title.
+Example: Adds a header with the title when `mode = 'First H1 or Filename if H1 Missing'`.
 
 Before:
 
@@ -834,7 +839,7 @@ title: Filename
 ---
 
 ``````
-Example: Make sure that markdown links in headings are properly copied to the yaml as just the text
+Example: Make sure that markdown links in headings are properly copied to the YAML as just the text when `mode = 'First H1 or Filename if H1 Missing'`
 
 Before:
 
@@ -849,6 +854,38 @@ After:
 title: This is a Heading
 ---
 # This is a [Heading](test heading.md)
+``````
+Example: When `mode = 'First H1'`, title does not have a value if no H1 is present
+
+Before:
+
+``````markdown
+## This is a Heading
+``````
+
+After:
+
+``````markdown
+---
+title: ""
+---
+## This is a Heading
+``````
+Example: When `mode = 'Filename'`, title uses the filename ignoring all H1s. Note: the filename is "Filename" in this example.
+
+Before:
+
+``````markdown
+# This is a Heading
+``````
+
+After:
+
+``````markdown
+---
+title: Filename
+---
+# This is a Heading
 ``````
 
 ### YAML Title Alias
@@ -2028,6 +2065,83 @@ After:
 
 ``````markdown
 Lorem (…) Impsum.
+``````
+
+### Quote Style
+
+Alias: `quote-style`
+
+Updates the quotes in the body content to be updated to the specified single and double quote styles.
+
+Options:
+- Enable `Single Quote Style`: Specifies that the selected single quote style should be used.
+	- Default: `true`
+- Single Quote Style: The style of single quotes to use.
+	- Default: `''`
+	- `''`: Uses "'" instead of smart single quotes
+	- `‘’`: Uses "‘" and "’" instead of straight single quotes
+- Enable `Double Quote Style`: Specifies that the selected double quote style should be used.
+	- Default: `true`
+- Double Quote Style: The style of double quotes to use.
+	- Default: `""`
+	- `""`: Uses '"' instead of smart double quotes
+	- `“”`: Uses '“' and '”' instead of straight double quotes
+
+Example: Smart quotes used in file are converted to straight quotes when styles are set to `Straight`
+
+Before:
+
+``````markdown
+# Double Quote Cases
+“There are a bunch of different kinds of smart quote indicators”
+„More than you would think”
+«Including this one for Spanish»
+# Single Quote Cases
+‘Simple smart quotes get replaced’
+‚Another single style smart quote also gets replaced’
+‹Even this style of single smart quotes is replaced›
+``````
+
+After:
+
+``````markdown
+# Double Quote Cases
+"There are a bunch of different kinds of smart quote indicators"
+"More than you would think"
+"Including this one for Spanish"
+# Single Quote Cases
+'Simple smart quotes get replaced'
+'Another single style smart quote also gets replaced'
+'Even this style of single smart quotes is replaced'
+``````
+Example: Straight quotes used in file are converted to smart quotes when styles are set to `Smart`
+
+Before:
+
+``````markdown
+"As you can see, these double quotes will be converted to smart quotes"
+"Common contractions are handled as well. For example can't is updated to smart quotes."
+"Nesting a quote in a quote like so: 'here I am' is handled correctly"
+'Single quotes by themselves are handled correctly'
+Possessives are handled correctly: Pam's dog is really cool!
+Templater commands are ignored: <% tp.date.now("YYYY-MM-DD", 7) %>
+
+Be careful as converting straight quotes to smart quotes requires you to have an even amount of quotes
+once possessives and common contractions have been dealt with. If not, it will throw an error.
+``````
+
+After:
+
+``````markdown
+“As you can see, these double quotes will be converted to smart quotes”
+“Common contractions are handled as well. For example can’t is updated to smart quotes.”
+“Nesting a quote in a quote like so: ‘here I am’ is handled correctly”
+‘Single quotes by themselves are handled correctly’
+Possessives are handled correctly: Pam’s dog is really cool!
+Templater commands are ignored: <% tp.date.now("YYYY-MM-DD", 7) %>
+
+Be careful as converting straight quotes to smart quotes requires you to have an even amount of quotes
+once possessives and common contractions have been dealt with. If not, it will throw an error.
 ``````
 
 ### Remove Consecutive List Markers
