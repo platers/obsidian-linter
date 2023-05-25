@@ -929,5 +929,5 @@ export function getAllCustomIgnoreSectionsInText(text: string): {startIndex: num
     }
   });
 
-  return positions;
+  return positions.reverse();
 }

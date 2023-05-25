@@ -91,7 +91,37 @@ const getCustomIgnoreSectionsInTextTestCases: customIgnoresInTextTestCase[] = [
       Finish
     `,
     expectedCustomIgnoresInText: 2,
-    expectedPositions: [{startIndex: 17, endIndex: 87}, {startIndex: 178, endIndex: 316}],
+    expectedPositions: [{startIndex: 178, endIndex: 316}, {startIndex: 17, endIndex: 87}],
+  },
+  { // relates to https://github.com/platers/obsidian-linter/issues/733
+    name: 'multiple matches can be returned',
+    text: dedent`
+      content
+      ${''}
+      <!-- linter-disable -->
+      ${''}
+      $$
+      abc
+      $$
+      {#eq:a}
+      ${''}
+      <!-- linter-enable -->
+      ${''}
+      content
+      ${''}
+      <!-- linter-disable -->
+      ${''}
+      $$
+      abc
+      $$
+      {#eq:b}
+      ${''}
+      <!-- linter-enable -->
+      ${''}
+      content
+    `,
+    expectedCustomIgnoresInText: 2,
+    expectedPositions: [{startIndex: 86, endIndex: 152}, {startIndex: 9, endIndex: 75}],
   },
 ];
 
