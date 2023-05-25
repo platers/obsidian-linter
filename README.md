@@ -22,6 +22,10 @@ When `Lint on save` is toggled on, the plugin will lint the current file on manu
 
 ### Disable rules
 
+#### YAML Frontmatter
+
+If you would like to disable all rules, one rule, or some set of rules for an entire file, you can add a key to the YAML frontmatter of the file. The expected key is `disabled rules`.
+
 ```markdown
 ---
 disabled rules: [capitalize-headings]
@@ -31,6 +35,24 @@ disabled rules: [capitalize-headings]
 Add `disabled rules: [ ... ]` to the YAML frontmatter of a file to disable those rules when linting that file.
 
 Add `disabled rules: [ all ]` to the YAML frontmatter of a file to disable all rules.
+
+#### Range Ignore
+
+If you are looking for a way to disable rules for a specific part of a file, that can be done with a ranged ignore. The syntax for a ranged ignore is `<!-- linter-disable -->` with an optional `<!-- linter-enable -->` where you want the Linter to start back up with its linting.
+Leaving off the ending of a range ignore will assume you want to ignore the file contents from the start of the range ignore to the end of the file. So be careful when not ending a range ignore.
+
+**Do note that this only prevents the values in the range ignore from being linted. It does not prevent whitespace or other additions around the ranged ignore.**
+
+``` markdown
+Here is some text
+<!-- linter-disable -->
+                          This area will not be formatted
+<!-- linter-enable -->
+More content goes here...
+```
+
+Things to note about range ignores:
+- Paste rules are not affected by range ignores as that would require the copied text to have a range ignore in them.
 
 ## Rules
 
@@ -76,6 +98,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [no-bare-urls](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#no-bare-urls)
 - [ordered-list-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#ordered-list-style)
 - [proper-ellipsis](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#proper-ellipsis)
+- [quote-style](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#quote-style)
 - [remove-consecutive-list-markers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-consecutive-list-markers)
 - [remove-empty-list-markers](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-empty-list-markers)
 - [remove-hyphenated-line-breaks](https://github.com/platers/obsidian-linter/blob/master/docs/rules.md#remove-hyphenated-line-breaks)
