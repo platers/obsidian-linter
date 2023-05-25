@@ -1,4 +1,4 @@
-import {Setting} from 'obsidian';
+import {Component, Setting} from 'obsidian';
 import {parseTextToHTMLWithoutOuterParagraph} from '../helpers';
 
 /**
@@ -10,6 +10,7 @@ export abstract class AddCustomRow {
 
   constructor(
     public containerEl: HTMLElement,
+    public parentComponent: Component,
     public name: string,
     public description: string,
     public warning: string,
@@ -22,7 +23,7 @@ export abstract class AddCustomRow {
   display() {
     this.containerEl.createEl(this.isMobile ? 'h4' : 'h3', {text: this.name});
 
-    parseTextToHTMLWithoutOuterParagraph(this.description, this.containerEl);
+    parseTextToHTMLWithoutOuterParagraph(this.description, this.containerEl, this.parentComponent);
     if (this.warning != null) {
       this.containerEl.createEl('p', {text: this.warning, cls: 'mod-warning'});
     }

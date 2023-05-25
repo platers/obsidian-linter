@@ -42,9 +42,9 @@ export abstract class Option {
     settings.ruleConfigs[this.ruleAlias][this.configKey] = value;
   }
 
-  protected parseNameAndDescriptionAndRemoveSettingBorder(setting: Setting) {
-    parseTextToHTMLWithoutOuterParagraph(this.getName(), setting.nameEl);
-    parseTextToHTMLWithoutOuterParagraph(this.getDescription(), setting.descEl);
+  protected parseNameAndDescriptionAndRemoveSettingBorder(setting: Setting, plugin: LinterPlugin) {
+    parseTextToHTMLWithoutOuterParagraph(this.getName(), setting.nameEl, plugin.settingsTab.component);
+    parseTextToHTMLWithoutOuterParagraph(this.getDescription(), setting.descEl, plugin.settingsTab.component);
 
     // remove border around every setting item
     setting.settingEl.style.border = 'none';
@@ -65,7 +65,7 @@ export class BooleanOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(setting);
+    this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
   }
 }
 
@@ -83,7 +83,7 @@ export class TextOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(setting);
+    this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
   }
 }
 
@@ -101,7 +101,7 @@ export class TextAreaOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(setting);
+    this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
   }
 }
 
@@ -120,7 +120,7 @@ export class MomentFormatOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(setting);
+    this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
   }
 }
 
@@ -169,6 +169,6 @@ export class DropdownOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(setting);
+    this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
   }
 }

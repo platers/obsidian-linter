@@ -1,4 +1,4 @@
-import {App, Platform, PluginSettingTab} from 'obsidian';
+import {App, Component, Platform, PluginSettingTab} from 'obsidian';
 import LinterPlugin from 'src/main';
 import {RuleType, ruleTypeToRules} from 'src/rules';
 import {hideEl} from './helpers';
@@ -11,23 +11,24 @@ import {DebugTab} from './linter-components/tab-components/debug-tab';
 import {getTextInLanguage} from 'src/lang/helpers';
 
 export class SettingTab extends PluginSettingTab {
-  plugin: LinterPlugin;
   navContainer: HTMLElement;
   tabNavEl: HTMLDivElement;
   settingsContentEl: HTMLDivElement;
+  component: Component;
   private tabNameToTab: Map<string, Tab> = new Map<string, Tab>();
   private selectedTab: string = 'General';
   private searchZeroState: HTMLDivElement;
   private tabSearcher: TabSearcher;
 
-  constructor(app: App, plugin: LinterPlugin) {
+  constructor(app: App, public plugin: LinterPlugin) {
     super(app, plugin);
-    this.plugin = plugin;
+    this.component = new Component();
   }
 
   display(): void {
     const {containerEl} = this;
 
+    this.component.load();
     containerEl.empty();
     const linterHeader = containerEl.createDiv('linter-setting-title');
     if (Platform.isMobile) {
@@ -46,6 +47,10 @@ export class SettingTab extends PluginSettingTab {
     if (this.selectedTab == '') {
       this.tabSearcher.focusOnInput();
     }
+  }
+
+  hide(): void {
+    this.component.unload();
   }
 
   private addTabs(isMobile: boolean) {

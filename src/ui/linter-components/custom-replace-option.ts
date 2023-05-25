@@ -1,4 +1,4 @@
-import {Setting} from 'obsidian';
+import {Setting, Component} from 'obsidian';
 import {getTextInLanguage} from 'src/lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 export type CustomReplace = {find: string, replace: string, flags: string};
@@ -6,9 +6,10 @@ export type CustomReplace = {find: string, replace: string, flags: string};
 const defaultFlags = 'gm';
 
 export class CustomReplaceOption extends AddCustomRow {
-  constructor(containerEl: HTMLElement, public regexes: CustomReplace[], isMobile: boolean, saveSettings: () => void) {
+  constructor(containerEl: HTMLElement, parentComponent: Component, public regexes: CustomReplace[], isMobile: boolean, saveSettings: () => void) {
     super(
         containerEl,
+        parentComponent,
         getTextInLanguage('options.custom-replace.name'),
         getTextInLanguage('options.custom-replace.description'),
         getTextInLanguage('options.custom-replace.warning'),
