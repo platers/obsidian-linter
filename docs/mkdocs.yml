@@ -1,14 +1,21 @@
 site_name: Linter
-site_url: https://example.com/
+repo_url: https://github.com/platers/obsidian-linter
+edit_uri: edit/master/docs/docs/
 markdown_extensions:
   - admonition
   - pymdownx.highlight
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed
 theme:
   name: material
   palette:
     primary: deep purple
+  logo: assets/linter-icon.png
+  favicon: assets/linter-icon.png
 nav:
   - Overview: 'index.md'
   - Usage:
