@@ -421,7 +421,7 @@ export default class LinterPlugin extends Plugin {
         ${charsAdded} ${getTextInLanguage('notice-text.characters-added')}
         ${charsRemoved} ${getTextInLanguage('notice-text.characters-removed')}
       `;
-      new Notice(message, userClickTimeout);
+      new Notice(message);
     }
   }
 
