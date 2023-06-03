@@ -114,7 +114,7 @@ Contributions are welcome and appreciated. You can help in any of the following 
 No repo setup required:
 - [Reporting a bug](https://github.com/platers/obsidian-linter/issues/new?assignees=&labels=bug&template=bug_report.md&title=Bug%3A+)
 - [Requesting a feature](https://github.com/platers/obsidian-linter/issues/new?assignees=&labels=rule+suggestion&template=feature_request.md&title=FR%3A+)
-- [Suggesting documentation](https://github.com/platers/obsidian-linter/issues/new?assignees=&labels=documentation)
+- [Suggesting documentation](https://github.com/platers/obsidian-linter/issues/new?assignees=&labels=documentation&template=documentation_request.md&title=Doc%3A+)
 
 Varying repo and development setup required:
 - [Updating or adding documentation](https://github.com/platers/obsidian-linter/blob/master/CONTRIBUTING.md#updating-documentation)
