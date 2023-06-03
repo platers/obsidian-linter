@@ -135,7 +135,6 @@ export class RulesRunner {
   }
 
   runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
-    // execute custom commands after regular rules, but before the timestamp rules
     logDebug(getTextInLanguage('logs.running-custom-lint-command'));
     const commandsRun = new Set<string>();
     for (const commandInfo of lintCommands) {
