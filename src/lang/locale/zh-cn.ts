@@ -3,8 +3,8 @@
 export default {
   'commands': {
     'lint-file': {
-      'name': '格式化所有文件',
-      'error-message': '格式化所有文件时出错',
+      'name': '格式化当前文件',
+      'error-message': '格式化当前文件时出错',
     },
     'lint-file-unless-ignored': {
       'name': '格式化所有文件（除了被忽略的文件）',
