@@ -2,6 +2,7 @@ import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
+import {checklistBoxIndicator} from '../utils/regex';
 
 class RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions implements Options {}
 
@@ -20,35 +21,35 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
   }
   apply(text: string, options: RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions): string {
     /* eslint-disable no-useless-escape */
-    // account for '- [x]' and  '- [ ]' checkbox markers
-    const checkBoxMarkerRegexText = '(( |\\t)*- \\[( |x)\\]( |\\t)+.+)';
-    text = this.replaceEmptyLinesBetweenList(text, checkBoxMarkerRegexText, '$1\n$5');
+    // account for '- [.]' where the period is any character except a line break character
+    const checkBoxMarkerRegexText = `(( |\\t)*- ${checklistBoxIndicator}( |\\t)+.+)`;
+    text = this.replaceEmptyLinesBetweenList(text, checkBoxMarkerRegexText);
 
     // account for ordered list marker
     const orderedMarkerRegexText = '(( |\\t)*\\d+\\.( |\\t)+.+)';
-    text = this.replaceEmptyLinesBetweenList(text, orderedMarkerRegexText, '$1\n$4');
+    text = this.replaceEmptyLinesBetweenList(text, orderedMarkerRegexText);
 
     // account for '+' list marker
     const plusMarkerRegexText = '(( |\\t)*\\+( |\\t)+.+)';
-    text = this.replaceEmptyLinesBetweenList(text, plusMarkerRegexText, '$1\n$4');
+    text = this.replaceEmptyLinesBetweenList(text, plusMarkerRegexText);
 
     // account for '-' list marker
-    const dashMarkerRegexText = '(( |\\t)*-(?! \\[( |x)\\])( |\\t)+.+)';
-    text = this.replaceEmptyLinesBetweenList(text, dashMarkerRegexText, '$1\n$5');
+    const dashMarkerRegexText = `(( |\\t)*-(?! ${checklistBoxIndicator})( |\\t)+.+)`;
+    text = this.replaceEmptyLinesBetweenList(text, dashMarkerRegexText);
 
     // account for '*' list marker
     const splatMarkerRegexText = '(( |\\t)*\\*( |\\t)+.+)';
-    return this.replaceEmptyLinesBetweenList(text, splatMarkerRegexText, '$1\n$4');
+    return this.replaceEmptyLinesBetweenList(text, splatMarkerRegexText);
     /* eslint-enable no-useless-escape */
   }
-  replaceEmptyLinesBetweenList = function(text: string, listIndicatorRegexText: string, replaceWith: string): string {
+  replaceEmptyLinesBetweenList = function(text: string, listIndicatorRegexText: string): string {
     const listRegex = new RegExp(`^${listIndicatorRegexText}\n{2,}${listIndicatorRegexText}$`, 'gm');
     let match;
     let newText = text;
 
     do {
       match = newText.match(listRegex);
-      newText = newText.replaceAll(listRegex, replaceWith);
+      newText = newText.replaceAll(listRegex, '$1\n$4');
     } while (match);
 
     return newText;
@@ -56,7 +57,79 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
   get exampleBuilders(): ExampleBuilder<RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions>[] {
     return [
       new ExampleBuilder({
-        description: '',
+        description: 'Blank lines are removed between ordered list items',
+        before: dedent`
+          1. Item 1
+          ${''}
+          2. Item 2
+        `,
+        after: dedent`
+          1. Item 1
+          2. Item 2
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Blank lines are removed between list items when the list indicator is \'-\'',
+        before: dedent`
+          - Item 1
+          ${''}
+          \t- Subitem 1
+          ${''}
+          - Item 2
+        `,
+        after: dedent`
+          - Item 1
+          \t- Subitem 1
+          - Item 2
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Blank lines are removed between checklist items',
+        before: dedent`
+          - [x] Item 1
+          ${''}
+          \t- [!] Subitem 1
+          ${''}
+          - [ ] Item 2
+        `,
+        after: dedent`
+          - [x] Item 1
+          \t- [!] Subitem 1
+          - [ ] Item 2
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Blank lines are removed between list items when the list indicator is \'+\'',
+        before: dedent`
+          + Item 1
+          ${''}
+          \t+ Subitem 1
+          ${''}
+          + Item 2
+        `,
+        after: dedent`
+          + Item 1
+          \t+ Subitem 1
+          + Item 2
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Blank lines are removed between list items when the list indicator is \'*\'',
+        before: dedent`
+          * Item 1
+          ${''}
+          \t* Subitem 1
+          ${''}
+          * Item 2
+        `,
+        after: dedent`
+          * Item 1
+          \t* Subitem 1
+          * Item 2
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Blanks lines are removed between like list types (ordered, specific list item indicators, and checklists) while blanks are left between different kinds of list item indicators',
         before: dedent`
           1. Item 1
           ${''}
@@ -70,7 +143,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
           ${''}
           - [x] Item 1
           ${''}
-          \t- [ ] Subitem 1
+          \t- [f] Subitem 1
           ${''}
           - [ ] Item 2
           ${''}
@@ -95,7 +168,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
           - Item 2
           ${''}
           - [x] Item 1
-          \t- [ ] Subitem 1
+          \t- [f] Subitem 1
           - [ ] Item 2
           ${''}
           + Item 1

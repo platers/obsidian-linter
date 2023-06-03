@@ -2,7 +2,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {lineStartingWithWhitespaceOrBlockquoteTemplate} from '../utils/regex';
+import {indentedOrBlockquoteNestedChecklistIndicatorRegex, nonBlockquoteChecklistRegex} from '../utils/regex';
 
 class PreventDoubleChecklistIndicatorOnPasteOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -22,16 +22,13 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
     return PreventDoubleChecklistIndicatorOnPasteOptions;
   }
   apply(text: string, options: PreventDoubleChecklistIndicatorOnPasteOptions): string {
-    const indentedOrBlockquoteNestedChecklistIndicatorRegex = new RegExp(`^${lineStartingWithWhitespaceOrBlockquoteTemplate}- \\[[ x]] `);
-    const checklistRegex = /^\s*- \[[ x]] /;
-
     const isChecklistLine = indentedOrBlockquoteNestedChecklistIndicatorRegex.test(options.lineContent);
-    const isChecklistClipboard = checklistRegex.test(text);
+    const isChecklistClipboard = nonBlockquoteChecklistRegex.test(text);
     if (!isChecklistLine || !isChecklistClipboard) {
       return text;
     }
 
-    return text.replace(checklistRegex, '');
+    return text.replace(nonBlockquoteChecklistRegex, '');
   }
   get exampleBuilders(): ExampleBuilder<PreventDoubleChecklistIndicatorOnPasteOptions>[] {
     return [
@@ -62,7 +59,7 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         },
       }),
       new ExampleBuilder({
-        description: 'Line being pasted into a blockquote with a checklist indicator is has its checklist indicator removed when current line is: `> - [x] `',
+        description: 'Line being pasted into a blockquote with a checklist indicator has its checklist indicator removed when current line is: `> - [x] `',
         before: dedent`
           - [ ] Checklist item contents here
           More content here
@@ -76,7 +73,7 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         },
       }),
       new ExampleBuilder({
-        description: 'Line being pasted with a checklist indicator is has its checklist indicator removed when current line is: `- [ ] `',
+        description: 'Line being pasted with a checklist indicator has its checklist indicator removed when current line is: `- [ ] `',
         before: dedent`
           - [x] Checklist item 1
           - [ ] Checklist item 2
@@ -87,6 +84,20 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         `,
         options: {
           lineContent: '- [ ] ',
+        },
+      }),
+      new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/748
+        description: 'Line being pasted as a checklist indicator has its checklist indicator removed when current line is: `- [!] `',
+        before: dedent`
+          - [x] Checklist item 1
+          - [ ] Checklist item 2
+        `,
+        after: dedent`
+          Checklist item 1
+          - [ ] Checklist item 2
+        `,
+        options: {
+          lineContent: '- [!] ',
         },
       }),
     ];

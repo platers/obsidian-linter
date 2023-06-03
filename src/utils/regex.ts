@@ -35,6 +35,11 @@ export const smartDoubleQuoteRegex = /[“”„«»]/g;
 export const smartSingleQuoteRegex = /[‘’‚‹›]/g;
 
 export const templaterCommandRegex = /<%[^]*?%>/g;
+// checklist regex
+export const checklistBoxIndicator = '\\[.\\]';
+export const checklistBoxStartsTextRegex = new RegExp(`^${checklistBoxIndicator}`);
+export const indentedOrBlockquoteNestedChecklistIndicatorRegex = new RegExp(`^${lineStartingWithWhitespaceOrBlockquoteTemplate}- ${checklistBoxIndicator} `);
+export const nonBlockquoteChecklistRegex = new RegExp(`^\\s*- ${checklistBoxIndicator} `);
 
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string

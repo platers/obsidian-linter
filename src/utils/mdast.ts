@@ -2,7 +2,7 @@ import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt} from './strings';
-import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator} from './regex';
+import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
 import {combineExtensions} from 'micromark-util-combine-extensions';
@@ -529,7 +529,6 @@ export function updateBoldText(text: string, func:(text: string) => string): str
 
 export function updateListItemText(text: string, func:(text: string) => string): string {
   const positions: Position[] = getListItemTextPositions(text);
-  const checklistIndicatorRegex = /^\[.\] /;
 
   for (const position of positions) {
     let startIndex = position.start.offset;
@@ -544,7 +543,7 @@ export function updateListItemText(text: string, func:(text: string) => string):
 
     let listText = text.substring(startIndex, position.end.offset);
     // for some reason some checklists are not getting treated as such and this causes the task indicator to be included in the text
-    if (checklistIndicatorRegex.test(listText)) {
+    if (checklistBoxStartsTextRegex.test(listText)) {
       startIndex += 4;
       listText = listText.substring(4);
     }
