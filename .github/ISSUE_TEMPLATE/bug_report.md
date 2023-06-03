@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+- [ ] I have verified that I am on the latest version of the Linter
+
 ## Describe the Bug
 
 A clear and concise description of what the bug is.
