@@ -9,4 +9,4 @@ assignees: ''
 
 ## What I Would Like Documented
 
-Feature, process, etc. that would benefit from better documentation or that needs updating to make it accurate.
+Feature, process, etc. that would benefit from better documentation or that needs a documentation to make it accurate or better clarify how it works.
