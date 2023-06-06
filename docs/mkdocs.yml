@@ -30,6 +30,7 @@ nav:
     - Spacing Rules: 'settings/spacing-rules.md'
     - Paste Rules: 'settings/paste-rules.md'
     - Custom Rules: 'settings/custom-rules.md'
+    - Debug Settings: 'settings/debug-settings.md'
   - Contributing:
     - Plugin Setup: 'contributing/getting-setup.md'
     - Adding a Rule: 'contributing/adding-a-rule.md'
