@@ -103,5 +103,39 @@ ruleTest({
         blah blah blah
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/751
+      testName: 'Blank line between heading and table',
+      before: dedent`
+        # H1
+        | a | b |
+
+        # H1
+
+        | a | b |
+
+
+        # H1
+
+
+        | a | b |
+      `,
+      after: dedent`
+        # H1
+
+        | a | b |
+
+        # H1
+
+        | a | b |
+
+        # H1
+
+        | a | b |
+      `,
+      options: {
+        bottom: false, // this bug only affects bottom false
+        emptyLineAfterYaml: true,
+      },
+    },
   ],
 });

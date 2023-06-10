@@ -35,6 +35,9 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
     text = text.replace(/^\n+(#+\s.*)/, '$1'); // remove blank lines before first heading
     text = text.replace(/(#+\s.*)\n+$/, '$1'); // remove blank lines after last heading
 
+    // blank line between heading and table, see https://github.com/platers/obsidian-linter/issues/751
+    text = text.replace(/(^#+\s.*)(\n\|)/gm, '$1\n$2');
+
     if (!options.emptyLineAfterYaml) {
       text = text.replace(new RegExp('(' + yamlRegex.source + ')\\n+(#+\\s.*)'), '$1\n$5');
     }
