@@ -80,7 +80,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
       const currentAliasValue = convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(aliasesValue));
       const newAliasValue = this.getNewAliasValue(currentAliasValue, shouldRemoveTitleAlias, title, previousTitle);
-      
+
       if (newAliasValue === '') {
         newYaml = removeYamlSection(newYaml, aliasKeyForFile);
       } else if (options.preserveExistingAliasesSectionStyle) {
@@ -110,7 +110,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     let unescapedTitle = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
     unescapedTitle = unescapedTitle || fileName;
     
-    const forceEscape = unescapedTitle.includes(',') && (aliasArrayStyle === NormalArrayFormats.SingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited) || isNumeric(unescapedTitle);
+    const forceEscape = (unescapedTitle.includes(',') && (aliasArrayStyle === NormalArrayFormats.SingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited)) || isNumeric(unescapedTitle);
     const escapedTitle = escapeStringIfNecessaryAndPossible(unescapedTitle, defaultEscapeCharacter, forceEscape);
 
     return [unescapedTitle, escapedTitle];
