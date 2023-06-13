@@ -117,10 +117,11 @@ function generateDocs() {
 
     let additionalInfoSection = '';
     if (additionalInfo != '') {
-      additionalInfoSection = dedent`### Additional Info
-      ${''}
-      ${additionalInfo}
-      `
+      additionalInfoSection = dedent`
+        ### Additional Info
+        ${''}
+        ${additionalInfo}
+      `;
     }
 
     rules_docs += dedent`
@@ -166,7 +167,7 @@ function getRuleTypeAdditionalInfo(ruleTypeName: string): string {
   if (existsSync(ruleTypeAdditionalInfoPath)) {
     ruleTypeAdditionAlInfo = '\n' + readFileSync(ruleTypeAdditionalInfoPath, 'utf8');
   }
-  
+
   return ruleTypeAdditionAlInfo;
 }
 
@@ -177,6 +178,6 @@ function getRuleAdditionalInfo(ruleAlias: string): string {
   if (existsSync(ruleAdditionalInfoPath)) {
     ruleAdditionAlInfo = '\n' + readFileSync(ruleAdditionalInfoPath, 'utf8');
   }
-  
+
   return ruleAdditionAlInfo;
 }
