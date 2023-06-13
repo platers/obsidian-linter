@@ -38,7 +38,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   }
   apply(text: string, options: YamlTitleAliasOptions): string {
     text = initYAML(text);
-    const [unescapedTitle, title] = this.getTitleInfo(text, options.fileName, options.aliasArrayStyle, options.defaultEscapeCharacter)
+    const [unescapedTitle, title] = this.getTitleInfo(text, options.fileName, options.aliasArrayStyle, options.defaultEscapeCharacter);
 
     let previousTitle: string = null;
     const yaml = text.match(yamlRegex)[1];
@@ -109,7 +109,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   getTitleInfo(text: string, fileName: string, aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats, defaultEscapeCharacter: QuoteCharacter): [string, string] {
     let unescapedTitle = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
     unescapedTitle = unescapedTitle || fileName;
-    
+
     const forceEscape = (unescapedTitle.includes(',') && (aliasArrayStyle === NormalArrayFormats.SingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited)) || isNumeric(unescapedTitle);
     const escapedTitle = escapeStringIfNecessaryAndPossible(unescapedTitle, defaultEscapeCharacter, forceEscape);
 
@@ -155,7 +155,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     }
 
     return originalValue;
-  };
+  }
   get exampleBuilders(): ExampleBuilder<YamlTitleAliasOptions>[] {
     return [
       new ExampleBuilder({
