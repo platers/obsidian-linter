@@ -1,4 +1,4 @@
-### Date Modified Value Origin
+#### Date Modified Value Origin
 
 The date modified is _not_ based on the file date modified metadata. This is because the Linter only has access to the last
 date modified when it runs. This is not a problem or too noticeable when you modify a file frequently.

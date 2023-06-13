@@ -3,19 +3,22 @@
 
 # Content Rules
 
-### Auto-correct Common Misspellings
+
+## Auto-correct Common Misspellings
 
 Alias: `auto-correct-common-misspellings`
 
 Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Ignore Words` | A comma separated list of lowercased words to ignore when auto-correcting | N/A | `` |
+| `Ignore Words` | A comma separated list of lowercased words to ignore when auto-correcting | N/A |  |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Auto-correct misspellings in regular text, but not code blocks, math blocks, YAML, or tags</summary>
 
@@ -96,19 +99,21 @@ http://www.Absoltely.com should not be corrected
 ``````
 </details>
 
-### Blockquote Style
+## Blockquote Style
 
 Alias: `blockquote-style`
 
 Makes sure the blockquote style is consistent.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Style` | The style used on blockquote indicators | `space`: > indicator is followed by a space<br/><br/>`no space`: >indicator is not followed by a space | `space` |
 
-Examples:
+
+
+### Examples
 
 <details><summary>When style = `space`, a space is added to blockquotes missing a space after the indicator</summary>
 
@@ -165,7 +170,7 @@ After:
 ``````
 </details>
 
-### Convert Bullet List Markers
+## Convert Bullet List Markers
 
 Alias: `convert-bullet-list-markers`
 
@@ -173,7 +178,9 @@ Converts common bullet list marker symbols to markdown list markers.
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Converts •</summary>
 
@@ -210,19 +217,21 @@ After:
 ``````
 </details>
 
-### Emphasis Style
+## Emphasis Style
 
 Alias: `emphasis-style`
 
 Makes sure the emphasis style is consistent.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Style` | The style used to denote emphasized content | `consistent`: Makes sure the first instance of emphasis is the style that will be used throughout the document<br/><br/>`asterisk`: Makes sure * is the emphasis indicator<br/><br/>`underscore`: Makes sure _ is the emphasis indicator | `consistent` |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Emphasis indicators should use underscores when style is set to 'underscore'</summary>
 
@@ -363,7 +372,7 @@ __Test bold__
 ``````
 </details>
 
-### No Bare URLs
+## No Bare URLs
 
 Alias: `no-bare-urls`
 
@@ -371,7 +380,9 @@ Encloses bare URLs with angle brackets except when enclosed in back ticks, squar
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Make sure that links are inside of angle brackets when not in single quotes('), double quotes("), or backticks(`)</summary>
 
@@ -442,20 +453,22 @@ After:
 ``````
 </details>
 
-### Ordered List Style
+## Ordered List Style
 
 Alias: `ordered-list-style`
 
 Makes sure that ordered lists follow the style specified. Note that 2 spaces or 1 tab is considered to be an indentation level.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Number Style` | The number style used in ordered list indicators | `ascending`: Makes sure ordered list items are ascending (i.e. 1, 2, 3, etc.)<br/><br/>`lazy`: Makes sure ordered list item indicators all are the number 1 | `ascending` |
 | `Ordered List Indicator End Style` | The ending character of an ordered list indicator | `.`: Makes sure ordered list items indicators end in '.' (i.e `1.`)<br/><br/>`)`: Makes sure ordered list item indicators end in ')' (i.e. `1)`) | `.` |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Ordered lists have list items set to ascending numerical order when Number Style is `ascending`.</summary>
 
@@ -580,7 +593,7 @@ After:
 ``````
 </details>
 
-### Proper Ellipsis
+## Proper Ellipsis
 
 Alias: `proper-ellipsis`
 
@@ -588,7 +601,9 @@ Replaces three consecutive dots with an ellipsis.
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Replacing three consecutive dots with an ellipsis.</summary>
 
@@ -605,13 +620,13 @@ Lorem (…) Impsum.
 ``````
 </details>
 
-### Quote Style
+## Quote Style
 
 Alias: `quote-style`
 
 Updates the quotes in the body content to be updated to the specified single and double quote styles.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
@@ -620,7 +635,9 @@ Options:
 | `Enable `Double Quote Style`` | Specifies that the selected double quote style should be used. | N/A | `true` |
 | `Double Quote Style` | The style of double quotes to use. | `""`: Uses '"' instead of smart double quotes<br/><br/>`“”`: Uses '“' and '”' instead of straight double quotes | `""` |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Smart quotes used in file are converted to straight quotes when styles are set to `Straight`</summary>
 
@@ -681,7 +698,7 @@ once possessives and common contractions have been dealt with. If not, it will t
 ``````
 </details>
 
-### Remove Consecutive List Markers
+## Remove Consecutive List Markers
 
 Alias: `remove-consecutive-list-markers`
 
@@ -689,7 +706,9 @@ Removes consecutive list markers. Useful when copy-pasting list items.
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Removing consecutive list markers.</summary>
 
@@ -714,7 +733,7 @@ After:
 ``````
 </details>
 
-### Remove Empty List Markers
+## Remove Empty List Markers
 
 Alias: `remove-empty-list-markers`
 
@@ -722,7 +741,9 @@ Removes empty list markers, i.e. list items without content.
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Removes empty list markers.</summary>
 
@@ -869,7 +890,7 @@ After:
 ``````
 </details>
 
-### Remove Hyphenated Line Breaks
+## Remove Hyphenated Line Breaks
 
 Alias: `remove-hyphenated-line-breaks`
 
@@ -877,7 +898,9 @@ Removes hyphenated line breaks. Useful when pasting text from textbooks.
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Removing hyphenated line breaks.</summary>
 
@@ -894,7 +917,7 @@ This text has a linebreak.
 ``````
 </details>
 
-### Remove Multiple Spaces
+## Remove Multiple Spaces
 
 Alias: `remove-multiple-spaces`
 
@@ -902,7 +925,9 @@ Removes two or more consecutive spaces. Ignores spaces at the beginning and endi
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Removing double and triple space.</summary>
 
@@ -919,19 +944,21 @@ Lorem ipsum dolor sit amet.
 ``````
 </details>
 
-### Strong Style
+## Strong Style
 
 Alias: `strong-style`
 
 Makes sure the strong style is consistent.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Style` | The style used to denote strong/bolded content | `consistent`: Makes sure the first instance of strong is the style that will be used throughout the document<br/><br/>`asterisk`: Makes sure ** is the strong indicator<br/><br/>`underscore`: Makes sure __ is the strong indicator | `consistent` |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Strong indicators should use underscores when style is set to 'underscore'</summary>
 
@@ -1072,7 +1099,7 @@ __Test bold__
 ``````
 </details>
 
-### Two Spaces Between Lines with Content
+## Two Spaces Between Lines with Content
 
 Alias: `two-spaces-between-lines-with-content`
 
@@ -1080,7 +1107,14 @@ Makes sure that two spaces are added to the ends of lines with content continued
 
 
 
-Examples:
+### Additional Info
+
+
+!!! Warning
+    Do not use with [paragraph blank lines](./spacing-rules.md#paragraph-blank-lines). They work differently and will result in unexpected results.
+
+
+### Examples
 
 <details><summary>Make sure two spaces are added to the ends of lines that have content on it and the next line for lists, blockquotes, and paragraphs</summary>
 
@@ -1171,19 +1205,21 @@ Even more content here
 ``````
 </details>
 
-### Unordered List Style
+## Unordered List Style
 
 Alias: `unordered-list-style`
 
 Makes sure that unordered lists follow the style specified.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `List item style` | The list item style to use in unordered lists | `consistent`: Makes sure unordered list items use a consistent list item indicator in the file which will be based on the first list item found<br/><br/>`-`: Makes sure unordered list items use `-` as their indicator<br/><br/>`*`: Makes sure unordered list items use `*` as their indicator<br/><br/>`+`: Makes sure unordered list items use `+` as their indicator | `consistent` |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Unordered lists have their indicator updated to `*` when `List item style = 'consistent'` and `*` is the first unordered list indicator</summary>
 

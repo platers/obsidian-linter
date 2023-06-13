@@ -3,19 +3,22 @@
 
 # Spacing Rules
 
-### Compact YAML
+
+## Compact YAML
 
 Alias: `compact-yaml`
 
 Removes leading and trailing blank lines in the YAML front matter.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Inner New Lines` | Remove new lines that are not at the start or the end of the YAML | N/A | `false` |
+| `Inner New Lines` | Remove new lines that are not at the start or the end of the YAML | N/A | false |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Remove blank lines at the start and end of the YAML</summary>
 
@@ -76,7 +79,7 @@ Body content here.
 ``````
 </details>
 
-### Consecutive blank lines
+## Consecutive blank lines
 
 Alias: `consecutive-blank-lines`
 
@@ -84,9 +87,11 @@ There should be at most one consecutive blank line.
 
 
 
-Examples:
 
-<details><summary></summary>
+
+### Examples
+
+<details><summary>Consecutive blank lines are removed</summary>
 
 Before:
 
@@ -106,19 +111,21 @@ Some more text
 ``````
 </details>
 
-### Convert Spaces to Tabs
+## Convert Spaces to Tabs
 
 Alias: `convert-spaces-to-tabs`
 
 Converts leading spaces to tabs.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Tabsize` | Number of spaces that will be converted to a tab | N/A | `4` |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Converting spaces to tabs with `tabsize = 3`</summary>
 
@@ -141,7 +148,7 @@ After:
 ``````
 </details>
 
-### Empty Line Around Blockquotes
+## Empty Line Around Blockquotes
 
 Alias: `empty-line-around-blockquotes`
 
@@ -149,7 +156,9 @@ Ensures that there is an empty line around blockquotes unless they start or end 
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Blockquotes that start a document do not get an empty line before them.</summary>
 
@@ -228,7 +237,7 @@ After:
 ``````
 </details>
 
-### Empty Line Around Code Fences
+## Empty Line Around Code Fences
 
 Alias: `empty-line-around-code-fences`
 
@@ -236,7 +245,9 @@ Ensures that there is an empty line around code fences unless they start or end 
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Fenced code blocks that start a document do not get an empty line before them.</summary>
 
@@ -355,7 +366,7 @@ var text = 'some string';
 ``````
 </details>
 
-### Empty Line Around Math Blocks
+## Empty Line Around Math Blocks
 
 Alias: `empty-line-around-math-blocks`
 
@@ -363,7 +374,9 @@ Ensures that there is an empty line around math blocks using `Number of Dollar S
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Math blocks that start a document do not get an empty line before them.</summary>
 
@@ -485,7 +498,7 @@ More content here
 ``````
 </details>
 
-### Empty Line Around Tables
+## Empty Line Around Tables
 
 Alias: `empty-line-around-tables`
 
@@ -493,7 +506,9 @@ Ensures that there is an empty line around github flavored tables unless they st
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Tables that start a document do not get an empty line before them.</summary>
 
@@ -638,20 +653,22 @@ More content here
 ``````
 </details>
 
-### Heading blank lines
+## Heading blank lines
 
 Alias: `heading-blank-lines`
 
 All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Bottom` | Insert a blank line after headings | N/A | `true` |
 | `Empty Line Between Yaml and Header` | Keep the empty line between the Yaml frontmatter and header | N/A | `true` |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Headings should be surrounded by blank lines</summary>
 
@@ -731,7 +748,7 @@ Paragraph here...
 ``````
 </details>
 
-### Line Break at Document End
+## Line Break at Document End
 
 Alias: `line-break-at-document-end`
 
@@ -739,7 +756,9 @@ Ensures that there is exactly one line break at the end of a document.
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Appending a line break to the end of the document.</summary>
 
@@ -775,7 +794,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 ``````
 </details>
 
-### Move Math Block Indicators to Their Own Line
+## Move Math Block Indicators to Their Own Line
 
 Alias: `move-math-block-indicators-to-their-own-line`
 
@@ -783,7 +802,9 @@ Move all starting and ending math block indicators to their own lines using `Num
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 2</summary>
 
@@ -846,7 +867,7 @@ $$
 ``````
 </details>
 
-### Paragraph blank lines
+## Paragraph blank lines
 
 Alias: `paragraph-blank-lines`
 
@@ -854,7 +875,18 @@ All paragraphs should have exactly one blank line both before and after.
 
 
 
-Examples:
+### Additional Info
+
+
+!!! Warning
+    Do not use with [two spaces between lines with consecutive content](./content-rules.md#two-spaces-between-lines-with-content). They work differently and will result in unexpected results.
+
+#### When Is a Blank Line Added?
+
+When a paragraph has another line after the current one and it does not end in 2 or more spaces or `<br>` or `<br/>`.
+
+
+### Examples
 
 <details><summary>Paragraphs should be surrounded by blank lines</summary>
 
@@ -906,7 +938,7 @@ A new paragraph
 ``````
 </details>
 
-### Remove Empty Lines Between List Markers and Checklists
+## Remove Empty Lines Between List Markers and Checklists
 
 Alias: `remove-empty-lines-between-list-markers-and-checklists`
 
@@ -914,9 +946,108 @@ There should not be any empty lines between list markers and checklists.
 
 
 
-Examples:
 
-<details><summary></summary>
+
+### Examples
+
+<details><summary>Blank lines are removed between ordered list items</summary>
+
+Before:
+
+`````` markdown
+1. Item 1
+
+2. Item 2
+``````
+
+After:
+
+`````` markdown
+1. Item 1
+2. Item 2
+``````
+</details>
+<details><summary>Blank lines are removed between list items when the list indicator is '-'</summary>
+
+Before:
+
+`````` markdown
+- Item 1
+
+	- Subitem 1
+
+- Item 2
+``````
+
+After:
+
+`````` markdown
+- Item 1
+	- Subitem 1
+- Item 2
+``````
+</details>
+<details><summary>Blank lines are removed between checklist items</summary>
+
+Before:
+
+`````` markdown
+- [x] Item 1
+
+	- [!] Subitem 1
+
+- [ ] Item 2
+``````
+
+After:
+
+`````` markdown
+- [x] Item 1
+	- [!] Subitem 1
+- [ ] Item 2
+``````
+</details>
+<details><summary>Blank lines are removed between list items when the list indicator is '+'</summary>
+
+Before:
+
+`````` markdown
++ Item 1
+
+	+ Subitem 1
+
++ Item 2
+``````
+
+After:
+
+`````` markdown
++ Item 1
+	+ Subitem 1
++ Item 2
+``````
+</details>
+<details><summary>Blank lines are removed between list items when the list indicator is '*'</summary>
+
+Before:
+
+`````` markdown
+* Item 1
+
+	* Subitem 1
+
+* Item 2
+``````
+
+After:
+
+`````` markdown
+* Item 1
+	* Subitem 1
+* Item 2
+``````
+</details>
+<details><summary>Blanks lines are removed between like list types (ordered, specific list item indicators, and checklists) while blanks are left between different kinds of list item indicators</summary>
 
 Before:
 
@@ -933,7 +1064,7 @@ Before:
 
 - [x] Item 1
 
-	- [ ] Subitem 1
+	- [f] Subitem 1
 
 - [ ] Item 2
 
@@ -961,7 +1092,7 @@ After:
 - Item 2
 
 - [x] Item 1
-	- [ ] Subitem 1
+	- [f] Subitem 1
 - [ ] Item 2
 
 + Item 1
@@ -974,7 +1105,7 @@ After:
 ``````
 </details>
 
-### Remove link spacing
+## Remove link spacing
 
 Alias: `remove-link-spacing`
 
@@ -982,7 +1113,9 @@ Removes spacing around link text.
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Space in regular markdown link text</summary>
 
@@ -1039,22 +1172,24 @@ After:
 ``````
 </details>
 
-### Remove Space around Characters
+## Remove Space around Characters
 
 Alias: `remove-space-around-characters`
 
 Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). Note that this may causes issues with markdown format in some cases.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Include Fullwidth Forms` | Include <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Fullwidth Forms Unicode block</a> | N/A | `true` |
 | `Include CJK Symbols and Punctuation` | Include <a href="https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation">CJK Symbols and Punctuation Unicode block</a> | N/A | `true` |
 | `Include Dashes` | Include en dash (–) and em dash (—) | N/A | `true` |
-| `Other symbols` | Other symbols to include | N/A | `` |
+| `Other symbols` | Other symbols to include | N/A |  |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Remove Spaces and Tabs around Fullwidth Characters</summary>
 
@@ -1139,20 +1274,22 @@ After:
 ``````
 </details>
 
-### Remove Space Before or After Characters
+## Remove Space Before or After Characters
 
 Alias: `remove-space-before-or-after-characters`
 
 Removes space before the specified characters and after the specified characters. Note that this may causes issues with markdown format in some cases.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Remove Space Before Characters` | Removes space before the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.** | N/A | `,!?;:).’”]` |
 | `Remove Space After Characters` | Removes space after the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.** | N/A | `¿¡‘“([` |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Remove Spaces and Tabs Before and After Default Symbol Set</summary>
 
@@ -1183,7 +1320,7 @@ A semicolon; and colon: have spaces removed before them
 ``````
 </details>
 
-### Space after list markers
+## Space after list markers
 
 Alias: `space-after-list-markers`
 
@@ -1191,9 +1328,11 @@ There should be a single space after list markers and checkboxes.
 
 
 
-Examples:
 
-<details><summary></summary>
+
+### Examples
+
+<details><summary>A single space is left between the list marker and the text of the list item</summary>
 
 Before:
 
@@ -1218,7 +1357,7 @@ After:
 ``````
 </details>
 
-### Space between Chinese Japanese or Korean and English or numbers
+## Space between Chinese Japanese or Korean and English or numbers
 
 Alias: `space-between-chinese-japanese-or-korean-and-english-or-numbers`
 
@@ -1226,7 +1365,9 @@ Ensures that Chinese, Japanese, or Korean and English or numbers are separated b
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Space between Chinese and English</summary>
 
@@ -1351,19 +1492,21 @@ After:
 ``````
 </details>
 
-### Trailing spaces
+## Trailing spaces
 
 Alias: `trailing-spaces`
 
 Removes extra spaces after every line.
 
-Options:
+### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Two Space Linebreak` | Ignore two spaces followed by a line break ("Two Space Rule"). | N/A | `false` |
+| `Two Space Linebreak` | Ignore two spaces followed by a line break ("Two Space Rule"). | N/A | false |
 
-Examples:
+
+
+### Examples
 
 <details><summary>Removes trailing spaces and tabs.</summary>
 

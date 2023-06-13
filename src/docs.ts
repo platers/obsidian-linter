@@ -1,10 +1,12 @@
-import {readFileSync, writeFileSync} from 'fs';
+import {readFileSync, writeFileSync, existsSync} from 'fs';
 import dedent from 'ts-dedent';
 import {DropdownOption} from './option';
 import {rules} from './rules';
 import './rules-registry';
 
 const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->\n';
+
+const pathToDocsFolder = './docs';
 
 // README
 
@@ -15,7 +17,7 @@ generateReadme();
 generateDocs();
 
 function generateReadme() {
-  const readme_template = readFileSync('./docs/templates/readme_template.md', 'utf8');
+  const readme_template = readFileSync(`${pathToDocsFolder}/templates/readme_template.md`, 'utf8');
 
   let rules_list = '';
   let prevSection = '';
@@ -52,6 +54,8 @@ function generateDocs() {
       \`\`\`\`\`\`
       </details>
     `).join('\n');
+
+    const additionalInfo = getRuleAdditionalInfo(rule.alias);
 
     const options_list = rule.options.slice(1).map((option) => {
       let listItems = '';
@@ -94,7 +98,7 @@ function generateDocs() {
     let options = '';
     if (options_list.length > 0) {
       options = dedent`
-        Options:
+        ### Options
 
         | Name | Description | List Items | Default Value |
         | ---- | ----------- | ---------- | ------------- |
@@ -111,6 +115,14 @@ function generateDocs() {
       prevSection = rule.type;
     }
 
+    let additionalInfoSection = '';
+    if (additionalInfo != '') {
+      additionalInfoSection = dedent`### Additional Info
+      ${''}
+      ${additionalInfo}
+      `
+    }
+
     rules_docs += dedent`
       ${''}
       ## ${rule.getName()}
@@ -121,7 +133,9 @@ function generateDocs() {
       ${''}
       ${options}
       ${''}
-      Examples:
+      ${additionalInfoSection}
+      ${''}
+      ### Examples
       ${''}
       ${examples}
       ${''}
@@ -138,8 +152,31 @@ function writeRuleDocument(ruleTypeName: string, rules_docs: string) {
     ${autogen_warning}
     ${''}
     # ${ruleTypeName} Rules
+    ${getRuleTypeAdditionalInfo(ruleTypeName)}
     ${rules_docs}
   `;
 
-  writeFileSync(`./docs/docs/settings/${ruleTypeName.toLowerCase()}-rules.md`, rules_documentation);
+  writeFileSync(`${pathToDocsFolder}/docs/settings/${ruleTypeName.toLowerCase()}-rules.md`, rules_documentation);
+}
+
+function getRuleTypeAdditionalInfo(ruleTypeName: string): string {
+  let ruleTypeAdditionAlInfo = '';
+
+  const ruleTypeAdditionalInfoPath = `${pathToDocsFolder}/additional-info/rule-types/${ruleTypeName.toLowerCase()}.md`;
+  if (existsSync(ruleTypeAdditionalInfoPath)) {
+    ruleTypeAdditionAlInfo = '\n' + readFileSync(ruleTypeAdditionalInfoPath, 'utf8');
+  }
+  
+  return ruleTypeAdditionAlInfo;
+}
+
+function getRuleAdditionalInfo(ruleAlias: string): string {
+  let ruleAdditionAlInfo = '';
+
+  const ruleAdditionalInfoPath = `${pathToDocsFolder}/additional-info/rules/${ruleAlias}.md`;
+  if (existsSync(ruleAdditionalInfoPath)) {
+    ruleAdditionAlInfo = '\n' + readFileSync(ruleAdditionalInfoPath, 'utf8');
+  }
+  
+  return ruleAdditionAlInfo;
 }

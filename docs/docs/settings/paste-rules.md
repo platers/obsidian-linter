@@ -3,7 +3,15 @@
 
 # Paste Rules
 
-### Add Blockquote Indentation on Paste
+## Limitations
+
+- The plugin only works with the standard pasting (`cmd/ctrl + v`) shortcut, and not with the `p` operator in vim. (Pasting with `cmd/ctrl + v` in normal or insert mode does work though.)
+- To avoid conflicts with Plugins like [Auto Link Title](https://obsidian.md/plugins?id=obsidian-auto-link-title) or [Paste URL into Selection](https://obsidian.md/plugins?id=url-into-selection), will not be triggered when an URL is detected in the clipboard.
+- On mobile, in order to paste the URL, ensure you perform the `Tap and Hold -> Paste` action to paste into your document and use the paste rules.
+- When doing a multicursor multiline paste, the cursors will stay where they were after pasting the values instead of moving to the end of the pasted value
+
+
+## Add Blockquote Indentation on Paste
 
 Alias: `add-blockquote-indentation-on-paste`
 
@@ -11,7 +19,9 @@ Adds blockquotes to all but the first line, when the cursor is in a blockquote/c
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Line being pasted into regular text does not get blockquotified with current line being `Part 1 of the sentence`</summary>
 
@@ -48,7 +58,7 @@ This content is being added to a blockquote
 ``````
 </details>
 
-### Prevent Double Checklist Indicator on Paste
+## Prevent Double Checklist Indicator on Paste
 
 Alias: `prevent-double-checklist-indicator-on-paste`
 
@@ -56,7 +66,9 @@ Removes starting checklist indicator from the text to paste if the line the curs
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Line being pasted is left alone when current line has no checklist indicator in it: `Regular text here`</summary>
 
@@ -88,7 +100,7 @@ After:
 More content here
 ``````
 </details>
-<details><summary>Line being pasted into a blockquote with a checklist indicator is has its checklist indicator removed when current line is: `> - [x] `</summary>
+<details><summary>Line being pasted into a blockquote with a checklist indicator has its checklist indicator removed when current line is: `> - [x] `</summary>
 
 Before:
 
@@ -104,7 +116,23 @@ Checklist item contents here
 More content here
 ``````
 </details>
-<details><summary>Line being pasted with a checklist indicator is has its checklist indicator removed when current line is: `- [ ] `</summary>
+<details><summary>Line being pasted with a checklist indicator has its checklist indicator removed when current line is: `- [ ] `</summary>
+
+Before:
+
+`````` markdown
+- [x] Checklist item 1
+- [ ] Checklist item 2
+``````
+
+After:
+
+`````` markdown
+Checklist item 1
+- [ ] Checklist item 2
+``````
+</details>
+<details><summary>Line being pasted as a checklist indicator has its checklist indicator removed when current line is: `- [!] `</summary>
 
 Before:
 
@@ -121,7 +149,7 @@ Checklist item 1
 ``````
 </details>
 
-### Prevent Double List Item Indicator on Paste
+## Prevent Double List Item Indicator on Paste
 
 Alias: `prevent-double-list-item-indicator-on-paste`
 
@@ -129,7 +157,9 @@ Removes starting list indicator from the text to paste if the line the cursor is
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Line being pasted is left alone when current line has no list indicator in it: `Regular text here`</summary>
 
@@ -194,7 +224,7 @@ List item 1
 ``````
 </details>
 
-### Proper Ellipsis on Paste
+## Proper Ellipsis on Paste
 
 Alias: `proper-ellipsis-on-paste`
 
@@ -202,7 +232,9 @@ Replaces three consecutive dots with an ellipsis even if they have a space betwe
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Replacing three consecutive dots with an ellipsis even if spaces are present</summary>
 
@@ -223,7 +255,7 @@ Lorem (…) Impsum.
 ``````
 </details>
 
-### Remove Hyphens on Paste
+## Remove Hyphens on Paste
 
 Alias: `remove-hyphens-on-paste`
 
@@ -231,7 +263,9 @@ Removes hyphens from the text to paste
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Remove hyphen in content to paste</summary>
 
@@ -249,7 +283,7 @@ Text that was cool but hypertension made it uncool.
 ``````
 </details>
 
-### Remove Leading or Trailing Whitespace on Paste
+## Remove Leading or Trailing Whitespace on Paste
 
 Alias: `remove-leading-or-trailing-whitespace-on-paste`
 
@@ -257,7 +291,9 @@ Removes any leading non-tab whitespace and all trailing whitespace for the text 
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Removes leading spaces and newline characters</summary>
 
@@ -294,7 +330,7 @@ After:
 ``````
 </details>
 
-### Remove Leftover Footnotes from Quote on Paste
+## Remove Leftover Footnotes from Quote on Paste
 
 Alias: `remove-leftover-footnotes-from-quote-on-paste`
 
@@ -302,7 +338,9 @@ Removes any leftover footnote references for the text to paste
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Footnote reference removed</summary>
 
@@ -323,7 +361,7 @@ _Note that the format for footnote references to move is a dot or comma followed
 ``````
 </details>
 
-### Remove Multiple Blank Lines on Paste
+## Remove Multiple Blank Lines on Paste
 
 Alias: `remove-multiple-blank-lines-on-paste`
 
@@ -331,7 +369,9 @@ Condenses multiple blank lines down into one blank line for the text to paste
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Multiple blanks lines condensed down to one</summary>
 

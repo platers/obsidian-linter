@@ -19,6 +19,22 @@ or rules documentation, update the rule information in the corresponding rule fi
 To update how rules have their information displayed, you will want to update the logic in the `generateDocs` method in 
 [docs.ts](https://github.com/platers/obsidian-linter/blob/master/src/docs.ts).
 
+## Additional Information for Rules and Rule Types
+
+Sometimes there is a need to clarify how a rule works, why a rule works the way that it does, or some general things to keep in
+mind about specific rule types.
+
+### Additional Information for Rules
+
+Additional info for rules are located under `docs/additional-info/rules/`. The file names are the same as the rule alias for
+the rule that they are supposed to add additional information for. Info added in these files generally are used to help clarify
+how a rule works or limitations to that specific rule. It can also warn users not to use specific rules with each other.
+
+### Additional Information for Rule Types
+
+Additional info for rules are located under `docs/additional-info/rule-types/`. The file names are the same as the rule type
+when lowercased. Info added in these files generally include limitations and things to keep in mind.
+
 ## Documentation Templates
 
 Currently there is 1 template file used for generating documentation with:

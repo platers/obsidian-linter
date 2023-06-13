@@ -3,7 +3,8 @@
 
 # Footnote Rules
 
-### Footnote after Punctuation
+
+## Footnote after Punctuation
 
 Alias: `footnote-after-punctuation`
 
@@ -11,7 +12,9 @@ Ensures that footnote references are placed after punctuation, not before.
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Placing footnotes after punctuation.</summary>
 
@@ -46,7 +49,7 @@ After:
 ``````
 </details>
 
-### Move Footnotes to the bottom
+## Move Footnotes to the bottom
 
 Alias: `move-footnotes-to-the-bottom`
 
@@ -54,7 +57,9 @@ Move all footnotes to the bottom of the document.
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Moving footnotes to the bottom</summary>
 
@@ -84,7 +89,7 @@ Maecenas malesuada dignissim purus ac volutpat.
 ``````
 </details>
 
-### Re-Index Footnotes
+## Re-Index Footnotes
 
 Alias: `re-index-footnotes`
 
@@ -92,7 +97,9 @@ Re-indexes footnote keys and footnote, based on the order of occurrence (NOTE: T
 
 
 
-Examples:
+
+
+### Examples
 
 <details><summary>Re-indexing footnotes after having deleted previous footnotes</summary>
 
