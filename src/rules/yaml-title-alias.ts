@@ -4,6 +4,7 @@ import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {getFirstHeaderOneText, yamlRegex} from '../utils/regex';
+import {isNumeric} from '../utils/strings';
 
 class YamlTitleAliasOptions implements Options {
   preserveExistingAliasesSectionStyle?: boolean = true;
@@ -37,13 +38,12 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   }
   apply(text: string, options: YamlTitleAliasOptions): string {
     text = initYAML(text);
-    let title = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
-    title = title || options.fileName;
+    const [unescapedTitle, title] = this.getTitleInfo(text, options.fileName, options.aliasArrayStyle, options.defaultEscapeCharacter)
 
     let previousTitle: string = null;
     const yaml = text.match(yamlRegex)[1];
 
-    const shouldRemoveTitleAlias = !options.keepAliasThatMatchesTheFilename && title === options.fileName;
+    const shouldRemoveTitleAlias = !options.keepAliasThatMatchesTheFilename && unescapedTitle === options.fileName;
     if (options.useYamlKeyToKeepTrackOfOldFilenameOrHeading) {
       previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_KEY));
     }
@@ -52,50 +52,6 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     const parsedYaml = loadYAML(yaml);
 
     previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_KEY));
-
-    const forceEscape = title.includes(',') && (options.aliasArrayStyle === NormalArrayFormats.SingleLine || options.aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || options.aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited);
-    title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter, forceEscape);
-    const getNewAliasValue = function(originalValue: string |string[], shouldRemoveTitle: boolean): string |string[] {
-      if (originalValue == null) {
-        return shouldRemoveTitle ? '' : title;
-      }
-
-      if (typeof originalValue === 'string') {
-        if (shouldRemoveTitle) {
-          if (originalValue === title) {
-            originalValue = '';
-          }
-        } else if (previousTitle === originalValue) {
-          originalValue = title;
-        } else {
-          originalValue = [title, originalValue];
-        }
-      } else if (previousTitle !== null) {
-        const previousTitleIndex = originalValue.indexOf(previousTitle);
-        if (previousTitleIndex !== -1) {
-          if (shouldRemoveTitle) {
-            originalValue.splice(previousTitleIndex, 1);
-          } else {
-            originalValue[previousTitleIndex] = title;
-          }
-        }
-      } else {
-        const currentTitleIndex = originalValue.indexOf(title);
-        if (currentTitleIndex !== -1) {
-          if (shouldRemoveTitle) {
-            originalValue.splice(currentTitleIndex, 1);
-          }
-        } else if (!shouldRemoveTitle) {
-          originalValue = [title, ...originalValue];
-        }
-      }
-
-      if (originalValue === '' || originalValue.length === 0) {
-        return '';
-      }
-
-      return originalValue;
-    };
 
     let aliasKeyForFile: string = null;
     const yamlKeys = Object.keys(parsedYaml);
@@ -106,7 +62,6 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         break;
       }
     }
-
 
     if (aliasKeyForFile != null) {
       const aliasesValue = getYamlSectionValue(newYaml, aliasKeyForFile);
@@ -124,8 +79,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       }
 
       const currentAliasValue = convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(aliasesValue));
-      const newAliasValue = getNewAliasValue(currentAliasValue, shouldRemoveTitleAlias);
-
+      const newAliasValue = this.getNewAliasValue(currentAliasValue, shouldRemoveTitleAlias, title, previousTitle);
       if (newAliasValue === '') {
         newYaml = removeYamlSection(newYaml, aliasKeyForFile);
       } else if (options.preserveExistingAliasesSectionStyle) {
@@ -147,10 +101,60 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       newYaml = setYamlSection(newYaml, LINTER_ALIASES_HELPER_KEY, ` ${title}`);
     }
 
-    text = text.replace(`---\n${yaml}---\n`, `---\n${newYaml}---\n`);
+    text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
 
     return text;
   }
+  getTitleInfo(text: string, fileName: string, aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats, defaultEscapeCharacter: QuoteCharacter): [string, string] {
+    let unescapedTitle = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
+    unescapedTitle = unescapedTitle || fileName;
+    
+    const forceEscape = unescapedTitle.includes(',') && (aliasArrayStyle === NormalArrayFormats.SingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited) || isNumeric(unescapedTitle);
+    const escapedTitle = escapeStringIfNecessaryAndPossible(unescapedTitle, defaultEscapeCharacter, forceEscape);
+
+    return [unescapedTitle, escapedTitle];
+  }
+  getNewAliasValue(originalValue: string |string[], shouldRemoveTitle: boolean, title: string, previousTitle: string): string |string[] {
+    if (originalValue == null) {
+      return shouldRemoveTitle ? '' : title;
+    }
+
+    if (typeof originalValue === 'string') {
+      if (shouldRemoveTitle) {
+        if (originalValue === title) {
+          originalValue = '';
+        }
+      } else if (previousTitle === originalValue) {
+        originalValue = title;
+      } else {
+        originalValue = [title, originalValue];
+      }
+    } else if (previousTitle !== null) {
+      const previousTitleIndex = originalValue.indexOf(previousTitle);
+      if (previousTitleIndex !== -1) {
+        if (shouldRemoveTitle) {
+          originalValue.splice(previousTitleIndex, 1);
+        } else {
+          originalValue[previousTitleIndex] = title;
+        }
+      }
+    } else {
+      const currentTitleIndex = originalValue.indexOf(title);
+      if (currentTitleIndex !== -1) {
+        if (shouldRemoveTitle) {
+          originalValue.splice(currentTitleIndex, 1);
+        }
+      } else if (!shouldRemoveTitle) {
+        originalValue = [title, ...originalValue];
+      }
+    }
+
+    if (originalValue === '' || originalValue.length === 0) {
+      return '';
+    }
+
+    return originalValue;
+  };
   get exampleBuilders(): ExampleBuilder<YamlTitleAliasOptions>[] {
     return [
       new ExampleBuilder({

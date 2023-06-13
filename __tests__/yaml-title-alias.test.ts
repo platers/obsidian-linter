@@ -1235,6 +1235,48 @@ ruleTest({
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
-
+    { // accounts for https://github.com/platers/obsidian-linter/issues/747
+      testName: 'Make sure numerical header gets escaped with quotes when converted to alias',
+      before: dedent`
+        ---
+        aliases:
+          - alias1
+        ---
+        # 12456378
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - '12456378'
+          - alias1
+        ---
+        # 12456378
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+        defaultEscapeCharacter: '\'',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/747
+      testName: 'Make sure numerical filename gets escaped with quotes when converted to alias due to not having a header in the file',
+      before: dedent`
+        ---
+        aliases: [alias1]
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: ["12345678", alias1]
+        ---
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+        keepAliasThatMatchesTheFilename: true,
+        defaultEscapeCharacter: '"',
+        fileName: '12345678',
+      },
+    },
   ],
 });
