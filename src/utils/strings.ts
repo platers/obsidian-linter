@@ -344,7 +344,8 @@ export function countInstances(text: string, instancesOf: string): number {
 
 // based on https://stackoverflow.com/a/175787/8353749
 export function isNumeric(str: string) {
-  if (typeof str != 'string') return false; // we only process strings!
+  const type = typeof str;
+  if (type != 'string') return type === 'number'; // we only process strings so if the value is not already a number the result is false
   return !isNaN(str as unknown as number) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
          !isNaN(parseFloat(str)); // ...and ensure strings of whitespace fail
 }

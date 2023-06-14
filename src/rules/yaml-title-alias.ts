@@ -4,6 +4,7 @@ import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {getFirstHeaderOneText, yamlRegex} from '../utils/regex';
+import {isNumeric} from '../utils/strings';
 
 class YamlTitleAliasOptions implements Options {
   preserveExistingAliasesSectionStyle?: boolean = true;
@@ -43,14 +44,15 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     const yaml = text.match(yamlRegex)[1];
 
     const shouldRemoveTitleAlias = !options.keepAliasThatMatchesTheFilename && unescapedTitle === options.fileName;
-    if (options.useYamlKeyToKeepTrackOfOldFilenameOrHeading) {
-      previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_KEY));
-    }
 
     let newYaml = yaml.replace('---\n', '').replace('\n---', '');
     const parsedYaml = loadYAML(yaml);
 
-    previousTitle = loadYAML(getYamlSectionValue(yaml, LINTER_ALIASES_HELPER_KEY));
+    previousTitle = parsedYaml[LINTER_ALIASES_HELPER_KEY] ?? null;
+    if (previousTitle != null && isNumeric(previousTitle)) {
+      // force previousTitle to be a string by concatenating with an empty string to make non-strings like numbers get handled correctly
+      previousTitle = escapeStringIfNecessaryAndPossible(previousTitle + '', options.defaultEscapeCharacter, true);
+    }
 
     let aliasKeyForFile: string = null;
     const yamlKeys = Object.keys(parsedYaml);

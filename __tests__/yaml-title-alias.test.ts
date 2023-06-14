@@ -1278,5 +1278,47 @@ ruleTest({
         fileName: '12345678',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/747
+      testName: 'Make sure old numerical alias gets removed when the alias for file changes and `linter-yaml-title-alias` is numeric and not escaped',
+      before: dedent`
+        ---
+        aliases: ["12345678", alias1]
+        linter-yaml-title-alias: 12345678
+        ---
+        # 1234
+      `,
+      after: dedent`
+        ---
+        aliases: ["1234", alias1]
+        linter-yaml-title-alias: "1234"
+        ---
+        # 1234
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        defaultEscapeCharacter: '"',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/747
+      testName: 'Make sure old numerical alias gets removed when the alias for file changes and `linter-yaml-title-alias` is numeric and is escaped',
+      before: dedent`
+        ---
+        aliases: ["12345678", alias1]
+        linter-yaml-title-alias: "12345678"
+        ---
+        # 1234
+      `,
+      after: dedent`
+        ---
+        aliases: ["1234", alias1]
+        linter-yaml-title-alias: "1234"
+        ---
+        # 1234
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        defaultEscapeCharacter: '"',
+      },
+    },
   ],
 });
