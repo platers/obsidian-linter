@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
+import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray, isValueEscapedAlready} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {getFirstHeaderOneText, yamlRegex} from '../utils/regex';
 import {isNumeric} from '../utils/strings';
@@ -137,13 +137,19 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         originalValue = [title, originalValue];
       }
     } else if (previousTitle !== null) {
-      const previousTitleIndex = originalValue.indexOf(previousTitle);
+      let previousTitleIndex = originalValue.indexOf(previousTitle);
+      if (previousTitleIndex === -1 && isValueEscapedAlready(previousTitle)) {
+        previousTitleIndex = originalValue.indexOf(previousTitle.substring(1, previousTitle.length - 1));
+      }
+
       if (previousTitleIndex !== -1) {
         if (shouldRemoveTitle) {
           originalValue.splice(previousTitleIndex, 1);
         } else {
           originalValue[previousTitleIndex] = title;
         }
+      } else {
+        originalValue = [title, ...originalValue];
       }
     } else {
       const currentTitleIndex = originalValue.indexOf(title);

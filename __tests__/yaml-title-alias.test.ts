@@ -1300,6 +1300,27 @@ ruleTest({
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/747
+      testName: 'Make sure old numerical alias gets removed when the alias for file changes and `linter-yaml-title-alias` is numeric and not escaped and value in alias is not escaped',
+      before: dedent`
+        ---
+        aliases: [12345678, alias1]
+        linter-yaml-title-alias: 12345678
+        ---
+        # 1234
+      `,
+      after: dedent`
+        ---
+        aliases: ["1234", alias1]
+        linter-yaml-title-alias: "1234"
+        ---
+        # 1234
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        defaultEscapeCharacter: '"',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/747
       testName: 'Make sure old numerical alias gets removed when the alias for file changes and `linter-yaml-title-alias` is numeric and is escaped',
       before: dedent`
         ---
@@ -1343,6 +1364,27 @@ ruleTest({
         tags:${' '}
         ---
         # test4
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        defaultEscapeCharacter: '"',
+      },
+    },
+    {
+      testName: 'Make sure that if previous title is present, but not present in aliases, new title is still added at start of aliases',
+      before: dedent`
+        ---
+        aliases: [alias1]
+        linter-yaml-title-alias: blob
+        ---
+        # 1234
+      `,
+      after: dedent`
+        ---
+        aliases: ["1234", alias1]
+        linter-yaml-title-alias: "1234"
+        ---
+        # 1234
       `,
       options: {
         aliasArrayStyle: NormalArrayFormats.SingleLine,
