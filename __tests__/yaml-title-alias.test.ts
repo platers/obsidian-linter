@@ -1320,5 +1320,34 @@ ruleTest({
         defaultEscapeCharacter: '"',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/758
+      testName: 'Make sure commas are handled properly when found in alias',
+      before: dedent`
+        ---
+        linter-yaml-title-alias: "test, test2, test3"
+        title: test, test2, test3
+        created: 1970-01-01
+        updated: 2023-06-14
+        aliases: ["test, test2, test3"]
+        tags:${' '}
+        ---
+        # test4
+      `,
+      after: dedent`
+        ---
+        linter-yaml-title-alias: test4
+        title: test, test2, test3
+        created: 1970-01-01
+        updated: 2023-06-14
+        aliases: [test4]
+        tags:${' '}
+        ---
+        # test4
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        defaultEscapeCharacter: '"',
+      },
+    },
   ],
 });

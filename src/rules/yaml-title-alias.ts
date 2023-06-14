@@ -49,9 +49,12 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     const parsedYaml = loadYAML(yaml);
 
     previousTitle = parsedYaml[LINTER_ALIASES_HELPER_KEY] ?? null;
-    if (previousTitle != null && isNumeric(previousTitle)) {
+    if (previousTitle != null) {
       // force previousTitle to be a string by concatenating with an empty string to make non-strings like numbers get handled correctly
-      previousTitle = escapeStringIfNecessaryAndPossible(previousTitle + '', options.defaultEscapeCharacter, true);
+      previousTitle = previousTitle + '';
+      // escaping the previous title makes sure that we will be able to find it in the array if needed to be escaped there, but not in the title placeholder
+      // see https://github.com/platers/obsidian-linter/issues/758 and https://github.com/platers/obsidian-linter/issues/747
+      previousTitle = escapeStringIfNecessaryAndPossible(previousTitle, options.defaultEscapeCharacter, this.forceEscape(previousTitle, options.aliasArrayStyle));
     }
 
     let aliasKeyForFile: string = null;
@@ -111,10 +114,12 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     let unescapedTitle = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
     unescapedTitle = unescapedTitle || fileName;
 
-    const forceEscape = unescapedTitle.includes(',') && (aliasArrayStyle === NormalArrayFormats.SingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited);
-    const escapedTitle = escapeStringIfNecessaryAndPossible(unescapedTitle, defaultEscapeCharacter, forceEscape);
+    const escapedTitle = escapeStringIfNecessaryAndPossible(unescapedTitle, defaultEscapeCharacter, this.forceEscape(unescapedTitle, aliasArrayStyle));
 
     return [unescapedTitle, escapedTitle];
+  }
+  forceEscape(title: string, aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats): boolean {
+    return isNumeric(title) || (title.includes(',') && (aliasArrayStyle === NormalArrayFormats.SingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited));
   }
   getNewAliasValue(originalValue: string |string[], shouldRemoveTitle: boolean, title: string, previousTitle: string): string |string[] {
     if (originalValue == null) {
