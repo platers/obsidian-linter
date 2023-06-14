@@ -1,6 +1,7 @@
 import {load, dump} from 'js-yaml';
 import {getTextInLanguage} from '../lang/helpers';
 import {escapeDollarSigns, yamlRegex} from './regex';
+import {isNumeric} from './strings';
 
 
 export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
@@ -102,76 +103,90 @@ export type QuoteCharacter = '\'' | '"';
  * @param {NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats} format The format that the array should be converted into.
  * @param {string} defaultEscapeCharacter The character escape to use around the value if a specific escape character is not needed.
  * @param {boolean} removeEscapeCharactersIfPossibleWhenGoingToMultiLine Whether or not to remove no longer needed escape values when converting to a multi-line format.
+ * @param {boolean} escapeNumericValues Whether or not to escape any numeric values found in the array.
  * @return {string} The formatted array in the specified yaml/obsidian yaml format.
  */
-export function formatYamlArrayValue(value: string | string[], format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats, defaultEscapeCharacter: QuoteCharacter, removeEscapeCharactersIfPossibleWhenGoingToMultiLine: boolean): string {
+export function formatYamlArrayValue(value: string | string[], format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats, defaultEscapeCharacter: QuoteCharacter, removeEscapeCharactersIfPossibleWhenGoingToMultiLine: boolean, escapeNumericValues: boolean = false): string {
   if (typeof value === 'string') {
     value = [value];
   }
 
+  // handle default values here
+  if (value == null || value.length === 0) {
+    return getDefaultYAMLArrayValue(format);
+  }
+
+  // handle escaping numeric values and the removal of escape characters where applicable for multiline arrays
+  const shouldRemoveEscapeCharactersIfPossible = removeEscapeCharactersIfPossibleWhenGoingToMultiLine && (format == NormalArrayFormats.MultiLine || (format == SpecialArrayFormats.SingleStringToMultiLine && value.length > 1));
+  if (escapeNumericValues || shouldRemoveEscapeCharactersIfPossible) {
+    for (let i = 0; i < value.length; i++) {
+      let currentValue = value[i];
+      const valueIsEscaped = isValueEscapedAlready(currentValue);
+      if (valueIsEscaped) {
+        currentValue = currentValue.substring(1, currentValue.length - 1);
+      }
+
+      const shouldRequireEscapeOfCurrentValue = escapeNumericValues && isNumeric(currentValue);
+      if (valueIsEscaped && shouldRequireEscapeOfCurrentValue) {
+        continue; // when dealing with numbers that we need escaped, we don't want to remove that escaping for multiline arrays
+      } else if (shouldRequireEscapeOfCurrentValue || (valueIsEscaped && shouldRemoveEscapeCharactersIfPossible)) {
+        value[i] = escapeStringIfNecessaryAndPossible(currentValue, defaultEscapeCharacter, shouldRequireEscapeOfCurrentValue);
+      }
+    }
+  }
+
+  // handle the values that are present based on the format of the array
+  /* eslint-disable no-fallthrough -- we are falling through here because it makes the most sense for the cases below */
   switch (format) {
-    case NormalArrayFormats.SingleLine:
-      if (value == null || value.length === 0) {
-        return ' []';
-      }
-
-      return ' ' + convertStringArrayToSingleLineArray(value);
-    case NormalArrayFormats.MultiLine:
-      if (value == null || value.length === 0) {
-        return '\n  - ';
-      }
-
-      if (removeEscapeCharactersIfPossibleWhenGoingToMultiLine) {
-        for (let i = 0; i < value.length; i++) {
-          const currentValue = value[i];
-          if (isValueEscapedAlready(currentValue)) {
-            value[i] = escapeStringIfNecessaryAndPossible(currentValue.substring(1, currentValue.length - 1), defaultEscapeCharacter);
-          }
-        }
-      }
-
-      return '\n  - ' + value.join('\n  - ');
     case SpecialArrayFormats.SingleStringToSingleLine:
-      if (value == null || value.length === 0) {
-        return ' ';
-      } else if (value.length === 1) {
+      if (value.length === 1) {
         return ' ' + value[0];
       }
-
+    case NormalArrayFormats.SingleLine:
       return ' ' + convertStringArrayToSingleLineArray(value);
     case SpecialArrayFormats.SingleStringToMultiLine:
-      if (value == null || value.length === 0) {
-        return ' ';
-      } else if (value.length === 1) {
+      if (value.length === 1) {
         return ' ' + value[0];
       }
-
+    case NormalArrayFormats.MultiLine:
       return '\n  - ' + value.join('\n  - ');
     case TagSpecificArrayFormats.SingleStringSpaceDelimited:
-      if (value == null || value.length === 0) {
-        return ' ';
-      } else if (value.length === 1) {
+      if (value.length === 1) {
         return ' ' + value[0];
       }
 
-      return ' ' +value.join(' ');
+      return ' ' + value.join(' ');
     case SpecialArrayFormats.SingleStringCommaDelimited:
-      if (value == null || value.length === 0) {
-        return ' ';
-      } else if (value.length === 1) {
+      if (value.length === 1) {
         return ' ' + value[0];
       }
 
       return ' ' + value.join(', ');
     case TagSpecificArrayFormats.SingleLineSpaceDelimited:
-      if (value == null || value.length === 0) {
-        return ' []';
-      } else if (value.length === 1) {
+      if (value.length === 1) {
         return ' ' + value[0];
       }
 
       return ' ' + convertStringArrayToSingleLineArray(value).replaceAll(', ', ' ');
   }
+  /* eslint-enable no-fallthrough */
+}
+
+function getDefaultYAMLArrayValue(format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats): string {
+  /* eslint-disable no-fallthrough */
+  switch (format) {
+    case NormalArrayFormats.SingleLine:
+    case TagSpecificArrayFormats.SingleLineSpaceDelimited:
+      return ' []';
+    case NormalArrayFormats.MultiLine:
+      return '\n  - ';
+    case SpecialArrayFormats.SingleStringToSingleLine:
+    case SpecialArrayFormats.SingleStringToMultiLine:
+    case TagSpecificArrayFormats.SingleStringSpaceDelimited:
+    case SpecialArrayFormats.SingleStringCommaDelimited:
+      return ' ';
+  }
+  /* eslint-enable no-fallthrough */
 }
 
 function convertStringArrayToSingleLineArray(arrayItems: string[]): string {

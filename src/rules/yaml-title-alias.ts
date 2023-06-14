@@ -4,7 +4,6 @@ import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {getFirstHeaderOneText, yamlRegex} from '../utils/regex';
-import {isNumeric} from '../utils/strings';
 
 class YamlTitleAliasOptions implements Options {
   preserveExistingAliasesSectionStyle?: boolean = true;
@@ -85,15 +84,15 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         newYaml = removeYamlSection(newYaml, aliasKeyForFile);
       } else if (options.preserveExistingAliasesSectionStyle) {
         if (!isEmpty && ((isSingleString && title == newAliasValue) || !isSingleString || currentAliasValue == newAliasValue)) {
-          newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, currentAliasStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
+          newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, currentAliasStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true/* escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747*/));
         } else {
-          newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
+          newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true/* escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747*/));
         }
       } else {
-        newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
+        newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true/* escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747*/));
       }
     } else if (!shouldRemoveTitleAlias) {
-      newYaml = setYamlSection(newYaml, OBSIDIAN_ALIAS_KEY_PLURAL, formatYamlArrayValue(title, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays));
+      newYaml = setYamlSection(newYaml, OBSIDIAN_ALIAS_KEY_PLURAL, formatYamlArrayValue(title, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true/* escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747*/));
     }
 
     if (!options.useYamlKeyToKeepTrackOfOldFilenameOrHeading || shouldRemoveTitleAlias) {
@@ -110,7 +109,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     let unescapedTitle = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
     unescapedTitle = unescapedTitle || fileName;
 
-    const forceEscape = (unescapedTitle.includes(',') && (aliasArrayStyle === NormalArrayFormats.SingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited)) || isNumeric(unescapedTitle);
+    const forceEscape = unescapedTitle.includes(',') && (aliasArrayStyle === NormalArrayFormats.SingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited);
     const escapedTitle = escapeStringIfNecessaryAndPossible(unescapedTitle, defaultEscapeCharacter, forceEscape);
 
     return [unescapedTitle, escapedTitle];

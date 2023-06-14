@@ -61,6 +61,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
                   options.aliasArrayStyle,
                   options.defaultEscapeCharacter,
                   options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+                  true, // escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747
               ),
           );
 
