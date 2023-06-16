@@ -75,7 +75,7 @@ export function logWarn(message: string) {
 }
 
 export function timingBegin(timingKey: string) {
-  if (log.getLevel() <= log.levels.DEBUG) {
+  if (log.getLevel() > log.levels.DEBUG) {
     return;
   }
 
@@ -87,7 +87,7 @@ export function timingBegin(timingKey: string) {
  * @param {string} timingKey - The timing key for the start time that should end.
  */
 export function timingEnd(timingKey: string) {
-  if (log.getLevel() <= log.levels.DEBUG) {
+  if (log.getLevel() > log.levels.DEBUG) {
     return;
   } else if (!timingInfo.has(timingKey)) {
     logWarn(getTextInLanguage('logs.timing-key-not-found').replace('{TIMING_KEY}', timingKey));
