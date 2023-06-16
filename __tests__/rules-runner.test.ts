@@ -34,6 +34,7 @@ type CustomCommandTestCase = {
   listOfCommands: Command[],
   expectedCommandCount: Map<string, number>;
   expectedNumberOfCommandsRun: number;
+  skipFileValue: boolean
 }
 
 const customCommandTestCases: CustomCommandTestCase[] = [
@@ -42,6 +43,7 @@ const customCommandTestCases: CustomCommandTestCase[] = [
     listOfCommands: [],
     expectedCommandCount: new Map<string, number>(),
     expectedNumberOfCommandsRun: 0,
+    skipFileValue: false,
   },
   {
     testName: 'When an app lint command is run it should be executed',
@@ -54,6 +56,7 @@ const customCommandTestCases: CustomCommandTestCase[] = [
       ['second id', 1],
     ]),
     expectedNumberOfCommandsRun: 2,
+    skipFileValue: false,
   },
   {
     testName: 'A lint command with an empty id should not get run',
@@ -64,6 +67,7 @@ const customCommandTestCases: CustomCommandTestCase[] = [
       ['', 0],
     ]),
     expectedNumberOfCommandsRun: 0,
+    skipFileValue: false,
   },
   {
     testName: 'When custom commands are run with two of the same command, the second command instance is skipped',
@@ -75,6 +79,17 @@ const customCommandTestCases: CustomCommandTestCase[] = [
       ['first id', 1],
     ]),
     expectedNumberOfCommandsRun: 1,
+    skipFileValue: false,
+  },
+  {
+    testName: 'When the file is listed to be skipped, no custom commands are run',
+    listOfCommands: [
+      {id: 'first id', name: 'command name'},
+      {id: 'second id', name: 'command name 2'},
+    ],
+    expectedCommandCount: new Map<string, number>(),
+    expectedNumberOfCommandsRun: 0,
+    skipFileValue: true,
   },
 ];
 
@@ -200,6 +215,7 @@ describe('Rules Runner', () => {
   for (const testCase of customCommandTestCases) {
     it(testCase.testName, () => {
       appCommandsMock.resetStats();
+      rulesRunner.skipFile = testCase.skipFileValue;
       rulesRunner.runCustomCommands(testCase.listOfCommands, appCommandsMock);
 
       expect(appCommandsMock.numberOfCommands).toEqual(testCase.expectedNumberOfCommandsRun);

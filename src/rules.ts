@@ -163,18 +163,18 @@ export const RuleTypeOrder = Object.values(RuleType);
 /**
  * Returns a list of ignored rules in the YAML frontmatter of the text.
  * @param {string} text The text to parse
- * @return {string[]} The list of ignored rules
+ * @return {[string[], boolean]} The list of ignored rules and whether the current file should be ignored entirely
  */
-export function getDisabledRules(text: string): string[] {
+export function getDisabledRules(text: string): [string[], boolean] {
   const yaml = text.match(yamlRegex);
   if (!yaml) {
-    return [];
+    return [[], false];
   }
 
   const yaml_text = yaml[1];
   const disabledRulesValue = getYamlSectionValue(yaml_text, 'disabled rules');
   if (disabledRulesValue == null) {
-    return [];
+    return [[], false];
   }
 
   let disabledRulesKeyAndValue = disabledRulesValue.includes('\n') ? 'disabled rules:\n' : 'disabled rules: ';
@@ -185,7 +185,7 @@ export function getDisabledRules(text: string): string[] {
       'disabled rules'
   ];
   if (!disabled_rules) {
-    return [];
+    return [[], false];
   }
 
   if (typeof disabled_rules === 'string') {
@@ -193,10 +193,10 @@ export function getDisabledRules(text: string): string[] {
   }
 
   if (disabled_rules.includes('all')) {
-    return rules.map((rule) => rule.alias);
+    return [rules.map((rule) => rule.alias), true];
   }
 
-  return disabled_rules;
+  return [disabled_rules, false];
 }
 
 export const rules: Rule[] = [];

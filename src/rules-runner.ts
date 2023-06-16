@@ -40,11 +40,17 @@ type FileInfo = {
 
 export class RulesRunner {
   private disabledRules: string[] = [];
+  skipFile: boolean;
 
   lintText(runOptions: RunLinterRulesOptions): string {
-    timingBegin(getTextInLanguage('logs.rule-running'));
+    this.skipFile = false;
     const originalText = runOptions.oldText;
-    this.disabledRules = getDisabledRules(originalText);
+    [this.disabledRules, this.skipFile] = getDisabledRules(originalText);
+    if (this.skipFile) {
+      return originalText;
+    }
+
+    timingBegin(getTextInLanguage('logs.rule-running'));
 
     const preRuleText = getTextInLanguage('logs.pre-rules');
     timingBegin(preRuleText);
@@ -136,6 +142,10 @@ export class RulesRunner {
   }
 
   runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
+    if (this.skipFile) {
+      return;
+    }
+
     logDebug(getTextInLanguage('logs.running-custom-lint-command'));
     const commandsRun = new Set<string>();
     for (const commandInfo of lintCommands) {
