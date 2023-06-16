@@ -354,6 +354,7 @@ ruleTest({
         dateCreatedKey: 'created',
         dateModifiedKey: 'modified',
         fileCreatedTime: '2020-01-01T00:00:00-00:00',
+        fileModifiedTime: '2020-02-04T18:00:00-00:00',
         currentTime: moment('Tuesday, February 4th 2020, 6:00:07 pm', 'dddd, MMMM Do YYYY, h:mm:ss a'),
         alreadyModified: false,
         forceRetentionOfCreatedValue: true,
@@ -361,15 +362,3 @@ ruleTest({
     },
   ],
 });
-
-/**
- * "yaml-timestamp": {
-      "enabled": true,
-      "date-created": true,
-      "date-created-key": "created",
-      "force-retention-of-create-value": true,
-      "date-modified": true,
-      "date-modified-key": "modified",
-      "format": "YYYY-MM-DDTHH:mm:ssZ"
-    },
- */

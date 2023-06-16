@@ -101,27 +101,31 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       textModified = true;
     } else if (keyWithValueFound) {
       const createdDateString = this.getYAMLTimestampString(text, created_match, options.dateCreatedKey);
-      const createdDateTime = moment(createdDateString, options.format, options.locale, true);
-      if (createdDateTime == undefined || (!createdDateTime.isValid() && !options.forceRetentionOfCreatedValue)) {
-        text = text.replace(
-            created_match,
-            escapeDollarSigns(created_date_line) + '\n',
-        );
-
-        textModified = true;
-      } else if (options.forceRetentionOfCreatedValue) {
+      if (options.forceRetentionOfCreatedValue) {
         const yamlCreatedDateTime = this.parseValueToCurrentFormatIfPossible(createdDateString, options.format, options.locale);
         if (yamlCreatedDateTime == null) {
           throw new Error(getTextInLanguage('logs.invalid-date-format-error').replace('{DATE}', createdDateString).replace('{FILE_NAME}', options.fileName));
         }
 
-        const created_date_yaml_line = `\n${options.dateCreatedKey}: ${yamlCreatedDateTime.format(options.format)}`;
-        text = text.replace(
-            created_match,
-            escapeDollarSigns(created_date_yaml_line) + '\n',
-        );
+        if (yamlCreatedDateTime.format(options.format) !== createdDateString) {
+          const created_date_yaml_line = `\n${options.dateCreatedKey}: ${yamlCreatedDateTime.format(options.format)}`;
+          text = text.replace(
+              created_match,
+              escapeDollarSigns(created_date_yaml_line) + '\n',
+          );
 
-        textModified = true;
+          textModified = true;
+        }
+      } else {
+        const createdDateTime = moment(createdDateString, options.format, options.locale, true);
+        if (createdDateTime == undefined || !createdDateTime.isValid()) {
+          text = text.replace(
+              created_match,
+              escapeDollarSigns(created_date_line) + '\n',
+          );
+
+          textModified = true;
+        }
       }
     }
 
@@ -139,7 +143,6 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
     // than 5 seconds prior to the time the linter will finish with the file (i.e. helps prevent accidental infinite loops on updating the date modified value)
     const formatted_modified_date = options.currentTime.format(options.format);
     const modified_date_line = `\n${options.dateModifiedKey}: ${formatted_modified_date}`;
-
     const keyWithValueFound = modified_match.test(text);
     if (keyWithValueFound) {
       const modifiedDateTime = moment(text.match(modified_match)[0].replace(options.dateModifiedKey + ':', '').trim(), options.format, options.locale, true);
