@@ -143,6 +143,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
     // than 5 seconds prior to the time the linter will finish with the file (i.e. helps prevent accidental infinite loops on updating the date modified value)
     const formatted_modified_date = options.currentTime.format(options.format);
     const modified_date_line = `\n${options.dateModifiedKey}: ${formatted_modified_date}`;
+
     const keyWithValueFound = modified_match.test(text);
     if (keyWithValueFound) {
       const modifiedDateTime = moment(text.match(modified_match)[0].replace(options.dateModifiedKey + ':', '').trim(), options.format, options.locale, true);
