@@ -1026,8 +1026,7 @@ ruleTest({
         defaultArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
-    {
-      // accounts for https://github.com/platers/obsidian-linter/issues/525
+    { // accounts for https://github.com/platers/obsidian-linter/issues/525
       testName: 'Converting a single string comma separated array to a multi-line array should respect escaped entries',
       before: dedent`
         ---
@@ -1043,6 +1042,40 @@ ruleTest({
       `,
       options: {
         aliasArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    {
+      testName: 'Numeric aliases are escaped when aliases are converted from one type to another',
+      before: dedent`
+        ---
+        aliases: 1234, alias1
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - "1234"
+          - alias1
+        ---
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    {
+      testName: 'Numeric aliases are escaped when aliases are otherwise unchanged',
+      before: dedent`
+        ---
+        aliases: 1234, alias1
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: "1234", alias1
+        ---
+      `,
+      options: {
+        aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
       },
     },
   ],
