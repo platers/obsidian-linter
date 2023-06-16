@@ -24,7 +24,6 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
   }
   apply(text: string, options: HeadingBlankLinesOptions): string {
     if (!options.bottom) {
-      text = text.replace(/(^#+\s.*)\n+/gm, '$1\n'); // trim blank lines after headings
       text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
     } else {
       text = text.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings

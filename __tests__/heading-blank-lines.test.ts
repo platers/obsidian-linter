@@ -103,5 +103,29 @@ ruleTest({
         blah blah blah
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/751
+      testName: 'Make sure that blank lines after a heading are left alone when `bottom = false`',
+      before: dedent`
+        ## diary
+        ${''}
+        ${''}
+        Content here
+        ## entry 2
+        blah blah blah
+      `,
+      after: dedent`
+        ## diary
+        ${''}
+        ${''}
+        Content here
+        ${''}
+        ## entry 2
+        blah blah blah
+      `,
+      options: {
+        bottom: false,
+        emptyLineAfterYaml: false,
+      },
+    },
   ],
 });
