@@ -5,6 +5,7 @@ type disabledRulesTestCase = {
   name: string,
   text: string,
   expectedDisabledRules: string[],
+  expectedSkipFileResult: boolean,
 };
 
 const disabledRulesTestCases: disabledRulesTestCase[] = [
@@ -14,6 +15,7 @@ const disabledRulesTestCases: disabledRulesTestCase[] = [
       Text
     `,
     expectedDisabledRules: [],
+    expectedSkipFileResult: false,
   },
   {
     name: 'when there is no YAML key for disabled rules, no rules are disabled',
@@ -23,6 +25,7 @@ const disabledRulesTestCases: disabledRulesTestCase[] = [
       Text
     `,
     expectedDisabledRules: [],
+    expectedSkipFileResult: false,
   },
   {
     name: 'when there is no value in YAML key for disabled rules, no rules are disabled',
@@ -33,6 +36,7 @@ const disabledRulesTestCases: disabledRulesTestCase[] = [
       Text
     `,
     expectedDisabledRules: [],
+    expectedSkipFileResult: false,
   },
   {
     name: 'when there is one value in YAML key for disabled rules, that one rules is disabled',
@@ -43,6 +47,7 @@ const disabledRulesTestCases: disabledRulesTestCase[] = [
       Text
     `,
     expectedDisabledRules: ['yaml-timestamp'],
+    expectedSkipFileResult: false,
   },
   {
     name: 'when there is more than one value in YAML key for disabled rules, those rules are disabled',
@@ -53,6 +58,7 @@ const disabledRulesTestCases: disabledRulesTestCase[] = [
       Text
     `,
     expectedDisabledRules: ['yaml-timestamp', 'capitalize-headings'],
+    expectedSkipFileResult: false,
   },
   {
     name: 'when the value in YAML key for disabled rules is "all", all rules are disabled',
@@ -63,6 +69,7 @@ const disabledRulesTestCases: disabledRulesTestCase[] = [
       Text
     `,
     expectedDisabledRules: rules.map((r) => r.alias),
+    expectedSkipFileResult: true,
   },
   {
     name: 'when the YAML is malformed, no error occurs trying to get disabled rules',
@@ -74,15 +81,17 @@ const disabledRulesTestCases: disabledRulesTestCase[] = [
       ---
     `,
     expectedDisabledRules: [],
+    expectedSkipFileResult: false,
   },
 ];
 
 describe('Disabled rules parsing', () => {
   for (const testCase of disabledRulesTestCases) {
     it(testCase.name, () => {
-      const disabledRules = getDisabledRules(testCase.text);
+      const [disabledRules, shouldSkipFile] = getDisabledRules(testCase.text);
 
       expect(disabledRules).toEqual(testCase.expectedDisabledRules);
+      expect(shouldSkipFile).toEqual(testCase.expectedSkipFileResult);
     });
   }
 });

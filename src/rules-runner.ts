@@ -22,6 +22,7 @@ import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from './utils/
 import {getTextInLanguage} from './lang/helpers';
 import CapitalizeHeadings from './rules/capitalize-headings';
 import BlockquoteStyle from './rules/blockquote-style';
+import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -39,11 +40,17 @@ type FileInfo = {
 
 export class RulesRunner {
   private disabledRules: string[] = [];
+  skipFile: boolean;
 
   lintText(runOptions: RunLinterRulesOptions): string {
-    timingBegin(getTextInLanguage('logs.rule-running'));
+    this.skipFile = false;
     const originalText = runOptions.oldText;
-    this.disabledRules = getDisabledRules(originalText);
+    [this.disabledRules, this.skipFile] = getDisabledRules(originalText);
+    if (this.skipFile) {
+      return originalText;
+    }
+
+    timingBegin(getTextInLanguage('logs.rule-running'));
 
     const preRuleText = getTextInLanguage('logs.pre-rules');
     timingBegin(preRuleText);
@@ -135,6 +142,10 @@ export class RulesRunner {
   }
 
   runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
+    if (this.skipFile) {
+      return;
+    }
+
     logDebug(getTextInLanguage('logs.running-custom-lint-command'));
     const commandsRun = new Set<string>();
     for (const commandInfo of lintCommands) {
@@ -155,18 +166,24 @@ export class RulesRunner {
   }
 
   runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
-    logDebug(getTextInLanguage('logs.running-custom-regex'));
-    let tempOldText = oldText;
-    for (const eachRegex of customRegexes) {
-      if (eachRegex.find == undefined || eachRegex.replace === undefined || eachRegex.replace === null ) {
-        continue;
+    return ignoreListOfTypes([IgnoreTypes.customIgnore], oldText, (text: string) => {
+      logDebug(getTextInLanguage('logs.running-custom-regex'));
+
+      let newText = text;
+      for (const eachRegex of customRegexes) {
+        const findIsEmpty = eachRegex.find === undefined || eachRegex.find == '' || eachRegex.find === null;
+        const replaceIsEmpty = eachRegex.replace === undefined || eachRegex.replace === null;
+        if (findIsEmpty || replaceIsEmpty) {
+          continue;
+        }
+
+        const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
+        // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
+        newText = newText.replace(regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace));
       }
 
-      const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
-      // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
-      tempOldText = tempOldText.replace(regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace));
-    }
-    return tempOldText;
+      return newText;
+    });
   }
 
   runPasteLint(currentLine: string, runOptions: RunLinterRulesOptions): string {
