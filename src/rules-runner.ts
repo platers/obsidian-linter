@@ -22,6 +22,7 @@ import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from './utils/
 import {getTextInLanguage} from './lang/helpers';
 import CapitalizeHeadings from './rules/capitalize-headings';
 import BlockquoteStyle from './rules/blockquote-style';
+import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -155,18 +156,24 @@ export class RulesRunner {
   }
 
   runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
-    logDebug(getTextInLanguage('logs.running-custom-regex'));
-    let tempOldText = oldText;
-    for (const eachRegex of customRegexes) {
-      if (eachRegex.find == undefined || eachRegex.replace === undefined || eachRegex.replace === null ) {
-        continue;
+    return ignoreListOfTypes([IgnoreTypes.customIgnore], oldText, (text: string) => {
+      logDebug(getTextInLanguage('logs.running-custom-regex'));
+
+      let newText = text;
+      for (const eachRegex of customRegexes) {
+        const findIsEmpty = eachRegex.find === undefined || eachRegex.find == '' || eachRegex.find === null;
+        const replaceIsEmpty = eachRegex.replace === undefined || eachRegex.replace === null;
+        if (findIsEmpty || replaceIsEmpty) {
+          continue;
+        }
+
+        const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
+        // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
+        newText = newText.replace(regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace));
       }
 
-      const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
-      // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
-      tempOldText = tempOldText.replace(regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace));
-    }
-    return tempOldText;
+      return newText;
+    });
   }
 
   runPasteLint(currentLine: string, runOptions: RunLinterRulesOptions): string {
