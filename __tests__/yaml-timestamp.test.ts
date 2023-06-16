@@ -332,5 +332,44 @@ ruleTest({
         alreadyModified: false,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/745
+      testName: 'When no changes are made, and force retention of creation date is active, do not update date modified when no change in modification time has been made',
+      before: dedent`
+        ---
+        tag: tag1
+        modified: Tuesday, February 4th 2020, 6:00:00 pm
+        created: Wednesday, January 1st 2020, 12:00:00 am
+        location: "path"
+        ---
+      `,
+      after: dedent`
+        ---
+        tag: tag1
+        modified: Tuesday, February 4th 2020, 6:00:00 pm
+        created: Wednesday, January 1st 2020, 12:00:00 am
+        location: "path"
+        ---
+      `,
+      options: {
+        dateCreatedKey: 'created',
+        dateModifiedKey: 'modified',
+        fileCreatedTime: '2020-01-01T00:00:00-00:00',
+        currentTime: moment('Tuesday, February 4th 2020, 6:00:07 pm', 'dddd, MMMM Do YYYY, h:mm:ss a'),
+        alreadyModified: false,
+        forceRetentionOfCreatedValue: true,
+      },
+    },
   ],
 });
+
+/**
+ * "yaml-timestamp": {
+      "enabled": true,
+      "date-created": true,
+      "date-created-key": "created",
+      "force-retention-of-create-value": true,
+      "date-modified": true,
+      "date-modified-key": "modified",
+      "format": "YYYY-MM-DDTHH:mm:ssZ"
+    },
+ */
