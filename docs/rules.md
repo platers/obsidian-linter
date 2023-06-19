@@ -3627,7 +3627,99 @@ There should not be any empty lines between list markers and checklists.
 
 
 
-Example: 
+Example: Blank lines are removed between ordered list items
+
+Before:
+
+``````markdown
+1. Item 1
+
+2. Item 2
+``````
+
+After:
+
+``````markdown
+1. Item 1
+2. Item 2
+``````
+Example: Blank lines are removed between list items when the list indicator is '-'
+
+Before:
+
+``````markdown
+- Item 1
+
+	- Subitem 1
+
+- Item 2
+``````
+
+After:
+
+``````markdown
+- Item 1
+	- Subitem 1
+- Item 2
+``````
+Example: Blank lines are removed between checklist items
+
+Before:
+
+``````markdown
+- [x] Item 1
+
+	- [!] Subitem 1
+
+- [ ] Item 2
+``````
+
+After:
+
+``````markdown
+- [x] Item 1
+	- [!] Subitem 1
+- [ ] Item 2
+``````
+Example: Blank lines are removed between list items when the list indicator is '+'
+
+Before:
+
+``````markdown
++ Item 1
+
+	+ Subitem 1
+
++ Item 2
+``````
+
+After:
+
+``````markdown
++ Item 1
+	+ Subitem 1
++ Item 2
+``````
+Example: Blank lines are removed between list items when the list indicator is '*'
+
+Before:
+
+``````markdown
+* Item 1
+
+	* Subitem 1
+
+* Item 2
+``````
+
+After:
+
+``````markdown
+* Item 1
+	* Subitem 1
+* Item 2
+``````
+Example: Blanks lines are removed between like list types (ordered, specific list item indicators, and checklists) while blanks are left between different kinds of list item indicators
 
 Before:
 
@@ -3644,7 +3736,7 @@ Before:
 
 - [x] Item 1
 
-	- [ ] Subitem 1
+	- [f] Subitem 1
 
 - [ ] Item 2
 
@@ -3672,7 +3764,7 @@ After:
 - Item 2
 
 - [x] Item 1
-	- [ ] Subitem 1
+	- [f] Subitem 1
 - [ ] Item 2
 
 + Item 1
@@ -4157,7 +4249,7 @@ After:
 - [ ] Checklist item contents here
 More content here
 ``````
-Example: Line being pasted into a blockquote with a checklist indicator is has its checklist indicator removed when current line is: `> - [x] `
+Example: Line being pasted into a blockquote with a checklist indicator has its checklist indicator removed when current line is: `> - [x] `
 
 Before:
 
@@ -4172,7 +4264,22 @@ After:
 Checklist item contents here
 More content here
 ``````
-Example: Line being pasted with a checklist indicator is has its checklist indicator removed when current line is: `- [ ] `
+Example: Line being pasted with a checklist indicator has its checklist indicator removed when current line is: `- [ ] `
+
+Before:
+
+``````markdown
+- [x] Checklist item 1
+- [ ] Checklist item 2
+``````
+
+After:
+
+``````markdown
+Checklist item 1
+- [ ] Checklist item 2
+``````
+Example: Line being pasted as a checklist indicator has its checklist indicator removed when current line is: `- [!] `
 
 Before:
 
