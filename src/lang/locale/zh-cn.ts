@@ -479,7 +479,7 @@ export default {
     },
     // quote-style.ts
     'quote-style': {
-      'name': '报价风格',
+      'name': '引用样式',
       'description': '更新正文内容中的引号以更新为指定的单引号和双引号样式。',
       'single-quote-enabled': {
         'name': '启用`单引号样式`',
