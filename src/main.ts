@@ -15,6 +15,7 @@ import {SettingTab} from './ui/settings';
 import {NormalArrayFormats} from './utils/yaml';
 import {urlRegex} from './utils/regex';
 import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
+import {RuleAliasSuggest} from './cm6/RuleAliasSuggester';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -88,6 +89,8 @@ export default class LinterPlugin extends Plugin {
     this.addCommands();
 
     this.registerEventsAndSaveCallback();
+
+    this.registerEditorSuggest(new RuleAliasSuggest(this));
 
     this.settingsTab = new SettingTab(this.app, this);
     this.addSettingTab(this.settingsTab);

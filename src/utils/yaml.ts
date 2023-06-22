@@ -11,6 +11,7 @@ export const OBSIDIAN_ALIAS_KEY_SINGULAR = 'alias';
 export const OBSIDIAN_ALIAS_KEY_PLURAL = 'aliases';
 export const OBSIDIAN_ALIASES_KEYS = [OBSIDIAN_ALIAS_KEY_SINGULAR, OBSIDIAN_ALIAS_KEY_PLURAL];
 export const LINTER_ALIASES_HELPER_KEY = 'linter-yaml-title-alias';
+export const DISABLED_RULES_KEY = 'disabled rules';
 
 /**
  * Adds an empty YAML block to the text if it doesn't already have one.

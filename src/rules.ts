@@ -1,4 +1,5 @@
 import {
+  DISABLED_RULES_KEY,
   getYamlSectionValue,
   loadYAML,
   QuoteCharacter,
@@ -172,12 +173,12 @@ export function getDisabledRules(text: string): [string[], boolean] {
   }
 
   const yaml_text = yaml[1];
-  const disabledRulesValue = getYamlSectionValue(yaml_text, 'disabled rules');
+  const disabledRulesValue = getYamlSectionValue(yaml_text, DISABLED_RULES_KEY);
   if (disabledRulesValue == null) {
     return [[], false];
   }
 
-  let disabledRulesKeyAndValue = disabledRulesValue.includes('\n') ? 'disabled rules:\n' : 'disabled rules: ';
+  let disabledRulesKeyAndValue = disabledRulesValue.includes('\n') ? `${DISABLED_RULES_KEY}:\n` : `${DISABLED_RULES_KEY}: `;
   disabledRulesKeyAndValue += disabledRulesValue;
 
   const parsed_yaml = loadYAML(disabledRulesKeyAndValue);
