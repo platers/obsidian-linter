@@ -49,8 +49,6 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
       return false;
     }
 
-    // this.inline = disabledRules.startsWith(`${disableRulesKeyWithColon} [`);
-
     return range.trimEnd().endsWith(disabledRules);
   }
   inline = false;
@@ -82,6 +80,7 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
 
   getSuggestions(context: EditorSuggestContext): ruleInfo[] {
     console.log('retrieve suggestions', context.query);
+    // TODO: get the value from the YAML as it is now...
     const query = context.query.toLowerCase();
     const suggestions = this.ruleInfo.filter((p) =>
       p.name.contains(query) || p.alias.contains(query),
@@ -91,9 +90,11 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
   }
 
   renderSuggestion(suggestion: ruleInfo, el: HTMLElement): void {
-    const outer = el.createDiv({cls: 'linter-suggester-container'});
-    outer.createDiv({cls: 'linter-rule-name'}).setText(`${suggestion.displayName}`);
-    outer.createDiv({cls: 'linter-rule-alias'}).setText(`${suggestion.alias}`);
+    el.addClass('mod-complex');
+
+    const outer = el.createDiv({cls: 'suggestion-content'});
+    outer.createDiv({cls: 'suggestion-title'}).setText(`${suggestion.displayName}`);
+    outer.createDiv({cls: 'suggestion-note'}).setText(`${suggestion.alias}`);
   }
 
   selectSuggestion(suggestion: ruleInfo): void {

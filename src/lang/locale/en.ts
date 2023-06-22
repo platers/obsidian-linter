@@ -93,6 +93,8 @@ export default {
     'characters-removed': 'characters removed',
   },
 
+  // rule-alias-suggester.ts
+
   // settings.ts
   'linter-title': 'Linter',
   'empty-search-results-text': 'No settings match search',
