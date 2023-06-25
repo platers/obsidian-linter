@@ -93,6 +93,9 @@ export default {
     'characters-removed': 'Zeichen entfernt',
   },
 
+  // rule-alias-suggester.ts
+  'all-rules-option': 'Alle',
+
   // settings.ts
   'linter-title': 'Linter',
   'empty-search-results-text': 'Keine Einstellungen stimmen mit der Suche überein',

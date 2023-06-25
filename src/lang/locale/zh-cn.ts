@@ -93,6 +93,9 @@ export default {
     'characters-removed': '字符已移除',
   },
 
+  // rule-alias-suggester.ts
+  'all-rules-option': '全部',
+
   // settings.ts
   'linter-title': 'Linter',
   'empty-search-results-text': '没有匹配的设置项',

@@ -11,6 +11,7 @@ export const OBSIDIAN_ALIAS_KEY_SINGULAR = 'alias';
 export const OBSIDIAN_ALIAS_KEY_PLURAL = 'aliases';
 export const OBSIDIAN_ALIASES_KEYS = [OBSIDIAN_ALIAS_KEY_SINGULAR, OBSIDIAN_ALIAS_KEY_PLURAL];
 export const LINTER_ALIASES_HELPER_KEY = 'linter-yaml-title-alias';
+export const DISABLED_RULES_KEY = 'disabled rules';
 
 /**
  * Adds an empty YAML block to the text if it doesn't already have one.
@@ -22,6 +23,15 @@ export function initYAML(text: string): string {
     text = '---\n---\n' + text;
   }
   return text;
+}
+
+export function getYAMLText(text: string): string | null {
+  const yaml = text.match(yamlRegex);
+  if (!yaml) {
+    return null;
+  }
+
+  return yaml[1];
 }
 
 export function formatYAML(text: string, func: (text: string) => string): string {
@@ -406,4 +416,28 @@ function basicEscapeString(value: string, defaultEscapeCharacter: QuoteCharacter
 
   // the line must have a colon with a space
   return `${defaultEscapeCharacter}${value}${defaultEscapeCharacter}`;
+}
+
+export function getExactDisabledRuleValue(yaml_text: string): string[] {
+  const disabledRulesValue = getYamlSectionValue(yaml_text, DISABLED_RULES_KEY);
+  if (disabledRulesValue == null) {
+    return [];
+  }
+
+  let disabledRulesKeyAndValue = disabledRulesValue.includes('\n') ? `${DISABLED_RULES_KEY}:\n` : `${DISABLED_RULES_KEY}: `;
+  disabledRulesKeyAndValue += disabledRulesValue;
+
+  const parsed_yaml = loadYAML(disabledRulesKeyAndValue);
+  let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string })[
+      'disabled rules'
+  ];
+  if (!disabled_rules) {
+    return [];
+  }
+
+  if (typeof disabled_rules === 'string') {
+    disabled_rules = [disabled_rules];
+  }
+
+  return disabled_rules;
 }

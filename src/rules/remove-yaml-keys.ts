@@ -1,8 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {yamlRegex} from '../utils/regex';
-import {removeYamlSection} from '../utils/yaml';
+import {getYAMLText, removeYamlSection} from '../utils/yaml';
 
 class RemoveYamlKeysOptions implements Options {
   yamlKeysToRemove: string[] = [];
@@ -22,12 +21,16 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
   }
   apply(text: string, options: RemoveYamlKeysOptions): string {
     const yamlKeysToRemove: string[] = options.yamlKeysToRemove;
-    const yaml = text.match(yamlRegex);
-    if (!yaml || yamlKeysToRemove.length === 0) {
+    if (yamlKeysToRemove.length === 0) {
       return text;
     }
 
-    let yamlText = yaml[1];
+    const yaml = getYAMLText(text);
+    if (yaml === null) {
+      return text;
+    }
+
+    let yamlText = yaml;
     for (const key of yamlKeysToRemove) {
       let actualKey = key.trim();
       if (actualKey.endsWith(':')) {
@@ -36,7 +39,7 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
 
       yamlText = removeYamlSection(yamlText, actualKey);
     }
-    return text.replace(yaml[1], yamlText);
+    return text.replace(yaml, yamlText);
   }
   get exampleBuilders(): ExampleBuilder<RemoveYamlKeysOptions>[] {
     return [

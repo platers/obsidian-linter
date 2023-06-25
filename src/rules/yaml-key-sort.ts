@@ -1,8 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {yamlRegex} from '../utils/regex';
-import {getYamlSectionValue, loadYAML, removeYamlSection, setYamlSection} from '../utils/yaml';
+import {getYAMLText, getYamlSectionValue, loadYAML, removeYamlSection, setYamlSection} from '../utils/yaml';
 
 type YamlSortOrderForOtherKeys = 'None' | 'Ascending Alphabetical' | 'Descending Alphabetical';
 
@@ -36,14 +35,12 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     return YamlKeySortOptions;
   }
   apply(text: string, options: YamlKeySortOptions): string {
-    const yaml = text.match(yamlRegex);
-    if (!yaml) {
+    const oldYaml = getYAMLText(text);
+    if (oldYaml === null) {
       return text;
     }
 
-    const oldYaml = yaml[1];
     let yamlText = oldYaml;
-
     const priorityAtStartOfYaml: boolean = options.priorityKeysAtStartOfYaml;
 
     const yamlKeys: string[] = options.yamlKeyPrioritySortOrder;

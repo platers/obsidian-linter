@@ -1,13 +1,12 @@
 import {
-  getYamlSectionValue,
-  loadYAML,
+  getExactDisabledRuleValue,
+  getYAMLText,
   QuoteCharacter,
 } from './utils/yaml';
 import {
   Option,
   BooleanOption,
 } from './option';
-import {yamlRegex} from './utils/regex';
 import {YAMLException} from 'js-yaml';
 import {LinterError} from './linter-error';
 import {
@@ -166,31 +165,12 @@ export const RuleTypeOrder = Object.values(RuleType);
  * @return {[string[], boolean]} The list of ignored rules and whether the current file should be ignored entirely
  */
 export function getDisabledRules(text: string): [string[], boolean] {
-  const yaml = text.match(yamlRegex);
-  if (!yaml) {
+  const yaml_text = getYAMLText(text);
+  if (yaml_text === null) {
     return [[], false];
   }
 
-  const yaml_text = yaml[1];
-  const disabledRulesValue = getYamlSectionValue(yaml_text, 'disabled rules');
-  if (disabledRulesValue == null) {
-    return [[], false];
-  }
-
-  let disabledRulesKeyAndValue = disabledRulesValue.includes('\n') ? 'disabled rules:\n' : 'disabled rules: ';
-  disabledRulesKeyAndValue += disabledRulesValue;
-
-  const parsed_yaml = loadYAML(disabledRulesKeyAndValue);
-  let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string })[
-      'disabled rules'
-  ];
-  if (!disabled_rules) {
-    return [[], false];
-  }
-
-  if (typeof disabled_rules === 'string') {
-    disabled_rules = [disabled_rules];
-  }
+  const disabled_rules = getExactDisabledRuleValue(yaml_text);
 
   if (disabled_rules.includes('all')) {
     return [rules.map((rule) => rule.alias), true];
