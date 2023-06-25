@@ -73,6 +73,7 @@ export default {
     'characters-added': 'Caracteres añadidos',
     'characters-removed': 'Caracteres eliminados',
   },
+  'all-rules-option': 'Todo',
   'linter-title': 'Linter',
   'empty-search-results-text': 'No hay configuración que coincida con la búsqueda',
   'warning-text': 'Advertencia',

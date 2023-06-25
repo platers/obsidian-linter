@@ -2,6 +2,7 @@ import {Editor, EditorPosition, EditorSuggest, EditorSuggestContext, EditorSugge
 import LinterPlugin from '../main';
 import {getDisabledRules, rules} from '../rules';
 import {DISABLED_RULES_KEY, getYamlSectionValue} from '../utils/yaml';
+import {getTextInLanguage} from '../lang/helpers';
 
 const openingYAMLIndicator = /^---\n/gm;
 const disableRulesKeyWithColon = `${DISABLED_RULES_KEY}:`;
@@ -12,14 +13,15 @@ export type ruleInfo = {
   alias: string
 }
 
-// based on tag suggester
+// based on tag suggester, see https://github.com/jmilldotdev/obsidian-frontmatter-tag-suggest/blob/d80bcfb64d96d7fcb908deb5f4b0c9c8041c267c/main.ts
 export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
   ruleInfo: ruleInfo[];
 
   constructor(public plugin: LinterPlugin) {
     super(plugin.app);
-    
-    this.ruleInfo = [{displayName: 'All', name: 'all', alias: 'all'}];
+
+    const allName = getTextInLanguage('all-rules-option');
+    this.ruleInfo = [{displayName: allName, name: allName.toLowerCase(), alias: 'all'}];
     for (const rule of rules) {
       const name = rule.getName();
       this.ruleInfo.push({displayName: name, name: name.toLowerCase(), alias: rule.alias});
@@ -27,10 +29,9 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
   }
   inline = false;
   onTrigger(cursor: EditorPosition, editor: Editor, _: TFile): EditorSuggestTriggerInfo | null {
-    console.log('triggered');
     const lineContents = editor.getLine(cursor.line).toLowerCase();
     const onFrontmatterDisabledRulesLine = lineContents.startsWith(disableRulesKeyWithColon) ||
-    disabledRulesIsEndOfStartOfFileToCursor(editor.getRange({line: 0, ch: 0}, cursor));
+    this.disabledRulesIsEndOfStartOfFileToCursor(editor.getRange({line: 0, ch: 0}, cursor));
 
     if (onFrontmatterDisabledRulesLine) {
       this.inline = lineContents.startsWith(disableRulesKeyWithColon);
@@ -48,11 +49,22 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
         return matchData;
       }
     }
+
     return null;
   }
 
   getSuggestions(context: EditorSuggestContext): ruleInfo[] {
-    return getSuggestions(context.query, context.editor.getValue());
+    const [disabledRules, allIncluded]= getDisabledRules(context.editor.getValue());
+    if (allIncluded) {
+      return [];
+    }
+
+    const query = context.query.toLowerCase();
+    const suggestions = this.ruleInfo.filter((r: ruleInfo) =>
+      (r.name.contains(query) || r.alias.contains(query)) && !disabledRules.includes(r.alias),
+    );
+
+    return suggestions;
   }
 
   renderSuggestion(suggestion: ruleInfo, el: HTMLElement): void {
@@ -67,7 +79,7 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
     if (this.context) {
       let suggestedValue = suggestion.alias;
       if (this.inline) {
-        suggestedValue = `${suggestedValue}`;
+        suggestedValue = `${suggestedValue},`;
       } else {
         suggestedValue = `${suggestedValue}\n  -`;
       }
@@ -79,38 +91,21 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
       );
     }
   }
-}
 
+  disabledRulesIsEndOfStartOfFileToCursor(range: string): boolean {
+    if (!range || !range.length) {
+      return false;
+    }
 
-// functions exported for testability since mocking obsidian related classes takes a lot of work and can be tedious
-export function disabledRulesIsEndOfStartOfFileToCursor(range: string): boolean {
-  if (!range || !range.length) {
-    return false;
+    if (range.match(openingYAMLIndicator)?.length != 1) {
+      return false;
+    }
+
+    const disabledRules = getYamlSectionValue(range + '\n', DISABLED_RULES_KEY)?.trimEnd();
+    if (disabledRules === null) {
+      return false;
+    }
+
+    return range.trimEnd().endsWith(disabledRules);
   }
-
-  console.log(range);
-  if (range.match(openingYAMLIndicator)?.length != 1) {
-    return false;
-  }
-
-  const disabledRules = getYamlSectionValue(range + '\n', DISABLED_RULES_KEY)?.trimEnd();
-  if (disabledRules === null) {
-    return false;
-  }
-
-  return range.trimEnd().endsWith(disabledRules);
-}
-
-export function getSuggestions(query: string, fileText: string): ruleInfo[] {
-  let [disabledRules, allIncluded]= getDisabledRules(fileText);
-  if (allIncluded) {
-    return [];
-  }
-
-  query = query.toLowerCase();
-  const suggestions = this.ruleInfo.filter((r: ruleInfo) =>
-    (r.name.contains(query) || r.alias.contains(query) && !disabledRules.includes(r.alias)),
-  );
-
-  return suggestions;
 }

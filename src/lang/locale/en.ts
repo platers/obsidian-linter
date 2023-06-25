@@ -94,6 +94,7 @@ export default {
   },
 
   // rule-alias-suggester.ts
+  'all-rules-option': 'All',
 
   // settings.ts
   'linter-title': 'Linter',

@@ -15,7 +15,7 @@ import {SettingTab} from './ui/settings';
 import {NormalArrayFormats} from './utils/yaml';
 import {urlRegex} from './utils/regex';
 import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
-import {RuleAliasSuggest} from './cm6/RuleAliasSuggester';
+import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
