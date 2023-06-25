@@ -35,7 +35,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     return YamlKeySortOptions;
   }
   apply(text: string, options: YamlKeySortOptions): string {
-    const oldYaml = getYAMLText(text)
+    const oldYaml = getYAMLText(text);
     if (oldYaml === null) {
       return text;
     }

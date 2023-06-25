@@ -165,12 +165,12 @@ export const RuleTypeOrder = Object.values(RuleType);
  * @return {[string[], boolean]} The list of ignored rules and whether the current file should be ignored entirely
  */
 export function getDisabledRules(text: string): [string[], boolean] {
-  const yaml_text = getYAMLText(text)
+  const yaml_text = getYAMLText(text);
   if (yaml_text === null) {
     return [[], false];
   }
 
-  let disabled_rules = getExactDisabledRuleValue(yaml_text)
+  const disabled_rules = getExactDisabledRuleValue(yaml_text);
 
   if (disabled_rules.includes('all')) {
     return [rules.map((rule) => rule.alias), true];

@@ -24,8 +24,8 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
     if (yamlKeysToRemove.length === 0) {
       return text;
     }
-    
-    const yaml = getYAMLText(text)
+
+    const yaml = getYAMLText(text);
     if (yaml === null) {
       return text;
     }
