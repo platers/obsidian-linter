@@ -16,7 +16,7 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       nameKey: 'rules.no-bare-urls.name',
       descriptionKey: 'rules.no-bare-urls.description',
       type: RuleType.CONTENT,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode, IgnoreTypes.anchorTag],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode, IgnoreTypes.anchorTag, IgnoreTypes.html],
     });
   }
   get OptionsClass(): new () => NoBareUrlsOptions {

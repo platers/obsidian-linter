@@ -47,13 +47,24 @@ ruleTest({
         \`http --headers --follow --all https://google.com\`
       `,
     },
-    {// https://github.com/platers/obsidian-linter/issues/588
+    {// accounts for https://github.com/platers/obsidian-linter/issues/588
       testName: 'Make sure that anchor tags are not affected by the rule',
       before: dedent`
         <a href="https://www.google.com" class="tc-tiddlylink-external" rel="noopener noreferrer" target="_blank">https://www.google.com</a>
       `,
       after: dedent`
         <a href="https://www.google.com" class="tc-tiddlylink-external" rel="noopener noreferrer" target="_blank">https://www.google.com</a>
+      `,
+    },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/777
+      testName: 'Make sure that iframe tags are not affected by the rule when a space is present in the src attribute of the tag',
+      before: dedent`
+        > [!note]  [Google](https://www.google.com)
+        > <iframe width="100%" height="600" src=" https://www.google.com "></iframe>
+      `,
+      after: dedent`
+        > [!note]  [Google](https://www.google.com)
+        > <iframe width="100%" height="600" src=" https://www.google.com "></iframe>
       `,
     },
   ],
