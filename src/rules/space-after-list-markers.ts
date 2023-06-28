@@ -30,7 +30,7 @@ export default class SpaceAfterListMarkers extends RuleBuilder<SpaceAfterListMar
   get exampleBuilders(): ExampleBuilder<SpaceAfterListMarkersOptions>[] {
     return [
       new ExampleBuilder({
-        description: '',
+        description: 'A single space is left between the list marker and the text of the list item',
         before: dedent`
           1.   Item 1
           2.  Item 2

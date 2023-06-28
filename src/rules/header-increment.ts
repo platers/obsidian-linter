@@ -73,7 +73,7 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
   get exampleBuilders(): ExampleBuilder<HeaderIncrementOptions>[] {
     return [
       new ExampleBuilder({
-        description: '',
+        description: 'Heading levels are decremented as needed',
         before: dedent`
           # H1
           ### H3

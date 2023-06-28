@@ -20,7 +20,6 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
     return RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions;
   }
   apply(text: string, options: RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions): string {
-    /* eslint-disable no-useless-escape */
     // account for '- [.]' where the period is any character except a line break character
     const checkBoxMarkerRegexText = `(( |\\t)*- ${checklistBoxIndicator}( |\\t)+.+)`;
     text = this.replaceEmptyLinesBetweenList(text, checkBoxMarkerRegexText);
@@ -40,7 +39,6 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
     // account for '*' list marker
     const splatMarkerRegexText = '(( |\\t)*\\*( |\\t)+.+)';
     return this.replaceEmptyLinesBetweenList(text, splatMarkerRegexText);
-    /* eslint-enable no-useless-escape */
   }
   replaceEmptyLinesBetweenList = function(text: string, listIndicatorRegexText: string): string {
     const listRegex = new RegExp(`^${listIndicatorRegexText}\n{2,}${listIndicatorRegexText}$`, 'gm');

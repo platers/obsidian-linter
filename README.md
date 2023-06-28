@@ -9,14 +9,14 @@ Rules can be toggled and configured in the settings.
 
 ## Usage
 
-![Demo](images/demo.gif)
+![Demo](docs/docs/assets/demo.gif)
 
 To lint the current file, run `Lint the current file` (`Ctrl+Alt+L` by default).
 To lint all files, run `Lint all files in the vault`.
 To lint all files in the current folder run `Lint all files in the current folder`. This action includes all subfolders.  
 You can also lint a folder by right clicking on it in the folder list and selecting "Lint folder" from the options.
 
-![Lint folder contents](images/lintfolder.png)
+![Lint folder contents](docs/docs/assets/lint-folder.png)
 
 When `Lint on save` is toggled on, the plugin will lint the current file on manual save (when you press `Ctrl+S`).
 

@@ -1,10 +1,12 @@
-import {readFileSync, writeFileSync} from 'fs';
+import {readFileSync, writeFileSync, existsSync} from 'fs';
 import dedent from 'ts-dedent';
 import {DropdownOption} from './option';
 import {rules} from './rules';
 import './rules-registry';
 
 const autogen_warning = '<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->\n';
+
+const pathToDocsFolder = './docs';
 
 // README
 
@@ -15,7 +17,7 @@ generateReadme();
 generateDocs();
 
 function generateReadme() {
-  const readme_template = readFileSync('./docs/templates/readme_template.md', 'utf8');
+  const readme_template = readFileSync(`${pathToDocsFolder}/templates/readme_template.md`, 'utf8');
 
   let rules_list = '';
   let prevSection = '';
@@ -33,34 +35,32 @@ function generateReadme() {
 }
 
 function generateDocs() {
-  const rules_template = readFileSync('./docs/templates/rules_template.md', 'utf8');
-
   let rules_docs = '';
   let prevSection = '';
   for (const rule of rules) {
     const examples = rule.examples.map((test) => dedent`
-      Example: ${test.description}
+      <details><summary>${test.description}</summary>
       ${''}
       Before:
       ${''}
-      \`\`\`\`\`\`markdown
+      \`\`\`\`\`\` markdown
       ${test.before}
       \`\`\`\`\`\`
       ${''}
       After:
       ${''}
-      \`\`\`\`\`\`markdown
+      \`\`\`\`\`\` markdown
       ${test.after}
       \`\`\`\`\`\`
+      </details>
     `).join('\n');
 
-    const options_list = rule.options.slice(1).map((option) => {
-      let text = dedent`
-        - ${option.getName()}: ${option.getDescription()}
-        \t- Default: \`${option.defaultValue}\`
-      `;
+    const additionalInfo = getRuleAdditionalInfo(rule.alias);
 
+    const options_list = rule.options.slice(1).map((option) => {
+      let listItems = '';
       if (option instanceof DropdownOption) {
+        let listItemNumber = 0;
         for (const record of option.options) {
           const nameParts = record.value.split('.');
           let name = '';
@@ -70,35 +70,63 @@ function generateDocs() {
             name = nameParts[nameParts.length - 1];
           }
 
+          // accounts for the fact that one of the rules has a period as its list value
           if (name == '') {
             name = '.';
           }
 
-          text += `\n\t- \`${name}\`: ${record.description}`;
+          if (listItemNumber > 0) {
+            listItems += '<br/><br/>';
+          }
+          listItems += `\`${name}\`: ${record.description}`;
+          listItemNumber++;
         }
       }
+      listItems = listItems || 'N/A';
+
+      let defaultValue = option.defaultValue;
+      if (defaultValue != '') {
+        defaultValue = `\`${defaultValue}\``;
+      }
+      const text = dedent`
+        | \`${option.getName()}\` | ${option.getDescription()} | ${listItems} | ${defaultValue} |
+      `;
+
 
       return text;
     }).join('\n');
     let options = '';
     if (options_list.length > 0) {
       options = dedent`
-        Options:
+        ### Options
+
+        | Name | Description | List Items | Default Value |
+        | ---- | ----------- | ---------- | ------------- |
         ${options_list}
       `;
     }
 
     if (rule.type !== prevSection) {
-      rules_docs += dedent`
-        ${''}
-        ## ${rule.type}
-      `;
+      if (prevSection !== '') {
+        writeRuleDocument(prevSection, rules_docs);
+      }
+
+      rules_docs = '';
       prevSection = rule.type;
+    }
+
+    let additionalInfoSection = '';
+    if (additionalInfo != '') {
+      additionalInfoSection = dedent`
+        ### Additional Info
+        ${''}
+        ${additionalInfo}
+      `;
     }
 
     rules_docs += dedent`
       ${''}
-      ### ${rule.getName()}
+      ## ${rule.getName()}
       ${''}
       Alias: \`${rule.alias}\`
       ${''}
@@ -106,19 +134,50 @@ function generateDocs() {
       ${''}
       ${options}
       ${''}
+      ${additionalInfoSection}
+      ${''}
+      ### Examples
+      ${''}
       ${examples}
       ${''}
     `;
   }
 
+  writeRuleDocument(prevSection, rules_docs);
+
+  console.log('Rules documentation updated');
+}
+
+function writeRuleDocument(ruleTypeName: string, rules_docs: string) {
   const rules_documentation = dedent`
     ${autogen_warning}
     ${''}
-    ${rules_template}
-    ${''}
+    # ${ruleTypeName} Rules
+    ${getRuleTypeAdditionalInfo(ruleTypeName)}
     ${rules_docs}
   `;
 
-  writeFileSync('./docs/rules.md', rules_documentation);
-  console.log('Rules documentation updated');
+  writeFileSync(`${pathToDocsFolder}/docs/settings/${ruleTypeName.toLowerCase()}-rules.md`, rules_documentation);
+}
+
+function getRuleTypeAdditionalInfo(ruleTypeName: string): string {
+  let ruleTypeAdditionAlInfo = '';
+
+  const ruleTypeAdditionalInfoPath = `${pathToDocsFolder}/additional-info/rule-types/${ruleTypeName.toLowerCase()}.md`;
+  if (existsSync(ruleTypeAdditionalInfoPath)) {
+    ruleTypeAdditionAlInfo = '\n' + readFileSync(ruleTypeAdditionalInfoPath, 'utf8');
+  }
+
+  return ruleTypeAdditionAlInfo;
+}
+
+function getRuleAdditionalInfo(ruleAlias: string): string {
+  let ruleAdditionAlInfo = '';
+
+  const ruleAdditionalInfoPath = `${pathToDocsFolder}/additional-info/rules/${ruleAlias}.md`;
+  if (existsSync(ruleAdditionalInfoPath)) {
+    ruleAdditionAlInfo = '\n' + readFileSync(ruleAdditionalInfoPath, 'utf8');
+  }
+
+  return ruleAdditionAlInfo;
 }

@@ -1,0 +1,46 @@
+site_name: Linter
+repo_url: https://github.com/platers/obsidian-linter
+edit_uri: edit/master/docs/docs/
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed
+theme:
+  name: material
+  palette:
+    primary: deep purple
+  logo: assets/linter-icon.png
+  favicon: assets/linter-icon.png
+nav:
+  - Overview: 'index.md'
+  - Usage:
+    - Running Rules: 'usage/running-rules.md'
+    - Disabling Rules: 'usage/disabling-rules.md'
+  - Settings and Rules:
+    - General Settings: settings/general-settings.md
+    - YAML Rules: 'settings/yaml-rules.md'
+    - Heading Rules: 'settings/heading-rules.md'
+    - Footnote Rules: 'settings/footnote-rules.md'
+    - Content Rules: 'settings/content-rules.md'
+    - Spacing Rules: 'settings/spacing-rules.md'
+    - Paste Rules: 'settings/paste-rules.md'
+    - Custom Rules: 'settings/custom-rules.md'
+    - Debug Settings: 'settings/debug-settings.md'
+  - Contributing:
+    - Plugin Setup: 'contributing/getting-setup.md'
+    - Adding a Rule: 'contributing/adding-a-rule.md'
+    - Bug Fixes: 'contributing/bug-fix.md'
+    - Refactoring Code: 'contributing/refactoring.md'
+    - Testing: 'contributing/testing.md'
+    - Translating the Linter: 'contributing/translation.md'
+    - Documenting the Linter: 'contributing/documentation.md'
+    - Opening a Pull Request: 'contributing/open-a-pr.md'
+    - Creating a Release: 'contributing/releasing.md'
+  - Credits: 'credits.md'
+plugins:
+  - search
