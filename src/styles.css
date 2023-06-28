@@ -151,3 +151,16 @@ textarea.full-width {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
+
+/**
+* Custom regex replacement
+*/
+.linter-custom-regex-replacement-normal-input {
+  width: 40%;
+}
+.linter-custom-regex-replacement-flags {
+  width: 15%;
+}
+.linter-custom-regex-replacement-label {
+  flex-direction: row-reverse;
+}
