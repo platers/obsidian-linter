@@ -106,7 +106,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace with no find value does not affect the text',
     listOfRegexReplacements: [
       {
-        find: '', replace: 'hello', flags: 'g',
+        label: '', find: '', replace: 'hello', flags: 'g',
       },
     ],
     before: dedent`
@@ -122,10 +122,10 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace with a null or undefined find value does not affect the text',
     listOfRegexReplacements: [
       {
-        find: 'How', replace: null, flags: '',
+        label: '', find: 'How', replace: null, flags: '',
       },
       {
-        find: 'look', replace: undefined, flags: '',
+        label: 'Replace 2', find: 'look', replace: undefined, flags: '',
       },
     ],
     before: dedent`
@@ -141,7 +141,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace searching for multiple blank lines in a row works (has proper escaping of a slash)',
     listOfRegexReplacements: [
       {
-        find: '\n{3,}', replace: '\n\n', flags: 'g',
+        label: 'condense multiple blanks into 1', find: '\n{3,}', replace: '\n\n', flags: 'g',
       },
     ],
     before: dedent`
@@ -160,7 +160,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace using capture groups works',
     listOfRegexReplacements: [
       {
-        find: '(k|e)(\\?)', replace: '$1', flags: 'g',
+        label: 'Remove a question mark proceeded by a k or an e', find: '(k|e)(\\?)', replace: '$1', flags: 'g',
       },
     ],
     before: dedent`
@@ -176,7 +176,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace using ^ and $ works',
     listOfRegexReplacements: [
       {
-        find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm',
+        label: 'Replace Did at the start of a line or look? at the end of a line', find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm',
       },
     ],
     before: dedent`
@@ -192,7 +192,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace should respect linter ignore ranges',
     listOfRegexReplacements: [
       {
-        find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm',
+        label: 'Replace Did at the start of a line or look? at the end of a line', find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm',
       },
     ],
     before: dedent`

@@ -202,6 +202,7 @@ export default {
       'regex-to-find-placeholder-text': 'regex to find',
       'flags-placeholder-text': 'flags',
       'regex-to-replace-placeholder-text': 'regex to replace',
+      'label-placeholder-text': 'label',
       'move-up-tooltip': 'Move up',
       'move-down-tooltip': 'Move down',
       'delete-tooltip': 'Delete',
