@@ -202,6 +202,7 @@ export default {
       'regex-to-find-placeholder-text': '正则查找',
       'flags-placeholder-text': 'flags',
       'regex-to-replace-placeholder-text': '正则替换',
+      'label-placeholder-text': '标签',
       'move-up-tooltip': '上移',
       'move-down-tooltip': '下移',
       'delete-tooltip': '删除',
