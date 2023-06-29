@@ -23,6 +23,7 @@ export class CustomReplaceOption extends AddCustomRow {
           this.addRegex(newRegex, this.regexes.length - 1, true);
         });
     this.display();
+    this.inputElDiv.addClass('linter-custom-regex-replacement-container');
   }
 
   protected showInputEls(): void {
@@ -32,7 +33,7 @@ export class CustomReplaceOption extends AddCustomRow {
   }
 
   private addRegex(regex: CustomReplace, index: number, focusOnCommand: boolean = false) {
-    const newRegexDiv = this.inputElDiv.createDiv();
+    const newRegexDiv = this.inputElDiv.createDiv({cls: 'linter-custom-regex-replacement'});
     const row1 = newRegexDiv.createDiv();
     const labelSetting = new Setting(row1).addText((cb) => {
       cb.setPlaceholder(getTextInLanguage('options.custom-replace.label-placeholder-text'))
@@ -43,6 +44,7 @@ export class CustomReplaceOption extends AddCustomRow {
           });
 
       cb.inputEl.setAttr('inputIndex', index);
+      cb.inputEl.addClass('linter-custom-regex-replacement-label-input');
 
       if (focusOnCommand) {
         cb.inputEl.focus();
@@ -109,7 +111,7 @@ export class CustomReplaceOption extends AddCustomRow {
           });
     });
 
-    setting.settingEl.style.flexWrap = 'wrap';
+    setting.settingEl.addClass('linter-custom-regex-replacement-row2');
   }
 
   // TODO: swap this out for something that actually swaps the values of the html elements as well to avoid the need for a refresh of these settings on swap and delete

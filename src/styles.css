@@ -155,6 +155,18 @@ textarea.full-width {
 /**
 * Custom regex replacement
 */
+.linter-custom-regex-replacement-container div:last-child{
+  border: none;
+}
+.linter-custom-regex-replacement {
+  margin-bottom: 15px;
+  border: none;
+  border-bottom: var(--hr-thickness) solid;
+  border-color: var(--hr-color);
+}
+.linter-custom-regex-replacement-row2 {
+  flex-wrap: wrap;
+}
 .linter-custom-regex-replacement-normal-input {
   width: 40%;
 }
@@ -163,4 +175,7 @@ textarea.full-width {
 }
 .linter-custom-regex-replacement-label {
   flex-direction: row-reverse;
+}
+.linter-custom-regex-replacement-label-input {
+  width: 50%;
 }
