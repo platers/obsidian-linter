@@ -161,7 +161,7 @@ export function moveFootnotesToEnd(text: string): string {
       footnoteReferenceLocations.push(footnoteReferenceLocation);
 
       startOfFootnoteReferenceSearch = footnoteReferenceLocation - 1;
-    } while (footnoteReferenceLocation > -1);
+    } while (footnoteReferenceLocation > 0);
 
     const keyInfo: footnoteKeyInfo = {
       key: footnoteReference,
@@ -243,7 +243,7 @@ export function reIndexFootnotes(text: string): string {
       footnoteReferenceLocationInfo.push({key: footnoteReference, position: footnoteReferenceLocation});
       firstFootnoteReferenceIndex = footnoteReferenceLocation;
       startOfFootnoteReferenceSearch = footnoteReferenceLocation - 1;
-    } while (footnoteReferenceLocation > -1);
+    } while (footnoteReferenceLocation > 0);
 
     footnoteKeys.add(footnoteReference);
 

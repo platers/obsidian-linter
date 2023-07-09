@@ -188,5 +188,21 @@ ruleTest({
         [^2]: Second reference
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/784
+      testName: 'A footnote reference wrapped by 2 references with one at the start of a file should not cause an infinite loop and should move each reference to the end of the file',
+      before: dedent`
+        [^2]: a
+        ${''}
+        a[^2]
+        ${''}
+        [^2]: b
+      `,
+      after: dedent`
+        a[^2]
+        ${''}
+        [^2]: a
+        [^2]: b
+      `,
+    },
   ],
 });
