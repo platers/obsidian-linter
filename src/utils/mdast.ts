@@ -12,6 +12,7 @@ import {fromMarkdown} from 'mdast-util-from-markdown';
 import {gfmFootnoteFromMarkdown} from 'mdast-util-gfm-footnote';
 import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
 import QuickLRU from 'quick-lru';
+import {countInstances} from './strings';
 import {getTextInLanguage} from '../lang/helpers';
 
 const LRU = new QuickLRU({maxSize: 200});
@@ -745,7 +746,12 @@ export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numb
   const mathOpeningIndicatorRegex = new RegExp('^(\\${' + numberOfDollarSignsForMathBlock + ',})(\\n*)');
   const mathEndingIndicatorRegex = new RegExp('(\\n*)(\\${' + numberOfDollarSignsForMathBlock + ',})([^\\$]*)$');
   for (const position of positions) {
-    text = addBlankLinesAroundStartAndStopMathIndicators(text, position.start.offset, position.end.offset, mathOpeningIndicatorRegex, mathEndingIndicatorRegex);
+    const mathBlock = text.substring(position.start.offset, position.end.offset);
+    const mathBlockIndexes = breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock, numberOfDollarSignsForMathBlock, position.start.offset);
+
+    for (const blockIndexes of mathBlockIndexes) {
+      text = addBlankLinesAroundStartAndStopMathIndicators(text, blockIndexes.startIndex, blockIndexes.endIndex, mathOpeningIndicatorRegex, mathEndingIndicatorRegex);
+    }
   }
 
   positions = getPositions(MDAstTypes.InlineMath, text);
@@ -758,6 +764,54 @@ export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numb
   }
 
   return text;
+}
+
+function breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock: string, numberOfDollarSignsForMathBlock: number, startIndexOfMathBlock: number): {startIndex: number, endIndex: number}[] {
+  let mathBlockIndicator = '$'.repeat(numberOfDollarSignsForMathBlock);
+  let endOfOpeningIndicator = numberOfDollarSignsForMathBlock;
+  while (mathBlock.charAt(endOfOpeningIndicator) === '$') {
+    mathBlockIndicator += '$';
+    endOfOpeningIndicator++;
+  }
+
+  const mathBlockIndexes = [] as {startIndex: number, endIndex: number}[];
+
+  let matchCount = countInstances(mathBlock, mathBlockIndicator);
+  if (matchCount <= 3) {
+    mathBlockIndexes.unshift({
+      startIndex: startIndexOfMathBlock,
+      endIndex: startIndexOfMathBlock + mathBlock.length,
+    });
+
+    return mathBlockIndexes;
+  }
+
+  // if there is an odd amount of matches, remove one from the list so it is even
+  if (matchCount % 2 === 1) {
+    matchCount--;
+  }
+
+  // pair the earliest matches together until there are no more pairs
+  let startIndex = startIndexOfMathBlock;
+  let startSearch = mathBlockIndicator.length;
+  while (matchCount > 2 ) {
+    const endOfIndex = mathBlock.indexOf(mathBlockIndicator, startSearch) + mathBlockIndicator.length;
+    mathBlockIndexes.unshift({
+      startIndex: startIndex,
+      endIndex: startIndexOfMathBlock + endOfIndex,
+    });
+
+    startIndex = startIndexOfMathBlock + endOfIndex + 1;
+    startSearch = endOfIndex + 1;
+    matchCount -= 2;
+  }
+
+  mathBlockIndexes.unshift({
+    startIndex: startIndexOfMathBlock + mathBlock.indexOf(mathBlockIndicator, startSearch),
+    endIndex: startIndexOfMathBlock + mathBlock.length,
+  });
+
+  return mathBlockIndexes;
 }
 
 function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockStartIndex: number, mathBlockEndIndex: number, mathOpeningIndicatorRegex: RegExp, mathEndingIndicatorRegex: RegExp): string {
