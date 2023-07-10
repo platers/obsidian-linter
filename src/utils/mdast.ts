@@ -750,7 +750,6 @@ export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numb
     const mathBlockIndexes = breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock, numberOfDollarSignsForMathBlock, position.start.offset);
 
     for (const blockIndexes of mathBlockIndexes) {
-      console.log(text.substring(blockIndexes.startIndex, blockIndexes.endIndex));
       text = addBlankLinesAroundStartAndStopMathIndicators(text, blockIndexes.startIndex, blockIndexes.endIndex, mathOpeningIndicatorRegex, mathEndingIndicatorRegex);
     }
   }
