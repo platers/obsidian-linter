@@ -59,5 +59,30 @@ ruleTest({
         > $$
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/783
+      testName: 'Math indicators greater than or equal to the the starting indicator lead to a splitting of the math block if the number of qualifying math blocks is greater than 3',
+      before: dedent`
+        $$a$$
+        ${''}
+        $$
+        b$$
+        ${''}
+        $$c
+        $$
+      `,
+      after: dedent`
+        $$
+        a
+        $$
+        ${''}
+        $$
+        b
+        $$
+        ${''}
+        $$
+        c
+        $$
+      `,
+    },
   ],
 });
