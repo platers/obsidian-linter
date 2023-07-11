@@ -328,5 +328,26 @@ ruleTest({
         ## Agenda
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/787
+      testName: 'Make sure that an empty list indicator does not have an extra empty line added around it',
+      before: dedent`
+        - reference to footnote 1 [^1]
+        - reference to footnote 2 [^2]
+        - reference to footnote 3 [^3]
+        ${''}
+        [^1]: [github.com](https://github.com)
+        [^2]: [github.com](https://github.com)
+        [^3]: [github.com](https://github.com)
+      `,
+      after: dedent`
+        - reference to footnote 1 [^1]
+        - reference to footnote 2 [^2]
+        - reference to footnote 3 [^3]
+        ${''}
+        [^1]: [github.com](https://github.com)
+        [^2]: [github.com](https://github.com)
+        [^3]: [github.com](https://github.com)
+      `,
+    },
   ],
 });
