@@ -41,6 +41,8 @@ export const checklistBoxStartsTextRegex = new RegExp(`^${checklistBoxIndicator}
 export const indentedOrBlockquoteNestedChecklistIndicatorRegex = new RegExp(`^${lineStartingWithWhitespaceOrBlockquoteTemplate}- ${checklistBoxIndicator} `);
 export const nonBlockquoteChecklistRegex = new RegExp(`^\\s*- ${checklistBoxIndicator} `);
 
+export const footnoteDefinitionIndicatorAtStartOfLine = /^(\[\^\w+\]) ?([,.;!:?])/gm;
+
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string
 // could have user constructed dollar signs in it
