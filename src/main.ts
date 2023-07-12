@@ -212,6 +212,17 @@ export default class LinterPlugin extends Plugin {
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
+    eventRef = this.app.workspace.on('active-leaf-change', () => {
+      const lastOpenFiles = this.app.workspace.getLastOpenFiles();
+      if (lastOpenFiles.length < 2) {
+        return;
+      }
+      console.log(lastOpenFiles[1], lastOpenFiles);
+    });
+    this.registerEvent(eventRef);
+    this.eventRefs.push(eventRef);
+
+
     // Source for save setting
     // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
     const saveCommandDefinition = this.app.commands?.commands?.[
