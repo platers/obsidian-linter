@@ -359,7 +359,7 @@ export default {
       },
       'default-array-style': {
         'name': '默认的yaml数组部分格式',
-        'description': '除了标签，别名或将键值强制为单行数组和将键值强制为多行数组之外，其他为常规 yaml 数组的样式。',
+        'description': '除了标签，别名或将键值强制为单行数组和将键值强制为多行数组之外，其他为常规 YAML 数组的样式。',
       },
       'default-array-keys': {
         'name': '格式化常规yaml数组部分',
@@ -392,8 +392,8 @@ export default {
         'description': '在标题后插入一个空行',
       },
       'empty-line-after-yaml': {
-        'name': 'Yaml 与标题之间的空行',
-        'description': '保留 Yaml 前置内容与标题之间的空行',
+        'name': 'YAML 与标题之间的空行',
+        'description': '保留 YAML 前置内容与标题之间的空行',
       },
     },
     // headings-start-line.ts
@@ -427,8 +427,8 @@ export default {
     },
     // move-tags-to-yaml.ts
     'move-tags-to-yaml': {
-      'name': '将标签移至 Yaml',
-      'description': '移动所有标签至 Yaml frontmatter',
+      'name': '将标签移至 YAML',
+      'description': '移动所有标签至 YAML frontmatter',
       'how-to-handle-existing-tags': {
         'name': '如何处理现有的标签',
         'description': '一旦移动到了前置元数据，对于文件正文中的非被忽略标签，应该采取何种操作？',
@@ -606,7 +606,7 @@ export default {
       'description': '移除特定的 YAML 键',
       'yaml-keys-to-remove': {
         'name': '需要移除的 YAML 键',
-        'description': '从带或不带冒号的 yaml frontmatter 中删除的 YAML 键',
+        'description': '从带或不带冒号的 YAML frontmatter 中删除的 YAML 键',
       },
     },
     // space-after-list-markers.ts

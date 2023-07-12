@@ -6,7 +6,7 @@ ruleTest({
   RuleBuilderClass: InsertYamlAttributes,
   testCases: [
     {
-      testName: 'Inits yaml if it does not exist',
+      testName: 'Inits YAML if it does not exist',
       before: dedent`
         ${''}
       `,
@@ -24,7 +24,7 @@ ruleTest({
     },
     {
       // accounts for https://github.com/platers/obsidian-linter/issues/176
-      testName: 'Inits yaml when the file has --- in it and no frontmatter',
+      testName: 'Inits YAML when the file has --- in it and no frontmatter',
       before: dedent`
         # Heading
         Text
@@ -56,7 +56,7 @@ ruleTest({
     },
     {
       // accounts for https://github.com/platers/obsidian-linter/issues/157
-      testName: 'When a file has tabs at the start of a line in the frontmatter, the yaml insertion still works leaving other tabs as they were',
+      testName: 'When a file has tabs at the start of a line in the frontmatter, the YAML insertion still works leaving other tabs as they were',
       before: dedent`
         ---
         title: this title\thas a tab

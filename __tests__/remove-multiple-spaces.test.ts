@@ -99,7 +99,7 @@ ruleTest({
     },
     {
       // accounts for https://github.com/platers/obsidian-linter/issues/289
-      testName: 'Callouts and block quotes allow multiple spaces at start to allow for code and list item indentation',
+      testName: 'Callouts and blockquotes allow multiple spaces at start to allow for code and list item indentation',
       before: dedent`
         # List Item in Callout
         ${''}
@@ -117,7 +117,7 @@ ruleTest({
         >     Line 2
         >     Line 3
         ${''}
-        # List Item in Block Quote
+        # List Item in Blockquote
         ${''}
         > Unordered List
         > - First Level
@@ -126,7 +126,7 @@ ruleTest({
         >     - Third Level
         > - First Level
         ${''}
-        # Code in Block Quote
+        # Code in Blockquote
         ${''}
         > Code
         >     Line 1
@@ -150,7 +150,7 @@ ruleTest({
         >     Line 2
         >     Line 3
         ${''}
-        # List Item in Block Quote
+        # List Item in Blockquote
         ${''}
         > Unordered List
         > - First Level
@@ -159,7 +159,7 @@ ruleTest({
         >     - Third Level
         > - First Level
         ${''}
-        # Code in Block Quote
+        # Code in Blockquote
         ${''}
         > Code
         >     Line 1

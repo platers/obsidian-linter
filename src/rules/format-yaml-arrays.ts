@@ -156,9 +156,9 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           ${''}
           # Notes:
           ${''}
-          Nesting yaml arrays may result in unexpected results.
+          Nesting YAML arrays may result in unexpected results.
           ${''}
-          Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
+          Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid YAML unless it comes as the last entry in the array.
         `,
         after: dedent`
           ---
@@ -171,9 +171,9 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
           ${''}
           # Notes:
           ${''}
-          Nesting yaml arrays may result in unexpected results.
+          Nesting YAML arrays may result in unexpected results.
           ${''}
-          Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
+          Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid YAML unless it comes as the last entry in the array.
         `,
         options: {
           aliasArrayStyle: NormalArrayFormats.MultiLine,
@@ -181,7 +181,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Format tags as a single string with space delimiters, ignore aliases, and format regular yaml arrays as single-line arrays',
+        description: 'Format tags as a single string with space delimiters, ignore aliases, and format regular YAML arrays as single-line arrays',
         before: dedent`
           ---
           aliases: Typescript

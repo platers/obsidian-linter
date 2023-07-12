@@ -1071,7 +1071,7 @@ ruleTest({
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/449
-      testName: 'Make sure that links in headings are properly copied to the yaml when there is a link prior to the first H1',
+      testName: 'Make sure that links in headings are properly copied to the YAML when there is a link prior to the first H1',
       before: dedent`
         [[Link1]]
 

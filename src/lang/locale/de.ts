@@ -347,8 +347,8 @@ export default {
     },
     // format-yaml-array.ts
     'format-yaml-array': {
-      'name': 'Formatieren des Yaml-Arrays',
-      'description': 'Ermöglicht die Formatierung von regulären yaml-Arrays als mehrzeilig oder einzeilig und `schilder` und `decknamen` dürfen einige Obsidian-spezifische Yaml-Formate haben. Beachten Sie, dass eine einzelne Zeichenfolge zu einer einzelnen Zeile von einem einzelnen Zeichenfolgeneintrag zu einem einzeiligen Array wechselt, wenn mehr als 1 Eintrag vorhanden ist. Das Gleiche gilt für eine einzelne Zeichenfolge bis zu einer mehrzeiligen Zeichenfolge, mit der Ausnahme, dass sie zu einem mehrzeiligen Array wird.',
+      'name': 'Formatieren des YAML-Arrays',
+      'description': 'Ermöglicht die Formatierung von regulären YAML-Arrays als mehrzeilig oder einzeilig und `schilder` und `decknamen` dürfen einige Obsidian-spezifische YAML-Formate haben. Beachten Sie, dass eine einzelne Zeichenfolge zu einer einzelnen Zeile von einem einzelnen Zeichenfolgeneintrag zu einem einzeiligen Array wechselt, wenn mehr als 1 Eintrag vorhanden ist. Das Gleiche gilt für eine einzelne Zeichenfolge bis zu einer mehrzeiligen Zeichenfolge, mit der Ausnahme, dass sie zu einem mehrzeiligen Array wird.',
       'alias-key': {
         'name': 'Abschnitt "YAML-Aliase" formatieren',
         'description': 'Aktiviert die Formatierung für den Abschnitt YAML-Aliase. Sie sollten diese Option nicht zusammen mit der Regel `YAML-Titel-Alias` aktivieren, da sie möglicherweise nicht gut zusammenarbeiten oder unterschiedliche Formatstile ausgewählt haben, was zu unerwarteten Ergebnissen führt.',
@@ -359,10 +359,10 @@ export default {
       },
       'default-array-style': {
         'name': 'Standardmäßiger YAML-Array-Abschnittsstil',
-        'description': 'Der Stil anderer yaml-Arrays, die nicht `schilder`, `decknamen` oder in `Erzwingen von Schlüsselwerten, dass es sich um einzeilige Arrays handelt` und `Erzwingen von Schlüsselwerten, dass es sich um mehrzeilige Arrays handelt` sind',
+        'description': 'Der Stil anderer YAML-Arrays, die nicht `schilder`, `decknamen` oder in `Erzwingen von Schlüsselwerten, dass es sich um einzeilige Arrays handelt` und `Erzwingen von Schlüsselwerten, dass es sich um mehrzeilige Arrays handelt` sind',
       },
       'default-array-keys': {
-        'name': 'Formatieren von Yaml-Array-Abschnitten',
+        'name': 'Formatieren von YAML-Array-Abschnitten',
         'description': 'Aktiviert die Formatierung für reguläre YAML-Arrays',
       },
       'force-single-line-array-style': {
@@ -371,7 +371,7 @@ export default {
       },
       'force-multi-line-array-style': {
         'name': 'Erzwingen von Schlüsselwerten, dass es sich um mehrzeilige Arrays handelt',
-        'description': 'Erzwingt, dass das yaml-Array für die neuen zeilengetrennten Schlüssel im mehrzeiligen Format vorliegt (leer lassen, um diese Option zu deaktivieren)',
+        'description': 'Erzwingt, dass das YAML-Array für die neuen zeilengetrennten Schlüssel im mehrzeiligen Format vorliegt (leer lassen, um diese Option zu deaktivieren)',
       },
     },
     // header-increment.ts
@@ -392,8 +392,8 @@ export default {
         'description': 'Einfügen einer Leerzeile nach Überschriften',
       },
       'empty-line-after-yaml': {
-        'name': 'Leere Zeile zwischen Yaml und Header',
-        'description': 'Behalten Sie die leere Zeile zwischen der Yaml-Frontmaterie und dem Header bei',
+        'name': 'Leere Zeile zwischen YAML und Header',
+        'description': 'Behalten Sie die leere Zeile zwischen der YAML-Frontmaterie und dem Header bei',
       },
     },
     // headings-start-line.ts
@@ -427,8 +427,8 @@ export default {
     },
     // move-tags-to-yaml.ts
     'move-tags-to-yaml': {
-      'name': 'Tags nach Yaml verschieben',
-      'description': 'Verschieben Sie alle Tags in die Yaml-Frontsache des Dokuments.',
+      'name': 'Tags nach YAML verschieben',
+      'description': 'Verschieben Sie alle Tags in die YAML-Frontsache des Dokuments.',
       'how-to-handle-existing-tags': {
         'name': 'Body-Tag-Betrieb',
         'description': 'Die Aktion, die mit nicht ignorierten Tags im Hauptteil der Datei ausgeführt werden soll, nachdem sie in die Frontmaterie verschoben wurden',
@@ -606,7 +606,7 @@ export default {
       'description': 'Entfernt die angegebenen YAML-Schlüssel',
       'yaml-keys-to-remove': {
         'name': 'Zu entfernende YAML-Schlüssel',
-        'description': 'Die zu entfernenden yaml-Tasten aus der yaml-Frontmaterie mit oder ohne Doppelpunkt',
+        'description': 'Die zu entfernenden YAML-Tasten aus der YAML-Frontmaterie mit oder ohne Doppelpunkt',
       },
     },
     // space-after-list-markers.ts

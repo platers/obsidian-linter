@@ -79,7 +79,7 @@ export function loadYAML(yaml_text: string): any {
     return null;
   }
 
-  // replacing tabs at the beginning of new lines with 2 spaces fixes loading yaml that has tabs at the start of a line
+  // replacing tabs at the beginning of new lines with 2 spaces fixes loading YAML that has tabs at the start of a line
   // https://github.com/platers/obsidian-linter/issues/157
   const parsed_yaml = load(yaml_text.replace(/\n(\t)+/g, '\n  ')) as {};
   if (parsed_yaml == null) {
@@ -108,13 +108,13 @@ export enum NormalArrayFormats {
 export type QuoteCharacter = '\'' | '"';
 
 /**
- * Formats the yaml array value passed in with the specified format.
+ * Formats the YAML array value passed in with the specified format.
  * @param {string | string[]} value The value(s) that will be used as the parts of the array that is assumed to already be broken down into the appropriate format to be put in the array.
  * @param {NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats} format The format that the array should be converted into.
  * @param {string} defaultEscapeCharacter The character escape to use around the value if a specific escape character is not needed.
  * @param {boolean} removeEscapeCharactersIfPossibleWhenGoingToMultiLine Whether or not to remove no longer needed escape values when converting to a multi-line format.
  * @param {boolean} escapeNumericValues Whether or not to escape any numeric values found in the array.
- * @return {string} The formatted array in the specified yaml/obsidian yaml format.
+ * @return {string} The formatted array in the specified YAML/obsidian YAML format.
  */
 export function formatYamlArrayValue(value: string | string[], format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats, defaultEscapeCharacter: QuoteCharacter, removeEscapeCharactersIfPossibleWhenGoingToMultiLine: boolean, escapeNumericValues: boolean = false): string {
   if (typeof value === 'string') {
