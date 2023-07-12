@@ -80,7 +80,7 @@ export default {
     'too-many-footnotes-error-message': `Footnote key '{FOOTNOTE_KEY}' has more than 1 footnote referencing it. Please update the footnotes so that there is only one footnote per footnote key.`,
 
     // rules.ts
-    'wrapper-yaml-error': 'error in the yaml: {ERROR_MESSAGE}',
+    'wrapper-yaml-error': 'error in the YAML: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'unknown error: {ERROR_MESSAGE}',
 
     // quote-style.ts
@@ -107,15 +107,15 @@ export default {
   'tabs': {
     'names': {
       // tab.ts
-      'general': 'General Settings',
-      'custom': 'Custom Settings',
-      'yaml': 'YAML Settings',
-      'heading': 'Heading Settings',
-      'content': 'Content Settings',
-      'footnote': 'Footnote Settings',
-      'spacing': 'Spacing Settings',
-      'paste': 'Paste Settings',
-      'debug': 'Debug Settings',
+      'general': 'General',
+      'custom': 'Custom',
+      'yaml': 'YAML',
+      'heading': 'Heading',
+      'content': 'Content',
+      'footnote': 'Footnote',
+      'spacing': 'Spacing',
+      'paste': 'Paste',
+      'debug': 'Debug',
     },
     // tab-searcher.ts
     'default-search-bar-text': 'Search all settings',
@@ -347,31 +347,31 @@ export default {
     },
     // format-yaml-array.ts
     'format-yaml-array': {
-      'name': 'Format Yaml Array',
-      'description': 'Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.',
+      'name': 'Format YAML Array',
+      'description': 'Allows for the formatting of regular YAML arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific YAML formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.',
       'alias-key': {
-        'name': 'Format yaml aliases section',
-        'description': 'Turns on formatting for the yaml aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.',
+        'name': 'Format YAML aliases section',
+        'description': 'Turns on formatting for the YAML aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.',
       },
       'tag-key': {
-        'name': 'Format yaml tags section',
-        'description': 'Turns on formatting for the yaml tags section.',
+        'name': 'Format YAML tags section',
+        'description': 'Turns on formatting for the YAML tags section.',
       },
       'default-array-style': {
-        'name': 'Default yaml array section style',
-        'description': 'The style of other yaml arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays`',
+        'name': 'Default YAML array section style',
+        'description': 'The style of other YAML arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays`',
       },
       'default-array-keys': {
-        'name': 'Format yaml array sections',
-        'description': 'Turns on formatting for regular yaml arrays',
+        'name': 'Format YAML array sections',
+        'description': 'Turns on formatting for regular YAML arrays',
       },
       'force-single-line-array-style': {
         'name': 'Force key values to be single-line arrays',
-        'description': 'Forces the yaml array for the new line separated keys to be in single-line format (leave empty to disable this option)',
+        'description': 'Forces the YAML array for the new line separated keys to be in single-line format (leave empty to disable this option)',
       },
       'force-multi-line-array-style': {
         'name': 'Force key values to be multi-line arrays',
-        'description': 'Forces the yaml array for the new line separated keys to be in multi-line format (leave empty to disable this option)',
+        'description': 'Forces the YAML array for the new line separated keys to be in multi-line format (leave empty to disable this option)',
       },
     },
     // header-increment.ts
@@ -392,8 +392,8 @@ export default {
         'description': 'Insert a blank line after headings',
       },
       'empty-line-after-yaml': {
-        'name': 'Empty Line Between Yaml and Header',
-        'description': 'Keep the empty line between the Yaml frontmatter and header',
+        'name': 'Empty Line Between YAML and Header',
+        'description': 'Keep the empty line between the YAML frontmatter and header',
       },
     },
     // headings-start-line.ts
@@ -427,8 +427,8 @@ export default {
     },
     // move-tags-to-yaml.ts
     'move-tags-to-yaml': {
-      'name': 'Move Tags to Yaml',
-      'description': 'Move all tags to Yaml frontmatter of the document.',
+      'name': 'Move Tags to YAML',
+      'description': 'Move all tags to YAML frontmatter of the document.',
       'how-to-handle-existing-tags': {
         'name': 'Body tag operation',
         'description': 'What to do with non-ignored tags in the body of the file once they have been moved to the frontmatter',
@@ -606,7 +606,7 @@ export default {
       'description': 'Removes the YAML keys specified',
       'yaml-keys-to-remove': {
         'name': 'YAML Keys to Remove',
-        'description': 'The yaml keys to remove from the yaml frontmatter with or without colons',
+        'description': 'The YAML keys to remove from the YAML frontmatter with or without colons',
       },
     },
     // space-after-list-markers.ts

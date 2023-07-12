@@ -184,7 +184,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
     expectedPositions: [{startIndex: 18, endIndex: 92}],
   },
   {
-    name: 'does not match yaml indicators',
+    name: 'does not match YAML indicators',
     text: dedent`
       ---
       ---
@@ -193,7 +193,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
     expectedPositions: [],
   },
   {
-    name: 'does not match yaml frontmatter',
+    name: 'does not match YAML frontmatter',
     text: dedent`
       ---
       date: 06/16/2022

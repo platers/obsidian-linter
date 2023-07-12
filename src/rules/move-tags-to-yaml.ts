@@ -123,7 +123,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       return text;
     });
 
-    // Make sure that the yaml frontmatter does not have whitespace added after the end of the yaml frontmatter.
+    // Make sure that the YAML frontmatter does not have whitespace added after the end of the YAML frontmatter.
     // This accounts for https://github.com/platers/obsidian-linter/issues/573
     text = text.replace(/(\n---)( |\t)+/, '$1');
 
@@ -132,7 +132,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
   get exampleBuilders(): ExampleBuilder<MoveTagsToYamlOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Move tags from body to Yaml with `Tags to ignore = \'ignored-tag\'`',
+        description: 'Move tags from body to YAML with `Tags to ignore = \'ignored-tag\'`',
         before: dedent`
           Text has to do with #test and #markdown
           ${''}

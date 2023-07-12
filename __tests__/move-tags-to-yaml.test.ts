@@ -93,7 +93,7 @@ ruleTest({
       `,
     },
     {
-      testName: 'Nothing happens when the tags in the body are covered by the tags in the yaml already',
+      testName: 'Nothing happens when the tags in the body are covered by the tags in the YAML already',
       before: dedent`
         ---
         tags: test
@@ -111,7 +111,7 @@ ruleTest({
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/472
-      testName: 'If yaml tag has space after or before the tag, it should not affect the tag comparison',
+      testName: 'If YAML tag has space after or before the tag, it should not affect the tag comparison',
       before: dedent`
         ---
         tags: [ space-before-tag, space-after-tag ]
@@ -198,7 +198,7 @@ ruleTest({
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/573
-      testName: 'Make sure that removing a tag after the yaml frontmatter does not leave whitespace on the same line as the frontmatter',
+      testName: 'Make sure that removing a tag after the YAML frontmatter does not leave whitespace on the same line as the frontmatter',
       before: dedent`
         ---
         title: Move Tags to YAML Duplicates YAML

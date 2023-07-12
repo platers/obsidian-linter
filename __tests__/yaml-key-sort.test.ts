@@ -6,7 +6,7 @@ ruleTest({
   RuleBuilderClass: YamlKeySort,
   testCases: [
     {
-      testName: 'When the sort changes the yaml contents and yaml timestamp date modified is active, update date modified value',
+      testName: 'When the sort changes the YAML contents and YAML timestamp date modified is active, update date modified value',
       before: dedent`
         ---
         language: Typescript
@@ -41,7 +41,7 @@ ruleTest({
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/415
-      testName: 'Sort works with dictionary Yaml value',
+      testName: 'Sort works with dictionary YAML value',
       before: dedent`
         ---
         test_key: "Hello"

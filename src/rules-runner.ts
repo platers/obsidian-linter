@@ -118,7 +118,7 @@ export class RulesRunner {
     });
 
     let currentTime = runOptions.getCurrentTime();
-    // run yaml timestamp at the end to help determine if something has changed
+    // run YAML timestamp at the end to help determine if something has changed
     let isYamlTimestampEnabled;
     [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       fileCreatedTime: runOptions.fileInfo.createdAtFormatted,

@@ -28,7 +28,7 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
         let keyValue = getYamlSectionValue(text, yamlKeyToEscape);
 
         if (keyValue != null) {
-          // skip yaml array values or already escaped values
+          // skip YAML array values or already escaped values
           if (keyValue.includes('\n') || keyValue.startsWith(' [') || isValueEscapedAlready(keyValue)) {
             continue;
           }
@@ -59,7 +59,7 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
         `,
       }),
       new ExampleBuilder({
-        description: 'Force YAML keys to be escaped with double quotes where not already escaped with `Force Yaml Escape on Keys = \'key\'\\n\'title\'\\n\'bool\'`',
+        description: 'Force YAML keys to be escaped with double quotes where not already escaped with `Force YAML Escape on Keys = \'key\'\\n\'title\'\\n\'bool\'`',
         before: dedent`
           ---
           key: 'Already escaped value'
@@ -68,7 +68,7 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
           unaffected: value
           ---
           ${''}
-          _Note that the force Yaml key option should not be used with arrays._
+          _Note that the force YAML key option should not be used with arrays._
         `,
         after: dedent`
           ---
@@ -78,7 +78,7 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
           unaffected: value
           ---
           ${''}
-          _Note that the force Yaml key option should not be used with arrays._
+          _Note that the force YAML key option should not be used with arrays._
         `,
         options: {
           forceYamlEscape: ['key', 'title', 'bool'],

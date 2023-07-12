@@ -181,7 +181,7 @@ ruleTest({
       },
     },
     {
-      testName: 'Formatting yaml tags does nothing when disabled',
+      testName: 'Formatting YAML tags does nothing when disabled',
       before: dedent`
         ---
         tags: tag1, tag2, tag3, tag4
@@ -472,7 +472,7 @@ ruleTest({
 
     // default array style
     {
-      testName: 'Convert multi-line to single-line for regular yaml arrays',
+      testName: 'Convert multi-line to single-line for regular YAML arrays',
       before: dedent`
         ---
         key:
@@ -490,7 +490,7 @@ ruleTest({
       },
     },
     {
-      testName: 'Convert single-line to multi-line for regular yaml arrays',
+      testName: 'Convert single-line to multi-line for regular YAML arrays',
       before: dedent`
         ---
         key: [val1, other val]
@@ -508,7 +508,7 @@ ruleTest({
       },
     },
     {
-      testName: 'Regular yaml array formatting does nothing when disabled',
+      testName: 'Regular YAML array formatting does nothing when disabled',
       before: dedent`
         ---
         key: [val1, other val]
@@ -525,7 +525,7 @@ ruleTest({
       },
     },
     {
-      testName: 'Regular yaml array formatting does nothing when key is present in list for forcing to be single-line',
+      testName: 'Regular YAML array formatting does nothing when key is present in list for forcing to be single-line',
       before: dedent`
         ---
         key: [val1, other val]
@@ -542,7 +542,7 @@ ruleTest({
       },
     },
     {
-      testName: 'Regular yaml array formatting does nothing when key is present in list for forcing to be multi-line',
+      testName: 'Regular YAML array formatting does nothing when key is present in list for forcing to be multi-line',
       before: dedent`
         ---
         key:
@@ -563,7 +563,7 @@ ruleTest({
       },
     },
     {
-      testName: 'Regular yaml array formatting does nothing to tags and aliases',
+      testName: 'Regular YAML array formatting does nothing to tags and aliases',
       before: dedent`
         ---
         aliases: [title1, other title]
@@ -581,7 +581,7 @@ ruleTest({
       },
     },
     {
-      testName: 'Convert single-line to multi-line for regular yaml arrays doesn\'t remove unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = false`',
+      testName: 'Convert single-line to multi-line for regular YAML arrays doesn\'t remove unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = false`',
       before: dedent`
         ---
         key: [val1, "other val"]
@@ -599,7 +599,7 @@ ruleTest({
       },
     },
     {
-      testName: 'Convert single-line to multi-line for regular yaml arrays removes unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = true`',
+      testName: 'Convert single-line to multi-line for regular YAML arrays removes unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = true`',
       before: dedent`
         ---
         key: [val1, "other val"]

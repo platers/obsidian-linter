@@ -64,7 +64,7 @@ export default {
     'invalid-delimiter-error-message': 'El delimitador solo puede ser de un solo carácter',
     'missing-footnote-error-message': 'La nota al pie `{FOOTNOTE}` no tiene ninguna referencia de nota al pie correspondiente antes del contenido de la nota al pie y no se puede procesar. Asegúrese de que todas las notas a pie de página tengan una referencia correspondiente antes del contenido de la nota al pie de página.',
     'too-many-footnotes-error-message': `La clave de nota al pie '{FOOTNOTE_KEY}' tiene más de 1 nota al pie que hace referencia a ella. Actualice las notas al pie para que solo haya una nota al pie por clave de nota al pie.`,
-    'wrapper-yaml-error': 'hubo un error en el yaml: {ERROR_MESSAGE}',
+    'wrapper-yaml-error': 'hubo un error en el YAML: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'huno un error desconocido: {ERROR_MESSAGE}',
     'uneven-amount-of-quotes': 'Las instancias de la cita `{QUOTE}` en el archivo no son pares, por lo que no podemos convertir las comillas rectas en comillas tipográficas.',
   },
@@ -80,15 +80,15 @@ export default {
   'file-backup-text': 'Asegúrese de haber realizado una copia de seguridad de sus archivos.',
   'tabs': {
     'names': {
-      'general': 'Ajustes generales',
-      'custom': 'Ajustes personalizados',
-      'yaml': 'Ajustes de YAML',
-      'heading': 'Ajustes del encabezado',
-      'content': 'Ajustes del contenido',
-      'footnote': 'Ajustes de notas al pie',
-      'spacing': 'Ajustes del espacio en blanco',
-      'paste': 'Ajustes de pegar',
-      'debug': 'Ajustes de depurar',
+      'general': 'General',
+      'custom': 'Personalizado',
+      'yaml': 'YAML',
+      'heading': 'Encabezado',
+      'content': 'Contenido',
+      'footnote': 'Notas al pie',
+      'spacing': 'Espacio en blanco',
+      'paste': 'Pegar',
+      'debug': 'Depurar',
     },
     'default-search-bar-text': 'Buscar en todos los ajustes',
     'general': {
@@ -296,7 +296,7 @@ export default {
       'description': 'Permite el formato de matrices regulares de YAML como multilínea o de una sola línea y las `etiquetas` y `alias` pueden tener algunos formatos específicos de YAML de Obsidian. Tenga en cuenta que una sola cadena a una sola línea pasa de una sola entrada de cadena a una matriz de una sola línea si hay más de 1 entrada presente. Lo mismo es cierto para una sola cadena a multilínea, excepto que se convierte en una matriz multilínea.',
       'alias-key': {
         'name': 'Dar formato a la sección de alias de YAML',
-        'description': 'Activa el formato para la sección de alias yaml. No debe habilitar esta opción junto con la regla `Alias de título YAML`, ya que es posible que no funcionen bien juntos o que tengan diferentes estilos de formato seleccionados que causen resultados inesperados.',
+        'description': 'Activa el formato para la sección de alias YAML. No debe habilitar esta opción junto con la regla `Alias de título YAML`, ya que es posible que no funcionen bien juntos o que tengan diferentes estilos de formato seleccionados que causen resultados inesperados.',
       },
       'tag-key': {
         'name': 'Dar formato a la sección de etiquetas de YAML',
