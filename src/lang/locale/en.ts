@@ -107,15 +107,15 @@ export default {
   'tabs': {
     'names': {
       // tab.ts
-      'general': 'General Settings',
-      'custom': 'Custom Settings',
-      'yaml': 'YAML Settings',
-      'heading': 'Heading Settings',
-      'content': 'Content Settings',
-      'footnote': 'Footnote Settings',
-      'spacing': 'Spacing Settings',
-      'paste': 'Paste Settings',
-      'debug': 'Debug Settings',
+      'general': 'General',
+      'custom': 'Custom',
+      'yaml': 'YAML',
+      'heading': 'Heading',
+      'content': 'Content',
+      'footnote': 'Footnote',
+      'spacing': 'Spacing',
+      'paste': 'Paste',
+      'debug': 'Debug',
     },
     // tab-searcher.ts
     'default-search-bar-text': 'Search all settings',

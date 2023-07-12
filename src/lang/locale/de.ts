@@ -107,15 +107,15 @@ export default {
   'tabs': {
     'names': {
       // tab.ts
-      'general': 'Allgemeine Einstellungen',
-      'custom': 'Benutzerdefinierte Einstellungen',
-      'yaml': 'YAML-Einstellungen',
-      'heading': 'Einstellungen für die Überschrift',
-      'content': 'Inhaltseinstellungen',
-      'footnote': 'Fußnoten-Einstellungen',
-      'spacing': 'Abstandseinstellungen',
-      'paste': 'Einstellungen einfügen',
-      'debug': 'Debug-Einstellungen',
+      'general': 'AAllgemein',
+      'custom': 'Brauch',
+      'yaml': 'YAML',
+      'heading': 'Überschriften',
+      'content': 'Inhalt',
+      'footnote': 'Fußnote',
+      'spacing': 'Abstand',
+      'paste': 'Kleben',
+      'debug': 'Debuggen',
     },
     // tab-searcher.ts
     'default-search-bar-text': 'Alle Einstellungen durchsuchen',

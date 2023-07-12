@@ -107,15 +107,15 @@ export default {
   'tabs': {
     'names': {
       // tab.ts
-      'general': '通用设置',
-      'custom': '自定义设置',
-      'yaml': 'YAML设置',
-      'heading': '标题设置',
-      'content': '脚注设置',
-      'footnote': '内容设置',
-      'spacing': '间距设置',
-      'paste': '粘贴设置',
-      'debug': 'Debug设置',
+      'general': '一般的',
+      'custom': '风俗',
+      'yaml': 'YAML',
+      'heading': '标题',
+      'content': '内容',
+      'footnote': '脚注',
+      'spacing': '间距',
+      'paste': '贴',
+      'debug': '调试',
     },
     // tab-searcher.ts
     'default-search-bar-text': '搜索所有设置项',
