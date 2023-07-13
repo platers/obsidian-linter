@@ -170,7 +170,7 @@ otherKey: []
 ---
 ``````
 </details>
-<details><summary>Force YAML keys to be escaped with double quotes where not already escaped with `Force Yaml Escape on Keys = 'key'\n'title'\n'bool'`</summary>
+<details><summary>Force YAML keys to be escaped with double quotes where not already escaped with `Force YAML Escape on Keys = 'key'\n'title'\n'bool'`</summary>
 
 Before:
 
@@ -182,7 +182,7 @@ bool: false
 unaffected: value
 ---
 
-_Note that the force Yaml key option should not be used with arrays._
+_Note that the force YAML key option should not be used with arrays._
 ``````
 
 After:
@@ -195,7 +195,7 @@ bool: "false"
 unaffected: value
 ---
 
-_Note that the force Yaml key option should not be used with arrays._
+_Note that the force YAML key option should not be used with arrays._
 ``````
 </details>
 
@@ -288,22 +288,22 @@ tags:
 ``````
 </details>
 
-## Format Yaml Array
+## Format YAML Array
 
 Alias: `format-yaml-array`
 
-Allows for the formatting of regular yaml arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific yaml formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.
+Allows for the formatting of regular YAML arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific YAML formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.
 
 ### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Format yaml aliases section` | Turns on formatting for the yaml aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results. | N/A | `true` |
-| `Format yaml tags section` | Turns on formatting for the yaml tags section. | N/A | `true` |
-| `Default yaml array section style` | The style of other yaml arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays` | `multi-line`: ```key:\n  - value```<br/><br/>`single-line`: ```key: [value]``` | `single-line` |
-| `Format yaml array sections` | Turns on formatting for regular yaml arrays | N/A | `true` |
-| `Force key values to be single-line arrays` | Forces the yaml array for the new line separated keys to be in single-line format (leave empty to disable this option) | N/A |  |
-| `Force key values to be multi-line arrays` | Forces the yaml array for the new line separated keys to be in multi-line format (leave empty to disable this option) | N/A |  |
+| `Format YAML aliases section` | Turns on formatting for the YAML aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results. | N/A | `true` |
+| `Format YAML tags section` | Turns on formatting for the YAML tags section. | N/A | `true` |
+| `Default YAML array section style` | The style of other YAML arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays` | `multi-line`: ```key:\n  - value```<br/><br/>`single-line`: ```key: [value]``` | `single-line` |
+| `Format YAML array sections` | Turns on formatting for regular YAML arrays | N/A | `true` |
+| `Force key values to be single-line arrays` | Forces the YAML array for the new line separated keys to be in single-line format (leave empty to disable this option) | N/A |  |
+| `Force key values to be multi-line arrays` | Forces the YAML array for the new line separated keys to be in multi-line format (leave empty to disable this option) | N/A |  |
 
 
 
@@ -324,9 +324,9 @@ test: this is a value
 
 # Notes:
 
-Nesting yaml arrays may result in unexpected results.
+Nesting YAML arrays may result in unexpected results.
 
-Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
+Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid YAML unless it comes as the last entry in the array.
 ``````
 
 After:
@@ -342,12 +342,12 @@ test: [this is a value]
 
 # Notes:
 
-Nesting yaml arrays may result in unexpected results.
+Nesting YAML arrays may result in unexpected results.
 
-Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid yaml unless it comes as the last entry in the array.
+Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid YAML unless it comes as the last entry in the array.
 ``````
 </details>
-<details><summary>Format tags as a single string with space delimiters, ignore aliases, and format regular yaml arrays as single-line arrays</summary>
+<details><summary>Format tags as a single string with space delimiters, ignore aliases, and format regular YAML arrays as single-line arrays</summary>
 
 Before:
 
@@ -438,11 +438,11 @@ animal: cat
 ``````
 </details>
 
-## Move Tags to Yaml
+## Move Tags to YAML
 
 Alias: `move-tags-to-yaml`
 
-Move all tags to Yaml frontmatter of the document.
+Move all tags to YAML frontmatter of the document.
 
 ### Options
 
@@ -455,7 +455,7 @@ Move all tags to Yaml frontmatter of the document.
 
 ### Examples
 
-<details><summary>Move tags from body to Yaml with `Tags to ignore = 'ignored-tag'`</summary>
+<details><summary>Move tags from body to YAML with `Tags to ignore = 'ignored-tag'`</summary>
 
 Before:
 
@@ -567,7 +567,7 @@ Removes the YAML keys specified
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `YAML Keys to Remove` | The yaml keys to remove from the yaml frontmatter with or without colons | N/A |  |
+| `YAML Keys to Remove` | The YAML keys to remove from the YAML frontmatter with or without colons | N/A |  |
 
 
 
@@ -771,8 +771,8 @@ However, when a file is rarely updated, the date modified could be very out of d
 
 For example, say the date modified is January 22nd 2020. But you update the file on January 3rd 2021. The date modified in
 the YAML frontmatter would say January 22nd 2020 despite being updated in 2021. If you did not run the Linter
-against the file a 2nd time, it could be left with th very misleading value. As such, the date modified is the time the
-Linter needs to update the file via any rule except Custom Commands.
+against the file a 2nd time, it could be left with a very misleading value. As such, the date modified is the time when
+Linter asks to update the file via any rule except Custom Commands. This should be within about 5 seconds of the value in the file metadata.
 
 
 ### Examples
