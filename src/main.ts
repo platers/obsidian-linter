@@ -72,6 +72,7 @@ export default class LinterPlugin extends Plugin {
   private momentLocale: string;
   private isEnabled: boolean = true;
   private rulesRunner = new RulesRunner();
+  private lastActiveFile: TFile;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -212,16 +213,10 @@ export default class LinterPlugin extends Plugin {
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
-    eventRef = this.app.workspace.on('active-leaf-change', () => {
-      const lastOpenFiles = this.app.workspace.getLastOpenFiles();
-      if (lastOpenFiles.length < 2) {
-        return;
-      }
-      console.log(lastOpenFiles[1], lastOpenFiles);
-    });
+    this.lastActiveFile = this.app.workspace.getActiveFile()
+    eventRef = this.app.workspace.on('active-leaf-change', () => this.onActiveLeafChange());
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
-
 
     // Source for save setting
     // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
@@ -276,6 +271,26 @@ export default class LinterPlugin extends Plugin {
             .setIcon(iconInfo.folder.id)
             .onClick(() => this.createFolderLintModal(file));
       });
+    }
+  }
+
+  async onActiveLeafChange() {
+    if (!this.isEnabled) {
+      return;
+    }
+
+    const currentActiveFile = this.app.workspace.getActiveFile();
+    if (this.lastActiveFile  == null || this.lastActiveFile  === currentActiveFile) {
+      return;
+    }
+
+    try {
+      await this.runLinterFile(this.lastActiveFile);
+    } catch (error) {
+      this.handleLintError(this.lastActiveFile, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+    } finally {
+      this.lastActiveFile  = currentActiveFile;
+      console.log(this.lastActiveFile.path);
     }
   }
 
