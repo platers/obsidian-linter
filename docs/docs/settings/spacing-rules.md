@@ -664,7 +664,7 @@ All headings have a blank line both before and after (except where the heading i
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Bottom` | Insert a blank line after headings | N/A | `true` |
-| `Empty Line Between Yaml and Header` | Keep the empty line between the Yaml frontmatter and header | N/A | `true` |
+| `Empty Line Between YAML and Header` | Keep the empty line between the YAML frontmatter and header | N/A | `true` |
 
 
 
@@ -723,7 +723,7 @@ line
 line
 ``````
 </details>
-<details><summary>Empty line before header and after Yaml is removed with `Empty Line Between Yaml and Header=false`</summary>
+<details><summary>Empty line before header and after YAML is removed with `Empty Line Between YAML and Header=false`</summary>
 
 Before:
 
@@ -1231,14 +1231,14 @@ Before:
 +   ［ another item here］
 * ［ one last item here］
 
-# Nested in a block quote
+# Nested in a blockquote
 
 > - ［ contents here］
 >   -  ［ more contents here］ more text here
 > +  ［ another item here］
 > * ［ one last item here］
 
-# Doubly nested in a block quote
+# Doubly nested in a blockquote
 
 > The following is doubly nested
 > > - ［ contents here］
@@ -1257,14 +1257,14 @@ After:
 + ［another item here］
 * ［one last item here］
 
-# Nested in a block quote
+# Nested in a blockquote
 
 > - ［contents here］
 >   - ［more contents here］more text here
 > + ［another item here］
 > * ［one last item here］
 
-# Doubly nested in a block quote
+# Doubly nested in a blockquote
 
 > The following is doubly nested
 > > - ［contents here］
