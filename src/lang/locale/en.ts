@@ -130,6 +130,14 @@ export default {
         'name': 'Display message on lint',
         'description': 'Display the number of characters changed after linting',
       },
+      'lint-on-file-change': {
+        'name': 'Lint on File Change',
+        'description': 'When the a file is closed or a new file is swapped to, the previous file is linted.',
+      },
+      'display-lint-on-file-change-message': {
+        'name': 'Display Lint on File Change Message',
+        'description': 'Displays a message when `Lint on File Change` occurs',
+      },
       'folders-to-ignore': {
         'name': 'Folders to ignore',
         'description': 'Folders to ignore when linting all files or linting on save. Enter folder paths separated by newlines',

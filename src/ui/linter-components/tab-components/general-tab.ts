@@ -16,7 +16,7 @@ export class GeneralTab extends Tab {
     let tempDiv = this.contentEl.createDiv();
     let settingName = getTextInLanguage('tabs.general.lint-on-save.name');
     let settingDesc = getTextInLanguage('tabs.general.lint-on-save.description');
-    const setting = new Setting(tempDiv)
+    let setting = new Setting(tempDiv)
         .setName(settingName)
         .addToggle((toggle) => {
           toggle
@@ -49,8 +49,8 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Lint on File Change';
-    settingDesc = 'When the a file is closed or a new file is swapped to, the previous file is linted.';
+    settingName = getTextInLanguage('tabs.general.lint-on-file-change.name');
+    settingDesc = getTextInLanguage('tabs.general.lint-on-file-change.description');
     new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
@@ -66,9 +66,9 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
-    settingName = 'Display Lint on File Change Message';
-    settingDesc = 'Displays a message when `Lint on File Change` occurs';
-    new Setting(tempDiv)
+    settingName = getTextInLanguage('tabs.general.display-lint-on-file-change-message.name');
+    settingDesc = getTextInLanguage('tabs.general.display-lint-on-file-change-message.description');
+    setting = new Setting(tempDiv)
         .setName(settingName)
         .setDesc(settingDesc)
         .addToggle((toggle) => {
@@ -79,6 +79,8 @@ export class GeneralTab extends Tab {
                 await this.plugin.saveSettings();
               });
         });
+
+    parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl, this.plugin.settingsTab.component);
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
