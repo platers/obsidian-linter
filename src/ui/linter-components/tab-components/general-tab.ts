@@ -16,7 +16,7 @@ export class GeneralTab extends Tab {
     let tempDiv = this.contentEl.createDiv();
     let settingName = getTextInLanguage('tabs.general.lint-on-save.name');
     let settingDesc = getTextInLanguage('tabs.general.lint-on-save.description');
-    const setting = new Setting(tempDiv)
+    let setting = new Setting(tempDiv)
         .setName(settingName)
         .addToggle((toggle) => {
           toggle
@@ -45,6 +45,42 @@ export class GeneralTab extends Tab {
                 await this.plugin.saveSettings();
               });
         });
+
+    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+
+    tempDiv = this.contentEl.createDiv();
+    settingName = getTextInLanguage('tabs.general.lint-on-file-change.name');
+    settingDesc = getTextInLanguage('tabs.general.lint-on-file-change.description');
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addToggle((toggle) => {
+          toggle
+              .setValue(this.plugin.settings.lintOnFileChange)
+              .onChange(async (value) => {
+                this.plugin.settings.lintOnFileChange = value;
+                await this.plugin.saveSettings();
+              });
+        });
+
+    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+
+    tempDiv = this.contentEl.createDiv();
+    settingName = getTextInLanguage('tabs.general.display-lint-on-file-change-message.name');
+    settingDesc = getTextInLanguage('tabs.general.display-lint-on-file-change-message.description');
+    setting = new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addToggle((toggle) => {
+          toggle
+              .setValue(this.plugin.settings.displayLintOnFileChangeNotice)
+              .onChange(async (value) => {
+                this.plugin.settings.displayLintOnFileChangeNotice = value;
+                await this.plugin.saveSettings();
+              });
+        });
+
+    parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl, this.plugin.settingsTab.component);
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 

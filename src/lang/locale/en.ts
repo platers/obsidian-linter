@@ -49,6 +49,7 @@ export default {
     'see-console': 'See console for more details.',
     'unknown-error': 'An unknown error occurred during linting.',
     'moment-locale-not-found': 'Trying to switch Moment.js locale to {MOMENT_LOCALE}, got {CURRENT_LOCALE}',
+    'file-change-lint-message-start': 'Linted',
 
     // rules-runner.ts
     'pre-rules': 'rules before regular rules',
@@ -128,6 +129,14 @@ export default {
       'display-message': {
         'name': 'Display message on lint',
         'description': 'Display the number of characters changed after linting',
+      },
+      'lint-on-file-change': {
+        'name': 'Lint on File Change',
+        'description': 'When the a file is closed or a new file is swapped to, the previous file is linted.',
+      },
+      'display-lint-on-file-change-message': {
+        'name': 'Display Lint on File Change Message',
+        'description': 'Displays a message when `Lint on File Change` occurs',
       },
       'folders-to-ignore': {
         'name': 'Folders to ignore',

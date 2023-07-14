@@ -48,6 +48,7 @@ export default {
     'see-console': 'Consulte la consola para obtener más detalles.',
     'unknown-error': 'Se ha producido un error desconocido durante el linting.',
     'moment-locale-not-found': 'Intentando cambiar la zona de Moment.js a {MOMENT_LOCALE}, el resulto fue {CURRENT_LOCALE}',
+    'file-change-lint-message-start': 'Analizó',
     'pre-rules': 'Las reglas antes de las reglas normales',
     'post-rules': 'las reglas después de las reglas normales',
     'rule-running': 'usando las reglas',
@@ -103,6 +104,14 @@ export default {
       'folders-to-ignore': {
         'name': 'Carpetas para omitir',
         'description': 'Carpetas que se deben omitir al analizar todos los archivos o al guardar en línea. Introducir rutas de carpeta separadas por nuevas líneas',
+      },
+      'lint-on-file-change': {
+        'name': 'Analizar archivo en cambiar',
+        'description': 'Cuando se cierra un archivo o se cambia a un nuevo archivo, el archivo anterior se analiza.',
+      },
+      'display-lint-on-file-change-message': {
+        'name': 'Mostrar mensaje en cambiar el archivo',
+        'description': 'Muestra un mensaje cuando se produce `Analizar archivo en cambiar`',
       },
       'override-locale': {
         'name': 'Anular configuración regional',

@@ -1,8 +1,8 @@
 import {Setting} from 'obsidian';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import LinterPlugin from './main';
-import {LinterSettings} from './rules';
 import {parseTextToHTMLWithoutOuterParagraph} from './ui/helpers';
+import {LinterSettings} from './settings-data';
 
 export type SearchOptionInfo = {name: string, description: string, options?: DropdownRecord[]}
 

@@ -49,6 +49,7 @@ export default {
     'see-console': '请查看控制台以获取更多信息',
     'unknown-error': '格式化过程发生未知错误',
     'moment-locale-not-found': '尝试通过 Moment.js 切换到 {MOMENT_LOCALE}, 实际切换到 {CURRENT_LOCALE}',
+    'file-change-lint-message-start': '棉绒',
 
     // rules-runner.ts
     'pre-rules': '比正常规则优先级更高的规则',
@@ -128,6 +129,14 @@ export default {
       'display-message': {
         'name': '格式化后显示消息',
         'description': '格式化后显示修改了多少字符',
+      },
+      'lint-on-file-change': {
+        'name': '文件更改时的 Lint',
+        'description': '当文件关闭或交换到新文件时，前一个文件将被检查。',
+      },
+      'display-lint-on-file-change-message': {
+        'name': '在文件更改消息上显示 Lint',
+        'description': '当发生`在文件更改消息上显示 Lint`时显示一条消息',
       },
       'folders-to-ignore': {
         'name': '忽略文件夹',

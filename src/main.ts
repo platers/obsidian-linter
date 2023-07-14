@@ -1,9 +1,8 @@
 import {normalizePath, App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange} from 'obsidian';
-import {LinterSettings, Options, rules} from './rules';
+import {Options, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
-import log from 'loglevel';
 import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
@@ -12,10 +11,10 @@ import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
-import {NormalArrayFormats} from './utils/yaml';
 import {urlRegex} from './utils/regex';
 import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
+import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -45,26 +44,6 @@ const langToMomentLocale = {
 
 const userClickTimeout = 0;
 
-const DEFAULT_SETTINGS: Partial<LinterSettings> = {
-  ruleConfigs: {},
-  lintOnSave: false,
-  recordLintOnSaveLogs: false,
-  displayChanged: true,
-  settingsConvertedToConfigKeyValues: false,
-  foldersToIgnore: [],
-  linterLocale: 'system-default',
-  logLevel: log.levels.ERROR,
-  lintCommands: [],
-  customRegexes: [],
-  commonStyles: {
-    aliasArrayStyle: NormalArrayFormats.SingleLine,
-    tagArrayStyle: NormalArrayFormats.SingleLine,
-    minimumNumberOfDollarSignsToBeAMathBlock: 2,
-    escapeCharacter: '"',
-    removeUnnecessaryEscapeCharsForMultiLineArrays: false,
-  },
-};
-
 export default class LinterPlugin extends Plugin {
   settings: LinterSettings;
   settingsTab: SettingTab;
@@ -72,6 +51,7 @@ export default class LinterPlugin extends Plugin {
   private momentLocale: string;
   private isEnabled: boolean = true;
   private rulesRunner = new RulesRunner();
+  private lastActiveFile: TFile;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -212,6 +192,11 @@ export default class LinterPlugin extends Plugin {
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
+    this.lastActiveFile = this.app.workspace.getActiveFile();
+    eventRef = this.app.workspace.on('active-leaf-change', () => this.onActiveLeafChange());
+    this.registerEvent(eventRef);
+    this.eventRefs.push(eventRef);
+
     // Source for save setting
     // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
     const saveCommandDefinition = this.app.commands?.commands?.[
@@ -265,6 +250,32 @@ export default class LinterPlugin extends Plugin {
             .setIcon(iconInfo.folder.id)
             .onClick(() => this.createFolderLintModal(file));
       });
+    }
+  }
+
+  async onActiveLeafChange() {
+    if (!this.isEnabled) {
+      return;
+    }
+
+    const currentActiveFile = this.app.workspace.getActiveFile();
+    if (!this.settings.lintOnFileChange || this.lastActiveFile == null || this.lastActiveFile === currentActiveFile) {
+      this.lastActiveFile = currentActiveFile;
+      return;
+    }
+
+    try {
+      await this.runLinterFile(this.lastActiveFile);
+    } catch (error) {
+      this.handleLintError(this.lastActiveFile, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+    } finally {
+      const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + this.lastActiveFile.path;
+      if (this.settings.displayLintOnFileChangeNotice) {
+        new Notice(message);
+      }
+
+      this.lastActiveFile = currentActiveFile;
+      logInfo(message);
     }
   }
 
