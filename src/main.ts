@@ -50,6 +50,8 @@ const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   lintOnSave: false,
   recordLintOnSaveLogs: false,
   displayChanged: true,
+  lintOnFileChange: false,
+  displayLintOnFileChangeNotice: false,
   settingsConvertedToConfigKeyValues: false,
   foldersToIgnore: [],
   linterLocale: 'system-default',
@@ -213,7 +215,7 @@ export default class LinterPlugin extends Plugin {
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
-    this.lastActiveFile = this.app.workspace.getActiveFile()
+    this.lastActiveFile = this.app.workspace.getActiveFile();
     eventRef = this.app.workspace.on('active-leaf-change', () => this.onActiveLeafChange());
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
@@ -280,7 +282,8 @@ export default class LinterPlugin extends Plugin {
     }
 
     const currentActiveFile = this.app.workspace.getActiveFile();
-    if (this.lastActiveFile  == null || this.lastActiveFile  === currentActiveFile) {
+    if (!this.settings.lintOnFileChange || this.lastActiveFile == null || this.lastActiveFile === currentActiveFile) {
+      this.lastActiveFile = currentActiveFile;
       return;
     }
 
@@ -289,8 +292,8 @@ export default class LinterPlugin extends Plugin {
     } catch (error) {
       this.handleLintError(this.lastActiveFile, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
     } finally {
-      this.lastActiveFile  = currentActiveFile;
       console.log(this.lastActiveFile.path);
+      this.lastActiveFile = currentActiveFile;
     }
   }
 

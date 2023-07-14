@@ -40,6 +40,8 @@ export interface LinterSettings {
   displayChanged: boolean;
   settingsConvertedToConfigKeyValues: boolean;
   recordLintOnSaveLogs: boolean;
+  lintOnFileChange: boolean,
+  displayLintOnFileChangeNotice: boolean,
   foldersToIgnore: string[];
   linterLocale: string;
   logLevel: number;

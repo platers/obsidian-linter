@@ -49,6 +49,40 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     tempDiv = this.contentEl.createDiv();
+    settingName = 'Lint on File Change';
+    settingDesc = 'When the a file is closed or a new file is swapped to, the previous file is linted.';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addToggle((toggle) => {
+          toggle
+              .setValue(this.plugin.settings.lintOnFileChange)
+              .onChange(async (value) => {
+                this.plugin.settings.lintOnFileChange = value;
+                await this.plugin.saveSettings();
+              });
+        });
+
+    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+
+    tempDiv = this.contentEl.createDiv();
+    settingName = 'Display Lint on File Change Message';
+    settingDesc = 'Displays a message when `Lint on File Change` occurs';
+    new Setting(tempDiv)
+        .setName(settingName)
+        .setDesc(settingDesc)
+        .addToggle((toggle) => {
+          toggle
+              .setValue(this.plugin.settings.displayLintOnFileChangeNotice)
+              .onChange(async (value) => {
+                this.plugin.settings.displayLintOnFileChangeNotice = value;
+                await this.plugin.saveSettings();
+              });
+        });
+
+    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+
+    tempDiv = this.contentEl.createDiv();
     settingName = getTextInLanguage('tabs.general.folders-to-ignore.name');
     settingDesc = getTextInLanguage('tabs.general.folders-to-ignore.description');
     new Setting(tempDiv)
