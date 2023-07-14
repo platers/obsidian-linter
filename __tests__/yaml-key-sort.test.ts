@@ -66,5 +66,40 @@ ruleTest({
         yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/796
+      testName: 'Sort works when priority keys end in a colon',
+      before: dedent`
+        ---
+        language: Typescript
+        type: programming
+        tags: computer
+        keywords: []
+        status: WIP
+        date: 01/15/2022
+        modified: Wednesday, January 1st 2020, 12:00:00 am
+        ---
+      `,
+      after: dedent`
+        ---
+        date: 01/15/2022
+        type: programming
+        language: Typescript
+        tags: computer
+        keywords: []
+        status: WIP
+        modified: Thursday, January 2nd 2020, 12:00:00 am
+        ---
+      `,
+      options: {
+        yamlKeyPrioritySortOrder: [
+          'date:',
+          'type:',
+          'language:',
+        ],
+        dateModifiedKey: 'modified',
+        currentTimeFormatted: 'Thursday, January 2nd 2020, 12:00:00 am',
+        yamlTimestampDateModifiedEnabled: true,
+      },
+    },
   ],
 });

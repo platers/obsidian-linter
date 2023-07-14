@@ -1,8 +1,9 @@
-import {Example, Options, Rule, RuleType, registerRule, LinterSettings, wrapLintError} from '../rules';
+import {Example, Options, Rule, RuleType, registerRule, wrapLintError} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
 import {logDebug} from '../utils/logger';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
+import {LinterSettings} from 'src/settings-data';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
