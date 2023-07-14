@@ -9,6 +9,13 @@ You will need to turn on the setting for `Lint on save` for this to work.
 
 Enabling this setting keeps you from having to manually run the Obsidian Command to a lint a file whenever you want to lint the current file.
 
+## On File Close or File Change
+
+There is an option to lint a file when a user either closes it or swaps to a different file. In order to activate this rule,
+you will need to turn on the setting for `Lint on File Change`.
+
+This way of linting a file can help out if you forget to run the Linter on files before changing to a new file or closing it.
+
 ## Obsidian Commands
 
 | Obsidian Command | Description | Default Keybinding |
