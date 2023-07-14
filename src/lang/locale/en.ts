@@ -304,7 +304,7 @@ export default {
     // empty-line-around-blockquotes.ts
     'empty-line-around-blockquotes': {
       'name': 'Empty Line Around Blockquotes',
-      'description': 'Ensures that there is an empty line around blockquotes unless they start or end a document. **Note that an empty line is either one less level of nesting for blockquotes or a newline character.**',
+      'description': 'Ensures that there is an empty line around blockquotes unless they start or end a document. **Note: an empty line is either one less level of nesting for blockquotes or a newline character.**',
     },
     // empty-line-around-code-fences.ts
     'empty-line-around-code-fences': {
@@ -455,7 +455,7 @@ export default {
     // ordered-list-style.ts
     'ordered-list-style': {
       'name': 'Ordered List Style',
-      'description': 'Makes sure that ordered lists follow the style specified. Note that 2 spaces or 1 tab is considered to be an indentation level.',
+      'description': 'Makes sure that ordered lists follow the style specified. **Note: that 2 spaces or 1 tab is considered to be an indentation level.**',
       'number-style': {
         'name': 'Number Style',
         'description': 'The number style used in ordered list indicators',
@@ -514,7 +514,7 @@ export default {
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': 'Re-Index Footnotes',
-      'description': 'Re-indexes footnote keys and footnote, based on the order of occurrence (NOTE: This rule does *not* work if there is more than one footnote for a key.)',
+      'description': 'Re-indexes footnote keys and footnote, based on the order of occurrence. **Note: This rule does _not_ work if there is more than one footnote for a key.**',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
@@ -569,7 +569,7 @@ export default {
     // remove-space-around-characters.ts
     'remove-space-around-characters': {
       'name': 'Remove Space around Characters',
-      'description': 'Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). Note that this may causes issues with markdown format in some cases.',
+      'description': 'Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). **Note: this may causes issues with markdown format in some cases.**',
       'include-fullwidth-forms': {
         'name': 'Include Fullwidth Forms',
         'description': 'Include <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Fullwidth Forms Unicode block</a>',
@@ -590,7 +590,7 @@ export default {
     // remove-space-before-or-after-characters.ts
     'remove-space-before-or-after-characters': {
       'name': 'Remove Space Before or After Characters',
-      'description': 'Removes space before the specified characters and after the specified characters. Note that this may causes issues with markdown format in some cases.',
+      'description': 'Removes space before the specified characters and after the specified characters. **Note: this may causes issues with markdown format in some cases.**',
       'characters-to-remove-space-before': {
         'name': 'Remove Space Before Characters',
         'description': 'Removes space before the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.**',
@@ -663,7 +663,7 @@ export default {
     // yaml-key-sort.ts
     'yaml-key-sort': {
       'name': 'YAML Key Sort',
-      'description': 'Sorts the YAML keys based on the order and priority specified. Note: may remove blank lines as well.',
+      'description': 'Sorts the YAML keys based on the order and priority specified. **Note: may remove blank lines as well.**',
       'yaml-key-priority-sort-order': {
         'name': 'YAML Key Priority Sort Order',
         'description': 'The order in which to sort keys with one on each line where it sorts in the order found in the list',
