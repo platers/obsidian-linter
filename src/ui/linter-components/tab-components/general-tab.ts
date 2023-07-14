@@ -70,7 +70,6 @@ export class GeneralTab extends Tab {
     settingDesc = getTextInLanguage('tabs.general.display-lint-on-file-change-message.description');
     setting = new Setting(tempDiv)
         .setName(settingName)
-        .setDesc(settingDesc)
         .addToggle((toggle) => {
           toggle
               .setValue(this.plugin.settings.displayLintOnFileChangeNotice)

@@ -7,6 +7,8 @@ import {indentedOrBlockquoteNestedChecklistIndicatorRegex, nonBlockquoteChecklis
 class PreventDoubleChecklistIndicatorOnPasteOptions implements Options {
   @RuleBuilder.noSettingControl()
     lineContent: string;
+  @RuleBuilder.noSettingControl()
+    selectedText: string;
 }
 
 @RuleBuilder.register
@@ -24,7 +26,8 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
   apply(text: string, options: PreventDoubleChecklistIndicatorOnPasteOptions): string {
     const isChecklistLine = indentedOrBlockquoteNestedChecklistIndicatorRegex.test(options.lineContent);
     const isChecklistClipboard = nonBlockquoteChecklistRegex.test(text);
-    if (!isChecklistLine || !isChecklistClipboard) {
+    const selectedTextStartsWithChecklist = nonBlockquoteChecklistRegex.test(options.selectedText);
+    if (!isChecklistLine || !isChecklistClipboard || selectedTextStartsWithChecklist) {
       return text;
     }
 
@@ -42,6 +45,7 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         `,
         options: {
           lineContent: 'Regular text here',
+          selectedText: '',
         },
       }),
       new ExampleBuilder({
@@ -56,6 +60,7 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         `,
         options: {
           lineContent: '> > ',
+          selectedText: '',
         },
       }),
       new ExampleBuilder({
@@ -70,6 +75,7 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         `,
         options: {
           lineContent: '> - [x] ',
+          selectedText: '',
         },
       }),
       new ExampleBuilder({
@@ -84,6 +90,7 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         `,
         options: {
           lineContent: '- [ ] ',
+          selectedText: '',
         },
       }),
       new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/748
@@ -98,6 +105,22 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         `,
         options: {
           lineContent: '- [!] ',
+          selectedText: '',
+        },
+      }),
+      new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/801
+        description: 'When pasting a checklist and the selected text starts with a checklist, the text to paste should still start with a checklist',
+        before: dedent`
+          - [x] Checklist item 1
+          - [ ] Checklist item 2
+        `,
+        after: dedent`
+          - [x] Checklist item 1
+          - [ ] Checklist item 2
+        `,
+        options: {
+          lineContent: '- [!] Some text here',
+          selectedText: '- [!] Some text here',
         },
       }),
     ];

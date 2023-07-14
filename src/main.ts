@@ -490,7 +490,11 @@ export default class LinterPlugin extends Plugin {
     const cursorSelections = editor.listSelections();
     if (cursorSelections.length === 1) {
       const cursorSelection = cursorSelections[0];
-      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection), createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings));
+      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection),
+          editor.getSelection() ?? '',
+          createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings),
+      );
+
       editor.replaceSelection(clipboardText);
     } else {
       this.handleMultiCursorPaste(editor, cursorSelections, clipboardText);

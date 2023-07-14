@@ -7,6 +7,8 @@ import {lineStartingWithWhitespaceOrBlockquoteTemplate} from '../utils/regex';
 class PreventDoubleListItemIndicatorOnPasteOptions implements Options {
   @RuleBuilder.noSettingControl()
     lineContent: string;
+  @RuleBuilder.noSettingControl()
+    selectedText: string;
 }
 
 @RuleBuilder.register
@@ -26,8 +28,9 @@ export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<P
     const listRegex = /^\s*[*+-] /;
 
     const isListLine = indentedOrBlockquoteNestedListIndicatorRegex.test(options.lineContent);
+    const selectedStartsWithListItem = indentedOrBlockquoteNestedListIndicatorRegex.test(options.selectedText);
     const isListClipboard = listRegex.test(text);
-    if (!isListLine || !isListClipboard) {
+    if (selectedStartsWithListItem || !isListLine || !isListClipboard) {
       return text;
     }
 
@@ -45,6 +48,7 @@ export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<P
         `,
         options: {
           lineContent: 'Regular text here',
+          selectedText: '',
         },
       }),
       new ExampleBuilder({
@@ -59,6 +63,7 @@ export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<P
         `,
         options: {
           lineContent: '> > ',
+          selectedText: '',
         },
       }),
       new ExampleBuilder({
@@ -73,6 +78,7 @@ export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<P
         `,
         options: {
           lineContent: '> * ',
+          selectedText: '',
         },
       }),
       new ExampleBuilder({
@@ -87,6 +93,22 @@ export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<P
         `,
         options: {
           lineContent: '+ ',
+          selectedText: '',
+        },
+      }),
+      new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/801
+        description: 'When pasting a list item and the selected text starts with a list item indicator, the text to paste should still start with a list item indicator',
+        before: dedent`
+          - List item 1
+          - List item 2
+        `,
+        after: dedent`
+          - List item 1
+          - List item 2
+        `,
+        options: {
+          lineContent: '+ ',
+          selectedText: '+ ',
         },
       }),
     ];

@@ -186,7 +186,7 @@ export class RulesRunner {
     });
   }
 
-  runPasteLint(currentLine: string, runOptions: RunLinterRulesOptions): string {
+  runPasteLint(currentLine: string, selectedText: string, runOptions: RunLinterRulesOptions): string {
     let newText = runOptions.oldText;
 
     [newText] = RemoveHyphensOnPaste.applyIfEnabled(newText, runOptions.settings, []);
@@ -199,9 +199,9 @@ export class RulesRunner {
 
     [newText] = RemoveLeadingOrTrailingWhitespaceOnPaste.applyIfEnabled(newText, runOptions.settings, []);
 
-    [newText] = PreventDoubleChecklistIndicatorOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine});
+    [newText] = PreventDoubleChecklistIndicatorOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine, selectedText: selectedText});
 
-    [newText] = PreventDoubleListItemIndicatorOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine});
+    [newText] = PreventDoubleListItemIndicatorOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine, selectedText: selectedText});
 
     [newText] = BlockquotifyOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine});
 
