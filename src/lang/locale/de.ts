@@ -49,6 +49,7 @@ export default {
     'see-console': 'Weitere Informationen finden Sie unter Konsole.',
     'unknown-error': 'Beim Flusen ist ein unbekannter Fehler aufgetreten.',
     'moment-locale-not-found': 'Beim Versuch, Moment.js locale auf {MOMENT_LOCALE} umzustellen, wurde {CURRENT_LOCALE} angezeigt',
+    'file-change-lint-message-start': 'Fusselig',
 
     // rules-runner.ts
     'pre-rules': 'Regeln vor regulären Regeln',
@@ -128,6 +129,14 @@ export default {
       'display-message': {
         'name': 'Meldung auf Flusen anzeigen',
         'description': 'Zeigen Sie die Anzahl der Zeichen an, die sich nach dem Linsen geändert haben',
+      },
+      'lint-on-file-change': {
+        'name': 'Flusen bei Dateiänderungen',
+        'description': 'Wenn eine Datei geschlossen oder eine neue Datei ausgelagert wird, wird die vorherige Datei mit Flusen versehen.',
+      },
+      'display-lint-on-file-change-message': {
+        'name': 'Lint auf Dateiänderungsmeldung anzeigen',
+        'description': 'Zeigt eine Meldung an, wenn `Flusen bei Dateiänderungen` auftritt',
       },
       'folders-to-ignore': {
         'name': 'Ordner, die ignoriert werden sollen',
