@@ -49,6 +49,7 @@ export default {
     'see-console': 'See console for more details.',
     'unknown-error': 'An unknown error occurred during linting.',
     'moment-locale-not-found': 'Trying to switch Moment.js locale to {MOMENT_LOCALE}, got {CURRENT_LOCALE}',
+    'file-change-lint-message-start': 'Linted',
 
     // rules-runner.ts
     'pre-rules': 'rules before regular rules',

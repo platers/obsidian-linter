@@ -14,10 +14,9 @@ import {
   SpecialArrayFormats,
   TagSpecificArrayFormats,
 } from './utils/yaml';
-import {LintCommand} from './ui/linter-components/custom-command-option';
-import {CustomReplace} from './ui/linter-components/custom-replace-option';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import {ignoreListOfTypes, IgnoreType} from './utils/ignore-types';
+import {LinterSettings} from './settings-data';
 
 // CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
 export type CommonStyles = {
@@ -31,24 +30,6 @@ export type CommonStyles = {
 export type Options = { [optionName: string]: any};
 
 type ApplyFunction = (text: string, options?: Options) => string;
-
-export interface LinterSettings {
-  ruleConfigs: {
-    [ruleName: string]: Options;
-  };
-  lintOnSave: boolean;
-  displayChanged: boolean;
-  settingsConvertedToConfigKeyValues: boolean;
-  recordLintOnSaveLogs: boolean;
-  lintOnFileChange: boolean,
-  displayLintOnFileChangeNotice: boolean,
-  foldersToIgnore: string[];
-  linterLocale: string;
-  logLevel: number;
-  lintCommands: LintCommand[];
-  customRegexes: CustomReplace[];
-  commonStyles: CommonStyles;
-}
 
 export enum RuleType {
   YAML = 'YAML',
