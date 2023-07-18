@@ -294,491 +294,491 @@ export default {
     },
     // emphasis-style.ts
     'emphasis-style': {
-      'name': 'Emphasis Style',
-      'description': 'Makes sure the emphasis style is consistent.',
+      'name': 'Vurgu Stili',
+      'description': 'Vurgu stilinin tutarlı olmasını sağlar.',
       'style': {
-        'name': 'Style',
-        'description': 'The style used to denote emphasized content',
+        'name': 'Stil',
+        'description': 'Vurgulanan içeriği belirtmek için kullanılan stil',
       },
     },
     // empty-line-around-blockquotes.ts
     'empty-line-around-blockquotes': {
-      'name': 'Empty Line Around Blockquotes',
-      'description': 'Ensures that there is an empty line around blockquotes unless they start or end a document. **Note: an empty line is either one less level of nesting for blockquotes or a newline character.**',
+      'name': 'Alıntı Bloklarının Etrafında Boş Satır',
+      'description': 'Bir belgenin başını veya sonunu başlatmayan alıntı blokların etrafında boş bir satır olmalıdır. **Not: boş bir satır ya alıntı bloklar için bir seviye daha az girinti veya yeni bir satır karakteri demektir.**',
     },
     // empty-line-around-code-fences.ts
     'empty-line-around-code-fences': {
-      'name': 'Empty Line Around Code Fences',
-      'description': 'Ensures that there is an empty line around code fences unless they start or end a document.',
+      'name': 'Kod Çitlerinin Etrafında Boş Satır',
+      'description': 'Bir belgenin başını veya sonunu başlatmayan kod çitlerinin etrafında boş bir satır olmalıdır.',
     },
     // empty-line-around-math-block.ts
     'empty-line-around-math-blocks': {
-      'name': 'Empty Line Around Math Blocks',
-      'description': 'Ensures that there is an empty line around math blocks using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.',
+      'name': 'Matematik Bloklarının Etrafında Boş Satır',
+      'description': 'Tek satırlık matematik için bir matematik bloğunu belirtmek için kaç dolar işareti olduğunu belirleyen `Dolar İşaretlerinin Sayısıyla Matematik Bloğunu Belirt` kullanılarak matematik bloklarının etrafında boş bir satır olmalıdır.',
     },
     // empty-line-around-tables.ts
     'empty-line-around-tables': {
-      'name': 'Empty Line Around Tables',
-      'description': 'Ensures that there is an empty line around github flavored tables unless they start or end a document.',
+      'name': 'Tabloların Etrafında Boş Satır',
+      'description': 'Bir belgenin başını veya sonunu başlatmayan github flavored tabloların etrafında boş bir satır olmalıdır.',
     },
     // escape-yaml-special-characters.ts
     'escape-yaml-special-characters': {
-      'name': 'Escape YAML Special Characters',
-      'description': 'Escapes colons with a space after them (: ), single quotes (\'), and double quotes (") in YAML.',
+      'name': 'YAML Özel Karakterlerine Kaçış İşlemi Yap',
+      'description': 'YAML içindeki boşlukla beraber gelen iki nokta üst üste (:), tek tırnak (\') ve çift tırnak (") karakterlerini kaçış işlemine tabi tutar.',
       'try-to-escape-single-line-arrays': {
-        'name': 'Try to Escape Single Line Arrays',
-        'description': 'Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".',
+        'name': 'Tek Satırlık Listeleri Kaçış Denemesi',
+        'description': 'Bir dizinin "[" ile başladığını, "]" ile bittiğini ve öğelerin "," ile ayrıldığını varsayarak dizi değerlerini kaçış işlemine tabi tutmaya çalışır.',
       },
     },
     // file-name-heading.ts
     'file-name-heading': {
-      'name': 'File Name Heading',
-      'description': 'Inserts the file name as a H1 heading if no H1 heading exists.',
+      'name': 'Dosya Adı Başlığı',
+      'description': 'Eğer hiç H1 başlığı yoksa dosya adını H1 başlığı olarak ekler.',
     },
     // footnote-after-punctuation.ts
     'footnote-after-punctuation': {
-      'name': 'Footnote after Punctuation',
-      'description': 'Ensures that footnote references are placed after punctuation, not before.',
+      'name': 'Noktalama İşaretinden Sonra Dipnot',
+      'description': 'Dipnot referanslarının noktalama işaretinden önce değil, sonra yerleştirildiğinden emin olur.',
     },
     // force-yaml-escape.ts
     'force-yaml-escape': {
-      'name': 'Force YAML Escape',
-      'description': 'Escapes the values for the specified YAML keys.',
+      'name': 'YAML Kaçışını Zorla',
+      'description': 'Belirtilen YAML anahtarları için kaçış değerleri.',
       'force-yaml-escape-keys': {
-        'name': 'Force YAML Escape on Keys',
-        'description': 'Uses the YAML escape character on the specified YAML keys separated by a new line character if it is not already escaped. Do not use on YAML arrays.',
+        'name': 'Anahtarlarda YAML Kaçışını Zorla',
+        'description': 'Yeni bir satır karakteri ile ayrılmış belirtilen YAML anahtarlarında YAML kaçış karakterini kullanır, eğer zaten kaçış yapılmamışsa. YAML dizilerinde kullanmayın',
       },
     },
     // format-tags-in-yaml.ts
     'format-tags-in-yaml': {
-      'name': 'Format Tags in YAML',
-      'description': 'Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.',
+      'name': 'YAML Etiketlerini Biçimlendir',
+      'description': 'YAML ön madde içindeki etiketlerden hashtagleri kaldırır, çünkü bunlar etiketleri geçersiz kılar.',
     },
     // format-yaml-array.ts
     'format-yaml-array': {
-      'name': 'Format YAML Array',
-      'description': 'Allows for the formatting of regular YAML arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific YAML formats. **Note: that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.**',
+      'name': 'YAML Dizisini Biçimlendir',
+      'description': 'Normal YAML dizilerinin çok satırlı veya tek satırlı olarak biçimlendirilmesine izin verir ve `tags` ve `aliases` bazı Obsidian özgü özelliklerine sahip YAML formatlarında bulunabilir. **Not: Tek girişli bir diziden birden fazla girişi olan tek satırlı bir diziye geçmek aynıdır, tek fark çok satırlı bir dizi olmasıdır.**',
       'alias-key': {
-        'name': 'Format YAML aliases section',
-        'description': 'Turns on formatting for the YAML aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.',
+        'name': 'YAML takma adları bölümünü biçimlendir',
+        'description': 'YAML takma adları bölümü için biçimlendirmeyi açar. Bu seçeneği `YAML Title Alias` kuralıyla birlikte kullanmamanız önerilir çünkü birlikte düzgün çalışmayabilir veya farklı biçimlendirme stilleri seçilmiş olabilir, bu beklenmeyen sonuçlara yol açabilir.',
       },
       'tag-key': {
-        'name': 'Format YAML tags section',
-        'description': 'Turns on formatting for the YAML tags section.',
+        'name': 'YAML etiketleri bölümünü biçimlendir',
+        'description': 'YAML etiketleri bölümü için biçimlendirmeyi açar.',
       },
       'default-array-style': {
-        'name': 'Default YAML array section style',
-        'description': 'The style of other YAML arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays`',
+        'name': 'Varsayılan YAML dizi bölümü stili',
+        'description': '`tags`, `aliases` veya `Force key values to be single-line arrays` ve `Force key values to be multi-line arrays` olmayan diğer YAML dizilerinin stili',
       },
       'default-array-keys': {
-        'name': 'Format YAML array sections',
-        'description': 'Turns on formatting for regular YAML arrays',
+        'name': 'YAML dizi bölümlerini biçimlendir',
+        'description': 'Normal YAML dizileri için biçimlendirmeyi açar',
       },
       'force-single-line-array-style': {
-        'name': 'Force key values to be single-line arrays',
-        'description': 'Forces the YAML array for the new line separated keys to be in single-line format (leave empty to disable this option)',
+        'name': 'Anahtar değerlerini tek satırlı dizilere zorla',
+        'description': 'Yeni satır ile ayrılan anahtarlar için YAML dizisini tek satırlı formatta olmaya zorlar (bu seçeneği devre dışı bırakmak için boş bırakın)',
       },
       'force-multi-line-array-style': {
-        'name': 'Force key values to be multi-line arrays',
-        'description': 'Forces the YAML array for the new line separated keys to be in multi-line format (leave empty to disable this option)',
+        'name': 'Anahtar değerlerini çok satırlı dizilere zorla',
+        'description': 'Yeni satır ile ayrılan anahtarlar için YAML dizisini çok satırlı formatta olmaya zorlar (bu seçeneği devre dışı bırakmak için boş bırakın)',
       },
     },
     // header-increment.ts
     'header-increment': {
-      'name': 'Header Increment',
-      'description': 'Heading levels should only increment by one level at a time',
+      'name': 'Başlık Artırımı',
+      'description': 'Başlık seviyeleri bir seferde sadece bir seviye artmalıdır',
       'start-at-h2': {
-        'name': 'Start Header Increment at Heading Level 2',
-        'description': 'Makes heading level 2 the minimum heading level in a file for header increment and shifts all headings accordingly so they increment starting with a level 2 heading.',
+        'name': 'Başlık Artırımını Başlık Seviyesi 2’de Başlat',
+        'description': 'Bir dosyadaki minimum başlık seviyesini başlık seviyesi 2 yapar ve buna göre tüm başlıkları kaydırır, böylece başlık artışı seviye 2 başlığı ile başlar.',
       },
     },
     // heading-blank-lines.ts
     'heading-blank-lines': {
-      'name': 'Heading blank lines',
-      'description': 'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',
+      'name': 'Başlık Boş Satırları',
+      'description': 'Tüm başlıkların hem öncesinde hem de sonrasında birer boş satır olmalıdır (başlık belgenin başında veya sonunda olduğunda bu durum geçerli değildir).',
       'bottom': {
-        'name': 'Bottom',
-        'description': 'Insert a blank line after headings',
+        'name': 'Alt',
+        'description': 'Başlıkların sonrasına boş satır ekler',
       },
       'empty-line-after-yaml': {
-        'name': 'Empty Line Between YAML and Header',
-        'description': 'Keep the empty line between the YAML frontmatter and header',
+        'name': 'YAML ve Başlık Arasında Boş Satır',
+        'description': 'YAML ön madde ve başlık arasındaki boş satırı korur',
       },
     },
     // headings-start-line.ts
     'headings-start-line': {
-      'name': 'Headings Start Line',
-      'description': 'Headings that do not start a line will have their preceding whitespace removed to make sure they get recognized as headers.',
+      'name': 'Başlıklar Satırı Başlatır',
+      'description': 'Bir satırı başlatmayan başlıkların öncesi boşlukları kaldırılır ki başlıklar başlık olarak tanınabilsin.',
     },
     // insert-yaml-attributes.ts
     'insert-yaml-attributes': {
-      'name': 'Insert YAML attributes',
-      'description': 'Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.',
+      'name': 'YAML Özniteliklerini Ekle',
+      'description': 'Verilen YAML özniteliklerini YAML ön maddesine ekler. Her özniteliği tek bir satıra koyun.',
       'text-to-insert': {
-        'name': 'Text to insert',
-        'description': 'Text to insert into the YAML frontmatter',
+        'name': 'Eklenecek metin',
+        'description': 'YAML ön maddesine eklenen metin',
       },
     },
     // line-break-at-document-end.ts
     'line-break-at-document-end': {
-      'name': 'Line Break at Document End',
-      'description': 'Ensures that there is exactly one line break at the end of a document.',
+      'name': 'Belge Sonunda Satır Sonu',
+      'description': 'Bir belgenin sonunda tam olarak bir satır sonu olduğunu garanti eder.',
     },
     // move-footnotes-to-the-bottom.ts
     'move-footnotes-to-the-bottom': {
-      'name': 'Move Footnotes to the bottom',
-      'description': 'Move all footnotes to the bottom of the document.',
+      'name': 'Dipnotları Altbilgiye Taşı',
+      'description': 'Tüm dipnotları belgenin altına taşır.',
     },
     // move-math-block-indicators-to-their-own-line.ts
     'move-math-block-indicators-to-their-own-line': {
-      'name': 'Move Math Block Indicators to Their Own Line',
-      'description': 'Move all starting and ending math block indicators to their own lines using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.',
+      'name': 'Matematik Blok Göstergelerini Kendi Satırlarına Taşı',
+      'description': 'Tek satırlı matematik için kaç dolar işaretinin bir matematik bloğunu gösterdiğini belirlemek için "Bir Matematik Bloğu Göstermek İçin Dolar İşareti Sayısı"nı kullanarak tüm başlangıç ve bitiş matematik bloğu göstergelerini kendi satırlarına taşıyın.',
     },
     // move-tags-to-yaml.ts
     'move-tags-to-yaml': {
-      'name': 'Move Tags to YAML',
-      'description': 'Move all tags to YAML frontmatter of the document.',
+      'name': 'Etiketleri YAML\'a Taşı',
+      'description': 'Tüm etiketleri belgenin YAML ön maddesine taşır.',
       'how-to-handle-existing-tags': {
-        'name': 'Body tag operation',
-        'description': 'What to do with non-ignored tags in the body of the file once they have been moved to the frontmatter',
+        'name': 'Metin içindeki etiket işlemi',
+        'description': 'Ön maddeye taşındıktan sonra dosyanın içeriğinde bulunan ve yoksayılmayan etiketlerle ne yapılacağı',
       },
       'tags-to-ignore': {
-        'name': 'Tags to ignore',
-        'description': 'The tags that will not be moved to the tags array or removed from the body content if `Remove the hashtag from tags in content body` is enabled. Each tag should be on a new line and without the `#`. **Make sure not to include the hashtag in the tag name.**',
+        'name': 'Yoksayılacak etiketler',
+        'description': 'İçerik gövdesindeki hashtag\'lerden kaldırma etkinleştirilmişse, etiketler dizisine taşınmayacak veya içerik gövdesinden kaldırılmayacak etiketler. Her etiket yeni bir satırda ve `#` olmadan olmalıdır. **Etiket adında hashtag içermediğinizden emin olun.**',
       },
     },
     // no-bare-urls.ts
     'no-bare-urls': {
-      'name': 'No Bare URLs',
-      'description': 'Encloses bare URLs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.',
+      'name': 'Yalın URL\'ler Olmasın',
+      'description': 'Yalın URL\'leri açılı ayraçlar ile kuşatır, tek veya çift tırnak, köşeli parantez veya eğik kesme işareti içinde değilse.',
     },
     // ordered-list-style.ts
     'ordered-list-style': {
-      'name': 'Ordered List Style',
-      'description': 'Makes sure that ordered lists follow the style specified. **Note: that 2 spaces or 1 tab is considered to be an indentation level.**',
+      'name': 'Sıralı Liste Stili',
+      'description': 'Sıralı listelerin belirtilen stili izlemesini sağlar. **Not: 2 boşluk veya 1 sekme bir girinti seviyesi olarak kabul edilir.**',
       'number-style': {
-        'name': 'Number Style',
-        'description': 'The number style used in ordered list indicators',
+        'name': 'Numara Stili',
+        'description': 'Sıralı liste göstergelerinde kullanılan numara stili',
       },
       'list-end-style': {
-        'name': 'Ordered List Indicator End Style',
-        'description': 'The ending character of an ordered list indicator',
+        'name': 'Sıralı Liste Gösterge Sonu Stili',
+        'description': 'Bir sıralı liste göstergesinin bitiş karakteri',
       },
     },
     // paragraph-blank-lines.ts
     'paragraph-blank-lines': {
-      'name': 'Paragraph blank lines',
-      'description': 'All paragraphs should have exactly one blank line both before and after.',
+      'name': 'Paragraf Boş Satırları',
+      'description': 'Tüm paragrafların hem önce hem sonra tam olarak bir boş satırı olmalıdır.',
     },
     // prevent-double-checklist-indicator-on-paste.ts
     'prevent-double-checklist-indicator-on-paste': {
-      'name': 'Prevent Double Checklist Indicator on Paste',
-      'description': 'Removes starting checklist indicator from the text to paste if the line the cursor is on in the file has a checklist indicator',
+      'name': 'Yapıştırmada Çift Kontrol Listesi Göstergesini Önle',
+      'description': 'Kursörün dosyadaki satırda bir kontrol listesi göstergesi varsa, yapıştırılacak metinden başlangıç kontrol listesi göstergesini kaldırır',
     },
     // prevent-double-list-item-indicator-on-paste.ts
     'prevent-double-list-item-indicator-on-paste': {
-      'name': 'Prevent Double List Item Indicator on Paste',
-      'description': 'Removes starting list indicator from the text to paste if the line the cursor is on in the file has a list indicator',
+      'name': 'Yapıştırmada Çift Liste Öğesi Göstergesini Önle',
+      'description': 'Kursörün dosyadaki satırda bir liste göstergesi varsa, yapıştırılacak metinden başlangıç listesi göstergesini kaldırır',
     },
     // proper-ellipsis-on-paste.ts
     'proper-ellipsis-on-paste': {
-      'name': 'Proper Ellipsis on Paste',
-      'description': 'Replaces three consecutive dots with an ellipsis even if they have a space between them in the text to paste',
+      'name': 'Yapıştırmada Uygun Üç Nokta',
+      'description': 'Yapıştırılacak metinde aralarında boşluk olsa bile ardışık üç noktayı, üç nokta karakteriyle ile değiştirir',
     },
     // proper-ellipsis.ts
     'proper-ellipsis': {
-      'name': 'Proper Ellipsis',
-      'description': 'Replaces three consecutive dots with an ellipsis.',
+      'name': 'Uygun Üç Nokta',
+      'description': 'Ardışık üç tane noktayı, üç nokta karakteriyle değiştirir.',
     },
     // quote-style.ts
     'quote-style': {
-      'name': 'Quote Style',
-      'description': 'Updates the quotes in the body content to be updated to the specified single and double quote styles.',
+      'name': 'üç nokta karakteriyle',
+      'description': 'Gövde içeriğindeki alıntıları belirtilen tek ve çift alıntı stillerine günceller.',
       'single-quote-enabled': {
-        'name': 'Enable `Single Quote Style`',
-        'description': 'Specifies that the selected single quote style should be used.',
+        'name': '`Tek Alıntı Stili` Kullanımı',
+        'description': 'Seçilen tek alıntı stilinin kullanılacağını belirtir.',
       },
       'single-quote-style': {
-        'name': 'Single Quote Style',
-        'description': 'The style of single quotes to use.',
+        'name': 'Tek Alıntı Stili',
+        'description': 'Kullanılacak tek alıntı stilidir.',
       },
       'double-quote-enabled': {
-        'name': 'Enable `Double Quote Style`',
-        'description': 'Specifies that the selected double quote style should be used.',
+        'name': '`Çift Alıntı Stili` Kullanımı',
+        'description': 'Seçilen çift alıntı stilinin kullanılacağını belirtir.',
       },
       'double-quote-style': {
-        'name': 'Double Quote Style',
-        'description': 'The style of double quotes to use.',
+        'name': 'Çift Alıntı Stili',
+        'description': 'Kullanılacak çift alıntı stilidir.',
       },
     },
     // re-index-footnotes.ts
     're-index-footnotes': {
-      'name': 'Re-Index Footnotes',
-      'description': 'Re-indexes footnote keys and footnote, based on the order of occurrence. **Note: This rule does _not_ work if there is more than one footnote for a key.**',
+      'name': 'Dipnotları Yeniden İndeksle',
+      'description': 'Dipnot anahtarlarını ve dipnotları, oluşum sırasına göre yeniden indeksler. **Not: Bir anahtar için birden fazla dipnot varsa, bu kural çalışmaz.**',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
-      'name': 'Remove Consecutive List Markers',
-      'description': 'Removes consecutive list markers. Useful when copy-pasting list items.',
+      'name': 'Ardışık Liste İşaretlerini Kaldır',
+      'description': 'Ardışık liste işaretlerini kaldırır. Liste öğelerini kopyala-yapıştır yaparken kullanışlıdır.',
     },
     // remove-empty-lines-between-list-markers-and-checklists.ts
     'remove-empty-lines-between-list-markers-and-checklists': {
-      'name': 'Remove Empty Lines Between List Markers and Checklists',
-      'description': 'There should not be any empty lines between list markers and checklists.',
+      'name': 'Liste İşaretleri ve Kontrol Listeleri Arasındaki Boş Satırları Kaldır',
+      'description': 'Liste işaretleri ve kontrol listeleri arasında boş satır olmamalıdır.',
     },
     // remove-empty-list-markers.ts
     'remove-empty-list-markers': {
-      'name': 'Remove Empty List Markers',
-      'description': 'Removes empty list markers, i.e. list items without content.',
+      'name': 'Boş Liste İşaretçilerini Kaldır',
+      'description': 'Boş liste işaretçilerini, yani içeriksiz liste öğelerini kaldırır.',
     },
     // remove-hyphenated-line-breaks.ts
     'remove-hyphenated-line-breaks': {
-      'name': 'Remove Hyphenated Line Breaks',
+      'name': 'Tireli Satır Sonlarını Kaldır',
       'description': 'Removes hyphenated line breaks. Useful when pasting text from textbooks.',
     },
     // remove-hyphens-on-paste.ts
     'remove-hyphens-on-paste': {
-      'name': 'Remove Hyphens on Paste',
-      'description': 'Removes hyphens from the text to paste',
+      'name': 'Yapıştırırken Tireleri Kaldır',
+      'description': 'Yapıştırılacak metindeki tireleri kaldırır',
     },
     // remove-leading-or-trailing-whitespace-on-paste.ts
     'remove-leading-or-trailing-whitespace-on-paste': {
-      'name': 'Remove Leading or Trailing Whitespace on Paste',
-      'description': 'Removes any leading non-tab whitespace and all trailing whitespace for the text to paste',
+      'name': 'Yapıştırda Öndeki veya Sondaki Boşlukları Kaldır',
+      'description': 'Yapıştırılacak metnin başındaki sekme olmayan boşlukları ve sonundaki tüm boşlukları kaldırır',
     },
     // remove-leftover-footnotes-from-quote-on-paste.ts
     'remove-leftover-footnotes-from-quote-on-paste': {
-      'name': 'Remove Leftover Footnotes from Quote on Paste',
-      'description': 'Removes any leftover footnote references for the text to paste',
+      'name': 'Yapıştırmada Alıntıdan Kalan Dipnotları Kaldır',
+      'description': 'Yapıştırılacak metinden herhangi bir kalıntı dipnot referanslarını kaldırır',
     },
     // remove-link-spacing.ts
     'remove-link-spacing': {
-      'name': 'Remove link spacing',
-      'description': 'Removes spacing around link text.',
+      'name': 'Link Aralığını Kaldır',
+      'description': 'Link metninin etrafındaki boşlukları kaldırır.',
     },
     // remove-multiple-blank-lines-on-paste.ts
     'remove-multiple-blank-lines-on-paste': {
-      'name': 'Remove Multiple Blank Lines on Paste',
-      'description': 'Condenses multiple blank lines down into one blank line for the text to paste',
+      'name': 'Yapıştırırken Birden Fazla Boş Satırı Kaldır',
+      'description': 'Metnin yapıştırılması için birden çok boş satırı tek bir boş satıra sıkıştırır',
     },
     // remove-multiple-spaces.ts
     'remove-multiple-spaces': {
-      'name': 'Remove Multiple Spaces',
-      'description': 'Removes two or more consecutive spaces. Ignores spaces at the beginning and ending of the line. ',
+      'name': 'Birden Fazla Boşluğu Kaldır',
+      'description': 'İki veya daha fazla ardışık boşluğu kaldırır. Satırın başındaki ve sonundaki boşlukları görmezden gelir. ',
     },
     // remove-space-around-characters.ts
     'remove-space-around-characters': {
-      'name': 'Remove Space around Characters',
-      'description': 'Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). **Note: this may causes issues with markdown format in some cases.**',
+      'name': 'Karakterler Etrafındaki Boşluğu Kaldır',
+      'description': 'Belirli karakterlerin boşluklarla (tek boşluk veya sekme) çevrelenmemesini sağlar. **Not: Bu, bazı durumlarda indirim biçimiyle ilgili sorunlara neden olabilir.**',
       'include-fullwidth-forms': {
-        'name': 'Include Fullwidth Forms',
-        'description': 'Include <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Fullwidth Forms Unicode block</a>',
+        'name': 'Tam Genişlikte Formları Dahil Et',
+        'description': '<a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Tam Genişlikte Formlar Unicode bloğunu</a> dahil eder',
       },
       'include-cjk-symbols-and-punctuation': {
-        'name': 'Include CJK Symbols and Punctuation',
-        'description': 'Include <a href="https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation">CJK Symbols and Punctuation Unicode block</a>',
+        'name': 'CJK Sembol ve Noktalama İşaretlerini Dahil Et',
+        'description': '<a href="https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation">CJK Sembol ve Noktalama Unicode bloğunu</a> dahil eder',
       },
       'include-dashes': {
-        'name': 'Include Dashes',
-        'description': 'Include en dash (–) and em dash (—)',
+        'name': 'Tireleri Dahil Et',
+        'description': 'En tire (–) ve em tireyi (—) dahil eder',
       },
       'other-symbols': {
-        'name': 'Other symbols',
-        'description': 'Other symbols to include',
+        'name': 'Diğer Semboller',
+        'description': 'Dahil edilecek diğer semboller',
       },
     },
     // remove-space-before-or-after-characters.ts
     'remove-space-before-or-after-characters': {
-      'name': 'Remove Space Before or After Characters',
-      'description': 'Removes space before the specified characters and after the specified characters. **Note: this may causes issues with markdown format in some cases.**',
+      'name': 'Karakterlerden Önce veya Sonra Boşluğu Kaldır',
+      'description': 'Belirtilen karakterlerden önceki ve sonraki boşluğu kaldırır. **Not: bu durum bazı durumlarda markdown formatında sorunlara neden olabilir.**',
       'characters-to-remove-space-before': {
-        'name': 'Remove Space Before Characters',
-        'description': 'Removes space before the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.**',
+        'name': 'Önceki Boşluğu Kaldırılacak Karakterler',
+        'description': 'Belirtilen karakterlerden önceki boşluğu kaldırır. **Not: karakter listesinde `{` veya `}` kullanmak, sahne arkasında yoksayma sözdizimi kullanıldığı için dosyaları beklenmedik şekilde etkiler.**',
       },
       'characters-to-remove-space-after': {
-        'name': 'Remove Space After Characters',
-        'description': 'Removes space after the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.**',
+        'name': 'Sonraki Boşluğu Kaldırılacak Karakterler',
+        'description': 'Belirtilen karakterlerden sonraki boşluğu kaldırır. **Not: karakter listesinde `{` veya `}` kullanmak, sahne arkasında yoksayma sözdizimi kullanıldığı için dosyaları beklenmedik şekilde etkiler.**',
       },
     },
     // remove-trailing-punctuation-in-heading.ts
     'remove-trailing-punctuation-in-heading': {
-      'name': 'Remove Trailing Punctuation in Heading',
-      'description': 'Removes the specified punctuation from the end of headings making sure to ignore the semicolon at the end of [HTML entity references](https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references).',
+      'name': 'Başlıklardaki Son Noktalama İşaretlerini Kaldır',
+      'description': 'Belirtilen noktalama işaretlerini başlıkların sonundan kaldırır ve [HTML varlık referanslarının](https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references) sonundaki noktalı virgülü yoksayar.',
       'punctuation-to-remove': {
-        'name': 'Trailing Punctuation',
-        'description': 'The trailing punctuation to remove from the headings in the file.',
+        'name': 'Sondaki Noktalama',
+        'description': 'Dosyadaki başlıklardan kaldırılacak noktalama işaretleri.',
       },
     },
     // remove-yaml-keys.ts
     'remove-yaml-keys': {
-      'name': 'Remove YAML Keys',
-      'description': 'Removes the YAML keys specified',
+      'name': 'YAML Anahtarlarını Kaldır',
+      'description': 'Belirtilen YAML anahtarlarını kaldırır',
       'yaml-keys-to-remove': {
-        'name': 'YAML Keys to Remove',
-        'description': 'The YAML keys to remove from the YAML frontmatter with or without colons',
+        'name': 'Kaldırılacak YAML Anahtarları',
+        'description': 'YAML ön maddesinden iki nokta üst üste ile veya olmadan kaldırılacak YAML anahtarları',
       },
     },
     // space-after-list-markers.ts
     'space-after-list-markers': {
-      'name': 'Space after list markers',
-      'description': 'There should be a single space after list markers and checkboxes.',
+      'name': 'Liste İşaretlerinden Sonra Boşluk',
+      'description': 'Liste işaretleri ve onay kutularından sonra tek bir boşluk olmalıdır',
     },
     // space-between-chinese-japanese-or-korean-and-english-or-numbers.ts
     'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
-      'name': 'Space between Chinese Japanese or Korean and English or numbers',
-      'description': 'Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)',
+      'name': 'Çince, Japonca veya Korece ve İngilizce veya Sayılar Arasında Boşluk',
+      'description': 'Çince, Japonca veya Korece ve İngilizce veya sayılar arasında tek bir boşluk olması gerektiğini sağlar. Bu [kuralları](https://github.com/sparanoid/chinese-copywriting-guidelines) takip eder',
     },
     // strong-style.ts
     'strong-style': {
-      'name': 'Strong Style',
-      'description': 'Makes sure the strong style is consistent.',
+      'name': 'Kalın Stil',
+      'description': 'Kalın stilin tutarlı olduğunu garanti eder.',
       'style': {
-        'name': 'Style',
-        'description': 'The style used to denote strong/bolded content',
+        'name': 'Stil',
+        'description': 'Kalın/yoğun içeriği belirtmek için kullanılan stil',
       },
     },
     // trailing-spaces.ts
     'trailing-spaces': {
-      'name': 'Trailing spaces',
-      'description': 'Removes extra spaces after every line.',
+      'name': 'Sondaki boşluklar',
+      'description': 'Her satırın sonundaki fazladan boşlukları kaldırır.',
       'twp-space-line-break': {
-        'name': 'Two Space Linebreak',
-        'description': 'Ignore two spaces followed by a line break ("Two Space Rule").',
+        'name': 'İki Boşluklu Satır Sonu',
+        'description': 'Bir satır sonunu takiben iki boşluğu göz ardı et ("İki Boşluk Kuralı").',
       },
     },
     // two-spaces-between-lines-with-content.ts
     'two-spaces-between-lines-with-content': {
-      'name': 'Two Spaces Between Lines with Content',
-      'description': 'Makes sure that two spaces are added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items',
+      'name': 'İçeriği Olan Satırlar Arasında İki Boşluk',
+      'description': 'İçeriği devam eden satırların sonuna paragraflar, blok alıntıları ve liste öğeleri için iki boşluk eklenmesini sağlar',
     },
     // unordered-list-style.ts
     'unordered-list-style': {
-      'name': 'Unordered List Style',
-      'description': 'Makes sure that unordered lists follow the style specified.',
+      'name': 'Sırasız Liste Stili',
+      'description': 'Sırasız listelerin belirtilen stili takip ettiğinden emin olur.',
       'list-style': {
-        'name': 'List item style',
-        'description': 'The list item style to use in unordered lists',
+        'name': 'Liste öğesi stili',
+        'description': 'Sırasız listelerde kullanılacak liste öğesi stili',
       },
     },
     // yaml-key-sort.ts
     'yaml-key-sort': {
-      'name': 'YAML Key Sort',
-      'description': 'Sorts the YAML keys based on the order and priority specified. **Note: may remove blank lines as well.**',
+      'name': 'YAML Anahtar Sıralaması',
+      'description': 'YAML anahtarlarını belirtilen sıra ve önceliğe göre sıralar. **Not: boş satırları da kaldırabilir.**',
       'yaml-key-priority-sort-order': {
-        'name': 'YAML Key Priority Sort Order',
-        'description': 'The order in which to sort keys with one on each line where it sorts in the order found in the list',
+        'name': 'YAML Anahtar Öncelik Sıralama Düzeni',
+        'description': 'Her satırda bir tane olacak şekilde anahtarların hangi sırayla sıralanacağı',
       },
       'priority-keys-at-start-of-yaml': {
-        'name': 'Priority Keys at Start of YAML',
-        'description': 'YAML Key Priority Sort Order is placed at the start of the YAML frontmatter',
+        'name': 'Öncelikli Anahtarlar YAML\'ın Başında',
+        'description': 'YAML Anahtar Öncelik Sıralama Düzeni, YAML ön maddesinin başında yer alır',
       },
       'yaml-sort-order-for-other-keys': {
-        'name': 'YAML Sort Order for Other Keys',
-        'description': 'The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area',
+        'name': 'Diğer Anahtarlar İçin YAML Sıralama Düzeni',
+        'description': 'YAML Anahtar Öncelik Sıralama Düzeni metin alanında bulunmayan anahtarları nasıl sıralayacağı',
       },
     },
     // yaml-timestamp.ts
     'yaml-timestamp': {
-      'name': 'YAML Timestamp',
-      'description': 'Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.',
+      'name': 'YAML Zaman Damgası',
+      'description': 'Dosyanın son düzenlendiği tarihi YAML ön maddesinde takip eder. Tarihler dosya metadatasından alınır.',
       'date-created': {
-        'name': 'Date Created',
-        'description': 'Insert the file creation date',
+        'name': 'Oluşturma Tarihi',
+        'description': 'Dosyanın oluşturma tarihini ekler',
       },
       'date-created-key': {
-        'name': 'Date Created Key',
-        'description': 'Which YAML key to use for creation date',
+        'name': 'Oluşturma Tarihi Anahtarı',
+        'description': 'Oluşturma tarihi için hangi YAML anahtarını kullanacağı',
       },
       'force-retention-of-create-value': {
-        'name': 'Force Date Created Key Value Retention',
-        'description': 'Reuses the value in the YAML frontmatter for date created instead of the file metadata which is useful for preventing file metadata changes from causing the value to change to a different value.',
+        'name': 'Oluşturma Tarihi Anahtar Değerinin Korunmasını Zorla',
+        'description': 'Dosya metadatası yerine YAML ön maddesindeki tarihi yeniden kullanır, bu da dosya metadatasındaki değişikliklerin değerin farklı bir değere değişmesine neden olmasını önler.',
       },
       'date-modified': {
-        'name': 'Date Modified',
-        'description': 'Insert the date the file was last modified',
+        'name': 'Değiştirme Tarihi',
+        'description': 'Dosyanın son değiştirildiği tarihi ekler',
       },
       'date-modified-key': {
-        'name': 'Date Modified Key',
-        'description': 'Which YAML key to use for modification date',
+        'name': 'Değiştirme Tarihi Anahtarı',
+        'description': 'Değiştirme tarihi için hangi YAML anahtarını kullanacağı',
       },
       'format': {
         'name': 'Format',
-        'description': 'Moment date format to use (see [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
+        'description': 'Kullanılacak Zaman formatı (bakınız [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
       },
     },
     // yaml-title-alias.ts
     'yaml-title-alias': {
-      'name': 'YAML Title Alias',
-      'description': 'Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
+      'name': 'YAML Başlık Takma Adı',
+      'description': 'Dosyanın başlığını YAML ön maddesinin takma adları bölümüne ekler. Başlığı ilk H1 veya dosya adından alır.',
       'preserve-existing-alias-section-style': {
-        'name': 'Preserve existing aliases section style',
-        'description': 'If set, the `YAML aliases section style` setting applies only to the newly created sections',
+        'name': 'Mevcut takma adlar bölüm stilini koru',
+        'description': 'Ayarlanırsa, `YAML takma adlar bölümü stili` ayarı yalnızca yeni oluşturulan bölümlere uygulanır',
       },
       'keep-alias-that-matches-the-filename': {
-        'name': 'Keep alias that matches the filename',
-        'description': 'Such aliases are usually redundant',
+        'name': 'Dosya adına uyan takma adı koru',
+        'description': 'Bu tür takma adlar genellikle gereksizdir',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': 'Use the YAML key `linter-yaml-title-alias` to help with filename and heading changes',
-        'description': 'If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array',
+        'name': '`linter-yaml-title-alias` YAML anahtarını kullanarak eski dosya adı ve başlık değişikliklerini takip et',
+        'description': 'Ayarlanırsa, ilk H1 başlığı değiştiğinde veya ilk H1 yoksa dosya adı değiştiğinde, bu anahtarda saklanan eski takma ad, takma adlar dizisine yeni bir giriş eklemek yerine yeni değerle değiştirilir',
       },
     },
     // yaml-title.ts
     'yaml-title': {
-      'name': 'YAML Title',
-      'description': 'Inserts the title of the file into the YAML frontmatter. Gets the title based on the selected mode.',
+      'name': 'YAML Başlık',
+      'description': 'Dosyanın başlığını YAML ön maddesine ekler. Başlık seçilen moda göre alınır.',
       'title-key': {
-        'name': 'Title Key',
-        'description': 'Which YAML key to use for title',
+        'name': 'Başlık Anahtarı',
+        'description': 'Başlık için hangi YAML anahtarını kullanacağı',
       },
       'mode': {
-        'name': 'Mode',
-        'description': 'The method to use to get the title',
+        'name': 'Mod',
+        'description': 'Başlığı almak için kullanılacak yöntem',
       },
     },
   },
 
   // These are the string values in the UI for enum values and thus they do not follow the key format as used above
   'enums': {
-    'Title Case': 'Title Case',
-    'ALL CAPS': 'ALL CAPS',
-    'First letter': 'First letter',
+    'Title Case': 'Baş Harfleri Büyük',
+    'ALL CAPS': 'TÜMÜ BÜYÜK HARF',
+    'First letter': 'İlk Harf',
     '.': '.', // leave as is
     ')': ')', // leave as is
-    'ERROR': 'error',
-    'TRACE': 'trace',
-    'DEBUG': 'debug',
-    'INFO': 'info',
-    'WARN': 'warn',
-    'SILENT': 'silent',
-    'ascending': 'ascending',
-    'lazy': 'lazy',
-    'Nothing': 'Nothing',
-    'Remove hashtag': 'Remove hashtag',
-    'Remove whole tag': 'Remove whole tag',
-    'asterisk': 'asterisk',
-    'underscore': 'underscore',
-    'consistent': 'consistent',
+    'ERROR': 'hata',
+    'TRACE': 'işaret',
+    'DEBUG': 'hata ayıklama',
+    'INFO': 'bilgi',
+    'WARN': 'uyarı',
+    'SILENT': 'sessiz',
+    'ascending': 'artan',
+    'lazy': 'tembel',
+    'Nothing': 'Hiçbiri',
+    'Remove hashtag': 'Hashtagi Kaldır',
+    'Remove whole tag': 'Tüm Etiketi Kaldır',
+    'asterisk': 'yıldız',
+    'underscore': 'alt çizgi',
+    'consistent': 'tutarlı',
     '-': '-', // leave as is
     '*': '*', // leave as is
     '+': '+', // leave as is
-    'space': 'space',
-    'no space': 'no space',
-    'None': 'None',
-    'Ascending Alphabetical': 'Ascending Alphabetical',
-    'Descending Alphabetical': 'Descending Alphabetical',
+    'space': 'boşluk',
+    'no space': 'boşluk yok',
+    'None': 'Yok',
+    'Ascending Alphabetical': 'Artan Alfabetik',
+    'Descending Alphabetical': 'Azalan Alfabetik',
     // yaml.ts
-    'multi-line': 'multi-line',
-    'single-line': 'single-line',
-    'single string to single-line': 'single string to single-line',
-    'single string to multi-line': 'single string to multi-line',
-    'single string comma delimited': 'single string comma delimited',
-    'single string space delimited': 'single string space delimited',
-    'single-line space delimited': 'single-line space delimited',
+    'multi-line': 'çoklu-satır',
+    'single-line': 'tek-satır',
+    'single string to single-line': 'tek dizeden tek satıra',
+    'single string to multi-line': 'tek dizeden çok satıra',
+    'single string comma delimited': 'virgülle ayrılmış tek dize',
+    'single string space delimited': 'boşlukla ayrılmış tek dize',
+    'single-line space delimited': 'boşlukla ayrılmış tek satır',
     // yaml-title.ts
-    'first-h1': 'First H1',
-    'first-h1-or-filename-if-h1-missing': 'First H1 or Filename if H1 is Missing',
-    'filename': 'Filename',
+    'first-h1': 'İlk H1',
+    'first-h1-or-filename-if-h1-missing': 'İlk H1 veya H1 Eksikse Dosya Adı',
+    'filename': 'Dosya Adı',
     // quote-style.ts
     '\'\'': '\'\'', // leave as is
     '‘’': '‘’', // leave as is
