@@ -29,11 +29,5 @@ jobs:
         run: npm run build
       - name: Run unit tests
         run: npm test
-      - name: Run ESLint to fix errors
-        run: npm run lint
-      - name: Commit ESLint fixes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Bot: fix ESLint errors"
       - name: Run ESLint
         run: npx eslint . --ext .ts
