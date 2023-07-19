@@ -169,7 +169,7 @@ export default {
       },
     },
     'debug': {
-    // debug-tab.ts
+      // debug-tab.ts
       'log-level': {
         'name': 'Log Level',
         'description': 'The types of logs that will be allowed to be logged by the service. The default is ERROR.',

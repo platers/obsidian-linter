@@ -292,7 +292,9 @@ export default class LinterPlugin extends Plugin {
     const oldText = stripCr(await this.app.vault.read(file));
     const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
 
-    await this.app.vault.modify(file, newText);
+    if (oldText != newText) {
+      await this.app.vault.modify(file, newText);
+    }
 
     // Make sure this is disabled until we actually add something to let it work on folder and vault linting
     // this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
