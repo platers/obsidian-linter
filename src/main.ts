@@ -112,12 +112,7 @@ export default class LinterPlugin extends Plugin {
       id: 'lint-file',
       name: getTextInLanguage('commands.lint-file.name'),
       editorCallback: (editor) => {
-        setCollectLogs(this.settings.recordLintOnSaveLogs);
-        clearLogs();
-
         this.runLinterEditor(editor);
-
-        setCollectLogs(false);
       },
       icon: iconInfo.file.id,
       hotkeys: [
@@ -215,12 +210,7 @@ export default class LinterPlugin extends Plugin {
           const file = this.app.workspace.getActiveFile();
 
           if (!this.shouldIgnoreFile(file)) {
-            setCollectLogs(this.settings.recordLintOnSaveLogs);
-            clearLogs();
-
             this.runLinterEditor(editor);
-
-            setCollectLogs(false);
           }
         }
       };
@@ -240,7 +230,13 @@ export default class LinterPlugin extends Plugin {
         item.setIcon(iconInfo.file.id)
             .setTitle(getTextInLanguage('commands.lint-file-pop-up-menu-text.name'))
             .onClick(async () => {
-              this.runLinterFile(file);
+              const activeFile = this.app.workspace.getActiveFile();
+              const editor = this.getEditor();
+              if (activeFile === file && editor) {
+                this.runLinterEditor(editor);
+              } else {
+                this.runLinterFile(file);
+              }
             });
       });
     } else if (file instanceof TFolder) {
@@ -360,6 +356,9 @@ export default class LinterPlugin extends Plugin {
   }
 
   runLinterEditor(editor: Editor) {
+    setCollectLogs(this.settings.recordLintOnSaveLogs);
+    clearLogs();
+
     logInfo(getTextInLanguage('logs.linter-run'));
 
     const file = this.app.workspace.getActiveFile();
@@ -407,6 +406,8 @@ export default class LinterPlugin extends Plugin {
     } catch (error) {
       this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
     }
+
+    setCollectLogs(false);
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
