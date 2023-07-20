@@ -112,12 +112,7 @@ export default class LinterPlugin extends Plugin {
       id: 'lint-file',
       name: getTextInLanguage('commands.lint-file.name'),
       editorCallback: (editor) => {
-        setCollectLogs(this.settings.recordLintOnSaveLogs);
-        clearLogs();
-
-        this.runLinterEditor(editor);
-
-        setCollectLogs(false);
+        this.runLintEditorWithLogsIfApplicable(editor);
       },
       icon: iconInfo.file.id,
       hotkeys: [
@@ -215,12 +210,7 @@ export default class LinterPlugin extends Plugin {
           const file = this.app.workspace.getActiveFile();
 
           if (!this.shouldIgnoreFile(file)) {
-            setCollectLogs(this.settings.recordLintOnSaveLogs);
-            clearLogs();
-
-            this.runLinterEditor(editor);
-
-            setCollectLogs(false);
+            this.runLintEditorWithLogsIfApplicable(editor);
           }
         }
       };
@@ -240,7 +230,13 @@ export default class LinterPlugin extends Plugin {
         item.setIcon(iconInfo.file.id)
             .setTitle(getTextInLanguage('commands.lint-file-pop-up-menu-text.name'))
             .onClick(async () => {
-              this.runLinterFile(file);
+              const activeFile = this.app.workspace.getActiveFile();
+              const editor = this.getEditor();
+              if (activeFile === file && editor) {
+                this.runLintEditorWithLogsIfApplicable(editor);
+              } else {
+                this.runLinterFile(file);
+              }
             });
       });
     } else if (file instanceof TFolder) {
@@ -359,6 +355,15 @@ export default class LinterPlugin extends Plugin {
     new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder)).open();
   }
 
+
+  runLintEditorWithLogsIfApplicable(editor: Editor) {
+    setCollectLogs(this.settings.recordLintOnSaveLogs);
+    clearLogs();
+
+    this.runLinterEditor(editor);
+
+    setCollectLogs(false);
+  }
   runLinterEditor(editor: Editor) {
     logInfo(getTextInLanguage('logs.linter-run'));
 
