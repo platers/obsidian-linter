@@ -130,7 +130,7 @@ export default class LinterPlugin extends Plugin {
         const file = this.app.workspace.getActiveFile();
 
         if (!this.shouldIgnoreFile(file)) {
-          this.runLinterEditor(editor);
+          this.runLintEditorWithLogsIfApplicable(editor);
         }
       },
       icon: iconInfo.file.id,
