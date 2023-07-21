@@ -1,6 +1,6 @@
 import {Example, Options, Rule, RuleType, registerRule, wrapLintError} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
-import {logDebug} from '../utils/logger';
+import {logDebug, timingBegin, timingEnd} from '../utils/logger';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
 import {LinterSettings} from 'src/settings-data';
@@ -24,12 +24,17 @@ export abstract class RuleBuilderBase {
   static applyIfEnabledBase(rule: Rule, text: string, settings: LinterSettings, extraOptions: Options): [result: string, isEnabled: boolean] {
     const optionsFromSettings = rule.getOptions(settings);
     if (optionsFromSettings[rule.enabledOptionName()]) {
+      timingBegin(rule.alias);
       const options = Object.assign({}, optionsFromSettings, extraOptions) as Options;
       logDebug(`${getTextInLanguage('logs.run-rule-text')} ${rule.getName()}`);
 
       try {
-        return [rule.apply(text, options), true];
+        const newText = rule.apply(text, options);
+        timingEnd(rule.alias);
+
+        return [newText, true];
       } catch (error) {
+        timingEnd(rule.alias);
         wrapLintError(error, rule.getName());
       }
     } else {

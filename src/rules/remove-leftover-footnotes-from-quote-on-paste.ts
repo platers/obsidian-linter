@@ -27,12 +27,12 @@ export default class RemoveLeftoverFootnotesFromQuoteOnPaste extends RuleBuilder
         before: dedent`
           He was sure that he would get off without doing any time, but the cops had other plans.50
           ${''}
-          _Note that the format for footnote references to move is a dot or comma followed by any number of digits_
+          _Note that the format for footnote references to remove is a dot or comma followed by any number of digits_
         `,
         after: dedent`
           He was sure that he would get off without doing any time, but the cops had other plans
           ${''}
-          _Note that the format for footnote references to move is a dot or comma followed by any number of digits_
+          _Note that the format for footnote references to remove is a dot or comma followed by any number of digits_
         `,
       }),
     ];
