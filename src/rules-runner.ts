@@ -67,7 +67,6 @@ export class RulesRunner {
         continue;
       }
 
-      timingBegin(rule.alias);
       [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, runOptions.settings, {
         fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
         fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
@@ -79,7 +78,6 @@ export class RulesRunner {
         defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
         removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
       });
-      timingEnd(rule.alias);
     }
 
     const customRegexLogText = getTextInLanguage('logs.custom-regex');
