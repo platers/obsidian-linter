@@ -126,5 +126,46 @@ ruleTest({
         > Content
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/684
+      testName: 'Make sure that a nested set of callouts are not merged when only a blank lines is between them with no content',
+      before: dedent`
+        > [!multi-column]
+        >
+        >> [!note]+ Use Case
+        >> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        >> ##### User Case Background
+        >> Vitae nunc sed velit dignissim sodales. In cursus turpis massa tincidunt dui ut ornare lectus.
+        >
+        >> [!warning]+ Resources
+        >> #### Requirement
+        >> - Lorem ipsum dolor sit amet
+        >> - Vitae nunc sed velit dignissim sodales.
+        >> - In cursus turpis massa tincidunt dui ut ornare lectus.
+        >
+        >> [!todo]+
+        >> - [x] Define Use Case
+        >> - [ ] Craft User Story
+        >> - [ ] Develop draft sketches
+      `,
+      after: dedent`
+        > [!multi-column]
+        >
+        >> [!note]+ Use Case
+        >> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        >> ##### User Case Background
+        >> Vitae nunc sed velit dignissim sodales. In cursus turpis massa tincidunt dui ut ornare lectus.
+        >
+        >> [!warning]+ Resources
+        >> #### Requirement
+        >> - Lorem ipsum dolor sit amet
+        >> - Vitae nunc sed velit dignissim sodales.
+        >> - In cursus turpis massa tincidunt dui ut ornare lectus.
+        >
+        >> [!todo]+
+        >> - [x] Define Use Case
+        >> - [ ] Craft User Story
+        >> - [ ] Develop draft sketches
+      `,
+    },
   ],
 });

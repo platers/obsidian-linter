@@ -42,6 +42,7 @@ export const indentedOrBlockquoteNestedChecklistIndicatorRegex = new RegExp(`^${
 export const nonBlockquoteChecklistRegex = new RegExp(`^\\s*- ${checklistBoxIndicator} `);
 
 export const footnoteDefinitionIndicatorAtStartOfLine = /^(\[\^\w+\]) ?([,.;!:?])/gm;
+export const calloutRegex = /^(>\s*)+\[![^\s]*\]/m;
 
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string
