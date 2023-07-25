@@ -84,5 +84,31 @@ ruleTest({
         $$
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/813
+      testName: 'Math indicators that are malformed with content between them should be properly formatted without messing up the content of the other math blocks',
+      before: dedent`
+        $$
+        \\sqrt{(x_1-x_2)^2+(y_1-y_2)^2+\cdots+(n_1-n_2)^2}$$
+        - here is some text
+        $$
+        \\begin{aligned}
+        \\frac{n*(n+1)}{2}=\\frac{1000*1001}{2}=500500
+        \\end{aligned}
+        $$
+        text
+      `,
+      after: dedent`
+        $$
+        \\sqrt{(x_1-x_2)^2+(y_1-y_2)^2+\cdots+(n_1-n_2)^2}
+        $$
+        - here is some text
+        $$
+        \\begin{aligned}
+        \\frac{n*(n+1)}{2}=\\frac{1000*1001}{2}=500500
+        \\end{aligned}
+        $$
+        text
+      `,
+    },
   ],
 });
