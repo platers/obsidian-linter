@@ -17,6 +17,7 @@ export default class MoveMathBlockIndicatorsToOwnLine extends RuleBuilder<MoveMa
       descriptionKey: 'rules.move-math-block-indicators-to-their-own-line.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode],
+      hasSpecialExecutionOrder: true,
     });
   }
   get OptionsClass(): new () => MoveMathBlockIndicatorsToOwnLineOptions {

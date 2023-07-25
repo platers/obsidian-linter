@@ -777,13 +777,20 @@ function breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock: string, numberOfDol
   const mathBlockIndexes = [] as {startIndex: number, endIndex: number}[];
 
   let matchCount = countInstances(mathBlock, mathBlockIndicator);
-  if (matchCount <= 3) {
+  if (matchCount <= 1) {
+    return [];
+  } else if (matchCount === 2) {
     mathBlockIndexes.unshift({
       startIndex: startIndexOfMathBlock,
       endIndex: startIndexOfMathBlock + mathBlock.length,
     });
 
     return mathBlockIndexes;
+  } else if (matchCount === 3) {
+    mathBlockIndexes.unshift({
+      startIndex: startIndexOfMathBlock,
+      endIndex: startIndexOfMathBlock + mathBlock.indexOf(mathBlockIndicator, mathBlockIndicator.length) + mathBlockIndicator.length,
+    });
   }
 
   // if there is an odd amount of matches, remove one from the list so it is even
@@ -794,7 +801,7 @@ function breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock: string, numberOfDol
   // pair the earliest matches together until there are no more pairs
   let startIndex = startIndexOfMathBlock;
   let startSearch = mathBlockIndicator.length;
-  while (matchCount > 2 ) {
+  while (matchCount > 2) {
     const endOfIndex = mathBlock.indexOf(mathBlockIndicator, startSearch) + mathBlockIndicator.length;
     mathBlockIndexes.unshift({
       startIndex: startIndex,
