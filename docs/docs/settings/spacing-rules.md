@@ -152,7 +152,7 @@ After:
 
 Alias: `empty-line-around-blockquotes`
 
-Ensures that there is an empty line around blockquotes unless they start or end a document. **Note that an empty line is either one less level of nesting for blockquotes or a newline character.**
+Ensures that there is an empty line around blockquotes unless they start or end a document. **Note: an empty line is either one less level of nesting for blockquotes or a newline character.**
 
 
 
@@ -1176,7 +1176,7 @@ After:
 
 Alias: `remove-space-around-characters`
 
-Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). Note that this may causes issues with markdown format in some cases.
+Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). **Note: this may causes issues with markdown format in some cases.**
 
 ### Options
 
@@ -1278,7 +1278,7 @@ After:
 
 Alias: `remove-space-before-or-after-characters`
 
-Removes space before the specified characters and after the specified characters. Note that this may causes issues with markdown format in some cases.
+Removes space before the specified characters and after the specified characters. **Note: this may causes issues with markdown format in some cases.**
 
 ### Options
 

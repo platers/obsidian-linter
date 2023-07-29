@@ -457,7 +457,7 @@ After:
 
 Alias: `ordered-list-style`
 
-Makes sure that ordered lists follow the style specified. Note that 2 spaces or 1 tab is considered to be an indentation level.
+Makes sure that ordered lists follow the style specified. **Note: that 2 spaces or 1 tab is considered to be an indentation level.**
 
 ### Options
 

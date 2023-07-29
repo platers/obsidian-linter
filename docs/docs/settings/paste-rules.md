@@ -148,6 +148,22 @@ Checklist item 1
 - [ ] Checklist item 2
 ``````
 </details>
+<details><summary>When pasting a checklist and the selected text starts with a checklist, the text to paste should still start with a checklist</summary>
+
+Before:
+
+`````` markdown
+- [x] Checklist item 1
+- [ ] Checklist item 2
+``````
+
+After:
+
+`````` markdown
+- [x] Checklist item 1
+- [ ] Checklist item 2
+``````
+</details>
 
 ## Prevent Double List Item Indicator on Paste
 
@@ -220,6 +236,22 @@ After:
 
 `````` markdown
 List item 1
+- List item 2
+``````
+</details>
+<details><summary>When pasting a list item and the selected text starts with a list item indicator, the text to paste should still start with a list item indicator</summary>
+
+Before:
+
+`````` markdown
+- List item 1
+- List item 2
+``````
+
+After:
+
+`````` markdown
+- List item 1
 - List item 2
 ``````
 </details>
@@ -349,7 +381,7 @@ Before:
 `````` markdown
 He was sure that he would get off without doing any time, but the cops had other plans.50
 
-_Note that the format for footnote references to move is a dot or comma followed by any number of digits_
+_Note that the format for footnote references to remove is a dot or comma followed by any number of digits_
 ``````
 
 After:
@@ -357,7 +389,7 @@ After:
 `````` markdown
 He was sure that he would get off without doing any time, but the cops had other plans
 
-_Note that the format for footnote references to move is a dot or comma followed by any number of digits_
+_Note that the format for footnote references to remove is a dot or comma followed by any number of digits_
 ``````
 </details>
 

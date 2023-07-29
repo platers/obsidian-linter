@@ -292,7 +292,7 @@ tags:
 
 Alias: `format-yaml-array`
 
-Allows for the formatting of regular YAML arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific YAML formats. Note that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.
+Allows for the formatting of regular YAML arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific YAML formats. **Note: that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.**
 
 ### Options
 
@@ -615,7 +615,7 @@ Text
 
 Alias: `yaml-key-sort`
 
-Sorts the YAML keys based on the order and priority specified. Note: may remove blank lines as well.
+Sorts the YAML keys based on the order and priority specified. **Note: may remove blank lines as well.**
 
 ### Options
 
