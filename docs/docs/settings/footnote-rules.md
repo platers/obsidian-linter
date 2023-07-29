@@ -93,7 +93,7 @@ Maecenas malesuada dignissim purus ac volutpat.
 
 Alias: `re-index-footnotes`
 
-Re-indexes footnote keys and footnote, based on the order of occurrence (NOTE: This rule does *not* work if there is more than one footnote for a key.)
+Re-indexes footnote keys and footnote, based on the order of occurrence. **Note: This rule does _not_ work if there is more than one footnote for a key.**
 
 
 
