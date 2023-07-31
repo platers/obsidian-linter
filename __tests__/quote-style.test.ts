@@ -5,8 +5,7 @@ import {ruleTest} from './common';
 ruleTest({
   RuleBuilderClass: QuoteStyle,
   testCases: [
-    {
-      // accounts for https://github.com/platers/obsidian-linter/issues/380
+    { // accounts for https://github.com/platers/obsidian-linter/issues/826
       testName: 'Make sure inline code is unaffected',
       before: dedent`
         \`'Test'\`
