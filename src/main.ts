@@ -255,23 +255,17 @@ export default class LinterPlugin extends Plugin {
     }
 
     const currentActiveFile = this.app.workspace.getActiveFile();
-    if (!this.settings.lintOnFileChange || this.lastActiveFile == null || this.lastActiveFile === currentActiveFile) {
+    if (!this.settings.lintOnFileChange || this.lastActiveFile == null || this.lastActiveFile === currentActiveFile || this.shouldIgnoreFile(this.lastActiveFile)) {
       this.lastActiveFile = currentActiveFile;
       return;
     }
 
     try {
-      await this.runLinterFile(this.lastActiveFile);
+      await this.runLinterFile(this.lastActiveFile, true);
     } catch (error) {
       this.handleLintError(this.lastActiveFile, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
     } finally {
-      const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + this.lastActiveFile.path;
-      if (this.settings.displayLintOnFileChangeNotice) {
-        new Notice(message);
-      }
-
       this.lastActiveFile = currentActiveFile;
-      logInfo(message);
     }
   }
 
@@ -284,12 +278,21 @@ export default class LinterPlugin extends Plugin {
     return false;
   }
 
-  async runLinterFile(file: TFile) {
+  async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
     const oldText = stripCr(await this.app.vault.read(file));
     const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
 
     if (oldText != newText) {
       await this.app.vault.modify(file, newText);
+
+      if (lintingLastActiveFile) {
+        const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + this.lastActiveFile.path;
+        if (this.settings.displayLintOnFileChangeNotice) {
+          new Notice(message);
+        }
+
+        logInfo(message);
+      }
     }
 
     // Make sure this is disabled until we actually add something to let it work on folder and vault linting
