@@ -19,7 +19,7 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
       nameKey: 'rules.remove-space-around-characters.name',
       descriptionKey: 'rules.remove-space-around-characters.description',
       type: RuleType.SPACING,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => RemoveSpaceAroundCharactersOptions {
