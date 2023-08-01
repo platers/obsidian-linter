@@ -598,7 +598,7 @@ export function ensureEmptyLinesAroundBlockquotes(text: string): string {
       endIndex++;
     }
 
-    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, endIndex);
+    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, endIndex, true);
   }
 
   return text;
