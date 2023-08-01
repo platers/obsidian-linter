@@ -126,5 +126,23 @@ ruleTest({
         > Other content
       `,
     },
+    { // relates to https://github.com/platers/obsidian-linter/issues/833
+      testName: 'Make sure that a nested callout with a code block does not get broken apart',
+      before: dedent`
+        > [!abstract]- Mentions
+        > > [!abstract]- Mentions2
+        > > \`\`\`dataview
+        > > XXX
+        > > \`\`\`
+      `,
+      after: dedent`
+        > [!abstract]- Mentions
+        > > [!abstract]- Mentions2
+        > >
+        > > \`\`\`dataview
+        > > XXX
+        > > \`\`\`
+      `,
+    },
   ],
 });
