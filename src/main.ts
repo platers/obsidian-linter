@@ -255,7 +255,8 @@ export default class LinterPlugin extends Plugin {
     }
 
     const currentActiveFile = this.app.workspace.getActiveFile();
-    if (!this.settings.lintOnFileChange || this.lastActiveFile == null || this.lastActiveFile === currentActiveFile || this.shouldIgnoreFile(this.lastActiveFile)) {
+    const lastActiveFileExists = this.lastActiveFile == null ? false : await this.app.vault.adapter.exists(this.lastActiveFile.path);
+    if (!this.settings.lintOnFileChange || !lastActiveFileExists || this.lastActiveFile === currentActiveFile || this.shouldIgnoreFile(this.lastActiveFile)) {
       this.lastActiveFile = currentActiveFile;
       return;
     }
