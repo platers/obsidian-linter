@@ -95,7 +95,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFile(text: str
   return text.substring(0, startOfNewContent) + '\n' + text.substring(startOfContent);
 }
 
-function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockquote(text: string, startOfLine: string, startOfContent: number, isCallout: boolean = false): string {
+function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockquote(text: string, startOfLine: string, startOfContent: number, isCallout: boolean = false, addingEmptyLinesAroundBlockquotes: boolean = false): string {
   if (startOfContent === 0) {
     return text;
   }
@@ -151,7 +151,9 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
     priorLine = text.substring(indexOfLastNewLine, startOfNewContent);
   }
 
-  return text.substring(0, startOfNewContent) + getEmptyLineForBlockqute(priorLine, isCallout, nestingLevel) + text.substring(startOfContent);
+  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForBlockqute(priorLine, isCallout, nestingLevel) : getEmptyLine(priorLine);
+
+  return text.substring(0, startOfNewContent) + emptyLine + text.substring(startOfContent);
 }
 
 function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFile(text: string, endOfContent: number): string {
@@ -183,7 +185,7 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFile(text: string
   return text.substring(0, endOfContent) + '\n' + text.substring(endOfNewContent);
 }
 
-function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text: string, startOfLine: string, endOfContent: number, isCallout: boolean = false): string {
+function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text: string, startOfLine: string, endOfContent: number, isCallout: boolean = false, addingEmptyLinesAroundBlockquotes: boolean = false): string {
   if (endOfContent === (text.length - 1)) {
     return text;
   }
@@ -245,7 +247,9 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     nextLine = text.substring(endOfNewContent + 1, indexOfSecondNewLineAfterContent);
   }
 
-  return text.substring(0, endOfContent) + getEmptyLineForBlockqute(nextLine, isCallout, nestingLevel) + text.substring(endOfNewContent);
+  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForBlockqute(nextLine, isCallout, nestingLevel) : getEmptyLine(nextLine);
+
+  return text.substring(0, endOfContent) + emptyLine + text.substring(endOfNewContent);
 }
 
 /**
@@ -253,15 +257,16 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
  * @param {string} text - The entire file's contents
  * @param {number} start - The starting index of the content to escape
  * @param {number} end - The ending index of the content to escape
+ * @param {boolean} addingEmptyLinesAroundBlockquotes - Whether or not the logic is meant to add empty lines around blockquotes. This is something meant to better help with spacing around blockquotes.
  * @return {string} The new file contents after the empty lines have been added
  */
-export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number): string {
+export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number, addingEmptyLinesAroundBlockquotes: boolean = false): string {
   const [startOfLine, startOfLineIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(text, start);
   if (startOfLine.trim() !== '') {
     const isCallout = calloutRegex.test(text.substring(start, end));
-    const newText = makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text, startOfLine, end, isCallout);
+    const newText = makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text, startOfLine, end, isCallout, addingEmptyLinesAroundBlockquotes);
 
-    return makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockquote(newText, startOfLine, startOfLineIndex, isCallout);
+    return makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockquote(newText, startOfLine, startOfLineIndex, isCallout, addingEmptyLinesAroundBlockquotes);
   }
 
   const newText = makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFile(text, end);
