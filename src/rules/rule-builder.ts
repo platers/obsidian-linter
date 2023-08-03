@@ -1,6 +1,6 @@
 import {Example, Options, Rule, RuleType, registerRule, wrapLintError} from '../rules';
 import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
-import {logDebug, logTrace, timingBegin, timingEnd} from '../utils/logger';
+import {logDebug, timingBegin, timingEnd} from '../utils/logger';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
 import {LinterSettings} from 'src/settings-data';
