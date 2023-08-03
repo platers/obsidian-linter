@@ -14,7 +14,7 @@ import {
   SpecialArrayFormats,
   TagSpecificArrayFormats,
 } from './utils/yaml';
-import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
+import {getLanguage, getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
 import {ignoreListOfTypes, IgnoreType} from './utils/ignore-types';
 import {LinterSettings} from './settings-data';
 
@@ -97,8 +97,13 @@ export class Rule {
 
   public getURL(): string {
     const url =
-      'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
-    return url + '#' + this.alias;
+      'https://platers.github.io/obsidian-linter/settings/';
+    const originalLang = getLanguage();
+    setLanguage('en');
+    const ruleHeading = this.getName().toLowerCase().replaceAll(' ', '-');
+    setLanguage(originalLang);
+
+    return url + this.type.toLowerCase() + '-rules/#' + ruleHeading;
   }
 
   public enabledOptionName(): string {
