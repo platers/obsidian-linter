@@ -31,7 +31,7 @@ export abstract class RuleBuilderBase {
       try {
         const newText = rule.apply(text, options);
         timingEnd(rule.alias);
-        logTrace(newText);
+        logDebug(newText);
 
         return [newText, true];
       } catch (error) {
