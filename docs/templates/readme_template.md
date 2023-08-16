@@ -7,6 +7,8 @@ This Obsidian plugin formats and styles your notes with a focus on configurabili
 Rules can be toggled and configured in the settings. The main documentation on rules and other things are
 located on the [wiki](https://platers.github.io/obsidian-linter/). Below is a quick run down of some reference links to the rules that exist and how to install the Linter.
 
+![Demo](docs/docs/assets/demo.gif)
+
 ## Rules
 
 Documentation for all rules can be found on the [wiki](https://platers.github.io/obsidian-linter/). The docs are updated before the plugin is released, so they may not be completely accurate.
@@ -41,4 +43,3 @@ Varying repo and development setup required:
 - [Translating the plugin into a new language](https://platers.github.io/obsidian-linter/contributing/translation/#adding-a-new-language-translation)
 - [Fixing a bug](https://platers.github.io/obsidian-linter/contributing/bug-fix/)
 - [Adding a new rule](https://platers.github.io/obsidian-linter/contributing/adding-a-rule/)
-
