@@ -7,7 +7,7 @@ This Obsidian plugin formats and styles your notes with a focus on configurabili
 Rules can be toggled and configured in the settings. The main documentation on rules and other things are
 located on the [wiki](https://platers.github.io/obsidian-linter/). Below is a quick run down of some reference links to the rules that exist and how to install the Linter.
 
-![Demo](docs/docs/assets/demo.gif)
+![Demo](https://github.com/platers/obsidian-linter/blob/master/docs/docs/assets/demo.gif)
 
 ## Rules
 
