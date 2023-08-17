@@ -66,10 +66,6 @@ export function setLanguage(newLang: string) {
   locale = localeMap[lang || 'en'];
 }
 
-export function getLanguage(): string {
-  return lang;
-}
-
 export function getTextInLanguage(str: LanguageStringKey): string {
   if (!locale) {
     logWarn(`locale not found for '${lang}'`);

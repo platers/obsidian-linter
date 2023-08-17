@@ -14,7 +14,7 @@ import {
   SpecialArrayFormats,
   TagSpecificArrayFormats,
 } from './utils/yaml';
-import {getLanguage, getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
+import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import {ignoreListOfTypes, IgnoreType} from './utils/ignore-types';
 import {LinterSettings} from './settings-data';
 
