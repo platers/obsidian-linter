@@ -327,9 +327,9 @@ export default class LinterPlugin extends Plugin {
 
     let numberOfErrors = 0;
     let lintedFiles = 0;
-    const folderPath = normalizePath(folder.path) + '/';
-    await Promise.all(this.app.vault.getMarkdownFiles().map(async (file) => {
-      if (normalizePath(file.path).startsWith(folderPath) && !this.shouldIgnoreFile(file)) {
+    const filesInFolder = this.getAllFilesInFolder(folder);
+    await Promise.all(filesInFolder.map(async (file) => {
+      if (!this.shouldIgnoreFile(file)) {
         try {
           await this.runLinterFile(file);
         } catch (error) {
@@ -627,5 +627,21 @@ export default class LinterPlugin extends Plugin {
     this.saveSettings();
 
     setLanguage(window.localStorage.getItem('language'));
+  }
+
+  private getAllFilesInFolder(startingFolder: TFolder): TFile[] {
+    const filesInFolder = [] as TFile[];
+    const foldersToIterateOver = [startingFolder] as TFolder[];
+    for (const folder of foldersToIterateOver) {
+      for (const child of folder.children) {
+        if (child instanceof TFile && child.extension === 'md') {
+          filesInFolder.push(child);
+        } else if (child instanceof TFolder) {
+          foldersToIterateOver.push(child);
+        }
+      }
+    }
+
+    return filesInFolder;
   }
 }
