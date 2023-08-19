@@ -79,6 +79,7 @@ export default {
   'empty-search-results-text': 'No hay configuración que coincida con la búsqueda',
   'warning-text': 'Advertencia',
   'file-backup-text': 'Asegúrese de haber realizado una copia de seguridad de sus archivos.',
+  'copy-aria-label': 'Copiar',
   'tabs': {
     'names': {
       'general': 'General',
@@ -103,7 +104,10 @@ export default {
       },
       'folders-to-ignore': {
         'name': 'Carpetas para omitir',
-        'description': 'Carpetas que se deben omitir al analizar todos los archivos o al guardar en línea. Introducir rutas de carpeta separadas por nuevas líneas',
+        'description': 'Carpetas que se deben omitir al analizar todos los archivos o al guardar en línea.',
+        'folder-search-placeholder-text': 'El nombre de la carpeta',
+        'add-input-button-text': 'Agregar otra carpeta para ignorar',
+        'delete-tooltip': 'Borrar',
       },
       'lint-on-file-change': {
         'name': 'Analizar archivo en cambiar',

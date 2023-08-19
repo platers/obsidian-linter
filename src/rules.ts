@@ -1,7 +1,6 @@
 import {
   getExactDisabledRuleValue,
   getYAMLText,
-  QuoteCharacter,
 } from './utils/yaml';
 import {
   Option,
@@ -9,23 +8,9 @@ import {
 } from './option';
 import {YAMLException} from 'js-yaml';
 import {LinterError} from './linter-error';
-import {
-  NormalArrayFormats,
-  SpecialArrayFormats,
-  TagSpecificArrayFormats,
-} from './utils/yaml';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import {ignoreListOfTypes, IgnoreType} from './utils/ignore-types';
 import {LinterSettings} from './settings-data';
-
-// CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
-export type CommonStyles = {
-  aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats;
-  tagArrayStyle: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
-  minimumNumberOfDollarSignsToBeAMathBlock: number;
-  escapeCharacter: QuoteCharacter;
-  removeUnnecessaryEscapeCharsForMultiLineArrays: boolean;
-}
 
 export type Options = { [optionName: string]: any};
 

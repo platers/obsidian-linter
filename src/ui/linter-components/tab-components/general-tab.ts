@@ -1,245 +1,104 @@
 import LinterPlugin from 'src/main';
 import {Tab} from './tab';
-import {Setting} from 'obsidian';
+import {App} from 'obsidian';
 import {moment} from 'obsidian';
-import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
-import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
-import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
+import {getTextInLanguage} from 'src/lang/helpers';
+import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
+import {DropdownRecordInfo, DropdownSetting} from 'src/ui/components/dropdown-setting';
+import {NumberInputSetting} from 'src/ui/components/number-input-setting';
+import {ToggleSetting} from 'src/ui/components/toggle-setting';
+import {FolderIgnoreOption} from '../folder-ignore-option';
 
 export class GeneralTab extends Tab {
-  constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin) {
+  constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin, private app: App) {
     super(navEl, settingsEl, 'General', isMobile, plugin);
     this.display();
   }
 
   display(): void {
     let tempDiv = this.contentEl.createDiv();
-    let settingName = getTextInLanguage('tabs.general.lint-on-save.name');
-    let settingDesc = getTextInLanguage('tabs.general.lint-on-save.description');
-    let setting = new Setting(tempDiv)
-        .setName(settingName)
-        .addToggle((toggle) => {
-          toggle
-              .setValue(this.plugin.settings.lintOnSave)
-              .onChange(async (value) => {
-                this.plugin.settings.lintOnSave = value;
-                await this.plugin.saveSettings();
-              });
-        });
-
-    parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl, this.plugin.settingsTab.component);
-
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.lint-on-save.name', 'tabs.general.lint-on-save.description', 'lintOnSave', this.plugin));
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('tabs.general.display-message.name');
-    settingDesc = getTextInLanguage('tabs.general.display-message.description');
-    new Setting(tempDiv)
-        .setName(settingName)
-        .setDesc(settingDesc)
-        .addToggle((toggle) => {
-          toggle
-              .setValue(this.plugin.settings.displayChanged)
-              .onChange(async (value) => {
-                this.plugin.settings.displayChanged = value;
-                await this.plugin.saveSettings();
-              });
-        });
-
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.display-message.name', 'tabs.general.display-message.description', 'displayChanged', this.plugin));
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('tabs.general.lint-on-file-change.name');
-    settingDesc = getTextInLanguage('tabs.general.lint-on-file-change.description');
-    new Setting(tempDiv)
-        .setName(settingName)
-        .setDesc(settingDesc)
-        .addToggle((toggle) => {
-          toggle
-              .setValue(this.plugin.settings.lintOnFileChange)
-              .onChange(async (value) => {
-                this.plugin.settings.lintOnFileChange = value;
-                await this.plugin.saveSettings();
-              });
-        });
-
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.lint-on-file-change.name', 'tabs.general.lint-on-file-change.description', 'lintOnFileChange', this.plugin));
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('tabs.general.display-lint-on-file-change-message.name');
-    settingDesc = getTextInLanguage('tabs.general.display-lint-on-file-change-message.description');
-    setting = new Setting(tempDiv)
-        .setName(settingName)
-        .addToggle((toggle) => {
-          toggle
-              .setValue(this.plugin.settings.displayLintOnFileChangeNotice)
-              .onChange(async (value) => {
-                this.plugin.settings.displayLintOnFileChangeNotice = value;
-                await this.plugin.saveSettings();
-              });
-        });
-
-    parseTextToHTMLWithoutOuterParagraph(settingDesc, setting.descEl, this.plugin.settingsTab.component);
-
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
-
-    tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('tabs.general.folders-to-ignore.name');
-    settingDesc = getTextInLanguage('tabs.general.folders-to-ignore.description');
-    new Setting(tempDiv)
-        .setName(settingName)
-        .setDesc(settingDesc)
-        .addTextArea((textArea) => {
-          textArea
-              .setValue(this.plugin.settings.foldersToIgnore.join('\n'))
-              .onChange(async (value) => {
-                this.plugin.settings.foldersToIgnore = value.split('\n');
-                await this.plugin.saveSettings();
-              });
-        });
-
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.display-lint-on-file-change-message.name', 'tabs.general.display-lint-on-file-change-message.description', 'displayLintOnFileChangeNotice', this.plugin));
 
     const sysLocale = navigator.language?.toLowerCase();
+    const localeValues = ['system-default'];
+    const localeDescriptions = [getTextInLanguage('tabs.general.same-as-system-locale').replace('{SYS_LOCALE}', sysLocale)];
+    for (const locale of moment.locales()) {
+      localeValues.push(locale);
+      localeDescriptions.push(locale);
+    }
+
+    const localeDropdownRecordInfo: DropdownRecordInfo = {
+      isForEnum: false,
+      values: localeValues,
+      descriptions: localeDescriptions,
+    };
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('tabs.general.override-locale.name');
-    settingDesc = getTextInLanguage('tabs.general.override-locale.description');
-    new Setting(tempDiv)
-        .setName(settingName)
-        .setDesc(settingDesc)
-        .addDropdown((dropdown) => {
-          dropdown.addOption('system-default', getTextInLanguage('tabs.general.same-as-system-locale').replace('{SYS_LOCALE}', sysLocale));
-          moment.locales().forEach((locale) => {
-            dropdown.addOption(locale, locale);
-          });
-          dropdown.setValue(this.plugin.settings.linterLocale);
-          dropdown.onChange(async (value) => {
-            this.plugin.settings.linterLocale = value;
-            await this.plugin.setOrUpdateMomentInstance();
-            await this.plugin.saveSettings();
-          });
-        });
+    this.addSettingSearchInfoForGeneralSettings(new DropdownSetting(tempDiv, 'tabs.general.override-locale.name', 'tabs.general.override-locale.description', 'linterLocale', this.plugin, localeDropdownRecordInfo, async () => {
+      await this.plugin.setOrUpdateMomentInstance();
+    }));
 
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
-
-    const yamlAliasRecords = [
-      // as types is needed to allow for the proper types as options otherwise it assumes it has to be the specific enum value
-      NormalArrayFormats.MultiLine as NormalArrayFormats | SpecialArrayFormats,
-      NormalArrayFormats.SingleLine,
-      SpecialArrayFormats.SingleStringCommaDelimited,
-      SpecialArrayFormats.SingleStringToSingleLine,
-      SpecialArrayFormats.SingleStringToMultiLine,
-    ];
+    const yamlAliasDropdownRecordInfo: DropdownRecordInfo = {
+      isForEnum: true,
+      values: [
+        NormalArrayFormats.MultiLine,
+        NormalArrayFormats.SingleLine,
+        SpecialArrayFormats.SingleStringCommaDelimited,
+        SpecialArrayFormats.SingleStringToSingleLine,
+        SpecialArrayFormats.SingleStringToMultiLine,
+      ],
+      descriptions: [],
+    };
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('tabs.general.yaml-aliases-section-style.name');
-    settingDesc = getTextInLanguage('tabs.general.yaml-aliases-section-style.description');
-    new Setting(tempDiv)
-        .setName(settingName)
-        .setDesc(settingDesc)
-        .addDropdown((dropdown) => {
-          yamlAliasRecords.forEach((aliasRecord) => {
-            const key = ('enums.' + aliasRecord) as LanguageStringKey;
-            dropdown.addOption(aliasRecord, getTextInLanguage(key));
-          });
-          dropdown.setValue(this.plugin.settings.commonStyles.aliasArrayStyle);
-          dropdown.onChange(async (value) => {
-            this.plugin.settings.commonStyles.aliasArrayStyle = value as NormalArrayFormats | SpecialArrayFormats;
-            await this.plugin.saveSettings();
-          });
-        });
+    this.addSettingSearchInfoForGeneralSettings(new DropdownSetting(tempDiv, 'tabs.general.yaml-aliases-section-style.name', 'tabs.general.yaml-aliases-section-style.description', 'commonStyles.aliasArrayStyle', this.plugin, yamlAliasDropdownRecordInfo));
 
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
-
-    const yamlTagRecords = [
-      NormalArrayFormats.MultiLine as TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats,
-      NormalArrayFormats.SingleLine,
-      SpecialArrayFormats.SingleStringToSingleLine,
-      SpecialArrayFormats.SingleStringToMultiLine,
-      TagSpecificArrayFormats.SingleLineSpaceDelimited,
-      TagSpecificArrayFormats.SingleStringSpaceDelimited,
-      SpecialArrayFormats.SingleStringCommaDelimited,
-    ];
+    const yamlTagDropdownRecordInfo: DropdownRecordInfo = {
+      isForEnum: true,
+      values: [
+        NormalArrayFormats.MultiLine,
+        NormalArrayFormats.SingleLine,
+        SpecialArrayFormats.SingleStringToSingleLine,
+        SpecialArrayFormats.SingleStringToMultiLine,
+        TagSpecificArrayFormats.SingleLineSpaceDelimited,
+        TagSpecificArrayFormats.SingleStringSpaceDelimited,
+        SpecialArrayFormats.SingleStringCommaDelimited,
+      ],
+      descriptions: [],
+    };
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('tabs.general.yaml-tags-section-style.name');
-    settingDesc = getTextInLanguage('tabs.general.yaml-tags-section-style.description');
-    new Setting(tempDiv)
-        .setName(settingName)
-        .setDesc(settingDesc)
-        .addDropdown((dropdown) => {
-          yamlTagRecords.forEach((tagRecord) => {
-            const key = ('enums.' + tagRecord) as LanguageStringKey;
-            dropdown.addOption(tagRecord, getTextInLanguage(key));
-          });
-          dropdown.setValue(this.plugin.settings.commonStyles.tagArrayStyle);
-          dropdown.onChange(async (value) => {
-            this.plugin.settings.commonStyles.tagArrayStyle = value as TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
-            await this.plugin.saveSettings();
-          });
-        });
+    this.addSettingSearchInfoForGeneralSettings(new DropdownSetting(tempDiv, 'tabs.general.yaml-tags-section-style.name', 'tabs.general.yaml-tags-section-style.description', 'commonStyles.tagArrayStyle', this.plugin, yamlTagDropdownRecordInfo));
 
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
-
-    const escapeCharRecords: QuoteCharacter[] = ['"', '\''];
+    const defaultEscapeChars = ['"', '\''];
+    const escapeCharDropdownRecordInfo: DropdownRecordInfo = {
+      isForEnum: false,
+      values: defaultEscapeChars,
+      descriptions: defaultEscapeChars,
+    };
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('tabs.general.default-escape-character.name');
-    settingDesc = getTextInLanguage('tabs.general.default-escape-character.description');
-    new Setting(tempDiv)
-        .setName(settingName)
-        .setDesc(settingDesc)
-        .addDropdown((dropdown) => {
-          escapeCharRecords.forEach((escapeChar) => {
-            dropdown.addOption(escapeChar, escapeChar);
-          });
-          dropdown.setValue(this.plugin.settings.commonStyles.escapeCharacter);
-          dropdown.onChange(async (value) => {
-            this.plugin.settings.commonStyles.escapeCharacter = value as QuoteCharacter;
-            await this.plugin.saveSettings();
-          });
-        });
-
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+    this.addSettingSearchInfoForGeneralSettings(new DropdownSetting(tempDiv, 'tabs.general.default-escape-character.name', 'tabs.general.default-escape-character.description', 'commonStyles.escapeCharacter', this.plugin, escapeCharDropdownRecordInfo));
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.name');
-    settingDesc = getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.description');
-    new Setting(tempDiv)
-        .setName(settingName)
-        .setDesc(settingDesc)
-        .addToggle((toggle) => {
-          toggle
-              .setValue(this.plugin.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays)
-              .onChange(async (value) => {
-                this.plugin.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays = value;
-                await this.plugin.saveSettings();
-              });
-        });
-
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.name', 'tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.description', 'commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays', this.plugin));
 
     tempDiv = this.contentEl.createDiv();
-    settingName = getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.name');
-    settingDesc = getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.description');
-    new Setting(tempDiv)
-        .setName(settingName)
-        .setDesc(settingDesc)
-        .addText((textbox) => {
-          textbox
-              .setValue(this.plugin.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock.toString())
-              .onChange(async (value) => {
-                let parsedInt = parseInt(value);
-                if (isNaN(parsedInt)) {
-                  parsedInt = 2;
-                }
+    this.addSettingSearchInfoForGeneralSettings(new NumberInputSetting(tempDiv, 'tabs.general.number-of-dollar-signs-to-indicate-math-block.name', 'tabs.general.number-of-dollar-signs-to-indicate-math-block.description', 'commonStyles.minimumNumberOfDollarSignsToBeAMathBlock', this.plugin));
 
-                this.plugin.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock = parsedInt;
-                await this.plugin.saveSettings();
-              });
-        });
-
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
+    const folderIgnoreEl = this.contentEl.createDiv();
+    const folderIgnore = new FolderIgnoreOption(folderIgnoreEl, this.plugin.settingsTab.component, this.plugin.settings.foldersToIgnore, this.app, () => {
+      this.plugin.saveSettings();
+    });
+    this.addSettingSearchInfo(folderIgnoreEl, folderIgnore.name, folderIgnore.description.replaceAll('\n', ' '));
   }
 }

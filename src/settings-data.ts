@@ -1,8 +1,17 @@
-import {CommonStyles, Options} from './rules';
+import {Options} from './rules';
 import {LintCommand} from './ui/linter-components/custom-command-option';
 import {CustomReplace} from './ui/linter-components/custom-replace-option';
-import {NormalArrayFormats} from './utils/yaml';
-import log from 'loglevel';
+import {NestedKeyOf} from './utils/nested-keyof';
+import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from './utils/yaml';
+
+// CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
+export type CommonStyles = {
+  aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats;
+  tagArrayStyle: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
+  minimumNumberOfDollarSignsToBeAMathBlock: number;
+  escapeCharacter: QuoteCharacter;
+  removeUnnecessaryEscapeCharsForMultiLineArrays: boolean;
+}
 
 export interface LinterSettings {
   ruleConfigs: {
@@ -16,11 +25,13 @@ export interface LinterSettings {
   displayLintOnFileChangeNotice: boolean,
   foldersToIgnore: string[];
   linterLocale: string;
-  logLevel: number;
+  logLevel: string;
   lintCommands: LintCommand[];
   customRegexes: CustomReplace[];
   commonStyles: CommonStyles;
 }
+
+export type LinterSettingsKeys = NestedKeyOf<LinterSettings>
 
 export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   ruleConfigs: {},
@@ -32,7 +43,7 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   settingsConvertedToConfigKeyValues: false,
   foldersToIgnore: [],
   linterLocale: 'system-default',
-  logLevel: log.levels.ERROR,
+  logLevel: 'ERROR',
   lintCommands: [],
   customRegexes: [],
   commonStyles: {

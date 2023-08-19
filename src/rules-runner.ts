@@ -1,6 +1,6 @@
 import {TFile, moment} from 'obsidian';
 import {logDebug, logWarn, timingBegin, timingEnd} from './utils/logger';
-import {getDisabledRules, LinterSettings, rules, wrapLintError, RuleType} from './rules';
+import {getDisabledRules, rules, wrapLintError, RuleType} from './rules';
 import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import ForceYamlEscape from './rules/force-yaml-escape';
@@ -24,6 +24,7 @@ import CapitalizeHeadings from './rules/capitalize-headings';
 import BlockquoteStyle from './rules/blockquote-style';
 import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
+import {LinterSettings} from './settings-data';
 
 export type RunLinterRulesOptions = {
   oldText: string,

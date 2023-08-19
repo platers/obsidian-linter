@@ -144,12 +144,42 @@
 
 /**
 * Full-width text areas
+* Based on https://github.com/nyable/obsidian-code-block-enhancer/blob/bb0c636c1e7609b6d26c48a8d7ca15d5cd9abdcf/src/styles/index.scss
 */
 textarea.full-width {
   width: 100%;
   min-height: 10em;
   margin-top: 0.8em;
   margin-bottom: 0.8em;
+}
+
+.full-width-textbox-input-wrapper {
+  position: relative;
+}
+
+.settings-copy-button {
+  position: absolute;
+  top: 0.8em;
+  right: 0.8em;
+  margin: 0 0 0 auto;
+  padding: 4px;
+}
+
+.settings-copy-button svg.linter-clipboard path {
+  fill: var(--text-faint);
+}
+.settings-copy-button svg.linter-success path {
+  fill: var(--interactive-success);
+}
+.settings-copy-button:hover, .settings-copy-button:active {
+  cursor: pointer;
+}
+.settings-copy-button:hover svg path, .settings-copy-button:active svg path {
+  fill: var(--text-accent-hover);
+  transition: all ease 0.3s;
+}
+.settings-copy-button:focus {
+  outline: 0;
 }
 
 /**
@@ -178,4 +208,18 @@ textarea.full-width {
 }
 .linter-custom-regex-replacement-label-input {
   width: 50%;
+}
+
+/**
+* Setting item no border
+*/
+.linter-no-border {
+  border: none;
+}
+
+/**
+* Custom row
+*/
+.custom-row-description {
+  margin-top: 0px;
 }
