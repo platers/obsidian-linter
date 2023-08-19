@@ -16,7 +16,7 @@ export abstract class BaseSetting<T> {
   setting: Setting;
   name: string;
   description: string;
-  constructor(public containerEl: HTMLDivElement, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, protected keyToUpdate: LinterSettingsKeys, protected plugin: LinterPlugin, protected beforeSave: (value: any) => void = null) {
+  constructor(public containerEl: HTMLDivElement, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, protected keyToUpdate: LinterSettingsKeys, protected plugin: LinterPlugin, protected beforeSave: () => void = null) {
     this.name = getTextInLanguage(nameKey);
     this.description = getTextInLanguage(descriptionKey);
   }
@@ -34,10 +34,6 @@ export abstract class BaseSetting<T> {
     if (this.beforeSave) {
       this.beforeSave();
     }
-
-    // if (this.keyToUpdate === 'linterLocale') {
-    //   await this.plugin.setOrUpdateMomentInstance();
-    // }
 
     await this.plugin.saveSettings();
   }

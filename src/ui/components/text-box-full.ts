@@ -23,7 +23,9 @@ export class TextBoxFull {
 
     this.inputContainerEl = settingEl.createDiv('full-width-textbox-input-wrapper');
     this.inputContainerEl.onmouseover = () => {
-      this.copyEl.removeClass('linter-visually-hidden');
+      if (this.getInput().trim() != '') {
+        this.copyEl.removeClass('linter-visually-hidden');
+      }
     };
     this.inputContainerEl.onmouseleave = () => {
       this.copyEl.addClass('linter-visually-hidden');

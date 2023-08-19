@@ -95,10 +95,11 @@ export class GeneralTab extends Tab {
     tempDiv = this.contentEl.createDiv();
     this.addSettingSearchInfoForGeneralSettings(new DropdownSetting(tempDiv, 'tabs.general.yaml-tags-section-style.name', 'tabs.general.yaml-tags-section-style.description', 'commonStyles.tagArrayStyle', this.plugin, yamlTagDropdownRecordInfo));
 
+    const defaultEscapeChars = ['"', '\''];
     const escapeCharDropdownRecordInfo: DropdownRecordInfo = {
-      isForEnum: true,
-      values: ['"', '\''],
-      descriptions: [],
+      isForEnum: false,
+      values: defaultEscapeChars,
+      descriptions: defaultEscapeChars,
     };
 
     tempDiv = this.contentEl.createDiv();
