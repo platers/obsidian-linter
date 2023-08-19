@@ -92,6 +92,7 @@ export default {
     'empty-clipboard': 'There is no clipboard content.',
     'characters-added': 'characters added',
     'characters-removed': 'characters removed',
+    'copy-to-clipboard-failed': 'Failed to copy text to clipboard: ',
   },
 
   // rule-alias-suggester.ts

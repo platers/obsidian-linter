@@ -1,4 +1,5 @@
-import {setIcon} from 'obsidian';
+import {Notice, setIcon} from 'obsidian';
+import {getTextInLanguage} from 'src/lang/helpers';
 
 export class TextBoxFull {
   nameEl: HTMLDivElement;
@@ -52,8 +53,8 @@ export class TextBoxFull {
       setTimeout(() => {
         setIcon(copyEl, 'linter-clipboard');
       }, 1500);
-    }, () => {
-      this.copyEl.innerText = 'Error';
+    }, (reason: any) => {
+      new Notice(`${getTextInLanguage('notice-text.copy-to-clipboard-failed') + reason}`, 0);
     });
   }
 }
