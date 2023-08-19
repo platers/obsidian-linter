@@ -29,9 +29,11 @@ export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<Remo
             return heading;
           }
 
-          const lastHeadingChar = $4.charAt($4.length - 1);
+          const trimmedHeaderText = $4.trimEnd();
+          const lastHeadingChar = trimmedHeaderText.charAt(trimmedHeaderText.length - 1);
+          console.log(trimmedHeaderText, trimmedHeaderText.endsWith('  ') || trimmedHeaderText.endsWith('\t'));
           if (options.punctuationToRemove.includes(lastHeadingChar)) {
-            return $1 + $2 + $3 + $4.substring(0, $4.length - 1) + $5;
+            return $1 + $2 + $3 + $4.substring(0, trimmedHeaderText.length - 1) + $4.substring(trimmedHeaderText.length) + $5;
           }
 
           return heading;
@@ -60,6 +62,17 @@ export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<Remo
         after: dedent`
           # Heading 1
           ## Heading &amp;
+        `,
+      }),
+      new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/851
+        description: 'Removes punctuation from the end of a heading when followed by whitespace',
+        before: dedent`
+          # Heading 1!${'  '}
+          ## Heading 2.\t
+        `,
+        after: dedent`
+          # Heading 1${'  '}
+          ## Heading 2\t
         `,
       }),
     ];
