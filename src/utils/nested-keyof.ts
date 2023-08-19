@@ -58,6 +58,7 @@ function findValueFromPath<ObjectType>(object: Partial<ObjectType>, path: string
 
   let result = object;
   for (const key of keys) {
+    // @ts-ignore ignore the fact that result is technically of type any
     result = result[key];
 
     if (result == undefined) {

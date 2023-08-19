@@ -18,14 +18,13 @@ export class DebugTab extends Tab {
 
   display(): void {
     let tempDiv = this.contentEl.createDiv();
-    const localeDropdownRecordInfo: DropdownRecordInfo = {
+    const logLevelDropdownRecordInfo: DropdownRecordInfo = {
       isForEnum: true,
       values: logLevels,
       descriptions: [],
     };
 
-    tempDiv = this.contentEl.createDiv();
-    this.addSettingSearchInfoForGeneralSettings(new DropdownSetting(tempDiv, 'tabs.debug.log-level.name', 'tabs.debug.log-level.description', 'logLevel', this.plugin, localeDropdownRecordInfo, async () => {
+    this.addSettingSearchInfoForGeneralSettings(new DropdownSetting(tempDiv, 'tabs.debug.log-level.name', 'tabs.debug.log-level.description', 'logLevel', this.plugin, logLevelDropdownRecordInfo, async () => {
       setLogLevel(this.plugin.settings.logLevel);
     }));
 
