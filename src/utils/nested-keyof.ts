@@ -13,6 +13,41 @@ export function getString<ObjectType>(object: Partial<ObjectType>, path: string)
     return null;
   }
 
+  const result = findValueFromPath(object, path);
+  if (typeof result === 'string') {
+    return result;
+  }
+
+  return null;
+}
+
+export function getNumber<ObjectType>(object: Partial<ObjectType>, path: string): number | null {
+  if (object == undefined) {
+    return null;
+  }
+
+  const result = findValueFromPath(object, path);
+  if (typeof result === 'number') {
+    return result;
+  }
+
+  return null;
+}
+
+export function getBoolean<ObjectType>(object: Partial<ObjectType>, path: string): boolean | null {
+  if (object == undefined) {
+    return null;
+  }
+
+  const result = findValueFromPath(object, path);
+  if (typeof result === 'boolean') {
+    return result;
+  }
+
+  return null;
+}
+
+function findValueFromPath<ObjectType>(object: Partial<ObjectType>, path: string): unknown {
   path = path.replace('..', '.'); // convert 2 periods in a row to a single period so we can properly account for the blank key value later on
   const keys = path.split('.');
 
@@ -21,9 +56,8 @@ export function getString<ObjectType>(object: Partial<ObjectType>, path: string)
     keys[keys.length - 1] = '.';
   }
 
-  let result = object;
+  let result: unknown = object;
   for (const key of keys) {
-    // @ts-ignore ignore the fact that result is technically of type any
     result = result[key];
 
     if (result == undefined) {
@@ -31,9 +65,5 @@ export function getString<ObjectType>(object: Partial<ObjectType>, path: string)
     }
   }
 
-  if (typeof result === 'string') {
-    return result;
-  }
-
-  return null;
+  return result;
 }
