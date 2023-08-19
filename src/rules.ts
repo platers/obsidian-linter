@@ -42,6 +42,8 @@ export enum RuleType {
 
 /** Class representing a rule */
 export class Rule {
+  private ruleHeading: string;
+
   /**
    * Create a rule
    * @param {LanguageStringKey} nameKey - The name key of the rule
@@ -67,6 +69,8 @@ export class Rule {
       public readonly hasSpecialExecutionOrder: boolean = false,
       public readonly ignoreTypes: IgnoreType[] = [],
   ) {
+    this.ruleHeading = this.getName().toLowerCase().replaceAll(' ', '-');
+
     options.unshift(new BooleanOption('enabled', this.descriptionKey, '' as LanguageStringKey, false));
     for (const option of options) {
       option.ruleAlias = alias;
@@ -96,9 +100,7 @@ export class Rule {
   }
 
   public getURL(): string {
-    const url =
-      'https://github.com/platers/obsidian-linter/blob/master/docs/rules.md';
-    return url + '#' + this.alias;
+    return 'https://platers.github.io/obsidian-linter/settings/' + this.type.toLowerCase() + '-rules/#' + this.ruleHeading;
   }
 
   public enabledOptionName(): string {
