@@ -5,7 +5,7 @@ import {BaseSetting} from './base-setting';
 
 export class ToggleSetting extends BaseSetting<boolean> {
   setting: Setting;
-  constructor(containerEl: HTMLElement, name: string, description: string, keyToUpdate: LinterSettingsKeys, plugin: LinterPlugin) {
+  constructor(containerEl: HTMLDivElement, name: string, description: string, keyToUpdate: LinterSettingsKeys, plugin: LinterPlugin) {
     super(containerEl, name, description, keyToUpdate, plugin);
     this.display();
   }

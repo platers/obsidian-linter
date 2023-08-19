@@ -12,8 +12,8 @@ export type DropdownRecordInfo = {
 
 export class DropdownSetting extends BaseSetting<string> {
   setting: Setting;
-  constructor(containerEl: HTMLElement, name: string, description: string, keyToUpdate: LinterSettingsKeys, plugin: LinterPlugin, private dropdownRecords: DropdownRecordInfo) {
-    super(containerEl, name, description, keyToUpdate, plugin);
+  constructor(containerEl: HTMLDivElement, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, keyToUpdate: LinterSettingsKeys, plugin: LinterPlugin, private dropdownRecords: DropdownRecordInfo, beforeSave: () => void = null) {
+    super(containerEl, nameKey, descriptionKey, keyToUpdate, plugin, beforeSave);
     this.display();
   }
 

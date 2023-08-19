@@ -2,11 +2,12 @@ import {Setting} from 'obsidian';
 import LinterPlugin from 'src/main';
 import {LinterSettingsKeys} from 'src/settings-data';
 import {BaseSetting} from './base-setting';
+import {LanguageStringKey} from 'src/lang/helpers';
 
 export class NumberInputSetting extends BaseSetting<number> {
   setting: Setting;
-  constructor(containerEl: HTMLElement, name: string, description: string, keyToUpdate: LinterSettingsKeys, plugin: LinterPlugin) {
-    super(containerEl, name, description, keyToUpdate, plugin);
+  constructor(containerEl: HTMLDivElement, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, keyToUpdate: LinterSettingsKeys, plugin: LinterPlugin) {
+    super(containerEl, nameKey, descriptionKey, keyToUpdate, plugin);
     this.display();
   }
 

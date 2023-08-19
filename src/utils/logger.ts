@@ -5,6 +5,15 @@ const logPrefix: string = '[Obsidian Linter]';
 const timingInfo = new Map<string, number>();
 let collectLogs = false;
 
+export enum LogLevels {
+  Info = 'INFO',
+  Trace = 'TRACE',
+  Debug = 'DEBUG',
+  Silent ='SILENT',
+  Warn = 'WARN',
+  Error = 'ERROR',
+}
+
 export let logsFromLastRun: string[] = [];
 
 /**
@@ -114,33 +123,57 @@ export function setCollectLogs(enabled: boolean) {
 
 /**
  * Allows the user to set the minimum logging level to display messages for
- * @param {number} logLevel The minimum log level to display in the console
+ * @param {string} logLevel The minimum log level to display in the console
  */
-export function setLogLevel(logLevel: number) {
+export function setLogLevel(logLevel: string) {
   switch (logLevel) {
-    case log.levels.INFO: {
+    case LogLevels.Info: {
       log.setLevel('info');
       break;
     }
-    case log.levels.TRACE: {
+    case LogLevels.Trace: {
       log.setLevel('trace');
       break;
     }
-    case log.levels.DEBUG: {
+    case LogLevels.Debug: {
       log.setLevel('debug');
       break;
     }
-    case log.levels.SILENT: {
+    case LogLevels.Silent: {
       log.setLevel('silent');
       break;
     }
-    case log.levels.ERROR: {
+    case LogLevels.Error: {
       log.setLevel('error');
       break;
     }
-    case log.levels.WARN: {
+    case LogLevels.Warn: {
       log.setLevel('warn');
       break;
     }
   }
 }
+
+export function convertNumberToLogLevel(logLevel: number): string {
+  switch (logLevel) {
+    case log.levels.INFO: {
+      return LogLevels.Info;
+    }
+    case log.levels.TRACE: {
+      return LogLevels.Trace;
+    }
+    case log.levels.DEBUG: {
+      return LogLevels.Debug;
+    }
+    case log.levels.SILENT: {
+      return LogLevels.Silent;
+    }
+    case log.levels.ERROR: {
+      return LogLevels.Error;
+    }
+    case log.levels.WARN: {
+      return LogLevels.Warn;
+    }
+  }
+}
+

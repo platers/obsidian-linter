@@ -3,7 +3,7 @@ import {Options, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
-import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs} from './utils/logger';
+import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
 import {iconInfo} from './ui/icons';
@@ -88,6 +88,10 @@ export default class LinterPlugin extends Plugin {
   async loadSettings() {
     const data = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+    if (typeof this.settings.logLevel === 'number') {
+      this.settings.logLevel = convertNumberToLogLevel(this.settings.logLevel);
+    }
+
     setLogLevel(this.settings.logLevel);
     this.setOrUpdateMomentInstance();
 

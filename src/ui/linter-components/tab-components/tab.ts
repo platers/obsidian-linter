@@ -6,6 +6,7 @@ import {settingSearchInfo} from './tab-searcher';
 import {SearchOptionInfo} from 'src/option';
 import {hideEl, unhideEl} from 'src/ui/helpers';
 import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
+import {GenericSetting} from 'src/ui/components/base-setting';
 
 export enum SearchStatus {
   LeavingSearchMode = 'leaving search mode by selecting a tab',
@@ -71,6 +72,16 @@ export abstract class Tab {
       description: description.toLowerCase(),
       options: options,
       alias: alias,
+    });
+  }
+
+  addSettingSearchInfoForGeneralSettings(generalSetting: GenericSetting) {
+    this.searchSettingInfo.push({
+      containerEl: generalSetting.containerEl,
+      name: generalSetting.name.toLowerCase(),
+      description: generalSetting.description.toLowerCase(),
+      options: null,
+      alias: null,
     });
   }
 

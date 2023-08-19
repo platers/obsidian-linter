@@ -3,7 +3,6 @@ import {LintCommand} from './ui/linter-components/custom-command-option';
 import {CustomReplace} from './ui/linter-components/custom-replace-option';
 import {NestedKeyOf} from './utils/nested-keyof';
 import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from './utils/yaml';
-import log from 'loglevel';
 
 // CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
 export type CommonStyles = {
@@ -26,18 +25,13 @@ export interface LinterSettings {
   displayLintOnFileChangeNotice: boolean,
   foldersToIgnore: string[];
   linterLocale: string;
-  logLevel: number;
+  logLevel: string;
   lintCommands: LintCommand[];
   customRegexes: CustomReplace[];
   commonStyles: CommonStyles;
 }
 
-export type CommonStylesKeys = keyof CommonStyles;
-// export type LinterSettingsKeys = keyof LinterSettings;
-
 export type LinterSettingsKeys = NestedKeyOf<LinterSettings>
-
-// console.log(CommonStylesKeys)
 
 export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   ruleConfigs: {},
@@ -49,7 +43,7 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   settingsConvertedToConfigKeyValues: false,
   foldersToIgnore: [],
   linterLocale: 'system-default',
-  logLevel: log.levels.ERROR,
+  logLevel: 'ERROR',
   lintCommands: [],
   customRegexes: [],
   commonStyles: {

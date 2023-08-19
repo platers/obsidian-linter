@@ -3,10 +3,23 @@ import LinterPlugin from 'src/main';
 import {DEFAULT_SETTINGS, LinterSettings, LinterSettingsKeys} from 'src/settings-data';
 import {getString, getBoolean, getNumber} from 'src/utils/nested-keyof';
 import {parseTextToHTMLWithoutOuterParagraph} from '../helpers';
+import {LanguageStringKey, getTextInLanguage} from 'src/lang/helpers';
+
+export type GenericSetting = {
+  containerEl: HTMLDivElement
+  setting: Setting,
+  name: string,
+  description: string,
+}
 
 export abstract class BaseSetting<T> {
   setting: Setting;
-  constructor(public containerEl: HTMLElement, protected name: string, protected description: string, protected keyToUpdate: LinterSettingsKeys, protected plugin: LinterPlugin) {}
+  name: string;
+  description: string;
+  constructor(public containerEl: HTMLDivElement, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, protected keyToUpdate: LinterSettingsKeys, protected plugin: LinterPlugin, protected beforeSave: (value: any) => void = null) {
+    this.name = getTextInLanguage(nameKey);
+    this.description = getTextInLanguage(descriptionKey);
+  }
 
   async saveValue(value: T) {
     const keys = this.keyToUpdate.split('.');
@@ -18,9 +31,13 @@ export abstract class BaseSetting<T> {
       this.plugin.settings[this.keyToUpdate] = value;
     }
 
-    if (this.keyToUpdate === 'linterLocale') {
-      await this.plugin.setOrUpdateMomentInstance();
+    if (this.beforeSave) {
+      this.beforeSave();
     }
+
+    // if (this.keyToUpdate === 'linterLocale') {
+    //   await this.plugin.setOrUpdateMomentInstance();
+    // }
 
     await this.plugin.saveSettings();
   }

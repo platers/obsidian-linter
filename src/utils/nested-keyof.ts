@@ -56,7 +56,7 @@ function findValueFromPath<ObjectType>(object: Partial<ObjectType>, path: string
     keys[keys.length - 1] = '.';
   }
 
-  let result: unknown = object;
+  let result = object;
   for (const key of keys) {
     result = result[key];
 
