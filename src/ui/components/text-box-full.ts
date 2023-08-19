@@ -35,7 +35,7 @@ export class TextBoxFull {
     this.inputEl.spellcheck = false;
     this.inputEl.disabled = this.disabled;
 
-    this.copyEl = this.inputContainerEl.createDiv({'cls': 'settings-copy-button linter-visually-hidden ', 'attr': {'aria-label': 'Copy'}});
+    this.copyEl = this.inputContainerEl.createDiv({'cls': 'settings-copy-button linter-visually-hidden ', 'attr': {'aria-label': getTextInLanguage('copy-aria-label')}});
     this.copyIconEl = this.copyEl.createSpan();
     setIcon(this.copyIconEl, 'linter-clipboard');
     this.copyIconEl.onclick = () => {

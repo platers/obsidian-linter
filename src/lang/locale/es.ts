@@ -79,6 +79,7 @@ export default {
   'empty-search-results-text': 'No hay configuración que coincida con la búsqueda',
   'warning-text': 'Advertencia',
   'file-backup-text': 'Asegúrese de haber realizado una copia de seguridad de sus archivos.',
+  'copy-aria-label': 'Copiar',
   'tabs': {
     'names': {
       'general': 'General',

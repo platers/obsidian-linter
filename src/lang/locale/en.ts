@@ -106,6 +106,8 @@ export default {
   'warning-text': 'Warning',
   'file-backup-text': 'Make sure you have backed up your files.',
 
+  'copy-aria-label': 'Copy',
+
   'tabs': {
     'names': {
       // tab.ts
