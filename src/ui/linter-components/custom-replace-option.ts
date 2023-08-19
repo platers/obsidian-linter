@@ -6,7 +6,7 @@ export type CustomReplace = {label: string, find: string, replace: string, flags
 const defaultFlags = 'gm';
 
 export class CustomReplaceOption extends AddCustomRow {
-  constructor(containerEl: HTMLElement, parentComponent: Component, public regexes: CustomReplace[], isMobile: boolean, saveSettings: () => void) {
+  constructor(containerEl: HTMLElement, parentComponent: Component, public regexes: CustomReplace[], saveSettings: () => void) {
     super(
         containerEl,
         parentComponent,
@@ -14,7 +14,6 @@ export class CustomReplaceOption extends AddCustomRow {
         getTextInLanguage('options.custom-replace.description'),
         getTextInLanguage('options.custom-replace.warning'),
         getTextInLanguage('options.custom-replace.add-input-button-text'),
-        isMobile,
         saveSettings,
         ()=>{
           const newRegex = {label: '', find: '', replace: '', flags: defaultFlags};

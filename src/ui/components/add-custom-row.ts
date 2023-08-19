@@ -15,17 +15,18 @@ export abstract class AddCustomRow {
     public description: string,
     public warning: string,
     private addInputBtnText: string,
-    protected isMobile: boolean,
     protected saveSettings: () => void,
     private onAddInput: () => void) {
   }
 
   display() {
-    this.containerEl.createEl(this.isMobile ? 'h4' : 'h3', {text: this.name});
+    this.containerEl.createDiv({cls: 'setting-item-name', text: this.name});
 
-    parseTextToHTMLWithoutOuterParagraph(this.description, this.containerEl, this.parentComponent);
-    if (this.warning != null) {
-      this.containerEl.createEl('p', {text: this.warning, cls: 'mod-warning'});
+    const descriptionAndWarningContainer = this.containerEl.createDiv({cls: 'setting-item-description'});
+
+    parseTextToHTMLWithoutOuterParagraph(this.description, descriptionAndWarningContainer.createEl('p', {cls: 'custom-row-description'}), this.parentComponent);
+    if (this.warning != null && this.warning.trim() != '') {
+      descriptionAndWarningContainer.createEl('p', {text: this.warning, cls: 'mod-warning'});
     }
 
     new Setting(this.containerEl)

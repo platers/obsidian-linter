@@ -103,7 +103,10 @@ export default {
       },
       'folders-to-ignore': {
         'name': 'Carpetas para omitir',
-        'description': 'Carpetas que se deben omitir al analizar todos los archivos o al guardar en línea. Introducir rutas de carpeta separadas por nuevas líneas',
+        'description': 'Carpetas que se deben omitir al analizar todos los archivos o al guardar en línea.',
+        'folder-search-placeholder-text': 'El nombre de la carpeta',
+        'add-input-button-text': 'Agregar otra carpeta para ignorar',
+        'delete-tooltip': 'Borrar',
       },
       'lint-on-file-change': {
         'name': 'Analizar archivo en cambiar',

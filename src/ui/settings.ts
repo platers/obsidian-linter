@@ -54,7 +54,7 @@ export class SettingTab extends PluginSettingTab {
   }
 
   private addTabs(isMobile: boolean) {
-    this.addTab(new GeneralTab(this.tabNavEl, this.settingsContentEl, isMobile, this.plugin));
+    this.addTab(new GeneralTab(this.tabNavEl, this.settingsContentEl, isMobile, this.plugin, this.app));
 
     for (const ruleType of Object.values(RuleType)) {
       this.addTab(new RuleTab(this.tabNavEl, this.settingsContentEl, ruleType, ruleTypeToRules.get(ruleType), isMobile, this.plugin));

@@ -1,15 +1,16 @@
 import LinterPlugin from 'src/main';
 import {Tab} from './tab';
-import {Setting} from 'obsidian';
+import {App} from 'obsidian';
 import {moment} from 'obsidian';
 import {getTextInLanguage} from 'src/lang/helpers';
 import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
 import {DropdownRecordInfo, DropdownSetting} from 'src/ui/components/dropdown-setting';
 import {NumberInputSetting} from 'src/ui/components/number-input-setting';
 import {ToggleSetting} from 'src/ui/components/toggle-setting';
+import {FolderIgnoreOption} from '../folder-ignore-option';
 
 export class GeneralTab extends Tab {
-  constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin) {
+  constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin, private app: App) {
     super(navEl, settingsEl, 'General', isMobile, plugin);
     this.display();
   }
@@ -26,23 +27,6 @@ export class GeneralTab extends Tab {
 
     tempDiv = this.contentEl.createDiv();
     this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.display-lint-on-file-change-message.name', 'tabs.general.display-lint-on-file-change-message.description', 'displayLintOnFileChangeNotice', this.plugin));
-
-    tempDiv = this.contentEl.createDiv();
-    const settingName = getTextInLanguage('tabs.general.folders-to-ignore.name');
-    const settingDesc = getTextInLanguage('tabs.general.folders-to-ignore.description');
-    new Setting(tempDiv)
-        .setName(settingName)
-        .setDesc(settingDesc)
-        .addTextArea((textArea) => {
-          textArea
-              .setValue(this.plugin.settings.foldersToIgnore.join('\n'))
-              .onChange(async (value) => {
-                this.plugin.settings.foldersToIgnore = value.split('\n');
-                await this.plugin.saveSettings();
-              });
-        });
-
-    this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
     const sysLocale = navigator.language?.toLowerCase();
     const localeValues = ['system-default'];
@@ -110,5 +94,11 @@ export class GeneralTab extends Tab {
 
     tempDiv = this.contentEl.createDiv();
     this.addSettingSearchInfoForGeneralSettings(new NumberInputSetting(tempDiv, 'tabs.general.number-of-dollar-signs-to-indicate-math-block.name', 'tabs.general.number-of-dollar-signs-to-indicate-math-block.description', 'commonStyles.minimumNumberOfDollarSignsToBeAMathBlock', this.plugin));
+
+    const folderIgnoreEl = this.contentEl.createDiv();
+    const folderIgnore = new FolderIgnoreOption(folderIgnoreEl, this.plugin.settingsTab.component, this.plugin.settings.foldersToIgnore, this.app, () => {
+      this.plugin.saveSettings();
+    });
+    this.addSettingSearchInfo(folderIgnoreEl, folderIgnore.name, folderIgnore.description.replaceAll('\n', ' '));
   }
 }

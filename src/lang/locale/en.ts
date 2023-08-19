@@ -141,7 +141,10 @@ export default {
       },
       'folders-to-ignore': {
         'name': 'Folders to ignore',
-        'description': 'Folders to ignore when linting all files or linting on save. Enter folder paths separated by newlines',
+        'description': 'Folders to ignore when linting all files or linting on save.',
+        'folder-search-placeholder-text': 'Folder name',
+        'add-input-button-text': 'Add another folder to ignore',
+        'delete-tooltip': 'Delete',
       },
       'override-locale': {
         'name': 'Override locale',

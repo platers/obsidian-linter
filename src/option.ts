@@ -46,8 +46,7 @@ export abstract class Option {
     parseTextToHTMLWithoutOuterParagraph(this.getName(), setting.nameEl, plugin.settingsTab.component);
     parseTextToHTMLWithoutOuterParagraph(this.getDescription(), setting.descEl, plugin.settingsTab.component);
 
-    // remove border around every setting item
-    setting.settingEl.style.border = 'none';
+    setting.settingEl.addClass('linter-no-border');
   }
 }
 

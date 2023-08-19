@@ -209,3 +209,17 @@ textarea.full-width {
 .linter-custom-regex-replacement-label-input {
   width: 50%;
 }
+
+/**
+* Setting item no border
+*/
+.linter-no-border {
+  border: none;
+}
+
+/**
+* Custom row
+*/
+.custom-row-description {
+  margin-top: 0px;
+}

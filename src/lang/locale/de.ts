@@ -108,7 +108,7 @@ export default {
   'tabs': {
     'names': {
       // tab.ts
-      'general': 'AAllgemein',
+      'general': 'Allgemein',
       'custom': 'Brauch',
       'yaml': 'YAML',
       'heading': 'Überschriften',
