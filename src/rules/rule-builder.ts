@@ -87,14 +87,10 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     this.type = args.type;
     this.hasSpecialExecutionOrder = args.hasSpecialExecutionOrder ?? false;
 
-    if (args.type === RuleType.PASTE) {
-      this.ignoreTypes = [];
+    if (args.ruleIgnoreTypes) {
+      this.ignoreTypes = [IgnoreTypes.customIgnore, ...args.ruleIgnoreTypes];
     } else {
-      if (args.ruleIgnoreTypes) {
-        this.ignoreTypes = [IgnoreTypes.customIgnore, ...args.ruleIgnoreTypes];
-      } else {
-        this.ignoreTypes = [IgnoreTypes.customIgnore];
-      }
+      this.ignoreTypes = [IgnoreTypes.customIgnore];
     }
   }
 

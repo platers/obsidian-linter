@@ -31,7 +31,6 @@ export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<Remo
 
           const trimmedHeaderText = $4.trimEnd();
           const lastHeadingChar = trimmedHeaderText.charAt(trimmedHeaderText.length - 1);
-          console.log(trimmedHeaderText, trimmedHeaderText.endsWith('  ') || trimmedHeaderText.endsWith('\t'));
           if (options.punctuationToRemove.includes(lastHeadingChar)) {
             return $1 + $2 + $3 + $4.substring(0, trimmedHeaderText.length - 1) + $4.substring(trimmedHeaderText.length) + $5;
           }
