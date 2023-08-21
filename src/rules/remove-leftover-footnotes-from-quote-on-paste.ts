@@ -1,5 +1,5 @@
 // based on https://github.com/chrisgrieser/obsidian-smarter-paste/blob/master/clipboardModification.ts#L15
-import { IgnoreTypes } from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
