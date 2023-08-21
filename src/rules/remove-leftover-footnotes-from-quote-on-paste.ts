@@ -12,7 +12,7 @@ export default class RemoveLeftoverFootnotesFromQuoteOnPaste extends RuleBuilder
     super({
       nameKey: 'rules.remove-leftover-footnotes-from-quote-on-paste.name',
       descriptionKey: 'rules.remove-leftover-footnotes-from-quote-on-paste.description',
-      ruleIgnoreTypes: [IgnoreTypes.wikiLink, IgnoreTypes.link],
+      ruleIgnoreTypes: [IgnoreTypes.wikiLink, IgnoreTypes.link, IgnoreTypes.image],
       type: RuleType.PASTE,
     });
   }
@@ -42,10 +42,14 @@ export default class RemoveLeftoverFootnotesFromQuoteOnPaste extends RuleBuilder
         before: dedent`
           [[Half is .5]]
           [Half is .5](HalfIs.5.md)
+          ![](HalfIs.5.jpg)
+          ![[Half is .5.jpg]]
         `,
         after: dedent`
           [[Half is .5]]
           [Half is .5](HalfIs.5.md)
+          ![](HalfIs.5.jpg)
+          ![[Half is .5.jpg]]
         `,
       }),
     ];
