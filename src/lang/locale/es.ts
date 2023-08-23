@@ -391,6 +391,10 @@ export default {
     'no-bare-urls': {
       'name': 'Sin URL desnuda',
       'description': 'Encierra las direcciones URL desnudas con corchetes angulares, excepto cuando están encerradas en marcas traseras, llaves cuadradas o comillas simples o dobles.',
+      'no-bare-uris': {
+        'name': 'Sin URI desnuda',
+        'description': 'Encierra las direcciones URI desnudas con corchetes angulares, excepto cuando están encerradas en marcas traseras, llaves cuadradas o comillas simples o dobles.',
+      },
     },
     'ordered-list-style': {
       'name': 'Estilo de lista ordenada',

@@ -1,11 +1,13 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
 import {simpleURIRegex, urlRegex} from '../utils/regex';
 
-class NoBareUrlsOptions implements Options {}
+class NoBareUrlsOptions implements Options {
+  noBareURIs?: boolean = false;
+}
 
 const specialCharsToNotEscapeContentsWithin = `'"‘’“”\`[]`;
 const uriSchemesToIgnore = ['http', 'ftp', 'https', 'smtp'];
@@ -151,9 +153,28 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
           <https://gitlab.com>
         `,
       }),
+      new ExampleBuilder({// accounts for https://github.com/platers/obsidian-linter/issues/776
+        description: 'Puts angle brackets around URIs when `No Bare URIs` is enabled',
+        before: dedent`
+          obsidian://show-plugin?id=cycle-in-sidebar
+        `,
+        after: dedent`
+          <obsidian://show-plugin?id=cycle-in-sidebar>
+        `,
+        options: {
+          noBareURIs: true,
+        },
+      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<NoBareUrlsOptions>[] {
-    return [];
+    return [
+      new BooleanOptionBuilder({
+        OptionsClass: NoBareUrlsOptions,
+        nameKey: 'rules.no-bare-urls.no-bare-uris.name',
+        descriptionKey: 'rules.no-bare-urls.no-bare-uris.description',
+        optionsKey: 'noBareURIs',
+      }),
+    ];
   }
 }

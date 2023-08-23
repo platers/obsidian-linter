@@ -85,15 +85,6 @@ ruleTest({
         This is a url followed by a paren <https://github.com>). Wow that worked!
       `,
     },
-    {// accounts for https://github.com/platers/obsidian-linter/issues/776
-      testName: 'Accounts for URIs',
-      before: dedent`
-        obsidian://show-plugin?id=cycle-in-sidebar
-      `,
-      after: dedent`
-        <obsidian://show-plugin?id=cycle-in-sidebar>
-      `,
-    },
   ],
 });
 

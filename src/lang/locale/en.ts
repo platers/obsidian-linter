@@ -457,6 +457,10 @@ export default {
     'no-bare-urls': {
       'name': 'No Bare URLs',
       'description': 'Encloses bare URLs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.',
+      'no-bare-uris': {
+        'name': 'No Bare URIs',
+        'description': 'Attempts to enclose bare URIs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.',
+      },
     },
     // ordered-list-style.ts
     'ordered-list-style': {
