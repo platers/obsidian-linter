@@ -85,6 +85,18 @@ ruleTest({
         This is a url followed by a paren <https://github.com>). Wow that worked!
       `,
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/776
+      testName: 'Does not put angle brackets around URIs when `No Bare URIs` is not enabled',
+      before: dedent`
+        obsidian://show-plugin?id=cycle-in-sidebar
+      `,
+      after: dedent`
+        obsidian://show-plugin?id=cycle-in-sidebar
+      `,
+      options: {
+        noBareURIs: false,
+      },
+    },
   ],
 });
 
