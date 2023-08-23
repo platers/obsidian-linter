@@ -31,9 +31,12 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       text = this.handleMatches(text, URLMatches, false);
     }
 
-    const URIMatches = text.match(simpleURIRegex);
-    if (URIMatches) {
-      text = this.handleMatches(text, URIMatches, true);
+
+    if (options.noBareURIs) {
+      const URIMatches = text.match(simpleURIRegex);
+      if (URIMatches) {
+        text = this.handleMatches(text, URIMatches, true);
+      }
     }
 
     return text;
