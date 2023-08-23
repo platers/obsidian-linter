@@ -7,8 +7,8 @@ import {simpleURIRegex, urlRegex} from '../utils/regex';
 
 class NoBareUrlsOptions implements Options {}
 
-const specialCharsToNotEscapeContentsWithin = `'"‘’“”\`[]<>`;
-const charsNotToEndWith = `.)`;
+const specialCharsToNotEscapeContentsWithin = `'"‘’“”\`[]`;
+const uriSchemesToIgnore = ['http', 'ftp', 'https', 'smtp'];
 
 @RuleBuilder.register
 export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
@@ -25,24 +25,38 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
   }
   apply(text: string, options: NoBareUrlsOptions): string {
     const URLMatches = text.match(urlRegex);
-    // console.log(text.match(simpleURIRegex));
-    if (!URLMatches) {
-      return text;
+    if (URLMatches) {
+      text = this.handleMatches(text, URLMatches, false);
     }
 
+    const URIMatches = text.match(simpleURIRegex);
+    if (URIMatches) {
+      text = this.handleMatches(text, URIMatches, true);
+    }
+
+    return text;
+  }
+  handleMatches(text: string, matches: RegExpMatchArray, isURISearch: boolean): string {
     // make sure you do not match on the same thing more than once by keeping track of the last position you checked up to
     let startSearch = 0;
-    const numMatches = URLMatches.length;
+    const numMatches = matches.length;
     for (let i = 0; i < numMatches; i++) {
-      const urlMatch = URLMatches[i];
-      const urlStart = text.indexOf(urlMatch, startSearch);
-      const urlEnd = urlStart + urlMatch.length;
+      let urlMatch = matches[i];
+      let urlStart = text.indexOf(urlMatch, startSearch);
+      let urlEnd = urlStart + urlMatch.length;
+      if (urlMatch.charAt(0) === '<') {
+        urlMatch = urlMatch.substring(1);
+        urlStart++;
+      }
+
+      if (urlMatch.charAt(urlMatch.length - 1) === '>') {
+        urlMatch = urlMatch.substring(0, urlMatch.length - 1);
+        urlEnd--;
+      }
 
       const previousChar = urlStart === 0 ? undefined : text.charAt(urlStart - 1);
       const nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
-      const startsWithSpecialCharacter = (previousChar != undefined && specialCharsToNotEscapeContentsWithin.includes(previousChar)) || specialCharsToNotEscapeContentsWithin.includes(urlMatch.charAt(0));
-      const endsWithSpecialCharacter = (nextChar != undefined && specialCharsToNotEscapeContentsWithin.includes(nextChar)) || specialCharsToNotEscapeContentsWithin.includes(urlMatch.charAt(urlMatch.length - 1));
-      if (startsWithSpecialCharacter && endsWithSpecialCharacter) {
+      if (this.skipMatch(previousChar, nextChar, urlMatch, isURISearch)) {
         startSearch = urlStart + urlMatch.length;
         continue;
       }
@@ -67,8 +81,20 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       text = replaceTextBetweenStartAndEndWithNewValue(text, urlStart, urlStart + urlMatch.length, '<' + urlMatch + '>');
       startSearch = urlStart + urlMatch.length + 2;
     }
-
     return text;
+  }
+  skipMatch(previousChar: string, nextChar: string, match: string, isURISearch: boolean) {
+    const startsWithSpecialCharacter = (previousChar != undefined && specialCharsToNotEscapeContentsWithin.includes(previousChar)) || specialCharsToNotEscapeContentsWithin.includes(match.charAt(0));
+    const endsWithSpecialCharacter = (nextChar != undefined && specialCharsToNotEscapeContentsWithin.includes(nextChar)) || specialCharsToNotEscapeContentsWithin.includes(match.charAt(match.length - 1));
+    if (startsWithSpecialCharacter && endsWithSpecialCharacter) {
+      return true;
+    }
+
+    if (isURISearch) {
+      return uriSchemesToIgnore.includes(match.substring(0, match.indexOf(':')));
+    }
+
+    return false;
   }
   get exampleBuilders(): ExampleBuilder<NoBareUrlsOptions>[] {
     return [

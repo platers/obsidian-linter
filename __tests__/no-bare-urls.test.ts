@@ -5,8 +5,7 @@ import {ruleTest} from './common';
 ruleTest({
   RuleBuilderClass: NoBareUrls,
   testCases: [
-    {
-      // accounts for https://github.com/platers/obsidian-linter/issues/275
+    {// accounts for https://github.com/platers/obsidian-linter/issues/275
       testName: 'Leaves markdown links and images alone',
       before: dedent`
         [regular link](https://google.com)
@@ -17,8 +16,7 @@ ruleTest({
         ![image alt text](https://github.com/favicon.ico)
       `,
     },
-    {
-      // accounts for https://github.com/platers/obsidian-linter/issues/339
+    {// accounts for https://github.com/platers/obsidian-linter/issues/339
       testName: 'Urls with a hashtag referring to header that are surrounded by `<` and `> should be left alone',
       before: dedent`
         <https://google.com#hashtag>
@@ -99,4 +97,3 @@ ruleTest({
   ],
 });
 
-//
