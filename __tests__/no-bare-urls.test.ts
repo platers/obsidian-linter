@@ -67,5 +67,36 @@ ruleTest({
         > <iframe width="100%" height="600" src=" https://www.google.com "></iframe>
       `,
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/776
+      testName: 'Trailing periods should not be included in the URL that gets enclosed in angle brackets',
+      before: dedent`
+        - https://theintercept.com/2023/05/23/henry-kissinger-cambodia-bombing-survivors/.
+        - https://www.gettyimages.com/detail/news-photo/617942032.
+      `,
+      after: dedent`
+        - <https://theintercept.com/2023/05/23/henry-kissinger-cambodia-bombing-survivors/>.
+        - <https://www.gettyimages.com/detail/news-photo/617942032>.
+      `,
+    },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/776
+      testName: 'Trailing parentheses should not be included in the URL that gets enclosed in angle brackets',
+      before: dedent`
+        This is a url followed by a paren https://github.com). Wow that worked!
+      `,
+      after: dedent`
+        This is a url followed by a paren <https://github.com>). Wow that worked!
+      `,
+    },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/776
+      testName: 'Accounts for URIs',
+      before: dedent`
+        obsidian://show-plugin?id=cycle-in-sidebar
+      `,
+      after: dedent`
+        <obsidian://show-plugin?id=cycle-in-sidebar>
+      `,
+    },
   ],
 });
+
+//

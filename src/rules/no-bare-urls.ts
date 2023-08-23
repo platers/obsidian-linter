@@ -3,11 +3,12 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
-import {urlRegex} from '../utils/regex';
+import {simpleURIRegex, urlRegex} from '../utils/regex';
 
 class NoBareUrlsOptions implements Options {}
 
-const specialCharsToNotEscapeContentsWithin = `'"‘’“”\`[]`;
+const specialCharsToNotEscapeContentsWithin = `'"‘’“”\`[]<>`;
+const charsNotToEndWith = `.)`;
 
 @RuleBuilder.register
 export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
@@ -24,7 +25,7 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
   }
   apply(text: string, options: NoBareUrlsOptions): string {
     const URLMatches = text.match(urlRegex);
-
+    // console.log(text.match(simpleURIRegex));
     if (!URLMatches) {
       return text;
     }
@@ -39,8 +40,9 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
 
       const previousChar = urlStart === 0 ? undefined : text.charAt(urlStart - 1);
       const nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
-      if (previousChar != undefined && specialCharsToNotEscapeContentsWithin.includes(previousChar) &&
-          nextChar != undefined && specialCharsToNotEscapeContentsWithin.includes(nextChar)) {
+      const startsWithSpecialCharacter = (previousChar != undefined && specialCharsToNotEscapeContentsWithin.includes(previousChar)) || specialCharsToNotEscapeContentsWithin.includes(urlMatch.charAt(0));
+      const endsWithSpecialCharacter = (nextChar != undefined && specialCharsToNotEscapeContentsWithin.includes(nextChar)) || specialCharsToNotEscapeContentsWithin.includes(urlMatch.charAt(urlMatch.length - 1));
+      if (startsWithSpecialCharacter && endsWithSpecialCharacter) {
         startSearch = urlStart + urlMatch.length;
         continue;
       }
