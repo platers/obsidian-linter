@@ -112,15 +112,16 @@ export default class LinterPlugin extends Plugin {
   }
 
   addCommands() {
+    const that = this;
     this.addCommand({
       id: 'lint-file',
       name: getTextInLanguage('commands.lint-file.name'),
       editorCheckCallback(checking, editor, ctx) {
         if (checking) {
-          return this.isMarkdownFile(ctx.file);
+          return that.isMarkdownFile(ctx.file);
         }
 
-        this.runLinterEditor(editor);
+        that.runLinterEditor(editor);
       },
       icon: iconInfo.file.id,
       hotkeys: [
@@ -136,12 +137,12 @@ export default class LinterPlugin extends Plugin {
       name: getTextInLanguage('commands.lint-file-unless-ignored.name'),
       editorCheckCallback(checking, editor, ctx) {
         if (checking) {
-          return this.isMarkdownFile(ctx.file);
+          return that.isMarkdownFile(ctx.file);
         }
 
-        const file = this.app.workspace.getActiveFile();
-        if (!this.shouldIgnoreFile(file)) {
-          this.runLinterEditor(editor);
+        const file = that.app.workspace.getActiveFile();
+        if (!that.shouldIgnoreFile(file)) {
+          that.runLinterEditor(editor);
         }
       },
       icon: iconInfo.file.id,
@@ -280,7 +281,7 @@ export default class LinterPlugin extends Plugin {
     }
   }
 
-  shouldIgnoreFile(file: TFile) {
+  shouldIgnoreFile(file: TFile): boolean {
     for (const folder of this.settings.foldersToIgnore) {
       if (folder.length > 0 && file.path.startsWith(folder)) {
         return true;
@@ -289,7 +290,7 @@ export default class LinterPlugin extends Plugin {
     return false;
   }
 
-  isMarkdownFile(file: TFile) {
+  isMarkdownFile(file: TFile): boolean {
     return file && file.extension === 'md';
   }
 
