@@ -140,8 +140,7 @@ export default class LinterPlugin extends Plugin {
           return that.isMarkdownFile(ctx.file);
         }
 
-        const file = that.app.workspace.getActiveFile();
-        if (!that.shouldIgnoreFile(file)) {
+        if (!that.shouldIgnoreFile(ctx.file)) {
           that.runLinterEditor(editor);
         }
       },
@@ -166,12 +165,12 @@ export default class LinterPlugin extends Plugin {
       id: 'lint-all-files-in-folder',
       name: getTextInLanguage('commands.lint-all-files-in-folder.name'),
       icon: iconInfo.folder.id,
-      editorCheckCallback: (checking: Boolean, _) => {
+      editorCheckCallback: (checking: Boolean, _, ctx) => {
         if (checking) {
-          return !this.app.workspace.getActiveFile().parent.isRoot();
+          return !ctx.file.parent.isRoot();
         }
 
-        this.createFolderLintModal(this.app.workspace.getActiveFile().parent);
+        this.createFolderLintModal(ctx.file.parent);
       },
     });
 
