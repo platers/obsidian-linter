@@ -53,6 +53,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
     let textModified = options.alreadyModified;
     const newText = initYAML(text);
     textModified = textModified || newText !== text;
+    options.format = options.format.trimEnd();
 
     return formatYAML(newText, (text) => {
       if (options.dateCreated) {

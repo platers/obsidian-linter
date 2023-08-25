@@ -136,7 +136,7 @@ export class RulesRunner {
 
     currentTime = runOptions.getCurrentTime();
     [newText] = YamlKeySort.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
-      currentTimeFormatted: currentTime.format(yamlTimestampOptions.format),
+      currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
       yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
       dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
     });
