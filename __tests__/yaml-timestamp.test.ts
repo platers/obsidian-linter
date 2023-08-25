@@ -41,6 +41,32 @@ ruleTest({
         format: '',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/861
+      testName: 'When format ends in whitespace, date created is not changed when time updates',
+      before: dedent`
+        ---
+        created: Wednesday, January 1st 2020, 12:00 am
+        modified: Thursday, January 2nd 2020, 12:00 am
+        ---
+      `,
+      after: dedent`
+        ---
+        created: Wednesday, January 1st 2020, 12:00 am
+        modified: Thursday, January 2nd 2020, 12:00 am
+        ---
+      `,
+      options: {
+        dateCreated: true,
+        dateCreatedKey: 'created',
+        dateModified: true,
+        dateModifiedKey: 'modified',
+        format: 'dddd, MMMM Do YYYY, h:mm a ',
+        currentTime: moment('Thursday, January 2nd 2020, 12:01 am', 'dddd, MMMM Do YYYY, h:mm a'),
+        alreadyModified: false,
+        forceRetentionOfCreatedValue: false,
+        fileModifiedTime: '2020-01-02T00:00:00-00',
+      },
+    },
     {
       testName: 'When the date format changes and `forceRetentionOfCreatedValue = true`, date created value is based on the one in the YAML frontmatter.',
       before: dedent`
