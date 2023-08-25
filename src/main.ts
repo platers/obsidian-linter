@@ -112,11 +112,16 @@ export default class LinterPlugin extends Plugin {
   }
 
   addCommands() {
+    const that = this;
     this.addCommand({
       id: 'lint-file',
       name: getTextInLanguage('commands.lint-file.name'),
-      editorCallback: (editor) => {
-        this.runLinterEditor(editor);
+      editorCheckCallback(checking, editor, ctx) {
+        if (checking) {
+          return that.isMarkdownFile(ctx.file);
+        }
+
+        that.runLinterEditor(editor);
       },
       icon: iconInfo.file.id,
       hotkeys: [
@@ -130,11 +135,13 @@ export default class LinterPlugin extends Plugin {
     this.addCommand({
       id: 'lint-file-unless-ignored',
       name: getTextInLanguage('commands.lint-file-unless-ignored.name'),
-      editorCallback: (editor: Editor) => {
-        const file = this.app.workspace.getActiveFile();
+      editorCheckCallback(checking, editor, ctx) {
+        if (checking) {
+          return that.isMarkdownFile(ctx.file);
+        }
 
-        if (!this.shouldIgnoreFile(file)) {
-          this.runLinterEditor(editor);
+        if (!that.shouldIgnoreFile(ctx.file)) {
+          that.runLinterEditor(editor);
         }
       },
       icon: iconInfo.file.id,
@@ -158,12 +165,12 @@ export default class LinterPlugin extends Plugin {
       id: 'lint-all-files-in-folder',
       name: getTextInLanguage('commands.lint-all-files-in-folder.name'),
       icon: iconInfo.folder.id,
-      editorCheckCallback: (checking: Boolean, _) => {
+      editorCheckCallback: (checking: Boolean, _, ctx) => {
         if (checking) {
-          return !this.app.workspace.getActiveFile().parent.isRoot();
+          return !ctx.file.parent.isRoot();
         }
 
-        this.createFolderLintModal(this.app.workspace.getActiveFile().parent);
+        this.createFolderLintModal(ctx.file.parent);
       },
     });
 
@@ -212,8 +219,7 @@ export default class LinterPlugin extends Plugin {
           }
 
           const file = this.app.workspace.getActiveFile();
-
-          if (!this.shouldIgnoreFile(file)) {
+          if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file)) {
             this.runLinterEditor(editor);
           }
         }
@@ -229,7 +235,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   onMenuOpenCallback(menu: Menu, file: TAbstractFile, _source: string) {
-    if (file instanceof TFile && file.extension === 'md') {
+    if (file instanceof TFile && this.isMarkdownFile(file)) {
       menu.addItem((item) => {
         item.setIcon(iconInfo.file.id)
             .setTitle(getTextInLanguage('commands.lint-file-pop-up-menu-text.name'))
@@ -260,7 +266,7 @@ export default class LinterPlugin extends Plugin {
 
     const currentActiveFile = this.app.workspace.getActiveFile();
     const lastActiveFileExists = this.lastActiveFile == null ? false : await this.app.vault.adapter.exists(this.lastActiveFile.path);
-    if (!this.settings.lintOnFileChange || !lastActiveFileExists || this.lastActiveFile === currentActiveFile || this.lastActiveFile.extension !== 'md' || this.shouldIgnoreFile(this.lastActiveFile)) {
+    if (!this.settings.lintOnFileChange || !lastActiveFileExists || this.lastActiveFile === currentActiveFile || !this.isMarkdownFile(this.lastActiveFile) || this.shouldIgnoreFile(this.lastActiveFile)) {
       this.lastActiveFile = currentActiveFile;
       return;
     }
@@ -274,13 +280,17 @@ export default class LinterPlugin extends Plugin {
     }
   }
 
-  shouldIgnoreFile(file: TFile) {
+  shouldIgnoreFile(file: TFile): boolean {
     for (const folder of this.settings.foldersToIgnore) {
       if (folder.length > 0 && file.path.startsWith(folder)) {
         return true;
       }
     }
     return false;
+  }
+
+  isMarkdownFile(file: TFile): boolean {
+    return file && file.extension === 'md';
   }
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
@@ -638,7 +648,7 @@ export default class LinterPlugin extends Plugin {
     const foldersToIterateOver = [startingFolder] as TFolder[];
     for (const folder of foldersToIterateOver) {
       for (const child of folder.children) {
-        if (child instanceof TFile && child.extension === 'md') {
+        if (child instanceof TFile && this.isMarkdownFile(child)) {
           filesInFolder.push(child);
         } else if (child instanceof TFolder) {
           foldersToIterateOver.push(child);
