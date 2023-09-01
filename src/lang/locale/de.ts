@@ -3,40 +3,40 @@
 export default {
   'commands': {
     'lint-file': {
-      'name': 'Flusen Sie die aktuelle Datei',
+      'name': 'Linten Sie die aktuelle Datei',
       'error-message': 'Lint-Datei-Fehler in der Datei',
     },
     'lint-file-unless-ignored': {
-      'name': 'Flusen Sie die aktuelle Datei, es sei denn, sie wird ignoriert',
+      'name': 'Linten Sie die aktuelle Datei, es sei denn, sie wird ignoriert',
     },
     'lint-all-files': {
-      'name': 'Flusen Sie alle Dateien im Tresor',
-      'error-message': 'Lint alle Dateien Fehler in der Datei',
-      'success-message': 'Alle Dateien gelinzelt',
-      'errors-message-singular': 'Alle Dateien wurden gefüttert und es gab 1 Fehler.',
-      'errors-message-plural': 'Alle Dateien wurden gelähmt und es gab {NUM}-Fehler.',
-      'start-message': 'Dadurch werden alle Ihre Dateien bearbeitet und es kann zu Fehlern kommen.',
-      'submit-button-text': 'Fussel alle',
-      'submit-button-notice-text': 'Linting alle Dateien...',
+      'name': 'Linten Sie alle Dateien im Vault',
+      'error-message': 'Beim Linten aller Dateien Fehler in der Datei',
+      'success-message': 'Alle Dateien gelinted',
+      'errors-message-singular': 'Beim Linten aller Dateien gab es einen Fehler.',
+      'errors-message-plural': 'Beim Linten aller Dateien gab es {NUM} Fehler.',
+      'start-message': 'Dadurch werden alle Ihre Dateien verändert und es können Fehler entstehen.',
+      'submit-button-text': 'Linte alle',
+      'submit-button-notice-text': 'Linte  alle Dateien...',
     },
     'lint-all-files-in-folder': {
-      'name': 'Flusen Sie alle Dateien im aktuellen Ordner',
-      'start-message': 'Dadurch werden alle Ihre Dateien in {FOLDER_NAME} bearbeitet, einschließlich der Dateien in den Unterordnern, die zu Fehlern führen können.',
-      'submit-button-text': 'Lint alle Dateien in {FOLDER_NAME}',
-      'submit-button-notice-text': 'Linting aller Dateien in {FOLDER_NAME}...',
-      'error-message': 'Lint alle Dateien im Ordner Fehler in der Datei',
-      'success-message': 'Alle {NUM}-Dateien wurden in {FOLDER_NAME} gelinzelt.',
-      'message-singular': 'Alle {NUM}-Dateien in {FOLDER_NAME} wurden gefüttert und es trat 1 Fehler auf.',
-      'message-plural': 'Alle {FILE_COUNT}-Dateien in {FOLDER_NAME} wurden gelinzelt und es gab einen {ERROR_COUNT}-Fehler.',
+      'name': 'Linte alle Dateien im aktuellen Ordner',
+      'start-message': 'Dadurch werden alle Ihre Dateien in {FOLDER_NAME} bearbeitet, einschließlich der Dateien in den Unterordnern, was zu Fehlern führen kann.',
+      'submit-button-text': 'Linte alle Dateien in {FOLDER_NAME}',
+      'submit-button-notice-text': 'Linten aller Dateien in {FOLDER_NAME}...',
+      'error-message': 'Beim Linten aller Dateien im Ordner gab es Fehler in der Datei',
+      'success-message': 'Alle {NUM}-Dateien in {FOLDER_NAME} wurden gelinted.',
+      'message-singular': 'Alle {NUM}-Dateien in {FOLDER_NAME} wurden gelinted und es trat ein Fehler auf.',
+      'message-plural': 'Alle {FILE_COUNT}-Dateien in {FOLDER_NAME} wurden gelinted und es gab {ERROR_COUNT} Fehler.',
     },
     'paste-as-plain-text': {
       'name': 'Einfügen als reiner Text und ohne Änderungen',
     },
     'lint-file-pop-up-menu-text': {
-      'name': 'Lint-Datei',
+      'name': 'Linte Datei',
     },
     'lint-folder-pop-up-menu-text': {
-      'name': 'Fussel-Ordnerr',
+      'name': 'Linte Ordner',
     },
   },
 
@@ -45,11 +45,11 @@ export default {
     'plugin-unload': 'Plugin entladen',
     'folder-lint': 'Linting-Ordner ',
     'linter-run': 'Laufender Linter',
-    'paste-link-warning': 'Abgebrochenes Einfügen von Flusen, da der Inhalt der Zwischenablage ein Link ist, wodurch Konflikte mit anderen Plugins vermieden werden, die das Einfügen ändern.',
-    'see-console': 'Weitere Informationen finden Sie unter Konsole.',
-    'unknown-error': 'Beim Flusen ist ein unbekannter Fehler aufgetreten.',
+    'paste-link-warning': 'Abgebrochenes Einfügen des Lints, da der Inhalt der Zwischenablage ein Link ist, wodurch Konflikte mit anderen Plugins vermieden werden, die das Einfügen ändern.',
+    'see-console': 'Weitere Informationen finden Sie in der Konsole.',
+    'unknown-error': 'Beim Linten ist ein unbekannter Fehler aufgetreten.',
     'moment-locale-not-found': 'Beim Versuch, Moment.js locale auf {MOMENT_LOCALE} umzustellen, wurde {CURRENT_LOCALE} angezeigt',
-    'file-change-lint-message-start': 'Fusselig',
+    'file-change-lint-message-start': 'Linted',
 
     // rules-runner.ts
     'pre-rules': 'Regeln vor regulären Regeln',
@@ -65,7 +65,7 @@ export default {
     'disabled-text': 'ist deaktiviert',
 
     // rule-builder.ts
-    'run-rule-text': 'Ausgeführte',
+    'run-rule-text': 'Läuft',
 
     // logger.ts
     'timing-key-not-found': 'Der Timing-Schlüssel \'{TIMING_KEY}\' ist in der Timing-Info-Liste nicht vorhanden, daher wurde er ignoriert',
@@ -89,9 +89,10 @@ export default {
   },
 
   'notice-text': {
-    'empty-clipboard': 'Es gibt keinen Inhalt der Zwischenablage.',
-    'characters-added': 'Hinzugefügte Charaktere',
+    'empty-clipboard': 'Es gibt keinen Inhalt in der Zwischenablage.',
+    'characters-added': 'Zeichen hinzugefügt',
     'characters-removed': 'Zeichen entfernt',
+    'copy-to-clipboard-failed': 'Kopieren des Textes in die Zwischenablage fehlgeschlagen: ',
   },
 
   // rule-alias-suggester.ts
@@ -109,13 +110,13 @@ export default {
     'names': {
       // tab.ts
       'general': 'Allgemein',
-      'custom': 'Brauch',
+      'custom': 'Individuell',
       'yaml': 'YAML',
-      'heading': 'Überschriften',
+      'heading': 'Überschrift',
       'content': 'Inhalt',
       'footnote': 'Fußnote',
       'spacing': 'Abstand',
-      'paste': 'Kleben',
+      'paste': 'Einfügen',
       'debug': 'Debuggen',
     },
     // tab-searcher.ts
@@ -123,24 +124,27 @@ export default {
     'general': {
       // general-tab.ts
       'lint-on-save': {
-        'name': 'Flusen beim Speichern',
-        'description': 'Lenken Sie die Datei beim manuellen Speichern (wenn `Strg + S` gedrückt wird oder wenn `:w` ausgeführt wird, während vim-Tastenkombinationen verwendet werden)',
+        'name': 'Linten beim Speichern',
+        'description': 'Linten der Datei beim manuellen Speichern (wenn `Strg + S` gedrückt wird oder wenn `:w` ausgeführt wird, während vim-Tastenkombinationen verwendet werden)',
       },
       'display-message': {
-        'name': 'Meldung auf Flusen anzeigen',
-        'description': 'Zeigen Sie die Anzahl der Zeichen an, die sich nach dem Linsen geändert haben',
+        'name': 'Meldung beim Linten anzeigen',
+        'description': 'Zeigen Sie die Anzahl der Zeichen an, die sich nach dem Linten geändert haben',
       },
       'lint-on-file-change': {
-        'name': 'Flusen bei Dateiänderungen',
-        'description': 'Wenn eine Datei geschlossen oder eine neue Datei ausgelagert wird, wird die vorherige Datei mit Flusen versehen.',
+        'name': 'Linten bei Dateiänderungen',
+        'description': 'Wenn eine Datei geschlossen oder zu einer neuen Datei gewechselt wird, wird die vorherige Datei gelinted.',
       },
       'display-lint-on-file-change-message': {
-        'name': 'Lint auf Dateiänderungsmeldung anzeigen',
-        'description': 'Zeigt eine Meldung an, wenn `Flusen bei Dateiänderungen` auftritt',
+        'name': 'Nachricht beim Linten nach einer Dateiänderung anzeigen',
+        'description': 'Zeigt eine Meldung an, wenn `Linten bei Dateiänderungen` ausgelöst wurde',
       },
       'folders-to-ignore': {
         'name': 'Ordner, die ignoriert werden sollen',
-        'description': 'Ordner, die ignoriert werden sollen, wenn alle Dateien gestürzt oder beim Speichern gestürzt werden. Geben Sie Ordnerpfade ein, die durch Zeilenumbrüche getrennt sind',
+        'description': 'Ordner, die ignoriert werden sollen, wenn alle Dateien gelinted oder beim Speichern gelinted werden. Geben Sie Ordnerpfade ein, die durch Zeilenumbrüche getrennt sind',
+        'folder-search-placeholder-text': 'Ordner-Name',
+        'add-input-button-text': 'Einen anderen zu ignorierenden Ordner hinzufügen',
+        'delete-tooltip': 'Löschen',
       },
       'override-locale': {
         'name': 'Gebietsschema überschreiben',
@@ -172,19 +176,19 @@ export default {
     // debug-tab.ts
       'log-level': {
         'name': 'Log-Ebene',
-        'description': 'Die Arten von Protokollen, die vom Dienst protokolliert werden dürfen. Der Standardwert ist Fehler.',
+        'description': 'Die Arten von Logmeldungen, die vom Dienst protokolliert werden dürfen. Der Standardwert ist Fehler.',
       },
       'linter-config': {
         'name': 'Linter-Konfiguration',
         'description': 'Der Inhalt der data.json für den Linter zum Zeitpunkt des Ladens der Einstellungsseite',
       },
       'log-collection': {
-        'name': 'Sammeln Sie Protokolle, wenn Sie beim Speichern und Flusen der aktuellen Datei flusen',
-        'description': 'Geht voran und sammelt Protokolle, wenn Sie `Flusen beim Speichern` und die aktuelle Datei flusen. Diese Protokolle können beim Debuggen und Erstellen von Fehlerberichten hilfreich sein.',
+        'name': 'Sammeln Sie Protokolle bei aktiviertem `Linten beim Speichern` und dem Linten der aktuellen Datei',
+        'description': 'Sammelt die Log-Meldungen, wenn Sie `Linten beim Speichern` aktiviert haben und die aktuelle Datei linten. Diese Protokolle können beim Debuggen und Erstellen von Fehlerberichten hilfreich sein.',
       },
       'linter-logs': {
         'name': 'Linter-Protokolle',
-        'description': 'Die Protokolle der letzten `Flusen beim Speichern` oder der letzten aktuellen Flusendatei werden ausgeführt, wenn sie aktiviert sind.',
+        'description': 'Die Protokolle des letzten `Linten beim Speichern`-Durchlaufes oder dem letzten Linten der aktuellen Datei werden gesammelt, wenn die Option aktiviert ist.',
       },
     },
   },
@@ -193,7 +197,7 @@ export default {
     'custom-command': {
       // custom-command-option.ts
       'name': 'Benutzerdefinierte Befehle',
-      'description': 'Benutzerdefinierte Befehle sind Obsidian-Befehle, die ausgeführt werden, nachdem der Linter seine regulären Regeln ausgeführt hat. Dies bedeutet, dass sie nicht ausgeführt werden, bevor die YAML-Zeitstempellogik ausgeführt wird, sodass sie dazu führen können, dass der YAML-Zeitstempel bei der nächsten Ausführung des Linter ausgelöst wird. Sie können einen Obsidian-Befehl nur einmal auswählen. **_Beachten Sie, dass dies derzeit nur beim Flusen der aktuellen Datei funktioniert._**',
+      'description': 'Benutzerdefinierte Befehle sind Obsidian-Befehle, die ausgeführt werden, nachdem der Linter seine regulären Regeln ausgeführt hat. Dies bedeutet, dass sie nicht ausgeführt werden, bevor die YAML-Zeitstempellogik ausgeführt wird, sodass sie dazu führen können, dass der YAML-Zeitstempel bei der nächsten Ausführung des Linters ausgelöst wird. Sie können einen Obsidian-Befehl nur einmal auswählen. **_Beachten Sie, dass dies derzeit nur beim Linten der aktuellen Datei funktioniert._**',
       'warning': 'Wenn Sie eine Option auswählen, stellen Sie sicher, dass Sie die Option entweder mit der Maus oder durch Drücken der Eingabetaste auswählen. Andere Auswahlmethoden funktionieren möglicherweise nicht und es werden nur Auswahlen eines tatsächlichen Obsidian-Befehls oder einer leeren Zeichenfolge gespeichert.',
 
       'add-input-button-text': 'Neuen Befehl hinzufügen',
@@ -206,7 +210,7 @@ export default {
       // custom-replace-option.ts
       'name': 'Benutzerdefinierter Regex-Ersatz',
       'description': 'Der benutzerdefinierte Regex-Ersatz kann verwendet werden, um alles zu ersetzen, was mit dem Such-Regex mit dem Ersatzwert übereinstimmt. Bei den Werten replace und find muss es sich um gültige Regex-Werte handeln.',
-      'warning': 'Verwenden Sie dies mit Vorsicht, wenn Sie Regex nicht kennen. Stellen Sie außerdem sicher, dass Sie keine Lookbehinds in Ihrem regulären Ausdruck auf iOS-Mobilgeräten verwenden, da dies dazu führt, dass Flusen fehlschlagen, da dies auf dieser Plattform nicht unterstützt wird.',
+      'warning': 'Verwenden Sie dies mit Vorsicht, wenn Sie Regex nicht kennen. Stellen Sie außerdem sicher, dass Sie keine Lookbehinds in Ihrem regulären Ausdruck auf iOS-Mobilgeräten verwenden, da dies dazu führt, dass Lints fehlschlagen, da dies auf dieser Plattform nicht unterstützt wird.',
       'add-input-button-text': 'Neuen Regex-Ersatz hinzufügen',
       'regex-to-find-placeholder-text': 'Regex zu finden',
       'flags-placeholder-text': 'Flaggen',
@@ -266,21 +270,21 @@ export default {
     },
     // compact-yaml.ts
     'compact-yaml': {
-      'name': 'Kompakte YAML',
-      'description': 'Entfernt führende und nachfolgende Leerzeilen in der YAML-Frontmaterie.',
+      'name': 'YAML komprimieren',
+      'description': 'Entfernt führende und nachfolgende Leerzeilen im YAML-Frontmatter.',
       'inner-new-lines': {
-        'name': 'Innere neue Linien',
+        'name': 'Innere neue Zeilen',
         'description': 'Entfernen Sie neue Zeilen, die sich nicht am Anfang oder am Ende der YAML befinden',
       },
     },
     // consecutive-blank-lines.ts
     'consecutive-blank-lines': {
-      'name': 'Consecutive blank lines',
-      'description': 'There should be at most one consecutive blank line.',
+      'name': 'aufeinanderfolgende Leerzeilen zusammenfassen',
+      'description': 'Es sollte höchstens eine aufeinanderfolgende Leerzeile geben.',
     },
     // convert-bullet-list-markers.ts
     'convert-bullet-list-markers': {
-      'name': 'Aufeinanderfolgende Leerzeilen',
+      'name': 'Konvertiere Aufzählungszeichen',
       'description': 'Konvertiert gängige Symbole für Aufzählungslisten in Markdown-Listenmarkierungen.',
     },
     // convert-spaces-to-tabs.ts
@@ -289,12 +293,12 @@ export default {
       'description': 'Konvertiert führende Leerzeichen in Tabulatoren.',
       'tabsize': {
         'name': 'Tabgröße',
-        'description': 'Anzahl der Leerzeichen, die in eine Registerkarte umgewandelt werden',
+        'description': 'Anzahl der Leerzeichen, die in einen Tabulator umgewandelt werden',
       },
     },
     // emphasis-style.ts
     'emphasis-style': {
-      'name': 'Betonung Stil',
+      'name': 'Hervorhebungsstil',
       'description': 'Stellt sicher, dass der Hervorhebungsstil konsistent ist.',
       'style': {
         'name': 'Stil',
@@ -308,8 +312,8 @@ export default {
     },
     // empty-line-around-code-fences.ts
     'empty-line-around-code-fences': {
-      'name': 'Leere Zeile um Code-Zäune',
-      'description': 'Stellt sicher, dass Codezäune mit einer leeren Zeile versehen sind, es sei denn, sie beginnen oder beenden ein Dokument.',
+      'name': 'Leere Zeile um Code-Bereiche',
+      'description': 'Stellt sicher, dass Codebereiche mit einer leeren Zeile versehen sind, es sei denn, sie beginnen oder beenden ein Dokument.',
     },
     // empty-line-around-math-block.ts
     'empty-line-around-math-blocks': {
@@ -319,14 +323,14 @@ export default {
     // empty-line-around-tables.ts
     'empty-line-around-tables': {
       'name': 'Leere Zeile um Tabellen',
-      'description': 'Stellt sicher, dass es eine leere Zeile um Github-Tabellen gibt, es sei denn, sie beginnen oder beenden ein Dokument.',
+      'description': 'Stellt sicher, dass es eine leere Zeile um Github-formatierte Tabellen gibt, es sei denn, sie beginnen oder beenden ein Dokument.',
     },
     // escape-yaml-special-characters.ts
     'escape-yaml-special-characters': {
       'name': 'Escape-YAML-Sonderzeichen',
-      'description': 'Maskiert Doppelpunkte mit einem Leerzeichen nach ihnen (:), einfache Anführungszeichen (\') und doppelte Anführungszeichen (") in YAML.',
+      'description': 'Maskiert Doppelpunkte mit einem Leerzeichen nach ihnen (: ), einfache Anführungszeichen (\') und doppelte Anführungszeichen (") in YAML.',
       'try-to-escape-single-line-arrays': {
-        'name': 'Versuchen Sie, Single-Line-Arrays zu umgehen',
+        'name': 'Versucht, Single-Line-Arrays zu vermeiden',
         'description': 'Versucht, Arraywerte zu maskieren, wobei davon ausgegangen wird, dass ein Array mit "[" beginnt, mit "]" endet und Elemente enthält, die durch "," getrennt sind.',
       },
     },
@@ -352,12 +356,12 @@ export default {
     // format-tags-in-yaml.ts
     'format-tags-in-yaml': {
       'name': 'Formatieren von Tags in YAML',
-      'description': 'Entfernen Sie Hashtags aus Tags in der YAML-Frontmaterie, da sie die Tags dort ungültig machen.',
+      'description': 'Entfernen Sie Hashtags aus Tags im YAML-Frontmatter, da sie die Tags dort ungültig machen.',
     },
     // format-yaml-array.ts
     'format-yaml-array': {
       'name': 'Formatieren des YAML-Arrays',
-      'description': 'Ermöglicht die Formatierung von regulären YAML-Arrays als mehrzeilig oder einzeilig und `schilder` und `decknamen` dürfen einige Obsidian-spezifische YAML-Formate haben. Beachten Sie, dass eine einzelne Zeichenfolge zu einer einzelnen Zeile von einem einzelnen Zeichenfolgeneintrag zu einem einzeiligen Array wechselt, wenn mehr als 1 Eintrag vorhanden ist. Das Gleiche gilt für eine einzelne Zeichenfolge bis zu einer mehrzeiligen Zeichenfolge, mit der Ausnahme, dass sie zu einem mehrzeiligen Array wird.',
+      'description': 'Ermöglicht die Formatierung von regulären YAML-Arrays als mehrzeilig oder einzeilig und `tags` und `aliases` dürfen einige Obsidian-spezifische YAML-Formate haben. Beachten Sie, dass eine einzelne Zeichenfolge zu einer einzelnen Zeile von einem einzelnen Zeichenfolgeneintrag zu einem einzeiligen Array wechselt, wenn mehr als 1 Eintrag vorhanden ist. Das Gleiche gilt für eine einzelne Zeichenfolge bis zu einer mehrzeiligen Zeichenfolge, mit der Ausnahme, dass sie zu einem mehrzeiligen Array wird.',
       'alias-key': {
         'name': 'Abschnitt "YAML-Aliase" formatieren',
         'description': 'Aktiviert die Formatierung für den Abschnitt YAML-Aliase. Sie sollten diese Option nicht zusammen mit der Regel `YAML-Titel-Alias` aktivieren, da sie möglicherweise nicht gut zusammenarbeiten oder unterschiedliche Formatstile ausgewählt haben, was zu unerwarteten Ergebnissen führt.',
@@ -368,18 +372,18 @@ export default {
       },
       'default-array-style': {
         'name': 'Standardmäßiger YAML-Array-Abschnittsstil',
-        'description': 'Der Stil anderer YAML-Arrays, die nicht `schilder`, `decknamen` oder in `Erzwingen von Schlüsselwerten, dass es sich um einzeilige Arrays handelt` und `Erzwingen von Schlüsselwerten, dass es sich um mehrzeilige Arrays handelt` sind',
+        'description': 'Der Stil anderer YAML-Arrays, die nicht `tags` oder `aliases` sind oder bei `Erzwingt für Schlüsselwerte einzeilige Arrays` und `Erzwingt für Schlüsselwerte mehrzeilige Arrays`',
       },
       'default-array-keys': {
         'name': 'Formatieren von YAML-Array-Abschnitten',
         'description': 'Aktiviert die Formatierung für reguläre YAML-Arrays',
       },
       'force-single-line-array-style': {
-        'name': 'Erzwingen von Schlüsselwerten, dass es sich um einzeilige Arrays handelt',
+        'name': 'Erzwingt für Schlüsselwerte einzeilige Arrays',
         'description': 'Erzwingt, dass das YAML-Array für die neuen zeilengetrennten Schlüssel im einzeiligen Format vorliegt (leer lassen, um diese Option zu deaktivieren)',
       },
       'force-multi-line-array-style': {
-        'name': 'Erzwingen von Schlüsselwerten, dass es sich um mehrzeilige Arrays handelt',
+        'name': 'Erzwingt für Schlüsselwerte mehrzeilige Arrays',
         'description': 'Erzwingt, dass das YAML-Array für die neuen zeilengetrennten Schlüssel im mehrzeiligen Format vorliegt (leer lassen, um diese Option zu deaktivieren)',
       },
     },
@@ -394,29 +398,29 @@ export default {
     },
     // heading-blank-lines.ts
     'heading-blank-lines': {
-      'name': 'Überschrift Leerzeilen',
+      'name': 'Überschriften mit Leerzeilen',
       'description': 'Alle Überschriften haben sowohl davor als auch danach eine Leerzeile (außer wenn sich die Überschrift am Anfang oder Ende des Dokuments befindet).',
       'bottom': {
-        'name': 'Unteres',
-        'description': 'Einfügen einer Leerzeile nach Überschriften',
+        'name': 'Darunter',
+        'description': 'Einfügen einer Leerzeile unter Überschriften',
       },
       'empty-line-after-yaml': {
         'name': 'Leere Zeile zwischen YAML und Header',
-        'description': 'Behalten Sie die leere Zeile zwischen der YAML-Frontmaterie und dem Header bei',
+        'description': 'Behalten Sie die leere Zeile zwischen dem YAML-Frontmatter und dem Header bei',
       },
     },
     // headings-start-line.ts
     'headings-start-line': {
-      'name': 'Überschriften Startlinie',
+      'name': 'Überschriften am Zeilenbeginn',
       'description': 'Bei Überschriften, die keine Zeile beginnen, wird der vorangehende Leerraum entfernt, um sicherzustellen, dass sie als Überschriften erkannt werden.',
     },
     // insert-yaml-attributes.ts
     'insert-yaml-attributes': {
       'name': 'Einfügen von YAML-Attributen',
-      'description': 'Fügt die angegebenen YAML-Attribute in die YAML-Frontmaterie ein. Setzen Sie jedes Attribut in eine einzelne Zeile.',
+      'description': 'Fügt die angegebenen YAML-Attribute in den YAML-Frontmatter ein. Setzen Sie jedes Attribut in eine einzelne Zeile.',
       'text-to-insert': {
         'name': 'Text zum Einfügen',
-        'description': 'Text, der in die YAML-Frontsache eingefügt werden soll',
+        'description': 'Text, der in den YAML-Frontmatter eingefügt werden soll',
       },
     },
     // line-break-at-document-end.ts
@@ -437,20 +441,20 @@ export default {
     // move-tags-to-yaml.ts
     'move-tags-to-yaml': {
       'name': 'Tags nach YAML verschieben',
-      'description': 'Verschieben Sie alle Tags in die YAML-Frontsache des Dokuments.',
+      'description': 'Verschieben Sie alle Tags in den YAML-Frontmatter des Dokuments.',
       'how-to-handle-existing-tags': {
-        'name': 'Body-Tag-Betrieb',
-        'description': 'Die Aktion, die mit nicht ignorierten Tags im Hauptteil der Datei ausgeführt werden soll, nachdem sie in die Frontmaterie verschoben wurden',
+        'name': 'Body-Tag-Operation',
+        'description': 'Die Aktion, die mit nicht ignorierten Tags im Hauptteil der Datei ausgeführt werden soll, nachdem sie in den Frontmatter verschoben wurden',
       },
       'tags-to-ignore': {
-        'name': 'Tags zum Ignorieren',
+        'name': 'ignorierte Tags',
         'description': 'Die Tags, die nicht in das Tags-Array verschoben oder aus dem Textinhalt entfernt werden, wenn `Entfernen Sie den Hashtag aus Tags im Inhaltstext` aktiviert ist. Jedes Tag sollte in einer neuen Zeile und ohne das `#`` stehen. **Stellen Sie sicher, dass Sie den Hashtag nicht in den Tag-Namen aufnehmen.**',
       },
     },
     // no-bare-urls.ts
     'no-bare-urls': {
       'name': 'Keine bloßen URLs',
-      'description': 'Umschließt bloße URLs mit spitzen Klammern, es sei denn, sie sind in hintere Häkchen, eckige Klammern oder einfache oder doppelte Anführungszeichen eingeschlossen.',
+      'description': 'Umschließt bloße URLs mit spitzen Klammern, es sei denn, sie sind in Back-Ticks, eckige Klammern oder einfache oder doppelte Anführungszeichen eingeschlossen.',
     },
     // ordered-list-style.ts
     'ordered-list-style': {
@@ -461,8 +465,8 @@ export default {
         'description': 'Der Zahlenstil, der in geordneten Listenindikatoren verwendet wird',
       },
       'list-end-style': {
-        'name': 'Endstil des geordneten Listenindikators',
-        'description': 'Das Endzeichen eines geordneten Listenkennzeichens',
+        'name': 'Endestil des Indikators für eine geordnete Liste',
+        'description': 'Das Endezeichen eines geordneten Listenkennzeichens',
       },
     },
     // paragraph-blank-lines.ts
@@ -558,12 +562,12 @@ export default {
     },
     // remove-multiple-blank-lines-on-paste.ts
     'remove-multiple-blank-lines-on-paste': {
-      'name': 'Entfernen Sie mehrere Leerzeilen beim Einfügen',
+      'name': 'Entfernen Sie mehrfache Leerzeilen beim Einfügen',
       'description': 'Verdichtet mehrere Leerzeilen zu einer Leerzeile, damit der Text eingefügt werden kann',
     },
     // remove-multiple-spaces.ts
     'remove-multiple-spaces': {
-      'name': 'Entfernen Sie mehrere Leerzeichen',
+      'name': 'Entfernen Sie mehrfache Leerzeichen',
       'description': 'Entfernt zwei oder mehr aufeinanderfolgende Leerzeichen. Ignoriert Leerzeichen am Anfang und am Ende der Zeile.',
     },
     // remove-space-around-characters.ts
@@ -615,7 +619,7 @@ export default {
       'description': 'Entfernt die angegebenen YAML-Schlüssel',
       'yaml-keys-to-remove': {
         'name': 'Zu entfernende YAML-Schlüssel',
-        'description': 'Die zu entfernenden YAML-Tasten aus der YAML-Frontmaterie mit oder ohne Doppelpunkt',
+        'description': 'Die zu entfernenden YAML-Schlüssel aus dem YAML-Frontmatter mit oder ohne Doppelpunkt',
       },
     },
     // space-after-list-markers.ts
@@ -665,51 +669,51 @@ export default {
       'name': 'Sortierung von YAML-Schlüsseln',
       'description': 'Sortiert die YAML-Schlüssel basierend auf der angegebenen Reihenfolge und Priorität. Hinweis: Kann auch Leerzeilen entfernen.',
       'yaml-key-priority-sort-order': {
-        'name': 'Sortierreihenfolge der YAML-Schlüsselpriorität',
-        'description': 'Die Reihenfolge, in der Schlüssel sortiert werden sollen, wobei einer in jeder Zeile sortiert wird, in der er in der Reihenfolge sortiert wird, die in der Liste gefunden wird',
+        'name': 'Prioritätssortierreihenfolge der YAML-Schlüssel',
+        'description': 'Die Reihenfolge, in der die Schlüssel sortiert werden sollen, wobei in jeder Zeile ein Schlüssel in der Reihenfolge der Liste sortiert wird',
       },
       'priority-keys-at-start-of-yaml': {
-        'name': 'Prioritätstasten beim Start von YAML',
-        'description': 'Die Sortierreihenfolge der YAML-Schlüsselpriorität wird am Anfang der YAML-Frontmaterie platziert',
+        'name': 'Prioritätsschlüssel am Anfang von YAML',
+        'description': 'Die priorisierte Sortierreihenfolge der YAML-Schlüssel wird am Anfang des YAML-Frontmatters platziert',
       },
       'yaml-sort-order-for-other-keys': {
         'name': 'YAML-Sortierreihenfolge für andere Schlüssel',
-        'description': 'Die Art und Weise, wie die Schlüssel sortiert werden, die nicht im Textbereich Sortierreihenfolge der YAML-Schlüsselpriorität gefunden werden',
+        'description': 'Die Art und Weise, wie die Schlüssel sortiert werden, die nicht im Textbereich der priorisierten Sortierreihenfolge von YAML-Keys vorhanden sind',
       },
     },
     // yaml-timestamp.ts
     'yaml-timestamp': {
       'name': 'YAML-Zeitstempel',
-      'description': 'Verfolgen Sie das Datum, an dem die Datei zuletzt bearbeitet wurde, in der YAML-Front. Ruft Datumsangaben aus Dateimetadaten ab.',
+      'description': 'Verfolgen Sie das Datum, an dem die Datei zuletzt bearbeitet wurde, im YAML-Frontmatter. Ruft Datumsangaben aus Dateimetadaten ab.',
       'date-created': {
         'name': 'Erstellungsdatum',
-        'description': 'Der YAML-Schlüssel, der für das Erstellungsdatum verwendet werden soll',
+        'description': 'Geben Sie das Datum ein, an dem die Datei erstellt wurde',
       },
       'date-created-key': {
-        'name': 'Erstellungsdatum des Schlüssels',
-        'description': 'Welcher YAML-Schlüssel soll für das Erstellungsdatum verwendet werden',
+        'name': 'Schlüssel für das Erstellungsdatum',
+        'description': 'Der YAML-Schlüssel, der für das Erstellungsdatum verwendet werden soll',
       },
       'force-retention-of-create-value': {
-        'name': 'Erstellungsdatum erzwingen Schlüsselwertaufbewahrung',
-        'description': 'Verwendet den Wert in der YAML-Frontmaterie für das Erstellungsdatum anstelle der Dateimetadaten, was nützlich ist, um zu verhindern, dass Änderungen an Dateimetadaten dazu führen, dass der Wert in einen anderen Wert geändert wird.',
+        'name': 'Erzwinge die Beibehaltung des Schlüsselwertes für das Erstellungsdatum',
+        'description': 'Verwendet den Wert im YAML-Frontmatter für das Erstellungsdatum anstelle den Dateimetadaten, was nützlich ist, um zu verhindern, dass Änderungen an Dateimetadaten dazu führen, dass der Wert in einen anderen Wert geändert wird.',
       },
       'date-modified': {
         'name': 'Änderungsdatum',
         'description': 'Geben Sie das Datum ein, an dem die Datei zuletzt geändert wurde',
       },
       'date-modified-key': {
-        'name': 'Änderungsdatum des Schlüssels',
+        'name': 'Schlüssel für das Änderungsdatum',
         'description': 'Der YAML-Schlüssel, der für das Änderungsdatum verwendet werden soll',
       },
       'format': {
         'name': 'Format',
-        'description': 'Zu verwendendes Momentdatumsformat (siehe [Momentformatoptionen](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
+        'description': 'Zu verwendendes Datumsformat für Moment.js (siehe [Momentformatoptionen](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
       },
     },
     // yaml-title-alias.ts
     'yaml-title-alias': {
       'name': 'YAML-Titel-Alias',
-      'description': 'Fügt den Titel der Datei in den Aliasabschnitt der YAML-Frontmaterie ein. Ruft den Titel aus dem ersten H1- oder Dateinamen ab.',
+      'description': 'Fügt den Titel der Datei in den Aliasabschnitt des YAML-Frontmatters ein. Ruft den Titel aus dem ersten H1- oder Dateinamen ab.',
       'preserve-existing-alias-section-style': {
         'name': 'Vorhandenes Alias-Abschnittsformat beibehalten',
         'description': 'Wenn diese Option festgelegt ist, gilt die Einstellung `YAML-Aliase-Abschnittsstil` nur für die neu erstellten Abschnitte',
