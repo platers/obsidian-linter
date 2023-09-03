@@ -24,7 +24,7 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
   }
   apply(text: string, options: HeadingBlankLinesOptions): string {
     if (!options.bottom) {
-      text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
+      text = text.replace(/(#+\s.*)?\n+(#+\s.*)/g, this.handleBlankLinesBeforeAHeaderWhenNoBlankLines);
     } else {
       text = text.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings
       text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
@@ -39,6 +39,14 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
     }
 
     return text;
+  }
+  handleBlankLinesBeforeAHeaderWhenNoBlankLines(match: string, $1: string, $2: string): string {
+    // if there is a heading behind the current heading then we leave things alone
+    if ($1 && $1 != '') {
+      return match;
+    }
+
+    return '\n\n' + $2;
   }
   get exampleBuilders(): ExampleBuilder<HeadingBlankLinesOptions>[] {
     return [
