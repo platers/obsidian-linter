@@ -127,5 +127,39 @@ ruleTest({
         emptyLineAfterYaml: false,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/773
+      testName: 'Make sure that blank lines are not added when there is no content between 2 headings when `bottom = false`',
+      before: dedent`
+        # Heading 1
+        ## Heading 2
+      `,
+      after: dedent`
+        # Heading 1
+        ## Heading 2
+      `,
+      options: {
+        bottom: false,
+        emptyLineAfterYaml: false,
+      },
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/773
+      testName: 'Make sure that blank lines are not changed when there is no content between 2 headings when `bottom = false`',
+      before: dedent`
+        # Heading 1
+        ${''}
+        ${''}
+        ## Heading 2
+      `,
+      after: dedent`
+        # Heading 1
+        ${''}
+        ${''}
+        ## Heading 2
+      `,
+      options: {
+        bottom: false,
+        emptyLineAfterYaml: false,
+      },
+    },
   ],
 });
