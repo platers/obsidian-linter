@@ -20,5 +20,37 @@ ruleTest({
         \t\t- Donec ut auctor dui.
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/410
+      testName: 'Properly converts callout spaces to tabs',
+      before: dedent`
+        > [!note]
+        > - A
+        >     - B
+        > - C
+      `,
+      after: dedent`
+        > [!note]
+        > - A
+        > \t- B
+        > - C
+      `,
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/410
+      testName: 'Properly converts callout spaces to tabs with nested callouts',
+      before: dedent`
+        > Blockquote 1
+        >> [!note]
+        > > - A
+        > >     - B
+        >> - C
+      `,
+      after: dedent`
+        > Blockquote 1
+        >> [!note]
+        > > - A
+        > > \t- B
+        >> - C
+      `,
+    },
   ],
 });
