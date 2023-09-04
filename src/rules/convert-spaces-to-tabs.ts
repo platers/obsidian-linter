@@ -23,12 +23,24 @@ export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabs
   apply(text: string, options: ConvertSpacesToTabsOptions): string {
     const tabsize = String(options.tabsize);
     const tabsize_regex = new RegExp(
-        '^(\t*) {' + String(tabsize) + '}',
+        '^(\t*) {' + tabsize + '}',
         'gm',
     );
 
-    while (text.match(tabsize_regex) != null) {
-      text = text.replace(tabsize_regex, '$1\t');
+    text = this.replaceAllRegexMatches(text, tabsize_regex);
+
+    const blockquote_regex = new RegExp(
+        '^((>( |\t*))*(>( |\t))\t*) {' + tabsize + '}',
+        'gm',
+    );
+
+    text = this.replaceAllRegexMatches(text, blockquote_regex);
+
+    return text;
+  }
+  replaceAllRegexMatches(text: string, regex: RegExp): string {
+    while (text.match(regex) != null) {
+      text = text.replace(regex, '$1\t');
     }
 
     return text;
@@ -49,6 +61,25 @@ export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabs
           \t- text indented with 3 spaces
           - text with no indention
           \t\t- text indented with 6 spaces
+        `,
+        options: {
+          tabsize: 3,
+        },
+      }),
+      new ExampleBuilder({
+        // accounts for https://github.com/platers/obsidian-linter/issues/410
+        description: 'Converting spaces to tabs with `tabsize = 3` works in blockquotes',
+        before: dedent`
+          > - text with no indention
+          >    - text indented with 3 spaces
+          > - text with no indention
+          >       - text indented with 6 spaces
+        `,
+        after: dedent`
+          > - text with no indention
+          > \t- text indented with 3 spaces
+          > - text with no indention
+          > \t\t- text indented with 6 spaces
         `,
         options: {
           tabsize: 3,
