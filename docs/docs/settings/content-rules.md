@@ -378,7 +378,11 @@ Alias: `no-bare-urls`
 
 Encloses bare URLs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes.
 
+### Options
 
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `No Bare URIs` | Attempts to enclose bare URIs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes. | N/A | false |
 
 
 
@@ -450,6 +454,20 @@ After:
 <https://github.com>
 <https://google.com>
 <https://gitlab.com>
+``````
+</details>
+<details><summary>Puts angle brackets around URIs when `No Bare URIs` is enabled</summary>
+
+Before:
+
+`````` markdown
+obsidian://show-plugin?id=cycle-in-sidebar
+``````
+
+After:
+
+`````` markdown
+<obsidian://show-plugin?id=cycle-in-sidebar>
 ``````
 </details>
 

@@ -353,3 +353,19 @@ After:
 ## Heading &amp;
 ``````
 </details>
+<details><summary>Removes punctuation from the end of a heading when followed by whitespace</summary>
+
+Before:
+
+`````` markdown
+# Heading 1!  
+## Heading 2.	
+``````
+
+After:
+
+`````` markdown
+# Heading 1  
+## Heading 2	
+``````
+</details>

@@ -147,6 +147,26 @@ After:
 		- text indented with 6 spaces
 ``````
 </details>
+<details><summary>Converting spaces to tabs with `tabsize = 3` works in blockquotes</summary>
+
+Before:
+
+`````` markdown
+> - text with no indention
+>    - text indented with 3 spaces
+> - text with no indention
+>       - text indented with 6 spaces
+``````
+
+After:
+
+`````` markdown
+> - text with no indention
+> 	- text indented with 3 spaces
+> - text with no indention
+> 		- text indented with 6 spaces
+``````
+</details>
 
 ## Empty Line Around Blockquotes
 

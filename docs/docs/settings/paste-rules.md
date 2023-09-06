@@ -392,6 +392,26 @@ He was sure that he would get off without doing any time, but the cops had other
 _Note that the format for footnote references to remove is a dot or comma followed by any number of digits_
 ``````
 </details>
+<details><summary>Footnote reference removal does not affect links</summary>
+
+Before:
+
+`````` markdown
+[[Half is .5]]
+[Half is .5](HalfIs.5.md)
+![](HalfIs.5.jpg)
+![[Half is .5.jpg]]
+``````
+
+After:
+
+`````` markdown
+[[Half is .5]]
+[Half is .5](HalfIs.5.md)
+![](HalfIs.5.jpg)
+![[Half is .5.jpg]]
+``````
+</details>
 
 ## Remove Multiple Blank Lines on Paste
 
