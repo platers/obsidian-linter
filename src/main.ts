@@ -1,5 +1,5 @@
 import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange} from 'obsidian';
-import {Options, rules} from './rules';
+import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {stripCr} from './utils/strings';
@@ -52,6 +52,7 @@ export default class LinterPlugin extends Plugin {
   private isEnabled: boolean = true;
   private rulesRunner = new RulesRunner();
   private lastActiveFile: TFile;
+  private overridePaste: boolean = false;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -105,10 +106,13 @@ export default class LinterPlugin extends Plugin {
         this.settings.ruleConfigs[rule.alias] = rule.getDefaultOptions();
       }
     }
+
+    this.updatePasteOverrideStatus();
   }
 
   async saveSettings() {
     await this.saveData(this.settings);
+    this.updatePasteOverrideStatus();
   }
 
   addCommands() {
@@ -177,7 +181,13 @@ export default class LinterPlugin extends Plugin {
     this.addCommand({
       id: 'paste-as-plain-text',
       name: getTextInLanguage('commands.paste-as-plain-text.name'),
-      editorCallback: (editor) => this.pasteAsPlainText(editor),
+      editorCheckCallback: (checking, editor) => {
+        if (checking) {
+          return this.overridePaste;
+        }
+
+        this.pasteAsPlainText(editor);
+      },
     });
   }
 
@@ -185,9 +195,11 @@ export default class LinterPlugin extends Plugin {
     let eventRef = this.app.workspace.on('editor-paste', (clipboardEv: ClipboardEvent) => {
       // do not paste if another handler has already handled pasting text as that would likely cause a
       // double pasting of the clipboard contents
-      if (clipboardEv.defaultPrevented) {
+      // also skip if no paste rules are enabled
+      if (clipboardEv.defaultPrevented || !this.overridePaste) {
         return;
       }
+
 
       this.modifyPasteEvent(clipboardEv);
     });
@@ -533,7 +545,7 @@ export default class LinterPlugin extends Plugin {
     const editorChange: EditorChange[] = [];
 
     cursorSelections.forEach((cursorSelection: EditorSelection, index: number) => {
-      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection), createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings));
+      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection), editor.getRange(cursorSelection.anchor, cursorSelection.head) ?? '', createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings));
       editorChange.push({
         text: clipboardText,
         from: cursorSelection.anchor,
@@ -657,5 +669,16 @@ export default class LinterPlugin extends Plugin {
     }
 
     return filesInFolder;
+  }
+
+  private updatePasteOverrideStatus() {
+    for (const rule of ruleTypeToRules.get(RuleType.PASTE)) {
+      if (rule.getOptions(this.settings)['enabled']) {
+        this.overridePaste = true;
+        return;
+      }
+    }
+
+    this.overridePaste = false;
   }
 }

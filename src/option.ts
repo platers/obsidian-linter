@@ -60,7 +60,7 @@ export class BooleanOption extends Option {
           toggle.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
-            plugin.saveData(plugin.settings);
+            plugin.saveSettings();
           });
         });
 
@@ -78,7 +78,7 @@ export class TextOption extends Option {
           textbox.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
-            plugin.saveData(plugin.settings);
+            plugin.saveSettings();
           });
         });
 
@@ -96,7 +96,7 @@ export class TextAreaOption extends Option {
           textbox.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
-            plugin.saveData(plugin.settings);
+            plugin.saveSettings();
           });
         });
 
@@ -115,7 +115,7 @@ export class MomentFormatOption extends Option {
           format.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
-            plugin.saveData(plugin.settings);
+            plugin.saveSettings();
           });
         });
 
@@ -164,7 +164,7 @@ export class DropdownOption extends Option {
           dropdown.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
-            plugin.saveData(plugin.settings);
+            plugin.saveSettings();
           });
         });
 
