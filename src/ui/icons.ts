@@ -135,20 +135,20 @@ const successSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="
 </svg>`;
 
 // exported SVG info
-export const iconInfo: Record<string, { id: string, source: string }> = {
-  folder: { id: 'lint-folder', source: lintFolderSVG },
-  file: { id: 'lint-file', source: lintFileSVG },
-  vault: { id: 'lint-vault', source: lintVaultSVG },
-  whitespace: { id: 'lint-whitespace', source: whitespaceSVG },
-  math: { id: 'lint-math', source: mathSVG },
-  content: { id: 'lint-content', source: contentSVG },
-  paste: { id: 'lint-paste', source: pasteSVG },
-  custom: { id: 'lint-custom', source: addBookSVG },
-  heading: { id: 'lint-heading', source: headingSVG },
-  footer: { id: 'lint-footer', source: footerSVG },
-  yaml: { id: 'lint-yaml', source: yamlSVG },
-  general: { id: 'lint-general', source: settingsSVG },
-  debug: { id: 'lint-debug', source: debugSVG },
-  clipboard: { id: 'linter-clipboard', source: clipboardSVG },
-  success: { id: 'linter-success', source: successSVG },
+export const iconInfo: Record<string, {id: string, source: string}> = {
+  folder: {id: 'lint-folder', source: lintFolderSVG},
+  file: {id: 'lint-file', source: lintFileSVG},
+  vault: {id: 'lint-vault', source: lintVaultSVG},
+  whitespace: {id: 'lint-whitespace', source: whitespaceSVG},
+  math: {id: 'lint-math', source: mathSVG},
+  content: {id: 'lint-content', source: contentSVG},
+  paste: {id: 'lint-paste', source: pasteSVG},
+  custom: {id: 'lint-custom', source: addBookSVG},
+  heading: {id: 'lint-heading', source: headingSVG},
+  footer: {id: 'lint-footer', source: footerSVG},
+  yaml: {id: 'lint-yaml', source: yamlSVG},
+  general: {id: 'lint-general', source: settingsSVG},
+  debug: {id: 'lint-debug', source: debugSVG},
+  clipboard: {id: 'linter-clipboard', source: clipboardSVG},
+  success: {id: 'linter-success', source: successSVG},
 } as const;
