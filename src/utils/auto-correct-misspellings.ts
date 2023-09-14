@@ -1,4 +1,5 @@
 export const misspellingToCorrection = new Map<string, string>([
+  ['realize','realise'],
   ['1nd', '1st'],
   ['2rd', '2nd'],
   ['2st', '2nd'],
