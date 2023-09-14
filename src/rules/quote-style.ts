@@ -82,7 +82,7 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
       nextCharIsALetter = unicodeLetterRegex.test(nextChar);
       isContraction = previousCharIsALetter && nextCharIsALetter;
       if (isContraction && isForSingleQuotes) {
-        quoteReplacement = openingSmartQuote;
+        quoteReplacement = closingSmartQuote;
       } else if (previousCharIsALetter && (isForSingleQuotes || !nextCharIsALetter)) {
         quoteReplacement = closingSmartQuote;
         previousQuote = quoteReplacement;
