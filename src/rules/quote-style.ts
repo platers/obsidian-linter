@@ -3,7 +3,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {smartDoubleQuoteRegex, smartSingleQuoteRegex, unicodeLetterRegex} from '../utils/regex';
-import {replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
+import {replaceTextBetweenStartAndEndWithNewValue, getSubstringIndex} from '../utils/strings';
 
 export enum SingleQuoteStyles {
   Straight = '\'\'',
@@ -62,7 +62,7 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
     return text.replace(smartDoubleQuoteRegex, '"');
   }
   convertStraightQuoteToSmartQuote(text: string, straightQuote: string, openingSmartQuote: string, closingSmartQuote: string, isForSingleQuotes: boolean): string {
-    const indices = this.locations(straightQuote, text);
+    const indices = getSubstringIndex(straightQuote, text);
     if (indices.length === 0) {
       return text;
     }
@@ -73,6 +73,8 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
     let nextChar = '';
     let previousCharIsALetter = false;
     let nextCharIsALetter = false;
+    let previousCharIsWhitespace = false;
+    let nextCharIsWhitespace = false;
     let isContraction = false;
     let previousQuote = '';
     for (const index of indices) {
@@ -81,15 +83,17 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
       previousCharIsALetter = unicodeLetterRegex.test(previousChar);
       nextCharIsALetter = unicodeLetterRegex.test(nextChar);
       isContraction = previousCharIsALetter && nextCharIsALetter;
+      previousCharIsWhitespace = previousChar != '' && previousChar.trim() === '';
+      nextCharIsWhitespace = nextChar != '' && nextChar.trim() === '';
       if (isContraction && isForSingleQuotes) {
         quoteReplacement = closingSmartQuote;
-      } else if (previousCharIsALetter && (isForSingleQuotes || !nextCharIsALetter)) {
+      } else if (nextCharIsWhitespace && !previousCharIsWhitespace) {
         quoteReplacement = closingSmartQuote;
         previousQuote = quoteReplacement;
-      } else if (nextCharIsALetter && (isForSingleQuotes || !previousCharIsALetter)) {
+      } else if (previousCharIsWhitespace && !nextCharIsWhitespace) {
         quoteReplacement = openingSmartQuote;
         previousQuote = quoteReplacement;
-      } else { // this case is meant for languages that do not have a concept of letters like Japanese or Chinese or in the case that we have a scenario where no letters surround the quote (generally this will be punctuation followed by a quote)
+      } else { // this case is meant for languages that do not have a concept of letters like Japanese or Chinese or in the case that we have a scenario where no non-whitespace surrounding the quote
         if (previousQuote === '' || previousQuote === closingSmartQuote) {
           quoteReplacement = openingSmartQuote;
         } else {
@@ -103,11 +107,6 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
     }
 
     return text;
-  }
-  locations(substring: string, text: string): number[] {
-    const a=[]; let i=-1;
-    while ((i=text.indexOf(substring, i+1)) >= 0) a.push(i);
-    return a;
   }
   get exampleBuilders(): ExampleBuilder<QuoteStyleOptions>[] {
     return [

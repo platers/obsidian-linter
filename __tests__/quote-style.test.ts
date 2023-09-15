@@ -98,5 +98,18 @@ ruleTest({
         doubleQuoteStyle: DoubleQuoteStyles.SmartQuote,
       },
     },
+    { // relates to https://github.com/platers/obsidian-linter/issues/885
+      testName: 'Make sure that replacing quotes with smart quotes works properly in partial replace situations',
+      before: dedent`
+        He said to his friend, “How are you able to say ‘this is fun.' when we could get grounded?" But he got no response.
+      `,
+      after: dedent`
+        He said to his friend, “How are you able to say ‘this is fun.’ when we could get grounded?” But he got no response.
+      `,
+      options: {
+        singleQuoteStyle: SingleQuoteStyles.SmartQuote,
+        doubleQuoteStyle: DoubleQuoteStyles.SmartQuote,
+      },
+    },
   ],
 });
