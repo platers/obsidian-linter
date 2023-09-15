@@ -799,8 +799,7 @@ ruleTest({
       `,
       after: dedent`
         ---
-        key:
-          - 
+        key: []
         ---
       `,
       options: {
@@ -840,7 +839,7 @@ ruleTest({
       },
     },
     {
-      testName: 'Trying to format tags to a multi-line when it is has an empty single-line will result in an empty multi-line',
+      testName: 'Trying to format tags to a multi-line when it is has an empty single-line will leave it as is',
       before: dedent`
         ---
         tags: []
@@ -848,8 +847,7 @@ ruleTest({
       `,
       after: dedent`
         ---
-        tags:
-          - 
+        tags: []
         ---
       `,
       options: {
@@ -939,14 +937,12 @@ ruleTest({
       testName: 'An empty multi-line array does not get modified when linted and it is supposed to be a multi-line array',
       before: dedent`
         ---
-        speakers:
-          - 
+        speakers: []
         ---
       `,
       after: dedent`
         ---
-        speakers:
-          - 
+        speakers: []
         ---
       `,
       options: {

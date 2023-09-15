@@ -159,7 +159,7 @@ export function formatYamlArrayValue(value: string | string[], format: NormalArr
         return ' ' + value[0];
       }
     case NormalArrayFormats.MultiLine:
-      return '\n  - ' + value.join('\n  - ');
+      return convertStringArrayToMultilineArray(value);
     case TagSpecificArrayFormats.SingleStringSpaceDelimited:
       if (value.length === 1) {
         return ' ' + value[0];
@@ -187,9 +187,8 @@ function getDefaultYAMLArrayValue(format: NormalArrayFormats | SpecialArrayForma
   switch (format) {
     case NormalArrayFormats.SingleLine:
     case TagSpecificArrayFormats.SingleLineSpaceDelimited:
-      return ' []';
     case NormalArrayFormats.MultiLine:
-      return '\n  - ';
+      return ' []';
     case SpecialArrayFormats.SingleStringToSingleLine:
     case SpecialArrayFormats.SingleStringToMultiLine:
     case TagSpecificArrayFormats.SingleStringSpaceDelimited:
@@ -205,6 +204,14 @@ function convertStringArrayToSingleLineArray(arrayItems: string[]): string {
   }
 
   return '[' + arrayItems.join(', ') + ']';
+}
+
+function convertStringArrayToMultilineArray(arrayItems: string[]): string {
+  if (arrayItems == null || arrayItems.length === 0) {
+    return '[]';
+  }
+
+  return '\n  - ' + arrayItems.join('\n  - ');
 }
 
 /**

@@ -161,5 +161,24 @@ ruleTest({
         emptyLineAfterYaml: false,
       },
     },
+    { // relates to https://github.com/platers/obsidian-linter/issues/773
+      testName: 'Make sure that blank lines are not added when there is already a blank line between headings `bottom = false`',
+      before: dedent`
+        ## foobar
+        ### Hello World
+        ${''}
+        ### Hello two
+      `,
+      after: dedent`
+        ## foobar
+        ### Hello World
+        ${''}
+        ### Hello two
+      `,
+      options: {
+        bottom: false,
+        emptyLineAfterYaml: false,
+      },
+    },
   ],
 });
