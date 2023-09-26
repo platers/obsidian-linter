@@ -83,9 +83,6 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'Fehler in der YAML: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'Unbekannter Fehler: {ERROR_MESSAGE}',
-
-    // quote-style.ts
-    'uneven-amount-of-quotes': 'Die Vorkommen des Anführungszeichens `{QUOTE}` in der Datei sind nicht gerade, daher können wir gerade Anführungszeichen nicht in intelligente Anführungszeichen umwandeln',
   },
 
   'notice-text': {

@@ -83,9 +83,6 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'YAML\'da hata: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'bilinmeyen hata: {ERROR_MESSAGE}',
-
-    // quote-style.ts
-    'uneven-amount-of-quotes': 'Dosyadaki `{QUOTE}` alıntısının sayısı çift değil, bu yüzden düz alıntıları akıllı alıntılara dönüştüremeyiz',
   },
 
   'notice-text': {

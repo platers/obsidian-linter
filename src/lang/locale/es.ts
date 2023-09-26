@@ -67,7 +67,6 @@ export default {
     'too-many-footnotes-error-message': `La clave de nota al pie '{FOOTNOTE_KEY}' tiene más de 1 nota al pie que hace referencia a ella. Actualice las notas al pie para que solo haya una nota al pie por clave de nota al pie.`,
     'wrapper-yaml-error': 'hubo un error en el YAML: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'huno un error desconocido: {ERROR_MESSAGE}',
-    'uneven-amount-of-quotes': 'Las instancias de la cita `{QUOTE}` en el archivo no son pares, por lo que no podemos convertir las comillas rectas en comillas tipográficas.',
   },
   'notice-text': {
     'empty-clipboard': 'No hay contenido del portapapeles.',
