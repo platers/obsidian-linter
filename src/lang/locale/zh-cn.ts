@@ -83,9 +83,6 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'yaml出现错误: {ERROR_MESSAGE}',
     'wrapper-unknown-error': '未知错误: {ERROR_MESSAGE}',
-
-    // quote-style.ts
-    'uneven-amount-of-quotes': '`{QUOTE}` 引号在文件中的数量不是偶数，所以我们无法将直引号转换为弯引号',
   },
 
   'notice-text': {

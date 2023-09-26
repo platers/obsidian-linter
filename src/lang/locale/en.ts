@@ -83,9 +83,6 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'error in the YAML: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'unknown error: {ERROR_MESSAGE}',
-
-    // quote-style.ts
-    'uneven-amount-of-quotes': 'The instances of the `{QUOTE}` quote in the file is not even, so we cannot convert straight quotes to smart quotes',
   },
 
   'notice-text': {

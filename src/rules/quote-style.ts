@@ -2,9 +2,8 @@ import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {smartDoubleQuoteRegex, smartSingleQuoteRegex} from '../utils/regex';
-import {countInstances} from '../utils/strings';
-import {getTextInLanguage} from '../lang/helpers';
+import {smartDoubleQuoteRegex, smartSingleQuoteRegex, unicodeLetterRegex} from '../utils/regex';
+import {replaceTextBetweenStartAndEndWithNewValue, getSubstringIndex} from '../utils/strings';
 
 export enum SingleQuoteStyles {
   Straight = '\'\'',
@@ -15,187 +14,6 @@ export enum DoubleQuoteStyles {
   Straight = '""',
   SmartQuote = '“”',
 }
-
-// from https://en.wikipedia.org/wiki/Wikipedia:List_of_English_contractions with any contractions
-// missing a single quote removed
-const englishContractions = [
-  'a\'ight',
-  'ain\'t',
-  'amn\'t',
-  '\'n\'',
-  'aren\'t',
-  '\'bout',
-  'boy\'s',
-  'can\'t',
-  'cap\'n',
-  '\'cause',
-  '\'cept',
-  'could\'ve',
-  'couldn\'t',
-  'couldn\'t\'ve',
-  'daren\'t',
-  'daresn\'t',
-  'dasn\'t',
-  'didn\'t',
-  'doesn\'t',
-  'don\'t',
-  'd\'ye',
-  'd\'ya',
-  'e\'en',
-  'e\'er',
-  '\'em',
-  'everybody\'s',
-  'everyone\'s',
-  'everything\'s',
-  'fo\'c\'sle',
-  '\'gainst',
-  'g\'day',
-  'girl\'s',
-  'giv\'n',
-  'gi\'z',
-  'gon\'t',
-  'guy\'s',
-  'hadn\'t',
-  'had\'ve',
-  'hasn\'t',
-  'haven\'t',
-  'he\'d',
-  'he\'ll',
-  'he\'s',
-  'here\'s',
-  'how\'d',
-  'how\'ll',
-  'how\'re',
-  'how\'s',
-  'I\'d',
-  'I\'d\'ve',
-  'I\'d\'nt',
-  'I\'d\'nt\'ve',
-  'If\'n',
-  'I\'ll',
-  'I\'m',
-  'I\'m\'o',
-  'I\'ve',
-  'isn\'t',
-  'it\'d',
-  'it\'ll',
-  'it\'s',
-  'let\'s',
-  'loven\'t',
-  'ma\'am',
-  'mayn\'t',
-  'may\'ve',
-  'mightn\'t',
-  'might\'ve',
-  'mine\'s',
-  'mustn\'t',
-  'mustn\'t\'ve',
-  'must\'ve',
-  '\'neath',
-  'needn\'t',
-  'ne\'er',
-  'o\'clock',
-  'o\'er',
-  'ol\'',
-  'ought\'ve',
-  'oughtn\'t',
-  'oughtn\'t\'ve',
-  '\'round',
-  'shalln\'t',
-  'shan\'',
-  'shan\'t',
-  'she\'d',
-  'she\'ll',
-  'she\'s',
-  'should\'ve',
-  'shouldn\'t',
-  'shouldn\'t\'ve',
-  'somebody\'s',
-  'someone\'s',
-  'something\'s',
-  'so\'re',
-  'so\'s',
-  'so\'ve',
-  'that\'ll',
-  'that\'re',
-  'that\'s',
-  'that\'d',
-  'there\'d',
-  'there\'ll',
-  'there\'re',
-  'there\'s',
-  'these\'re',
-  'these\'ve',
-  'they\'d',
-  'they\'d\'ve',
-  'they\'ll',
-  'they\'re',
-  'they\'ve',
-  'this\'s',
-  'those\'re',
-  'those\'ve',
-  '\'thout',
-  '\'til',
-  '\'tis',
-  'to\'ve',
-  '\'twas',
-  '\'tween',
-  '\'twere',
-  'w\'all',
-  'w\'at',
-  'wasn\'t',
-  'we\'d',
-  'we\'d\'ve',
-  'we\'ll',
-  'we\'re',
-  'we\'ve',
-  'weren\'t',
-  'what\'d',
-  'what\'ll',
-  'what\'re',
-  'what\'s',
-  'what\'ve',
-  'when\'s',
-  'where\'d',
-  'where\'ll',
-  'where\'re',
-  'where\'s',
-  'where\'ve',
-  'which\'d',
-  'which\'ll',
-  'which\'re',
-  'which\'s',
-  'which\'ve',
-  'who\'d',
-  'who\'d\'ve',
-  'who\'ll',
-  'who\'re',
-  'who\'s',
-  'who\'ve',
-  'why\'d',
-  'why\'re',
-  'why\'s',
-  'willn\'t',
-  'won\'t',
-  'would\'ve',
-  'wouldn\'t',
-  'wouldn\'t\'ve',
-  'y\'ain\'t',
-  'y\'all',
-  'y\'all\'d\'ve',
-  'y\'all\'d\'n\'t\'ve',
-  'y\'all\'re',
-  'y\'all\'ren\'t',
-  'y\'at',
-  'yes\'m',
-  'y\'know',
-  'you\'d',
-  'you\'ll',
-  'you\'re',
-  'you\'ve',
-  'when\'d',
-  'willn\'t',
-];
 
 class QuoteStyleOptions implements Options {
   singleQuoteStyleEnabled?: boolean = true;
@@ -223,7 +41,7 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
       if (options.doubleQuoteStyle === DoubleQuoteStyles.Straight) {
         newText = this.convertSmartDoubleQuotesToStraightQuotes(newText);
       } else {
-        newText = this.convertStraightDoubleQuotesToDoubleSmartQuotes(newText);
+        newText = this.convertStraightQuoteToSmartQuote(newText, '"', DoubleQuoteStyles.SmartQuote[0], DoubleQuoteStyles.SmartQuote[1], false);
       }
     }
 
@@ -231,7 +49,7 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
       if (options.singleQuoteStyle === SingleQuoteStyles.Straight) {
         newText = this.convertSmartSingleQuotesToStraightQuotes(newText);
       } else {
-        newText = this.convertStraightSingleQuotesToSingleSmartQuotes(newText);
+        newText = this.convertStraightQuoteToSmartQuote(newText, '\'', SingleQuoteStyles.SmartQuote[0], SingleQuoteStyles.SmartQuote[1], true);
       }
     }
 
@@ -243,77 +61,52 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
   convertSmartDoubleQuotesToStraightQuotes(text: string): string {
     return text.replace(smartDoubleQuoteRegex, '"');
   }
-  // based on https://inkplant.com/tools/smart-quotes-converter
-  convertStraightDoubleQuotesToDoubleSmartQuotes(text: string): string {
-    this.throwErrorIfNotEqualNumberOfQuotes(text, '"');
-    const openingDoubleQuote = DoubleQuoteStyles.SmartQuote[0];
-    const endingDoubleQuote = DoubleQuoteStyles.SmartQuote[1];
+  convertStraightQuoteToSmartQuote(text: string, straightQuote: string, openingSmartQuote: string, closingSmartQuote: string, isForSingleQuotes: boolean): string {
+    const indices = getSubstringIndex(straightQuote, text);
+    if (indices.length === 0) {
+      return text;
+    }
 
-    let numReplacementsMade = 0;
-    text = text.replaceAll('"', () => {
-      let doubleQuote = openingDoubleQuote;
-      if (numReplacementsMade % 2 === 1) {
-        doubleQuote = endingDoubleQuote;
+    const endOfText = text.length - 1;
+    let quoteReplacement: string;
+    let previousChar = '';
+    let nextChar = '';
+    let previousCharIsALetter = false;
+    let nextCharIsALetter = false;
+    let previousCharIsWhitespace = false;
+    let nextCharIsWhitespace = false;
+    let isContraction = false;
+    let previousQuote = '';
+    for (const index of indices) {
+      previousChar = index == 0 ? '' : text.charAt(index - 1);
+      nextChar = index === endOfText ? '' : text.charAt(index + 1);
+      previousCharIsALetter = unicodeLetterRegex.test(previousChar);
+      nextCharIsALetter = unicodeLetterRegex.test(nextChar);
+      isContraction = previousCharIsALetter && nextCharIsALetter;
+      previousCharIsWhitespace = previousChar != '' && previousChar.trim() === '';
+      nextCharIsWhitespace = nextChar != '' && nextChar.trim() === '';
+      if (isContraction && isForSingleQuotes) {
+        quoteReplacement = closingSmartQuote;
+      } else if (nextCharIsWhitespace && !previousCharIsWhitespace) {
+        quoteReplacement = closingSmartQuote;
+        previousQuote = quoteReplacement;
+      } else if (previousCharIsWhitespace && !nextCharIsWhitespace) {
+        quoteReplacement = openingSmartQuote;
+        previousQuote = quoteReplacement;
+      } else { // this case is meant for languages that do not have a concept of letters like Japanese or Chinese or in the case that we have a scenario where no non-whitespace surrounding the quote
+        if (previousQuote === '' || previousQuote === closingSmartQuote) {
+          quoteReplacement = openingSmartQuote;
+        } else {
+          quoteReplacement = closingSmartQuote;
+        }
+
+        previousQuote = quoteReplacement;
       }
 
-      numReplacementsMade++;
-
-      return doubleQuote;
-    });
-
-    return text;
-  }
-  // based on https://inkplant.com/tools/smart-quotes-converter
-  convertStraightSingleQuotesToSingleSmartQuotes(text: string): string {
-    const openingSingleQuote = SingleQuoteStyles.SmartQuote[0];
-    const endingSingleQuote = SingleQuoteStyles.SmartQuote[1];
-
-    text = this.convertContractionStraightQuotesToSmartQuotes(text, openingSingleQuote, endingSingleQuote);
-
-    text = this.convertPossessiveStraightQuotesToSmartQuotes(text, endingSingleQuote);
-
-    this.throwErrorIfNotEqualNumberOfQuotes(text, '\'');
-
-    let numReplacementsMade = 0;
-    text = text.replaceAll('\'', () => {
-      let singleQuote = openingSingleQuote;
-      if (numReplacementsMade % 2 === 1) {
-        singleQuote = endingSingleQuote;
-      }
-
-      numReplacementsMade++;
-
-      return singleQuote;
-    });
-
-    return text;
-  }
-  convertContractionStraightQuotesToSmartQuotes(text: string, openingSmartQuote: string, closingSmartQuote: string): string {
-    const replaceMatchQuotes = function(match: string) {
-      if (match[0] === '\'') {
-        match = openingSmartQuote + match.substring(1);
-      }
-
-      return match.replaceAll('\'', closingSmartQuote);
-    };
-
-    for (const contraction of englishContractions) {
-      text = text.replace(new RegExp(contraction, 'gi'), replaceMatchQuotes);
+      text = replaceTextBetweenStartAndEndWithNewValue(text, index, index + 1, quoteReplacement);
     }
 
     return text;
-  }
-  convertPossessiveStraightQuotesToSmartQuotes(text: string, smartQuote: string): string {
-    return text.replace(/([a-zA-Z0-9]'s|s')/g, (match: string) => {
-      return match.replace('\'', smartQuote);
-    });
-  }
-  throwErrorIfNotEqualNumberOfQuotes(text: string, quote: string) {
-    const numInstances = countInstances(text, quote);
-
-    if (numInstances % 2 !== 0) {
-      throw new Error(getTextInLanguage('logs.uneven-amount-of-quotes').replace('{QUOTE}', quote));
-    }
   }
   get exampleBuilders(): ExampleBuilder<QuoteStyleOptions>[] {
     return [
