@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
-import {replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
+import {countInstances, replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
 import {simpleURIRegex, urlRegex} from '../utils/regex';
 
 class NoBareUrlsOptions implements Options {
@@ -60,11 +60,20 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       }
 
       const previousChar = urlStart === 0 ? undefined : text.charAt(urlStart - 1);
-      const nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
+      let nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
+      // check for an unmatched opening paren
+      const openingParentheses = countInstances(urlMatch, '(');
+      if (openingParentheses != 0 && openingParentheses != countInstances(urlMatch, ')') && nextChar == ')') {
+        urlMatch += nextChar;
+        urlEnd++;
+        nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
+      }
+
       if (this.skipMatch(previousChar, nextChar, urlMatch, isURISearch)) {
         startSearch = urlStart + urlMatch.length;
         continue;
       }
+
 
       if (previousChar != undefined && previousChar === '<' && nextChar != undefined && nextChar === '>') {
         let startOfOpeningChevrons = urlStart - 1;

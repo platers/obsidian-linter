@@ -97,6 +97,24 @@ ruleTest({
         noBareURIs: false,
       },
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/908
+      testName: 'Make sure that a link ending in ) gets fully put in the angle brackets',
+      before: dedent`
+        [The Score]: https://en.wikipedia.org/wiki/The_Score_(album)
+      `,
+      after: dedent`
+        [The Score]: <https://en.wikipedia.org/wiki/The_Score_(album)>
+      `,
+    },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/908
+      testName: 'Make sure that a link ending in ! gets fully put in the angle brackets',
+      before: dedent`
+        [This Is Fats Domino!]: https://en.wikipedia.org/wiki/This_Is_Fats_Domino!
+      `,
+      after: dedent`
+        [This Is Fats Domino!]: <https://en.wikipedia.org/wiki/This_Is_Fats_Domino!>
+      `,
+    },
   ],
 });
 
