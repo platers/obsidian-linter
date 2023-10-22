@@ -67,6 +67,10 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
         urlMatch += nextChar;
         urlEnd++;
         nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
+      } else if (openingParentheses == 0 && urlMatch.endsWith(')')) {
+        nextChar = ')';
+        urlEnd--;
+        urlMatch = urlMatch.substring(0, urlMatch.length -1);
       }
 
       if (this.skipMatch(previousChar, nextChar, urlMatch, isURISearch)) {

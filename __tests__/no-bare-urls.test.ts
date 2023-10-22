@@ -98,12 +98,21 @@ ruleTest({
       },
     },
     {// accounts for https://github.com/platers/obsidian-linter/issues/908
-      testName: 'Make sure that a link ending in ) gets fully put in the angle brackets',
+      testName: 'Make sure that a link ending in ) gets fully put in the angle brackets if it has an opening paren',
       before: dedent`
         [The Score]: https://en.wikipedia.org/wiki/The_Score_(album)
       `,
       after: dedent`
         [The Score]: <https://en.wikipedia.org/wiki/The_Score_(album)>
+      `,
+    },
+    {// relates for https://github.com/platers/obsidian-linter/issues/908
+      testName: 'Make sure that a link ending in ), but without an opening paren does not get angle brackets added around it',
+      before: dedent`
+        [The Score]: https://en.wikipedia.org/wiki/The_Score_album)
+      `,
+      after: dedent`
+        [The Score]: <https://en.wikipedia.org/wiki/The_Score_album>)
       `,
     },
     {// accounts for https://github.com/platers/obsidian-linter/issues/908
