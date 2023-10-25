@@ -182,5 +182,17 @@ ruleTest({
         ignoreCasedWords: true,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/921
+      testName: `Make sure that a header with inline code is properly ignored for capitalization`,
+      before: dedent`
+        ## \`= durationformat(date(this.day) - date(2023-10-06),"dd")\` th days passed since the Black Shabbat
+      `,
+      after: dedent`
+        ## \`= durationformat(date(this.day) - date(2023-10-06),"dd")\` TH DAYS PASSED SINCE THE BLACK SHABBAT
+      `,
+      options: {
+        style: 'ALL CAPS',
+      },
+    },
   ],
 });

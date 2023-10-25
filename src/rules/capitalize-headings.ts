@@ -404,7 +404,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       descriptionKey: 'rules.capitalize-headings.description',
       type: RuleType.HEADING,
       hasSpecialExecutionOrder: true, // this is meant to run at the end after all headers have been updated, added, or removed from the file
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => CapitalizeHeadingsOptions {
