@@ -26,7 +26,6 @@ import uk from './locale/uk';
 import zhCN from './locale/zh-cn';
 import zhTW from './locale/zh-tw';
 
-
 type LanguageStrings = typeof en;
 
 export const localeMap: { [k: string]: Partial<LanguageStrings> } = {
