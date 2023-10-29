@@ -111,7 +111,7 @@ ruleTest({
         doubleQuoteStyle: DoubleQuoteStyles.SmartQuote,
       },
     },
-    {  // accounts for https://github.com/platers/obsidian-linter/issues/929
+    { // accounts for https://github.com/platers/obsidian-linter/issues/929
       testName: 'Make sure quotes in markdown links get ignored',
       before: dedent`
         [link](https://test.it 'Test title')
