@@ -29,7 +29,7 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
       nameKey: 'rules.quote-style.name',
       descriptionKey: 'rules.quote-style.description',
       type: RuleType.CONTENT,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html, IgnoreTypes.templaterCommand],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.templaterCommand],
     });
   }
   get OptionsClass(): new () => QuoteStyleOptions {
