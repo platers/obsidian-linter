@@ -42,7 +42,6 @@ const langToMomentLocale = {
   'ja': 'ja',
 };
 
-
 const userClickTimeout = 0;
 
 export default class LinterPlugin extends Plugin {
