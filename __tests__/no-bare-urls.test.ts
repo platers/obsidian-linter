@@ -124,6 +124,24 @@ ruleTest({
         [This Is Fats Domino!]: <https://en.wikipedia.org/wiki/This_Is_Fats_Domino!>
       `,
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/900
+      testName: 'Make sure that a link ending in a blob of text without spaces does not include `>`',
+      before: dedent`
+        我是一个网址<https://github.com/platers/obsidian-linter>一些中文字符。被包含进去了如果我继续写
+      `,
+      after: dedent`
+        我是一个网址<https://github.com/platers/obsidian-linter>一些中文字符。被包含进去了如果我继续写
+      `,
+    },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/900
+      testName: 'Chinese is not allowed in links',
+      before: dedent`
+        我是一个网址https://github.com/platers/obsidian-linter一些中文字符。被包含进去了
+      `,
+      after: dedent`
+        我是一个网址<https://github.com/platers/obsidian-linter>一些中文字符。被包含进去了
+      `,
+    },
   ],
 });
 
