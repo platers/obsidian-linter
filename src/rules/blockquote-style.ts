@@ -3,6 +3,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
+import {getStartOfLineWhitespaceOrBlockquoteLevel, replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
 
 type BlockquoteStyleValues = 'no space' | 'space';
 
@@ -26,18 +27,49 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
   }
   apply(text: string, options: BlockquoteStyleOptions): string {
     if (options.style === 'space') {
-      return updateBlockquotes(text, this.addSpaceToIndicator);
+      return updateBlockquotes(text, (blockquote: string) => {
+        return this.updateBlockquoteLines(blockquote, this.addSpaceToIndicator);
+      });
     }
 
-    return updateBlockquotes(text, this.removeSpaceFromIndicator);
+    return updateBlockquotes(text, (blockquote: string) => {
+      return this.updateBlockquoteLines(blockquote, this.removeSpaceFromIndicator);
+    });
   }
-  removeSpaceFromIndicator(blockquote: string): string {
-    return blockquote.replace(/>( |\t)+/g, '>');
+  removeSpaceFromIndicator(startOfLine: string): string {
+    return startOfLine.replace(/>( |\t)+/g, '>');
   }
-  addSpaceToIndicator(blockquote: string): string {
+  addSpaceToIndicator(startOfLine: string): string {
     // first we add spaces to blockquote indicators that are not followed by a space and then to catch any that were not handled already
     // we make sure to add a space between any 2 indicators that are side by side
-    return blockquote.replace(/>([^ ])/g, '> $1').replace(/>>/g, '> >');
+    return startOfLine.replace(/>([^ \t])/g, '> $1').replace(/>>/g, '> >');
+  }
+  updateBlockquoteLines(blockquote: string, startOfLineModification: (startOfLine: string) => string): string {
+    let currentIndex = 0;
+    let nextNewLine = 0;
+    let startOfLine = '';
+    let updatedStartOfLine = '';
+    let startOfIndex = 0;
+    let newBlockquote = blockquote;
+    let breakOutOfLoop = false;
+    do {
+      nextNewLine = newBlockquote.indexOf('\n', currentIndex);
+      if (nextNewLine === -1) {
+        nextNewLine = newBlockquote.length -1;
+        breakOutOfLoop = true;
+      }
+
+      [startOfLine, startOfIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(newBlockquote, nextNewLine-1);
+      updatedStartOfLine = startOfLineModification(startOfLine);
+
+      newBlockquote = replaceTextBetweenStartAndEndWithNewValue(newBlockquote, startOfIndex, startOfIndex + startOfLine.length, updatedStartOfLine);
+
+      // nextNewLine = newBlockquote.indexOf('\n', currentIndex);
+      // TODO: determine what the actual new location of the new line is
+      currentIndex = nextNewLine+ 2 + startOfLine.length - updatedStartOfLine.length;
+    } while (!breakOutOfLoop);
+
+    return newBlockquote;
   }
   get exampleBuilders(): ExampleBuilder<BlockquoteStyleOptions>[] {
     return [
