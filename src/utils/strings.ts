@@ -31,7 +31,7 @@ export function stripCr(text: string): string {
   return text.replace(/\r/g, '');
 }
 
-function getStartOfLineWhitespaceOrBlockquoteLevel(text: string, startPosition: number): [string, number] {
+export function getStartOfLineWhitespaceOrBlockquoteLevel(text: string, startPosition: number): [string, number] {
   if (startPosition === 0) {
     return ['', 0];
   }
@@ -60,7 +60,7 @@ function getEmptyLine(priorLine: string = ''): string {
   return '\n' + priorLineStart.trim();
 }
 
-function getEmptyLineForBlockqute(priorLine: string = '', isCallout: boolean = false, blockquoteLevel: number = 1): string {
+function getEmptyLineForBlockquote(priorLine: string = '', isCallout: boolean = false, blockquoteLevel: number = 1): string {
   const potentialEmptyLine = getEmptyLine(priorLine);
   const previousBlockquoteLevel = countInstances(potentialEmptyLine, '>');
   const dealingWithACallout = isCallout || calloutRegex.test(priorLine);
@@ -151,7 +151,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
     priorLine = text.substring(indexOfLastNewLine, startOfNewContent);
   }
 
-  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForBlockqute(priorLine, isCallout, nestingLevel) : getEmptyLine(priorLine);
+  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForBlockquote(priorLine, isCallout, nestingLevel) : getEmptyLine(priorLine);
 
   return text.substring(0, startOfNewContent) + emptyLine + text.substring(startOfContent);
 }
@@ -247,7 +247,7 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     nextLine = text.substring(endOfNewContent + 1, indexOfSecondNewLineAfterContent);
   }
 
-  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForBlockqute(nextLine, isCallout, nestingLevel) : getEmptyLine(nextLine);
+  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForBlockquote(nextLine, isCallout, nestingLevel) : getEmptyLine(nextLine);
 
   return text.substring(0, endOfContent) + emptyLine + text.substring(endOfNewContent);
 }
