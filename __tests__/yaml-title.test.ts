@@ -309,5 +309,53 @@ ruleTest({
         # >title
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/941
+      testName: 'Escapes title if it has a hashtag in it that is not escaped and make sure that the link is properly parsed when it has a hashtag in it',
+      before: dedent`
+        # [test #1](github.com/platers/obsidian-linter)
+      `,
+      after: dedent`
+        ---
+        title: "test #1"
+        ---
+        # [test #1](github.com/platers/obsidian-linter)
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/941
+      testName: 'Escapes title if it has a hashtag in it that is not escaped',
+      before: dedent`
+        # test #2
+      `,
+      after: dedent`
+        ---
+        title: "test #2"
+        ---
+        # test #2
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/941
+      testName: 'Properly gets simple link text out and put in the title',
+      before: dedent`
+        # [test 3](github.com/platers/obsidian-linter)
+      `,
+      after: dedent`
+        ---
+        title: test 3
+        ---
+        # [test 3](github.com/platers/obsidian-linter)
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/941
+      testName: 'Make sure that pulling out an escaped hashtag in link text works properly',
+      before: dedent`
+        # [test \#4](github.com/platers/obsidian-linter)
+      `,
+      after: dedent`
+        ---
+        title: "test \#4"
+        ---
+        # [test \#4](github.com/platers/obsidian-linter)
+      `,
+    },
   ],
 });
