@@ -309,5 +309,17 @@ ruleTest({
         # >title
       `,
     },
+    {
+      testName: 'Escapes title if it has a hashtag in it that is not escaped and make sure that the link is properly parsed when it has a hashtag in it',
+      before: dedent`
+        # [test #1](github.com/platers/obsidian-linter)
+      `,
+      after: dedent`
+        ---
+        title: "test #1"
+        ---
+        # [test #1](github.com/platers/obsidian-linter)
+      `,
+    },
   ],
 });
