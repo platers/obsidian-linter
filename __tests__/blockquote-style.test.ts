@@ -17,17 +17,17 @@ ruleTest({
       `,
       options: {style: 'space'},
     },
-    // { // accounts for https://github.com/platers/obsidian-linter/issues/935
-    //   testName: 'Make sure we properly handle removing spaces from blockquote indicators instead of removing them from values that are not at the start of the line',
-    //   before: dedent`
-    //     > Using a C++ "member of pointer" operator: \`pointer-> field\`
-    //     > \`> \`
-    //   `,
-    //   after: dedent`
-    //     >Using a C++ "member of pointer" operator: \`pointer-> field\`
-    //     >\`> \`
-    //   `,
-    //   options: {style: 'no space'},
-    // },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/935
+      testName: 'Make sure we properly handle removing spaces from blockquote indicators instead of removing them from values that are not at the start of the line',
+      before: dedent`
+        > Using a C++ "member of pointer" operator: \`pointer-> field\`
+        > \`> \`
+      `,
+      after: dedent`
+        >Using a C++ "member of pointer" operator: \`pointer-> field\`
+        >\`> \`
+      `,
+      options: {style: 'no space'},
+    },
   ],
 });

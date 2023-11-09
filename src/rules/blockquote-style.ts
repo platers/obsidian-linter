@@ -42,7 +42,7 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
   addSpaceToIndicator(startOfLine: string): string {
     // first we add spaces to blockquote indicators that are not followed by a space and then to catch any that were not handled already
     // we make sure to add a space between any 2 indicators that are side by side
-    return startOfLine.replace(/>([^ \t])/g, '> $1').replace(/>>/g, '> >');
+    return startOfLine.replace(/>([^ \t]|$)/g, '> $1').replace(/>>/g, '> >');
   }
   updateBlockquoteLines(blockquote: string, startOfLineModification: (startOfLine: string) => string): string {
     let currentIndex = 0;
@@ -62,11 +62,12 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
       [startOfLine, startOfIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(newBlockquote, nextNewLine-1);
       updatedStartOfLine = startOfLineModification(startOfLine);
 
+      // since start of index refers to where the new line character is
+      startOfIndex++;
+
       newBlockquote = replaceTextBetweenStartAndEndWithNewValue(newBlockquote, startOfIndex, startOfIndex + startOfLine.length, updatedStartOfLine);
 
-      // nextNewLine = newBlockquote.indexOf('\n', currentIndex);
-      // TODO: determine what the actual new location of the new line is
-      currentIndex = nextNewLine+ 2 + startOfLine.length - updatedStartOfLine.length;
+      currentIndex = nextNewLine+ 1 + startOfLine.length - updatedStartOfLine.length;
     } while (!breakOutOfLoop);
 
     return newBlockquote;
