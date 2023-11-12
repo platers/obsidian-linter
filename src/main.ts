@@ -1,4 +1,4 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, WorkspaceLeaf} from 'obsidian';
 import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -15,6 +15,7 @@ import {urlRegex} from './utils/regex';
 import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
+import AsyncLock from 'async-lock';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -53,6 +54,7 @@ export default class LinterPlugin extends Plugin {
   private rulesRunner = new RulesRunner();
   private lastActiveFile: TFile;
   private overridePaste: boolean = false;
+  private customCommandsLock = new AsyncLock();
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -161,7 +163,7 @@ export default class LinterPlugin extends Plugin {
         const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files.submit-button-notice-text');
         new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => {
           return this.runLinterAllFiles(this.app);
-        }).open();
+        }, this.settings.lintCommands && this.settings.lintCommands.length > 0).open();
       },
     });
 
@@ -322,8 +324,18 @@ export default class LinterPlugin extends Plugin {
       }
     }
 
-    // Make sure this is disabled until we actually add something to let it work on folder and vault linting
-    // this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+    let sidebarTab: WorkspaceLeaf = null;
+    if (this.settings.lintCommands && this.settings.lintCommands.length !== 0) {
+      if (!sidebarTab) {
+        sidebarTab = this.app.workspace.getRightLeaf(false);
+      }
+
+      await this.customCommandsLock.acquire('command', async () => {
+        await sidebarTab.openFile(file);
+        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+      });
+      sidebarTab.detach();
+    }
   }
 
   async runLinterAllFiles(app: App) {
@@ -382,7 +394,7 @@ export default class LinterPlugin extends Plugin {
     const startMessage = getTextInLanguage('commands.lint-all-files-in-folder.start-message').replace('{FOLDER_NAME}', folder.name);
     const submitBtnText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-text').replace('{FOLDER_NAME}', folder.name);
     const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-notice-text').replace('{FOLDER_NAME}', folder.name);
-    new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder)).open();
+    new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder), this.settings.lintCommands && this.settings.lintCommands.length > 0).open();
   }
 
   runLinterEditor(editor: Editor) {

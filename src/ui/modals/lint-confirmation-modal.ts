@@ -4,11 +4,15 @@ import {getTextInLanguage} from 'src/lang/helpers';
 // https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/src/modal.ts#L68
 export class LintConfirmationModal extends Modal {
   constructor(app: App, startModalMessageText: string, submitBtnText: string,
-      submitBtnNoticeText: string, btnSubmitAction: () => Promise<void>) {
+      submitBtnNoticeText: string, btnSubmitAction: () => Promise<void>, showCustomCommandWarning: boolean = false) {
     super(app);
     this.modalEl.addClass('confirm-modal');
 
     this.contentEl.createEl('h3', {text: getTextInLanguage('warning-text')}).style.textAlign = 'center';
+
+    if (showCustomCommandWarning) {
+      this.contentEl.createEl('p', {text: getTextInLanguage('custom-command-warning')}).style.fontWeight = 'bold';
+    }
 
     this.contentEl.createEl('p',
         {text: startModalMessageText + ' ' + getTextInLanguage('file-backup-text')}).id = 'confirm-dialog';
