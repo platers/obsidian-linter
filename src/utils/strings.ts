@@ -197,6 +197,7 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
   let lineNestingLevel = 0;
   let foundABlankLine = false;
   let previousChar = '';
+  let firstChar = true;
   while (index < text.length) {
     const currentChar = text.charAt(index);
     if (currentChar.trim() !== '' && currentChar !== '>') {
@@ -227,6 +228,12 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     index++;
 
     previousChar = currentChar;
+    // the first character being a new line character means we have two new line characters back to back
+    if (firstChar && currentChar === '\n' && addingEmptyLinesAroundBlockquotes) {
+      endOfNewContent = index;
+      break;
+    }
+    firstChar = false;
   }
 
   if (index === text.length || endOfNewContent === text.length - 1) {

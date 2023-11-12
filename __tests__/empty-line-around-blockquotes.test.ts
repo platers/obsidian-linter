@@ -94,14 +94,14 @@ ruleTest({
       testName: 'Make sure that consecutive blockquotes do not get merged when the first one ends with an empty blockquote line',
       before: dedent`
         > [!FAQ] Title
-        > 
+        >
         ${''}
         > [!NOTES] Title
         > Content
       `,
       after: dedent`
         > [!FAQ] Title
-        > 
+        >
         ${''}
         > [!NOTES] Title
         > Content
@@ -165,6 +165,39 @@ ruleTest({
         >> - [x] Define Use Case
         >> - [ ] Craft User Story
         >> - [ ] Develop draft sketches
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/910
+      testName: 'Problem child...',
+      before: dedent`
+        ---
+        date created: 29-10-2023 04:16 PM
+        date modified: 12-11-2023 04:11 PM
+        ---
+
+        > 1
+        > 
+        > > 2
+        > > 
+        > > > 3
+
+        > 4
+
+      `,
+      after: dedent`
+        ---
+        date created: 29-10-2023 04:16 PM
+        date modified: 12-11-2023 04:11 PM
+        ---
+
+        > 1
+        >
+        > > 2
+        > >
+        > > > 3
+
+        > 4
+
       `,
     },
   ],
