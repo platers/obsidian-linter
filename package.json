@@ -50,6 +50,7 @@
     "unified-lint-rule": "^2.1.1"
   },
   "dependencies": {
+    "@babel/plugin-transform-class-properties": "^7.23.3",
     "@popperjs/core": "^2.11.6",
     "@types/js-yaml": "^4.0.5",
     "async-lock": "^1.4.0",
