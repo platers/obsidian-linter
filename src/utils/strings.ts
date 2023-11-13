@@ -198,6 +198,12 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
   let foundABlankLine = false;
   let previousChar = '';
   let firstChar = true;
+  // for some reason I am getting the ending new line character for the blockquote and other times it is
+  // the new line character after the ending new line character that is the end of the blockquote. So
+  // check the character before the starting end of content to see if we need to prematurely exit
+  // if it is a newline character.
+  // see https://github.com/platers/obsidian-linter/issues/910
+  const preEndingChar = text.charAt(index - 1);
   while (index < text.length) {
     const currentChar = text.charAt(index);
     if (currentChar.trim() !== '' && currentChar !== '>') {
@@ -229,7 +235,7 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
 
     previousChar = currentChar;
     // the first character being a new line character means we have two new line characters back to back
-    if (firstChar && currentChar === '\n' && addingEmptyLinesAroundBlockquotes) {
+    if (firstChar && currentChar === '\n' && addingEmptyLinesAroundBlockquotes && preEndingChar === '\n') {
       endOfNewContent = index;
       break;
     }

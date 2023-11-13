@@ -168,36 +168,36 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/910
-      testName: 'Problem child...',
+      testName: 'Make sure that the end of a blockqoute is properly identified when there is a blank line right after a blockqoute',
       before: dedent`
         ---
         date created: 29-10-2023 04:16 PM
         date modified: 12-11-2023 04:11 PM
         ---
-
+        ${''}
         > 1
-        > 
+        >
         > > 2
-        > > 
+        > >
         > > > 3
-
+        ${''}
         > 4
-
+        ${''}
       `,
       after: dedent`
         ---
         date created: 29-10-2023 04:16 PM
         date modified: 12-11-2023 04:11 PM
         ---
-
+        ${''}
         > 1
         >
         > > 2
         > >
         > > > 3
-
+        ${''}
         > 4
-
+        ${''}
       `,
     },
   ],
