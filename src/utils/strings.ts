@@ -54,21 +54,48 @@ export function getStartOfLineWhitespaceOrBlockquoteLevel(text: string, startPos
   return [startOfLine, index];
 }
 
-function getEmptyLine(priorLine: string = ''): string {
-  const [priorLineStart] = getStartOfLineWhitespaceOrBlockquoteLevel(priorLine, priorLine.length);
+function getEmptyLine(line: string = ''): string {
+  const [lineStart] = getStartOfLineWhitespaceOrBlockquoteLevel(line, line.length);
 
-  return '\n' + priorLineStart.trim();
+  return '\n' + lineStart.trim();
 }
 
-function getEmptyLineForBlockquote(priorLine: string = '', isCallout: boolean = false, blockquoteLevel: number = 1): string {
-  const potentialEmptyLine = getEmptyLine(priorLine);
+function getEmptyLineForAfterBlockquote(nextLine: string = '', isCallout: boolean = false, blockquoteLevel: number = 1): string {
+  const potentialEmptyLine = getEmptyLine(nextLine);
+  const nextBlockquoteLevel = countInstances(potentialEmptyLine, '>');
+
+  // avoid joining callouts together
+  const dealingWithACallout = isCallout || calloutRegex.test(nextLine);
+  if (dealingWithACallout && blockquoteLevel === nextBlockquoteLevel) {
+    return potentialEmptyLine.substring(0, potentialEmptyLine.lastIndexOf('>'));
+  }
+
+  // if the level after you is more than you, keep the current level (i.e. 2 to a 3)
+  if (blockquoteLevel < nextBlockquoteLevel) {
+    return potentialEmptyLine.substring(0, potentialEmptyLine.lastIndexOf('>'));
+  }
+
+  // if the level after you is less than you, use that level (i.e. 3 to a 2)
+  return potentialEmptyLine;
+}
+
+function getEmptyLineForBeforeBlockquote(previousLine: string = '', isCallout: boolean = false, blockquoteLevel: number = 1): string {
+  const potentialEmptyLine = getEmptyLine(previousLine);
   const previousBlockquoteLevel = countInstances(potentialEmptyLine, '>');
-  const dealingWithACallout = isCallout || calloutRegex.test(priorLine);
+
+  // avoid joining callouts together
+  const dealingWithACallout = isCallout || calloutRegex.test(previousLine);
   if (dealingWithACallout && blockquoteLevel === previousBlockquoteLevel) {
     return potentialEmptyLine.substring(0, potentialEmptyLine.lastIndexOf('>'));
   }
 
-  return potentialEmptyLine;
+  // if the level before you is less than or equal to you, use that level (i.e. 2 to 3)
+  if (blockquoteLevel >= previousBlockquoteLevel) {
+    return potentialEmptyLine;
+  }
+
+  // if the level before you is greater than you, use one level less than that level
+  return potentialEmptyLine.substring(0, potentialEmptyLine.lastIndexOf('>'));
 }
 
 function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFile(text: string, startOfContent: number): string {
@@ -151,7 +178,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
     priorLine = text.substring(indexOfLastNewLine, startOfNewContent);
   }
 
-  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForBlockquote(priorLine, isCallout, nestingLevel) : getEmptyLine(priorLine);
+  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForBeforeBlockquote(priorLine, isCallout, nestingLevel) : getEmptyLine(priorLine);
 
   return text.substring(0, startOfNewContent) + emptyLine + text.substring(startOfContent);
 }
@@ -260,7 +287,7 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     nextLine = text.substring(endOfNewContent + 1, indexOfSecondNewLineAfterContent);
   }
 
-  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForBlockquote(nextLine, isCallout, nestingLevel) : getEmptyLine(nextLine);
+  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForAfterBlockquote(nextLine, isCallout, nestingLevel) : getEmptyLine(nextLine);
 
   return text.substring(0, endOfContent) + emptyLine + text.substring(endOfNewContent);
 }
@@ -274,10 +301,19 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
  * @return {string} The new file contents after the empty lines have been added
  */
 export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, start: number, end: number, addingEmptyLinesAroundBlockquotes: boolean = false): string {
-  const [startOfLine, startOfLineIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(text, start);
+  let [startOfLine, startOfLineIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(text, start);
   if (startOfLine.trim() !== '') {
     const isCallout = calloutRegex.test(text.substring(start, end));
-    const newText = makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text, startOfLine, end, isCallout, addingEmptyLinesAroundBlockquotes);
+    const blockquoteLevel = countInstances(startOfLine, '>');
+
+    // make sure we get the end of the last non-empty line to make sure blockquotes ending
+    // in a blank blockquote are properly handled/removes
+    const newEnd = getIndexOfEndOfLastNonEmptyLine(text, end, blockquoteLevel);
+    const newText = makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text, startOfLine, newEnd, isCallout, addingEmptyLinesAroundBlockquotes);
+
+    // make sure we get the first non-empty line as the start of the blockquote if possible to avoid issues
+    // where the blockquote starts with a blank line which causes things to not properly get recognized as an empty line to remove
+    startOfLineIndex = getIndexOfStartOfFirstNonEmptyLine(newText, startOfLineIndex, blockquoteLevel);
 
     return makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockquote(newText, startOfLine, startOfLineIndex, isCallout, addingEmptyLinesAroundBlockquotes);
   }
@@ -388,4 +424,68 @@ export function getSubstringIndex(substring: string, text: string): number[] {
   }
 
   return indexes;
+}
+
+function getIndexOfStartOfFirstNonEmptyLine(text: string, currentStartOfBlockquote: number, blockquoteLevel: number): number {
+  let actualStartOfBlockquote = currentStartOfBlockquote;
+  let blockquoteIndex = currentStartOfBlockquote+1;
+  let currentChar = '';
+  let foundNewStart = false;
+  let level = 0;
+  while (blockquoteIndex < text.length) {
+    currentChar = text.charAt(blockquoteIndex);
+    if (currentChar.trim() !== '' && currentChar !== '>') {
+      foundNewStart = true;
+      break;
+    } else if (currentChar === '\n') {
+      if (level !== blockquoteLevel) {
+        break;
+      }
+
+      level = 0;
+      actualStartOfBlockquote = blockquoteIndex;
+    } else if (currentChar === '>') {
+      level++;
+    }
+
+    blockquoteIndex++;
+  }
+
+  if (foundNewStart) {
+    return actualStartOfBlockquote;
+  }
+
+  return currentStartOfBlockquote;
+}
+
+function getIndexOfEndOfLastNonEmptyLine(text: string, currentEndOfBlockquote: number, blockquoteLevel: number): number {
+  let actualEndOfBlockquote = currentEndOfBlockquote;
+  let blockquoteIndex = currentEndOfBlockquote-1;
+  let currentChar = '';
+  let foundNewEnd = false;
+  let level = 0;
+  while (blockquoteIndex >= 0) {
+    currentChar = text.charAt(blockquoteIndex);
+    if (currentChar.trim() !== '' && currentChar !== '>') {
+      foundNewEnd = true;
+      break;
+    } else if (currentChar === '\n') {
+      if (level !== blockquoteLevel) {
+        break;
+      }
+
+      level = 0;
+      actualEndOfBlockquote = blockquoteIndex;
+    } else if (currentChar === '>') {
+      level++;
+    }
+
+    blockquoteIndex--;
+  }
+
+  if (foundNewEnd) {
+    return actualEndOfBlockquote;
+  }
+
+  return currentEndOfBlockquote;
 }

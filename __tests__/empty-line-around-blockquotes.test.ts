@@ -121,7 +121,6 @@ ruleTest({
         > [!FAQ] Title
         > Content here
         ${''}
-        >
         > [!NOTES] Title
         > Content
       `,
@@ -198,6 +197,70 @@ ruleTest({
         ${''}
         > 4
         ${''}
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/910
+      testName: 'Make sure that a blockquote 1 level lower than the next one ends in an empty line that it is on its level',
+      before: dedent`
+        > 1
+        >> 2
+        >
+        >>> 3
+        ${''}
+        > 4
+      `,
+      after: dedent`
+        > 1
+        >
+        >> 2
+        >>
+        >>> 3
+        ${''}
+        > 4
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/910
+      testName: 'Make sure that a blockquote that starts with an empty blockquote line gets the proper blockquote empty line set',
+      before: dedent`
+        > 1
+        >> 2
+        >>>
+        >>> 3
+        ${''}
+        > 4
+      `,
+      after: dedent`
+        > 1
+        >
+        >> 2
+        >>
+        >>> 3
+        ${''}
+        > 4
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/910
+      testName: 'Make sure that a blockquote that ends in a blank blockquote line gets the proper blockquote empty line set',
+      before: dedent`
+        > 1
+        >> 2
+        >>
+        >>> 3
+        >>>
+        >> 2
+        ${''}
+        > 4
+      `,
+      after: dedent`
+        > 1
+        >
+        >> 2
+        >>
+        >>> 3
+        >>
+        >> 2
+        ${''}
+        > 4
       `,
     },
   ],
