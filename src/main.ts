@@ -55,6 +55,7 @@ export default class LinterPlugin extends Plugin {
   private lastActiveFile: TFile;
   private overridePaste: boolean = false;
   private customCommandsLock = new AsyncLock();
+  private originalSaveCallback?: () => void = null;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -85,6 +86,13 @@ export default class LinterPlugin extends Plugin {
 
     for (const eventRef of this.eventRefs) {
       this.app.workspace.offref(eventRef);
+    }
+
+    const saveCommandDefinition = this.app.commands?.commands?.[
+      'editor:save-file'
+    ];
+    if (saveCommandDefinition && saveCommandDefinition.callback && this.originalSaveCallback) {
+      saveCommandDefinition.callback = this.originalSaveCallback;
     }
   }
 
@@ -222,21 +230,22 @@ export default class LinterPlugin extends Plugin {
     const saveCommandDefinition = this.app.commands?.commands?.[
       'editor:save-file'
     ];
-    const save = saveCommandDefinition?.callback;
 
-    if (typeof save === 'function') {
+    this.originalSaveCallback = saveCommandDefinition?.callback;
+
+    if (typeof this.originalSaveCallback === 'function') {
       saveCommandDefinition.callback = () => {
         if (this.settings.lintOnSave && this.isEnabled) {
           const editor = this.getEditor();
-          if (!editor) {
-            return;
-          }
-
-          const file = this.app.workspace.getActiveFile();
-          if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file)) {
-            this.runLinterEditor(editor);
+          if (editor) {
+            const file = this.app.workspace.getActiveFile();
+            if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file)) {
+              this.runLinterEditor(editor);
+            }
           }
         }
+
+        this.originalSaveCallback();
       };
     }
 
