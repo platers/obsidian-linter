@@ -14,6 +14,7 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
       nameKey: 'rules.trailing-spaces.name',
       descriptionKey: 'rules.trailing-spaces.description',
       type: RuleType.SPACING,
+      hasSpecialExecutionOrder: true, // run after all other possible rules to make sure trailing spaces are properly removed
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }

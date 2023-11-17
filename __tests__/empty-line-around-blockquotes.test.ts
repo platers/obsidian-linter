@@ -94,14 +94,14 @@ ruleTest({
       testName: 'Make sure that consecutive blockquotes do not get merged when the first one ends with an empty blockquote line',
       before: dedent`
         > [!FAQ] Title
-        > 
+        >
         ${''}
         > [!NOTES] Title
         > Content
       `,
       after: dedent`
         > [!FAQ] Title
-        > 
+        >
         ${''}
         > [!NOTES] Title
         > Content
@@ -121,7 +121,6 @@ ruleTest({
         > [!FAQ] Title
         > Content here
         ${''}
-        >
         > [!NOTES] Title
         > Content
       `,
@@ -165,6 +164,103 @@ ruleTest({
         >> - [x] Define Use Case
         >> - [ ] Craft User Story
         >> - [ ] Develop draft sketches
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/910
+      testName: 'Make sure that the end of a blockqoute is properly identified when there is a blank line right after a blockqoute',
+      before: dedent`
+        ---
+        date created: 29-10-2023 04:16 PM
+        date modified: 12-11-2023 04:11 PM
+        ---
+        ${''}
+        > 1
+        >
+        > > 2
+        > >
+        > > > 3
+        ${''}
+        > 4
+        ${''}
+      `,
+      after: dedent`
+        ---
+        date created: 29-10-2023 04:16 PM
+        date modified: 12-11-2023 04:11 PM
+        ---
+        ${''}
+        > 1
+        >
+        > > 2
+        > >
+        > > > 3
+        ${''}
+        > 4
+        ${''}
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/910
+      testName: 'Make sure that a blockquote 1 level lower than the next one ends in an empty line that it is on its level',
+      before: dedent`
+        > 1
+        >> 2
+        >
+        >>> 3
+        ${''}
+        > 4
+      `,
+      after: dedent`
+        > 1
+        >
+        >> 2
+        >>
+        >>> 3
+        ${''}
+        > 4
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/910
+      testName: 'Make sure that a blockquote that starts with an empty blockquote line gets the proper blockquote empty line set',
+      before: dedent`
+        > 1
+        >> 2
+        >>>
+        >>> 3
+        ${''}
+        > 4
+      `,
+      after: dedent`
+        > 1
+        >
+        >> 2
+        >>
+        >>> 3
+        ${''}
+        > 4
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/910
+      testName: 'Make sure that a blockquote that ends in a blank blockquote line gets the proper blockquote empty line set',
+      before: dedent`
+        > 1
+        >> 2
+        >>
+        >>> 3
+        >>>
+        >> 2
+        ${''}
+        > 4
+      `,
+      after: dedent`
+        > 1
+        >
+        >> 2
+        >>
+        >>> 3
+        >>
+        >> 2
+        ${''}
+        > 4
       `,
     },
   ],

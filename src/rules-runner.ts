@@ -25,6 +25,7 @@ import BlockquoteStyle from './rules/blockquote-style';
 import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
 import {LinterSettings} from './settings-data';
+import TrailingSpaces from './rules/trailing-spaces';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -120,6 +121,8 @@ export class RulesRunner {
     [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
     });
+
+    [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
     let currentTime = runOptions.getCurrentTime();
     // run YAML timestamp at the end to help determine if something has changed
