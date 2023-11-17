@@ -228,15 +228,14 @@ export default class LinterPlugin extends Plugin {
       saveCommandDefinition.callback = () => {
         if (this.settings.lintOnSave && this.isEnabled) {
           const editor = this.getEditor();
-          if (!editor) {
-            return;
-          }
-
-          const file = this.app.workspace.getActiveFile();
-          if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file)) {
-            this.runLinterEditor(editor);
+          if (editor) {
+            const file = this.app.workspace.getActiveFile();
+            if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file)) {
+              this.runLinterEditor(editor);
+            }
           }
         }
+        save()
       };
     }
 
