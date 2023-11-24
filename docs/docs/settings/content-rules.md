@@ -221,13 +221,13 @@ After:
 
 Alias: `default-language-for-code-fences`
 
-Add a default language for code fences if not exist.
+Add a default language to code fences that do not have a language specified.
 
 ### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Default Language` | The default programing language for code fences. | N/A |  |
+| `Programming Language` | Leave empty to do nothing. Languages tags can be found [here](https://prismjs.com/#supported-languages). | N/A |  |
 
 
 
@@ -268,6 +268,26 @@ After:
 
 `````` markdown
 ```javascript
+var temp = 'text';
+// this is a code block
+```
+``````
+</details>
+<details><summary>Empty string as the default language will not add a language to code blocks</summary>
+
+Before:
+
+`````` markdown
+```
+var temp = 'text';
+// this is a code block
+```
+``````
+
+After:
+
+`````` markdown
+```
 var temp = 'text';
 // this is a code block
 ```

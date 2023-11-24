@@ -238,15 +238,6 @@ export default {
       'name': 'Add Blockquote Indentation on Paste',
       'description': 'Adds blockquotes to all but the first line, when the cursor is in a blockquote/callout line during pasting',
     },
-    // default-language-for-code-fences.ts
-    'default-language-for-code-fences': {
-      'name': 'Default Language For Code Fences',
-      'description': 'Add a default language for code fences if not exist.',
-      'default-language': {
-        'name': 'Default Language',
-        'description': 'The default programing language for code fences.',
-      },
-    },
     // blockquote-style.ts
     'blockquote-style': {
       'name': 'Blockquote Style',
@@ -303,6 +294,15 @@ export default {
       'tabsize': {
         'name': 'Tabsize',
         'description': 'Number of spaces that will be converted to a tab',
+      },
+    },
+    // default-language-for-code-fences.ts
+    'default-language-for-code-fences': {
+      'name': 'Default Language For Code Fences',
+      'description': 'Add a default language to code fences that do not have a language specified.',
+      'default-language': {
+        'name': 'Programming Language',
+        'description': 'Leave empty to do nothing. Languages tags can be found [here](https://prismjs.com/#supported-languages).',
       },
     },
     // emphasis-style.ts

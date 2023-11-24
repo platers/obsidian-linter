@@ -289,6 +289,15 @@ export default {
         'description': '制表符对应的空格宽度',
       },
     },
+    // default-language-for-code-fences.ts
+    'default-language-for-code-fences': {
+      'name': '代码块默认语言',
+      'description': '为没有指定语言的代码块添加默认语言。',
+      'default-language': {
+        'name': '编程语言',
+        'description': '留空不进行任何操作。可以在[这里](https://prismjs.com/#supported-languages)找到语言标签。',
+      },
+    },
     // emphasis-style.ts
     'emphasis-style': {
       'name': '突出样式',

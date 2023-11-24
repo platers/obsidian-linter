@@ -62,6 +62,24 @@ export default class DefaultLanguageForCodeFences extends RuleBuilder<DefaultLan
           defaultLanguage: 'shell',
         },
       }),
+      new ExampleBuilder({
+        description: 'Empty string as the default language will not add a language to code blocks',
+        before: dedent`
+          \`\`\`
+          var temp = 'text';
+          // this is a code block
+          \`\`\`
+        `,
+        after: dedent`
+          \`\`\`
+          var temp = 'text';
+          // this is a code block
+          \`\`\`
+        `,
+        options: {
+          defaultLanguage: '',
+        },
+      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<DefaultLanguageForCodeFencesOptions>[] {
