@@ -238,6 +238,15 @@ export default {
       'name': 'Add Blockquote Indentation on Paste',
       'description': 'Adds blockquotes to all but the first line, when the cursor is in a blockquote/callout line during pasting',
     },
+    // default-language-for-code-fences.ts
+    'default-language-for-code-fences': {
+      'name': 'Default Language For Code Fences',
+      'description': 'Add a default language for code fences if not exist.',
+      'default-language': {
+        'name': 'Default Language',
+        'description': 'The default programing language for code fences.',
+      },
+    },
     // blockquote-style.ts
     'blockquote-style': {
       'name': 'Blockquote Style',

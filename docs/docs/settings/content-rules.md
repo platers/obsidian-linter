@@ -217,6 +217,63 @@ After:
 ``````
 </details>
 
+## Default Language For Code Fences
+
+Alias: `default-language-for-code-fences`
+
+Add a default language for code fences if not exist.
+
+### Options
+
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `Default Language` | The default programing language for code fences. | N/A |  |
+
+
+
+### Examples
+
+<details><summary>Add a default language `javascript` to code blocks that do not have a language specified</summary>
+
+Before:
+
+`````` markdown
+```
+var temp = 'text';
+// this is a code block
+```
+``````
+
+After:
+
+`````` markdown
+```javascript
+var temp = 'text';
+// this is a code block
+```
+``````
+</details>
+<details><summary>If a code block already has a language specified, do not change it</summary>
+
+Before:
+
+`````` markdown
+```javascript
+var temp = 'text';
+// this is a code block
+```
+``````
+
+After:
+
+`````` markdown
+```javascript
+var temp = 'text';
+// this is a code block
+```
+``````
+</details>
+
 ## Emphasis Style
 
 Alias: `emphasis-style`

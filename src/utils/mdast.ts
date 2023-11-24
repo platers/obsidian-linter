@@ -991,3 +991,22 @@ export function getAllCustomIgnoreSectionsInText(text: string): {startIndex: num
 
   return positions.reverse();
 }
+
+export function ensureFencedCodeBlocksHasLanguage(text: string, defaultLanguage: string): string {
+  const positions: Position[] = getPositions(MDAstTypes.Code, text);
+
+  for (const position of positions) {
+    const codeBlock = text.substring(position.start.offset, position.end.offset);
+    if (!codeBlock.startsWith('```')) {
+      continue;
+    }
+
+    const language = codeBlock.substring(3, codeBlock.indexOf('\n')).trim();
+    if (language !== '') {
+      continue;
+    }
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset + 3, position.start.offset + 3, defaultLanguage);
+  }
+
+  return text;
+}
