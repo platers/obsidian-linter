@@ -247,6 +247,55 @@ ruleTest({
         howToHandleExistingTags: 'Remove whole tag',
       },
     },
-
+    { // accounts for https://github.com/platers/obsidian-linter/issues/952
+      testName: 'Make sure that tags immediately followed by a wiki link only copies the tag value and not the wiki link value and removes properly',
+      before: dedent`
+        ---
+        title: Note
+        Date: 2023-10-24T23:00:00+08:00
+        lastMod: 2023-11-28T17:36:29+08:00
+        ---
+        ${''}
+        #tag![[image.png]]
+      `,
+      after: dedent`
+        ---
+        title: Note
+        Date: 2023-10-24T23:00:00+08:00
+        lastMod: 2023-11-28T17:36:29+08:00
+        tags: tag
+        ---
+        ![[image.png]]
+      `,
+      options: {
+        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+        howToHandleExistingTags: 'Remove whole tag',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/952
+      testName: 'Make sure that tags immediately followed by a wiki link only copies the tag value and not the wiki link value',
+      before: dedent`
+        ---
+        title: Note
+        Date: 2023-10-24T23:00:00+08:00
+        lastMod: 2023-11-28T17:36:29+08:00
+        ---
+        ${''}
+        #tag![[image.png]]
+      `,
+      after: dedent`
+        ---
+        title: Note
+        Date: 2023-10-24T23:00:00+08:00
+        lastMod: 2023-11-28T17:36:29+08:00
+        tags: tag
+        ---
+        ${''}
+        #tag![[image.png]]
+      `,
+      options: {
+        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+      },
+    },
   ],
 });
