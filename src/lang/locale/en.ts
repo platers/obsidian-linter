@@ -233,6 +233,11 @@ export default {
         'description': 'A comma separated list of lowercased words to ignore when auto-correcting',
       },
     },
+    // add-blank-line-after-yaml.ts
+    'add-blank-line-after-yaml': {
+      'name': 'Add Blank Line After YAML',
+      'description': 'Adds a blank line after the YAML block if it does not end the current file or it is not already followed by at least 1 blank line',
+    },
     // blockquotify-on-paste.ts
     'add-blockquote-indentation-on-paste': {
       'name': 'Add Blockquote Indentation on Paste',
