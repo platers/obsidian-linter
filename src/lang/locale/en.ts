@@ -301,6 +301,27 @@ export default {
         'description': 'Number of spaces that will be converted to a tab',
       },
     },
+    // dedupe-yaml-array-values.ts
+    'dedupe-yaml-array-values': {
+      'name': 'Dedupe YAML Array Values',
+      'description': 'Removes duplicate array values in a case sensitive manner.',
+      'alias-key': {
+        'name': 'Dedupe YAML aliases section',
+        'description': 'Turns on removing duplicate aliases.',
+      },
+      'tag-key': {
+        'name': 'Dedupe YAML tags section',
+        'description': 'Turns on removing duplicate tags.',
+      },
+      'default-array-keys': {
+        'name': 'Dedupe YAML array sections',
+        'description': 'Turns on removing duplicate values for regular YAML arrays',
+      },
+      'ignore-keys': {
+        'name': 'YAML Keys to Ignore',
+        'description': 'A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them.',
+      },
+    },
     // default-language-for-code-fences.ts
     'default-language-for-code-fences': {
       'name': 'Default Language For Code Fences',
