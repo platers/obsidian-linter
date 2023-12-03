@@ -19,6 +19,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 
 ### YAML rules
 
+- [add-blank-line-after-yaml](https://platers.github.io/obsidian-linter/settings/yaml-rules/#add-blank-line-after-yaml)
 - [escape-yaml-special-characters](https://platers.github.io/obsidian-linter/settings/yaml-rules/#escape-yaml-special-characters)
 - [force-yaml-escape](https://platers.github.io/obsidian-linter/settings/yaml-rules/#force-yaml-escape)
 - [format-tags-in-yaml](https://platers.github.io/obsidian-linter/settings/yaml-rules/#format-tags-in-yaml)
