@@ -163,23 +163,43 @@ Then the `localeMap` in [helpers.ts](https://github.com/platers/obsidian-linter/
 have an entry added in it for the new language:
 
 ``` TypeScript
-export const localeMap: { [k: string]: Partial<LanguageStrings> } = {
+export const localeMap: { [k: string]: LanguageLocale } = {
   en,
   {LANGUAGE_SHORT_CODE},
   ...
 };
 ```
 
+Lastly you will need to make sure that you add the proper value to the list of locales to their corresponding file names:
+
+``` TypeScript
+export const localeToFileName: { [k: string]: string} = {
+  'en': 'en',
+  '{LANGUAGE_SHORT_CODE}': '{LANGUAGE_SHORT_CODE}',
+  ...
+}
+```
+
+!!! info "Why add values to locale to file name object?"
+    This is is done because it allows the UTs to validate that there is a unique file that exists for each locale that the
+    Linter users.
+
 In the case of adding Spanish, we would make the following changes:
 
 ``` TypeScript
 import es from './locale/es'; // import new language into helper file
 ...
-export const localeMap: { [k: string]: Partial<LanguageStrings> } = {
+export const localeMap: { [k: string]: LanguageLocale } = {
   en,
-  es, // add new language to locale map
+  es, // add new language to locale mapping
   ...
 };
+
+export const localeToFileName: { [k: string]: string} = {
+  'en': 'en',
+  'es': 'es', // add new language locale to file name mapping
+  ...
+}
 ```
 
 !!! note "Special Considerations for Locale Map"
@@ -187,13 +207,22 @@ export const localeMap: { [k: string]: Partial<LanguageStrings> } = {
     In these cases, you will want to make sure to map the Obsidian locale to the new language:
 
     ``` TypeScript
-    export const localeMap: { [k: string]: Partial<LanguageStrings> } = {
+    export const localeMap: { [k: string]: LanguageLocale } = {
       en,
       es,
       'pt-BR': ptBR, // special mapping of Obsidian locale to language
       ...
       'zh-TW': zhTW, // special mapping of Obsidian locale to language
       'zh': zhCN, // special mapping of Obsidian locale to language
+    };
+
+    export const localeToFileName: { [k: string]: string} = {
+      'en': 'en',
+      'es': 'es',
+      'pt-BR': 'pt-br', // special mapping of Obsidian locale to language file name
+      ...
+      'zh-TW': 'zh-tw', // special mapping of Obsidian locale to language file name
+      'zh': 'zh-cn', // special mapping of Obsidian locale to language file name
     };
     ```
 

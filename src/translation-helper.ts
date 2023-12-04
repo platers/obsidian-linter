@@ -1,7 +1,9 @@
 import * as readline from 'readline';
 import {stdout, stdin, exit} from 'process';
-import {LanguageStringKey, setLanguage, getTextInLanguage, localeHasKey, localeMap} from './lang/helpers';
+import {LanguageStringKey, setLanguage, getTextInLanguage, localeHasKey, localeMap, LanguageLocale, getLanguageSourceFile} from './lang/helpers';
 import * as fs from 'fs';
+import {ValidationInfo, validateSelectedKey, validateLanguageSelected} from './lang/validation';
+import dedent from 'ts-dedent';
 
 const rl = readline.createInterface({
   input: stdin,
@@ -10,33 +12,36 @@ const rl = readline.createInterface({
 
 const availableLanguages = Object.keys(localeMap).join(', ');
 const englishKeys = getObjectKeys(localeMap['en']);
+const translationOptions = dedent`
+  =========================================================================
+  Select a translation mode to use:
+  [A]dd a translation value for a specific language.
+  [L]ist untranslated keys in the specified language.
+  [R]eplace translated value with a new value for the specified key.
+  [T]ranslate all untranslated keys in a language one at a time.
+  =========================================================================
+`;
 
 setLanguage('en');
 
 selectTranslationModeAndKickOffTheAssociatedLogic();
 
 function selectTranslationModeAndKickOffTheAssociatedLogic() {
-  console.log('=========================================================================');
-  console.log('Select a translation mode to use:');
-  console.log('[A]dd a translation value for a specific language.');
-  console.log('[L]ist untranslated keys in the specified language.');
-  console.log('[R]eplace translated value with a new value for the specified key.');
-  console.log('[T]ranslate all untranslated keys in a language one at a time.');
-  console.log('=========================================================================');
+  console.log(translationOptions);
 
   getUserInput('Select a translation mode to use: ', (mode: string) => {
     switch (mode.toLowerCase()) {
       case 'a':
-        addANewValueToALanguage();
+        selectLanguageAndDoAction('Enter which language to have a value added to: ', addANewValueToALanguage);
         break;
       case 'l':
-        listUntranslatedKeysInALanguage();
+        selectLanguageAndDoAction('Enter which language to list the untranslated keys for: ', listUntranslatedKeysInALanguage);
         break;
       case 'r':
-        replaceLanguageKeyWithANewValue();
+        selectLanguageAndDoAction('Enter which language to have a value replaced in: ', replaceLanguageKeyWithANewValue);
         break;
       case 't':
-        translateAllKeysInALanguage();
+        selectLanguageAndDoAction('Enter which language to translate all keys from: ', translateAllKeysInALanguage);
         break;
       default:
         console.log('"' + mode + '" is not a valid translation mode.');
@@ -51,112 +56,73 @@ function getUserInput(prompt: string, handleResponse: (answer: string) => void) 
   });
 }
 
-function addANewValueToALanguage() {
+function selectLanguageAndDoAction(prompt: string, action: (language: string, selectedLanguage: LanguageLocale) => void) {
   console.log('Valid languages:\n\t' + availableLanguages + '\n');
-  getUserInput('Enter which language to have a value added to: ', (language) => {
-    if (localeMap[language]) {
-      const selectedLanguage = localeMap[language];
-      getUserInput('Enter the key of the value to add: ', (keyToAdd: string) => {
-        if (!localeHasKey(localeMap['en'], keyToAdd as LanguageStringKey)) {
-          console.log(`'${keyToAdd}' is not a valid key.`);
-          endProgram(true);
-        } else if (localeHasKey(selectedLanguage, keyToAdd as LanguageStringKey)) {
-          console.log(`'${keyToAdd}' already exists in the specified language.`);
-          endProgram(true);
-        }
+  getUserInput(prompt, (language) => {
+    logMsgAndExitIfValidationFailed(validateLanguageSelected(language));
 
-        getUserInput(`Enter the value for "${keyToAdd}": `, (replacementValue: string) => {
-          const key = keyToAdd as LanguageStringKey;
-          console.log(replacementValue);
-          setValueInLanguage(language, key, replacementValue);
-          replaceTranslationValuesInFile(language);
-          endProgram();
-        });
-      });
-    } else {
-      console.log('"' + language + '" is not in the language list. Please try rerun the program and enter another language.');
-      endProgram(true);
-    }
+    action(language, localeMap[language]);
   });
 }
 
-function replaceLanguageKeyWithANewValue() {
-  console.log('Valid languages:\n\t' + availableLanguages + '\n');
-  getUserInput('Enter which language to have a value replaced in: ', (language) => {
-    if (localeMap[language]) {
-      const selectedLanguage = localeMap[language];
-      getUserInput('Enter the key to replace the value of: ', (keyToReplace: string) => {
-        if (!localeHasKey(localeMap['en'], keyToReplace as LanguageStringKey)) {
-          console.log(`'${keyToReplace}' is not a valid key.`);
-          endProgram(true);
-        } else if (!localeHasKey(selectedLanguage, keyToReplace as LanguageStringKey)) {
-          console.log(`'${keyToReplace}' does not exist already in the specified language.`);
-          endProgram(true);
-        }
+function addANewValueToALanguage(language: string, selectedLanguage: LanguageLocale) {
+  getUserInput('Enter the key of the value to add: ', (keyToAdd: string) => {
+    logMsgAndExitIfValidationFailed(validateSelectedKey(selectedLanguage, keyToAdd as LanguageStringKey));
 
-        setLanguage(language);
-        const currentValue = getTextInLanguage(keyToReplace as LanguageStringKey);
-        setLanguage('en');
-        getUserInput(`Enter the replacement value for "${currentValue}": `, (replacementValue: string) => {
-          const key = keyToReplace as LanguageStringKey;
-          setValueInLanguage(language, key, replacementValue);
-          replaceTranslationValuesInFile(language);
-          endProgram();
-        });
-      });
-    } else {
-      console.log('"' + language + '" is not in the language list. Please try rerun the program and enter another language.');
-      endProgram(true);
-    }
-  });
-}
-
-function listUntranslatedKeysInALanguage() {
-  console.log('Valid languages:\n\t' + availableLanguages + '\n');
-
-  getUserInput('Enter which language to list the untranslated keys for: ', (language) => {
-    if (localeMap[language]) {
-      const missingKeys = getMissingKeysInLanguage(language);
-
-      if (missingKeys.length === 0) {
-        console.log('"' + language + '" has no values that need translating.');
-      } else {
-        const keyText = missingKeys.length > 1 ? 'keys' : 'key';
-        console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}:`);
-        missingKeys.forEach((element) => {
-          console.log(`${element}: ` + getTextInLanguage(element as LanguageStringKey) );
-        });
-      }
-
+    getUserInput(`Enter the value for "${keyToAdd}": `, (replacementValue: string) => {
+      const key = keyToAdd as LanguageStringKey;
+      setValueInLanguage(language, key, replacementValue);
+      replaceTranslationValuesInFile(language);
       endProgram();
-    } else {
-      console.log('"' + language + '" is not in the language list. Please try rerun the program and enter another language.');
-      endProgram(true);
-    }
+    });
   });
 }
 
-function translateAllKeysInALanguage() {
-  console.log('Valid languages:\n\t' + availableLanguages + '\n');
+function replaceLanguageKeyWithANewValue(language: string, selectedLanguage: LanguageLocale) {
+  getUserInput('Enter the key to replace the value of: ', (keyToReplace: string) => {
+    logMsgAndExitIfValidationFailed(validateSelectedKey(selectedLanguage, keyToReplace as LanguageStringKey));
 
-  getUserInput('Enter which language to translate all keys from: ', (language) => {
-    if (localeMap[language]) {
-      const missingKeys = getMissingKeysInLanguage(language);
+    setLanguage(language);
+    const currentValue = getTextInLanguage(keyToReplace as LanguageStringKey);
+    setLanguage('en');
 
-      if (missingKeys.length === 0) {
-        console.log('"' + language + '" has no values that need translating.');
-      } else {
-        const keyText = missingKeys.length > 1 ? 'keys' : 'key';
-        console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}:`);
-
-        const firstElement = missingKeys.shift();
-        getNextTranslation(missingKeys, firstElement, language);
-      }
-    } else {
-      console.log('"' + language + '" is not in the language list. Please try rerun the program and enter another language.');
-      endProgram(true);
-    }
+    getUserInput(`Enter the replacement value for "${currentValue}": `, (replacementValue: string) => {
+      const key = keyToReplace as LanguageStringKey;
+      setValueInLanguage(language, key, replacementValue);
+      replaceTranslationValuesInFile(language);
+      endProgram();
+    });
   });
+}
+
+function listUntranslatedKeysInALanguage(language: string, selectedLanguage: LanguageLocale) {
+  const missingKeys = getMissingKeysInLanguage(selectedLanguage);
+
+  if (missingKeys.length === 0) {
+    console.log('"' + language + '" has no values that need translating.');
+  } else {
+    const keyText = missingKeys.length > 1 ? 'keys' : 'key';
+    console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}:`);
+    missingKeys.forEach((element) => {
+      console.log(`${element}: ` + getTextInLanguage(element as LanguageStringKey) );
+    });
+  }
+
+  endProgram();
+}
+
+function translateAllKeysInALanguage(language: string, selectedLanguage: LanguageLocale) {
+  const missingKeys = getMissingKeysInLanguage(selectedLanguage);
+
+  if (missingKeys.length === 0) {
+    console.log('"' + language + '" has no values that need translating.');
+  } else {
+    const keyText = missingKeys.length > 1 ? 'keys' : 'key';
+    console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}:`);
+
+    const firstElement = missingKeys.shift();
+    getNextTranslation(missingKeys, firstElement, language);
+  }
 }
 
 function getNextTranslation(missingKeys: string[], element: string, language: string) {
@@ -183,7 +149,7 @@ function getNextTranslation(missingKeys: string[], element: string, language: st
 }
 
 function setValueInLanguage(language: string, key: string, value: string) {
-  let object = localeMap[language] as object;
+  let object = localeMap[language] as {[k: string]: any};
   const keyParts = key.split('.');
   keyParts.forEach((keyPart: string, index: number) => {
     if (keyParts.length -1 === index) {
@@ -200,11 +166,10 @@ function setValueInLanguage(language: string, key: string, value: string) {
   });
 }
 
-function getMissingKeysInLanguage(language: string): string[] {
-  const indicatedLanguage = localeMap[language];
+function getMissingKeysInLanguage(selectedLanguage: LanguageLocale): string[] {
   const missingKeys = [] as string[];
   for (const nestedKey of englishKeys) {
-    if (!localeHasKey(indicatedLanguage, nestedKey as LanguageStringKey) && localeHasKey(localeMap['en'], nestedKey as LanguageStringKey)) {
+    if (!localeHasKey(selectedLanguage, nestedKey as LanguageStringKey) && localeHasKey(localeMap['en'], nestedKey as LanguageStringKey)) {
       missingKeys.push(nestedKey);
     }
   }
@@ -225,7 +190,7 @@ function getObjectKeys(obj: any, prefix: string = ''): string[] {
 }
 
 function replaceTranslationValuesInFile(language: string) {
-  const filePath = `./src/lang/locale/${language}.ts`;
+  const filePath = getLanguageSourceFile(language);
   try {
     const originalData = fs.readFileSync(filePath, 'utf8');
 
@@ -251,4 +216,12 @@ function endProgram(withError: boolean = false) {
   }
 
   exit();
+}
+
+function logMsgAndExitIfValidationFailed(validationResult: ValidationInfo) {
+  if (!validationResult.isValid) {
+    console.log(validationResult.validationMsg);
+
+    endProgram(true);
+  }
 }
