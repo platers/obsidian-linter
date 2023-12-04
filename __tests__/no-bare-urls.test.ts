@@ -142,6 +142,15 @@ ruleTest({
         我是一个网址<https://github.com/platers/obsidian-linter>一些中文字符。被包含进去了
       `,
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/959
+      testName: 'Make sure that URLs with `#` in them are properly recognized as URLs.',
+      before: dedent`
+        https://github.com/platers/obsidian-linter//issues/42#issuecomment-1234567890
+      `,
+      after: dedent`
+        <https://github.com/platers/obsidian-linter//issues/42#issuecomment-1234567890>
+      `,
+    },
   ],
 });
 
