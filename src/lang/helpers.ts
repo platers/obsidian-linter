@@ -28,7 +28,9 @@ import zhTW from './locale/zh-tw';
 
 type LanguageStrings = typeof en;
 
-export const localeMap: { [k: string]: Partial<LanguageStrings> } = {
+export type LanguageLocale = Partial<LanguageStrings>;
+
+export const localeMap: { [k: string]: LanguageLocale } = {
   ar,
   cz,
   da,
@@ -55,6 +57,33 @@ export const localeMap: { [k: string]: Partial<LanguageStrings> } = {
   'zh': zhCN,
 };
 
+export const localeToFileName: { [k: string]: string} = {
+  'ar': 'ar',
+  'cz': 'cz',
+  'da': 'da',
+  'de': 'de',
+  'en': 'en',
+  'es': 'es',
+  'fr': 'fr',
+  'hi': 'hi',
+  'id': 'id',
+  'it': 'it',
+  'ja': 'ja',
+  'ko': 'ko',
+  'nl': 'nl',
+  'no': 'no',
+  'pl': 'pl',
+  'pt-BR': 'pt-br',
+  'pt': 'pt',
+  'ro': 'ro',
+  'ru': 'ru',
+  'sq': 'sq',
+  'tr': 'tr',
+  'uk': 'uk',
+  'zh-TW': 'zh-tw',
+  'zh': 'zh-cn',
+};
+
 export type LanguageStringKey = NestedKeyOf<LanguageStrings>
 
 let lang = 'en';
@@ -77,4 +106,8 @@ export function getTextInLanguage(str: LanguageStringKey): string {
 
 export function localeHasKey(locale: Partial<LanguageStrings>, key: LanguageStringKey): boolean {
   return !!getString<LanguageStrings>(locale, key);
+}
+
+export function getLanguageSourceFile(language: string) {
+  return `./src/lang/locale/${localeToFileName[language]}.ts`;
 }
