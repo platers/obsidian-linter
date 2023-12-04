@@ -149,7 +149,7 @@ function getNextTranslation(missingKeys: string[], element: string, language: st
 }
 
 function setValueInLanguage(language: string, key: string, value: string) {
-  let object = localeMap[language] as object;
+  let object = localeMap[language] as {[k: string]: any};
   const keyParts = key.split('.');
   keyParts.forEach((keyPart: string, index: number) => {
     if (keyParts.length -1 === index) {

@@ -104,7 +104,7 @@ export function getTextInLanguage(str: LanguageStringKey): string {
   return text as string;
 }
 
-export function localeHasKey(locale: Partial<LanguageStrings>, key: LanguageStringKey): boolean {
+export function localeHasKey(locale: LanguageLocale, key: LanguageStringKey): boolean {
   return !!getString<LanguageStrings>(locale, key);
 }
 
