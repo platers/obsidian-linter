@@ -2,6 +2,7 @@ import esbuild from 'esbuild';
 import process from 'process';
 import builtins from 'builtin-modules';
 import importGlobPlugin from 'esbuild-plugin-import-glob';
+import inlineWorkerPlugin from 'esbuild-plugin-inline-worker';
 import {replace} from 'esbuild-plugin-replace';
 
 const banner =
@@ -73,6 +74,7 @@ const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
     entryPoints: [entryPoint],
     plugins: [
       importGlobPlugin.default(),
+      inlineWorkerPlugin(),
       ...extraPlugins,
     ],
     bundle: true,

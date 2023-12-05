@@ -20,6 +20,7 @@ import {warn} from 'loglevel';
 import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
 import {ChangeSpec} from '@codemirror/state';
 import {downloadMisspellings, readInMisspellingsFile} from './utils/auto-correct-misspellings';
+import MyWorker from './rules-runner/myworker.worker';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -91,6 +92,14 @@ export default class LinterPlugin extends Plugin {
       const svg = iconInfo[key];
       addIcon(svg.id, svg.source);
     }
+
+    const worker = new MyWorker();
+
+    worker.postMessage(`Hello`);
+    worker.onmessage = (event: any) => {
+      console.log(`Main thread received message: ${event.data}`);
+    };
+
 
     await this.loadSettings();
 
