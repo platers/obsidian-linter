@@ -5,6 +5,7 @@ import importGlobPlugin from 'esbuild-plugin-import-glob';
 import { replace } from 'esbuild-plugin-replace';
 import { copyFileSync } from 'node:fs';
 import { join } from 'node:path';
+import inlineWorkerPlugin from 'esbuild-plugin-inline-worker';
 
 const banner =
   `/*
@@ -80,6 +81,7 @@ const createEsbuildArgs = function (banner, entryPoint, outfile, extraPlugins) {
     entryPoints: [entryPoint],
     plugins: [
       importGlobPlugin.default(),
+      inlineWorkerPlugin(),
       ...extraPlugins,
     ],
     bundle: true,
