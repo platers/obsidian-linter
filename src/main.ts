@@ -425,28 +425,13 @@ export default class LinterPlugin extends Plugin {
     // Replace changed lines
     const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
     const changes = dmp.diff_main(oldText, newText);
-    let curText = '';
-    changes.forEach((change) => {
-      function endOfDocument(doc: string) {
-        const lines = doc.split('\n');
-        return {line: lines.length - 1, ch: lines[lines.length - 1].length};
-      }
 
-      const [type, value] = change;
-
-      if (type == DiffMatchPatch.DIFF_INSERT) {
-        editor.replaceRange(value, endOfDocument(curText));
-        curText += value;
-      } else if (type == DiffMatchPatch.DIFF_DELETE) {
-        const start = endOfDocument(curText);
-        let tempText = curText;
-        tempText += value;
-        const end = endOfDocument(tempText);
-        editor.replaceRange('', start, end);
-      } else {
-        curText += value;
-      }
-    });
+    // for some reason Live Preview does not work with editor replace ranges like source mode does so it makes more sense
+    // to just set the value of the editor instead of trying to update just the parts that need it to avoid replaces
+    // updating the wrong parts of the YAML frontmatter.
+    if (oldText != newText) {
+      editor.setValue(newText);
+    }
 
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
