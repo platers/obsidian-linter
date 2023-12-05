@@ -60,6 +60,7 @@
     "@popperjs/core": "^2.11.6",
     "async-lock": "^1.4.1",
     "diff-match-patch": "^1.0.5",
+    "esbuild-plugin-inline-worker": "^0.1.1",
     "loglevel": "^1.9.1",
     "mdast-util-from-markdown": "^2.0.0",
     "mdast-util-frontmatter": "^2.0.1",
