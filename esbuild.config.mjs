@@ -66,6 +66,10 @@ const unusedCodeForProduction = [replace({
   delimiters: ['', ''],
 })];
 
+const externalPackages = [
+  'obsidian',
+  ...builtins];
+
 const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
   return {
     banner: {
@@ -74,13 +78,13 @@ const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
     entryPoints: [entryPoint],
     plugins: [
       importGlobPlugin.default(),
-      inlineWorkerPlugin(),
+      inlineWorkerPlugin({
+        external: externalPackages,
+      }),
       ...extraPlugins,
     ],
     bundle: true,
-    external: [
-      'obsidian',
-      ...builtins],
+    external: externalPackages,
     format: 'cjs',
     target: 'es2020',
     sourcemap: prod ? false : 'inline',
