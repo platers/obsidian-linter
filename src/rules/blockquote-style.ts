@@ -42,7 +42,7 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
   addSpaceToIndicator(startOfLine: string): string {
     // first we add spaces to blockquote indicators that are not followed by a space and then to catch any that were not handled already
     // we make sure to add a space between any 2 indicators that are side by side
-    return startOfLine.replace(/>([^ \t]|$)/g, '> $1').replace(/>>/g, '> >');
+    return startOfLine.replace(/>([^ \t]+|$)/g, '> $1').replace(/>>/g, '> >').replace(/>[ \t]+/g, '> ');
   }
   updateBlockquoteLines(blockquote: string, startOfLineModification: (startOfLine: string) => string): string {
     let currentIndex = 0;

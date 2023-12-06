@@ -29,5 +29,19 @@ ruleTest({
       `,
       options: {style: 'no space'},
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/961
+      testName: 'Multiple spaces after a blockquote indicator is converted into one space',
+      before: dedent`
+        >   Text here
+        >     >           More Text Here
+        > \t > \t\t\t >Some More Text
+      `,
+      after: dedent`
+        > Text here
+        > > More Text Here
+        > > > Some More Text
+      `,
+      options: {style: 'space'},
+    },
   ],
 });
