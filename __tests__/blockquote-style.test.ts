@@ -35,11 +35,13 @@ ruleTest({
         >   Text here
         >     >           More Text Here
         > \t > \t\t\t >Some More Text
+        >>>>\tJust a Tab
       `,
       after: dedent`
         > Text here
         > > More Text Here
         > > > Some More Text
+        > > > > Just a Tab
       `,
       options: {style: 'space'},
     },
