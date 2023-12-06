@@ -56,6 +56,8 @@ export default class LinterPlugin extends Plugin {
   private overridePaste: boolean = false;
   private customCommandsLock = new AsyncLock();
   private originalSaveCallback?: () => void = null;
+  private lintOnSaveFiles: TFile[] = [];
+  private lintLastActiveFiles: TFile[] = [];
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -225,6 +227,24 @@ export default class LinterPlugin extends Plugin {
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
+    eventRef = this.app.metadataCache.on('changed', (file: TFile) => {
+      if (this.lintOnSaveFiles.includes(file)) {
+        await this.customCommandsLock.acquire('command', async () => {
+          await sidebarTab.openFile(file);
+          this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+        });
+      }
+
+      try {
+        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+      } catch (error) {
+        this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      }
+      // this.manager?.updateCacheOnExternalFrontmatterUpdate(file.path, cache.frontmatter ?? {});
+    });
+    this.registerEvent(eventRef);
+    this.eventRefs.push(eventRef);
+
     // Source for save setting
     // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
     const saveCommandDefinition = this.app.commands?.commands?.[
@@ -255,6 +275,33 @@ export default class LinterPlugin extends Plugin {
     window.CodeMirrorAdapter.commands.save = () => {
       that.app.commands.executeCommandById('editor:save-file');
     };
+  }
+
+  async onMetadataCacheUpdatedCallback(file: TFile) {
+    if (!this.settings.lintCommands || this.settings.lintCommands.length === 0) {
+      return;
+    }
+
+    if (this.lintOnSaveFiles.includes(file)) {
+      this.lintOnSaveFiles.remove(file);
+
+      await this.customCommandsLock.acquire('command', async () => {
+        try {
+          this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+        } catch (error) {
+          this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+        }
+      });
+    } else if (this.lintLastActiveFiles.includes(file)) {
+      this.lintLastActiveFiles.remove(file);
+      const sidebarTab: WorkspaceLeaf = this.app.workspace.getRightLeaf(false);
+
+      await this.customCommandsLock.acquire('command', async () => {
+        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+      });
+
+      sidebarTab.detach();
+    }
   }
 
   onMenuOpenCallback(menu: Menu, file: TAbstractFile, _source: string) {
@@ -331,6 +378,12 @@ export default class LinterPlugin extends Plugin {
 
         logInfo(message);
       }
+    }
+
+    if (lintingLastActiveFile) {
+      this.lintLastActiveFiles.push(file);
+
+      return;
     }
 
     let sidebarTab: WorkspaceLeaf = null;
@@ -417,6 +470,7 @@ export default class LinterPlugin extends Plugin {
     let newText: string;
     try {
       newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
+      this.lintOnSaveFiles.push(file);
     } catch (error) {
       this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;
@@ -441,11 +495,11 @@ export default class LinterPlugin extends Plugin {
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
     this.displayChangedMessage(charsAdded, charsRemoved);
 
-    try {
-      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-    } catch (error) {
-      this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
-    }
+    // try {
+    //   this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+    // } catch (error) {
+    //   this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+    // }
 
     setCollectLogs(false);
   }
