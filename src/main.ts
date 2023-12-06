@@ -430,7 +430,11 @@ export default class LinterPlugin extends Plugin {
     // to just set the value of the editor instead of trying to update just the parts that need it to avoid replaces
     // updating the wrong parts of the YAML frontmatter.
     if (oldText != newText) {
+      const currentCursorOffset = editor.posToOffset(editor.getCursor());
+      const newCursorOffset = this.getNewCursorOffset(currentCursorOffset, changes, newText.length, currentCursorOffset == newText.length);
+
       editor.setValue(newText);
+      editor.setCursor(editor.offsetToPos(newCursorOffset));
     }
 
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
@@ -444,6 +448,41 @@ export default class LinterPlugin extends Plugin {
     }
 
     setCollectLogs(false);
+  }
+
+  private getNewCursorOffset(currentPos: number, changes: DiffMatchPatch.Diff[], newTextLength: number, isAtEndOfContent: boolean): number {
+    if (isAtEndOfContent) {
+      return newTextLength;
+    }
+
+    let newPos = currentPos;
+    let curText = '';
+    changes.forEach((change) => {
+      const [type, value] = change;
+
+      if (type == DiffMatchPatch.DIFF_INSERT) {
+        newPos += value.length;
+        curText += value;
+      } else if (type == DiffMatchPatch.DIFF_DELETE) {
+        if (curText.length + value.length > newPos) {
+          newPos -= newPos - (curText.length + value.length);
+        } else {
+          newPos -= value.length;
+        }
+      } else {
+        curText += value;
+      }
+
+      if (curText.length > newPos) {
+        return;
+      }
+    });
+
+    if (newPos < 0) {
+      return 0;
+    }
+
+    return newPos;
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
