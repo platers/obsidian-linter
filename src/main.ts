@@ -227,21 +227,7 @@ export default class LinterPlugin extends Plugin {
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
-    eventRef = this.app.metadataCache.on('changed', (file: TFile) => {
-      if (this.lintOnSaveFiles.includes(file)) {
-        await this.customCommandsLock.acquire('command', async () => {
-          await sidebarTab.openFile(file);
-          this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-        });
-      }
-
-      try {
-        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-      } catch (error) {
-        this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
-      }
-      // this.manager?.updateCacheOnExternalFrontmatterUpdate(file.path, cache.frontmatter ?? {});
-    });
+    eventRef = this.app.metadataCache.on('changed', (file: TFile) => this.onMetadataCacheUpdatedCallback(file));
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
