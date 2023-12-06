@@ -481,12 +481,6 @@ export default class LinterPlugin extends Plugin {
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
     this.displayChangedMessage(charsAdded, charsRemoved);
 
-    // try {
-    //   this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-    // } catch (error) {
-    //   this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
-    // }
-
     setCollectLogs(false);
   }
 
