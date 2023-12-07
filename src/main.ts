@@ -18,8 +18,9 @@ import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 import AsyncLock from 'async-lock';
 import {warn} from 'loglevel';
 // @ts-ignore because it does not have the expected default export, but it does not need one
-import MyWorker from './rules-runner/rules-runner.worker';
-import {LinterWorker, WorkerArgs, WorkerResponseMessage} from './typings/worker';
+// import MyWorker from './rules-runner/rules-runner.worker';
+// import {LinterWorker, WorkerArgs, WorkerResponseMessage} from './typings/worker';
+import {FileLintManager} from './rules-runner/file-lint-manager';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -67,6 +68,7 @@ export default class LinterPlugin extends Plugin {
   private fileLintFiles: Set<TFile> = new Set();
   private customCommandsCallback: (file: TFile) => Promise<void> = null;
   private currentlyOpeningSidebar: boolean = false;
+  private lintFileManager: FileLintManager = undefined;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -81,20 +83,22 @@ export default class LinterPlugin extends Plugin {
 
     await this.loadSettings();
 
-    const worker = new MyWorker() as LinterWorker;
+    this.lintFileManager = new FileLintManager(1, this.momentLocale, this.settings, this.app.vault);
 
-    worker.postMessage({
-      oldText: 'text',
-      fileInfo: {
-        name: 'file name',
-        createdAtFormatted: 'created',
-        modifiedAtFormatted: 'updated',
-      },
-      settings: this.settings,
-    });
-    worker.onmessage = (event: WorkerResponseMessage) => {
-      console.log(`Main thread received message: ${event.data}`);
-    };
+    // const worker = new MyWorker() as LinterWorker;
+
+    // worker.postMessage({
+    //   oldText: 'text',
+    //   fileInfo: {
+    //     name: 'file name',
+    //     createdAtFormatted: 'created',
+    //     modifiedAtFormatted: 'updated',
+    //   },
+    //   settings: this.settings,
+    // });
+    // worker.onmessage = (event: WorkerResponseMessage) => {
+    //   console.log(`Main thread received message: ${event.data}`);
+    // };
 
 
     this.addCommands();
@@ -453,7 +457,8 @@ export default class LinterPlugin extends Plugin {
     const oldText = editor.getValue();
     let newText: string;
     try {
-      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
+      this.lintFileManager.lintFile(file);
+      // newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
     } catch (error) {
       this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;

@@ -32,6 +32,17 @@ const mockedPlugins = [replace({
   },
   delimiters: ['', ''],
 })];
+const webWorkerIgnores = [replace({
+  values: {
+    // update usage of moment from obsidian to the node implementation of moment we have
+    'import {moment} from \'obsidian\';': '',
+    // remove the use of obsidian in the options to allow for docs.js to run
+    'import {Setting} from \'obsidian\';': '',
+    // remove the use of obsidian in settings helper to allow for docs.js to run
+    'import {Component, MarkdownRenderer} from \'obsidian\';': '',
+  },
+  delimiters: ['', ''],
+})];
 
 const externalPackages = [
   'obsidian',
@@ -48,6 +59,7 @@ const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
       inlineWorkerPlugin({
         external: externalPackages,
         format: 'cjs',
+        plugins: [...webWorkerIgnores],
       }),
       ...extraPlugins,
     ],
