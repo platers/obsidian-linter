@@ -17,7 +17,9 @@ import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 import AsyncLock from 'async-lock';
 import {warn} from 'loglevel';
-import MyWorker from './rules-runner/myworker.worker';
+// @ts-ignore because it does not have the expected default export, but it does not need one
+import MyWorker from './rules-runner/rules-runner.worker';
+import {LinterWorker, WorkerArgs, WorkerResponseMessage} from './typings/worker';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -77,15 +79,23 @@ export default class LinterPlugin extends Plugin {
       addIcon(svg.id, svg.source);
     }
 
-    const worker = new MyWorker();
+    await this.loadSettings();
 
-    worker.postMessage(`Hello`);
-    worker.onmessage = (event: any) => {
+    const worker = new MyWorker() as LinterWorker;
+
+    worker.postMessage({
+      oldText: 'text',
+      fileInfo: {
+        name: 'file name',
+        createdAtFormatted: 'created',
+        modifiedAtFormatted: 'updated',
+      },
+      settings: this.settings,
+    });
+    worker.onmessage = (event: WorkerResponseMessage) => {
       console.log(`Main thread received message: ${event.data}`);
     };
 
-
-    await this.loadSettings();
 
     this.addCommands();
 

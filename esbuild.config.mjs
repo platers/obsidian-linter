@@ -47,6 +47,7 @@ const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
       importGlobPlugin.default(),
       inlineWorkerPlugin({
         external: externalPackages,
+        format: 'cjs',
       }),
       ...extraPlugins,
     ],
