@@ -57,3 +57,19 @@ export interface LinterWorker {
   postMessage: (data: WorkerArgs) => void;
   onmessage: (data: WorkerResponseMessage) => void;
 }
+
+export type RunLinterRulesOptions = {
+  oldText: string,
+  fileInfo: FileInfo,
+  settings: LinterSettings,
+}
+
+type FileInfo = {
+  name: string,
+  createdAtFormatted: string,
+  modifiedAtFormatted: string,
+}
+
+export interface RulesRunner {
+  lintText(runOptions: RunLinterRulesOptions): string
+}

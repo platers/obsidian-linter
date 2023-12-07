@@ -1,8 +1,23 @@
 // here is a worker to sent data back and forth
 
-import {WorkerMessage as WorkerStartMessage} from '../typings/worker';
+import {RulesRunner, WorkerMessage} from '../typings/worker';
 
-onmessage = (event: WorkerStartMessage) => {
-  console.log(`Worker received message: ${event.data.oldText}`);
-  postMessage('Hello from worker!');
+
+let rulesRunner: RulesRunner = null;
+import('./rules-runner').then((mod: any) => {
+  rulesRunner = new mod.RulesRunner();
+});
+
+// import {RulesRunner} from './rules-runner';
+
+
+self.document = {
+  createElement: () => {},
+};
+
+onmessage = (event: WorkerMessage) => {
+  console.log(event.data.oldText);
+  const newText = rulesRunner.lintText(event.data);
+  console.log(newText);
+  postMessage(newText);
 };
