@@ -425,28 +425,17 @@ export default class LinterPlugin extends Plugin {
     // Replace changed lines
     const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
     const changes = dmp.diff_main(oldText, newText);
-    let curText = '';
-    changes.forEach((change) => {
-      function endOfDocument(doc: string) {
-        const lines = doc.split('\n');
-        return {line: lines.length - 1, ch: lines[lines.length - 1].length};
-      }
 
-      const [type, value] = change;
+    // for some reason Live Preview does not work with editor replace ranges like source mode does so it makes more sense
+    // to just set the value of the editor instead of trying to update just the parts that need it to avoid replaces
+    // updating the wrong parts of the YAML frontmatter.
+    if (oldText != newText) {
+      const currentCursorOffset = editor.posToOffset(editor.getCursor());
+      const newCursorOffset = this.getNewCursorOffset(currentCursorOffset, changes, newText.length, currentCursorOffset == newText.length);
 
-      if (type == DiffMatchPatch.DIFF_INSERT) {
-        editor.replaceRange(value, endOfDocument(curText));
-        curText += value;
-      } else if (type == DiffMatchPatch.DIFF_DELETE) {
-        const start = endOfDocument(curText);
-        let tempText = curText;
-        tempText += value;
-        const end = endOfDocument(tempText);
-        editor.replaceRange('', start, end);
-      } else {
-        curText += value;
-      }
-    });
+      editor.setValue(newText);
+      editor.setCursor(editor.offsetToPos(newCursorOffset));
+    }
 
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
@@ -459,6 +448,41 @@ export default class LinterPlugin extends Plugin {
     }
 
     setCollectLogs(false);
+  }
+
+  private getNewCursorOffset(currentPos: number, changes: DiffMatchPatch.Diff[], newTextLength: number, isAtEndOfContent: boolean): number {
+    if (isAtEndOfContent) {
+      return newTextLength;
+    }
+
+    let newPos = currentPos;
+    let curText = '';
+    changes.forEach((change) => {
+      const [type, value] = change;
+
+      if (type == DiffMatchPatch.DIFF_INSERT) {
+        newPos += value.length;
+        curText += value;
+      } else if (type == DiffMatchPatch.DIFF_DELETE) {
+        if (curText.length + value.length > newPos) {
+          newPos -= newPos - (curText.length + value.length);
+        } else {
+          newPos -= value.length;
+        }
+      } else {
+        curText += value;
+      }
+
+      if (curText.length > newPos) {
+        return;
+      }
+    });
+
+    if (newPos < 0) {
+      return 0;
+    }
+
+    return newPos;
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109

@@ -66,3 +66,7 @@ esbuild.build(
 esbuild.build(
     createEsbuildArgs(mockedBanner, 'src/translation-helper.ts', 'translation-helper.js', mockedPlugins),
 ).catch(() => process.exit(1));
+
+esbuild.build(
+    createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []),
+).catch(() => process.exit(1));
