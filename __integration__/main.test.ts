@@ -1,7 +1,8 @@
-import {Editor, MarkdownView, Plugin, TFile, normalizePath} from 'obsidian';
+import {Editor, EventRef, MarkdownView, Plugin, TFile, normalizePath} from 'obsidian';
 import LinterPlugin from 'src/main';
 import {obsidianModeTestCases} from './obsidian-mode.test';
-import {setWorkspaceItemMode} from './utils.test';
+import {delay, setWorkspaceItemMode} from './utils.test';
+import {customCommandTestCases} from './custom-commands.test';
 
 export type IntegrationTestCase = {
   name: string,
@@ -11,8 +12,10 @@ export type IntegrationTestCase = {
 }
 
 export default class TestLinterPlugin extends Plugin {
-  tests: Array<IntegrationTestCase> = [...obsidianModeTestCases];
+  regularTests: Array<IntegrationTestCase> = [...obsidianModeTestCases];
+  afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
+  private eventRefs: EventRef[] = [];
 
   async onload() {
     this.addCommand({
@@ -28,9 +31,11 @@ export default class TestLinterPlugin extends Plugin {
   async setup() {
     if (!this.plugin) {
       this.plugin = new LinterPlugin(this.app, this.manifest);
-    }
 
-    await this.loadOrResetSettings();
+      await this.plugin.onload();
+    } else {
+      await this.resetSettings();
+    }
   }
 
   async runTests() {
@@ -40,7 +45,15 @@ export default class TestLinterPlugin extends Plugin {
       return;
     }
 
-    for (const t of this.tests) {
+    await this.runTestSuite(this.regularTests, activeLeaf);
+
+    await this.runTestSuite(this.afterCacheUpdateTests, activeLeaf, false, 3000, (t: IntegrationTestCase, activeLeaf: MarkdownView, originalText: string) => {
+      this.addMetadataCacheTestCallback(t, activeLeaf, originalText);
+    });
+  }
+
+  async runTestSuite(tests: IntegrationTestCase[], activeLeaf: MarkdownView, runAssertionsRightAway: boolean = true, delayMs?: number, extraSetup?: (t: IntegrationTestCase, activeLeaf: MarkdownView, originalText: string) => void) {
+    for (const t of tests) {
       const file = this.getFileFromPath(t.filePath);
       if (!file) {
         console.error('failed to get file: ' + t.filePath);
@@ -48,10 +61,12 @@ export default class TestLinterPlugin extends Plugin {
       }
 
       await activeLeaf.leaf.openFile(file);
-
       const originalText = activeLeaf.editor.getValue();
+      await this.resetSettings();
 
-      await this.loadOrResetSettings();
+      if (extraSetup) {
+        extraSetup(t, activeLeaf, originalText);
+      }
 
       try {
         if (t.setup) {
@@ -59,18 +74,74 @@ export default class TestLinterPlugin extends Plugin {
         }
 
         this.plugin.runLinterEditor(activeLeaf.editor);
+        if (runAssertionsRightAway) {
+          await t.assertions(activeLeaf.editor);
 
-        t.assertions(activeLeaf.editor);
+          console.log('✅', t.name);
+        }
+      } catch (e) {
+        console.log('❌', t.name);
+        console.error(e);
+
+        if (!runAssertionsRightAway) {
+          await this.resetFileContents(activeLeaf, originalText);
+        }
+      }
+
+      if (runAssertionsRightAway) {
+        await this.resetFileContents(activeLeaf, originalText);
+      }
+
+      if (delayMs && delayMs > 0) {
+        await delay(delayMs);
+      }
+    }
+  }
+
+  addMetadataCacheTestCallback(t: IntegrationTestCase, activeLeaf: MarkdownView, originalText: string) {
+    // we use this to make sure a second cache update is not able to run before the first one
+    // for the file we are looking for has completed
+    let alreadyRun = false;
+    const eventRef = this.app.metadataCache.on('changed', async (updatedFile: TFile) => {
+      if (activeLeaf.file !== updatedFile || alreadyRun ) {
+        return;
+      }
+
+      alreadyRun = true;
+
+      try {
+        await t.assertions(activeLeaf.editor);
+
         console.log('✅', t.name);
       } catch (e) {
         console.log('❌', t.name);
         console.error(e);
       } finally {
-        if (activeLeaf) {
-          activeLeaf.editor.setValue(originalText);
-          await setWorkspaceItemMode(this.app, true);
-        }
+        this.app.workspace.offref(eventRef);
+        this.eventRefs.remove(eventRef);
+
+        await this.resetFileContents(activeLeaf, originalText);
       }
+    });
+
+    this.registerEvent(eventRef);
+    this.eventRefs.push(eventRef);
+  }
+
+  onunload(): void {
+    for (const eventRef of this.eventRefs) {
+      this.app.workspace.offref(eventRef);
+    }
+
+    if (this.plugin) {
+      this.plugin.onunload();
+    }
+  }
+
+  private async resetFileContents(activeLeaf: MarkdownView, originalText: string) {
+    if (activeLeaf) {
+      activeLeaf.editor.setValue(originalText);
+      await setWorkspaceItemMode(this.app, true);
     }
   }
 
@@ -89,7 +160,7 @@ export default class TestLinterPlugin extends Plugin {
     return null;
   }
 
-  private async loadOrResetSettings() {
+  private async resetSettings() {
     await this.plugin.loadSettings();
   }
 }

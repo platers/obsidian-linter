@@ -212,7 +212,6 @@ export default class LinterPlugin extends Plugin {
         return;
       }
 
-
       this.modifyPasteEvent(clipboardEv);
     });
     this.registerEvent(eventRef);
