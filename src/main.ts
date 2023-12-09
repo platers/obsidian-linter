@@ -1,4 +1,4 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, WorkspaceLeaf} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange} from 'obsidian';
 import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -56,8 +56,11 @@ export default class LinterPlugin extends Plugin {
   private overridePaste: boolean = false;
   private customCommandsLock = new AsyncLock();
   private originalSaveCallback?: () => void = null;
-  private lintOnSaveFiles: TFile[] = [];
-  private lintLastActiveFiles: TFile[] = [];
+  // The amount of files you can use editor lint on at once is pretty small, so we will use an array
+  private editorLintFiles: TFile[] = [];
+  // the amount of files that can be linted as a file can be quite large, so we will want to use a set to make
+  // search and other operations faster
+  private fileLintFiles: Set<TFile> = new Set();
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -263,12 +266,12 @@ export default class LinterPlugin extends Plugin {
   }
 
   async onMetadataCacheUpdatedCallback(file: TFile) {
-    if (!this.settings.lintCommands || this.settings.lintCommands.length === 0) {
-      return;
-    }
+    if (this.editorLintFiles.includes(file)) {
+      this.editorLintFiles.remove(file);
 
-    if (this.lintOnSaveFiles.includes(file)) {
-      this.lintOnSaveFiles.remove(file);
+      if (!this.settings.lintCommands || this.settings.lintCommands.length === 0) {
+        return;
+      }
 
       await this.customCommandsLock.acquire('command', async () => {
         try {
@@ -277,15 +280,10 @@ export default class LinterPlugin extends Plugin {
           this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
         }
       });
-    } else if (this.lintLastActiveFiles.includes(file)) {
-      this.lintLastActiveFiles.remove(file);
-      const sidebarTab: WorkspaceLeaf = this.app.workspace.getRightLeaf(false);
+    } else if (this.fileLintFiles.has(file)) {
+      this.fileLintFiles.delete(file);
 
-      await this.customCommandsLock.acquire('command', async () => {
-        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-      });
-
-      sidebarTab.detach();
+      this.runCustomCommandsInSidebar(file);
     }
   }
 
@@ -363,26 +361,15 @@ export default class LinterPlugin extends Plugin {
 
         logInfo(message);
       }
-    }
 
-    if (lintingLastActiveFile) {
-      this.lintLastActiveFiles.push(file);
+      // when a change is made to the file we know that the cache will update down the road
+      // so we can defer running the custom commands to the cache callback
+      this.fileLintFiles.add(file);
 
       return;
     }
 
-    let sidebarTab: WorkspaceLeaf = null;
-    if (this.settings.lintCommands && this.settings.lintCommands.length !== 0) {
-      if (!sidebarTab) {
-        sidebarTab = this.app.workspace.getRightLeaf(false);
-      }
-
-      await this.customCommandsLock.acquire('command', async () => {
-        await sidebarTab.openFile(file);
-        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-      });
-      sidebarTab.detach();
-    }
+    await this.runCustomCommandsInSidebar(file);
   }
 
   async runLinterAllFiles(app: App) {
@@ -455,7 +442,7 @@ export default class LinterPlugin extends Plugin {
     let newText: string;
     try {
       newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
-      this.lintOnSaveFiles.push(file);
+      this.editorLintFiles.push(file);
     } catch (error) {
       this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;
@@ -676,6 +663,18 @@ export default class LinterPlugin extends Plugin {
     }
 
     editor.replaceSelection(clipboardContent);
+  }
+
+  private async runCustomCommandsInSidebar(file: TFile) {
+    if (this.settings.lintCommands && this.settings.lintCommands.length !== 0) {
+      const sidebarTab = this.app.workspace.getRightLeaf(false);
+
+      await this.customCommandsLock.acquire('command', async () => {
+        await sidebarTab.openFile(file);
+        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+      });
+      sidebarTab.detach();
+    }
   }
 
   /**
