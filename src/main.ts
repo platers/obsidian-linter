@@ -269,17 +269,7 @@ export default class LinterPlugin extends Plugin {
     if (this.editorLintFiles.includes(file)) {
       this.editorLintFiles.remove(file);
 
-      if (!this.settings.lintCommands || this.settings.lintCommands.length === 0) {
-        return;
-      }
-
-      await this.customCommandsLock.acquire('command', async () => {
-        try {
-          this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-        } catch (error) {
-          this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
-        }
-      });
+      this.runCustomCommands(file);
     } else if (this.fileLintFiles.has(file)) {
       this.fileLintFiles.delete(file);
 
@@ -442,7 +432,6 @@ export default class LinterPlugin extends Plugin {
     let newText: string;
     try {
       newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
-      this.editorLintFiles.push(file);
     } catch (error) {
       this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;
@@ -455,17 +444,26 @@ export default class LinterPlugin extends Plugin {
     // for some reason Live Preview does not work with editor replace ranges like source mode does so it makes more sense
     // to just set the value of the editor instead of trying to update just the parts that need it to avoid replaces
     // updating the wrong parts of the YAML frontmatter.
-    if (oldText != newText) {
+    const changeMade = oldText != newText;
+    if (changeMade) {
       const currentCursorOffset = editor.posToOffset(editor.getCursor());
       const newCursorOffset = this.getNewCursorOffset(currentCursorOffset, changes, newText.length, currentCursorOffset == newText.length);
 
       editor.setValue(newText);
       editor.setCursor(editor.offsetToPos(newCursorOffset));
+
+      // we defer the running of custom commands to the metadata cache when an update is made
+      this.editorLintFiles.push(file);
     }
 
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
     this.displayChangedMessage(charsAdded, charsRemoved);
+
+    // run custom commands now since no change was made
+    if (!changeMade) {
+      this.runCustomCommands(file);
+    }
 
     setCollectLogs(false);
   }
@@ -666,15 +664,31 @@ export default class LinterPlugin extends Plugin {
   }
 
   private async runCustomCommandsInSidebar(file: TFile) {
-    if (this.settings.lintCommands && this.settings.lintCommands.length !== 0) {
-      const sidebarTab = this.app.workspace.getRightLeaf(false);
-
-      await this.customCommandsLock.acquire('command', async () => {
-        await sidebarTab.openFile(file);
-        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-      });
-      sidebarTab.detach();
+    if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
+      return;
     }
+
+    const sidebarTab = this.app.workspace.getRightLeaf(false);
+
+    await this.customCommandsLock.acquire('command', async () => {
+      await sidebarTab.openFile(file);
+      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+    });
+    sidebarTab.detach();
+  }
+
+  private async runCustomCommands(file: TFile) {
+    if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
+      return;
+    }
+
+    await this.customCommandsLock.acquire('command', async () => {
+      try {
+        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+      } catch (error) {
+        this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      }
+    });
   }
 
   /**
