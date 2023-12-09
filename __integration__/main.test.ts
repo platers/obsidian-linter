@@ -1,7 +1,7 @@
 import {Editor, EventRef, MarkdownView, Plugin, TFile, normalizePath} from 'obsidian';
 import LinterPlugin from 'src/main';
 import {obsidianModeTestCases} from './obsidian-mode.test';
-import {delay, setWorkspaceItemMode} from './utils.test';
+import {setWorkspaceItemMode} from './utils.test';
 import {customCommandTestCases} from './custom-commands.test';
 
 export type IntegrationTestCase = {
@@ -45,7 +45,33 @@ export default class TestLinterPlugin extends Plugin {
       return;
     }
 
-    await this.runTestSuite(this.regularTests, activeLeaf);
+    for (const t of this.regularTests) {
+      const file = this.getFileFromPath(t.filePath);
+      if (!file) {
+        console.error('failed to get file: ' + t.filePath);
+        continue;
+      }
+
+      await activeLeaf.leaf.openFile(file);
+      const originalText = activeLeaf.editor.getValue();
+      await this.resetSettings();
+
+      try {
+        if (t.setup) {
+          await t.setup(this, activeLeaf.editor);
+        }
+
+        this.plugin.runLinterEditor(activeLeaf.editor);
+        await t.assertions(activeLeaf.editor);
+
+        console.log('✅', t.name);
+      } catch (e) {
+        console.log('❌', t.name);
+        console.error(e);
+      }
+
+      await this.resetFileContents(activeLeaf, originalText);
+    }
 
     await this.runMetadataTests(this.afterCacheUpdateTests, activeLeaf);
   }
@@ -114,52 +140,6 @@ export default class TestLinterPlugin extends Plugin {
     }
 
     return originalText;
-  }
-
-  async runTestSuite(tests: IntegrationTestCase[], activeLeaf: MarkdownView, runAssertionsRightAway: boolean = true, delayMs?: number, extraSetup?: (t: IntegrationTestCase, activeLeaf: MarkdownView, originalText: string) => void) {
-    for (const t of tests) {
-      const file = this.getFileFromPath(t.filePath);
-      if (!file) {
-        console.error('failed to get file: ' + t.filePath);
-        continue;
-      }
-
-      await activeLeaf.leaf.openFile(file);
-      const originalText = activeLeaf.editor.getValue();
-      await this.resetSettings();
-
-      if (extraSetup) {
-        extraSetup(t, activeLeaf, originalText);
-      }
-
-      try {
-        if (t.setup) {
-          await t.setup(this, activeLeaf.editor);
-        }
-
-        this.plugin.runLinterEditor(activeLeaf.editor);
-        if (runAssertionsRightAway) {
-          await t.assertions(activeLeaf.editor);
-
-          console.log('✅', t.name);
-        }
-      } catch (e) {
-        console.log('❌', t.name);
-        console.error(e);
-
-        if (!runAssertionsRightAway) {
-          await this.resetFileContents(activeLeaf, originalText);
-        }
-      }
-
-      if (runAssertionsRightAway) {
-        await this.resetFileContents(activeLeaf, originalText);
-      }
-
-      if (delayMs && delayMs > 0) {
-        await delay(delayMs);
-      }
-    }
   }
 
   addMetadataCacheTestCallback(t: IntegrationTestCase, activeLeaf: MarkdownView, originalText: string) {
