@@ -47,9 +47,73 @@ export default class TestLinterPlugin extends Plugin {
 
     await this.runTestSuite(this.regularTests, activeLeaf);
 
-    await this.runTestSuite(this.afterCacheUpdateTests, activeLeaf, false, 3000, (t: IntegrationTestCase, activeLeaf: MarkdownView, originalText: string) => {
-      this.addMetadataCacheTestCallback(t, activeLeaf, originalText);
+    await this.runMetadataTests(this.afterCacheUpdateTests, activeLeaf);
+  }
+
+  async runMetadataTests(tests: IntegrationTestCase[], activeLeaf: MarkdownView) {
+    let index = 0;
+    let originalText = await this.setupMetadataTest(this, tests[index], activeLeaf);
+    if (originalText == null) {
+      return;
+    }
+
+    const that = this;
+
+    this.plugin.setCustomCommandCallback(async (file: TFile) => {
+      if (file !== activeLeaf.file) {
+        return;
+      }
+
+      const t = tests[index];
+      try {
+        await t.assertions(activeLeaf.editor);
+
+        console.log('✅', t.name);
+      } catch (e) {
+        console.log('❌', t.name);
+        console.error(e);
+      }
+
+      await that.resetFileContents(activeLeaf, originalText);
+
+      originalText = null;
+      while (index+1 < tests.length && originalText == null) {
+        originalText = await that.setupMetadataTest(that, tests[++index], activeLeaf);
+      }
+
+      // remove the custom commands callback once all tests have run
+      if (index >= tests.length && originalText == null) {
+        that.plugin.setCustomCommandCallback(null);
+      }
     });
+  }
+
+  async setupMetadataTest(testPlugin: TestLinterPlugin, t: IntegrationTestCase, activeLeaf: MarkdownView): Promise<string> {
+    const file = this.getFileFromPath(t.filePath);
+    if (!file) {
+      console.error('failed to get file: ' + t.filePath);
+      return null;
+    }
+
+    await activeLeaf.leaf.openFile(file);
+    const originalText = activeLeaf.editor.getValue();
+    await testPlugin.resetSettings();
+
+    try {
+      if (t.setup) {
+        await t.setup(this, activeLeaf.editor);
+      }
+
+      testPlugin.plugin.runLinterEditor(activeLeaf.editor);
+    } catch (e) {
+      console.log('❌', t.name);
+      console.error(e);
+      await testPlugin.resetFileContents(activeLeaf, originalText);
+
+      return null;
+    }
+
+    return originalText;
   }
 
   async runTestSuite(tests: IntegrationTestCase[], activeLeaf: MarkdownView, runAssertionsRightAway: boolean = true, delayMs?: number, extraSetup?: (t: IntegrationTestCase, activeLeaf: MarkdownView, originalText: string) => void) {

@@ -16,6 +16,7 @@ import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers'
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 import AsyncLock from 'async-lock';
+import {warn} from 'loglevel';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -61,6 +62,7 @@ export default class LinterPlugin extends Plugin {
   // the amount of files that can be linted as a file can be quite large, so we will want to use a set to make
   // search and other operations faster
   private fileLintFiles: Set<TFile> = new Set();
+  private customCommandsCallback: (file: TFile) => Promise<void> = null;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -663,6 +665,11 @@ export default class LinterPlugin extends Plugin {
     editor.replaceSelection(clipboardContent);
   }
 
+  setCustomCommandCallback(callback: (file: TFile) => Promise<void>) {
+    warn('Please only set the custom command callback for integration tests.');
+    this.customCommandsCallback = callback;
+  }
+
   private async runCustomCommandsInSidebar(file: TFile) {
     if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
       return;
@@ -671,8 +678,14 @@ export default class LinterPlugin extends Plugin {
     const sidebarTab = this.app.workspace.getRightLeaf(false);
 
     await this.customCommandsLock.acquire('command', async () => {
+      // TODO: disable lint on file change
       await sidebarTab.openFile(file);
       this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+      if (this.customCommandsCallback) {
+        await this.customCommandsCallback(file);
+      }
+
+      // TODO: move back to the original tab
     });
     sidebarTab.detach();
   }
@@ -687,6 +700,10 @@ export default class LinterPlugin extends Plugin {
         this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
       } catch (error) {
         this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      }
+
+      if (this.customCommandsCallback) {
+        await this.customCommandsCallback(file);
       }
     });
   }
