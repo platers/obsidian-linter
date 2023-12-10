@@ -1,4 +1,4 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, WorkspaceLeaf} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange} from 'obsidian';
 import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -16,6 +16,7 @@ import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers'
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 import AsyncLock from 'async-lock';
+import {warn} from 'loglevel';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -56,6 +57,12 @@ export default class LinterPlugin extends Plugin {
   private overridePaste: boolean = false;
   private customCommandsLock = new AsyncLock();
   private originalSaveCallback?: () => void = null;
+  // The amount of files you can use editor lint on at once is pretty small, so we will use an array
+  private editorLintFiles: TFile[] = [];
+  // the amount of files that can be linted as a file can be quite large, so we will want to use a set to make
+  // search and other operations faster
+  private fileLintFiles: Set<TFile> = new Set();
+  private customCommandsCallback: (file: TFile) => Promise<void> = null;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -210,7 +217,6 @@ export default class LinterPlugin extends Plugin {
         return;
       }
 
-
       this.modifyPasteEvent(clipboardEv);
     });
     this.registerEvent(eventRef);
@@ -222,6 +228,10 @@ export default class LinterPlugin extends Plugin {
 
     this.lastActiveFile = this.app.workspace.getActiveFile();
     eventRef = this.app.workspace.on('active-leaf-change', () => this.onActiveLeafChange());
+    this.registerEvent(eventRef);
+    this.eventRefs.push(eventRef);
+
+    eventRef = this.app.metadataCache.on('changed', (file: TFile) => this.onMetadataCacheUpdatedCallback(file));
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
@@ -255,6 +265,18 @@ export default class LinterPlugin extends Plugin {
     window.CodeMirrorAdapter.commands.save = () => {
       that.app.commands.executeCommandById('editor:save-file');
     };
+  }
+
+  async onMetadataCacheUpdatedCallback(file: TFile) {
+    if (this.editorLintFiles.includes(file)) {
+      this.editorLintFiles.remove(file);
+
+      this.runCustomCommands(file);
+    } else if (this.fileLintFiles.has(file)) {
+      this.fileLintFiles.delete(file);
+
+      this.runCustomCommandsInSidebar(file);
+    }
   }
 
   onMenuOpenCallback(menu: Menu, file: TAbstractFile, _source: string) {
@@ -331,20 +353,15 @@ export default class LinterPlugin extends Plugin {
 
         logInfo(message);
       }
+
+      // when a change is made to the file we know that the cache will update down the road
+      // so we can defer running the custom commands to the cache callback
+      this.fileLintFiles.add(file);
+
+      return;
     }
 
-    let sidebarTab: WorkspaceLeaf = null;
-    if (this.settings.lintCommands && this.settings.lintCommands.length !== 0) {
-      if (!sidebarTab) {
-        sidebarTab = this.app.workspace.getRightLeaf(false);
-      }
-
-      await this.customCommandsLock.acquire('command', async () => {
-        await sidebarTab.openFile(file);
-        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-      });
-      sidebarTab.detach();
-    }
+    await this.runCustomCommandsInSidebar(file);
   }
 
   async runLinterAllFiles(app: App) {
@@ -429,22 +446,25 @@ export default class LinterPlugin extends Plugin {
     // for some reason Live Preview does not work with editor replace ranges like source mode does so it makes more sense
     // to just set the value of the editor instead of trying to update just the parts that need it to avoid replaces
     // updating the wrong parts of the YAML frontmatter.
-    if (oldText != newText) {
+    const changeMade = oldText != newText;
+    if (changeMade) {
       const currentCursorOffset = editor.posToOffset(editor.getCursor());
       const newCursorOffset = this.getNewCursorOffset(currentCursorOffset, changes, newText.length, currentCursorOffset == newText.length);
 
       editor.setValue(newText);
       editor.setCursor(editor.offsetToPos(newCursorOffset));
+
+      // we defer the running of custom commands to the metadata cache when an update is made
+      this.editorLintFiles.push(file);
     }
 
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
     this.displayChangedMessage(charsAdded, charsRemoved);
 
-    try {
-      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-    } catch (error) {
-      this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+    // run custom commands now since no change was made
+    if (!changeMade) {
+      this.runCustomCommands(file);
     }
 
     setCollectLogs(false);
@@ -643,6 +663,49 @@ export default class LinterPlugin extends Plugin {
     }
 
     editor.replaceSelection(clipboardContent);
+  }
+
+  setCustomCommandCallback(callback: (file: TFile) => Promise<void>) {
+    warn(getTextInLanguage('logs.custom-command-callback-warning'));
+    this.customCommandsCallback = callback;
+  }
+
+  private async runCustomCommandsInSidebar(file: TFile) {
+    if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
+      return;
+    }
+
+    const sidebarTab = this.app.workspace.getRightLeaf(false);
+
+    await this.customCommandsLock.acquire('command', async () => {
+      // TODO: disable lint on file change
+      await sidebarTab.openFile(file);
+      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+      if (this.customCommandsCallback) {
+        await this.customCommandsCallback(file);
+      }
+
+      // TODO: move back to the original tab
+    });
+    sidebarTab.detach();
+  }
+
+  private async runCustomCommands(file: TFile) {
+    if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
+      return;
+    }
+
+    await this.customCommandsLock.acquire('command', async () => {
+      try {
+        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+      } catch (error) {
+        this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      }
+
+      if (this.customCommandsCallback) {
+        await this.customCommandsCallback(file);
+      }
+    });
   }
 
   /**

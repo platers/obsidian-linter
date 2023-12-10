@@ -21,6 +21,8 @@ test-vault/.obsidian/*.json
 !test-vault/.obsidian/plugins/hot-reload/*
 test-vault/.obsidian/plugins/obsidian-linter/*
 !test-vault/.obsidian/plugins/obsidian-linter/.hotreload
+test-vault/.obsidian/plugins/table-editor-obsidian/*
+!test-vault/.obsidian/plugins/table-editor-obsidian/.gitkeep
 
 # obsidian
 data.json
