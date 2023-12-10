@@ -666,7 +666,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   setCustomCommandCallback(callback: (file: TFile) => Promise<void>) {
-    warn('Please only set the custom command callback for integration tests.');
+    warn(getTextInLanguage('logs.custom-command-callback-warning'));
     this.customCommandsCallback = callback;
   }
 
