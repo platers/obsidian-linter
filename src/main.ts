@@ -63,6 +63,7 @@ export default class LinterPlugin extends Plugin {
   // search and other operations faster
   private fileLintFiles: Set<TFile> = new Set();
   private customCommandsCallback: (file: TFile) => Promise<void> = null;
+  private currentlyOpeningSidebar: boolean = false;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -305,7 +306,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   async onActiveLeafChange() {
-    if (!this.isEnabled) {
+    if (!this.isEnabled || this.currentlyOpeningSidebar) {
       return;
     }
 
@@ -676,18 +677,23 @@ export default class LinterPlugin extends Plugin {
     }
 
     const sidebarTab = this.app.workspace.getRightLeaf(false);
+    const activeEditor = this.getEditor();
 
     await this.customCommandsLock.acquire('command', async () => {
-      // TODO: disable lint on file change
+      this.currentlyOpeningSidebar = true;
+
       await sidebarTab.openFile(file);
       this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
       if (this.customCommandsCallback) {
         await this.customCommandsCallback(file);
       }
-
-      // TODO: move back to the original tab
     });
     sidebarTab.detach();
+    if (activeEditor) {
+      activeEditor.focus();
+    }
+
+    this.currentlyOpeningSidebar = false;
   }
 
   private async runCustomCommands(file: TFile) {
