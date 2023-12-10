@@ -13,6 +13,9 @@ node_modules
 *.js
 *.js.map
 
+# obsidian
+data.json
+
 # test vault
 test-vault/.obsidian/*.json
 # keep activated community plugin list
@@ -21,11 +24,9 @@ test-vault/.obsidian/*.json
 !test-vault/.obsidian/plugins/hot-reload/*
 test-vault/.obsidian/plugins/obsidian-linter/*
 !test-vault/.obsidian/plugins/obsidian-linter/.hotreload
+!test-vault/.obsidian/plugins/obsidian-linter/data.json
 test-vault/.obsidian/plugins/table-editor-obsidian/*
 !test-vault/.obsidian/plugins/table-editor-obsidian/.gitkeep
-
-# obsidian
-data.json
 
 yarn.lock
 

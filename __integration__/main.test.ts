@@ -1,4 +1,4 @@
-import {Editor, EventRef, MarkdownView, Plugin, TFile, normalizePath} from 'obsidian';
+import {Editor, MarkdownView, Plugin, TFile, normalizePath} from 'obsidian';
 import LinterPlugin from 'src/main';
 import {obsidianModeTestCases} from './obsidian-mode.test';
 import {setWorkspaceItemMode} from './utils.test';
@@ -15,7 +15,6 @@ export default class TestLinterPlugin extends Plugin {
   regularTests: Array<IntegrationTestCase> = [...obsidianModeTestCases];
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
-  private eventRefs: EventRef[] = [];
 
   async onload() {
     this.addCommand({
@@ -90,6 +89,10 @@ export default class TestLinterPlugin extends Plugin {
         return;
       }
 
+      if (originalText == null) {
+        that.plugin.setCustomCommandCallback(null);
+      }
+
       const t = tests[index];
       try {
         await t.assertions(activeLeaf.editor);
@@ -142,41 +145,7 @@ export default class TestLinterPlugin extends Plugin {
     return originalText;
   }
 
-  addMetadataCacheTestCallback(t: IntegrationTestCase, activeLeaf: MarkdownView, originalText: string) {
-    // we use this to make sure a second cache update is not able to run before the first one
-    // for the file we are looking for has completed
-    let alreadyRun = false;
-    const eventRef = this.app.metadataCache.on('changed', async (updatedFile: TFile) => {
-      if (activeLeaf.file !== updatedFile || alreadyRun ) {
-        return;
-      }
-
-      alreadyRun = true;
-
-      try {
-        await t.assertions(activeLeaf.editor);
-
-        console.log('✅', t.name);
-      } catch (e) {
-        console.log('❌', t.name);
-        console.error(e);
-      } finally {
-        this.app.workspace.offref(eventRef);
-        this.eventRefs.remove(eventRef);
-
-        await this.resetFileContents(activeLeaf, originalText);
-      }
-    });
-
-    this.registerEvent(eventRef);
-    this.eventRefs.push(eventRef);
-  }
-
   onunload(): void {
-    for (const eventRef of this.eventRefs) {
-      this.app.workspace.offref(eventRef);
-    }
-
     if (this.plugin) {
       this.plugin.onunload();
     }
