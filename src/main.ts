@@ -246,6 +246,8 @@ export default class LinterPlugin extends Plugin {
 
     if (typeof this.originalSaveCallback === 'function') {
       saveCommandDefinition.callback = () => {
+        this.originalSaveCallback();
+
         if (this.settings.lintOnSave && this.isEnabled) {
           const editor = this.getEditor();
           if (editor) {
@@ -255,8 +257,6 @@ export default class LinterPlugin extends Plugin {
             }
           }
         }
-
-        this.originalSaveCallback();
       };
     }
 
