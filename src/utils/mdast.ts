@@ -292,7 +292,12 @@ export function reIndexFootnotes(text: string): string {
   }
 
   for (const duplicateFootnoteDefinition of duplicateFootnotesToReplace) {
-    text = text.replace(duplicateFootnoteDefinition, '');
+    let newText = text.replace(`\n${duplicateFootnoteDefinition}\n`, '\n');
+    if (text === newText) {
+      newText = text.replace(duplicateFootnoteDefinition, '');
+    }
+
+    text = newText;
   }
 
   return text;
