@@ -45,5 +45,57 @@ ruleTest({
       `,
       options: {style: 'space'},
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/961
+      testName: 'Multiple spaces after a blockquote indicator is not converted into one space when it is a list item or checklist line when `style=space`',
+      before: dedent`
+        >   Text here
+        >   - List item 1
+        >\t * List item 2
+        >   + List item 3
+        >   1. Ordered item 1
+        >   2) Ordered item 2
+        >   - [ ] Checklist item
+        >- List item 4
+      `,
+      after: dedent`
+        > Text here
+        >   - List item 1
+        > \t * List item 2
+        >   + List item 3
+        >   1. Ordered item 1
+        >   2) Ordered item 2
+        >   - [ ] Checklist item
+        > - List item 4
+      `,
+      options: {style: 'space'},
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/961
+      testName: 'Multiple spaces after a blockquote indicator should be removed except when dealing with list mark lines when `style=no space`',
+      before: dedent`
+        >   Text here
+        >   - List item 1
+        >\t * List item 2
+        >   + List item 3
+        >   1. Ordered item 1
+        >   2) Ordered item 2
+        >   - [ ] Checklist item
+        >- List item 4
+        > >  >   \t > - List item 5
+        > >  >   \t > > - List item 6
+      `,
+      after: dedent`
+        >Text here
+        >   - List item 1
+        >\t * List item 2
+        >   + List item 3
+        >   1. Ordered item 1
+        >   2) Ordered item 2
+        >   - [ ] Checklist item
+        >- List item 4
+        >>>> - List item 5
+        >>>>> - List item 6
+      `,
+      options: {style: 'no space'},
+    },
   ],
 });
