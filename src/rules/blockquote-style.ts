@@ -4,6 +4,7 @@ import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} f
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {getStartOfLineWhitespaceOrBlockquoteLevel, replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
+import {startsWithListMarkerRegex} from '../utils/regex';
 
 type BlockquoteStyleValues = 'no space' | 'space';
 
@@ -36,15 +37,25 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
       return this.updateBlockquoteLines(blockquote, this.removeSpaceFromIndicator);
     });
   }
-  removeSpaceFromIndicator(startOfLine: string): string {
-    return startOfLine.replace(/>( |\t)+/g, '>');
+  removeSpaceFromIndicator(startOfLine: string, isListItemMarkerLine: boolean): string {
+    if (isListItemMarkerLine) {
+      return startOfLine.replace(/>[ \t]+>/g, '>>');
+    }
+
+    return startOfLine.replace(/>[ \t]+/g, '>');
   }
-  addSpaceToIndicator(startOfLine: string): string {
+  addSpaceToIndicator(startOfLine: string, isListItemMarkerLine: boolean): string {
     // first we add spaces to blockquote indicators that are not followed by a space and then to catch any that were not handled already
     // we make sure to add a space between any 2 indicators that are side by side
-    return startOfLine.replace(/>([^ \t]|$)/g, '> $1').replace(/>>/g, '> >').replace(/>(?:[ \t]{2,}|\t+)/g, '> ');
+    const newStartOfLine = startOfLine.replace(/>([^ ]|$)/g, '> $1').replace(/>>/g, '> >');
+    if (isListItemMarkerLine) {
+      return newStartOfLine;
+    }
+
+    // since we are not dealing with a list item or checklist line, we can go ahead and remove multiple spaces
+    return newStartOfLine.replace(/>(?:[ \t]{2,}|\t+)/g, '> ');
   }
-  updateBlockquoteLines(blockquote: string, startOfLineModification: (startOfLine: string) => string): string {
+  updateBlockquoteLines(blockquote: string, startOfLineModification: (startOfLine: string, isListMarker: boolean) => string): string {
     let currentIndex = 0;
     let nextNewLine = 0;
     let startOfLine = '';
@@ -60,7 +71,16 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
       }
 
       [startOfLine, startOfIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(newBlockquote, nextNewLine-1);
-      updatedStartOfLine = startOfLineModification(startOfLine);
+      const startOfRestOfLine = startOfIndex + startOfLine.length+1;
+
+      let endOfRestOfLine = nextNewLine;
+      if (breakOutOfLoop) {
+        endOfRestOfLine++;
+      }
+
+      const restOfLine = newBlockquote.substring(startOfRestOfLine, endOfRestOfLine);
+      const isListItemMarker = startsWithListMarkerRegex.test(restOfLine);
+      updatedStartOfLine = startOfLineModification(startOfLine, isListItemMarker);
 
       // since start of index refers to where the new line character is
       startOfIndex++;
