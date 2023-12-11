@@ -204,5 +204,34 @@ ruleTest({
         [^2]: b
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/359
+      testName: 'Moving footnotes to the end of the file sorts footnote definitions by first reference in document',
+      before: dedent`
+        aaaaaa[^1]
+        cccccc[^3]
+        ddddd[^4]
+        bbbbb[^2]
+        fffffff[^5]
+        ${''}
+        [^1]: a-footnote
+        [^2]: b-footnote
+        [^3]: c-footnote
+        [^4]: d-footnote
+        [^5]: f-footnote
+      `,
+      after: dedent`
+        aaaaaa[^1]
+        cccccc[^3]
+        ddddd[^4]
+        bbbbb[^2]
+        fffffff[^5]
+        ${''}
+        [^1]: a-footnote
+        [^3]: c-footnote
+        [^4]: d-footnote
+        [^2]: b-footnote
+        [^5]: f-footnote
+      `,
+    },
   ],
 });

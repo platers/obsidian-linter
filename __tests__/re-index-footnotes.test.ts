@@ -14,33 +14,21 @@ ruleTest({
         \`h[^ae]llo\`
       `,
     },
-    { // accounts for https://github.com/platers/obsidian-linter/issues/359
-      testName: 'Out of order references are sorted into their proper our based on the order in which they first appear in the file',
+    { // accounts for https://github.com/platers/obsidian-linter/issues/902
+      testName: 'Re-indexing footnotes does not move the footnote references',
       before: dedent`
-        aaaaaa[^1]
-        cccccc[^3]
-        ddddd[^4]
-        bbbbb[^2]
-        fffffff[^5]
+        foo [^1]
         ${''}
-        [^1]: a-footnote
-        [^2]: b-footnote
-        [^3]: c-footnote
-        [^4]: d-footnote
-        [^5]: f-footnote
+        [^1]: bar
+        ${''}
+        foobar
       `,
       after: dedent`
-        aaaaaa[^1]
-        cccccc[^2]
-        ddddd[^3]
-        bbbbb[^4]
-        fffffff[^5]
+        foo [^1]
         ${''}
-        [^1]: a-footnote
-        [^2]: c-footnote
-        [^3]: d-footnote
-        [^4]: b-footnote
-        [^5]: f-footnote
+        [^1]: bar
+        ${''}
+        foobar
       `,
     },
   ],
