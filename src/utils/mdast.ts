@@ -59,8 +59,9 @@ function parseTextToAST(text: string): Root {
     return LRU.get(textHash) as Root;
   }
 
+  // @ts-expect-error for some reason an overload is missing
   const ast = fromMarkdown(text, {
-    extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem]), math()],
+    extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem()]), math()],
     mdastExtensions: [[
       gfmFootnoteFromMarkdown(),
       gfmTaskListItemFromMarkdown,
@@ -173,7 +174,21 @@ export function moveFootnotesToEnd(text: string): string {
     footnoteKeyToFootnoteKeyInfo.set(footnoteReference, keyInfo);
   };
 
-  text = removeFootnotesAndDoAnActionThem(positions, text, footnotes, getAllReferencePositionsForFootnote);
+  for (const position of positions) {
+    const footnote = text.substring(position.start.offset, position.end.offset);
+    footnotes.push(footnote);
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    // Remove the newline after the footnote if it exists
+    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
+      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
+    }
+    text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
+
+    getAllReferencePositionsForFootnote(text, footnote, position.start.offset);
+  }
 
   for (const footnoteData of footnoteKeyToFootnoteKeyInfo) {
     const keyInfo = footnoteData[1];
@@ -207,67 +222,60 @@ export function moveFootnotesToEnd(text: string): string {
 }
 
 /**
- * Re-indexes the footnotes in the document making sure that they increase in number from 1 on up
- * and reorders the footnotes themselves as well.
+ * Re-indexes the footnotes in the document making sure that they increase in number from 1 on up.
  * @param {string} text - The text to re-index the footnotes in.
  * @return {string} The text with footnotes re-indexed.
  */
 export function reIndexFootnotes(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
-  let footnotes: string[] = [];
+  const footnotes: string[] = [];
 
-  const mapOfFootnoteToFirstFootnoteReferenceIndex = new Map<string, number>();
+  type keyInfo = {
+    key: string,
+    position: number,
+  }
+
   const footnoteToFootnoteKey = new Map<string, string>();
   const oldKeyToNewKey = new Map<string, string>();
-  let footnoteReferenceLocationInfo: {key: string, position: number}[] = [];
+  const footnoteReferenceLocationInfo: keyInfo[] = [];
   const footnoteKeys = new Set<string>();
+  const duplicateFootnotesToReplace: string[] = [];
 
-  const getFirstReferenceToFootnote = function(text: string, footnote: string, startOfFootnoteReferenceSearch: number): number {
+  const getAllFootnoteReferences = function(text: string, footnote: string, startOfFootnoteReferenceSearch: number): void {
     const footnoteReference = footnote.match(/\[\^.*?\]/)[0];
     footnoteToFootnoteKey.set(footnote, footnoteReference);
 
     const footnoteKeyAlreadyUsed = footnoteKeys.has(footnoteReference);
-    if (footnoteKeyAlreadyUsed && mapOfFootnoteToFirstFootnoteReferenceIndex.has(footnote)) {
-      return mapOfFootnoteToFirstFootnoteReferenceIndex.get(footnote);
+    if (footnoteKeyAlreadyUsed && footnotes.includes(footnote)) {
+      duplicateFootnotesToReplace.unshift(footnote);
+
+      return;
     } else if (footnoteKeyAlreadyUsed) {
       throw new Error(getTextInLanguage('logs.too-many-footnotes-error-message').replace('{FOOTNOTE_KEY}', footnoteReference));
     }
 
     let footnoteReferenceLocation: number;
-    let firstFootnoteReferenceIndex: number = -1;
     do {
       footnoteReferenceLocation = text.lastIndexOf(footnoteReference, startOfFootnoteReferenceSearch);
       if (footnoteReferenceLocation === -1) {
         continue;
       }
 
-      footnoteReferenceLocationInfo.push({key: footnoteReference, position: footnoteReferenceLocation});
-      firstFootnoteReferenceIndex = footnoteReferenceLocation;
+      if (footnoteReferenceLocation + footnote.length > text.length || text.substring(footnoteReferenceLocation, footnoteReferenceLocation + footnote.length) !== footnote) {
+        footnoteReferenceLocationInfo.push({key: footnoteReference, position: footnoteReferenceLocation});
+      }
+
       startOfFootnoteReferenceSearch = footnoteReferenceLocation - 1;
     } while (footnoteReferenceLocation > 0);
 
     footnoteKeys.add(footnoteReference);
-
-    return firstFootnoteReferenceIndex;
   };
 
-  text = removeFootnotesAndDoAnActionThem(positions, text, footnotes, (text: string, footnote: string, startOfFootnoteReferenceSearch: number) => {
-    mapOfFootnoteToFirstFootnoteReferenceIndex.set(footnote, getFirstReferenceToFootnote(text, footnote, startOfFootnoteReferenceSearch));
-  });
+  for (const position of positions) {
+    const footnote = text.substring(position.start.offset, position.end.offset);
+    footnotes.unshift(footnote);
 
-  // Sort the footnotes into the order of their references in the text
-  footnotes = footnotes.sort((f1: string, f2: string) => {
-    return mapOfFootnoteToFirstFootnoteReferenceIndex.get(f1) - mapOfFootnoteToFirstFootnoteReferenceIndex.get(f2);
-  });
-
-  // Sort the footnote references from last to first to prevent issues when replacing the footnote references down the road
-  footnoteReferenceLocationInfo = footnoteReferenceLocationInfo.sort((f1: {key: string, position: number}, f2: {key: string, position: number}) => {
-    return f2.position - f1.position;
-  });
-
-  // Add the footnotes to the end of the document
-  if (footnotes.length > 0) {
-    text = text.trimEnd() + '\n';
+    getAllFootnoteReferences(text, footnote, position.start.offset);
   }
 
   let footnoteIndex = 1;
@@ -281,34 +289,33 @@ export function reIndexFootnotes(text: string): string {
     const footnoteKey = footnoteToFootnoteKey.get(footnote);
     const newFootnoteKey = `[^${footnoteIndex++}]`;
     oldKeyToNewKey.set(footnoteKey, newFootnoteKey);
-
-    text += '\n' + footnote.replace(footnoteKey, newFootnoteKey);
   }
 
+  footnoteReferenceLocationInfo.sort((pos1: keyInfo, pos2: keyInfo) => {
+    return pos2.position - pos1.position;
+  });
+
+  // replace the values that are tied to existing positions from last to first first since replace works even if positions change
   for (const footnoteReference of footnoteReferenceLocationInfo) {
     const newFootnoteKey = oldKeyToNewKey.get(footnoteReference.key);
 
     text = replaceAt(text, footnoteReference.key, newFootnoteKey, footnoteReference.position);
   }
 
-  return text;
-}
+  for (const footnote of footnotesAdded) {
+    const footnoteKey = footnoteToFootnoteKey.get(footnote);
+    const newFootnoteKey = oldKeyToNewKey.get(footnoteKey);
 
-function removeFootnotesAndDoAnActionThem(positions: Position[], text: string, footnotes: string[], action: (text: string, footnote: string, startOfFootnoteReferenceSearch: number) => void) {
-  for (const position of positions) {
-    const footnote = text.substring(position.start.offset, position.end.offset);
-    footnotes.push(footnote);
-    // Remove the newline after the footnote if it exists
-    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
-      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
-    }
-    // Remove the newline after the footnote if it exists
-    if (position.end.offset < text.length && text[position.end.offset] === '\n') {
-      text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
-    }
-    text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
+    text = text.replace(footnote, footnote.replace(footnoteKey, newFootnoteKey));
+  }
 
-    action(text, footnote, position.start.offset);
+  for (const duplicateFootnoteDefinition of duplicateFootnotesToReplace) {
+    let newText = text.replace(`\n${duplicateFootnoteDefinition}\n`, '\n');
+    if (text === newText) {
+      newText = text.replace(duplicateFootnoteDefinition, '');
+    }
+
+    text = newText;
   }
 
   return text;

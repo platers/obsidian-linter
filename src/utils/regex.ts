@@ -45,7 +45,7 @@ export const nonBlockquoteChecklistRegex = new RegExp(`^\\s*- ${checklistBoxIndi
 
 export const startsWithListMarkerRegex = new RegExp(`^\\s*(-|\\*|\\+|\\d+[.)]|- (${checklistBoxIndicator}))`, 'm');
 
-export const footnoteDefinitionIndicatorAtStartOfLine = /^(\[\^\w+\]) ?([,.;!:?])/gm;
+export const footnoteDefinitionIndicatorAtStartOfLine = /^(\[\^[^\]]*\]) ?([,.;!:?])/gm;
 export const calloutRegex = /^(>\s*)+\[![^\s]*\]/m;
 
 export const unicodeLetterRegex = RegExp(/\p{L}/, 'u');

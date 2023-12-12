@@ -349,5 +349,46 @@ ruleTest({
         [^3]: [github.com](https://github.com)
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/902
+      testName: 'Make sure that if a footnote definition has a dash in it it is properly treated like a footnote definition and the paragraph is ignored',
+      before: dedent`
+        AAA[^2]
+        ${''}
+        BBB[^3]
+        ${''}
+        Something[^test-foot]
+        ${''}
+        CCC[^4]
+        ${''}
+        DDD[^5]
+        ${''}
+        More text.
+        ${''}
+        [^test-foot]: Some text.
+        [^2]: A
+        [^3]: B
+        [^4]: C
+        [^5]: D
+      `,
+      after: dedent`
+        AAA[^2]
+        ${''}
+        BBB[^3]
+        ${''}
+        Something[^test-foot]
+        ${''}
+        CCC[^4]
+        ${''}
+        DDD[^5]
+        ${''}
+        More text.
+        ${''}
+        [^test-foot]: Some text.
+        [^2]: A
+        [^3]: B
+        [^4]: C
+        [^5]: D
+      `,
+    },
   ],
 });
