@@ -686,7 +686,7 @@ export default {
     // yaml-key-sort.ts
     'yaml-key-sort': {
       'name': 'YAML Key Sort',
-      'description': 'Sorts the YAML keys based on the order and priority specified. **Note: may remove blank lines as well.**',
+      'description': 'Sorts the YAML keys based on the order and priority specified. **Note: may remove blank lines as well. Only works on non-nested keys.**',
       'yaml-key-priority-sort-order': {
         'name': 'YAML Key Priority Sort Order',
         'description': 'The order in which to sort keys with one on each line where it sorts in the order found in the list',

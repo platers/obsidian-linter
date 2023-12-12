@@ -28,6 +28,9 @@ test-vault/.obsidian/plugins/obsidian-linter/*
 test-vault/.obsidian/plugins/table-editor-obsidian/*
 !test-vault/.obsidian/plugins/table-editor-obsidian/.gitkeep
 
+# occasional bug fix test
+main.zip
+
 yarn.lock
 
 .DS_Store
