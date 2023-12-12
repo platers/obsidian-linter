@@ -233,5 +233,46 @@ ruleTest({
         [^5]: f-footnote
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/902
+      testName: 'Moving footnotes to the end of the file should make sure that there are no empty lines between footnotes',
+      before: dedent`
+        AAA[^1]
+        ${''}
+        BBB[^2]
+        ${''}
+        Something[^foo-bar]
+        ${''}
+        CCC[^hello-world]
+        ${''}
+        DDD[^3]
+        ${''}
+        [^foo-bar]: Some text.
+        [^1]: A
+        [^2]: B
+        [^hello-world]: C
+        [^3]: D
+        ${''}
+        More text.
+      `,
+      after: dedent`
+        AAA[^1]
+        ${''}
+        BBB[^2]
+        ${''}
+        Something[^foo-bar]
+        ${''}
+        CCC[^hello-world]
+        ${''}
+        DDD[^3]
+        ${''}
+        More text.
+        ${''}
+        [^1]: A
+        [^2]: B
+        [^foo-bar]: Some text.
+        [^hello-world]: C
+        [^3]: D
+      `,
+    },
   ],
 });
