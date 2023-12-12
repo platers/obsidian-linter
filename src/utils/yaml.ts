@@ -46,8 +46,12 @@ export function formatYAML(text: string, func: (text: string) => string): string
   return text;
 }
 
-function getYamlSectionRegExp(rawKey: string): RegExp {
-  return new RegExp(`^([\\t ]*)${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm');
+function getYamlSectionRegExp(rawKey: string, allowNestedKey: boolean = true): RegExp {
+  if (allowNestedKey) {
+    return new RegExp(`^([\\t ]*)${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm');
+  }
+
+  return new RegExp(`^${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm');
 }
 
 export function setYamlSection(yaml: string, rawKey: string, rawValue: string): string {
@@ -63,14 +67,22 @@ export function setYamlSection(yaml: string, rawKey: string, rawValue: string): 
   return result;
 }
 
-export function getYamlSectionValue(yaml: string, rawKey: string): string | null {
-  const match = yaml.match(getYamlSectionRegExp(rawKey));
-  const result = match == null ? null : match[2];
+export function getYamlSectionValue(yaml: string, rawKey: string, allowNestedKey: boolean = true): string | null {
+  const match = yaml.match(getYamlSectionRegExp(rawKey, allowNestedKey));
+  if (match == null) {
+    return null;
+  }
+
+  let result = match[2];
+  if (!allowNestedKey) {
+    result = match[1];
+  }
+
   return result;
 }
 
-export function removeYamlSection(yaml: string, rawKey: string): string {
-  const result = yaml.replace(getYamlSectionRegExp(rawKey), '');
+export function removeYamlSection(yaml: string, rawKey: string, allowNestedKey: boolean = true): string {
+  const result = yaml.replace(getYamlSectionRegExp(rawKey, allowNestedKey), '');
   return result;
 }
 
