@@ -151,6 +151,15 @@ ruleTest({
         <https://github.com/platers/obsidian-linter//issues/42#issuecomment-1234567890>
       `,
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/980
+      testName: 'Make sure that URLs with multiple params in them are properly matched',
+      before: dedent`
+        https://m3.bbz-dormagen-moodle.de/tag/index.php?tc=1&tag=Nachschreibtermin&from=4817
+      `,
+      after: dedent`
+        <https://m3.bbz-dormagen-moodle.de/tag/index.php?tc=1&tag=Nachschreibtermin&from=4817>
+      `,
+    },
   ],
 });
 
