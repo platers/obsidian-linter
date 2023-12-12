@@ -230,9 +230,14 @@ export function reIndexFootnotes(text: string): string {
   const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
   const footnotes: string[] = [];
 
+  type keyInfo = {
+    key: string,
+    position: number,
+  }
+
   const footnoteToFootnoteKey = new Map<string, string>();
   const oldKeyToNewKey = new Map<string, string>();
-  const footnoteReferenceLocationInfo: {key: string, position: number}[] = [];
+  const footnoteReferenceLocationInfo: keyInfo[] = [];
   const footnoteKeys = new Set<string>();
   const duplicateFootnotesToReplace: string[] = [];
 
@@ -256,7 +261,10 @@ export function reIndexFootnotes(text: string): string {
         continue;
       }
 
-      footnoteReferenceLocationInfo.push({key: footnoteReference, position: footnoteReferenceLocation});
+      if (footnoteReferenceLocation + footnote.length > text.length || text.substring(footnoteReferenceLocation, footnoteReferenceLocation + footnote.length) !== footnote) {
+        footnoteReferenceLocationInfo.push({key: footnoteReference, position: footnoteReferenceLocation});
+      }
+
       startOfFootnoteReferenceSearch = footnoteReferenceLocation - 1;
     } while (footnoteReferenceLocation > 0);
 
@@ -281,14 +289,24 @@ export function reIndexFootnotes(text: string): string {
     const footnoteKey = footnoteToFootnoteKey.get(footnote);
     const newFootnoteKey = `[^${footnoteIndex++}]`;
     oldKeyToNewKey.set(footnoteKey, newFootnoteKey);
-
-    text.replace(footnote, footnote.replace(footnoteKey, newFootnoteKey));
   }
 
+  footnoteReferenceLocationInfo.sort((pos1: keyInfo, pos2: keyInfo) => {
+    return pos2.position - pos1.position;
+  });
+
+  // replace the values that are tied to existing positions from last to first first since replace works even if positions change
   for (const footnoteReference of footnoteReferenceLocationInfo) {
     const newFootnoteKey = oldKeyToNewKey.get(footnoteReference.key);
 
     text = replaceAt(text, footnoteReference.key, newFootnoteKey, footnoteReference.position);
+  }
+
+  for (const footnote of footnotesAdded) {
+    const footnoteKey = footnoteToFootnoteKey.get(footnote);
+    const newFootnoteKey = oldKeyToNewKey.get(footnoteKey);
+
+    text = text.replace(footnote, footnote.replace(footnoteKey, newFootnoteKey));
   }
 
   for (const duplicateFootnoteDefinition of duplicateFootnotesToReplace) {
