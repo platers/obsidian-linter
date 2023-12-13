@@ -53,7 +53,7 @@ After:
 
 Alias: `move-footnotes-to-the-bottom`
 
-Move all footnotes to the bottom of the document.
+Move all footnotes to the bottom of the document and makes sure they are sorted based on the order they are referenced in the file's body.
 
 
 
