@@ -177,6 +177,7 @@ export class RulesRunner {
       logDebug(getTextInLanguage('logs.running-custom-regex'));
 
       let newText = text;
+      let initialText = text;
       for (const eachRegex of customRegexes) {
         const findIsEmpty = eachRegex.find === undefined || eachRegex.find == '' || eachRegex.find === null;
         const replaceIsEmpty = eachRegex.replace === undefined || eachRegex.replace === null;
@@ -184,9 +185,22 @@ export class RulesRunner {
           continue;
         }
 
+        let debugMsg = eachRegex.label;
+        if (debugMsg.trim() != '') {
+          debugMsg += ':\n';
+        }
+        debugMsg +=`/${eachRegex.find}/${eachRegex.flags}/${eachRegex.replace}/`;
+
+        logDebug(debugMsg);
         const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
         // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
         newText = newText.replace(regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace));
+
+        if (initialText != newText) {
+          logDebug(newText);
+        }
+
+        initialText = newText;
       }
 
       return newText;
