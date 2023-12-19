@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
@@ -16,15 +16,18 @@ import {convertAliasValueToStringOrStringArray,
   splitValueIfSingleOrMultilineArray,
   TagSpecificArrayFormats} from '../utils/yaml';
 
-class DedupeYamlArrayValuesOptions implements Options {
+type YamlArraySortOrder = 'Ascending Alphabetical' | 'Descending Alphabetical'
+
+class SortYamlArrayValuesOptions implements Options {
   @RuleBuilder.noSettingControl()
     aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
-  dedupeAliasKey?: boolean = true;
+  sortAliasKey?: boolean = true;
   @RuleBuilder.noSettingControl()
     tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
-  dedupeTagKey?: boolean = true;
-  dedupeArrayKeys?: boolean = true;
-  ignoreDedupeArrayKeys?: string[] = [];
+  sortTagKey?: boolean = true;
+  sortArrayKeys?: boolean = true;
+  sortOrder?: YamlArraySortOrder = 'Ascending Alphabetical';
+  ignoreSortArrayKeys?: string[] = [];
   @RuleBuilder.noSettingControl()
     defaultEscapeCharacter?: QuoteCharacter = '"';
   @RuleBuilder.noSettingControl()
@@ -32,19 +35,19 @@ class DedupeYamlArrayValuesOptions implements Options {
 }
 
 @RuleBuilder.register
-export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptions> {
+export default class RuleTemplate extends RuleBuilder<SortYamlArrayValuesOptions> {
   constructor() {
     super({
-      nameKey: 'rules.dedupe-yaml-array-values.name',
-      descriptionKey: 'rules.dedupe-yaml-array-values.description',
+      nameKey: 'rules.sort-yaml-array-values.name',
+      descriptionKey: 'rules.sort-yaml-array-values.description',
       type: RuleType.YAML,
       hasSpecialExecutionOrder: true,
     });
   }
-  get OptionsClass(): new () => DedupeYamlArrayValuesOptions {
-    return DedupeYamlArrayValuesOptions;
+  get OptionsClass(): new () => SortYamlArrayValuesOptions {
+    return SortYamlArrayValuesOptions;
   }
-  apply(text: string, options: DedupeYamlArrayValuesOptions): string {
+  apply(text: string, options: SortYamlArrayValuesOptions): string {
     return formatYAML(text, (text: string) => {
       const yaml = loadYAML(text.replace('---\n', '').replace('\n---', ''));
       if (!yaml) {
@@ -52,11 +55,11 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
       }
 
       for (const aliasKey of OBSIDIAN_ALIASES_KEYS) {
-        if (options.dedupeAliasKey && Object.keys(yaml).includes(aliasKey)) {
+        if (options.sortAliasKey && Object.keys(yaml).includes(aliasKey)) {
           text = setYamlSection(text,
               aliasKey,
               formatYamlArrayValue(
-                  convertAliasValueToStringOrStringArray(this.getUniqueArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, aliasKey)))),
+                  convertAliasValueToStringOrStringArray(this.sortArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, aliasKey)), options.sortOrder)),
                   options.aliasArrayStyle,
                   options.defaultEscapeCharacter,
                   options.removeUnnecessaryEscapeCharsForMultiLineArrays,
@@ -69,11 +72,11 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
       }
 
       for (const tagKey of OBSIDIAN_TAG_KEYS) {
-        if (options.dedupeTagKey && Object.keys(yaml).includes(tagKey)) {
+        if (options.sortTagKey && Object.keys(yaml).includes(tagKey)) {
           text = setYamlSection(text,
               tagKey,
               formatYamlArrayValue(
-                  convertTagValueToStringOrStringArray(this.getUniqueArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, tagKey)))),
+                  convertTagValueToStringOrStringArray(this.sortArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, tagKey)), options.sortOrder)),
                   options.tagArrayStyle,
                   options.defaultEscapeCharacter,
                   options.removeUnnecessaryEscapeCharsForMultiLineArrays,
@@ -84,8 +87,8 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
         }
       }
 
-      if (options.dedupeArrayKeys) {
-        const keysToIgnore = [...OBSIDIAN_ALIASES_KEYS, ...OBSIDIAN_TAG_KEYS, ...options.ignoreDedupeArrayKeys];
+      if (options.sortArrayKeys) {
+        const keysToIgnore = [...OBSIDIAN_ALIASES_KEYS, ...OBSIDIAN_TAG_KEYS, ...options.ignoreSortArrayKeys];
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays, arrays of objects, ignored keys, and already accounted for keys
@@ -99,7 +102,7 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
             arrayType = NormalArrayFormats.MultiLine;
           }
 
-          const newVal = this.getUniqueArray(splitValueIfSingleOrMultilineArray(currentYamlText));
+          const newVal = this.sortArray(splitValueIfSingleOrMultilineArray(currentYamlText), options.sortOrder);
 
           text = setYamlSection(text,
               key,
@@ -116,32 +119,38 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
       return text;
     });
   }
-  getUniqueArray(arr: string | string[]): string | string[] {
+  sortArray(arr: string | string[], sortType: YamlArraySortOrder): string | string[] {
     if (arr == null || typeof arr === 'string' || arr.length <= 1) {
       return arr;
     }
 
-    return [...new Set(arr)];
-  }
+    arr.sort();
+    if (sortType === 'Ascending Alphabetical') {
+      return arr;
+    }
 
-  get exampleBuilders(): ExampleBuilder<DedupeYamlArrayValuesOptions>[] {
+    arr.reverse();
+
+    return arr;
+  }
+  get exampleBuilders(): ExampleBuilder<SortYamlArrayValuesOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Dedupe YAML tags is case sensitive and will use your default format for tags.',
+        description: 'Sorting YAML array values alphabetically',
         before: dedent`
           ---
-          tags: [computer, research, computer, Computer]
+          tags: [computer, research, androids, Computer]
           aliases:
             - Title 1
-            - Title2
+            - Title 2
           ---
         `,
         after: dedent`
           ---
-          tags: [computer, research, Computer]
+          tags: [androids, computer, Computer, research]
           aliases:
             - Title 1
-            - Title2
+            - Title 2
           ---
         `,
         options: {
@@ -149,25 +158,21 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
         },
       }),
       new ExampleBuilder({
-        description: 'Dedupe YAML aliases is case sensitive and will use your default format for aliases.',
+        description: 'Sorting YAML array values to be alphabetically descending',
         before: dedent`
           ---
-          tags: [computer, research]
+          tags: [computer, research, androids, Computer]
           aliases:
             - Title 1
-            - Title2
-            - Title 1
-            - Title2
-            - Title 3
+            - Title 2
           ---
         `,
         after: dedent`
           ---
-          tags: [computer, research]
+          tags: [research, Computer, computer, androids]
           aliases:
+            - Title 2
             - Title 1
-            - Title2
-            - Title 3
           ---
         `,
         options: {
@@ -175,20 +180,18 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
         },
       }),
       new ExampleBuilder({
-        description: 'Dedupe YAML array keys is case sensitive and will try to preserve the original array format.',
+        description: 'Sort YAML Arrays respects list of keys to not sort values of for normal arrays (keys to ignore is just `arr2` for this example)',
         before: dedent`
           ---
           tags: [computer, research]
           aliases:
             - Title 1
-            - Title2
-          arr1: [val, val1, val, val2, Val]
+            - Title 2
+          arr1: [val, val2, val1]
           arr2:
-            - Val
-            - Val
             - val
             - val2
-            - Val2
+            - val1
           ---
         `,
         after: dedent`
@@ -196,83 +199,62 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
           tags: [computer, research]
           aliases:
             - Title 1
-            - Title2
-          arr1: [val, val1, val2, Val]
+            - Title 2
+          arr1: [val, val1, val2]
           arr2:
-            - Val
             - val
             - val2
-            - Val2
+            - val1
           ---
         `,
         options: {
           aliasArrayStyle: NormalArrayFormats.MultiLine,
-        },
-      }),
-      new ExampleBuilder({
-        description: 'Dedupe YAML respects list of keys to not remove duplicates of for normal arrays (keys to ignore is just `arr2` for this example)',
-        before: dedent`
-          ---
-          tags: [computer, research]
-          aliases:
-            - Title 1
-            - Title2
-          arr1: [val, val1, val, val2, Val]
-          arr2:
-            - Val
-            - Val
-            - val
-            - val2
-            - Val2
-          ---
-        `,
-        after: dedent`
-          ---
-          tags: [computer, research]
-          aliases:
-            - Title 1
-            - Title2
-          arr1: [val, val1, val2, Val]
-          arr2:
-            - Val
-            - Val
-            - val
-            - val2
-            - Val2
-          ---
-        `,
-        options: {
-          aliasArrayStyle: NormalArrayFormats.MultiLine,
-          ignoreDedupeArrayKeys: ['arr2'],
+          ignoreSortArrayKeys: ['arr2'],
         },
       }),
     ];
   }
-  get optionBuilders(): OptionBuilderBase<DedupeYamlArrayValuesOptions>[] {
+  get optionBuilders(): OptionBuilderBase<SortYamlArrayValuesOptions>[] {
     return [
       new BooleanOptionBuilder({
-        OptionsClass: DedupeYamlArrayValuesOptions,
-        nameKey: 'rules.dedupe-yaml-array-values.dedupe-alias-key.name',
-        descriptionKey: 'rules.dedupe-yaml-array-values.dedupe-alias-key.description',
-        optionsKey: 'dedupeAliasKey',
+        OptionsClass: SortYamlArrayValuesOptions,
+        nameKey: 'rules.sort-yaml-array-values.sort-alias-key.name',
+        descriptionKey: 'rules.sort-yaml-array-values.sort-alias-key.description',
+        optionsKey: 'sortAliasKey',
       }),
       new BooleanOptionBuilder({
-        OptionsClass: DedupeYamlArrayValuesOptions,
-        nameKey: 'rules.dedupe-yaml-array-values.dedupe-tag-key.name',
-        descriptionKey: 'rules.dedupe-yaml-array-values.dedupe-tag-key.description',
-        optionsKey: 'dedupeTagKey',
+        OptionsClass: SortYamlArrayValuesOptions,
+        nameKey: 'rules.sort-yaml-array-values.sort-tag-key.name',
+        descriptionKey: 'rules.sort-yaml-array-values.sort-tag-key.description',
+        optionsKey: 'sortTagKey',
       }),
       new BooleanOptionBuilder({
-        OptionsClass: DedupeYamlArrayValuesOptions,
-        nameKey: 'rules.dedupe-yaml-array-values.dedupe-array-keys.name',
-        descriptionKey: 'rules.dedupe-yaml-array-values.dedupe-array-keys.description',
-        optionsKey: 'dedupeArrayKeys',
+        OptionsClass: SortYamlArrayValuesOptions,
+        nameKey: 'rules.sort-yaml-array-values.sort-array-keys.name',
+        descriptionKey: 'rules.sort-yaml-array-values.sort-array-keys.description',
+        optionsKey: 'sortArrayKeys',
       }),
       new TextAreaOptionBuilder({
-        OptionsClass: DedupeYamlArrayValuesOptions,
-        nameKey: 'rules.dedupe-yaml-array-values.ignore-keys.name',
-        descriptionKey: 'rules.dedupe-yaml-array-values.ignore-keys.description',
-        optionsKey: 'ignoreDedupeArrayKeys',
+        OptionsClass: SortYamlArrayValuesOptions,
+        nameKey: 'rules.sort-yaml-array-values.ignore-keys.name',
+        descriptionKey: 'rules.sort-yaml-array-values.ignore-keys.description',
+        optionsKey: 'ignoreSortArrayKeys',
+      }),
+      new DropdownOptionBuilder<SortYamlArrayValuesOptions, YamlArraySortOrder>({
+        OptionsClass: SortYamlArrayValuesOptions,
+        nameKey: 'rules.sort-yaml-array-values.sort-order.name',
+        descriptionKey: 'rules.sort-yaml-array-values.sort-order.description',
+        optionsKey: 'sortOrder',
+        records: [
+          {
+            value: 'Ascending Alphabetical',
+            description: 'Sorts the array values from a to z',
+          },
+          {
+            value: 'Descending Alphabetical',
+            description: 'Sorts the array values from z to a',
+          },
+        ],
       }),
     ];
   }
