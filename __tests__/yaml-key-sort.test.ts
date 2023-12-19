@@ -48,7 +48,7 @@ ruleTest({
         dictionary:
           abc: "abc"
           def: "def"
-        tags: 
+        tags:
           - Test
         ---
       `,
@@ -99,6 +99,48 @@ ruleTest({
         dateModifiedKey: 'modified',
         currentTimeFormatted: 'Thursday, January 2nd 2020, 12:00:00 am',
         yamlTimestampDateModifiedEnabled: true,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/899
+      testName: 'Make sure that nested values are left alone when sorting priority sort values with the same key name as a nested key',
+      before: dedent`
+        ---
+        foo:
+          type: bar
+        ---
+      `,
+      after: dedent`
+        ---
+        foo:
+          type: bar
+        ---
+      `,
+      options: {
+        yamlKeyPrioritySortOrder: [
+          'type:',
+        ],
+      },
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/899
+      testName: 'Make sure that nested values are left alone when sorting priority sort values with the same key name as a nested key even when there is non-nested key with the same name',
+      before: dedent`
+        ---
+        foo:
+          type: bar
+        type: cat
+        ---
+      `,
+      after: dedent`
+        ---
+        type: cat
+        foo:
+          type: bar
+        ---
+      `,
+      options: {
+        yamlKeyPrioritySortOrder: [
+          'type:',
+        ],
       },
     },
   ],

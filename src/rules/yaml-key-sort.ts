@@ -53,12 +53,12 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
       index++;
     }
 
-    const sortKeysResult = this.getYAMLKeysSorted(yamlText, yamlKeys);
+    const yamlObject = loadYAML(yamlText);
+    const sortKeysResult = this.getYAMLKeysSorted(yamlText, yamlKeys, yamlObject);
     const priorityKeysSorted = sortKeysResult.sortedYamlKeyValues;
     yamlText = sortKeysResult.remainingYaml;
 
     const sortOrder = options.yamlSortOrderForOtherKeys;
-    const yamlObject = loadYAML(yamlText);
     if (yamlObject == null) {
       return this.getTextWithNewYamlFrontmatter(text, oldYaml, priorityKeysSorted, yamlText, priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
     }
@@ -74,14 +74,19 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     }
 
     remainingKeys = remainingKeys.sort(sortMethod);
-    const remainingKeysSortResult = this.getYAMLKeysSorted(yamlText, remainingKeys);
+    const remainingKeysSortResult = this.getYAMLKeysSorted(yamlText, remainingKeys, yamlObject);
 
     return this.getTextWithNewYamlFrontmatter(text, oldYaml, priorityKeysSorted, remainingKeysSortResult.sortedYamlKeyValues, priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
   }
-  getYAMLKeysSorted(yaml: string, keys: string[]): {remainingYaml: string, sortedYamlKeyValues: string} {
+  getYAMLKeysSorted(yaml: string, keys: string[], yamlObject: any): {remainingYaml: string, sortedYamlKeyValues: string} {
     let specifiedYamlKeysSorted = '';
     for (const key of keys) {
-      const value = getYamlSectionValue(yaml, key);
+      // we skip any nested elements when sorting to prevent issues where possible
+      if (!(key in yamlObject)) {
+        continue;
+      }
+
+      const value = getYamlSectionValue(yaml, key, false);
 
       if (value !== null) {
         if (value.includes('\n')) {
@@ -90,7 +95,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
           specifiedYamlKeysSorted += `${key}: ${value}\n`;
         }
 
-        yaml = removeYamlSection(yaml, key);
+        yaml = removeYamlSection(yaml, key, false);
       }
     }
 

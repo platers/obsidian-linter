@@ -11,6 +11,80 @@ These rules try their best to work with YAML values in [Obsidian.md](https://obs
 - Blank lines may be removed if you try sorting or making modifications to the order of keys in the YAML via the Linter
 
 
+## Add Blank Line After YAML
+
+Alias: `add-blank-line-after-yaml`
+
+Adds a blank line after the YAML block if it does not end the current file or it is not already followed by at least 1 blank line
+
+
+
+
+
+### Examples
+
+<details><summary>A file with just YAML in it does not get a blank line after the YAML</summary>
+
+Before:
+
+`````` markdown
+---
+key: value
+---
+``````
+
+After:
+
+`````` markdown
+---
+key: value
+---
+``````
+</details>
+<details><summary>A file with YAML followed directly by content has an empty line added</summary>
+
+Before:
+
+`````` markdown
+---
+key: value
+---
+Here is some text
+``````
+
+After:
+
+`````` markdown
+---
+key: value
+---
+
+Here is some text
+``````
+</details>
+<details><summary>A file with YAML that already has a blank line after it and before content has no empty line added</summary>
+
+Before:
+
+`````` markdown
+---
+key: value
+---
+
+Here is some text
+``````
+
+After:
+
+`````` markdown
+---
+key: value
+---
+
+Here is some text
+``````
+</details>
+
 ## Escape YAML Special Characters
 
 Alias: `escape-yaml-special-characters`
@@ -615,7 +689,7 @@ Text
 
 Alias: `yaml-key-sort`
 
-Sorts the YAML keys based on the order and priority specified. **Note: may remove blank lines as well.**
+Sorts the YAML keys based on the order and priority specified. **Note: may remove blank lines as well. Only works on non-nested keys.**
 
 ### Options
 

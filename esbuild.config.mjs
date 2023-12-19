@@ -19,82 +19,54 @@ document = {
 
 const prod = (process.argv[2] === 'production');
 
-esbuild.build({
-  banner: {
-    js: banner,
+const mockedBanner = banner + dummyMocksForDocs;
+const mockedPlugins = [replace({
+  values: {
+    // update usage of moment from obsidian to the node implementation of moment we have
+    'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
+    // remove the use of obsidian in the options to allow for docs.js to run
+    'import {Setting} from \'obsidian\';': '',
+    // remove the use of obsidian in settings helper to allow for docs.js to run
+    'import {Component, MarkdownRenderer} from \'obsidian\';': '',
   },
-  entryPoints: ['src/main.ts'],
-  plugins: [
-    importGlobPlugin.default(),
-  ],
-  bundle: true,
-  external: [
-    'obsidian',
-    ...builtins],
-  format: 'cjs',
-  target: 'es2020',
-  sourcemap: prod ? false : 'inline',
-  minify: prod,
-  treeShaking: true,
-  outfile: 'main.js',
-}).catch(() => process.exit(1));
+  delimiters: ['', ''],
+})];
 
-esbuild.build({
-  banner: {
-    js: banner + dummyMocksForDocs,
-  },
-  entryPoints: ['src/docs.ts'],
-  plugins: [
-    importGlobPlugin.default(),
-    replace({
-      values: {
-        // update usage of moment from obsidian to the node implementation of moment we have
-        'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
-        // remove the use of obsidian in the options to allow for docs.js to run
-        'import {Setting} from \'obsidian\';': '',
-        // remove the use of obsidian in settings helper to allow for docs.js to run
-        'import {Component, MarkdownRenderer} from \'obsidian\';': '',
-      },
-      delimiters: ['', ''],
-    }),
-  ],
-  bundle: true,
-  external: [
-    'obsidian',
-    ...builtins],
-  format: 'cjs',
-  target: 'es2020',
-  sourcemap: prod ? false : 'inline',
-  treeShaking: true,
-  outfile: 'docs.js',
-}).catch(() => process.exit(1));
+const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
+  return {
+    banner: {
+      js: banner,
+    },
+    entryPoints: [entryPoint],
+    plugins: [
+      importGlobPlugin.default(),
+      ...extraPlugins,
+    ],
+    bundle: true,
+    external: [
+      'obsidian',
+      ...builtins],
+    format: 'cjs',
+    target: 'es2020',
+    sourcemap: prod ? false : 'inline',
+    minify: prod,
+    treeShaking: true,
+    outfile: outfile,
+  };
+};
 
-esbuild.build({
-  banner: {
-    js: banner + dummyMocksForDocs,
-  },
-  entryPoints: ['src/translation-helper.ts'],
-  plugins: [
-    importGlobPlugin.default(),
-    replace({
-      values: {
-        // update usage of moment from obsidian to the node implementation of moment we have
-        'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
-        // remove the use of obsidian in the options to allow for docs.js to run
-        'import {Setting} from \'obsidian\';': '',
-        // remove the use of obsidian in settings helper to allow for dovs.js to run
-        'import {MarkdownRenderer} from \'obsidian\';': '',
-      },
-      delimiters: ['', ''],
-    }),
-  ],
-  bundle: true,
-  external: [
-    'obsidian',
-    ...builtins],
-  format: 'cjs',
-  target: 'es2020',
-  sourcemap: prod ? false : 'inline',
-  treeShaking: true,
-  outfile: 'translation-helper.js',
-}).catch(() => process.exit(1));
+esbuild.build(
+    createEsbuildArgs(banner, 'src/main.ts', 'main.js', []),
+).catch(() => process.exit(1));
+
+esbuild.build(
+    createEsbuildArgs(mockedBanner, 'src/docs.ts', 'docs.js', mockedPlugins),
+).catch(() => process.exit(1));
+
+esbuild.build(
+    createEsbuildArgs(mockedBanner, 'src/translation-helper.ts', 'translation-helper.js', mockedPlugins),
+).catch(() => process.exit(1));
+
+esbuild.build(
+    createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []),
+).catch(() => process.exit(1));

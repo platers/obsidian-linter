@@ -50,6 +50,7 @@ export default {
     'unknown-error': 'An unknown error occurred during linting.',
     'moment-locale-not-found': 'Trying to switch Moment.js locale to {MOMENT_LOCALE}, got {CURRENT_LOCALE}',
     'file-change-lint-message-start': 'Linted',
+    'custom-command-callback-warning': 'Please only set the custom command callback for integration tests.',
 
     // rules-runner.ts
     'pre-rules': 'rules before regular rules',
@@ -466,7 +467,7 @@ export default {
     // move-footnotes-to-the-bottom.ts
     'move-footnotes-to-the-bottom': {
       'name': 'Move Footnotes to the bottom',
-      'description': 'Move all footnotes to the bottom of the document.',
+      'description': 'Move all footnotes to the bottom of the document and makes sure they are sorted based on the order they are referenced in the file\'s body.',
     },
     // move-math-block-indicators-to-their-own-line.ts
     'move-math-block-indicators-to-their-own-line': {
@@ -706,7 +707,7 @@ export default {
     // yaml-key-sort.ts
     'yaml-key-sort': {
       'name': 'YAML Key Sort',
-      'description': 'Sorts the YAML keys based on the order and priority specified. **Note: may remove blank lines as well.**',
+      'description': 'Sorts the YAML keys based on the order and priority specified. **Note: may remove blank lines as well. Only works on non-nested keys.**',
       'yaml-key-priority-sort-order': {
         'name': 'YAML Key Priority Sort Order',
         'description': 'The order in which to sort keys with one on each line where it sorts in the order found in the list',

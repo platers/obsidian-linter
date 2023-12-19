@@ -20,7 +20,7 @@ export default class RemoveEmptyListMarkers extends RuleBuilder<RemoveEmptyListM
     return RemoveEmptyListMarkersOptions;
   }
   apply(text: string, options: RemoveEmptyListMarkersOptions): string {
-    const emptyListMarkerRegex = new RegExp(`^${lineStartingWithWhitespaceOrBlockquoteTemplate}(-|\\*|\\+|\\d+[.)]|- (\\[( |x)\\]))\\s*?$`, 'gm');
+    const emptyListMarkerRegex = new RegExp(`^${lineStartingWithWhitespaceOrBlockquoteTemplate}(-|\\*|\\+|\\d+[.)]|- (\\[(.)\\]))\\s*?$`, 'gm');
     // remove all empty list markers followed by a new line
     text = text.replace(new RegExp(emptyListMarkerRegex.source + '\\n', 'gm'), '');
     // remove all empty list markers proceeded by a new line

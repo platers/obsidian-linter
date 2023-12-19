@@ -204,5 +204,75 @@ ruleTest({
         [^2]: b
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/359
+      testName: 'Moving footnotes to the end of the file sorts footnote definitions by first reference in document',
+      before: dedent`
+        aaaaaa[^1]
+        cccccc[^3]
+        ddddd[^4]
+        bbbbb[^2]
+        fffffff[^5]
+        ${''}
+        [^1]: a-footnote
+        [^2]: b-footnote
+        [^3]: c-footnote
+        [^4]: d-footnote
+        [^5]: f-footnote
+      `,
+      after: dedent`
+        aaaaaa[^1]
+        cccccc[^3]
+        ddddd[^4]
+        bbbbb[^2]
+        fffffff[^5]
+        ${''}
+        [^1]: a-footnote
+        [^3]: c-footnote
+        [^4]: d-footnote
+        [^2]: b-footnote
+        [^5]: f-footnote
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/902
+      testName: 'Moving footnotes to the end of the file should make sure that there are no empty lines between footnotes',
+      before: dedent`
+        AAA[^1]
+        ${''}
+        BBB[^2]
+        ${''}
+        Something[^foo-bar]
+        ${''}
+        CCC[^hello-world]
+        ${''}
+        DDD[^3]
+        ${''}
+        [^foo-bar]: Some text.
+        [^1]: A
+        [^2]: B
+        [^hello-world]: C
+        [^3]: D
+        ${''}
+        More text.
+      `,
+      after: dedent`
+        AAA[^1]
+        ${''}
+        BBB[^2]
+        ${''}
+        Something[^foo-bar]
+        ${''}
+        CCC[^hello-world]
+        ${''}
+        DDD[^3]
+        ${''}
+        More text.
+        ${''}
+        [^1]: A
+        [^2]: B
+        [^foo-bar]: Some text.
+        [^hello-world]: C
+        [^3]: D
+      `,
+    },
   ],
 });

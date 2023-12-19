@@ -12,6 +12,7 @@ const config: Config.InitialOptions = {
     '**/__tests__/**/*.[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)',
     '!**/__tests__/common.ts',
+    '!**/__integration__/*.[jt]s?(x)',
   ],
 };
 export default config;

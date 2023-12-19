@@ -1,4 +1,4 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, WorkspaceLeaf} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange} from 'obsidian';
 import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -16,6 +16,7 @@ import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers'
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 import AsyncLock from 'async-lock';
+import {warn} from 'loglevel';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -56,6 +57,13 @@ export default class LinterPlugin extends Plugin {
   private overridePaste: boolean = false;
   private customCommandsLock = new AsyncLock();
   private originalSaveCallback?: () => void = null;
+  // The amount of files you can use editor lint on at once is pretty small, so we will use an array
+  private editorLintFiles: TFile[] = [];
+  // the amount of files that can be linted as a file can be quite large, so we will want to use a set to make
+  // search and other operations faster
+  private fileLintFiles: Set<TFile> = new Set();
+  private customCommandsCallback: (file: TFile) => Promise<void> = null;
+  private currentlyOpeningSidebar: boolean = false;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -210,7 +218,6 @@ export default class LinterPlugin extends Plugin {
         return;
       }
 
-
       this.modifyPasteEvent(clipboardEv);
     });
     this.registerEvent(eventRef);
@@ -225,6 +232,10 @@ export default class LinterPlugin extends Plugin {
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
+    eventRef = this.app.metadataCache.on('changed', (file: TFile) => this.onMetadataCacheUpdatedCallback(file));
+    this.registerEvent(eventRef);
+    this.eventRefs.push(eventRef);
+
     // Source for save setting
     // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
     const saveCommandDefinition = this.app.commands?.commands?.[
@@ -235,6 +246,8 @@ export default class LinterPlugin extends Plugin {
 
     if (typeof this.originalSaveCallback === 'function') {
       saveCommandDefinition.callback = () => {
+        this.originalSaveCallback();
+
         if (this.settings.lintOnSave && this.isEnabled) {
           const editor = this.getEditor();
           if (editor) {
@@ -244,8 +257,6 @@ export default class LinterPlugin extends Plugin {
             }
           }
         }
-
-        this.originalSaveCallback();
       };
     }
 
@@ -255,6 +266,18 @@ export default class LinterPlugin extends Plugin {
     window.CodeMirrorAdapter.commands.save = () => {
       that.app.commands.executeCommandById('editor:save-file');
     };
+  }
+
+  async onMetadataCacheUpdatedCallback(file: TFile) {
+    if (this.editorLintFiles.includes(file)) {
+      this.editorLintFiles.remove(file);
+
+      this.runCustomCommands(file);
+    } else if (this.fileLintFiles.has(file)) {
+      this.fileLintFiles.delete(file);
+
+      this.runCustomCommandsInSidebar(file);
+    }
   }
 
   onMenuOpenCallback(menu: Menu, file: TAbstractFile, _source: string) {
@@ -283,7 +306,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   async onActiveLeafChange() {
-    if (!this.isEnabled) {
+    if (!this.isEnabled || this.currentlyOpeningSidebar) {
       return;
     }
 
@@ -331,20 +354,15 @@ export default class LinterPlugin extends Plugin {
 
         logInfo(message);
       }
+
+      // when a change is made to the file we know that the cache will update down the road
+      // so we can defer running the custom commands to the cache callback
+      this.fileLintFiles.add(file);
+
+      return;
     }
 
-    let sidebarTab: WorkspaceLeaf = null;
-    if (this.settings.lintCommands && this.settings.lintCommands.length !== 0) {
-      if (!sidebarTab) {
-        sidebarTab = this.app.workspace.getRightLeaf(false);
-      }
-
-      await this.customCommandsLock.acquire('command', async () => {
-        await sidebarTab.openFile(file);
-        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-      });
-      sidebarTab.detach();
-    }
+    await this.runCustomCommandsInSidebar(file);
   }
 
   async runLinterAllFiles(app: App) {
@@ -425,40 +443,67 @@ export default class LinterPlugin extends Plugin {
     // Replace changed lines
     const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
     const changes = dmp.diff_main(oldText, newText);
-    let curText = '';
-    changes.forEach((change) => {
-      function endOfDocument(doc: string) {
-        const lines = doc.split('\n');
-        return {line: lines.length - 1, ch: lines[lines.length - 1].length};
-      }
 
-      const [type, value] = change;
+    // for some reason Live Preview does not work with editor replace ranges like source mode does so it makes more sense
+    // to just set the value of the editor instead of trying to update just the parts that need it to avoid replaces
+    // updating the wrong parts of the YAML frontmatter.
+    const changeMade = oldText != newText;
+    if (changeMade) {
+      const currentCursorOffset = editor.posToOffset(editor.getCursor());
+      const newCursorOffset = this.getNewCursorOffset(currentCursorOffset, changes, newText.length, currentCursorOffset == newText.length);
 
-      if (type == DiffMatchPatch.DIFF_INSERT) {
-        editor.replaceRange(value, endOfDocument(curText));
-        curText += value;
-      } else if (type == DiffMatchPatch.DIFF_DELETE) {
-        const start = endOfDocument(curText);
-        let tempText = curText;
-        tempText += value;
-        const end = endOfDocument(tempText);
-        editor.replaceRange('', start, end);
-      } else {
-        curText += value;
-      }
-    });
+      editor.setValue(newText);
+      editor.setCursor(editor.offsetToPos(newCursorOffset));
+
+      // we defer the running of custom commands to the metadata cache when an update is made
+      this.editorLintFiles.push(file);
+    }
 
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
     this.displayChangedMessage(charsAdded, charsRemoved);
 
-    try {
-      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
-    } catch (error) {
-      this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+    // run custom commands now since no change was made
+    if (!changeMade) {
+      this.runCustomCommands(file);
     }
 
     setCollectLogs(false);
+  }
+
+  private getNewCursorOffset(currentPos: number, changes: DiffMatchPatch.Diff[], newTextLength: number, isAtEndOfContent: boolean): number {
+    if (isAtEndOfContent) {
+      return newTextLength;
+    }
+
+    let newPos = currentPos;
+    let curText = '';
+    changes.forEach((change) => {
+      const [type, value] = change;
+
+      if (type == DiffMatchPatch.DIFF_INSERT) {
+        newPos += value.length;
+        curText += value;
+      } else if (type == DiffMatchPatch.DIFF_DELETE) {
+        if (curText.length + value.length > newPos) {
+          newPos -= newPos - (curText.length + value.length);
+        } else {
+          newPos -= value.length;
+        }
+      } else {
+        curText += value;
+      }
+
+      if (curText.length > newPos) {
+        return;
+      }
+    });
+
+    if (newPos < 0) {
+      return 0;
+    }
+
+    return newPos;
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
@@ -619,6 +664,54 @@ export default class LinterPlugin extends Plugin {
     }
 
     editor.replaceSelection(clipboardContent);
+  }
+
+  setCustomCommandCallback(callback: (file: TFile) => Promise<void>) {
+    warn(getTextInLanguage('logs.custom-command-callback-warning'));
+    this.customCommandsCallback = callback;
+  }
+
+  private async runCustomCommandsInSidebar(file: TFile) {
+    if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
+      return;
+    }
+
+    const sidebarTab = this.app.workspace.getRightLeaf(false);
+    const activeEditor = this.getEditor();
+
+    await this.customCommandsLock.acquire('command', async () => {
+      this.currentlyOpeningSidebar = true;
+
+      await sidebarTab.openFile(file);
+      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+      if (this.customCommandsCallback) {
+        await this.customCommandsCallback(file);
+      }
+    });
+    sidebarTab.detach();
+    if (activeEditor) {
+      activeEditor.focus();
+    }
+
+    this.currentlyOpeningSidebar = false;
+  }
+
+  private async runCustomCommands(file: TFile) {
+    if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
+      return;
+    }
+
+    await this.customCommandsLock.acquire('command', async () => {
+      try {
+        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+      } catch (error) {
+        this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      }
+
+      if (this.customCommandsCallback) {
+        await this.customCommandsCallback(file);
+      }
+    });
   }
 
   /**
