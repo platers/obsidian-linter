@@ -306,15 +306,15 @@ export default {
     'dedupe-yaml-array-values': {
       'name': 'Dedupe YAML Array Values',
       'description': 'Removes duplicate array values in a case sensitive manner.',
-      'alias-key': {
+      'dedupe-alias-key': {
         'name': 'Dedupe YAML aliases section',
         'description': 'Turns on removing duplicate aliases.',
       },
-      'tag-key': {
+      'dedupe-tag-key': {
         'name': 'Dedupe YAML tags section',
         'description': 'Turns on removing duplicate tags.',
       },
-      'default-array-keys': {
+      'dedupe-array-keys': {
         'name': 'Dedupe YAML array sections',
         'description': 'Turns on removing duplicate values for regular YAML arrays',
       },
@@ -660,6 +660,31 @@ export default {
       'yaml-keys-to-remove': {
         'name': 'YAML Keys to Remove',
         'description': 'The YAML keys to remove from the YAML frontmatter with or without colons',
+      },
+    },
+    // sort-yaml-array-values.ts
+    'sort-yaml-array-values': {
+      'name': 'Sort YAML Array Values',
+      'description': 'Sorts YAML array values based on the specified sort order.',
+      'sort-alias-key': {
+        'name': 'Sort YAML aliases section',
+        'description': 'Turns on sorting aliases.',
+      },
+      'sort-tag-key': {
+        'name': 'Sort YAML tags section',
+        'description': 'Turns on sorting tags.',
+      },
+      'sort-array-keys': {
+        'name': 'Sort YAML array sections',
+        'description': 'Turns on sorting values for regular YAML arrays',
+      },
+      'ignore-keys': {
+        'name': 'YAML Keys to Ignore',
+        'description': 'A list of YAML keys without the ending colon on their own lines that are not meant to have their values sorted.',
+      },
+      'sort-order': {
+        'name': 'Sort Order',
+        'description': 'The way to sort the YAML array values.',
       },
     },
     // space-after-list-markers.ts
