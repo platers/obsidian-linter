@@ -24,7 +24,7 @@ class DedupeYamlArrayValuesOptions implements Options {
     tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   dedupeTagKey?: boolean = true;
   dedupeArrayKeys?: boolean = true;
-  ignoreDedupeArrayKeys?: string[];
+  ignoreDedupeArrayKeys?: string[] = [];
   @RuleBuilder.noSettingControl()
     defaultEscapeCharacter?: QuoteCharacter = '"';
   @RuleBuilder.noSettingControl()
