@@ -390,5 +390,26 @@ ruleTest({
         [^5]: D
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/999
+      testName: 'Make sure that tables with escaped pipes in them are ignored',
+      before: dedent`
+        | 1 | 2 |
+        | --- | --- |
+        | 3 | 4 |
+
+        | [[2024-01-25\\|Thursday]] | [[2024-01-26\\|Friday]] |
+        | --- | --- |
+        | 3 | 4 |
+      `,
+      after: dedent`
+        | 1 | 2 |
+        | --- | --- |
+        | 3 | 4 |
+
+        | [[2024-01-25\\|Thursday]] | [[2024-01-26\\|Friday]] |
+        | --- | --- |
+        | 3 | 4 |
+      `,
+    },
   ],
 });

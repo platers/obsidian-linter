@@ -198,7 +198,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       ---
       date: 06/16/2022
       type: topic
-      tags: 
+      tags:
       keywords: []
       status: WIP
       ---
@@ -217,6 +217,20 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
     `,
     expectedTablesInText: 0,
     expectedPositions: [],
+  },
+  { // accounts for https://github.com/platers/obsidian-linter/issues/999
+    name: 'handle tables with a escaped pipes in them',
+    text: dedent`
+      | 1 | 2 |
+      | --- | --- |
+      | 3 | 4 |
+
+      | [[2024-01-25\\|Thursday]] | [[2024-01-26\\|Friday]] |
+      | --- | --- |
+      | 3 | 4 |
+    `,
+    expectedTablesInText: 2,
+    expectedPositions: [{startIndex: 112, endIndex: 35}, {startIndex: 0, endIndex: 33}],
   },
 ];
 

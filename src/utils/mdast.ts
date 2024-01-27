@@ -909,7 +909,7 @@ export function getAllTablesInText(text: string): {startIndex: number, endIndex:
 
     // if the delimiter row and the first row do not have the same amount of cells,
     // we are not dealing with a table
-    if (firstLine.split('|').length !== delimiterLine.split('|').length) {
+    if (countTableDelimiters(firstLine) !== countTableDelimiters(delimiterLine)) {
       continue;
     }
 
@@ -956,6 +956,29 @@ function isInvalidTableSeparatorRow(fullRow: string, separatorMatch: string): bo
   // it could contain text or an invalid table cell for the separator
   const nonSeparatorContent = fullRow.replace(separatorMatch, '');
   return /[^\s>]/.test(nonSeparatorContent);
+}
+
+function countTableDelimiters(line: string): number {
+  let previousCharIsEscapeChar = false;
+  let numEscapeCharsInARow = 0;
+  let numDelimiters = 0;
+  let currentChar = '';
+  for (let i = 0; i < line.length; i++) {
+    currentChar = line[i];
+    if (currentChar === '\\') {
+      numEscapeCharsInARow++;
+      previousCharIsEscapeChar = numEscapeCharsInARow % 2 == 1;
+    } else {
+      numEscapeCharsInARow = 0;
+      if (currentChar === '|' && !previousCharIsEscapeChar) {
+        numDelimiters++;
+      }
+
+      previousCharIsEscapeChar = false;
+    }
+  }
+
+  return numDelimiters;
 }
 
 export function getAllCustomIgnoreSectionsInText(text: string): {startIndex: number, endIndex: number}[] {
