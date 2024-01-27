@@ -1,8 +1,8 @@
 import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
-import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt} from './strings';
-import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex} from './regex';
+import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
+import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
 import {combineExtensions} from 'micromark-util-combine-extensions';
@@ -830,9 +830,10 @@ function breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock: string, numberOfDol
 
 function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockStartIndex: number, mathBlockEndIndex: number, mathOpeningIndicatorRegex: RegExp, mathEndingIndicatorRegex: RegExp): string {
   const startOfLine = text.substring(getStartOfLineIndex(text, mathBlockStartIndex), mathBlockStartIndex) ?? '';
+  const [lineStart] = getStartOfLineWhitespaceOrBlockquoteLevel(startOfLine, startOfLine.length);
   const startOfEndingLine = text.substring(getStartOfLineIndex(text, mathBlockEndIndex), mathBlockEndIndex) ?? '';
   let mathBlock = text.substring(mathBlockStartIndex, mathBlockEndIndex);
-  const isBlockquote = emptyLineMathBlockquoteRegex.test(startOfLine.trim());
+  const isBlockquote = startsWithBlockquote.test(startOfLine.trim());
   let startingNewLineAdded = false;
 
   mathBlock = mathBlock.replace(mathOpeningIndicatorRegex, (_: string, $1: string, $2: string = '') => {
@@ -840,13 +841,16 @@ function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockSt
     if (!isBlockquote && startOfLine.trim() != '') {
       newOpening += '\n';
       startingNewLineAdded = true;
+    } else if (isBlockquote && !emptyLineMathBlockquoteRegex.test(startOfLine)) {
+      newOpening += '\n' + lineStart;
+      startingNewLineAdded = true;
     }
 
     newOpening += $1 + '\n';
 
     // a new line is being added
     if ($2 === '' && isBlockquote) {
-      newOpening += startOfLine;
+      newOpening += lineStart;
     }
 
     return newOpening;
@@ -858,7 +862,7 @@ function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockSt
     if (groupOneIsEmpty && isBlockquote && emptyLineMathBlockquoteRegex.test(startOfEndingLine.trim())) {
       return match;
     } else if (groupOneIsEmpty && isBlockquote) { // a new line is being added
-      return '\n' + startOfLine + $2 + $3;
+      return '\n' + lineStart + $2 + $3;
     }
 
     return '\n' + $2 + $3;
@@ -866,7 +870,13 @@ function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockSt
 
   // try to cleanup whitespace that may get left behind by this logic when moving the opening
   // math block indicators to its own line
-  if (startingNewLineAdded && mathBlockStartIndex > 0 && text[mathBlockStartIndex-1].trim() === '') {
+  // eslint-disable-next-line no-unmodified-loop-condition
+  while (startingNewLineAdded && mathBlockStartIndex > 0) {
+    const previousChar = text[mathBlockStartIndex-1];
+    if (previousChar !== ' ' && previousChar !== '\t') {
+      break;
+    }
+
     mathBlockStartIndex--;
   }
 

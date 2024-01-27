@@ -19,6 +19,7 @@ export const wordSplitterRegex = /[,\s]+/;
 export const ellipsisRegex = /(\. ?){2}\./g;
 export const lineStartingWithWhitespaceOrBlockquoteTemplate = `\\s*(>\\s*)*`;
 export const emptyLineMathBlockquoteRegex = /^(>( |\t)*)+\$*?$/m;
+export const startsWithBlockquote = /^\s*(>\s*)+/m;
 export const tableSeparator = /(\|? *:?-{1,}:? *\|?)(\| *:?-{1,}:? *\|?)*( |\t)*$/gm;
 export const tableStartingPipe = /^(((>[ ]?)*)|([ ]{0,3}))\|/m;
 export const tableRow = /[^\n]*?\|[^\n]*?(\n|$)/m;
