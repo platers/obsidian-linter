@@ -110,5 +110,41 @@ ruleTest({
         text
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/996
+      testName: 'Math indicators with content before them should not have that content duplicated unless it is a blockquote',
+      before: dedent`
+        a $$b$$
+      `,
+      after: dedent`
+        a
+        $$
+        b
+        $$
+      `,
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/996
+      testName: 'Math indicators with content before them should have the opening indicator moved to a new line and have any tabs and spaces that were between the content and the opening indicators removed.',
+      before: dedent`
+        a \t    $$b$$
+      `,
+      after: dedent`
+        a
+        $$
+        b
+        $$
+      `,
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/996
+      testName: 'Math indicators in a blockquote/callout with content before them should have the opening indicator moved to a new line and have any tabs and spaces that were between the content and the opening indicators removed.',
+      before: dedent`
+        > a \t    $$b$$
+      `,
+      after: dedent`
+        > a
+        > $$
+        > b
+        > $$
+      `,
+    },
   ],
 });
