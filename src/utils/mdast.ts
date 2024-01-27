@@ -2,7 +2,7 @@ import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt} from './strings';
-import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine} from './regex';
+import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
 import {combineExtensions} from 'micromark-util-combine-extensions';
@@ -831,28 +831,44 @@ function breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock: string, numberOfDol
 function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockStartIndex: number, mathBlockEndIndex: number, mathOpeningIndicatorRegex: RegExp, mathEndingIndicatorRegex: RegExp): string {
   const startOfLine = text.substring(getStartOfLineIndex(text, mathBlockStartIndex), mathBlockStartIndex) ?? '';
   const startOfEndingLine = text.substring(getStartOfLineIndex(text, mathBlockEndIndex), mathBlockEndIndex) ?? '';
-  const emptyLineBlockquoteRegex = /^(>( |\t)*)+\$+$/m;
   let mathBlock = text.substring(mathBlockStartIndex, mathBlockEndIndex);
+  const isBlockquote = emptyLineMathBlockquoteRegex.test(startOfLine.trim());
+  let startingNewLineAdded = false;
+
   mathBlock = mathBlock.replace(mathOpeningIndicatorRegex, (_: string, $1: string, $2: string = '') => {
-    // a new line is being added
-    if ($2 === '') {
-      return $1 + '\n' + startOfLine;
+    let newOpening = '';
+    if (!isBlockquote && startOfLine.trim() != '') {
+      newOpening += '\n';
+      startingNewLineAdded = true;
     }
 
-    return $1 + '\n';
+    newOpening += $1 + '\n';
+
+    // a new line is being added
+    if ($2 === '' && isBlockquote) {
+      newOpening += startOfLine;
+    }
+
+    return newOpening;
   });
-  mathBlock= mathBlock.replace(mathEndingIndicatorRegex, (match: string, $1: string = '', $2: string, $3: string) => {
+  mathBlock = mathBlock.replace(mathEndingIndicatorRegex, (match: string, $1: string = '', $2: string, $3: string) => {
     const groupOneIsEmpty = $1 === '';
 
     // make sure that a blank blockquote line is checked for in order to determine if a change needs to happen just for blockquotes
-    if (groupOneIsEmpty && emptyLineBlockquoteRegex.test(startOfEndingLine.trim())) {
+    if (groupOneIsEmpty && isBlockquote && emptyLineMathBlockquoteRegex.test(startOfEndingLine.trim())) {
       return match;
-    } else if (groupOneIsEmpty) { // a new line is being added
+    } else if (groupOneIsEmpty && isBlockquote) { // a new line is being added
       return '\n' + startOfLine + $2 + $3;
     }
 
     return '\n' + $2 + $3;
   });
+
+  // try to cleanup whitespace that may get left behind by this logic when moving the opening
+  // math block indicators to its own line
+  if (startingNewLineAdded && mathBlockStartIndex > 0 && text[mathBlockStartIndex-1].trim() === '') {
+    mathBlockStartIndex--;
+  }
 
   return replaceTextBetweenStartAndEndWithNewValue(text, mathBlockStartIndex, mathBlockEndIndex, mathBlock);
 }

@@ -110,5 +110,17 @@ ruleTest({
         text
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/996
+      testName: 'Math indicators with content before them should not have that content duplicated unless it is a blockquote',
+      before: dedent`
+        a $$b$$
+      `,
+      after: dedent`
+        a
+        $$
+        b
+        $$
+      `,
+    },
   ],
 });
