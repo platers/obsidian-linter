@@ -1,10 +1,12 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
-import {addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent} from '../utils/mdast';
+import {LineBreakIndicators, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent} from '../utils/mdast';
 
-class TwoSpacesBetweenLinesWithContentOptions implements Options {}
+class TwoSpacesBetweenLinesWithContentOptions implements Options {
+  lineBreakIndicator?: LineBreakIndicators = LineBreakIndicators.TwoSpaces;
+}
 
 @RuleBuilder.register
 export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpacesBetweenLinesWithContentOptions> {
@@ -20,7 +22,7 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
     return TwoSpacesBetweenLinesWithContentOptions;
   }
   apply(text: string, options: TwoSpacesBetweenLinesWithContentOptions): string {
-    return addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text);
+    return addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text, options.lineBreakIndicator);
   }
   get exampleBuilders(): ExampleBuilder<TwoSpacesBetweenLinesWithContentOptions>[] {
     return [
@@ -110,6 +112,31 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
     ];
   }
   get optionBuilders(): OptionBuilderBase<TwoSpacesBetweenLinesWithContentOptions>[] {
-    return [];
+    return [
+      new DropdownOptionBuilder<TwoSpacesBetweenLinesWithContentOptions, LineBreakIndicators>({
+        OptionsClass: TwoSpacesBetweenLinesWithContentOptions,
+        nameKey: 'rules.ordered-list-style.list-end-style.name',
+        descriptionKey: 'rules.ordered-list-style.list-end-style.description',
+        optionsKey: 'lineBreakIndicator',
+        records: [
+          {
+            value: LineBreakIndicators.TwoSpaces,
+            description: LineBreakIndicators.TwoSpaces,
+          },
+          {
+            value: LineBreakIndicators.LineBreakHtml,
+            description: LineBreakIndicators.LineBreakHtml,
+          },
+          {
+            value: LineBreakIndicators.LineBreakHtmlNotXml,
+            description: LineBreakIndicators.LineBreakHtmlNotXml,
+          },
+          {
+            value: LineBreakIndicators.Backslash,
+            description: LineBreakIndicators.Backslash,
+          },
+        ],
+      }),
+    ];
   }
 }
