@@ -230,7 +230,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       | 3 | 4 |
     `,
     expectedTablesInText: 2,
-    expectedPositions: [{startIndex: 112, endIndex: 35}, {startIndex: 0, endIndex: 33}],
+    expectedPositions: [{startIndex: 35, endIndex: 112}, {startIndex: 0, endIndex: 33}],
   },
 ];
 
