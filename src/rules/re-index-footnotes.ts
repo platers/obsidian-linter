@@ -13,7 +13,7 @@ export default class ReIndexFootnotes extends RuleBuilder<ReIndexFootnotesOption
       nameKey: 'rules.re-index-footnotes.name',
       descriptionKey: 'rules.re-index-footnotes.description',
       type: RuleType.FOOTNOTE,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => ReIndexFootnotesOptions {

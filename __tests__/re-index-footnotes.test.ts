@@ -93,6 +93,36 @@ ruleTest({
         More text.
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1006
+      testName: 'Re-indexing footnotes with links as the referenced values should keep the references to text correlation',
+      before: dedent`
+        Paragraph 1. [^4]
+        ${''}
+        Paragraph 2. [^1]
+        ${''}
+        Paragraph 3. [^2]
+        ${''}
+        Paragraph 4. [^3]
+        ${''}
+        [^4]: [4444](4444)
+        [^1]: [1111](111)
+        [^2]: [2222](222)
+        [^3]: [3333](333)
+      `,
+      after: dedent`
+        Paragraph 1. [^1]
+        ${''}
+        Paragraph 2. [^2]
+        ${''}
+        Paragraph 3. [^3]
+        ${''}
+        Paragraph 4. [^4]
+        ${''}
+        [^1]: [4444](4444)
+        [^2]: [1111](111)
+        [^3]: [2222](222)
+        [^4]: [3333](333)
+      `,
+    },
   ],
 });
-
