@@ -274,5 +274,36 @@ ruleTest({
         [^3]: D
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1006
+      testName: 'Moving footnotes to the bottom of the file should properly order values even when links are present',
+      before: dedent`
+        Paragraph 1. [^4]
+        ${''}
+        Paragraph 2. [^1]
+        ${''}
+        Paragraph 3. [^2]
+        ${''}
+        Paragraph 4. [^3]
+        ${''}
+        [^1]: [1111](111)
+        [^2]: [2222](222)
+        [^3]: [3333](333)
+        [^4]: [4444](4444)
+      `,
+      after: dedent`
+        Paragraph 1. [^4]
+        ${''}
+        Paragraph 2. [^1]
+        ${''}
+        Paragraph 3. [^2]
+        ${''}
+        Paragraph 4. [^3]
+        ${''}
+        [^4]: [4444](4444)
+        [^1]: [1111](111)
+        [^2]: [2222](222)
+        [^3]: [3333](333)
+      `,
+    },
   ],
 });
