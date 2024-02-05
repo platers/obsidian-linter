@@ -180,5 +180,29 @@ ruleTest({
         emptyLineAfterYaml: false,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/993
+      testName: 'Make sure that headings proceeded by a line with a hashtag get a blank line added when `Bottom=false`.',
+      before: dedent`
+        # Heading 1
+        Lorem ipsum.
+        ${''}
+        ## Heading 2
+        Woah, cool text here. #reallycool
+        ## Heading 3
+      `,
+      after: dedent`
+        # Heading 1
+        Lorem ipsum.
+        ${''}
+        ## Heading 2
+        Woah, cool text here. #reallycool
+        ${''}
+        ## Heading 3
+      `,
+      options: {
+        bottom: false,
+        emptyLineAfterYaml: false,
+      },
+    },
   ],
 });
