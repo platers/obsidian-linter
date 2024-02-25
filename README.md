@@ -20,6 +20,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 ### YAML rules
 
 - [add-blank-line-after-yaml](https://platers.github.io/obsidian-linter/settings/yaml-rules/#add-blank-line-after-yaml)
+- [dedupe-yaml-array-values](https://platers.github.io/obsidian-linter/settings/yaml-rules/#dedupe-yaml-array-values)
 - [escape-yaml-special-characters](https://platers.github.io/obsidian-linter/settings/yaml-rules/#escape-yaml-special-characters)
 - [force-yaml-escape](https://platers.github.io/obsidian-linter/settings/yaml-rules/#force-yaml-escape)
 - [format-tags-in-yaml](https://platers.github.io/obsidian-linter/settings/yaml-rules/#format-tags-in-yaml)
@@ -27,6 +28,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [insert-yaml-attributes](https://platers.github.io/obsidian-linter/settings/yaml-rules/#insert-yaml-attributes)
 - [move-tags-to-yaml](https://platers.github.io/obsidian-linter/settings/yaml-rules/#move-tags-to-yaml)
 - [remove-yaml-keys](https://platers.github.io/obsidian-linter/settings/yaml-rules/#remove-yaml-keys)
+- [sort-yaml-array-values](https://platers.github.io/obsidian-linter/settings/yaml-rules/#sort-yaml-array-values)
 - [yaml-key-sort](https://platers.github.io/obsidian-linter/settings/yaml-rules/#yaml-key-sort)
 - [yaml-timestamp](https://platers.github.io/obsidian-linter/settings/yaml-rules/#yaml-timestamp)
 - [yaml-title](https://platers.github.io/obsidian-linter/settings/yaml-rules/#yaml-title)

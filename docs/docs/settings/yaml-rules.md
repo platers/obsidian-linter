@@ -85,6 +85,153 @@ Here is some text
 ``````
 </details>
 
+## Dedupe YAML Array Values
+
+Alias: `dedupe-yaml-array-values`
+
+Removes duplicate array values in a case sensitive manner.
+
+### Options
+
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `Dedupe YAML aliases section` | Turns on removing duplicate aliases. | N/A | `true` |
+| `Dedupe YAML tags section` | Turns on removing duplicate tags. | N/A | `true` |
+| `Dedupe YAML array sections` | Turns on removing duplicate values for regular YAML arrays | N/A | `true` |
+| `YAML Keys to Ignore` | A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them. | N/A |  |
+
+
+
+### Examples
+
+<details><summary>Dedupe YAML tags is case sensitive and will use your default format for tags.</summary>
+
+Before:
+
+`````` markdown
+---
+tags: [computer, research, computer, Computer]
+aliases:
+  - Title 1
+  - Title2
+---
+``````
+
+After:
+
+`````` markdown
+---
+tags: [computer, research, Computer]
+aliases:
+  - Title 1
+  - Title2
+---
+``````
+</details>
+<details><summary>Dedupe YAML aliases is case sensitive and will use your default format for aliases.</summary>
+
+Before:
+
+`````` markdown
+---
+tags: [computer, research]
+aliases:
+  - Title 1
+  - Title2
+  - Title 1
+  - Title2
+  - Title 3
+---
+``````
+
+After:
+
+`````` markdown
+---
+tags: [computer, research]
+aliases:
+  - Title 1
+  - Title2
+  - Title 3
+---
+``````
+</details>
+<details><summary>Dedupe YAML array keys is case sensitive and will try to preserve the original array format.</summary>
+
+Before:
+
+`````` markdown
+---
+tags: [computer, research]
+aliases:
+  - Title 1
+  - Title2
+arr1: [val, val1, val, val2, Val]
+arr2:
+  - Val
+  - Val
+  - val
+  - val2
+  - Val2
+---
+``````
+
+After:
+
+`````` markdown
+---
+tags: [computer, research]
+aliases:
+  - Title 1
+  - Title2
+arr1: [val, val1, val2, Val]
+arr2:
+  - Val
+  - val
+  - val2
+  - Val2
+---
+``````
+</details>
+<details><summary>Dedupe YAML respects list of keys to not remove duplicates of for normal arrays (keys to ignore is just `arr2` for this example)</summary>
+
+Before:
+
+`````` markdown
+---
+tags: [computer, research]
+aliases:
+  - Title 1
+  - Title2
+arr1: [val, val1, val, val2, Val]
+arr2:
+  - Val
+  - Val
+  - val
+  - val2
+  - Val2
+---
+``````
+
+After:
+
+`````` markdown
+---
+tags: [computer, research]
+aliases:
+  - Title 1
+  - Title2
+arr1: [val, val1, val2, Val]
+arr2:
+  - Val
+  - Val
+  - val
+  - val2
+  - Val2
+---
+``````
+</details>
+
 ## Escape YAML Special Characters
 
 Alias: `escape-yaml-special-characters`
@@ -682,6 +829,109 @@ tags: computer
 # Header Context
 
 Text
+``````
+</details>
+
+## Sort YAML Array Values
+
+Alias: `sort-yaml-array-values`
+
+Sorts YAML array values based on the specified sort order.
+
+### Options
+
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `Sort YAML aliases section` | Turns on sorting aliases. | N/A | `true` |
+| `Sort YAML tags section` | Turns on sorting tags. | N/A | `true` |
+| `Sort YAML array sections` | Turns on sorting values for regular YAML arrays | N/A | `true` |
+| `YAML Keys to Ignore` | A list of YAML keys without the ending colon on their own lines that are not meant to have their values sorted. | N/A |  |
+| `Sort Order` | The way to sort the YAML array values. | `Ascending Alphabetical`: Sorts the array values from a to z<br/><br/>`Descending Alphabetical`: Sorts the array values from z to a | `Ascending Alphabetical` |
+
+
+
+### Examples
+
+<details><summary>Sorting YAML array values alphabetically</summary>
+
+Before:
+
+`````` markdown
+---
+tags: [computer, research, androids, Computer]
+aliases:
+  - Title 1
+  - Title 2
+---
+``````
+
+After:
+
+`````` markdown
+---
+tags: [androids, computer, Computer, research]
+aliases:
+  - Title 1
+  - Title 2
+---
+``````
+</details>
+<details><summary>Sorting YAML array values to be alphabetically descending</summary>
+
+Before:
+
+`````` markdown
+---
+tags: [computer, research, androids, Computer]
+aliases:
+  - Title 1
+  - Title 2
+---
+``````
+
+After:
+
+`````` markdown
+---
+tags: [research, Computer, computer, androids]
+aliases:
+  - Title 2
+  - Title 1
+---
+``````
+</details>
+<details><summary>Sort YAML Arrays respects list of keys to not sort values of for normal arrays (keys to ignore is just `arr2` for this example)</summary>
+
+Before:
+
+`````` markdown
+---
+tags: [computer, research]
+aliases:
+  - Title 1
+  - Title 2
+arr1: [val, val2, val1]
+arr2:
+  - val
+  - val2
+  - val1
+---
+``````
+
+After:
+
+`````` markdown
+---
+tags: [computer, research]
+aliases:
+  - Title 1
+  - Title 2
+arr1: [val, val1, val2]
+arr2:
+  - val
+  - val2
+  - val1
+---
 ``````
 </details>
 
