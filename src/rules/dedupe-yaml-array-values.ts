@@ -38,7 +38,6 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
       nameKey: 'rules.dedupe-yaml-array-values.name',
       descriptionKey: 'rules.dedupe-yaml-array-values.description',
       type: RuleType.YAML,
-      hasSpecialExecutionOrder: true,
     });
   }
   get OptionsClass(): new () => DedupeYamlArrayValuesOptions {
