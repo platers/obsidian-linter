@@ -123,7 +123,18 @@ export default class RuleTemplate extends RuleBuilder<SortYamlArrayValuesOptions
       return arr;
     }
 
-    arr.sort();
+    // logic from https://stackoverflow.com/a/26061065/8353749
+    arr.sort(function(a, b) {
+      /* Storing case insensitive comparison */
+      const comparison = a.toLowerCase().localeCompare(b.toLowerCase());
+      /* If strings are equal in case insensitive comparison */
+      if (comparison === 0) {
+        /* Return case sensitive comparison instead */
+        return a.localeCompare(b);
+      }
+      /* Otherwise return result */
+      return comparison;
+    });
     if (sortType === 'Ascending Alphabetical') {
       return arr;
     }
