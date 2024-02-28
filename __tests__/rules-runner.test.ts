@@ -208,6 +208,22 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
       <!-- linter-enable -->
     `,
   },
+  { // accounts for https://github.com/platers/obsidian-linter/issues/1025
+    testName: 'A custom replace with an undefined label should still run.',
+    listOfRegexReplacements: [
+      {
+        label: undefined, find: 'lobo', replace: 'hello', flags: 'g',
+      },
+    ],
+    before: dedent`
+      How does this look?
+      Did it stay the same?
+    `,
+    after: dedent`
+      How does this look?
+      Did it stay the same?
+    `,
+  },
 ];
 
 describe('Rules Runner', () => {
