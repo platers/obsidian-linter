@@ -2,7 +2,7 @@ import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
-import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote} from './regex';
+import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
 import {combineExtensions} from 'micromark-util-combine-extensions';
@@ -420,8 +420,7 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
 
     // exclude list items, footnote definitions, and blockquotes
     const firstLine = paragraphLines[0].trimStart();
-    if (firstLine.startsWith('>') || firstLine.startsWith('- ') || firstLine.startsWith('-\t') ||
-      firstLine.match(/^[0-9]+\.( |\t)+/) || firstLine.match(footnoteDefinitionIndicatorAtStartOfLine)) {
+    if (firstLine.startsWith('>') || firstLine.match(startsWithListMarkerRegex) || firstLine.match(footnoteDefinitionIndicatorAtStartOfLine)) {
       continue;
     }
 
