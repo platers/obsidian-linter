@@ -186,7 +186,7 @@ export class RulesRunner {
         }
 
         let debugMsg = eachRegex.label;
-        if (debugMsg.trim() != '') {
+        if (debugMsg && debugMsg.trim() != '') {
           debugMsg += ':\n';
         }
         debugMsg +=`/${eachRegex.find}/${eachRegex.flags}/${eachRegex.replace}/`;
