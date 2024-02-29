@@ -160,6 +160,23 @@ ruleTest({
         <https://m3.bbz-dormagen-moodle.de/tag/index.php?tc=1&tag=Nachschreibtermin&from=4817>
       `,
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/1029
+      testName: 'Make sure that URLs with percents are properly matched',
+      before: dedent`
+        https://zh.wikipedia.org/wiki/%E5%85%AC%E5%8E%86
+        https://baike.baidu.com/item/%E7%99%BE%E7%A7%91
+        https://www.google.com/search?q=%E7%A9%BA%E6%A0%BC
+        https://cn.bing.com/search?pglt=163&q=%E6%A0%BC%E5%BC%8F%E5%8C%96
+        https://www.google.com/search?q=%E3%81%A1%E3%82%85%E3%81%86%E3%81%94%E3%81%8F%E3%81%94
+      `,
+      after: dedent`
+        <https://zh.wikipedia.org/wiki/%E5%85%AC%E5%8E%86>
+        <https://baike.baidu.com/item/%E7%99%BE%E7%A7%91>
+        <https://www.google.com/search?q=%E7%A9%BA%E6%A0%BC>
+        <https://cn.bing.com/search?pglt=163&q=%E6%A0%BC%E5%BC%8F%E5%8C%96>
+        <https://www.google.com/search?q=%E3%81%A1%E3%82%85%E3%81%86%E3%81%94%E3%81%8F%E3%81%94>
+      `,
+    },
   ],
 });
 
