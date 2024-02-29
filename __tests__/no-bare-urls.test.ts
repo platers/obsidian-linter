@@ -177,6 +177,22 @@ ruleTest({
         <https://www.google.com/search?q=%E3%81%A1%E3%82%85%E3%81%86%E3%81%94%E3%81%8F%E3%81%94>
       `,
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/1030
+      testName: 'Make sure that file URIs with three slashes are properly matched',
+      before: dedent`
+        # Untitled
+
+        file:///C:/Untitled.md
+      `,
+      after: dedent`
+        # Untitled
+
+        <file:///C:/Untitled.md>
+      `,
+      options: {
+        noBareURIs: true,
+      },
+    },
   ],
 });
 
