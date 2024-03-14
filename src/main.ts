@@ -1,4 +1,4 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, MarkdownViewModeType, getFrontMatterInfo, FileView} from 'obsidian';
 import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -440,70 +440,64 @@ export default class LinterPlugin extends Plugin {
       return;
     }
 
+    const mode = this.getCurrentMode();
+
     // Replace changed lines
     const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
     const changes = dmp.diff_main(oldText, newText);
+    let curText = '';
+    let startingIndex = 0;
+    // in Live Preview mode, there is some wonkiness around how the frontmatter values are replaced.
+    // So if the frontmatter needs updating at all, we are treating it as the whole frontmatter needing
+    // to be replaced. Hopefully this will fix issues with the frontmatter getting mangled.
+    if (mode === 'preview') {
+      const oldTextFrontmatterInfo = getFrontMatterInfo(oldText);
+      const newTextFrontmatterInfo = getFrontMatterInfo(newText);
 
-    // for some reason Live Preview does not work with editor replace ranges like source mode does so it makes more sense
-    // to just set the value of the editor instead of trying to update just the parts that need it to avoid replaces
-    // updating the wrong parts of the YAML frontmatter.
-    const changeMade = oldText != newText;
-    if (changeMade) {
-      const currentCursorOffset = editor.posToOffset(editor.getCursor());
-      const newCursorOffset = this.getNewCursorOffset(currentCursorOffset, changes, newText.length, currentCursorOffset == newText.length);
-
-      editor.setValue(newText);
-      editor.setCursor(editor.offsetToPos(newCursorOffset));
-
-      // we defer the running of custom commands to the metadata cache when an update is made
-      this.editorLintFiles.push(file);
+      if (oldTextFrontmatterInfo.exists != newTextFrontmatterInfo.exists ||
+        oldTextFrontmatterInfo.from != newTextFrontmatterInfo.from ||
+        oldTextFrontmatterInfo.to != newTextFrontmatterInfo.to ||
+        oldTextFrontmatterInfo.frontmatter != newTextFrontmatterInfo.frontmatter) {
+        editor.replaceRange(newTextFrontmatterInfo.frontmatter, editor.offsetToPos(oldTextFrontmatterInfo.from), editor.offsetToPos(oldTextFrontmatterInfo.to));
+        startingIndex = newTextFrontmatterInfo.to;
+      }
     }
+
+    let isBeforeStartIndex = false;
+    changes.forEach((change) => {
+      isBeforeStartIndex = curText.length < startingIndex;
+
+      const [type, value] = change;
+
+      // handle updates
+      if (!isBeforeStartIndex) {
+        if (type == DiffMatchPatch.DIFF_INSERT) {
+          editor.replaceRange(value, this.endOfDocument(curText));
+        } else if (type == DiffMatchPatch.DIFF_DELETE) {
+          const start = this.endOfDocument(curText);
+          let tempText = curText;
+          tempText += value;
+          const end = this.endOfDocument(tempText);
+          editor.replaceRange('', start, end);
+        }
+      }
+
+      // update current text
+      if (type != DiffMatchPatch.DIFF_DELETE) {
+        curText += value;
+      }
+    });
 
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
     this.displayChangedMessage(charsAdded, charsRemoved);
 
     // run custom commands now since no change was made
-    if (!changeMade) {
+    if (!charsAdded && !charsRemoved) {
       this.runCustomCommands(file);
     }
 
     setCollectLogs(false);
-  }
-
-  private getNewCursorOffset(currentPos: number, changes: DiffMatchPatch.Diff[], newTextLength: number, isAtEndOfContent: boolean): number {
-    if (isAtEndOfContent) {
-      return newTextLength;
-    }
-
-    let newPos = currentPos;
-    let curText = '';
-    changes.forEach((change) => {
-      const [type, value] = change;
-
-      if (type == DiffMatchPatch.DIFF_INSERT) {
-        newPos += value.length;
-        curText += value;
-      } else if (type == DiffMatchPatch.DIFF_DELETE) {
-        if (curText.length + value.length > newPos) {
-          newPos -= newPos - (curText.length + value.length);
-        } else {
-          newPos -= value.length;
-        }
-      } else {
-        curText += value;
-      }
-
-      if (curText.length > newPos) {
-        return;
-      }
-    });
-
-    if (newPos < 0) {
-      return 0;
-    }
-
-    return newPos;
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
@@ -724,6 +718,27 @@ export default class LinterPlugin extends Plugin {
     return activeLeaf.editor;
   }
 
+  // Note that MarkdownViewModeType actually refers to editing mode versus source mode
+  // however the naming is so similar to live preview versus source mode that I am going
+  // to reuse this here. Please be careful with this logic.
+  private getCurrentMode(): MarkdownViewModeType {
+    const view: FileView = this.app.workspace.getActiveFileView();
+    if (!view) {
+      return;
+    }
+
+    const state = view.getState();
+    if (Object.hasOwn(state, 'source')) {
+      if (state.source) {
+        return 'source';
+      }
+
+      return 'preview';
+    }
+
+    return null;
+  }
+
   /**
    * Makes sure to get the whole line where the cursor is at even if a selection is made.
    * @param {Editor} editor - The codemirror editor where the content is located.
@@ -794,5 +809,10 @@ export default class LinterPlugin extends Plugin {
     }
 
     this.overridePaste = false;
+  }
+
+  private endOfDocument(doc: string) {
+    const lines = doc.split('\n');
+    return {line: lines.length - 1, ch: lines[lines.length - 1].length};
   }
 }
