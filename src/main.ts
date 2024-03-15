@@ -454,74 +454,74 @@ export default class LinterPlugin extends Plugin {
     logInfo(getTextInLanguage('logs.linter-run'));
 
     const file = this.app.workspace.getActiveFile();
-    const oldText = editor.getValue();
-    let newText: string;
+    // const oldText = editor.getValue();
+    // let newText: string;
     try {
-      this.lintFileManager.lintFile(file);
+      this.lintFileManager.lintFile(file, (oldText: string, newText: string) => {
+        const mode = this.getCurrentMode();
+
+        // Replace changed lines
+        const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
+        const changes = dmp.diff_main(oldText, newText);
+        let curText = '';
+        let startingIndex = 0;
+        // in Live Preview mode, there is some wonkiness around how the frontmatter values are replaced.
+        // So if the frontmatter needs updating at all, we are treating it as the whole frontmatter needing
+        // to be replaced. Hopefully this will fix issues with the frontmatter getting mangled.
+        if (mode === 'preview') {
+          const oldTextFrontmatterInfo = getFrontMatterInfo(oldText);
+          const newTextFrontmatterInfo = getFrontMatterInfo(newText);
+
+          if (oldTextFrontmatterInfo.exists != newTextFrontmatterInfo.exists ||
+            oldTextFrontmatterInfo.from != newTextFrontmatterInfo.from ||
+            oldTextFrontmatterInfo.to != newTextFrontmatterInfo.to ||
+            oldTextFrontmatterInfo.frontmatter != newTextFrontmatterInfo.frontmatter) {
+            editor.replaceRange(newTextFrontmatterInfo.frontmatter, editor.offsetToPos(oldTextFrontmatterInfo.from), editor.offsetToPos(oldTextFrontmatterInfo.to));
+            startingIndex = newTextFrontmatterInfo.to;
+          }
+        }
+
+        let isBeforeStartIndex = false;
+        changes.forEach((change) => {
+          isBeforeStartIndex = curText.length < startingIndex;
+
+          const [type, value] = change;
+
+          // handle updates
+          if (!isBeforeStartIndex) {
+            if (type == DiffMatchPatch.DIFF_INSERT) {
+              editor.replaceRange(value, this.endOfDocument(curText));
+            } else if (type == DiffMatchPatch.DIFF_DELETE) {
+              const start = this.endOfDocument(curText);
+              let tempText = curText;
+              tempText += value;
+              const end = this.endOfDocument(tempText);
+              editor.replaceRange('', start, end);
+            }
+          }
+
+          // update current text
+          if (type != DiffMatchPatch.DIFF_DELETE) {
+            curText += value;
+          }
+        });
+
+        const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
+        const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
+        this.displayChangedMessage(charsAdded, charsRemoved);
+
+        // run custom commands now since no change was made
+        if (!charsAdded && !charsRemoved) {
+          this.runCustomCommands(file);
+        }
+
+        setCollectLogs(false);
+      });
       // newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
     } catch (error) {
       this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;
     }
-
-    const mode = this.getCurrentMode();
-
-    // Replace changed lines
-    const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
-    const changes = dmp.diff_main(oldText, newText);
-    let curText = '';
-    let startingIndex = 0;
-    // in Live Preview mode, there is some wonkiness around how the frontmatter values are replaced.
-    // So if the frontmatter needs updating at all, we are treating it as the whole frontmatter needing
-    // to be replaced. Hopefully this will fix issues with the frontmatter getting mangled.
-    if (mode === 'preview') {
-      const oldTextFrontmatterInfo = getFrontMatterInfo(oldText);
-      const newTextFrontmatterInfo = getFrontMatterInfo(newText);
-
-      if (oldTextFrontmatterInfo.exists != newTextFrontmatterInfo.exists ||
-        oldTextFrontmatterInfo.from != newTextFrontmatterInfo.from ||
-        oldTextFrontmatterInfo.to != newTextFrontmatterInfo.to ||
-        oldTextFrontmatterInfo.frontmatter != newTextFrontmatterInfo.frontmatter) {
-        editor.replaceRange(newTextFrontmatterInfo.frontmatter, editor.offsetToPos(oldTextFrontmatterInfo.from), editor.offsetToPos(oldTextFrontmatterInfo.to));
-        startingIndex = newTextFrontmatterInfo.to;
-      }
-    }
-
-    let isBeforeStartIndex = false;
-    changes.forEach((change) => {
-      isBeforeStartIndex = curText.length < startingIndex;
-
-      const [type, value] = change;
-
-      // handle updates
-      if (!isBeforeStartIndex) {
-        if (type == DiffMatchPatch.DIFF_INSERT) {
-          editor.replaceRange(value, this.endOfDocument(curText));
-        } else if (type == DiffMatchPatch.DIFF_DELETE) {
-          const start = this.endOfDocument(curText);
-          let tempText = curText;
-          tempText += value;
-          const end = this.endOfDocument(tempText);
-          editor.replaceRange('', start, end);
-        }
-      }
-
-      // update current text
-      if (type != DiffMatchPatch.DIFF_DELETE) {
-        curText += value;
-      }
-    });
-
-    const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
-    const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
-    this.displayChangedMessage(charsAdded, charsRemoved);
-
-    // run custom commands now since no change was made
-    if (!charsAdded && !charsRemoved) {
-      this.runCustomCommands(file);
-    }
-
-    setCollectLogs(false);
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
