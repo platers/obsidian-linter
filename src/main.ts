@@ -84,14 +84,11 @@ export default class LinterPlugin extends Plugin {
   private activeFileChangeDebouncer: Map<string, FileChangeUpdateInfo> = new Map();
   private defaultAutoCorrectMisspellings: Map<string, string> = new Map();
   private hasLoadedMisspellingFiles = false;
-<<<<<<< HEAD
   private diffPreviewCommandsRegistered = false;
   private saveSettingsDebounce = debounce(async (settings: LinterSettings) => {
     await this.saveData(settings);
   }, 5000);
-=======
   private lintFileManager: FileLintManager = undefined;
->>>>>>> 2d44582 (got the worker to build and run in Obsidian)
 
   async onload() {
     sortRules();
@@ -695,11 +692,28 @@ export default class LinterPlugin extends Plugin {
     logInfo(getTextInLanguage('logs.linter-run'));
 
     const file = this.app.workspace.getActiveFile();
-    const oldText = stripCr(editor.getValue());
-    let newText: string;
+    // const oldText = stripCr(editor.getValue());
+    // let newText: string;
     try {
       // newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
-      this.lintFileManager.lintFile(file);
+      this.lintFileManager.lintFile(file, (oldText: string, newText: string) => {
+        const changes = this.updateEditor(oldText, newText, editor);
+        const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
+        const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
+
+        this.displayChangedMessage(charsAdded, charsRemoved);
+
+        // run custom commands now since no change was made
+        if (!charsAdded && !charsRemoved) {
+          void this.runCustomCommands(file);
+        } else {
+          this.updateFileDebouncerText(file, newText);
+          this.editorLintFiles.push(file);
+        }
+
+        setCollectLogs(false);
+      });
+      // newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
     } catch (error) {
       this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;

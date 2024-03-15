@@ -1,9 +1,9 @@
-// import {TFile, moment} from 'obsidian';
+import {moment} from 'obsidian';
 import {logDebug, logWarn, timingBegin, timingEnd} from '../utils/logger';
 import {getDisabledRules, rules, wrapLintError, RuleType} from '../rules';
 import BlockquotifyOnPaste from '../rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from '../rules/escape-yaml-special-characters';
-// import ForceYamlEscape from '../rules/force-yaml-escape';
+import ForceYamlEscape from '../rules/force-yaml-escape';
 import FormatTagsInYaml from '../rules/format-tags-in-yaml';
 import PreventDoubleChecklistIndicatorOnPaste from '../rules/prevent-double-checklist-indicator-on-paste';
 import PreventDoubleListItemIndicatorOnPaste from '../rules/prevent-double-list-item-indicator-on-paste';
@@ -20,25 +20,25 @@ import {CustomReplace} from '../ui/linter-components/custom-replace-option';
 import {LintCommand} from '../ui/linter-components/custom-command-option';
 import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from '../utils/strings';
 import {getTextInLanguage} from '../lang/helpers';
-// import CapitalizeHeadings from '../rules/capitalize-headings';
-// import BlockquoteStyle from '../rules/blockquote-style';
+import CapitalizeHeadings from '../rules/capitalize-headings';
+import BlockquoteStyle from '../rules/blockquote-style';
 import {IgnoreTypes, ignoreListOfTypes} from '../utils/ignore-types';
 import MoveMathBlockIndicatorsToOwnLine from '../rules/move-math-block-indicators-to-own-line';
 import {LinterSettings} from '../settings-data';
-import {TFile} from '../typings/worker';
-// import TrailingSpaces from '../rules/trailing-spaces';
+import {RunLinterRulesOptions, TFile} from '../typings/worker';
+import TrailingSpaces from '../rules/trailing-spaces';
 
-export type RunLinterRulesOptions = {
-  oldText: string,
-  fileInfo: FileInfo,
-  settings: LinterSettings,
-}
+// export type RunLinterRulesOptions = {
+//   oldText: string,
+//   fileInfo: FileInfo,
+//   settings: LinterSettings,
+// }
 
-type FileInfo = {
-  name: string,
-  createdAtFormatted: string,
-  modifiedAtFormatted: string,
-}
+// type FileInfo = {
+//   name: string,
+//   createdAtFormatted: string,
+//   modifiedAtFormatted: string,
+// }
 
 export class RulesRunner {
   private disabledRules: string[] = [];
@@ -48,6 +48,8 @@ export class RulesRunner {
     this.skipFile = false;
     const originalText = runOptions.oldText;
     [this.disabledRules, this.skipFile] = getDisabledRules(originalText);
+    runOptions.skipFile = this.skipFile;
+    runOptions.disabledRules = this.disabledRules;
     if (this.skipFile) {
       return originalText;
     }
@@ -89,8 +91,7 @@ export class RulesRunner {
 
     runOptions.oldText = newText;
 
-    return newText;
-    // return this.runAfterRegularRules(originalText, runOptions);
+    return this.runAfterRegularRules(originalText, runOptions);
   }
 
   private runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
@@ -110,43 +111,43 @@ export class RulesRunner {
     return newText;
   }
 
-  // private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
-  //   let newText = runOptions.oldText;
-  //   const postRuleLogText = getTextInLanguage('logs.post-rules');
-  //   timingBegin(postRuleLogText);
-  //   [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+  private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
+    let newText = runOptions.oldText;
+    const postRuleLogText = getTextInLanguage('logs.post-rules');
+    timingBegin(postRuleLogText);
+    [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
-  //   [newText] = BlockquoteStyle.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+    [newText] = BlockquoteStyle.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
-  //   [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
-  //     defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
-  //   });
+    [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+    });
 
-  //   [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+    [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
-  //   let currentTime = runOptions.getCurrentTime();
-  //   // run YAML timestamp at the end to help determine if something has changed
-  //   let isYamlTimestampEnabled;
-  //   [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
-  //     fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
-  //     fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
-  //     currentTime: currentTime,
-  //     alreadyModified: originalText != newText,
-  //     locale: runOptions.momentLocale,
-  //   });
+    // let currentTime = runOptions.getCurrentTime();
+    // // run YAML timestamp at the end to help determine if something has changed
+    // let isYamlTimestampEnabled;
+    // [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+    //   fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
+    //   fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
+    //   currentTime: currentTime,
+    //   alreadyModified: originalText != newText,
+    //   locale: runOptions.momentLocale,
+    // });
 
-  //   const yamlTimestampOptions = YamlTimestamp.getRuleOptions(runOptions.settings);
+    // const yamlTimestampOptions = YamlTimestamp.getRuleOptions(runOptions.settings);
 
-  //   currentTime = runOptions.getCurrentTime();
-  //   [newText] = YamlKeySort.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
-  //     currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
-  //     yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
-  //     dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
-  //   });
-  //   timingEnd(postRuleLogText);
-  //   timingEnd(getTextInLanguage('logs.rule-running'));
-  //   return newText;
-  // }
+    // currentTime = runOptions.getCurrentTime();
+    // [newText] = YamlKeySort.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+    //   currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
+    //   yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
+    //   dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
+    // });
+    timingEnd(postRuleLogText);
+    timingEnd(getTextInLanguage('logs.rule-running'));
+    return newText;
+  }
 
   runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
     if (this.skipFile) {
@@ -217,27 +218,25 @@ export class RulesRunner {
 }
 
 export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings): RunLinterRulesOptions {
-  // const createdAt = file ? moment(file.stat.ctime): moment();
-  // createdAt.locale(momentLocale);
-  // const modifiedAt = file ? moment(file.stat.mtime): moment();
-  // modifiedAt.locale(momentLocale);
-  // const modifiedAtTime = modifiedAt.format();
-  // const createdAtTime = createdAt.format();
-
-  // const currentTime = moment();
-  // currentTime.locale(momentLocale);
+  const createdAt = file ? moment(file.stat.ctime): moment();
+  createdAt.locale(momentLocale);
+  const modifiedAt = file ? moment(file.stat.mtime): moment();
+  modifiedAt.locale(momentLocale);
+  const modifiedAtTime = modifiedAt.format();
+  const createdAtTime = createdAt.format();
 
   return {
     oldText: text,
+    newText: '',
+    momentLocale: momentLocale,
     fileInfo: {
+      path: file ? file.path: '',
       name: file ? file.basename: '',
-      createdAtFormatted: 'created',
-      modifiedAtFormatted: 'modified',
+      createdAtFormatted: createdAtTime,
+      modifiedAtFormatted: modifiedAtTime,
     },
     settings: settings,
-    // momentLocale: momentLocale,
-    // getCurrentTime: () => {
-    //   return undefined;
-    // },
+    skipFile: false,
+    disabledRules: [],
   };
 }

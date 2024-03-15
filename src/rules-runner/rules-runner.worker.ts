@@ -12,12 +12,12 @@ import('./rules-runner').then((mod: any) => {
 
 
 self.document = {
+  // @ts-ignore this is meant for preventing an error on run, but it is not really needed beyond that
   createElement: () => {},
 };
 
 onmessage = (event: WorkerMessage) => {
   console.log(event.data.oldText);
-  const newText = rulesRunner.lintText(event.data);
-  console.log(newText);
-  postMessage(newText);
+  event.data.newText = rulesRunner.lintText(event.data);
+  postMessage(event.data);
 };
