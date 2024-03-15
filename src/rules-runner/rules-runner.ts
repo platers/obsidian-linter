@@ -13,8 +13,6 @@ import RemoveLeadingOrTrailingWhitespaceOnPaste from '../rules/remove-leading-or
 import RemoveLeftoverFootnotesFromQuoteOnPaste from '../rules/remove-leftover-footnotes-from-quote-on-paste';
 import RemoveMultipleBlankLinesOnPaste from '../rules/remove-multiple-blank-lines-on-paste';
 import {RuleBuilderBase} from '../rules/rule-builder';
-// import YamlKeySort from '../rules/yaml-key-sort';
-// import YamlTimestamp from '../rules/yaml-timestamp';
 import {ObsidianCommandInterface} from '../typings/obsidian-ex';
 import {CustomReplace} from '../ui/linter-components/custom-replace-option';
 import {LintCommand} from '../ui/linter-components/custom-command-option';
@@ -27,18 +25,6 @@ import MoveMathBlockIndicatorsToOwnLine from '../rules/move-math-block-indicator
 import {LinterSettings} from '../settings-data';
 import {RunLinterRulesOptions, TFile} from '../typings/worker';
 import TrailingSpaces from '../rules/trailing-spaces';
-
-// export type RunLinterRulesOptions = {
-//   oldText: string,
-//   fileInfo: FileInfo,
-//   settings: LinterSettings,
-// }
-
-// type FileInfo = {
-//   name: string,
-//   createdAtFormatted: string,
-//   modifiedAtFormatted: string,
-// }
 
 export class RulesRunner {
   private disabledRules: string[] = [];
@@ -75,7 +61,6 @@ export class RulesRunner {
         fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
         fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
         fileName: runOptions.fileInfo.name,
-        // locale: runOptions.momentLocale,
         minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
         aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
         tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
@@ -91,7 +76,7 @@ export class RulesRunner {
 
     runOptions.oldText = newText;
 
-    return this.runAfterRegularRules(originalText, runOptions);
+    return this.runAfterRegularRules(runOptions);
   }
 
   private runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
@@ -111,7 +96,7 @@ export class RulesRunner {
     return newText;
   }
 
-  private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
+  private runAfterRegularRules(runOptions: RunLinterRulesOptions): string {
     let newText = runOptions.oldText;
     const postRuleLogText = getTextInLanguage('logs.post-rules');
     timingBegin(postRuleLogText);
@@ -125,25 +110,6 @@ export class RulesRunner {
 
     [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
-    // let currentTime = runOptions.getCurrentTime();
-    // // run YAML timestamp at the end to help determine if something has changed
-    // let isYamlTimestampEnabled;
-    // [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
-    //   fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
-    //   fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
-    //   currentTime: currentTime,
-    //   alreadyModified: originalText != newText,
-    //   locale: runOptions.momentLocale,
-    // });
-
-    // const yamlTimestampOptions = YamlTimestamp.getRuleOptions(runOptions.settings);
-
-    // currentTime = runOptions.getCurrentTime();
-    // [newText] = YamlKeySort.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
-    //   currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
-    //   yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
-    //   dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
-    // });
     timingEnd(postRuleLogText);
     timingEnd(getTextInLanguage('logs.rule-running'));
     return newText;
@@ -238,5 +204,6 @@ export function createRunLinterRulesOptions(text: string, file: TFile = null, mo
     settings: settings,
     skipFile: false,
     disabledRules: [],
+    logsFromRun: [],
   };
 }
