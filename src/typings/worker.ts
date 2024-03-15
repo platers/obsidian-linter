@@ -29,28 +29,35 @@ export interface TFile {
    * @public
    */
   extension: string;
+  /**
+   * @public
+   */
+  path: string;
 }
 
 export type WorkerArgs = {
   oldText: string,
-  fileInfo: {
-    name: string,
-    createdAtFormatted: string,
-    modifiedAtFormatted: string,
-  },
+  fileInfo: FileInfo,
   settings: LinterSettings,
+  skipFile: boolean,
+  disabledRules: string[],
 }
 
 export type WorkerMessage = {
-  data: WorkerArgs;
+  data: RunLinterRulesOptions,
 }
 
 export type WorkerResponse = {
+  oldText: string,
   newText: string,
+  fileInfo: FileInfo,
+  settings: LinterSettings,
+  skipFile: boolean,
+  disabledRules: string[],
 }
 
 export type WorkerResponseMessage = {
-  data: WorkerResponse
+  data: RunLinterRulesOptions,
 }
 
 export interface LinterWorker {
@@ -60,11 +67,16 @@ export interface LinterWorker {
 
 export type RunLinterRulesOptions = {
   oldText: string,
+  newText: string,
+  momentLocale: string,
   fileInfo: FileInfo,
   settings: LinterSettings,
+  skipFile: boolean,
+  disabledRules: string[],
 }
 
 type FileInfo = {
+  path: string,
   name: string,
   createdAtFormatted: string,
   modifiedAtFormatted: string,
