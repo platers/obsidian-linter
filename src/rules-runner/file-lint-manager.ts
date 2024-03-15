@@ -9,6 +9,7 @@ import {LinterSettings} from '../settings-data';
 import {LinterWorker, RunLinterRulesOptions} from '../typings/worker';
 import YamlTimestamp from '../rules/yaml-timestamp';
 import YamlKeySort from '../rules/yaml-key-sort';
+import {setLogs} from '../utils/logger';
 
 /** Callback when a file is resolved. */
 type FileCallback = (oldText: string, newText: string) => void;
@@ -104,7 +105,7 @@ export class FileLintManager {
   //   return promise;
   // }
 
-  /** Finish the parsing of a file, potentially queueing a new file. */
+  // Finish the parsing of a file, potentially queueing a new file.
   private finish(data: RunLinterRulesOptions, index: number) {
     // Cache the callbacks before we do book-keeping.
     // const calls = ([] as [FileCallback, FileCallback][]).concat(this.callbacks.get(path) ?? []);
@@ -120,6 +121,10 @@ export class FileLintManager {
     const job = this.lintQueue.shift();
     if (job !== undefined) {
       this.send(job, index);
+    }
+
+    if (data.settings.recordLintOnSaveLogs) {
+      setLogs(data.logsFromRun);
     }
 
     // run lint actions related to moment and other areas that cannot be run in the worker
