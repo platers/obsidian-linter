@@ -1,5 +1,6 @@
 // here is a worker to sent data back and forth
 
+import {clearLogs, logsFromLastRun, setCollectLogs, setLogLevel} from '../utils/logger';
 import {RulesRunner, WorkerMessage} from '../typings/worker';
 
 
@@ -17,7 +18,18 @@ self.document = {
 };
 
 onmessage = (event: WorkerMessage) => {
-  console.log(event.data.oldText);
+  const oldText = event.data.oldText;
+
+  setLogLevel(event.data.settings.logLevel);
+  setCollectLogs(event.data.settings.recordLintOnSaveLogs);
+  clearLogs();
+
   event.data.newText = rulesRunner.lintText(event.data);
+  event.data.oldText = oldText;
+
+  if (event.data.settings.recordLintOnSaveLogs) {
+    event.data.logsFromRun = logsFromLastRun;
+  }
+
   postMessage(event.data);
 };
