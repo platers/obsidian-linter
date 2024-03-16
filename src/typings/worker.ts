@@ -35,25 +35,8 @@ export interface TFile {
   path: string;
 }
 
-export type WorkerArgs = {
-  oldText: string,
-  fileInfo: FileInfo,
-  settings: LinterSettings,
-  skipFile: boolean,
-  disabledRules: string[],
-}
-
 export type WorkerMessage = {
   data: RunLinterRulesOptions,
-}
-
-export type WorkerResponse = {
-  oldText: string,
-  newText: string,
-  fileInfo: FileInfo,
-  settings: LinterSettings,
-  skipFile: boolean,
-  disabledRules: string[],
 }
 
 export type WorkerResponseMessage = {
@@ -61,7 +44,7 @@ export type WorkerResponseMessage = {
 }
 
 export interface LinterWorker {
-  postMessage: (data: WorkerArgs) => void;
+  postMessage: (data: RunLinterRulesOptions) => void;
   onmessage: (data: WorkerResponseMessage) => void;
   terminate: () => void;
 }
