@@ -17,10 +17,9 @@ import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 import AsyncLock from 'async-lock';
 import {warn} from 'loglevel';
-// @ts-ignore because it does not have the expected default export, but it does not need one
-// import MyWorker from './rules-runner/rules-runner.worker';
-// import {LinterWorker, WorkerArgs, WorkerResponseMessage} from './typings/worker';
 import {FileLintManager} from './rules-runner/file-lint-manager';
+import {RunLinterRulesOptions} from './typings/worker';
+import {runCustomCommands} from './rules-runner/rules-runner';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -85,22 +84,6 @@ export default class LinterPlugin extends Plugin {
 
     this.lintFileManager = new FileLintManager(1, this.momentLocale, this.settings, this.app.vault);
 
-    // const worker = new MyWorker() as LinterWorker;
-
-    // worker.postMessage({
-    //   oldText: 'text',
-    //   fileInfo: {
-    //     name: 'file name',
-    //     createdAtFormatted: 'created',
-    //     modifiedAtFormatted: 'updated',
-    //   },
-    //   settings: this.settings,
-    // });
-    // worker.onmessage = (event: WorkerResponseMessage) => {
-    //   console.log(`Main thread received message: ${event.data}`);
-    // };
-
-
     this.addCommands();
 
     this.registerEventsAndSaveCallback();
@@ -125,6 +108,8 @@ export default class LinterPlugin extends Plugin {
     if (saveCommandDefinition && saveCommandDefinition.callback && this.originalSaveCallback) {
       saveCommandDefinition.callback = this.originalSaveCallback;
     }
+
+    this.lintFileManager.terminateWorkers();
   }
 
   async loadSettings() {
@@ -295,7 +280,8 @@ export default class LinterPlugin extends Plugin {
     if (this.editorLintFiles.includes(file)) {
       this.editorLintFiles.remove(file);
 
-      this.runCustomCommands(file);
+      // TODO: come back and fix this since I need a way to pass over the options for this pjk
+      this.runCustomCommands(file, null);
     } else if (this.fileLintFiles.has(file)) {
       this.fileLintFiles.delete(file);
 
@@ -454,23 +440,21 @@ export default class LinterPlugin extends Plugin {
     logInfo(getTextInLanguage('logs.linter-run'));
 
     const file = this.app.workspace.getActiveFile();
-    // const oldText = editor.getValue();
-    // let newText: string;
     try {
-      this.lintFileManager.lintFile(file, (oldText: string, newText: string) => {
+      this.lintFileManager.lintFile(file, (runOptions: RunLinterRulesOptions) => {
         const mode = this.getCurrentMode();
 
         // Replace changed lines
         const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
-        const changes = dmp.diff_main(oldText, newText);
+        const changes = dmp.diff_main(runOptions.oldText, runOptions.newText);
         let curText = '';
         let startingIndex = 0;
         // in Live Preview mode, there is some wonkiness around how the frontmatter values are replaced.
         // So if the frontmatter needs updating at all, we are treating it as the whole frontmatter needing
         // to be replaced. Hopefully this will fix issues with the frontmatter getting mangled.
         if (mode === 'preview') {
-          const oldTextFrontmatterInfo = getFrontMatterInfo(oldText);
-          const newTextFrontmatterInfo = getFrontMatterInfo(newText);
+          const oldTextFrontmatterInfo = getFrontMatterInfo(runOptions.oldText);
+          const newTextFrontmatterInfo = getFrontMatterInfo(runOptions.newText);
 
           if (oldTextFrontmatterInfo.exists != newTextFrontmatterInfo.exists ||
             oldTextFrontmatterInfo.from != newTextFrontmatterInfo.from ||
@@ -512,7 +496,9 @@ export default class LinterPlugin extends Plugin {
 
         // run custom commands now since no change was made
         if (!charsAdded && !charsRemoved) {
-          this.runCustomCommands(file);
+          this.runCustomCommands(file, runOptions);
+        } else {
+          this.editorLintFiles.push(file);
         }
 
         setCollectLogs(false);
@@ -714,14 +700,14 @@ export default class LinterPlugin extends Plugin {
     this.currentlyOpeningSidebar = false;
   }
 
-  private async runCustomCommands(file: TFile) {
+  private async runCustomCommands(file: TFile, runOptions: RunLinterRulesOptions) {
     if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
       return;
     }
 
     await this.customCommandsLock.acquire('command', async () => {
       try {
-        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+        runCustomCommands(this.settings.lintCommands, this.app.commands, runOptions);
       } catch (error) {
         this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       }
