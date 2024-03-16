@@ -2,6 +2,7 @@ import esbuild from 'esbuild';
 import process from 'process';
 import builtins from 'builtin-modules';
 import importGlobPlugin from 'esbuild-plugin-import-glob';
+import inlineWorkerPlugin from 'esbuild-plugin-inline-worker';
 import {replace} from 'esbuild-plugin-replace';
 
 const banner =
@@ -11,7 +12,7 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `;
 
-const dummyMocksForDocs = `
+const dummyMocksForDocsAndWorker = `
 document = {
   createElement: function() {},
 };
@@ -19,7 +20,7 @@ document = {
 
 const prod = (process.argv[2] === 'production');
 
-const mockedBanner = banner + dummyMocksForDocs;
+const mockedBanner = banner + dummyMocksForDocsAndWorker;
 const mockedPlugins = [replace({
   values: {
     // update usage of moment from obsidian to the node implementation of moment we have
@@ -31,6 +32,21 @@ const mockedPlugins = [replace({
   },
   delimiters: ['', ''],
 })];
+const webWorkerIgnores = [replace({
+  values: {
+    // update usage of moment from obsidian to the node implementation of moment we have
+    'import {moment} from \'obsidian\';': '',
+    // remove the use of obsidian in the options to allow for docs.js to run
+    'import {Setting} from \'obsidian\';': '',
+    // remove the use of obsidian in settings helper to allow for docs.js to run
+    'import {Component, MarkdownRenderer} from \'obsidian\';': '',
+  },
+  delimiters: ['', ''],
+})];
+
+const externalPackages = [
+  'obsidian',
+  ...builtins];
 
 const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
   return {
@@ -40,12 +56,19 @@ const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
     entryPoints: [entryPoint],
     plugins: [
       importGlobPlugin.default(),
+      inlineWorkerPlugin({
+        banner:
+        {
+          js: dummyMocksForDocsAndWorker,
+        },
+        external: externalPackages,
+        format: 'cjs',
+        plugins: [...webWorkerIgnores],
+      }),
       ...extraPlugins,
     ],
     bundle: true,
-    external: [
-      'obsidian',
-      ...builtins],
+    external: externalPackages,
     format: 'cjs',
     target: 'es2020',
     sourcemap: prod ? false : 'inline',

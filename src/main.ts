@@ -2,12 +2,10 @@ import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile
 import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
-import {stripCr} from './utils/strings';
 import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
 import {iconInfo} from './ui/icons';
-import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
@@ -17,6 +15,9 @@ import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 import AsyncLock from 'async-lock';
 import {warn} from 'loglevel';
+import {FileLintManager} from './rules-runner/file-lint-manager';
+import {RunLinterRulesOptions} from './typings/worker';
+import {runCustomCommands, runPasteLint, createRunLinterRulesOptions} from './rules-runner/rules-runner';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -52,18 +53,18 @@ export default class LinterPlugin extends Plugin {
   private eventRefs: EventRef[] = [];
   private momentLocale: string;
   private isEnabled: boolean = true;
-  private rulesRunner = new RulesRunner();
   private lastActiveFile: TFile;
   private overridePaste: boolean = false;
   private customCommandsLock = new AsyncLock();
   private originalSaveCallback?: () => void = null;
   // The amount of files you can use editor lint on at once is pretty small, so we will use an array
   private editorLintFiles: TFile[] = [];
-  // the amount of files that can be linted as a file can be quite large, so we will want to use a set to make
+  // The amount of files that can be linted as a file can be quite large, so we will want to use a set to make
   // search and other operations faster
   private fileLintFiles: Set<TFile> = new Set();
   private customCommandsCallback: (file: TFile) => Promise<void> = null;
   private currentlyOpeningSidebar: boolean = false;
+  private lintFileManager: FileLintManager = undefined;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -77,6 +78,8 @@ export default class LinterPlugin extends Plugin {
     }
 
     await this.loadSettings();
+
+    this.lintFileManager = new FileLintManager(1, this.momentLocale, this.settings, this.app.vault);
 
     this.addCommands();
 
@@ -102,6 +105,8 @@ export default class LinterPlugin extends Plugin {
     if (saveCommandDefinition && saveCommandDefinition.callback && this.originalSaveCallback) {
       saveCommandDefinition.callback = this.originalSaveCallback;
     }
+
+    this.lintFileManager.terminateWorkers();
   }
 
   async loadSettings() {
@@ -340,29 +345,32 @@ export default class LinterPlugin extends Plugin {
   }
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
-    const oldText = stripCr(await this.app.vault.read(file));
-    const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
+    this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
+      if (runOptions.oldText != runOptions.newText) {
+        await this.app.vault.modify(file, runOptions.newText);
 
-    if (oldText != newText) {
-      await this.app.vault.modify(file, newText);
+        if (lintingLastActiveFile) {
+          const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + this.lastActiveFile.path;
+          if (this.settings.displayLintOnFileChangeNotice) {
+            new Notice(message);
+          }
 
-      if (lintingLastActiveFile) {
-        const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + this.lastActiveFile.path;
-        if (this.settings.displayLintOnFileChangeNotice) {
-          new Notice(message);
+          logInfo(message);
         }
 
-        logInfo(message);
+        if (!runOptions.skipFile) {
+          // when a change is made to the file we know that the cache will update down the road
+        // so we can defer running the custom commands to the cache callback
+          this.fileLintFiles.add(file);
+        }
+
+        return;
       }
 
-      // when a change is made to the file we know that the cache will update down the road
-      // so we can defer running the custom commands to the cache callback
-      this.fileLintFiles.add(file);
-
-      return;
-    }
-
-    await this.runCustomCommandsInSidebar(file);
+      if (!runOptions.skipFile) {
+        await this.runCustomCommandsInSidebar(file);
+      }
+    });
   }
 
   async runLinterAllFiles(app: App) {
@@ -431,73 +439,75 @@ export default class LinterPlugin extends Plugin {
     logInfo(getTextInLanguage('logs.linter-run'));
 
     const file = this.app.workspace.getActiveFile();
-    const oldText = editor.getValue();
-    let newText: string;
     try {
-      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
+      this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
+        const mode = this.getCurrentMode();
+
+        // Replace changed lines
+        const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
+        const changes = dmp.diff_main(runOptions.oldText, runOptions.newText);
+        let curText = '';
+        let startingIndex = 0;
+        // in Live Preview mode, there is some wonkiness around how the frontmatter values are replaced.
+        // So if the frontmatter needs updating at all, we are treating it as the whole frontmatter needing
+        // to be replaced. Hopefully this will fix issues with the frontmatter getting mangled.
+        if (mode === 'preview') {
+          const oldTextFrontmatterInfo = getFrontMatterInfo(runOptions.oldText);
+          const newTextFrontmatterInfo = getFrontMatterInfo(runOptions.newText);
+
+          if (oldTextFrontmatterInfo.exists != newTextFrontmatterInfo.exists ||
+            oldTextFrontmatterInfo.from != newTextFrontmatterInfo.from ||
+            oldTextFrontmatterInfo.to != newTextFrontmatterInfo.to ||
+            oldTextFrontmatterInfo.frontmatter != newTextFrontmatterInfo.frontmatter) {
+            editor.replaceRange(newTextFrontmatterInfo.frontmatter, editor.offsetToPos(oldTextFrontmatterInfo.from), editor.offsetToPos(oldTextFrontmatterInfo.to));
+            startingIndex = newTextFrontmatterInfo.to;
+          }
+        }
+
+        let isBeforeStartIndex = false;
+        changes.forEach((change) => {
+          isBeforeStartIndex = curText.length < startingIndex;
+
+          const [type, value] = change;
+
+          // handle updates
+          if (!isBeforeStartIndex) {
+            if (type == DiffMatchPatch.DIFF_INSERT) {
+              editor.replaceRange(value, this.endOfDocument(curText));
+            } else if (type == DiffMatchPatch.DIFF_DELETE) {
+              const start = this.endOfDocument(curText);
+              let tempText = curText;
+              tempText += value;
+              const end = this.endOfDocument(tempText);
+              editor.replaceRange('', start, end);
+            }
+          }
+
+          // update current text
+          if (type != DiffMatchPatch.DIFF_DELETE) {
+            curText += value;
+          }
+        });
+
+        const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
+        const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
+        this.displayChangedMessage(charsAdded, charsRemoved);
+
+        if (!runOptions.skipFile) {
+          // run custom commands now since no change was made
+          if (!charsAdded && !charsRemoved) {
+            await this.runCustomCommands(file);
+          } else {
+            this.editorLintFiles.push(file);
+          }
+        }
+
+        setCollectLogs(false);
+      });
     } catch (error) {
       this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;
     }
-
-    const mode = this.getCurrentMode();
-
-    // Replace changed lines
-    const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
-    const changes = dmp.diff_main(oldText, newText);
-    let curText = '';
-    let startingIndex = 0;
-    // in Live Preview mode, there is some wonkiness around how the frontmatter values are replaced.
-    // So if the frontmatter needs updating at all, we are treating it as the whole frontmatter needing
-    // to be replaced. Hopefully this will fix issues with the frontmatter getting mangled.
-    if (mode === 'preview') {
-      const oldTextFrontmatterInfo = getFrontMatterInfo(oldText);
-      const newTextFrontmatterInfo = getFrontMatterInfo(newText);
-
-      if (oldTextFrontmatterInfo.exists != newTextFrontmatterInfo.exists ||
-        oldTextFrontmatterInfo.from != newTextFrontmatterInfo.from ||
-        oldTextFrontmatterInfo.to != newTextFrontmatterInfo.to ||
-        oldTextFrontmatterInfo.frontmatter != newTextFrontmatterInfo.frontmatter) {
-        editor.replaceRange(newTextFrontmatterInfo.frontmatter, editor.offsetToPos(oldTextFrontmatterInfo.from), editor.offsetToPos(oldTextFrontmatterInfo.to));
-        startingIndex = newTextFrontmatterInfo.to;
-      }
-    }
-
-    let isBeforeStartIndex = false;
-    changes.forEach((change) => {
-      isBeforeStartIndex = curText.length < startingIndex;
-
-      const [type, value] = change;
-
-      // handle updates
-      if (!isBeforeStartIndex) {
-        if (type == DiffMatchPatch.DIFF_INSERT) {
-          editor.replaceRange(value, this.endOfDocument(curText));
-        } else if (type == DiffMatchPatch.DIFF_DELETE) {
-          const start = this.endOfDocument(curText);
-          let tempText = curText;
-          tempText += value;
-          const end = this.endOfDocument(tempText);
-          editor.replaceRange('', start, end);
-        }
-      }
-
-      // update current text
-      if (type != DiffMatchPatch.DIFF_DELETE) {
-        curText += value;
-      }
-    });
-
-    const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
-    const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
-    this.displayChangedMessage(charsAdded, charsRemoved);
-
-    // run custom commands now since no change was made
-    if (!charsAdded && !charsRemoved) {
-      this.runCustomCommands(file);
-    }
-
-    setCollectLogs(false);
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
@@ -583,7 +593,7 @@ export default class LinterPlugin extends Plugin {
     const cursorSelections = editor.listSelections();
     if (cursorSelections.length === 1) {
       const cursorSelection = cursorSelections[0];
-      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection),
+      clipboardText = runPasteLint(this.getLineContent(editor, cursorSelection),
           editor.getSelection() ?? '',
           createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings),
       );
@@ -605,7 +615,7 @@ export default class LinterPlugin extends Plugin {
     const editorChange: EditorChange[] = [];
 
     cursorSelections.forEach((cursorSelection: EditorSelection, index: number) => {
-      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection), editor.getRange(cursorSelection.anchor, cursorSelection.head) ?? '', createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings));
+      clipboardText = runPasteLint(this.getLineContent(editor, cursorSelection), editor.getRange(cursorSelection.anchor, cursorSelection.head) ?? '', createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings));
       editorChange.push({
         text: clipboardText,
         from: cursorSelection.anchor,
@@ -677,7 +687,8 @@ export default class LinterPlugin extends Plugin {
       this.currentlyOpeningSidebar = true;
 
       await sidebarTab.openFile(file);
-      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+
+      runCustomCommands(this.settings.lintCommands, this.app.commands);
       if (this.customCommandsCallback) {
         await this.customCommandsCallback(file);
       }
@@ -697,7 +708,7 @@ export default class LinterPlugin extends Plugin {
 
     await this.customCommandsLock.acquire('command', async () => {
       try {
-        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+        runCustomCommands(this.settings.lintCommands, this.app.commands);
       } catch (error) {
         this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       }

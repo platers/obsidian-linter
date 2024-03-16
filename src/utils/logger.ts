@@ -16,6 +16,10 @@ export enum LogLevels {
 
 export let logsFromLastRun: string[] = [];
 
+export function setLogs(logs: string[]) {
+  logsFromLastRun = logs;
+}
+
 /**
  * Allows for the logging of errors
  * @param {string} labelForError The label for the error
