@@ -1,6 +1,6 @@
 import {moment} from 'obsidian';
 import {logDebug, logWarn, timingBegin, timingEnd} from '../utils/logger';
-import {getDisabledRules, rules, wrapLintError, RuleType} from '../rules';
+import {rules, wrapLintError, RuleType} from '../rules';
 import BlockquotifyOnPaste from '../rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from '../rules/escape-yaml-special-characters';
 import ForceYamlEscape from '../rules/force-yaml-escape';
@@ -26,161 +26,150 @@ import {LinterSettings} from '../settings-data';
 import {RunLinterRulesOptions, TFile} from '../typings/worker';
 import TrailingSpaces from '../rules/trailing-spaces';
 
-export class RulesRunner {
-  private disabledRules: string[] = [];
-  skipFile: boolean;
+/**
+ * Lints the text provided in @runOptions.
+ * @param {RunLinterRulesOptions} runOptions the different options provided when linting text
+ * @return {string} the text after all of the updates have been made.
+ */
+export function lintText(runOptions: RunLinterRulesOptions): string {
+  timingBegin(getTextInLanguage('logs.rule-running'));
 
-  lintText(runOptions: RunLinterRulesOptions): string {
-    this.skipFile = false;
-    const originalText = runOptions.oldText;
-    [this.disabledRules, this.skipFile] = getDisabledRules(originalText);
-    runOptions.skipFile = this.skipFile;
-    runOptions.disabledRules = this.disabledRules;
-    if (this.skipFile) {
-      return originalText;
+  const preRuleText = getTextInLanguage('logs.pre-rules');
+  timingBegin(preRuleText);
+  let newText = runBeforeRegularRules(runOptions);
+  timingEnd(preRuleText);
+
+  const disabledRuleText = getTextInLanguage('logs.disabled-text');
+  for (const rule of rules) {
+    // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
+    if (runOptions.disabledRules.includes(rule.alias)) {
+      logDebug(rule.alias + ' ' + disabledRuleText);
+      continue;
+    } else if (rule.hasSpecialExecutionOrder || rule.type === RuleType.PASTE) {
+      continue;
     }
 
-    timingBegin(getTextInLanguage('logs.rule-running'));
-
-    const preRuleText = getTextInLanguage('logs.pre-rules');
-    timingBegin(preRuleText);
-    let newText = this.runBeforeRegularRules(runOptions);
-    timingEnd(preRuleText);
-
-    const disabledRuleText = getTextInLanguage('logs.disabled-text');
-    for (const rule of rules) {
-      // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
-      if (this.disabledRules.includes(rule.alias)) {
-        logDebug(rule.alias + ' ' + disabledRuleText);
-        continue;
-      } else if (rule.hasSpecialExecutionOrder || rule.type === RuleType.PASTE) {
-        continue;
-      }
-
-      [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, runOptions.settings, {
-        fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
-        fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
-        fileName: runOptions.fileInfo.name,
-        minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
-        aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
-        tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
-        defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
-        removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
-      });
-    }
-
-    const customRegexLogText = getTextInLanguage('logs.custom-regex');
-    timingBegin(customRegexLogText);
-    newText = this.runCustomRegexReplacement(runOptions.settings.customRegexes, newText);
-    timingEnd(customRegexLogText);
-
-    runOptions.oldText = newText;
-
-    return this.runAfterRegularRules(runOptions);
-  }
-
-  private runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
-    let newText = runOptions.oldText;
-    // remove hashtags from tags before parsing yaml
-    [newText] = FormatTagsInYaml.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
-
-    // escape YAML where possible before parsing yaml
-    [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
-      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
-    });
-
-    [newText] = MoveMathBlockIndicatorsToOwnLine.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+    [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, runOptions.settings, {
+      fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
+      fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
+      fileName: runOptions.fileInfo.name,
       minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
-    });
-
-    return newText;
-  }
-
-  private runAfterRegularRules(runOptions: RunLinterRulesOptions): string {
-    let newText = runOptions.oldText;
-    const postRuleLogText = getTextInLanguage('logs.post-rules');
-    timingBegin(postRuleLogText);
-    [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
-
-    [newText] = BlockquoteStyle.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
-
-    [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
+      tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
-    });
-
-    [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
-
-    timingEnd(postRuleLogText);
-    timingEnd(getTextInLanguage('logs.rule-running'));
-    return newText;
-  }
-
-  runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
-    if (this.skipFile) {
-      return;
-    }
-
-    logDebug(getTextInLanguage('logs.running-custom-lint-command'));
-    const commandsRun = new Set<string>();
-    for (const commandInfo of lintCommands) {
-      if (!commandInfo.id) {
-        continue;
-      } else if (commandsRun.has(commandInfo.id)) {
-        logWarn(getTextInLanguage('logs.custom-lint-duplicate-warning').replace('{COMMAND_NAME}', commandInfo.name));
-        continue;
-      }
-
-      try {
-        commandsRun.add(commandInfo.id);
-        commands.executeCommandById(commandInfo.id);
-      } catch (error) {
-        wrapLintError(error, `${getTextInLanguage('logs.custom-lint-error-message')} ${commandInfo.id}`);
-      }
-    }
-  }
-
-  runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
-    return ignoreListOfTypes([IgnoreTypes.customIgnore], oldText, (text: string) => {
-      logDebug(getTextInLanguage('logs.running-custom-regex'));
-
-      let newText = text;
-      for (const eachRegex of customRegexes) {
-        const findIsEmpty = eachRegex.find === undefined || eachRegex.find == '' || eachRegex.find === null;
-        const replaceIsEmpty = eachRegex.replace === undefined || eachRegex.replace === null;
-        if (findIsEmpty || replaceIsEmpty) {
-          continue;
-        }
-
-        const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
-        // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
-        newText = newText.replace(regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace));
-      }
-
-      return newText;
+      removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
     });
   }
 
-  runPasteLint(currentLine: string, selectedText: string, runOptions: RunLinterRulesOptions): string {
-    let newText = runOptions.oldText;
+  const customRegexLogText = getTextInLanguage('logs.custom-regex');
+  timingBegin(customRegexLogText);
+  newText = runCustomRegexReplacement(runOptions.settings.customRegexes, newText);
+  timingEnd(customRegexLogText);
 
-    [newText] = RemoveHyphensOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+  return runAfterRegularRules(newText, runOptions);
+}
 
-    [newText] = RemoveMultipleBlankLinesOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+function runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
+  let newText = runOptions.oldText;
+  // remove hashtags from tags before parsing yaml
+  [newText] = FormatTagsInYaml.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
 
-    [newText] = RemoveLeftoverFootnotesFromQuoteOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+  // escape YAML where possible before parsing yaml
+  [newText] = EscapeYamlSpecialCharacters.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules, {
+    defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+  });
 
-    [newText] = ProperEllipsisOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+  [newText] = MoveMathBlockIndicatorsToOwnLine.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules, {
+    minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
+  });
 
-    [newText] = RemoveLeadingOrTrailingWhitespaceOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+  return newText;
+}
 
-    [newText] = PreventDoubleChecklistIndicatorOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine, selectedText: selectedText});
+function runAfterRegularRules(currentText: string, runOptions: RunLinterRulesOptions): string {
+  let newText = currentText;
+  const postRuleLogText = getTextInLanguage('logs.post-rules');
+  timingBegin(postRuleLogText);
+  [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
 
-    [newText] = PreventDoubleListItemIndicatorOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine, selectedText: selectedText});
+  [newText] = BlockquoteStyle.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
 
-    [newText] = BlockquotifyOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine});
+  [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules, {
+    defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+  });
+
+  [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
+
+  timingEnd(postRuleLogText);
+  timingEnd(getTextInLanguage('logs.rule-running'));
+  return newText;
+}
+
+function runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
+  return ignoreListOfTypes([IgnoreTypes.customIgnore], oldText, (text: string) => {
+    logDebug(getTextInLanguage('logs.running-custom-regex'));
+
+    let newText = text;
+    for (const eachRegex of customRegexes) {
+      const findIsEmpty = eachRegex.find === undefined || eachRegex.find == '' || eachRegex.find === null;
+      const replaceIsEmpty = eachRegex.replace === undefined || eachRegex.replace === null;
+      if (findIsEmpty || replaceIsEmpty) {
+        continue;
+      }
+
+      const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
+      // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
+      newText = newText.replace(regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace));
+    }
 
     return newText;
+  });
+}
+
+export function runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface, runOptions: RunLinterRulesOptions) {
+  if (runOptions.skipFile) {
+    return;
   }
+
+  logDebug(getTextInLanguage('logs.running-custom-lint-command'));
+  const commandsRun = new Set<string>();
+  for (const commandInfo of lintCommands) {
+    if (!commandInfo.id) {
+      continue;
+    } else if (commandsRun.has(commandInfo.id)) {
+      logWarn(getTextInLanguage('logs.custom-lint-duplicate-warning').replace('{COMMAND_NAME}', commandInfo.name));
+      continue;
+    }
+
+    try {
+      commandsRun.add(commandInfo.id);
+      commands.executeCommandById(commandInfo.id);
+    } catch (error) {
+      wrapLintError(error, `${getTextInLanguage('logs.custom-lint-error-message')} ${commandInfo.id}`);
+    }
+  }
+}
+
+export function runPasteLint(currentLine: string, selectedText: string, runOptions: RunLinterRulesOptions): string {
+  let newText = runOptions.oldText;
+
+  [newText] = RemoveHyphensOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+
+  [newText] = RemoveMultipleBlankLinesOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+
+  [newText] = RemoveLeftoverFootnotesFromQuoteOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+
+  [newText] = ProperEllipsisOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+
+  [newText] = RemoveLeadingOrTrailingWhitespaceOnPaste.applyIfEnabled(newText, runOptions.settings, []);
+
+  [newText] = PreventDoubleChecklistIndicatorOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine, selectedText: selectedText});
+
+  [newText] = PreventDoubleListItemIndicatorOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine, selectedText: selectedText});
+
+  [newText] = BlockquotifyOnPaste.applyIfEnabled(newText, runOptions.settings, [], {lineContent: currentLine});
+
+  return newText;
 }
 
 export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings): RunLinterRulesOptions {

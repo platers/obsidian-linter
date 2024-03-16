@@ -63,6 +63,7 @@ export type WorkerResponseMessage = {
 export interface LinterWorker {
   postMessage: (data: WorkerArgs) => void;
   onmessage: (data: WorkerResponseMessage) => void;
+  terminate: () => void;
 }
 
 export type RunLinterRulesOptions = {
@@ -81,8 +82,4 @@ type FileInfo = {
   name: string,
   createdAtFormatted: string,
   modifiedAtFormatted: string,
-}
-
-export interface RulesRunner {
-  lintText(runOptions: RunLinterRulesOptions): string
 }
