@@ -7,7 +7,6 @@ import {LinterSettings} from './settings-data';
 export type SearchOptionInfo = {name: string, description: string, options?: DropdownRecord[]}
 
 /** Class representing an option of a rule */
-
 export abstract class Option {
   public ruleAlias: string;
 

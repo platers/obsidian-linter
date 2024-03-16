@@ -2,12 +2,10 @@ import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile
 import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
-import {stripCr} from './utils/strings';
 import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
 import {iconInfo} from './ui/icons';
-import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
@@ -19,7 +17,7 @@ import AsyncLock from 'async-lock';
 import {warn} from 'loglevel';
 import {FileLintManager} from './rules-runner/file-lint-manager';
 import {RunLinterRulesOptions} from './typings/worker';
-import {runCustomCommands} from './rules-runner/rules-runner';
+import {runCustomCommands, runPasteLint, createRunLinterRulesOptions} from './rules-runner/rules-runner';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -55,14 +53,13 @@ export default class LinterPlugin extends Plugin {
   private eventRefs: EventRef[] = [];
   private momentLocale: string;
   private isEnabled: boolean = true;
-  private rulesRunner = new RulesRunner();
   private lastActiveFile: TFile;
   private overridePaste: boolean = false;
   private customCommandsLock = new AsyncLock();
   private originalSaveCallback?: () => void = null;
   // The amount of files you can use editor lint on at once is pretty small, so we will use an array
   private editorLintFiles: TFile[] = [];
-  // the amount of files that can be linted as a file can be quite large, so we will want to use a set to make
+  // The amount of files that can be linted as a file can be quite large, so we will want to use a set to make
   // search and other operations faster
   private fileLintFiles: Set<TFile> = new Set();
   private customCommandsCallback: (file: TFile) => Promise<void> = null;
@@ -280,8 +277,7 @@ export default class LinterPlugin extends Plugin {
     if (this.editorLintFiles.includes(file)) {
       this.editorLintFiles.remove(file);
 
-      // TODO: come back and fix this since I need a way to pass over the options for this pjk
-      this.runCustomCommands(file, null);
+      this.runCustomCommands(file);
     } else if (this.fileLintFiles.has(file)) {
       this.fileLintFiles.delete(file);
 
@@ -349,29 +345,32 @@ export default class LinterPlugin extends Plugin {
   }
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
-    const oldText = stripCr(await this.app.vault.read(file));
-    const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
+    this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
+      if (runOptions.oldText != runOptions.newText) {
+        await this.app.vault.modify(file, runOptions.newText);
 
-    if (oldText != newText) {
-      await this.app.vault.modify(file, newText);
+        if (lintingLastActiveFile) {
+          const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + this.lastActiveFile.path;
+          if (this.settings.displayLintOnFileChangeNotice) {
+            new Notice(message);
+          }
 
-      if (lintingLastActiveFile) {
-        const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + this.lastActiveFile.path;
-        if (this.settings.displayLintOnFileChangeNotice) {
-          new Notice(message);
+          logInfo(message);
         }
 
-        logInfo(message);
+        if (!runOptions.skipFile) {
+          // when a change is made to the file we know that the cache will update down the road
+        // so we can defer running the custom commands to the cache callback
+          this.fileLintFiles.add(file);
+        }
+
+        return;
       }
 
-      // when a change is made to the file we know that the cache will update down the road
-      // so we can defer running the custom commands to the cache callback
-      this.fileLintFiles.add(file);
-
-      return;
-    }
-
-    await this.runCustomCommandsInSidebar(file);
+      if (!runOptions.skipFile) {
+        await this.runCustomCommandsInSidebar(file);
+      }
+    });
   }
 
   async runLinterAllFiles(app: App) {
@@ -441,7 +440,7 @@ export default class LinterPlugin extends Plugin {
 
     const file = this.app.workspace.getActiveFile();
     try {
-      this.lintFileManager.lintFile(file, (runOptions: RunLinterRulesOptions) => {
+      this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
         const mode = this.getCurrentMode();
 
         // Replace changed lines
@@ -494,16 +493,17 @@ export default class LinterPlugin extends Plugin {
         const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
         this.displayChangedMessage(charsAdded, charsRemoved);
 
-        // run custom commands now since no change was made
-        if (!charsAdded && !charsRemoved) {
-          this.runCustomCommands(file, runOptions);
-        } else {
-          this.editorLintFiles.push(file);
+        if (!runOptions.skipFile) {
+          // run custom commands now since no change was made
+          if (!charsAdded && !charsRemoved) {
+            await this.runCustomCommands(file);
+          } else {
+            this.editorLintFiles.push(file);
+          }
         }
 
         setCollectLogs(false);
       });
-      // newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
     } catch (error) {
       this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;
@@ -593,7 +593,7 @@ export default class LinterPlugin extends Plugin {
     const cursorSelections = editor.listSelections();
     if (cursorSelections.length === 1) {
       const cursorSelection = cursorSelections[0];
-      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection),
+      clipboardText = runPasteLint(this.getLineContent(editor, cursorSelection),
           editor.getSelection() ?? '',
           createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings),
       );
@@ -615,7 +615,7 @@ export default class LinterPlugin extends Plugin {
     const editorChange: EditorChange[] = [];
 
     cursorSelections.forEach((cursorSelection: EditorSelection, index: number) => {
-      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection), editor.getRange(cursorSelection.anchor, cursorSelection.head) ?? '', createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings));
+      clipboardText = runPasteLint(this.getLineContent(editor, cursorSelection), editor.getRange(cursorSelection.anchor, cursorSelection.head) ?? '', createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings));
       editorChange.push({
         text: clipboardText,
         from: cursorSelection.anchor,
@@ -687,7 +687,8 @@ export default class LinterPlugin extends Plugin {
       this.currentlyOpeningSidebar = true;
 
       await sidebarTab.openFile(file);
-      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+
+      runCustomCommands(this.settings.lintCommands, this.app.commands);
       if (this.customCommandsCallback) {
         await this.customCommandsCallback(file);
       }
@@ -700,14 +701,14 @@ export default class LinterPlugin extends Plugin {
     this.currentlyOpeningSidebar = false;
   }
 
-  private async runCustomCommands(file: TFile, runOptions: RunLinterRulesOptions) {
+  private async runCustomCommands(file: TFile) {
     if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
       return;
     }
 
     await this.customCommandsLock.acquire('command', async () => {
       try {
-        runCustomCommands(this.settings.lintCommands, this.app.commands, runOptions);
+        runCustomCommands(this.settings.lintCommands, this.app.commands);
       } catch (error) {
         this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       }

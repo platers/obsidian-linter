@@ -27,7 +27,7 @@ import {RunLinterRulesOptions, TFile} from '../typings/worker';
 import TrailingSpaces from '../rules/trailing-spaces';
 
 /**
- * Lints the text provided in @runOptions.
+ * Lints the text provided in runOptions.
  * @param {RunLinterRulesOptions} runOptions the different options provided when linting text
  * @return {string} the text after all of the updates have been made.
  */
@@ -126,11 +126,7 @@ function runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: stri
   });
 }
 
-export function runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface, runOptions: RunLinterRulesOptions) {
-  if (runOptions.skipFile) {
-    return;
-  }
-
+export function runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
   logDebug(getTextInLanguage('logs.running-custom-lint-command'));
   const commandsRun = new Set<string>();
   for (const commandInfo of lintCommands) {

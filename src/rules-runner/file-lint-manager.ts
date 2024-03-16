@@ -11,18 +11,19 @@ import {LinterWorker, RunLinterRulesOptions} from '../typings/worker';
 import YamlTimestamp from '../rules/yaml-timestamp';
 import YamlKeySort from '../rules/yaml-key-sort';
 import {setLogs} from '../utils/logger';
+import {stripCr} from '../utils/strings';
 
 /** Callback when a file is resolved. */
 type FileCallback = (runOptions: RunLinterRulesOptions) => void;
 
 /** Multi-threaded file linter which debounces rapid file requests automatically. */
 export class FileLintManager {
-  /* Background workers which do the actual file parsing. */
+  /* Background workers which do the actual file linting. */
   workers: LinterWorker[];
-  /** Tracks which workers are actively parsing a file, to make sure we properly delegate results. */
+  /** Tracks which workers are actively linting a file, to make sure we properly delegate results. */
   busy: boolean[];
 
-  /** List of files which have been queued for to be linted */
+  /** List of files which have been queued to be linted */
   lintQueue: TFile[];
   /** Paths -> callback function to run once file linting has finished running rules.
    * Note: this does not mean that the logic for running custom commands has run.
@@ -39,8 +40,8 @@ export class FileLintManager {
     for (let index = 0; index < numWorkers; index++) {
       // eslint-disable-next-line new-cap
       const worker = Worker();
-      worker.onmessage = (resp: any) => {
-        this.finish(resp.data as RunLinterRulesOptions, index);
+      worker.onmessage = async (resp: any) => {
+        await this.finish(resp.data as RunLinterRulesOptions, index);
       };
 
       this.workers.push(worker);
@@ -75,7 +76,7 @@ export class FileLintManager {
 
 
   // Finish the parsing of a file, potentially queueing a new file.
-  private finish(data: RunLinterRulesOptions, index: number) {
+  private async finish(data: RunLinterRulesOptions, index: number) {
     // Notify the queue this file is available for new work.
     this.busy[index] = false;
 
@@ -118,7 +119,7 @@ export class FileLintManager {
       const callback = this.callbacks.get(data.fileInfo.path);
       this.callbacks.delete(data.fileInfo.path);
       data.newText = newText;
-      callback(data);
+      await callback(data);
 
       // TODO: see about hashing the file contents here if possible, but custom commands may make this not viable
       // likely needs to be called at the end of run custom commands since that waits until the cache is ready after
@@ -129,8 +130,8 @@ export class FileLintManager {
   // /** Send a new task to the given worker ID. */
   private send(file: TFile, workerId: number) {
     this.busy[workerId] = true;
-    this.vault.cachedRead(file).then((oldText: string) => {
-      const lintRunnerSettings = createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings);
+    this.vault.read(file).then((oldText: string) => {
+      const lintRunnerSettings = createRunLinterRulesOptions(stripCr(oldText), file, this.momentLocale, this.settings);
       this.workers[workerId].postMessage(lintRunnerSettings);
     });
   }
