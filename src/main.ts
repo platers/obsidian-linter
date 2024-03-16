@@ -24,6 +24,8 @@ import {downloadMisspellings, readInMisspellingsFile} from './utils/auto-correct
 // import MyWorker from './rules-runner/rules-runner.worker';
 // import {LinterWorker, WorkerArgs, WorkerResponseMessage} from './typings/worker';
 import {FileLintManager} from './rules-runner/file-lint-manager';
+import {RunLinterRulesOptions} from './typings/worker';
+import {runCustomCommands} from './rules-runner/rules-runner';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -100,22 +102,6 @@ export default class LinterPlugin extends Plugin {
 
     this.lintFileManager = new FileLintManager(1, this.momentLocale, this.settings, this.app.vault);
 
-    // const worker = new MyWorker() as LinterWorker;
-
-    // worker.postMessage({
-    //   oldText: 'text',
-    //   fileInfo: {
-    //     name: 'file name',
-    //     createdAtFormatted: 'created',
-    //     modifiedAtFormatted: 'updated',
-    //   },
-    //   settings: this.settings,
-    // });
-    // worker.onmessage = (event: WorkerResponseMessage) => {
-    //   console.log(`Main thread received message: ${event.data}`);
-    // };
-
-
     this.addCommands();
 
     this.registerEventsAndSaveCallback();
@@ -140,6 +126,8 @@ export default class LinterPlugin extends Plugin {
     if (saveCommandDefinition && saveCommandDefinition.callback && this.originalSaveCallback) {
       saveCommandDefinition.callback = this.originalSaveCallback;
     }
+
+    this.lintFileManager.terminateWorkers();
   }
 
   async loadSettings() {
@@ -372,7 +360,8 @@ export default class LinterPlugin extends Plugin {
     if (this.editorLintFiles.includes(file)) {
       this.editorLintFiles.remove(file);
 
-      void this.runCustomCommands(file);
+      // TODO: come back and fix this since I need a way to pass over the options for this pjk
+      this.runCustomCommands(file, null);
     } else if (this.fileLintFiles.has(file)) {
       this.fileLintFiles.delete(file);
 
@@ -598,12 +587,10 @@ export default class LinterPlugin extends Plugin {
     logInfo(getTextInLanguage('logs.linter-run'));
 
     const file = this.app.workspace.getActiveFile();
-    // const oldText = editor.getValue();
-    // let newText: string;
     try {
       // newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
-      this.lintFileManager.lintFile(file, (oldText: string, newText: string) => {
-        const changes = this.updateEditor(oldText, newText, editor);
+      this.lintFileManager.lintFile(file, (runOptions: RunLinterRulesOptions) => {
+        const changes = this.updateEditor(runOptions.oldText, runOptions.newText, editor);
         const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
         const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
 
@@ -613,7 +600,7 @@ export default class LinterPlugin extends Plugin {
         if (!charsAdded && !charsRemoved) {
           void this.runCustomCommands(file);
         } else {
-          this.updateFileDebouncerText(file, newText);
+          this.updateFileDebouncerText(file, runOptions.newText);
           this.editorLintFiles.push(file);
         }
 
@@ -1060,14 +1047,14 @@ export default class LinterPlugin extends Plugin {
     this.currentlyOpeningSidebar = false;
   }
 
-  private async runCustomCommands(file: TFile) {
+  private async runCustomCommands(file: TFile, runOptions: RunLinterRulesOptions) {
     if (!this.settings.lintCommands || this.settings.lintCommands.length == 0 || !this.hasCustomCommands) {
       return;
     }
 
     await this.customCommandsLock.acquire('command', async () => {
       try {
-        this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+        runCustomCommands(this.settings.lintCommands, this.app.commands, runOptions);
       } catch (error) {
         this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       }

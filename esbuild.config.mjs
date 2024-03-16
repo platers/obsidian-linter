@@ -12,7 +12,7 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `;
 
-const dummyMocksForDocs = `
+const dummyMocksForDocsAndWorker = `
 document = {
   createElement: function() {},
 };
@@ -20,7 +20,7 @@ document = {
 
 const prod = (process.argv[2] === 'production');
 
-const mockedBanner = banner + dummyMocksForDocs;
+const mockedBanner = banner + dummyMocksForDocsAndWorker;
 const mockedPlugins = [replace({
   values: {
     // update usage of moment from obsidian to the node implementation of moment we have
@@ -90,6 +90,10 @@ const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
     plugins: [
       importGlobPlugin.default(),
       inlineWorkerPlugin({
+        banner:
+        {
+          js: dummyMocksForDocsAndWorker,
+        },
         external: externalPackages,
         format: 'cjs',
         plugins: [...webWorkerIgnores],
