@@ -474,7 +474,7 @@ export default class LinterPlugin extends Plugin {
     changes.forEach((change) => {
       let [type, value] = change;
       isBeforeStartIndex = curText.length < startingIndex;
-      if (isBeforeStartIndex && curText.length + value.length >= startingIndex) {
+      if (isBeforeStartIndex && curText.length + value.length >= startingIndex && type == DiffMatchPatch.DIFF_INSERT) {
         const valueIndexStart = startingIndex - curText.length;
         curText = value.substring(0, valueIndexStart);
         value = value.substring(valueIndexStart);
