@@ -193,6 +193,30 @@ ruleTest({
         noBareURIs: true,
       },
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/1050
+      testName: 'Make sure that URls containing an \'@\' are properly matched',
+      before: dedent`
+        https://domain.org/@user
+        https://domain.org/@user/some-kebab-case-path
+        https://domain.org/some-path/@user/some-kebab-case-path
+        https://domain.org/some-path/@user/some-kebab-case-path
+        https://domain.org/some-path/@user/some-kebab-case-path/@user
+        https://domain.org/some-path/@user/some-kebab-case-path#anchor
+        https://domain.org/some-path/@user/some-kebab-case-path#anchor?t=4
+      `,
+      after: dedent`
+        <https://domain.org/@user>
+        <https://domain.org/@user/some-kebab-case-path>
+        <https://domain.org/some-path/@user/some-kebab-case-path>
+        <https://domain.org/some-path/@user/some-kebab-case-path>
+        <https://domain.org/some-path/@user/some-kebab-case-path/@user>
+        <https://domain.org/some-path/@user/some-kebab-case-path#anchor>
+        <https://domain.org/some-path/@user/some-kebab-case-path#anchor?t=4>
+      `,
+      options: {
+        noBareURIs: false,
+      },
+    },
   ],
 });
 
