@@ -458,16 +458,28 @@ export default class LinterPlugin extends Plugin {
         oldTextFrontmatterInfo.from != newTextFrontmatterInfo.from ||
         oldTextFrontmatterInfo.to != newTextFrontmatterInfo.to ||
         oldTextFrontmatterInfo.frontmatter != newTextFrontmatterInfo.frontmatter) {
-        editor.replaceRange(newTextFrontmatterInfo.frontmatter, editor.offsetToPos(oldTextFrontmatterInfo.from), editor.offsetToPos(oldTextFrontmatterInfo.to));
-        startingIndex = newTextFrontmatterInfo.to;
+        let newFrontmatter: string;
+        if (oldTextFrontmatterInfo.exists == false) {
+          newFrontmatter = `---\n${newTextFrontmatterInfo.frontmatter}---`;
+        } else {
+          newFrontmatter = newTextFrontmatterInfo.frontmatter;
+        }
+
+        editor.replaceRange(newFrontmatter, editor.offsetToPos(oldTextFrontmatterInfo.from), editor.offsetToPos(oldTextFrontmatterInfo.to));
+        startingIndex = oldTextFrontmatterInfo.from + newFrontmatter.length;
       }
     }
 
     let isBeforeStartIndex = false;
     changes.forEach((change) => {
+      let [type, value] = change;
       isBeforeStartIndex = curText.length < startingIndex;
-
-      const [type, value] = change;
+      if (isBeforeStartIndex && curText.length + value.length >= startingIndex && type == DiffMatchPatch.DIFF_INSERT) {
+        const valueIndexStart = startingIndex - curText.length;
+        curText = value.substring(0, valueIndexStart);
+        value = value.substring(valueIndexStart);
+        isBeforeStartIndex = false;
+      }
 
       // handle updates
       if (!isBeforeStartIndex) {
