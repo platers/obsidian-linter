@@ -9,7 +9,6 @@ fi
 
 echo "Releasing beta version '${NEW_VERSION}'"
 
-
 # Delete old files if they exist
 rm -f package.tmp.json
 rm -f manifest-beta.tmp.json
