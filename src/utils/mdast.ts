@@ -438,7 +438,7 @@ function addOrReplaceLineEnding(paragraphLine: string, indicator: LineBreakIndic
     paragraphLine = paragraphLine.substring(0, paragraphLine.length - numCharsToRemove);
   }
 
-  return paragraphLine + indicator;
+  return paragraphLine.trimEnd() + indicator;
 }
 
 /**

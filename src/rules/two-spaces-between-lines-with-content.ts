@@ -27,7 +27,7 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
   get exampleBuilders(): ExampleBuilder<TwoSpacesBetweenLinesWithContentOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Make sure two spaces are added to the ends of lines that have content on it and the next line for lists, blockquotes, and paragraphs',
+        description: 'Make sure two spaces are added to the ends of lines that have content on it and the next line for lists, blockquotes, and paragraphs when the line break indicator is `  `',
         before: dedent`
           # Heading 1
           First paragraph stays as the first paragraph
@@ -48,7 +48,7 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
           ${''}
           Paragraph lines that end in <br/>
           Or lines that end in <br>
-          Are left alone
+          Are left swapped
           Since they mean the same thing
           ${''}
           \`\`\` text
@@ -86,9 +86,9 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
           Continuation *of* the paragraph has \`inline code block\` __in it__.  ${''}
           Even more continuation
           ${''}
-          Paragraph lines that end in <br/>
-          Or lines that end in <br>
-          Are left alone  ${''}
+          Paragraph lines that end in  ${''}
+          Or lines that end in  ${''}
+          Are left swapped  ${''}
           Since they mean the same thing
           ${''}
           \`\`\` text
@@ -108,6 +108,9 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
           Even more content here
           ${''}
         `,
+        options: {
+          lineBreakIndicator: LineBreakIndicators.TwoSpaces,
+        },
       }),
     ];
   }
