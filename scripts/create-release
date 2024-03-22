@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Creates release tag and push it to upstream for the version in the package.json file
+
+set -e
+
+VERSION=$(cat package.json | jq ".version")
+
+if [ -z "$VERSION" ]; then
+  echo "Failed to get a valid tag out of the package.json"
+  exit 1
+fi
+
+echo "Creating tag $VERSION"
+
+git tag -a "$VERSION" -m "$VERSION" && git push --tags upstream
+
+echo "Finished creating release $VERSION"

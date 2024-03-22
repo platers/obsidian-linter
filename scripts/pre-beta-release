@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Automatically update versions in files and commit changes
 
+set -e
+
 NEW_VERSION=$1
 
 if [ -z "$NEW_VERSION" ]; then
