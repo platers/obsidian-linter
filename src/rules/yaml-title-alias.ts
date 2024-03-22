@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray, isValueEscapedAlready} from '../utils/yaml';
+import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, DEFAULT_LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray, isValueEscapedAlready} from '../utils/yaml';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {getFirstHeaderOneText, yamlRegex} from '../utils/regex';
 import {isNumeric} from '../utils/strings';
@@ -10,6 +10,7 @@ class YamlTitleAliasOptions implements Options {
   preserveExistingAliasesSectionStyle?: boolean = true;
   keepAliasThatMatchesTheFilename?: boolean = false;
   useYamlKeyToKeepTrackOfOldFilenameOrHeading?: boolean = true;
+  aliasHelperKey?: string = DEFAULT_LINTER_ALIASES_HELPER_KEY;
 
   @RuleBuilder.noSettingControl()
     aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
@@ -47,8 +48,12 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     let newYaml = yaml.replace('---\n', '').replace('\n---', '');
     const parsedYaml = loadYAML(yaml);
+    let aliasHelperKey = options.aliasHelperKey ?? DEFAULT_LINTER_ALIASES_HELPER_KEY;
+    if (aliasHelperKey.endsWith(':')) {
+      aliasHelperKey = aliasHelperKey.substring(0, aliasHelperKey.length - 1);
+    }
 
-    previousTitle = parsedYaml[LINTER_ALIASES_HELPER_KEY] ?? null;
+    previousTitle = parsedYaml[aliasHelperKey] ?? null;
     if (previousTitle != null) {
       // force previousTitle to be a string by concatenating with an empty string to make non-strings like numbers get handled correctly
       previousTitle = previousTitle + '';
@@ -101,9 +106,9 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     }
 
     if (!options.useYamlKeyToKeepTrackOfOldFilenameOrHeading || shouldRemoveTitleAlias) {
-      newYaml = removeYamlSection(newYaml, LINTER_ALIASES_HELPER_KEY);
+      newYaml = removeYamlSection(newYaml, aliasHelperKey);
     } else {
-      newYaml = setYamlSection(newYaml, LINTER_ALIASES_HELPER_KEY, ` ${title}`);
+      newYaml = setYamlSection(newYaml, aliasHelperKey, ` ${title}`);
     }
 
     text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
@@ -277,8 +282,27 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         options: {
           aliasArrayStyle: NormalArrayFormats.MultiLine,
         },
-      },
-      ),
+      }),
+      new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/1044
+        description: 'Using `title` as `Alias Helper Key` sets the value of `title` to the alias.',
+        before: dedent`
+          ${''}
+        `,
+        after: dedent`
+          ---
+          aliases:
+            - Filename
+          title: Filename
+          ---
+          ${''}
+        `,
+        options: {
+          fileName: 'Filename',
+          keepAliasThatMatchesTheFilename: true,
+          aliasArrayStyle: NormalArrayFormats.MultiLine,
+          aliasHelperKey: 'title',
+        },
+      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<YamlTitleAliasOptions>[] {
@@ -300,6 +324,12 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         nameKey: 'rules.yaml-title-alias.use-yaml-key-to-keep-track-of-old-filename-or-heading.name',
         descriptionKey: 'rules.yaml-title-alias.use-yaml-key-to-keep-track-of-old-filename-or-heading.description',
         optionsKey: 'useYamlKeyToKeepTrackOfOldFilenameOrHeading',
+      }),
+      new TextOptionBuilder({
+        OptionsClass: YamlTitleAliasOptions,
+        nameKey: 'rules.yaml-title-alias.alias-helper-key.name',
+        descriptionKey: 'rules.yaml-title-alias.alias-helper-key.description',
+        optionsKey: 'aliasHelperKey',
       }),
     ];
   }
