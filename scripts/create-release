@@ -10,6 +10,8 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
+VERSION="${VERSION//\"/}"
+
 echo "Creating tag $VERSION"
 
 git tag -a "$VERSION" -m "$VERSION" && git push --tags upstream
