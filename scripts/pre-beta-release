@@ -14,12 +14,11 @@ echo "Releasing beta version '${NEW_VERSION}'"
 # Delete old files if they exist
 rm -f package.tmp.json
 rm -f manifest-beta.tmp.json
-rm -f versions.tmp.json
 
 # Rewrite versions in relevant files.
 jq ".version=\"${NEW_VERSION}\"" package.json > package.tmp.json && mv package.tmp.json package.json
 jq ".version=\"${NEW_VERSION}\"" manifest-beta.json > manifest-beta.tmp.json && mv manifest-beta.tmp.json manifest-beta.json
-jq ". + {\"${NEW_VERSION}\": \"1.5.8\"}" versions.json > versions.tmp.json && mv versions.tmp.json versions.json
+# jq ". + {\"${NEW_VERSION}\": \"1.5.8\"}" versions.json > versions.tmp.json && mv versions.tmp.json versions.json
 
 # Create commit & commit.
 git commit -a -m "Auto-release beta ${NEW_VERSION}"
