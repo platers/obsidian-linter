@@ -40,7 +40,7 @@ export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLines
         `,
       }),
       new ExampleBuilder({
-        description: 'Paragraphs can be extended via the use of 2 or more spaces at the end of a line, a line break html, or a backslash (\\)',
+        description: 'Paragraphs can be extended via the use of 2 or more spaces at the end of a line, a line break html or xml, or a backslash (\\)',
         before: dedent`
           # H1
           Content${'  '}
