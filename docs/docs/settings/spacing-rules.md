@@ -687,6 +687,7 @@ All headings have a blank line both before and after (except where the heading i
 | `Empty Line Between YAML and Header` | Keep the empty line between the YAML frontmatter and header | N/A | `true` |
 
 
+
 ### Examples
 
 <details><summary>Headings should be surrounded by blank lines</summary>
