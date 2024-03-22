@@ -788,8 +788,12 @@ export default {
         'description': 'Such aliases are usually redundant',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': 'Use the YAML key `linter-yaml-title-alias` to help with filename and heading changes',
+        'name': 'Use the YAML key specified by `Alias Helper Key` to help with filename and heading changes',
         'description': 'If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array',
+      },
+      'alias-helper-key': {
+        'name': 'Alias Helper Key',
+        'description': 'The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule.',
       },
     },
     // yaml-title.ts

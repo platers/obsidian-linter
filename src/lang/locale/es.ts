@@ -631,8 +631,12 @@ export default {
         'description': 'Estos alias suelen ser redundantes.',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': 'Use la clave de YAML `linter-yaml-title-alias` para ayudar con los cambios de nombre de archivo y encabezado',
+        'name': 'Use la clave de YAML especificado por `Clave auxiliar de alias` para ayudar con los cambios de nombre de archivo y encabezado',
         'description': 'Si se establece, cuando cambia el primer encabezado H1 o cambia el nombre de archivo si el primer H1 no está presente, el alias anterior almacenado en esta clave se reemplazará con el nuevo valor en lugar de simplemente insertar una nueva entrada en la matriz de alias.',
+      },
+      'alias-helper-key': {
+        'name': 'Clave auxiliar de alias',
+        'description': 'La clave que se debe utilizar para ayudar a realizar un seguimiento de cuál fue el último nombre de archivo o encabezado que esta regla almacenó en el frontmatter.',
       },
     },
     'yaml-title': {
