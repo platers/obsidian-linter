@@ -20,7 +20,7 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
       descriptionKey: 'rules.blockquote-style.description',
       type: RuleType.CONTENT,
       hasSpecialExecutionOrder: true, // to make sure we run after the other rules to make sure all blockquotes are affected and follow the same style
-      ruleIgnoreTypes: [IgnoreTypes.html],
+      ruleIgnoreTypes: [IgnoreTypes.html, IgnoreTypes.code],
     });
   }
   get OptionsClass(): new () => BlockquoteStyleOptions {
