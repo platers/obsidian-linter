@@ -390,7 +390,7 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
       if (lineEndsInLineBreak(paragraphLine, indicator)) {
         continue;
       }
-      paragraphLines[i] = paragraphLine.trimEnd() + indicator;
+      paragraphLines[i] = addOrReplaceLineEnding(paragraphLine, indicator);
     }
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, paragraphLines.join('\n'));
@@ -400,23 +400,45 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
 }
 
 function lineEndsInLineBreak(paragraphLine: string, indicator: LineBreakIndicators): boolean {
-  if (paragraphLine.endsWith('<br>') && indicator != LineBreakIndicators.LineBreakHtmlNotXml) {
+  if (paragraphLine.endsWith('<br>') && indicator == LineBreakIndicators.LineBreakHtmlNotXml) {
     return true;
   }
 
-  if (paragraphLine.endsWith('<br/>') && indicator != LineBreakIndicators.LineBreakHtml) {
+  if (paragraphLine.endsWith('<br/>') && indicator == LineBreakIndicators.LineBreakHtml) {
     return true;
   }
 
-  if (paragraphLine.endsWith('  ') && indicator != LineBreakIndicators.TwoSpaces) {
+  if (paragraphLine.endsWith('  ') && indicator == LineBreakIndicators.TwoSpaces) {
     return true;
   }
 
-  if (!paragraphLine.endsWith('\\\\') && paragraphLine.endsWith('\\') && indicator != LineBreakIndicators.Backslash) {
+  if (!paragraphLine.endsWith('\\\\') && paragraphLine.endsWith('\\') && indicator == LineBreakIndicators.Backslash) {
     return true;
   }
 
   return false;
+}
+
+function addOrReplaceLineEnding(paragraphLine: string, indicator: LineBreakIndicators): string {
+  paragraphLine = paragraphLine.trimEnd();
+  let numCharsToRemove = 0;
+  if (paragraphLine.endsWith('<br>')) {
+    numCharsToRemove = 4;
+  }
+
+  if (paragraphLine.endsWith('<br/>')) {
+    numCharsToRemove = 5;
+  }
+
+  if (!paragraphLine.endsWith('\\\\') && paragraphLine.endsWith('\\')) {
+    numCharsToRemove = 1;
+  }
+
+  if (numCharsToRemove) {
+    paragraphLine = paragraphLine.substring(0, paragraphLine.length - numCharsToRemove);
+  }
+
+  return paragraphLine + indicator;
 }
 
 /**
@@ -464,8 +486,8 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
         newParagraphLines.push(paragraphLine);
       }
 
-      // make sure that lines that end in <br>, <br/>, or two or more spaces are in the same paragraph
-      nextLineIsSameParagraph = paragraphLine.endsWith('<br>') || paragraphLine.endsWith('<br/>') || paragraphLine.endsWith('  ') || (!paragraphLine.endsWith('\\\\') && paragraphLine.endsWith('\\'));
+      // make sure that lines that end in \, <br>, <br/>, or two or more spaces are in the same paragraph
+      nextLineIsSameParagraph = paragraphLine.endsWith(LineBreakIndicators.LineBreakHtmlNotXml) || paragraphLine.endsWith(LineBreakIndicators.LineBreakHtml) || paragraphLine.endsWith(LineBreakIndicators.TwoSpaces) || (!paragraphLine.endsWith('\\\\') && paragraphLine.endsWith(LineBreakIndicators.Backslash));
     }
 
     // remove new lines prior to paragraph

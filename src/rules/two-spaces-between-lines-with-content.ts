@@ -115,8 +115,8 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
     return [
       new DropdownOptionBuilder<TwoSpacesBetweenLinesWithContentOptions, LineBreakIndicators>({
         OptionsClass: TwoSpacesBetweenLinesWithContentOptions,
-        nameKey: 'rules.ordered-list-style.list-end-style.name',
-        descriptionKey: 'rules.ordered-list-style.list-end-style.description',
+        nameKey: 'rules.two-spaces-between-lines-with-content.line-break-indicator.name',
+        descriptionKey: 'rules.two-spaces-between-lines-with-content.line-break-indicator.description',
         optionsKey: 'lineBreakIndicator',
         records: [
           {
