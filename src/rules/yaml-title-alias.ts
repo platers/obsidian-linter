@@ -48,8 +48,12 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     let newYaml = yaml.replace('---\n', '').replace('\n---', '');
     const parsedYaml = loadYAML(yaml);
+    let aliasHelperKey = options.aliasHelperKey ?? DEFAULT_LINTER_ALIASES_HELPER_KEY;
+    if (aliasHelperKey.endsWith(':')) {
+      aliasHelperKey = aliasHelperKey.substring(0, aliasHelperKey.length - 1);
+    }
 
-    previousTitle = parsedYaml[options.aliasHelperKey] ?? null;
+    previousTitle = parsedYaml[aliasHelperKey] ?? null;
     if (previousTitle != null) {
       // force previousTitle to be a string by concatenating with an empty string to make non-strings like numbers get handled correctly
       previousTitle = previousTitle + '';
@@ -102,9 +106,9 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     }
 
     if (!options.useYamlKeyToKeepTrackOfOldFilenameOrHeading || shouldRemoveTitleAlias) {
-      newYaml = removeYamlSection(newYaml, options.aliasHelperKey);
+      newYaml = removeYamlSection(newYaml, aliasHelperKey);
     } else {
-      newYaml = setYamlSection(newYaml, options.aliasHelperKey, ` ${title}`);
+      newYaml = setYamlSection(newYaml, aliasHelperKey, ` ${title}`);
     }
 
     text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
