@@ -3,4 +3,4 @@
 
 #### When Is a Blank Line Added?
 
-When a paragraph has another line after the current one and it does not end in 2 or more spaces or `<br>` or `<br/>`.
+When a paragraph has another line after the current one and it does not end in 2 or more spaces, `<br>`, `<br/>`, or `\`.

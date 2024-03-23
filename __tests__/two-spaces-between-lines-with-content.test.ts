@@ -1,6 +1,7 @@
 import TwoSpacesBetweenLinesWithContent from '../src/rules/two-spaces-between-lines-with-content';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
+import {LineBreakIndicators} from '../src/utils/mdast';
 
 ruleTest({
   RuleBuilderClass: TwoSpacesBetweenLinesWithContent,
@@ -85,6 +86,86 @@ ruleTest({
         T:: 0
         %%
       `,
+    },
+    {
+      testName: 'Make sure that using a line break indicator of `<br>` replaces the other line break endings properly',
+      before: dedent`
+        Here is some text${'  '}
+        Here is some more text\\
+        Here is yet some more text<br>
+        Even more text<br/>
+        Once more...
+      `,
+      after: dedent`
+        Here is some text<br>
+        Here is some more text<br>
+        Here is yet some more text<br>
+        Even more text<br>
+        Once more...
+      `,
+      options: {
+        lineBreakIndicator: LineBreakIndicators.LineBreakHtmlNotXml,
+      },
+    },
+    {
+      testName: 'Make sure that using a line break indicator of `<br/>` replaces the other line break endings properly',
+      before: dedent`
+        Here is some text${'  '}
+        Here is some more text\\
+        Here is yet some more text<br>
+        Even more text<br/>
+        Once more...
+      `,
+      after: dedent`
+        Here is some text<br/>
+        Here is some more text<br/>
+        Here is yet some more text<br/>
+        Even more text<br/>
+        Once more...
+      `,
+      options: {
+        lineBreakIndicator: LineBreakIndicators.LineBreakHtml,
+      },
+    },
+    {
+      testName: 'Make sure that using a line break indicator of `\\` replaces the other line break endings properly',
+      before: dedent`
+        Here is some text${'  '}
+        Here is some more text\\
+        Here is yet some more text<br>
+        Even more text<br/>
+        Once more...
+      `,
+      after: dedent`
+        Here is some text\\
+        Here is some more text\\
+        Here is yet some more text\\
+        Even more text\\
+        Once more...
+      `,
+      options: {
+        lineBreakIndicator: LineBreakIndicators.Backslash,
+      },
+    },
+    {
+      testName: 'Make sure that using a line break indicator of `  ` replaces the other line break endings properly',
+      before: dedent`
+        Here is some text${'  '}
+        Here is some more text\\
+        Here is yet some more text<br>
+        Even more text<br/>
+        Once more...
+      `,
+      after: dedent`
+        Here is some text${'  '}
+        Here is some more text${'  '}
+        Here is yet some more text${'  '}
+        Even more text${'  '}
+        Once more...
+      `,
+      options: {
+        lineBreakIndicator: LineBreakIndicators.TwoSpaces,
+      },
     },
   ],
 });

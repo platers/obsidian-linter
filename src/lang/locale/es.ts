@@ -565,7 +565,11 @@ export default {
     },
     'two-spaces-between-lines-with-content': {
       'name': 'Dos espacios entre líneas con contenido',
-      'description': 'Se asegura de que se agreguen dos espacios al final de las líneas con contenido que continúa en la siguiente línea para párrafos, comillas y elementos de lista',
+      'description': 'Se asegura de que el salto de línea especificado se agregue al final de las líneas y el contenido continúe en la línea siguiente para párrafos, citas en bloque y elementos de lista.',
+      'line-break-indicator': {
+        'name': 'Indicador de salto de línea',
+        'description': 'El indicador de salto de línea a utilizar.',
+      },
     },
     'unordered-list-style': {
       'name': 'Estilo de lista desordenada',
@@ -694,5 +698,10 @@ export default {
     '‘’': '‘’', // leave as is
     '""': '""', // leave as is
     '“”': '“”', // leave as is
+    // yaml.ts
+    '\\': '\\', // leave as is
+    '<br>': '<br>', // leave as is
+    '  ': '  ', // leave as is
+    '<br/>': '<br/>', // leave as is
   },
 };

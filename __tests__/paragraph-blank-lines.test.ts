@@ -164,6 +164,7 @@ ruleTest({
         paragraph line 1 <br>
         paragraph line 2  ${''}
         paragraph line 3 <br/>
+        paragraph line 4 \\
         paragraph final line
         ${''}
         ${''}
@@ -174,6 +175,7 @@ ruleTest({
         paragraph line 1 <br>
         paragraph line 2  ${''}
         paragraph line 3 <br/>
+        paragraph line 4 \\
         paragraph final line
         ${''}
       `,

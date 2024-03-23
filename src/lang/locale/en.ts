@@ -717,8 +717,12 @@ export default {
     },
     // two-spaces-between-lines-with-content.ts
     'two-spaces-between-lines-with-content': {
-      'name': 'Two Spaces Between Lines with Content',
-      'description': 'Makes sure that two spaces are added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items',
+      'name': 'Line Break Between Lines with Content',
+      'description': 'Makes sure that the specified line break is added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items',
+      'line-break-indicator': {
+        'name': 'Line Break Indicator',
+        'description': 'The line break indicator to use.',
+      },
     },
     // unordered-list-style.ts
     'unordered-list-style': {
@@ -857,5 +861,10 @@ export default {
     '‘’': '‘’', // leave as is
     '""': '""', // leave as is
     '“”': '“”', // leave as is
+    // yaml.ts
+    '\\': '\\', // leave as is
+    '<br>': '<br>', // leave as is
+    '  ': '  ', // leave as is
+    '<br/>': '<br/>', // leave as is
   },
 };
