@@ -55,6 +55,7 @@ export default class LinterPlugin extends Plugin {
   private rulesRunner = new RulesRunner();
   private lastActiveFile: TFile;
   private overridePaste: boolean = false;
+  private hasCustomCommands: boolean = false;
   private customCommandsLock = new AsyncLock();
   private originalSaveCallback?: () => void = null;
   // The amount of files you can use editor lint on at once is pretty small, so we will use an array
@@ -126,11 +127,13 @@ export default class LinterPlugin extends Plugin {
     }
 
     this.updatePasteOverrideStatus();
+    this.updateHasCustomCommandStatus();
   }
 
   async saveSettings() {
     await this.saveData(this.settings);
     this.updatePasteOverrideStatus();
+    this.updateHasCustomCommandStatus();
   }
 
   addCommands() {
@@ -678,7 +681,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   private async runCustomCommandsInSidebar(file: TFile) {
-    if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
+    if (!this.settings.lintCommands || this.settings.lintCommands.length == 0 || !this.hasCustomCommands) {
       return;
     }
 
@@ -703,7 +706,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   private async runCustomCommands(file: TFile) {
-    if (!this.settings.lintCommands || this.settings.lintCommands.length == 0) {
+    if (!this.settings.lintCommands || this.settings.lintCommands.length == 0 || !this.hasCustomCommands) {
       return;
     }
 
@@ -821,6 +824,17 @@ export default class LinterPlugin extends Plugin {
     }
 
     this.overridePaste = false;
+  }
+
+  private updateHasCustomCommandStatus() {
+    for (const customCommand of this.settings.lintCommands) {
+      if (customCommand.id && customCommand.id.trim() != '') {
+        this.hasCustomCommands = true;
+        return;
+      }
+    }
+
+    this.hasCustomCommands = false;
   }
 
   private endOfDocument(doc: string) {
