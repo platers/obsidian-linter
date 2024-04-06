@@ -774,6 +774,10 @@ export default {
         'name': 'Format',
         'description': 'Moment date format to use (see [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
       },
+      'convert-to-utc': {
+        'name': 'Convert Local Time to UTC',
+        'description': 'Uses UTC equivalent for saved dates instead of local time',
+      },
     },
     // yaml-title-alias.ts
     'yaml-title-alias': {

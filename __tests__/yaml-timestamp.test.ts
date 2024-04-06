@@ -386,5 +386,54 @@ ruleTest({
         forceRetentionOfCreatedValue: true,
       },
     },
+    {
+      testName: 'When creation date exists and force retention of created date and convert to UTC are true, creation date should remain unchanged',
+      before: dedent`
+        ---
+        created: 2019-12-31T14:00:00+00:00
+        ---
+      `,
+      after: dedent`
+        ---
+        created: 2019-12-31T14:00:00+00:00
+        ---
+      `,
+      options: {
+        format: 'YYYY-MM-DDTHH:mm:ssZ',
+        dateCreated: true,
+        dateCreatedKey: 'created',
+        dateModified: false,
+        fileCreatedTime: '2020-01-01T09:00:00-05:00', // 9 AM Eastern Standard Time
+        currentTime: moment('2020-01-01T21:00:05-05:00', 'YYYY-MM-DDTHH:mm:ssZ'), // 9:00:05 PM EST, same day
+        forceRetentionOfCreatedValue: true,
+        convertToUTC: true,
+      },
+    },
+    {
+      testName: 'When timestamp format has changed and convert to UTC is true, updated timestamps should be in UTC',
+      before: dedent`
+        ---
+        created: Wed, 1 Jan 2020 09:00:00 -05:00
+        modified: Wed, 1 Jan 2020 18:00:00 -05:00
+        ---
+      `,
+      after: dedent`
+        ---
+        created: 2020-01-01T14:00:00+00:00
+        modified: 2020-01-02T02:00:05+00:00
+        ---
+      `,
+      options: {
+        format: 'YYYY-MM-DDTHH:mm:ssZ',
+        dateCreated: true,
+        dateCreatedKey: 'created',
+        dateModified: true,
+        dateModifiedKey: 'modified',
+        fileCreatedTime: '2020-01-01T09:00:00-05:00', // 9 AM Eastern Standard Time
+        fileModifiedTime: '2020-01-01T21:00:00-05:00', // 9 PM Eastern Standard Time, same day
+        currentTime: moment('2020-01-01T21:00:05-05:00', 'YYYY-MM-DDTHH:mm:ssZ'), // 9:00:05 PM EST, same day
+        convertToUTC: true,
+      },
+    },
   ],
 });

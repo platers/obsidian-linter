@@ -23,6 +23,8 @@ class YamlTimestampOptions implements Options {
   dateModified?: boolean = true;
   dateModifiedKey?: string = 'date modified';
 
+  convertToUTC?: boolean = false;
+
   @RuleBuilder.noSettingControl()
     fileModifiedTime?: string;
 
@@ -80,7 +82,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
     const created_date = moment(options.fileCreatedTime);
     created_date.locale(options.locale);
 
-    const formatted_date = created_date.format(options.format);
+    const formatted_date = options.convertToUTC ? created_date.utc().format(options.format) : created_date.format(options.format);
     const created_date_line = `\n${options.dateCreatedKey}: ${formatted_date}`;
 
     const keyWithValueFound = created_match.test(text);
@@ -103,13 +105,15 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
     } else if (keyWithValueFound) {
       const createdDateString = this.getYAMLTimestampString(text, created_match, options.dateCreatedKey);
       if (options.forceRetentionOfCreatedValue) {
-        const yamlCreatedDateTime = this.parseValueToCurrentFormatIfPossible(createdDateString, options.format, options.locale);
+        const yamlCreatedDateTime = this.parseValueToCurrentFormatIfPossible(createdDateString, options.format, options.locale, options.convertToUTC);
         if (yamlCreatedDateTime == null) {
           throw new Error(getTextInLanguage('logs.invalid-date-format-error').replace('{DATE}', createdDateString).replace('{FILE_NAME}', options.fileName));
         }
 
-        if (yamlCreatedDateTime.format(options.format) !== createdDateString) {
-          const created_date_yaml_line = `\n${options.dateCreatedKey}: ${yamlCreatedDateTime.format(options.format)}`;
+        const formattedYamlCreatedDate = options.convertToUTC ? yamlCreatedDateTime.utc().format(options.format) : yamlCreatedDateTime.format(options.format);
+
+        if (formattedYamlCreatedDate !== createdDateString) {
+          const created_date_yaml_line = `\n${options.dateCreatedKey}: ${formattedYamlCreatedDate}`;
           text = text.replace(
               created_match,
               escapeDollarSigns(created_date_yaml_line) + '\n',
@@ -142,7 +146,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
     modified_date.locale(options.locale);
     // using the current time helps prevent issues where the previous modified time was greater
     // than 5 seconds prior to the time the linter will finish with the file (i.e. helps prevent accidental infinite loops on updating the date modified value)
-    const formatted_modified_date = options.currentTime.format(options.format);
+    const formatted_modified_date = options.convertToUTC ? options.currentTime.utc().format(options.format) : options.currentTime.format(options.format);
     const modified_date_line = `\n${options.dateModifiedKey}: ${formatted_modified_date}`;
 
     const keyWithValueFound = modified_match.test(text);
@@ -168,12 +172,12 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
     return text;
   }
-  parseValueToCurrentFormatIfPossible(timestamp: string, format: string, locale: string): moment.Moment | null {
+  parseValueToCurrentFormatIfPossible(timestamp: string, format: string, locale: string, utc: boolean): moment.Moment | null {
     if (timestamp == undefined) {
       return null;
     }
 
-    const desiredFormatDate = moment(timestamp, format, locale, true);
+    const desiredFormatDate = utc ? moment.utc(timestamp, format, locale, true) : moment(timestamp, format, locale, true);
     if (desiredFormatDate != undefined && desiredFormatDate.isValid()) {
       return desiredFormatDate;
     }
@@ -181,10 +185,11 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
     // @ts-ignore
     const actualFormat = parseFormat(timestamp);
     if (actualFormat != undefined) {
-      const date = moment(timestamp, actualFormat);
+      const date = utc ? moment.utc(timestamp, actualFormat) : moment(timestamp, actualFormat);
       date.locale(locale);
 
-      return moment(date.format(format), format, locale, true);
+      const formattedDateStr = utc ? date.utc().format(format) : date.format(format);
+      return moment(formattedDateStr, format, locale, true);
     }
 
     return null;
@@ -282,6 +287,92 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
           alreadyModified: false,
         },
       }),
+      new ExampleBuilder({
+        description: 'Header is set with convert to UTC option true',
+        before: dedent`
+          # H1
+        `,
+        after: dedent`
+          ---
+          date created: 2020-01-01T14:00:00+00:00
+          date modified: 2020-01-02T02:00:05+00:00
+          ---
+          # H1
+        `,
+        options: {
+          format: 'YYYY-MM-DDTHH:mm:ssZ',
+          fileCreatedTime: '2020-01-01T09:00:00-05:00', // 9 AM Eastern Standard Time
+          fileModifiedTime: '2020-01-01T21:00:00-05:00', // 9 PM Eastern Standard Time, same day
+          currentTime: moment('2020-01-01T21:00:05-05:00', 'YYYY-MM-DDTHH:mm:ssZ'), // 9:00:05 PM EST, same day
+          alreadyModified: false,
+          convertToUTC: true,
+        },
+      }),
+      new ExampleBuilder({
+        description: 'dateCreated option is false with convert to UTC option true',
+        before: dedent`
+          # H1
+        `,
+        after: dedent`
+          ---
+          date modified: 2020-01-02T02:00:05+00:00
+          ---
+          # H1
+        `,
+        options: {
+          format: 'YYYY-MM-DDTHH:mm:ssZ',
+          dateCreated: false,
+          fileCreatedTime: '2020-01-01T09:00:00-05:00', // 9 AM Eastern Standard Time
+          fileModifiedTime: '2020-01-01T21:00:00-05:00', // 9 PM Eastern Standard Time, same day
+          currentTime: moment('2020-01-01T21:00:05-05:00', 'YYYY-MM-DDTHH:mm:ssZ'), // 9:00:05 PM EST, same day
+          alreadyModified: false,
+          convertToUTC: true,
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Date Created Key is set with convert to UTC option true',
+        before: dedent`
+          # H1
+        `,
+        after: dedent`
+          ---
+          created: 2020-01-01T14:00:00+00:00
+          ---
+          # H1
+        `,
+        options: {
+          format: 'YYYY-MM-DDTHH:mm:ssZ',
+          dateCreated: true,
+          dateModified: false,
+          dateCreatedKey: 'created',
+          fileCreatedTime: '2020-01-01T09:00:00-05:00', // 9 AM Eastern Standard Time
+          currentTime: moment('2020-01-01T21:00:05-05:00', 'YYYY-MM-DDTHH:mm:ssZ'), // 9:00:05 PM EST, same day
+          alreadyModified: false,
+          convertToUTC: true,
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Date Modified Key is set with convert to UTC option true',
+        before: dedent`
+          # H1
+        `,
+        after: dedent`
+          ---
+          modified: 2020-01-02T02:00:05+00:00
+          ---
+          # H1
+        `,
+        options: {
+          format: 'YYYY-MM-DDTHH:mm:ssZ',
+          dateCreated: false,
+          dateModified: true,
+          dateModifiedKey: 'modified',
+          fileModifiedTime: '2020-01-01T21:00:00-05:00', // 9 PM Eastern Standard Time, same day
+          currentTime: moment('2020-01-01T21:00:05-05:00', 'YYYY-MM-DDTHH:mm:ssZ'), // 9:00:05 PM EST, same day
+          alreadyModified: false,
+          convertToUTC: true,
+        },
+      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<YamlTimestampOptions>[] {
@@ -321,6 +412,12 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         nameKey: 'rules.yaml-timestamp.format.name',
         descriptionKey: 'rules.yaml-timestamp.format.description',
         optionsKey: 'format',
+      }),
+      new BooleanOptionBuilder({
+        OptionsClass: YamlTimestampOptions,
+        nameKey: 'rules.yaml-timestamp.convert-to-utc.name',
+        descriptionKey: 'rules.yaml-timestamp.convert-to-utc.description',
+        optionsKey: 'convertToUTC',
       }),
     ];
   }
