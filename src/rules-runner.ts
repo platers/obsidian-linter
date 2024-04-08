@@ -138,6 +138,9 @@ export class RulesRunner {
     const yamlTimestampOptions = YamlTimestamp.getRuleOptions(runOptions.settings);
 
     currentTime = runOptions.getCurrentTime();
+    if (yamlTimestampOptions.convertToUTC) {
+      currentTime = currentTime.utc();
+    }
     [newText] = YamlKeySort.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
       yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
