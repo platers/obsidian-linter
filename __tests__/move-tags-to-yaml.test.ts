@@ -298,7 +298,7 @@ ruleTest({
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/1068
-      testName: 'Make sure that "`" is not valid in a header',
+      testName: 'Make sure that "`" is not valid in a tag',
       before: dedent`
         ---
         title: Note
