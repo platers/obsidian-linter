@@ -226,6 +226,11 @@ export default {
         'description': '以逗号分隔的小写单词列表，在自动更正时会忽略',
       },
     },
+    // add-blank-line-after-yaml.ts
+    'add-blank-line-after-yaml': {
+      'name': '在 YAML 块后添加空行',
+      'description': '如果 YAML 块不处于文件末尾或 YAML 块后不存在至少一个空行时添加一个空行',
+    },
     // blockquotify-on-paste.ts
     'add-blockquote-indentation-on-paste': {
       'name': '添加引用块缩进',
@@ -289,6 +294,27 @@ export default {
         'description': '制表符对应的空格宽度',
       },
     },
+    // dedupe-yaml-array-values.ts
+    'dedupe-yaml-array-values': {
+      'name': 'YAML 值去重',
+      'description': '去重时区分大小写',
+      'dedupe-alias-key': {
+        'name': 'YAML aliases 去重',
+        'description': '打开以对 YAML aliases 去重',
+      },
+      'dedupe-tag-key': {
+        'name': 'YAML tags 去重',
+        'description': '打开以对 YAML tags 去重',
+      },
+      'dedupe-array-keys': {
+        'name': 'YAML array 去重',
+        'description': '打开以对普通 YAML 数组中的值去重',
+      },
+      'ignore-keys': {
+        'name': '要忽略的 YAML 键',
+        'description': '要忽略的 YAML 键列表，每行一个键',
+      },
+    },
     // default-language-for-code-fences.ts
     'default-language-for-code-fences': {
       'name': '代码块默认语言',
@@ -320,7 +346,7 @@ export default {
     // empty-line-around-math-block.ts
     'empty-line-around-math-blocks': {
       'name': 'Latex 块前后空行',
-      'description': '确保Latex 块前后有空行。使用**指示 Latex 块的 `$` 符号数量**来确定单行 Latex 是否被认定为 Latex 块',
+      'description': '确保 Latex 块前后有空行。使用**指示 Latex 块的 `$` 符号数量**来确定单行 Latex 是否被认定为 Latex 块',
     },
     // empty-line-around-tables.ts
     'empty-line-around-tables': {
@@ -330,10 +356,10 @@ export default {
     // escape-yaml-special-characters.ts
     'escape-yaml-special-characters': {
       'name': '转义 YAML 特殊字符',
-      'description': '转义 YAML 中的冒号(: )，单引号 (\') 和双引号 (")',
+      'description': '转义 YAML 中的冒号(:)，单引号 (\') 和双引号 (")',
       'try-to-escape-single-line-arrays': {
         'name': '尝试转义单行数组',
-        'description': '尝试转义数组值，假设数组以`[`开头，`]`结尾，并且由`,`分隔',
+        'description': '尝试转义数组值，假设数组以 "[" 开头， "]" 结尾，并且由 "," 分隔',
       },
     },
     // file-name-heading.ts
@@ -457,6 +483,10 @@ export default {
     'no-bare-urls': {
       'name': '禁止原始 URL',
       'description': '除非被反引号、方括号或单引号/双引号包围，否则将原始 URL 用尖括号包围',
+      'no-bare-uris': {
+        'name': '禁止原始 URI',
+        'description': '除非被反引号、方括号或单引号/双引号包围，否则将原始 URI 用尖括号包围',
+      },
     },
     // ordered-list-style.ts
     'ordered-list-style': {
@@ -624,6 +654,31 @@ export default {
         'description': '要从 YAML Front-matter 中删除的 YAML 键 （可带或不带冒号）',
       },
     },
+    // sort-yaml-array-values.ts
+    'sort-yaml-array-values': {
+      'name': 'YAML 值排序',
+      'description': '基于指定规则对 YAML 值排序',
+      'sort-alias-key': {
+        'name': 'YAML aliases 排序',
+        'description': '打开以对 YAML aliases 排序',
+      },
+      'sort-tag-key': {
+        'name': 'YAML tags 排序',
+        'description': '打开以对 YAML tags 排序',
+      },
+      'sort-array-keys': {
+        'name': 'YAML array 排序',
+        'description': '打开以对普通 YAML 数组中的值排序',
+      },
+      'ignore-keys': {
+        'name': '要忽略的 YAML 键',
+        'description': '要忽略的 YAML 键列表，每行一个键',
+      },
+      'sort-order': {
+        'name': '排序方式',
+        'description': '排序方式',
+      },
+    },
     // space-after-list-markers.ts
     'space-after-list-markers': {
       'name': '列表标志空格',
@@ -760,7 +815,7 @@ export default {
     'ascending': '升序',
     'lazy': '全为1',
     'Nothing': '无',
-    'Remove hashtag': '移除hashtag',
+    'Remove hashtag': '移除 hashtag',
     'Remove whole tag': '移除整个 tag',
     'asterisk': '星号(*)',
     'underscore': '下划线(_)',
