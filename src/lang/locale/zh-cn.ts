@@ -844,5 +844,10 @@ export default {
     '‘’': '‘’', // leave as is
     '""': '""', // leave as is
     '“”': '“”', // leave as is
+    // yaml.ts
+    '\\': '\\', // leave as is
+    '<br>': '<br>', // leave as is
+    '  ': '  ', // leave as is
+    '<br/>': '<br/>', // leave as is
   },
 };
