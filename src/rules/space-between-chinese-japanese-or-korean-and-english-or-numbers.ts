@@ -27,8 +27,8 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
       text: string,
       options: SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions,
   ): string {
-    const head = new RegExp(`(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})( *)(\\[[^[]*\\]\\(.*\\)|\`[^\`]*\`|\\w+|[${escapeRegExp(options.englishNonLetterCharactersAfterCJKCharacters)}]|\\*[^*])`, 'gmu');
-    const tail = new RegExp(`(\\[[^[]*\\]\\(.*\\)|\`[^\`]*\`|\\w+|[${escapeRegExp(options.englishNonLetterCharactersBeforeCJKCharacters)})\\]]|[^*]\\*)( *)(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})`, 'gmu');
+    const head = this.buildHeadRegex(options.englishNonLetterCharactersAfterCJKCharacters);
+    const tail = this.buildTailRegex(options.englishNonLetterCharactersBeforeCJKCharacters);
     // inline math, inline code, markdown links, and wiki links are an exception in that even though they are to be ignored we want to keep a space around these types when surrounded by CJK characters
     const regexEscapedIgnoreExceptionPlaceHolders = `${IgnoreTypes.link.placeholder}|${IgnoreTypes.inlineMath.placeholder}|${IgnoreTypes.inlineCode.placeholder}|${IgnoreTypes.wikiLink.placeholder}`.replaceAll('{', '\\{').replaceAll('}', '\\}');
     const ignoreExceptionsHead = new RegExp(`(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})( *)(${regexEscapedIgnoreExceptionPlaceHolders})`, 'gmu');
@@ -46,6 +46,32 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
     newText = updateBoldText(newText, addSpaceAroundChineseJapaneseKoreanAndEnglish);
 
     return newText;
+  }
+  buildHeadRegex(englishPunctuationAndSymbols: string): RegExp {
+    if (englishPunctuationAndSymbols && englishPunctuationAndSymbols !== '') {
+      // strip all whitespace
+      englishPunctuationAndSymbols =englishPunctuationAndSymbols.replaceAll(/\s/g, '');
+    }
+
+    let puncAndSymbolGroup = '';
+    if (englishPunctuationAndSymbols && englishPunctuationAndSymbols.length != 0) {
+      puncAndSymbolGroup = `|[${escapeRegExp(englishPunctuationAndSymbols)}]`;
+    }
+
+    return new RegExp(`(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})( *)(\\[[^[]*\\]\\(.*\\)|\`[^\`]*\`|\\w+${puncAndSymbolGroup}|\\*[^*])`, 'gmu');
+  }
+  buildTailRegex(englishPunctuationAndSymbols: string): RegExp {
+    if (englishPunctuationAndSymbols && englishPunctuationAndSymbols !== '') {
+      // strip all whitespace
+      englishPunctuationAndSymbols =englishPunctuationAndSymbols.replaceAll(/\s/g, '');
+    }
+
+    let puncAndSymbolGroup = '';
+    if (englishPunctuationAndSymbols && englishPunctuationAndSymbols.length != 0) {
+      puncAndSymbolGroup = `|[${escapeRegExp(englishPunctuationAndSymbols)}]`;
+    }
+
+    return new RegExp(`(\\[[^[]*\\]\\(.*\\)|\`[^\`]*\`|\\w+${puncAndSymbolGroup}|[^*]\\*)( *)(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})`, 'gmu');
   }
   get exampleBuilders(): ExampleBuilder<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions>[] {
     return [

@@ -135,5 +135,20 @@ ruleTest({
         englishNonLetterCharactersBeforeCJKCharacters: `+;:'"°%$)]`,
       },
     },
+    {
+      testName: 'Make sure that whitespace is removed from the value of punctuation or symbols and that an empty value does not cause issues',
+      before: dedent`
+        你好\t\t世界
+        this测试-还
+      `,
+      after: dedent`
+        你好\t\t世界
+        this 测试-还
+      `,
+      options: {
+        englishNonLetterCharactersAfterCJKCharacters: ``,
+        englishNonLetterCharactersBeforeCJKCharacters: ` \t`,
+      },
+    },
   ],
 });
