@@ -124,6 +124,18 @@ export default class LinterPlugin extends Plugin {
       if (!this.settings.ruleConfigs[rule.alias]) {
         this.settings.ruleConfigs[rule.alias] = rule.getDefaultOptions();
       }
+
+      // remove this after a reasonable amount of time
+      if (rule.alias == 'space-between-chinese-japanese-or-korean-and-english-or-numbers') {
+        const defaults = rule.getDefaultOptions();
+        if (!('english-symbols-punctuation-before' in this.settings.ruleConfigs[rule.alias])) {
+          this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-before'] = defaults['english-symbols-punctuation-before'];
+        }
+
+        if (!('english-symbols-punctuation-after' in this.settings.ruleConfigs[rule.alias])) {
+          this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = defaults['english-symbols-punctuation-after'];
+        }
+      }
     }
 
     this.updatePasteOverrideStatus();
