@@ -696,6 +696,14 @@ export default {
     'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
       'name': 'Space between Chinese Japanese or Korean and English or numbers',
       'description': 'Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)',
+      'english-symbols-punctuation-before': {
+        'name': 'English Punctuations and Symbols Before CJK',
+        'description': 'The list of non-letter punctuation and symbols to consider to be from English when found before Chinese, Japanese, or Korean characters. **Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.**',
+      },
+      'english-symbols-punctuation-after': {
+        'name': 'English Punctuations and Symbols After CJK',
+        'description': 'The list of non-letter punctuation and symbols to consider to be from English when found after Chinese, Japanese, or Korean characters. **Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.**',
+      },
     },
     // strong-style.ts
     'strong-style': {

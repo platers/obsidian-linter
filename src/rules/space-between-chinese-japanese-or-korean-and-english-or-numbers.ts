@@ -1,10 +1,14 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {updateBoldText, updateItalicsText} from '../utils/mdast';
+import {escapeRegExp} from '../utils/regex';
 
-class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions implements Options {}
+class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions implements Options {
+  englishNonLetterCharactersAfterCJKCharacters?: string = `-+'"([¥$`;
+  englishNonLetterCharactersBeforeCJKCharacters?: string = `-+;:'"°%$)]`;
+}
 
 @RuleBuilder.register
 export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers extends RuleBuilder<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions> {
@@ -23,8 +27,8 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
       text: string,
       options: SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions,
   ): string {
-    const head = /(\p{sc=Han}|\p{sc=Katakana}|\p{sc=Hiragana}|\p{sc=Hangul})( *)(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+'"([¥$]|\*[^*])/gmu;
-    const tail = /(\[[^[]*\]\(.*\)|`[^`]*`|\w+|[-+;:'"°%$)\]]|[^*]\*)( *)(\p{sc=Han}|\p{sc=Katakana}|\p{sc=Hiragana}|\p{sc=Hangul})/gmu;
+    const head = this.buildHeadRegex(options.englishNonLetterCharactersAfterCJKCharacters);
+    const tail = this.buildTailRegex(options.englishNonLetterCharactersBeforeCJKCharacters);
     // inline math, inline code, markdown links, and wiki links are an exception in that even though they are to be ignored we want to keep a space around these types when surrounded by CJK characters
     const regexEscapedIgnoreExceptionPlaceHolders = `${IgnoreTypes.link.placeholder}|${IgnoreTypes.inlineMath.placeholder}|${IgnoreTypes.inlineCode.placeholder}|${IgnoreTypes.wikiLink.placeholder}`.replaceAll('{', '\\{').replaceAll('}', '\\}');
     const ignoreExceptionsHead = new RegExp(`(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})( *)(${regexEscapedIgnoreExceptionPlaceHolders})`, 'gmu');
@@ -42,6 +46,32 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
     newText = updateBoldText(newText, addSpaceAroundChineseJapaneseKoreanAndEnglish);
 
     return newText;
+  }
+  buildHeadRegex(englishPunctuationAndSymbols: string): RegExp {
+    if (englishPunctuationAndSymbols && englishPunctuationAndSymbols !== '') {
+      // strip all whitespace
+      englishPunctuationAndSymbols =englishPunctuationAndSymbols.replaceAll(/\s/g, '');
+    }
+
+    let puncAndSymbolGroup = '';
+    if (englishPunctuationAndSymbols && englishPunctuationAndSymbols.length != 0) {
+      puncAndSymbolGroup = `|[${escapeRegExp(englishPunctuationAndSymbols)}]`;
+    }
+
+    return new RegExp(`(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})( *)(\\[[^[]*\\]\\(.*\\)|\`[^\`]*\`|\\w+${puncAndSymbolGroup}|\\*[^*])`, 'gmu');
+  }
+  buildTailRegex(englishPunctuationAndSymbols: string): RegExp {
+    if (englishPunctuationAndSymbols && englishPunctuationAndSymbols !== '') {
+      // strip all whitespace
+      englishPunctuationAndSymbols =englishPunctuationAndSymbols.replaceAll(/\s/g, '');
+    }
+
+    let puncAndSymbolGroup = '';
+    if (englishPunctuationAndSymbols && englishPunctuationAndSymbols.length != 0) {
+      puncAndSymbolGroup = `|[${escapeRegExp(englishPunctuationAndSymbols)}]`;
+    }
+
+    return new RegExp(`(\\[[^[]*\\]\\(.*\\)|\`[^\`]*\`|\\w+${puncAndSymbolGroup}|[^*]\\*)( *)(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})`, 'gmu');
   }
   get exampleBuilders(): ExampleBuilder<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions>[] {
     return [
@@ -139,6 +169,19 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
     ];
   }
   get optionBuilders(): OptionBuilderBase<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions>[] {
-    return [];
+    return [
+      new TextOptionBuilder({
+        OptionsClass: SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions,
+        nameKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.english-symbols-punctuation-before.name',
+        descriptionKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.english-symbols-punctuation-before.description',
+        optionsKey: 'englishNonLetterCharactersBeforeCJKCharacters',
+      }),
+      new TextOptionBuilder({
+        OptionsClass: SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions,
+        nameKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.english-symbols-punctuation-after.name',
+        descriptionKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.english-symbols-punctuation-after.description',
+        optionsKey: 'englishNonLetterCharactersAfterCJKCharacters',
+      }),
+    ];
   }
 }

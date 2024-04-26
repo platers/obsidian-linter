@@ -122,5 +122,33 @@ ruleTest({
         ![[流浪地球-1.webp|image title|600]]
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1036
+      testName: 'A dash can be removed from the characters to add space around for before and after CJK characters.',
+      before: dedent`
+        你好-世界
+      `,
+      after: dedent`
+        你好-世界
+      `,
+      options: {
+        englishNonLetterCharactersAfterCJKCharacters: `+'"([¥$`,
+        englishNonLetterCharactersBeforeCJKCharacters: `+;:'"°%$)]`,
+      },
+    },
+    {
+      testName: 'Make sure that whitespace is removed from the value of punctuation or symbols and that an empty value does not cause issues',
+      before: dedent`
+        你好\t\t世界
+        this测试-还
+      `,
+      after: dedent`
+        你好\t\t世界
+        this 测试-还
+      `,
+      options: {
+        englishNonLetterCharactersAfterCJKCharacters: ``,
+        englishNonLetterCharactersBeforeCJKCharacters: ` \t`,
+      },
+    },
   ],
 });
