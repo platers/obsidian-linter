@@ -122,5 +122,18 @@ ruleTest({
         ![[流浪地球-1.webp|image title|600]]
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1036
+      testName: 'A dash can be removed from the characters to add space around for before and after CJK characters.',
+      before: dedent`
+        你好-世界
+      `,
+      after: dedent`
+        你好-世界
+      `,
+      options: {
+        englishNonLetterCharactersAfterCJKCharacters: `+'"([¥$`,
+        englishNonLetterCharactersBeforeCJKCharacters: `+;:'"°%$)]`,
+      },
+    },
   ],
 });
