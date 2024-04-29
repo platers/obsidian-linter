@@ -64,7 +64,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [remove-hyphenated-line-breaks](https://platers.github.io/obsidian-linter/settings/content-rules/#remove-hyphenated-line-breaks)
 - [remove-multiple-spaces](https://platers.github.io/obsidian-linter/settings/content-rules/#remove-multiple-spaces)
 - [strong-style](https://platers.github.io/obsidian-linter/settings/content-rules/#strong-style)
-- [two-spaces-between-lines-with-content](https://platers.github.io/obsidian-linter/settings/content-rules/#two-spaces-between-lines-with-content)
+- [two-spaces-between-lines-with-content](https://platers.github.io/obsidian-linter/settings/content-rules/#line-break-between-lines-with-content)
 - [unordered-list-style](https://platers.github.io/obsidian-linter/settings/content-rules/#unordered-list-style)
 
 ### Spacing rules

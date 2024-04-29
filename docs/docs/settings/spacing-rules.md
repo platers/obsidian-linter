@@ -911,7 +911,7 @@ All paragraphs should have exactly one blank line both before and after.
 
 #### When Is a Blank Line Added?
 
-When a paragraph has another line after the current one and it does not end in 2 or more spaces or `<br>` or `<br/>`.
+When a paragraph has another line after the current one and it does not end in 2 or more spaces, `<br>`, `<br/>`, or `\`.
 
 
 ### Examples
@@ -936,7 +936,7 @@ Newlines are inserted.
 A paragraph is a line that starts with a letter.
 ``````
 </details>
-<details><summary>Paragraphs can be extended via the use of 2 or more spaces at the end of a line or line break html</summary>
+<details><summary>Paragraphs can be extended via the use of 2 or more spaces at the end of a line, a line break html or xml, or a backslash (\)</summary>
 
 Before:
 
@@ -945,6 +945,7 @@ Before:
 Content  
 Paragraph content continued <br>
 Paragraph content continued once more <br/>
+Paragraph content yet again\
 Last line of paragraph
 A new paragraph
 # H2
@@ -958,6 +959,7 @@ After:
 Content  
 Paragraph content continued <br>
 Paragraph content continued once more <br/>
+Paragraph content yet again\
 Last line of paragraph
 
 A new paragraph
@@ -1391,7 +1393,12 @@ Alias: `space-between-chinese-japanese-or-korean-and-english-or-numbers`
 
 Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)
 
+### Options
 
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `English Punctuations and Symbols Before CJK` | The list of non-letter punctuation and symbols to consider to be from English when found before Chinese, Japanese, or Korean characters. **Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.** | N/A | `-+;:'"°%$)]` |
+| `English Punctuations and Symbols After CJK` | The list of non-letter punctuation and symbols to consider to be from English when found after Chinese, Japanese, or Korean characters. **Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.** | N/A | `-+'"([¥$` |
 
 
 

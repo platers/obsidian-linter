@@ -1286,8 +1286,14 @@ Inserts the title of the file into the YAML frontmatter's aliases section. Gets 
 | ---- | ----------- | ---------- | ------------- |
 | `Preserve existing aliases section style` | If set, the `YAML aliases section style` setting applies only to the newly created sections | N/A | `true` |
 | `Keep alias that matches the filename` | Such aliases are usually redundant | N/A | false |
-| `Use the YAML key `linter-yaml-title-alias` to help with filename and heading changes` | If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array | N/A | `true` |
+| `Use the YAML key specified by `Alias Helper Key` to help with filename and heading changes` | If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array | N/A | `true` |
+| `Alias Helper Key` | The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule. | N/A | `linter-yaml-title-alias` |
 
+### Additional Info
+
+
+!!! Note
+    An empty `Alias Helper Key` will be treated as if you are using `linter-yaml-title-alias` as the value.
 
 
 ### Examples
@@ -1409,5 +1415,24 @@ aliases:
 linter-yaml-title-alias: This is a Heading
 ---
 # This is a [Heading](markdown.md)
+``````
+</details>
+<details><summary>Using `title` as `Alias Helper Key` sets the value of `title` to the alias.</summary>
+
+Before:
+
+`````` markdown
+
+``````
+
+After:
+
+`````` markdown
+---
+aliases:
+  - Filename
+title: Filename
+---
+
 ``````
 </details>
