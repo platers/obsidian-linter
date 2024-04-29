@@ -1194,13 +1194,17 @@ __Test bold__
 ``````
 </details>
 
-## Two Spaces Between Lines with Content
+## Line Break Between Lines with Content
 
 Alias: `two-spaces-between-lines-with-content`
 
-Makes sure that two spaces are added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items
+Makes sure that the specified line break is added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items
 
+### Options
 
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `Line Break Indicator` | The line break indicator to use. | `  `:   <br/><br/>`<br/>`: <br/><br/><br/>`<br>`: <br><br/><br/>`\`: \ | `  ` |
 
 ### Additional Info
 
@@ -1211,7 +1215,7 @@ Makes sure that two spaces are added to the ends of lines with content continued
 
 ### Examples
 
-<details><summary>Make sure two spaces are added to the ends of lines that have content on it and the next line for lists, blockquotes, and paragraphs</summary>
+<details><summary>Make sure two spaces are added to the ends of lines that have content on it and the next line for lists, blockquotes, and paragraphs when the line break indicator is `  `</summary>
 
 Before:
 
@@ -1235,7 +1239,7 @@ Even more continuation
 
 Paragraph lines that end in <br/>
 Or lines that end in <br>
-Are left alone
+Are left swapped
 Since they mean the same thing
 
 ``` text
@@ -1276,9 +1280,9 @@ Paragraph for with link [[other file name]].
 Continuation *of* the paragraph has `inline code block` __in it__.  
 Even more continuation
 
-Paragraph lines that end in <br/>
-Or lines that end in <br>
-Are left alone  
+Paragraph lines that end in  
+Or lines that end in  
+Are left swapped  
 Since they mean the same thing
 
 ``` text
