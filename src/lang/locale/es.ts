@@ -625,7 +625,7 @@ export default {
     },
     'yaml-title-alias': {
       'name': 'Alias de título de YAML',
-      'description': 'Inserta el título del archivo en la sección de alias de YAML frontmatter. Obtiene el título del primer H1 o nombre de archivo.',
+      'description': 'Inserta o actualiza el título del archivo en la sección de alias de YAML frontmatter. Obtiene el título del primer H1 o nombre de archivo.',
       'preserve-existing-alias-section-style': {
         'name': 'Conservar el estilo de sección de alias existente',
         'description': 'Si se establece, la configuración `Estilo de sección de alias de YAML` se aplica solo a las secciones recién creadas',

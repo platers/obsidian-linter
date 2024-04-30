@@ -790,7 +790,7 @@ export default {
     // yaml-title-alias.ts
     'yaml-title-alias': {
       'name': 'YAML Title Alias',
-      'description': 'Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
+      'description': 'Inserts or updates the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
       'preserve-existing-alias-section-style': {
         'name': 'Preserve existing aliases section style',
         'description': 'If set, the `YAML aliases section style` setting applies only to the newly created sections',
