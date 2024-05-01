@@ -228,7 +228,7 @@ export default {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
       'name': 'Auto-correct Common Misspellings',
-      'description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words.',
+      'description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words. **Note: this list can work on text from multiple languages, but this list is the same no matter what language is currently in use.**',
       'ignore-words': {
         'name': 'Ignore Words',
         'description': 'A comma separated list of lowercased words to ignore when auto-correcting',
@@ -790,7 +790,7 @@ export default {
     // yaml-title-alias.ts
     'yaml-title-alias': {
       'name': 'YAML Title Alias',
-      'description': 'Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
+      'description': 'Inserts or updates the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
       'preserve-existing-alias-section-style': {
         'name': 'Preserve existing aliases section style',
         'description': 'If set, the `YAML aliases section style` setting applies only to the newly created sections',

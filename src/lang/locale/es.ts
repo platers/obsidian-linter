@@ -189,7 +189,7 @@ export default {
   'rules': {
     'auto-correct-common-misspellings': {
       'name': 'Corrección automática de errores ortográficos comunes',
-      'description': 'Utiliza un diccionario de errores ortográficos comunes para convertirlos automáticamente a su ortografía correcta. Consulte [mapa de autocorrección](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) para obtener la lista completa de palabras corregidas automáticamente.',
+      'description': 'Utiliza un diccionario de errores ortográficos comunes para convertirlos automáticamente a su ortografía correcta. Consulte [mapa de autocorrección](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) para obtener la lista completa de palabras corregidas automáticamente. **Nota: esta lista puede funcionar en texto de varios idiomas, pero esta lista es la misma sin importar qué idioma esté en uso actualmente.**',
       'ignore-words': {
         'name': 'Ignorar palabras',
         'description': 'Una lista separada por comas de palabras en minúsculas para ignorar al corregir automáticamente',
@@ -625,7 +625,7 @@ export default {
     },
     'yaml-title-alias': {
       'name': 'Alias de título de YAML',
-      'description': 'Inserta el título del archivo en la sección de alias de YAML frontmatter. Obtiene el título del primer H1 o nombre de archivo.',
+      'description': 'Inserta o actualiza el título del archivo en la sección de alias de YAML frontmatter. Obtiene el título del primer H1 o nombre de archivo.',
       'preserve-existing-alias-section-style': {
         'name': 'Conservar el estilo de sección de alias existente',
         'description': 'Si se establece, la configuración `Estilo de sección de alias de YAML` se aplica solo a las secciones recién creadas',
