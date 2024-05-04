@@ -189,7 +189,7 @@ export default {
   'rules': {
     'auto-correct-common-misspellings': {
       'name': 'Corrección automática de errores ortográficos comunes',
-      'description': 'Utiliza un diccionario de errores ortográficos comunes para convertirlos automáticamente a su ortografía correcta. Consulte [mapa de autocorrección](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) para obtener la lista completa de palabras corregidas automáticamente.',
+      'description': 'Utiliza un diccionario de errores ortográficos comunes para convertirlos automáticamente a su ortografía correcta. Consulte [mapa de autocorrección](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) para obtener la lista completa de palabras corregidas automáticamente. **Nota: esta lista puede funcionar en texto de varios idiomas, pero esta lista es la misma sin importar qué idioma esté en uso actualmente.**',
       'ignore-words': {
         'name': 'Ignorar palabras',
         'description': 'Una lista separada por comas de palabras en minúsculas para ignorar al corregir automáticamente',
@@ -565,7 +565,11 @@ export default {
     },
     'two-spaces-between-lines-with-content': {
       'name': 'Dos espacios entre líneas con contenido',
-      'description': 'Se asegura de que se agreguen dos espacios al final de las líneas con contenido que continúa en la siguiente línea para párrafos, comillas y elementos de lista',
+      'description': 'Se asegura de que el salto de línea especificado se agregue al final de las líneas y el contenido continúe en la línea siguiente para párrafos, citas en bloque y elementos de lista.',
+      'line-break-indicator': {
+        'name': 'Indicador de salto de línea',
+        'description': 'El indicador de salto de línea a utilizar.',
+      },
     },
     'unordered-list-style': {
       'name': 'Estilo de lista desordenada',
@@ -621,7 +625,7 @@ export default {
     },
     'yaml-title-alias': {
       'name': 'Alias de título de YAML',
-      'description': 'Inserta el título del archivo en la sección de alias de YAML frontmatter. Obtiene el título del primer H1 o nombre de archivo.',
+      'description': 'Inserta o actualiza el título del archivo en la sección de alias de YAML frontmatter. Obtiene el título del primer H1 o nombre de archivo.',
       'preserve-existing-alias-section-style': {
         'name': 'Conservar el estilo de sección de alias existente',
         'description': 'Si se establece, la configuración `Estilo de sección de alias de YAML` se aplica solo a las secciones recién creadas',
@@ -694,5 +698,10 @@ export default {
     '‘’': '‘’', // leave as is
     '""': '""', // leave as is
     '“”': '“”', // leave as is
+    // yaml.ts
+    '\\': '\\', // leave as is
+    '<br>': '<br>', // leave as is
+    '  ': '  ', // leave as is
+    '<br/>': '<br/>', // leave as is
   },
 };

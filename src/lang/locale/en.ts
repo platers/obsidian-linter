@@ -228,7 +228,7 @@ export default {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
       'name': 'Auto-correct Common Misspellings',
-      'description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words.',
+      'description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words. **Note: this list can work on text from multiple languages, but this list is the same no matter what language is currently in use.**',
       'ignore-words': {
         'name': 'Ignore Words',
         'description': 'A comma separated list of lowercased words to ignore when auto-correcting',
@@ -696,6 +696,14 @@ export default {
     'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
       'name': 'Space between Chinese Japanese or Korean and English or numbers',
       'description': 'Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)',
+      'english-symbols-punctuation-before': {
+        'name': 'English Punctuations and Symbols Before CJK',
+        'description': 'The list of non-letter punctuation and symbols to consider to be from English when found before Chinese, Japanese, or Korean characters. **Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.**',
+      },
+      'english-symbols-punctuation-after': {
+        'name': 'English Punctuations and Symbols After CJK',
+        'description': 'The list of non-letter punctuation and symbols to consider to be from English when found after Chinese, Japanese, or Korean characters. **Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.**',
+      },
     },
     // strong-style.ts
     'strong-style': {
@@ -717,8 +725,12 @@ export default {
     },
     // two-spaces-between-lines-with-content.ts
     'two-spaces-between-lines-with-content': {
-      'name': 'Two Spaces Between Lines with Content',
-      'description': 'Makes sure that two spaces are added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items',
+      'name': 'Line Break Between Lines with Content',
+      'description': 'Makes sure that the specified line break is added to the ends of lines with content continued on the next line for paragraphs, blockquotes, and list items',
+      'line-break-indicator': {
+        'name': 'Line Break Indicator',
+        'description': 'The line break indicator to use.',
+      },
     },
     // unordered-list-style.ts
     'unordered-list-style': {
@@ -782,7 +794,7 @@ export default {
     // yaml-title-alias.ts
     'yaml-title-alias': {
       'name': 'YAML Title Alias',
-      'description': 'Inserts the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
+      'description': 'Inserts or updates the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
       'preserve-existing-alias-section-style': {
         'name': 'Preserve existing aliases section style',
         'description': 'If set, the `YAML aliases section style` setting applies only to the newly created sections',
@@ -861,5 +873,10 @@ export default {
     '‘’': '‘’', // leave as is
     '""': '""', // leave as is
     '“”': '“”', // leave as is
+    // yaml.ts
+    '\\': '\\', // leave as is
+    '<br>': '<br>', // leave as is
+    '  ': '  ', // leave as is
+    '<br/>': '<br/>', // leave as is
   },
 };

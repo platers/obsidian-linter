@@ -104,7 +104,10 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       textModified = true;
     } else if (keyWithValueFound) {
       const createdDateString = this.getYAMLTimestampString(text, created_match, options.dateCreatedKey);
-      if (options.forceRetentionOfCreatedValue) {
+
+      // @ts-expect-error
+      const actualFormat = parseFormat(createdDateString);
+      if (options.forceRetentionOfCreatedValue && options.format !== actualFormat) {
         const yamlCreatedDateTime = this.parseValueToCurrentFormatIfPossible(createdDateString, options.format, options.locale, options.convertToUTC);
         if (yamlCreatedDateTime == null) {
           throw new Error(getTextInLanguage('logs.invalid-date-format-error').replace('{DATE}', createdDateString).replace('{FILE_NAME}', options.fileName));
@@ -121,7 +124,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
           textModified = true;
         }
-      } else {
+      } else if (!options.forceRetentionOfCreatedValue) {
         const createdDateTime = moment(createdDateString, options.format, options.locale, true);
         if (createdDateTime == undefined || !createdDateTime.isValid()) {
           text = text.replace(
@@ -182,7 +185,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       return desiredFormatDate;
     }
 
-    // @ts-ignore
+    // @ts-expect-error
     const actualFormat = parseFormat(timestamp);
     if (actualFormat != undefined) {
       const date = utc ? moment.utc(timestamp, actualFormat) : moment(timestamp, actualFormat);
