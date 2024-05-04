@@ -1,9 +1,12 @@
 export const misspellingToCorrection = new Map<string, string>([
   ['1nd', '1st'],
+  ['1th', '1st'],
   ['2rd', '2nd'],
   ['2st', '2nd'],
+  ['2th', '2nd'],
   ['3nd', '3rd'],
   ['3st', '3rd'],
+  ['3th', '3rd'],
   ['4rd', '4th'],
   ['a-diaerers', 'a-diaereses'],
   ['aaccess', 'access'],
