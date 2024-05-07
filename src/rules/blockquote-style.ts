@@ -20,7 +20,7 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
       descriptionKey: 'rules.blockquote-style.description',
       type: RuleType.CONTENT,
       hasSpecialExecutionOrder: true, // to make sure we run after the other rules to make sure all blockquotes are affected and follow the same style
-      ruleIgnoreTypes: [IgnoreTypes.html, IgnoreTypes.code],
+      ruleIgnoreTypes: [IgnoreTypes.html, IgnoreTypes.code, IgnoreTypes.math],
     });
   }
   get OptionsClass(): new () => BlockquoteStyleOptions {
@@ -79,8 +79,15 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
       }
 
       const restOfLine = newBlockquote.substring(startOfRestOfLine, endOfRestOfLine);
+      // we need to ignore code and math blocks to prevent changing values in the display
+      if (restOfLine.includes(IgnoreTypes.math.placeholder) || restOfLine.includes(IgnoreTypes.code.placeholder)) {
+        currentIndex++;
+        continue;
+      }
+
       const isListItemMarker = startsWithListMarkerRegex.test(restOfLine);
       updatedStartOfLine = startOfLineModification(startOfLine, isListItemMarker);
+
 
       // since start of index refers to where the new line character is
       startOfIndex++;

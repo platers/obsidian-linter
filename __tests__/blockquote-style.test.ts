@@ -102,7 +102,7 @@ ruleTest({
       before: dedent`
         > Example blockquote
         >Wrongly indented line
-        > 
+        >
         >\`\`\`javascript
         > function greet() {
         >     console.log("Hello mom!")
@@ -112,12 +112,68 @@ ruleTest({
       after: dedent`
         > Example blockquote
         > Wrongly indented line
-        > 
-        > \`\`\`javascript
+        > ${''}
+        >\`\`\`javascript
         > function greet() {
         >     console.log("Hello mom!")
         > }
         > \`\`\`
+      `,
+      options: {style: 'space'},
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1087
+      testName: 'Math blocks in a blockquote should not have their spacing affected since that can remove indentation for lists',
+      before: dedent`
+        >[!INFO] Linter sublist latex repro
+        > text
+        > - list item 1
+        >     $$
+        >     f = ma
+        >     $$
+        >     - sublist item 1
+        >         $$
+        >         y = ax + b
+        >         $$
+      `,
+      after: dedent`
+        > [!INFO] Linter sublist latex repro
+        > text
+        > - list item 1
+        >     $$
+        >     f = ma
+        >     $$
+        >     - sublist item 1
+        >         $$
+        >         y = ax + b
+        >         $$
+      `,
+      options: {style: 'space'},
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1087
+      testName: 'Code blocks in a blockquote should not have their spacing affected since that can remove indentation for lists',
+      before: dedent`
+        >[!INFO] Linter sublist code repro
+        > text
+        > - list item 1
+        >     \`\`\`
+        >     f = ma
+        >     \`\`\`
+        >     - sublist item 1
+        >         \`\`\`
+        >         y = ax + b
+        >         \`\`\`
+      `,
+      after: dedent`
+        > [!INFO] Linter sublist code repro
+        > text
+        > - list item 1
+        >     \`\`\`
+        >     f = ma
+        >     \`\`\`
+        >     - sublist item 1
+        >         \`\`\`
+        >         y = ax + b
+        >         \`\`\`
       `,
       options: {style: 'space'},
     },
