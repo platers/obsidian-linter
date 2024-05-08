@@ -77,7 +77,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       let currentAliasStyle: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
       const isEmpty = aliasesValue === '';
       let isSingleString = false;
-      if (!aliasesValue.includes('\n')) {
+      if (!aliasesValue.includes('\n') && !(aliasesValue === '[]' && options.aliasArrayStyle === NormalArrayFormats.MultiLine)) {
         if (aliasesValue.match(/^\[.*\]/) === null) {
           // Note that the value here is just really a placeholder to indicate it is not single-line or multi-line
           currentAliasStyle = SpecialArrayFormats.SingleStringToSingleLine;

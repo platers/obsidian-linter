@@ -1391,5 +1391,28 @@ ruleTest({
         defaultEscapeCharacter: '"',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1085
+      testName: 'Make sure that if the aliases section is empty and the default format for arrays is multiline, then it should use multiline as the output',
+      before: dedent`
+        ---
+        aliases: []
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Filename
+        aliases2: Filename
+        ---
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        defaultEscapeCharacter: '"',
+        preserveExistingAliasesSectionStyle: true,
+        aliasHelperKey: 'aliases2',
+        keepAliasThatMatchesTheFilename: true,
+        fileName: 'Filename',
+      },
+    },
   ],
 });
