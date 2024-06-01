@@ -185,7 +185,7 @@ textarea.full-width {
 /**
 * Custom regex replacement
 */
-.linter-custom-regex-replacement-container div:last-child{
+.linter-custom-regex-replacement-container div:last-child {
   border: none;
 }
 .linter-custom-regex-replacement {
@@ -208,6 +208,25 @@ textarea.full-width {
 }
 .linter-custom-regex-replacement-label-input {
   width: 50%;
+}
+
+/**
+* Files to ignore
+*/
+.linter-files-to-ignore-container div:last-child {
+  border: none;
+}
+.linter-files-to-ignore {
+  margin-bottom: 15px;
+  border: none;
+  border-bottom: var(--hr-thickness) solid;
+  border-color: var(--hr-color);
+}
+.linter-files-to-ignore-normal-input {
+  width: 40%;
+}
+.linter-files-to-ignore-flags {
+  width: 15%;
 }
 
 /**

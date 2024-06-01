@@ -147,6 +147,16 @@ export default {
         'add-input-button-text': 'Add another folder to ignore',
         'delete-tooltip': 'Delete',
       },
+      'files-to-ignore': {
+        'name': 'Files to ignore',
+        'description': 'Files to ignore when linting all files or linting on save.',
+        'file-search-placeholder-text': 'regex for file to ignore',
+        'add-input-button-text': 'Add another file to ignore regex',
+        'delete-tooltip': 'Delete',
+        'label-placeholder-text': 'label',
+        'flags-placeholder-text': 'flags',
+        'warning': 'Use this with caution if you do not know regex. Also, please make sure that if you use lookbehinds in your regex on iOS mobile that you are on a version that supports using them.',
+      },
       'override-locale': {
         'name': 'Override locale',
         'description': 'Set this if you want to use a locale different from the default',
@@ -211,7 +221,7 @@ export default {
       // custom-replace-option.ts
       'name': 'Custom Regex Replacement',
       'description': 'Custom regex replacement can be used to replace anything that matches the find regex with the replacement value. The replace and find values will need to be valid regex values.',
-      'warning': 'Use this with caution if you do not know regex. Also, please make sure that you do not use lookbehinds in your regex on iOS mobile as that will cause linting to fail since that is not supported on that platform.',
+      'warning': 'Use this with caution if you do not know regex. Also, please make sure that if you use lookbehinds in your regex on iOS mobile that you are on a version that supports using them.',
       'add-input-button-text': 'Add new regex replacement',
       'regex-to-find-placeholder-text': 'regex to find',
       'flags-placeholder-text': 'flags',
