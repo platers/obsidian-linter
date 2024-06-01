@@ -524,6 +524,8 @@ export default class LinterPlugin extends Plugin {
     // run custom commands now since no change was made
     if (!charsAdded && !charsRemoved) {
       this.runCustomCommands(file);
+    } else {
+      this.editorLintFiles.push(file);
     }
 
     setCollectLogs(false);
