@@ -474,14 +474,16 @@ export default class LinterPlugin extends Plugin {
         oldTextFrontmatterInfo.to != newTextFrontmatterInfo.to ||
         oldTextFrontmatterInfo.frontmatter != newTextFrontmatterInfo.frontmatter) {
         let newFrontmatter: string;
+        let offset = 0;
         if (oldTextFrontmatterInfo.exists == false) {
           newFrontmatter = `---\n${newTextFrontmatterInfo.frontmatter}---`;
         } else {
           newFrontmatter = newTextFrontmatterInfo.frontmatter;
+          offset += 3; // make sure we start after the ending --- for the frontmatter to avoid an edge case update breaking the frontmatter in live preview
         }
 
         editor.replaceRange(newFrontmatter, editor.offsetToPos(oldTextFrontmatterInfo.from), editor.offsetToPos(oldTextFrontmatterInfo.to));
-        startingIndex = oldTextFrontmatterInfo.from + newFrontmatter.length;
+        startingIndex = oldTextFrontmatterInfo.from + newFrontmatter.length + offset;
       }
     }
 
