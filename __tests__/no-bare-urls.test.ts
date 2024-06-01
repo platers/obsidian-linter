@@ -217,6 +217,20 @@ ruleTest({
         noBareURIs: false,
       },
     },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/1084
+      testName: 'Make sure that URls containing `~` are properly matched',
+      before: dedent`
+        https://some.website/~username/
+        <https://some.website/~username/>
+      `,
+      after: dedent`
+        <https://some.website/~username/>
+        <https://some.website/~username/>
+      `,
+      options: {
+        noBareURIs: false,
+      },
+    },
   ],
 });
 
