@@ -1,6 +1,7 @@
 import {Options} from './rules';
 import {LintCommand} from './ui/linter-components/custom-command-option';
 import {CustomReplace} from './ui/linter-components/custom-replace-option';
+import {FileToIgnore} from './ui/linter-components/files-to-ignore-option';
 import {NestedKeyOf} from './utils/nested-keyof';
 import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from './utils/yaml';
 
@@ -24,6 +25,7 @@ export interface LinterSettings {
   lintOnFileChange: boolean,
   displayLintOnFileChangeNotice: boolean,
   foldersToIgnore: string[];
+  filesToIgnore: FileToIgnore[];
   linterLocale: string;
   logLevel: string;
   lintCommands: LintCommand[];
@@ -42,6 +44,7 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   displayLintOnFileChangeNotice: false,
   settingsConvertedToConfigKeyValues: false,
   foldersToIgnore: [],
+  filesToIgnore: [],
   linterLocale: 'system-default',
   logLevel: 'ERROR',
   lintCommands: [],

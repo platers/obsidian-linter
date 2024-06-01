@@ -8,6 +8,7 @@ import {DropdownRecordInfo, DropdownSetting} from 'src/ui/components/dropdown-se
 import {NumberInputSetting} from 'src/ui/components/number-input-setting';
 import {ToggleSetting} from 'src/ui/components/toggle-setting';
 import {FolderIgnoreOption} from '../folder-ignore-option';
+import {FilesToIgnoreOption} from '../files-to-ignore-option';
 
 export class GeneralTab extends Tab {
   constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin, private app: App) {
@@ -99,6 +100,14 @@ export class GeneralTab extends Tab {
     const folderIgnore = new FolderIgnoreOption(folderIgnoreEl, this.plugin.settingsTab.component, this.plugin.settings.foldersToIgnore, this.app, () => {
       this.plugin.saveSettings();
     });
+
     this.addSettingSearchInfo(folderIgnoreEl, folderIgnore.name, folderIgnore.description.replaceAll('\n', ' '));
+
+    const filesToIgnoreEl = this.contentEl.createDiv();
+    const filesToIgnore = new FilesToIgnoreOption(filesToIgnoreEl, this.plugin.settingsTab.component, this.plugin.settings.filesToIgnore, () => {
+      this.plugin.saveSettings();
+    });
+
+    this.addSettingSearchInfo(filesToIgnoreEl, filesToIgnore.name, filesToIgnore.description.replaceAll('\n', ' '));
   }
 }

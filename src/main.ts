@@ -347,6 +347,18 @@ export default class LinterPlugin extends Plugin {
         return true;
       }
     }
+
+    for (const fileToIgnore of this.settings.filesToIgnore) {
+      if (!fileToIgnore.match) {
+        continue;
+      }
+
+      const fileNameRegex = new RegExp(`${fileToIgnore.match}`, fileToIgnore.flags);
+      if (fileNameRegex.test(file.path)) {
+        return true;
+      }
+    }
+
     return false;
   }
 
