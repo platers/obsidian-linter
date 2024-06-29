@@ -19,7 +19,9 @@ export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterP
     return FootnoteAfterPunctuationOptions;
   }
   apply(text: string, options: FootnoteAfterPunctuationOptions): string {
-    return text.replace(/(\[\^\w+\]) ?([,.;!:?])/gm, '$2$1');
+    // Matches a footnote reference containing any text except newlines and the
+    // terminating ].
+    return text.replace(/(\[\^[^\]]+\]) ?([,.;!:?])/gm, '$2$1');
   }
   get exampleBuilders(): ExampleBuilder<FootnoteAfterPunctuationOptions>[] {
     return [
