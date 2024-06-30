@@ -1,12 +1,13 @@
 import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, MdFilePickerOptionBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {misspellingToCorrection} from '../utils/auto-correct-misspellings';
 import {wordRegex, wordSplitterRegex} from '../utils/regex';
 
 class AutoCorrectCommonMisspellingsOptions implements Options {
   ignoreWords?: string[] = [];
+  extraAutoCorrectFiles?: string[] = [];
 }
 
 @RuleBuilder.register
@@ -114,6 +115,12 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
         optionsKey: 'ignoreWords',
         splitter: wordSplitterRegex,
         separator: ', ',
+      }),
+      new MdFilePickerOptionBuilder({
+        OptionsClass: AutoCorrectCommonMisspellingsOptions,
+        nameKey: 'rules.auto-correct-common-misspellings.extra-auto-correct-files.name',
+        descriptionKey: 'rules.auto-correct-common-misspellings.extra-auto-correct-files.description',
+        optionsKey: 'extraAutoCorrectFiles',
       }),
     ];
   }

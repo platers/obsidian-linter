@@ -17,7 +17,7 @@ export default class FolderSuggester extends TextInputSuggest<string> {
     }
 
     const nonSelectedFolders = all_folders.filter((el: string) => {
-      return !this.valuesToExclude.includes(el) || el === this.inputEl.getAttribute('folderExists');
+      return !this.valuesToExclude.includes(el) || el === this.inputEl.getAttribute('folderName');
     });
 
     const folders: string[] = [];

@@ -1,5 +1,5 @@
 import {Example, Options, Rule, RuleType, registerRule, wrapLintError} from '../rules';
-import {BooleanOption, DropdownOption, DropdownRecord, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
+import {BooleanOption, DropdownOption, DropdownRecord, MdFilePickerOption, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
 import {logDebug, timingBegin, timingEnd} from '../utils/logger';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
@@ -292,5 +292,11 @@ export class TextOptionBuilder<TOptions extends Options> extends OptionBuilder<T
 export class MomentFormatOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string> {
   protected buildOption(): Option {
     return new MomentFormatOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue);
+  }
+}
+
+export class MdFilePickerOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string[]> {
+  protected buildOption(): Option {
+    return new MdFilePickerOption(this.configKey, this.nameKey, this.descriptionKey);
   }
 }

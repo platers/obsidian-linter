@@ -243,6 +243,10 @@ export default {
         'name': 'Ignore Words',
         'description': 'A comma separated list of lowercased words to ignore when auto-correcting',
       },
+      'extra-auto-correct-files': {
+        'name': 'Extra Auto-Correct Source Files',
+        'description': 'These are files that have a markdown table in them that have the initial word and the word to correct it to (these are case insensitive corrections). **Note: the tables used should have the starting and ending `|` indicators present for each line.**',
+      },
     },
     // add-blank-line-after-yaml.ts
     'add-blank-line-after-yaml': {

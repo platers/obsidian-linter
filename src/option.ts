@@ -3,6 +3,7 @@ import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import LinterPlugin from './main';
 import {parseTextToHTMLWithoutOuterParagraph} from './ui/helpers';
 import {LinterSettings} from './settings-data';
+import {AutoCorrectFilesPickerOption} from './ui/linter-components/auto-correct-files-picker-option';
 
 export type SearchOptionInfo = {name: string, description: string, options?: DropdownRecord[]}
 
@@ -169,5 +170,43 @@ export class DropdownOption extends Option {
         });
 
     this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
+  }
+}
+
+
+export class MdFilePickerOption extends Option {
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, ruleAlias?: string | null) {
+    super(configKey, nameKey, descriptionKey, [], ruleAlias);
+  }
+
+  public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
+    // const folderIgnoreEl = this.contentEl.createDiv();
+    console.log(this.configKey);
+    console.log(settings.ruleConfigs[this.ruleAlias]);
+    console.log(settings.ruleConfigs[this.ruleAlias][this.configKey]);
+    new AutoCorrectFilesPickerOption(containerEl, plugin.settingsTab.component, settings.ruleConfigs[this.ruleAlias][this.configKey], plugin.app, () => {
+      plugin.saveSettings();
+    }, this.nameKey, this.descriptionKey);
+
+    // this.addSettingSearchInfo(folderIgnoreEl, folderIgnore.name, folderIgnore.description.replaceAll('\n', ' '));
+
+    // const setting = new Setting(containerEl)
+    //     .addDropdown((dropdown) => {
+    //       // First, add all the available options
+    //       for (const option of this.options) {
+    //         dropdown.addOption(option.value.replace('enums.', ''), option.getDisplayValue());
+    //       }
+
+    //       // Set currently selected value from existing settings
+    //       dropdown.setValue(settings.ruleConfigs[this.ruleAlias][this.configKey]);
+
+    //       dropdown.onChange((value) => {
+    //         this.setOption(value, settings);
+    //         plugin.settings = settings;
+    //         plugin.saveSettings();
+    //       });
+    //     });
+
+    // this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
   }
 }
