@@ -144,5 +144,30 @@ ruleTest({
         > > \`\`\`
       `,
     },
+    { // fixes https://github.com/platers/obsidian-linter/issues/1074
+      testName: 'Make sure that a nested callout with a code block does not get joined together',
+      before: dedent`
+        > [!multi-column]
+        >
+        > > \`\`\`
+        > > some query or basic code-block
+        > > \`\`\`
+        >
+        > > \`\`\`
+        > > another query or basic code-block
+        > > \`\`\`
+      `,
+      after: dedent`
+        > [!multi-column]
+        >
+        > > \`\`\`
+        > > some query or basic code-block
+        > > \`\`\`
+        >
+        > > \`\`\`
+        > > another query or basic code-block
+        > > \`\`\`
+      `,
+    },
   ],
 });

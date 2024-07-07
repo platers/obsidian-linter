@@ -1,4 +1,4 @@
-import {calloutRegex} from './regex';
+import {calloutRegex, codeBlockBlockquoteRegex} from './regex';
 /**
  * Inserts a string at the given position in a string.
  * @param {string} str - The string to insert into
@@ -77,25 +77,6 @@ function getEmptyLineForAfterBlockquote(nextLine: string = '', isCallout: boolea
 
   // if the level after you is less than you, use that level (i.e. 3 to a 2)
   return potentialEmptyLine;
-}
-
-function getEmptyLineForBeforeBlockquote(previousLine: string = '', isCallout: boolean = false, blockquoteLevel: number = 1): string {
-  const potentialEmptyLine = getEmptyLine(previousLine);
-  const previousBlockquoteLevel = countInstances(potentialEmptyLine, '>');
-
-  // avoid joining callouts together
-  const dealingWithACallout = isCallout || calloutRegex.test(previousLine);
-  if (dealingWithACallout && blockquoteLevel === previousBlockquoteLevel) {
-    return potentialEmptyLine.substring(0, potentialEmptyLine.lastIndexOf('>'));
-  }
-
-  // if the level before you is less than or equal to you, use that level (i.e. 2 to 3)
-  if (blockquoteLevel >= previousBlockquoteLevel) {
-    return potentialEmptyLine;
-  }
-
-  // if the level before you is greater than you, use one level less than that level
-  return potentialEmptyLine.substring(0, potentialEmptyLine.lastIndexOf('>'));
 }
 
 function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFile(text: string, startOfContent: number): string {
@@ -178,7 +159,24 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
     priorLine = text.substring(indexOfLastNewLine, startOfNewContent);
   }
 
-  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForBeforeBlockquote(priorLine, isCallout, nestingLevel) : getEmptyLine(priorLine);
+  let firstLineOfBlockquote: string;
+  const indexOfEndOfFirstLine = text.indexOf('\n', startOfContent+1);
+  if (indexOfEndOfFirstLine === -1) {
+    firstLineOfBlockquote = text.substring(startOfContent);
+  } else {
+    firstLineOfBlockquote = text.substring(startOfContent, indexOfEndOfFirstLine);
+  }
+
+  let emptyLine: string;
+  if (addingEmptyLinesAroundBlockquotes) {
+    emptyLine = getEmptyLineForAfterBlockquote(priorLine, isCallout, nestingLevel);
+  } else if (countInstances(priorLine, '>') != 0 && !calloutRegex.test(priorLine) && (codeBlockBlockquoteRegex.test(priorLine) || codeBlockBlockquoteRegex.test(firstLineOfBlockquote))) {
+    // for now we will assume that the current empty line is correct if we are dealing with a table on the current or next line
+    // we can change this to the necessary implementation when this scenario is encountered
+    emptyLine = text.substring(startOfNewContent, startOfContent).trimEnd();
+  } else {
+    emptyLine = getEmptyLine(priorLine);
+  }
 
   return text.substring(0, startOfNewContent) + emptyLine + text.substring(startOfContent);
 }
@@ -287,7 +285,25 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     nextLine = text.substring(endOfNewContent + 1, indexOfSecondNewLineAfterContent);
   }
 
-  const emptyLine = addingEmptyLinesAroundBlockquotes ? getEmptyLineForAfterBlockquote(nextLine, isCallout, nestingLevel) : getEmptyLine(nextLine);
+  let lastLineOfBlockquote: string;
+  const indexOfEndOfLastLine = text.lastIndexOf('\n', endOfContent-1);
+  if (indexOfEndOfLastLine === -1) {
+    lastLineOfBlockquote = text.substring(0, endOfNewContent);
+  } else {
+    lastLineOfBlockquote = text.substring(indexOfEndOfLastLine+1, endOfContent);
+  }
+
+  let emptyLine: string;
+  if (addingEmptyLinesAroundBlockquotes) {
+    emptyLine = getEmptyLineForAfterBlockquote(nextLine, isCallout, nestingLevel);
+  } else if (codeBlockBlockquoteRegex.test(nextLine) || codeBlockBlockquoteRegex.test(lastLineOfBlockquote)) {
+    // for now we will assume that the current empty line is correct if we are dealing with a table on the current or next line
+    // we can change this to the necessary implementation when this scenario is encountered
+    emptyLine = text.substring(endOfContent, endOfNewContent).trimEnd();
+  } else {
+    emptyLine = getEmptyLine(nextLine);
+  }
+
 
   return text.substring(0, endOfContent) + emptyLine + text.substring(endOfNewContent);
 }

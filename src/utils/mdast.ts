@@ -616,7 +616,7 @@ export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
 
   for (const position of positions) {
     const codeBlock = text.substring(position.start.offset, position.end.offset);
-    if (!codeBlock.startsWith('```')) {
+    if (!codeBlock.startsWith('```') && ! codeBlock.startsWith(`~~~`)) {
       continue;
     }
 
