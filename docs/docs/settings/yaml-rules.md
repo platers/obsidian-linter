@@ -1083,6 +1083,7 @@ Keep track of the date the file was last edited in the YAML front matter. Gets d
 | `Date Modified` | Insert the date the file was last modified | N/A | `true` |
 | `Date Modified Key` | Which YAML key to use for modification date | N/A | `date modified` |
 | `Format` | Moment date format to use (see [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/)) | N/A | `dddd, MMMM Do YYYY, h:mm:ss a` |
+| `Convert Local Time to UTC` | Uses UTC equivalent for saved dates instead of local time | N/A | false |
 
 ### Additional Info
 
@@ -1166,6 +1167,75 @@ After:
 `````` markdown
 ---
 modified: Wednesday, January 1st 2020, 4:00:00 pm
+---
+# H1
+``````
+</details>
+<details><summary>Header is set with convert to UTC option true</summary>
+
+Before:
+
+`````` markdown
+# H1
+``````
+
+After:
+
+`````` markdown
+---
+date created: 2020-01-01T14:00:00+00:00
+date modified: 2020-01-02T02:00:05+00:00
+---
+# H1
+``````
+</details>
+<details><summary>dateCreated option is false with convert to UTC option true</summary>
+
+Before:
+
+`````` markdown
+# H1
+``````
+
+After:
+
+`````` markdown
+---
+date modified: 2020-01-02T02:00:05+00:00
+---
+# H1
+``````
+</details>
+<details><summary>Date Created Key is set with convert to UTC option true</summary>
+
+Before:
+
+`````` markdown
+# H1
+``````
+
+After:
+
+`````` markdown
+---
+created: 2020-01-01T14:00:00+00:00
+---
+# H1
+``````
+</details>
+<details><summary>Date Modified Key is set with convert to UTC option true</summary>
+
+Before:
+
+`````` markdown
+# H1
+``````
+
+After:
+
+`````` markdown
+---
+modified: 2020-01-02T02:00:05+00:00
 ---
 # H1
 ``````
@@ -1278,7 +1348,7 @@ title: Filename
 
 Alias: `yaml-title-alias`
 
-Inserts the title of the file into the YAML frontmatter's aliases section. Gets the title from the first H1 or filename.
+Inserts or updates the title of the file into the YAML frontmatter's aliases section. Gets the title from the first H1 or filename.
 
 ### Options
 

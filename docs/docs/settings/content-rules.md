@@ -8,7 +8,7 @@
 
 Alias: `auto-correct-common-misspellings`
 
-Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words.
+Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words. **Note: this list can work on text from multiple languages, but this list is the same no matter what language is currently in use.**
 
 ### Options
 
