@@ -13,6 +13,7 @@ export const codeBlockRegex = new RegExp(`${backtickBlockRegexTemplate}|${tildeB
 export const wikiLinkRegex = /(!?)\[{2}([^\][\n|]+)(\|([^\][\n|]+))?(\|([^\][\n|]+))?\]{2}/g;
 // based on https://davidwells.io/snippets/regex-match-markdown-links
 export const genericLinkRegex = /(!?)\[([^[]*)\](\(.*\))/g;
+// based on https://help.obsidian.md/Editing+and+formatting/Tags#Tag+format
 export const tagWithLeadingWhitespaceRegex = /(\s|^)(#[\p{L}\-_\d/]+)/gu;
 export const obsidianMultilineCommentRegex = /^%%\n[^%]*\n%%/gm;
 export const wordSplitterRegex = /[,\s]+/;
