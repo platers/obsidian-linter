@@ -505,7 +505,7 @@ export default class LinterPlugin extends Plugin {
       isBeforeStartIndex = curText.length < startingIndex;
       if (isBeforeStartIndex && curText.length + value.length >= startingIndex && type == DiffMatchPatch.DIFF_INSERT) {
         const valueIndexStart = startingIndex - curText.length;
-        curText = value.substring(0, valueIndexStart);
+        curText += value.substring(0, valueIndexStart);
         value = value.substring(valueIndexStart);
         isBeforeStartIndex = false;
       }
