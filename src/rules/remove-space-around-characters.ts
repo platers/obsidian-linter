@@ -33,7 +33,7 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
     }
 
     if (options.includeCJKSymbolsAndPunctuation) {
-      symbolsRegExpBuilder += '\u3000-\u30ff';
+      symbolsRegExpBuilder += '\u3000-\u303f';
     }
 
     if (options.includeDashes) {
