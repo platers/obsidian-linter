@@ -80,5 +80,17 @@ ruleTest({
         otherSymbols: ':;',
       },
     },
+    { // accounts for to https://github.com/platers/obsidian-linter/issues/1127
+      testName: 'Make sure that a header does not get spaces removed in some situations with CJK',
+      before: dedent`
+        ## テスト
+      `,
+      after: dedent`
+        ## テスト
+      `,
+      options: {
+        includeCJKSymbolsAndPunctuation: true,
+      },
+    },
   ],
 });
