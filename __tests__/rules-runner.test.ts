@@ -224,6 +224,26 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
       Did it stay the same?
     `,
   },
+  { // relates for https://github.com/platers/obsidian-linter/issues/1121
+    testName: 'A custom replace should respect linter ignore ranges that use the Obsidian comment format',
+    listOfRegexReplacements: [
+      {
+        label: 'Replace Did at the start of a line or look? at the end of a line', find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm',
+      },
+    ],
+    before: dedent`
+      How does this look?
+      %% linter-disable %%
+      Did it stay the same?
+      %% linter-enable %%
+    `,
+    after: dedent`
+      How does this swapped
+      %% linter-disable %%
+      Did it stay the same?
+      %% linter-enable %%
+    `,
+  },
 ];
 
 describe('Rules Runner', () => {

@@ -59,6 +59,44 @@ const ignoreListOfTypesTestCases: customIgnoresInTextTestCase[] = [
     `,
     ignoreTypes: [IgnoreTypes.customIgnore],
   },
+  {
+    name: 'when no custom ignore ranges are used and multiple times, the text is properly replaced and put back together when Obsidian comment format used',
+    text: dedent`
+      content
+      ${''}
+      %% linter-disable %%
+      ${''}
+      $$
+      abc
+      $$
+      ${''}
+      %% linter-enable %%
+      ${''}
+      content
+      ${''}
+      %% linter-disable %%
+      ${''}
+      $$
+      abc
+      $$
+      ${''}
+      %% linter-enable %%
+      ${''}
+      content
+    `,
+    expectedTextAfterIgnore: dedent`
+      content
+      ${''}
+      {CUSTOM_IGNORE_PLACEHOLDER}
+      ${''}
+      content
+      ${''}
+      {CUSTOM_IGNORE_PLACEHOLDER}
+      ${''}
+      content
+    `,
+    ignoreTypes: [IgnoreTypes.customIgnore],
+  },
 ];
 
 describe('Ignore List of Types', () => {

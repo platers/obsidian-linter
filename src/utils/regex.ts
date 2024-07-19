@@ -133,7 +133,7 @@ export function matchTagRegex(text: string): string[] {
 }
 
 export function generateHTMLLinterCommentWithSpecificTextAndWhitespaceRegexMatch(isStart: boolean): RegExp {
-  const regexTemplate = '<!-{2,} *linter-{ENDING_TEXT} *-{2,}>';
+  const regexTemplate = '(?:<!-{2,}|%%) *linter-{ENDING_TEXT} *(?:-{2,}>|%%)';
   let endingText = '';
 
   if (isStart) {
