@@ -21,6 +21,7 @@ import {LintCommand} from './ui/linter-components/custom-command-option';
 import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from './utils/strings';
 import {getTextInLanguage} from './lang/helpers';
 import CapitalizeHeadings from './rules/capitalize-headings';
+import YamlTitle from './rules/yaml-title';
 import BlockquoteStyle from './rules/blockquote-style';
 import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
@@ -115,6 +116,11 @@ export class RulesRunner {
     const postRuleLogText = getTextInLanguage('logs.post-rules');
     timingBegin(postRuleLogText);
     [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+
+    [newText] = YamlTitle.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      fileName: runOptions.fileInfo.name,
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+    });
 
     [newText] = BlockquoteStyle.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
