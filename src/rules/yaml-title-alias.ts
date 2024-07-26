@@ -32,6 +32,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       nameKey: 'rules.yaml-title-alias.name',
       descriptionKey: 'rules.yaml-title-alias.description',
       type: RuleType.YAML,
+      hasSpecialExecutionOrder: true, // this rule must run after capitalize-headings in order to update the alias correctly
     });
   }
   get OptionsClass(): new () => YamlTitleAliasOptions {

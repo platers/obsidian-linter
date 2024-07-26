@@ -22,6 +22,7 @@ import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from './utils/
 import {getTextInLanguage} from './lang/helpers';
 import CapitalizeHeadings from './rules/capitalize-headings';
 import YamlTitle from './rules/yaml-title';
+import YamlTitleAlias from './rules/yaml-title-alias';
 import BlockquoteStyle from './rules/blockquote-style';
 import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
@@ -120,6 +121,13 @@ export class RulesRunner {
     [newText] = YamlTitle.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       fileName: runOptions.fileInfo.name,
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+    });
+
+    [newText] = YamlTitleAlias.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      fileName: runOptions.fileInfo.name,
+      aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+      removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
     });
 
     [newText] = BlockquoteStyle.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
