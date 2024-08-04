@@ -27,6 +27,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
       nameKey: 'rules.yaml-title.name',
       descriptionKey: 'rules.yaml-title.description',
       type: RuleType.YAML,
+      hasSpecialExecutionOrder: true, // this rule must run after capitalize-headings in order to update the title correctly
     });
   }
   get OptionsClass(): new () => YamlTitleOptions {
