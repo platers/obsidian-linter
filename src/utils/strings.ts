@@ -1,4 +1,6 @@
 import {calloutRegex, codeBlockBlockquoteRegex} from './regex';
+import {logWarn} from './logger';
+import {getAllTablesInText} from './mdast';
 /**
  * Inserts a string at the given position in a string.
  * @param {string} str - The string to insert into
@@ -504,4 +506,32 @@ function getIndexOfEndOfLastNonEmptyLine(text: string, currentEndOfBlockquote: n
   }
 
   return currentEndOfBlockquote;
+}
+
+export function parseCustomReplacements(text: string): Map<string, string> {
+  const tableInfo = getAllTablesInText(text);
+  const customReplacements = new Map<string, string>();
+
+  let tableContent = '';
+  let tableRows = [] as string[];
+  let rowParts = [] as string[];
+  for (const table of tableInfo) {
+    tableContent = text.substring(table.startIndex, table.endIndex);
+    tableRows = tableContent.split('\n');
+    tableRows.splice(0, 2); // skip header and divider rows
+
+    for (const row of tableRows) {
+      rowParts = row.split('|');
+
+      if (rowParts.length !== 4) {
+        // TODO: move this to en.ts
+        logWarn(`"${row}" is not a valid row with custom replacements. It must have only 2 columns.`);
+        continue;
+      }
+
+      customReplacements.set(rowParts[1].trim().toLowerCase(), rowParts[2].trim());
+    }
+  }
+
+  return customReplacements;
 }

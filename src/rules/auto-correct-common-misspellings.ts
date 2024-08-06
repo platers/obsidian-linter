@@ -4,10 +4,11 @@ import RuleBuilder, {ExampleBuilder, MdFilePickerOptionBuilder, OptionBuilderBas
 import dedent from 'ts-dedent';
 import {misspellingToCorrection} from '../utils/auto-correct-misspellings';
 import {wordRegex, wordSplitterRegex} from '../utils/regex';
+import {CustomAutoCorrectContent} from '../ui/linter-components/auto-correct-files-picker-option';
 
 class AutoCorrectCommonMisspellingsOptions implements Options {
   ignoreWords?: string[] = [];
-  extraAutoCorrectFiles?: string[] = [];
+  extraAutoCorrectFiles?: CustomAutoCorrectContent[] = [];
 }
 
 @RuleBuilder.register
@@ -28,16 +29,30 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
   }
   replaceWordWithCorrectCasing(word: string, options: AutoCorrectCommonMisspellingsOptions): string {
     const lowercasedWord = word.toLowerCase();
-    if (!misspellingToCorrection.has(lowercasedWord) || options.ignoreWords.includes(lowercasedWord)) {
+    if (options.ignoreWords.includes(lowercasedWord)) {
       return word;
     }
 
-    let correctedWord = misspellingToCorrection.get(lowercasedWord);
-    if (word.charAt(0) == word.charAt(0).toUpperCase()) {
-      correctedWord = correctedWord.charAt(0).toUpperCase() + correctedWord.substring(1);
+    if (misspellingToCorrection.has(lowercasedWord)) {
+      return this.determineCorrectedWord(word, misspellingToCorrection.get(lowercasedWord));
     }
 
-    return correctedWord;
+    if (options.extraAutoCorrectFiles) {
+      for (let i = 0; i < options.extraAutoCorrectFiles.length; i++) {
+        if (options.extraAutoCorrectFiles[i].customReplacements?.has(lowercasedWord)) {
+          return this.determineCorrectedWord(word, options.extraAutoCorrectFiles[i].customReplacements?.get(lowercasedWord));
+        }
+      }
+    }
+
+    return word;
+  }
+  determineCorrectedWord(originalWord: string, replacement: string): string {
+    if (originalWord.charAt(0) == originalWord.charAt(0).toUpperCase()) {
+      replacement = replacement.charAt(0).toUpperCase() + replacement.substring(1);
+    }
+
+    return replacement;
   }
   get exampleBuilders(): ExampleBuilder<AutoCorrectCommonMisspellingsOptions>[] {
     return [
