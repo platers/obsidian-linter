@@ -9,7 +9,7 @@ export type CustomAutoCorrectContent = {filePath: string, customReplacements: Ma
 export class AutoCorrectFilesPickerOption extends AddCustomRow {
   private selectedFiles: string[] = [];
 
-  constructor(containerEl: HTMLElement, parentComponent: Component, public filesPicked: CustomAutoCorrectContent[] = [], private app: App, saveSettings: () => void, name: LanguageStringKey, description: LanguageStringKey) {
+  constructor(containerEl: HTMLElement, parentComponent: Component, public filesPicked: CustomAutoCorrectContent[], private app: App, saveSettings: () => void, name: LanguageStringKey, description: LanguageStringKey) {
     super(
         containerEl,
         parentComponent,
