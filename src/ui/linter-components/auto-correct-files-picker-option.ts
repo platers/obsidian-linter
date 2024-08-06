@@ -1,10 +1,15 @@
-import {Setting, Component, App} from 'obsidian';
+import {Setting, Component, App, TFile, normalizePath} from 'obsidian';
 import {LanguageStringKey, getTextInLanguage} from 'src/lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 import MdFileSuggester from '../suggesters/md-file-suggester';
+import {parseCustomReplacements, stripCr} from '../../utils/strings';
+
+export type CustomAutoCorrectContent = {filePath: string, customReplacements: Map<string, string>};
 
 export class AutoCorrectFilesPickerOption extends AddCustomRow {
-  constructor(containerEl: HTMLElement, parentComponent: Component, public filesPicked: string[], private app: App, saveSettings: () => void, name: LanguageStringKey, description: LanguageStringKey) {
+  private selectedFiles: string[] = [];
+
+  constructor(containerEl: HTMLElement, parentComponent: Component, public filesPicked: CustomAutoCorrectContent[] = [], private app: App, saveSettings: () => void, name: LanguageStringKey, description: LanguageStringKey) {
     super(
         containerEl,
         parentComponent,
@@ -14,8 +19,14 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
         'Add another custom file',
         saveSettings,
         ()=>{
-          const newPickedFile = '';
+          this.selectedFiles = [];
+          for (const filePicked of this.filesPicked) {
+            this.selectedFiles.push(filePicked.filePath);
+          }
+
+          const newPickedFile: CustomAutoCorrectContent = {filePath: '', customReplacements: null};
           this.filesPicked.push(newPickedFile);
+          this.selectedFiles.push('');
           this.saveSettings();
           this.addPickedFile(newPickedFile, this.filesPicked.length - 1, true);
         });
@@ -29,18 +40,27 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
     });
   }
 
-  private addPickedFile(pickedFile: string, index: number, focusOnCommand: boolean = false) {
+  private addPickedFile(pickedFile: CustomAutoCorrectContent, index: number, focusOnCommand: boolean = false) {
     const setting = new Setting(this.inputElDiv)
         .addSearch((cb) => {
-          new MdFileSuggester(this.app, cb.inputEl, this.filesPicked);
+          new MdFileSuggester(this.app, cb.inputEl, this.selectedFiles);
           cb.setPlaceholder(getTextInLanguage('tabs.general.folders-to-ignore.folder-search-placeholder-text'))
-              .setValue(pickedFile)
-              .onChange((newFolderToIgnore) => {
-                // TODO: add the logic for when a file exists and has been selected that we parse that file's contents into the extra words list
-                const folderToIgnore = newFolderToIgnore;
+              .setValue(pickedFile.filePath)
+              .onChange(async (newPickedFile) => {
+                const customReplacementFile = newPickedFile;
 
-                if (folderToIgnore === '' || folderToIgnore === cb.inputEl.getAttribute('fileName')) {
-                  this.filesPicked[index] = folderToIgnore;
+                if (customReplacementFile === '' || customReplacementFile === cb.inputEl.getAttribute('fileName')) {
+                  console.log('getting file from path...');
+                  const file = this.getFileFromPath(customReplacementFile);
+                  pickedFile.filePath = customReplacementFile;
+                  if (file) {
+                    pickedFile.customReplacements = parseCustomReplacements(stripCr(await this.app.vault.read(file)));
+                  } else {
+                    pickedFile.customReplacements = null;
+                  }
+
+                  console.log(pickedFile);
+                  this.filesPicked[index] = pickedFile;
                   this.saveSettings();
                 }
               });
@@ -63,5 +83,14 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
         });
 
     setting.settingEl.addClass('linter-no-border');
+  }
+
+  private getFileFromPath(filePath: string): TFile {
+    const file = this.app.vault.getAbstractFileByPath(normalizePath(filePath));
+    if (file instanceof TFile) {
+      return file;
+    }
+
+    return null;
   }
 }

@@ -1,3 +1,4 @@
+import {CustomAutoCorrectContent} from '../linter-components/auto-correct-files-picker-option';
 import {TextInputSuggest} from './suggest';
 import {App, TFile} from 'obsidian';
 
@@ -5,7 +6,7 @@ export default class MdFileSuggester extends TextInputSuggest<string> {
   constructor(
     public app: App,
     public inputEl: HTMLInputElement,
-    public valuesToExclude: string[] = [],
+    public valuesToExclude: CustomAutoCorrectContent[] = [],
   ) {
     super(app, inputEl);
   }
