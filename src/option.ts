@@ -184,6 +184,8 @@ export class MdFilePickerOption extends Option {
     console.log(this.configKey);
     console.log(settings.ruleConfigs[this.ruleAlias]);
     console.log(settings.ruleConfigs[this.ruleAlias][this.configKey]);
+    settings.ruleConfigs[this.ruleAlias][this.configKey] = settings.ruleConfigs[this.ruleAlias][this.configKey] ?? [];
+
     new AutoCorrectFilesPickerOption(containerEl, plugin.settingsTab.component, settings.ruleConfigs[this.ruleAlias][this.configKey], plugin.app, () => {
       plugin.saveSettings();
     }, this.nameKey, this.descriptionKey);
