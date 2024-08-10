@@ -1,5 +1,5 @@
 import {Setting, Component, App, TFile, normalizePath} from 'obsidian';
-import {LanguageStringKey, getTextInLanguage} from 'src/lang/helpers';
+import {LanguageStringKey, getTextInLanguage} from '../../lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 import MdFileSuggester from '../suggesters/md-file-suggester';
 import {parseCustomReplacements, stripCr} from '../../utils/strings';

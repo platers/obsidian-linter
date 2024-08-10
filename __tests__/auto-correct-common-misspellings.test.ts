@@ -36,5 +36,20 @@ ruleTest({
         être
       `,
     },
+    {
+      testName: 'Custom replacements should work on file content',
+      before: dedent`
+        The cartt is over theree.
+      `,
+      after: dedent`
+        The cart is over there.
+      `,
+      options: {
+        extraAutoCorrectFiles: [{
+          filePath: 'file_path',
+          customReplacements: new Map<string, string>([['cartt', 'cart'], ['theree', 'there']]),
+        }],
+      },
+    },
   ],
 });
