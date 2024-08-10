@@ -3,6 +3,7 @@ import {LanguageStringKey, getTextInLanguage} from 'src/lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 import MdFileSuggester from '../suggesters/md-file-suggester';
 import {parseCustomReplacements, stripCr} from '../../utils/strings';
+import {ParseResultsModal} from '../modals/parse-results-modal';
 
 export type CustomAutoCorrectContent = {filePath: string, customReplacements: Map<string, string>};
 
@@ -16,7 +17,7 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
         getTextInLanguage(name),
         getTextInLanguage(description),
         null,
-        'Add another custom file',
+        getTextInLanguage('options.custom-auto-correct.add-input-button-text'),
         saveSettings,
         ()=>{
           this.selectedFiles = [];
@@ -44,13 +45,12 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
     const setting = new Setting(this.inputElDiv)
         .addSearch((cb) => {
           new MdFileSuggester(this.app, cb.inputEl, this.selectedFiles);
-          cb.setPlaceholder(getTextInLanguage('tabs.general.folders-to-ignore.folder-search-placeholder-text'))
+          cb.setPlaceholder(getTextInLanguage('options.custom-auto-correct.file-search-placeholder-text'))
               .setValue(pickedFile.filePath)
               .onChange(async (newPickedFile) => {
                 const customReplacementFile = newPickedFile;
 
                 if (customReplacementFile === '' || customReplacementFile === cb.inputEl.getAttribute('fileName')) {
-                  console.log('getting file from path...');
                   const file = this.getFileFromPath(customReplacementFile);
                   pickedFile.filePath = customReplacementFile;
                   if (file) {
@@ -59,7 +59,6 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
                     pickedFile.customReplacements = null;
                   }
 
-                  console.log(pickedFile);
                   this.filesPicked[index] = pickedFile;
                   this.saveSettings();
                 }
@@ -73,8 +72,15 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
           }
         })
         .addExtraButton((cb) => {
+          cb.setIcon('info')
+              .setTooltip(getTextInLanguage('options.custom-auto-correct.show-parsed-contents-tooltip'))
+              .onClick(() => {
+                new ParseResultsModal(this.app, pickedFile).open();
+              });
+        })
+        .addExtraButton((cb) => {
           cb.setIcon('cross')
-              .setTooltip(getTextInLanguage('tabs.general.folders-to-ignore.delete-tooltip'))
+              .setTooltip(getTextInLanguage('options.custom-auto-correct.delete-tooltip'))
               .onClick(() => {
                 this.filesPicked.splice(index, 1);
                 this.saveSettings();

@@ -18,7 +18,7 @@ export class LintConfirmationModal extends Modal {
         {text: startModalMessageText + ' ' + getTextInLanguage('file-backup-text')}).id = 'confirm-dialog';
 
     this.contentEl.createDiv('modal-button-container', (buttonsEl) => {
-      buttonsEl.createEl('button', {text: 'Cancel'}).addEventListener('click', () => this.close());
+      buttonsEl.createEl('button', {text: getTextInLanguage('cancel-button-text')}).addEventListener('click', () => this.close());
 
       const btnSubmit = buttonsEl.createEl('button', {
         attr: {type: 'submit'},

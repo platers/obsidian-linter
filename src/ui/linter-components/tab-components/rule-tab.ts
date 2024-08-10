@@ -23,12 +23,6 @@ export class RuleTab extends Tab {
         optionInfo.push(option.getSearchInfo());
       }
 
-      // // add file picker for custom inputs to auto-correct-common-misspellings
-      // if (rule.alias === 'auto-correct-common-misspellings') {
-
-      // }
-
-
       this.addSettingSearchInfo(ruleDiv, rule.getName().toLowerCase(), rule.getDescription().toLowerCase(), optionInfo, ruleDiv.id);
     }
   }

@@ -1,4 +1,5 @@
 import {calloutRegex, codeBlockBlockquoteRegex} from './regex';
+import {getTextInLanguage} from '../lang/helpers';
 import {logWarn} from './logger';
 import {getAllTablesInText} from './mdast';
 /**
@@ -524,8 +525,7 @@ export function parseCustomReplacements(text: string): Map<string, string> {
       rowParts = row.split('|');
 
       if (rowParts.length !== 4) {
-        // TODO: move this to en.ts
-        logWarn(`"${row}" is not a valid row with custom replacements. It must have only 2 columns.`);
+        logWarn(getTextInLanguage('options.custom-auto-correct.custom-row-parse-warning').replace('{ROW}', row));
         continue;
       }
 
