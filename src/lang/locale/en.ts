@@ -104,8 +104,17 @@ export default {
   'warning-text': 'Warning',
   'file-backup-text': 'Make sure you have backed up your files.',
   'custom-command-warning': 'Linting multiple files with custom commands enabled is a slow process that requires the ability to open panes in the side panel. It is noticeably slower than running without custom commands enabled. Please proceed with caution.',
+  'cancel-button-text': 'Cancel',
 
   'copy-aria-label': 'Copy',
+
+  // parse-results-modal.ts
+  'parse-results-heading-text': 'Custom Parse Values',
+  'file-parse-description-text': 'The following is the list of custom replacements found in {FILE}.',
+  'no-parsed-values-found-text': 'There were no custom replacements found in {FILE}. Please make sure that all tables with custom replacements in {FILE} only have two columns and all rows start and end with a pipe (i.e. |).',
+  'find-header-text': 'Word to Find',
+  'replace-header-text': 'Replacement Word',
+  'close-button-text': 'Close',
 
   'tabs': {
     'names': {
@@ -231,6 +240,13 @@ export default {
       'move-down-tooltip': 'Move down',
       'delete-tooltip': 'Delete',
     },
+    'custom-auto-correct': {
+      'delete-tooltip': 'Delete',
+      'show-parsed-contents-tooltip': 'View parsed replacements',
+      'custom-row-parse-warning': '"{ROW}" is not a valid row with custom replacements. It must have only 2 columns.',
+      'file-search-placeholder-text': 'File name',
+      'add-input-button-text': 'Add another custom file',
+    },
   },
 
   // rules
@@ -242,6 +258,10 @@ export default {
       'ignore-words': {
         'name': 'Ignore Words',
         'description': 'A comma separated list of lowercased words to ignore when auto-correcting',
+      },
+      'extra-auto-correct-files': {
+        'name': 'Extra Auto-Correct Source Files',
+        'description': 'These are files that have a markdown table in them that have the initial word and the word to correct it to (these are case insensitive corrections). **Note: the tables used should have the starting and ending `|` indicators present for each line.**',
       },
     },
     // add-blank-line-after-yaml.ts

@@ -1,8 +1,8 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, MarkdownViewModeType, getFrontMatterInfo, FileView} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, MarkdownViewModeType, getFrontMatterInfo, FileView, normalizePath} from 'obsidian';
 import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
-import {stripCr} from './utils/strings';
+import {parseCustomReplacements, stripCr} from './utils/strings';
 import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
@@ -17,6 +17,7 @@ import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 import AsyncLock from 'async-lock';
 import {warn} from 'loglevel';
+import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -134,6 +135,16 @@ export default class LinterPlugin extends Plugin {
 
         if (!('english-symbols-punctuation-after' in this.settings.ruleConfigs[rule.alias])) {
           this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = defaults['english-symbols-punctuation-after'];
+        }
+      }
+    }
+
+    // load the custom replacements since they are not stored in the data.json when the settings data is saved
+    for (const replacementFileInfo of this.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] as CustomAutoCorrectContent[]) {
+      if (replacementFileInfo.filePath != '') {
+        const file = this.getFileFromPath(replacementFileInfo.filePath);
+        if (file) {
+          replacementFileInfo.customReplacements = parseCustomReplacements(stripCr(await this.app.vault.cachedRead(file)));
         }
       }
     }
@@ -868,5 +879,14 @@ export default class LinterPlugin extends Plugin {
   private endOfDocument(doc: string) {
     const lines = doc.split('\n');
     return {line: lines.length - 1, ch: lines[lines.length - 1].length};
+  }
+
+  private getFileFromPath(filePath: string): TFile {
+    const file = this.app.vault.getAbstractFileByPath(normalizePath(filePath));
+    if (file instanceof TFile) {
+      return file;
+    }
+
+    return null;
   }
 }
