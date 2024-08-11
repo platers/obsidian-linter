@@ -25,7 +25,8 @@ The following is a table with custom misspellings:
 
 ##### Current Limitations
 
+
 - The list of custom replacements is only loaded when the plugin initially loads or when the file is added to the list of files that include custom misspellings
-  - This means that making a change to a file that is already in the list of custom misspelling files will not work unless the Linter is reloaded or the file is removed and re-added to the list of custom misspelling files
+    * This means that making a change to a file that is already in the list of custom misspelling files will not work unless the Linter is reloaded or the file is removed and re-added to the list of custom misspelling files
 - There is no way to specify that a word is to always be capitalized
-  - This is due to how the auto-correct rule was designed as it sets the first letter of the replacement word to the case of the first letter of the word being replaced
+    - This is due to how the auto-correct rule was designed as it sets the first letter of the replacement word to the case of the first letter of the word being replaced
