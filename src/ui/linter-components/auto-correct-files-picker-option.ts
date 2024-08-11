@@ -1,4 +1,4 @@
-import {Setting, Component, App, TFile, normalizePath} from 'obsidian';
+import {Setting, Component, App, TFile, normalizePath, ExtraButtonComponent} from 'obsidian';
 import {LanguageStringKey, getTextInLanguage} from '../../lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 import MdFileSuggester from '../suggesters/md-file-suggester';
@@ -42,6 +42,7 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
   }
 
   private addPickedFile(pickedFile: CustomAutoCorrectContent, index: number, focusOnCommand: boolean = false) {
+    let showCustomParseContentButton: ExtraButtonComponent;
     const setting = new Setting(this.inputElDiv)
         .addSearch((cb) => {
           new MdFileSuggester(this.app, cb.inputEl, this.selectedFiles);
@@ -55,8 +56,12 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
                   pickedFile.filePath = customReplacementFile;
                   if (file) {
                     pickedFile.customReplacements = parseCustomReplacements(stripCr(await this.app.vault.read(file)));
+                    showCustomParseContentButton.disabled = false;
+                    showCustomParseContentButton.extraSettingsEl.addClass('clickable-icon');
                   } else {
+                    showCustomParseContentButton.disabled = true;
                     pickedFile.customReplacements = null;
+                    showCustomParseContentButton.extraSettingsEl.removeClass('clickable-icon');
                   }
 
                   this.filesPicked[index] = pickedFile;
@@ -72,11 +77,17 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
           }
         })
         .addExtraButton((cb) => {
+          showCustomParseContentButton = cb;
           cb.setIcon('info')
               .setTooltip(getTextInLanguage('options.custom-auto-correct.show-parsed-contents-tooltip'))
               .onClick(() => {
                 new ParseResultsModal(this.app, pickedFile).open();
               });
+
+          if (pickedFile.filePath === '') {
+            cb.disabled = true;
+            cb.extraSettingsEl.removeClass('clickable-icon');
+          }
         })
         .addExtraButton((cb) => {
           cb.setIcon('cross')

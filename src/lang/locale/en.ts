@@ -111,6 +111,7 @@ export default {
   // parse-results-modal.ts
   'parse-results-heading-text': 'Custom Parse Values',
   'file-parse-description-text': 'The following is the list of custom replacements found in {FILE}.',
+  'no-parsed-values-found-text': 'There were no custom replacements found in {FILE}. Please make sure that all tables with custom replacements in {FILE} only have two columns and all rows start and end with a pipe (i.e. |).',
   'find-header-text': 'Word to Find',
   'replace-header-text': 'Replacement Word',
   'close-button-text': 'Close',

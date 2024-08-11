@@ -10,18 +10,22 @@ export class ParseResultsModal extends Modal {
 
     this.contentEl.createEl('h3', {text: getTextInLanguage('parse-results-heading-text')}).style.textAlign = 'center';
 
-    this.contentEl.createEl('p', {text: getTextInLanguage('file-parse-description-text').replace('{FILE}', customAutoCorrectionInfo.filePath)}).id = 'confirm-dialog';
+    if (customAutoCorrectionInfo?.customReplacements.size > 0) {
+      this.contentEl.createEl('p', {text: getTextInLanguage('file-parse-description-text').replace('{FILE}', customAutoCorrectionInfo.filePath)}).id = 'confirm-dialog';
 
-    const tableEl = this.contentEl.createDiv().createEl('table', {cls: 'markdown-rendered'});
-    const tableHeaderEl = tableEl.createEl('tr');
-    tableHeaderEl.createEl('th', {text: getTextInLanguage('find-header-text')});
-    tableHeaderEl.createEl('th', {text: getTextInLanguage('replace-header-text')});
+      const tableEl = this.contentEl.createDiv().createEl('table', {cls: 'markdown-rendered'});
+      const tableHeaderEl = tableEl.createEl('tr');
+      tableHeaderEl.createEl('th', {text: getTextInLanguage('find-header-text')});
+      tableHeaderEl.createEl('th', {text: getTextInLanguage('replace-header-text')});
 
-    let tableRow: HTMLElement;
-    for (const replacementInfo of customAutoCorrectionInfo.customReplacements) {
-      tableRow = tableEl.createEl('tr');
-      tableRow.createEl('td', {text: replacementInfo[0]});
-      tableRow.createEl('td', {text: replacementInfo[1]});
+      let tableRow: HTMLElement;
+      for (const replacementInfo of customAutoCorrectionInfo.customReplacements) {
+        tableRow = tableEl.createEl('tr');
+        tableRow.createEl('td', {text: replacementInfo[0]});
+        tableRow.createEl('td', {text: replacementInfo[1]});
+      }
+    } else {
+      this.contentEl.createEl('p', {text: getTextInLanguage('no-parsed-values-found-text').replaceAll('{FILE}', customAutoCorrectionInfo.filePath)}).style.fontWeight = 'bold';
     }
 
     this.contentEl.createDiv('modal-button-container', (buttonsEl) => {
@@ -30,4 +34,3 @@ export class ParseResultsModal extends Modal {
   }
 }
 
-// function createParseResultsTable(customAutoCorrectionInfo: CustomAutoCorrectContent) {}
