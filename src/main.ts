@@ -140,7 +140,7 @@ export default class LinterPlugin extends Plugin {
     }
 
     // load the custom replacements since they are not stored in the data.json when the settings data is saved
-    for (const replacementFileInfo of this.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] as CustomAutoCorrectContent[]) {
+    for (const replacementFileInfo of this.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
       if (replacementFileInfo.filePath != '') {
         const file = this.getFileFromPath(replacementFileInfo.filePath);
         if (file) {
