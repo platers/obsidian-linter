@@ -41,6 +41,27 @@ const mockedPlugins = [replace({
   },
   delimiters: ['', ''],
 })];
+const unusedCodeForProduction = [replace({
+  values: {
+    // remove values for examples as they are not necessary in the actual plugin when it goes out to users
+    'abstract get exampleBuilders(): ExampleBuilder<TOptions>[];': '',
+    // removes eslint disabling that was just meant for examples
+    '/* eslint-disable no-tabs */': '',
+    '/* eslint-disable no-mixed-spaces-and-tabs, no-tabs */': '',
+    // remove eslint enabling that was just meant for examples
+    '/* eslint-enable no-tabs */': '',
+    '/* eslint-enable no-mixed-spaces-and-tabs, no-tabs */': '',
+    // add the multiline comment to remove the examples
+    'get exampleBuilders():': '/*',
+    // add the ending of the multiline comment that will remove the examples
+    '}\n  get optionBuilders()': '*/ get optionBuilders()',
+    // removes the logic that adds the examples to the rule
+    'builder.exampleBuilders.map((b) => b.example),': '',
+    // removes the expectation that examples will exist on the rule class
+    'public examples: Array<Example>,': '',
+  },
+  delimiters: ['', ''],
+})];
 
 const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
   return {
@@ -65,18 +86,20 @@ const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
   };
 };
 
-esbuild.build(
-    createEsbuildArgs(banner, 'src/main.ts', 'main.js', []),
-).catch(() => process.exit(1));
+const esbuildArgs = [
+  createEsbuildArgs(banner, 'src/main.ts', 'main.js', unusedCodeForProduction),
+  createEsbuildArgs(mockedBanner, 'src/docs.ts', 'docs.js', mockedPlugins),
+  createEsbuildArgs(mockedBanner, 'src/translation-helper.ts', 'translation-helper.js', mockedPlugins),
+  createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []),
+];
 
-esbuild.build(
-    createEsbuildArgs(mockedBanner, 'src/docs.ts', 'docs.js', mockedPlugins),
-).catch(() => process.exit(1));
-
-esbuild.build(
-    createEsbuildArgs(mockedBanner, 'src/translation-helper.ts', 'translation-helper.js', mockedPlugins),
-).catch(() => process.exit(1));
-
-esbuild.build(
-    createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []),
-).catch(() => process.exit(1));
+for (let i = 0; i < esbuildArgs.length; i++) {
+  if (prod) {
+    esbuild.build(
+        esbuildArgs[i],
+    ).catch(() => process.exit(1));
+  } else {
+    const context = await esbuild.context(esbuildArgs[i]);
+    await context.watch();
+  }
+}
