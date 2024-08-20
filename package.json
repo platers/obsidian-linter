@@ -47,13 +47,13 @@
     "ts-node": "^10.9.2",
     "tslib": "^2.4.1",
     "typescript": "^5.4.2",
-    "unified-lint-rule": "^2.1.1"
+    "unified-lint-rule": "^2.1.1",
+    "@babel/plugin-transform-private-methods": "^7.23.3",
+    "@types/js-yaml": "^4.0.5"
   },
   "dependencies": {
-    "@babel/plugin-transform-private-methods": "^7.23.3",
-    "@popperjs/core": "^2.11.6",
-    "@types/js-yaml": "^4.0.5",
     "async-lock": "^1.4.1",
+    "@popperjs/core": "^2.11.6",
     "diff-match-patch": "^1.0.5",
     "js-yaml": "^4.1.0",
     "loglevel": "^1.9.1",

@@ -57,6 +57,7 @@ export default class LinterPlugin extends Plugin {
   private lastActiveFile: TFile;
   private overridePaste: boolean = false;
   private hasCustomCommands: boolean = false;
+  private hasLoadedFiles: boolean = false;
   private customCommandsLock = new AsyncLock();
   private originalSaveCallback?: () => void = null;
   // The amount of files you can use editor lint on at once is pretty small, so we will use an array
@@ -135,16 +136,6 @@ export default class LinterPlugin extends Plugin {
 
         if (!('english-symbols-punctuation-after' in this.settings.ruleConfigs[rule.alias])) {
           this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = defaults['english-symbols-punctuation-after'];
-        }
-      }
-    }
-
-    // load the custom replacements since they are not stored in the data.json when the settings data is saved
-    for (const replacementFileInfo of this.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
-      if (replacementFileInfo.filePath != '') {
-        const file = this.getFileFromPath(replacementFileInfo.filePath);
-        if (file) {
-          replacementFileInfo.customReplacements = parseCustomReplacements(stripCr(await this.app.vault.cachedRead(file)));
         }
       }
     }
@@ -311,7 +302,7 @@ export default class LinterPlugin extends Plugin {
       menu.addItem((item) => {
         item.setIcon(iconInfo.file.id)
             .setTitle(getTextInLanguage('commands.lint-file-pop-up-menu-text.name'))
-            .onClick(async () => {
+            .onClick(() => {
               const activeFile = this.app.workspace.getActiveFile();
               const editor = this.getEditor();
               if (activeFile === file && editor) {
@@ -378,6 +369,10 @@ export default class LinterPlugin extends Plugin {
   }
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
+    if (!this.hasLoadedFiles) {
+      await this.loadCustomReplacements();
+    }
+
     const oldText = stripCr(await this.app.vault.read(file));
     const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
 
@@ -462,11 +457,15 @@ export default class LinterPlugin extends Plugin {
     new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder), this.settings.lintCommands && this.settings.lintCommands.length > 0).open();
   }
 
-  runLinterEditor(editor: Editor) {
+  async runLinterEditor(editor: Editor) {
     setCollectLogs(this.settings.recordLintOnSaveLogs);
     clearLogs();
 
     logInfo(getTextInLanguage('logs.linter-run'));
+
+    if (!this.hasLoadedFiles) {
+      await this.loadCustomReplacements();
+    }
 
     const file = this.app.workspace.getActiveFile();
     const oldText = editor.getValue();
@@ -879,6 +878,19 @@ export default class LinterPlugin extends Plugin {
   private endOfDocument(doc: string) {
     const lines = doc.split('\n');
     return {line: lines.length - 1, ch: lines[lines.length - 1].length};
+  }
+
+  private async loadCustomReplacements() {
+    for (const replacementFileInfo of this.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
+      if (replacementFileInfo.filePath != '') {
+        const file = this.getFileFromPath(replacementFileInfo.filePath);
+        if (file) {
+          replacementFileInfo.customReplacements = parseCustomReplacements(stripCr(await this.app.vault.cachedRead(file)));
+        }
+      }
+    }
+
+    this.hasLoadedFiles = true;
   }
 
   private getFileFromPath(filePath: string): TFile {
