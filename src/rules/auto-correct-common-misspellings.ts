@@ -39,8 +39,8 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
 
     if (options.extraAutoCorrectFiles) {
       for (let i = 0; i < options.extraAutoCorrectFiles.length; i++) {
-        if (options.extraAutoCorrectFiles[i].customReplacements?.has(lowercasedWord)) {
-          return this.determineCorrectedWord(word, options.extraAutoCorrectFiles[i].customReplacements?.get(lowercasedWord));
+        if (options.extraAutoCorrectFiles[i].customReplacements instanceof Map && options.extraAutoCorrectFiles[i].customReplacements?.has(lowercasedWord)) {
+          return this.determineCorrectedWord(word, options.extraAutoCorrectFiles[i].customReplacements.get(lowercasedWord));
         }
       }
     }
