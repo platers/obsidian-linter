@@ -101,12 +101,11 @@ export class FileLintManager {
       fileCreatedTime: data.fileInfo.createdAtFormatted,
       fileModifiedTime: data.fileInfo.modifiedAtFormatted,
       currentTime: currentTime,
-      alreadyModified: data.oldText != newText,
+      alreadyModified: data.oldText != data.newText,
       locale: data.momentLocale,
     });
 
     const yamlTimestampOptions = YamlTimestamp.getRuleOptions(data.settings);
-
     currentTime = moment();
     currentTime.locale(data.momentLocale);
     [newText] = YamlKeySort.applyIfEnabled(newText, data.settings, data.disabledRules, {
