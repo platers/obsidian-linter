@@ -6,7 +6,7 @@ import moment from 'moment';
 
 const cursorStart = 319;
 
-function modeSetup(plugin: TestLinterPlugin, editor: Editor) {
+function modeSetup(plugin: TestLinterPlugin, editor: Editor): Promise<void> {
   plugin.plugin.settings.ruleConfigs['yaml-key-sort'] = {
     'enabled': true,
     'yaml-key-priority-sort-order': '',
@@ -15,6 +15,8 @@ function modeSetup(plugin: TestLinterPlugin, editor: Editor) {
   };
 
   editor.setCursor(editor.offsetToPos(cursorStart));
+
+  return;
 }
 
 function modeAssertions(editor: Editor) {
@@ -30,7 +32,7 @@ function edgeCaseExpectedTextModifications(text: string):string {
 }
 
 
-function edgeCaseSetup(plugin: TestLinterPlugin, _: Editor) {
+function edgeCaseSetup(plugin: TestLinterPlugin, _: Editor): Promise<void> {
   plugin.plugin.settings.ruleConfigs['yaml-timestamp'] = {
     'enabled': true,
     'date-created': true,
@@ -78,6 +80,8 @@ function edgeCaseSetup(plugin: TestLinterPlugin, _: Editor) {
     'enabled': true,
     'style': 'asterisk',
   };
+
+  return;
 }
 
 export const obsidianModeTestCases: IntegrationTestCase[] = [
@@ -85,7 +89,7 @@ export const obsidianModeTestCases: IntegrationTestCase[] = [
     name: 'Updating YAML in live preview mode does not break YAML and keeps cursor at the expected location',
     filePath: 'obsidian-mode/mode-yaml.md',
     async setup(plugin: TestLinterPlugin, editor: Editor) {
-      modeSetup(plugin, editor),
+      await modeSetup(plugin, editor),
       await setWorkspaceItemMode(plugin.app, false);
     },
     assertions: modeAssertions,
@@ -100,7 +104,7 @@ export const obsidianModeTestCases: IntegrationTestCase[] = [
     name: 'Updating YAML in live preview mode does not break YAML when an update is being made to the end of the frontmatter',
     filePath: 'obsidian-mode/edge-case-yaml.md',
     async setup(plugin: TestLinterPlugin, editor: Editor) {
-      edgeCaseSetup(plugin, editor),
+      await edgeCaseSetup(plugin, editor),
       await setWorkspaceItemMode(plugin.app, false);
     },
     modifyExpected: edgeCaseExpectedTextModifications,

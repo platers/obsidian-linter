@@ -1,10 +1,12 @@
 import TestLinterPlugin, {IntegrationTestCase} from './main.test';
 import {Editor} from 'obsidian';
 
-function addBlankLineAfterSetup(plugin: TestLinterPlugin, _editor: Editor) {
+function addBlankLineAfterSetup(plugin: TestLinterPlugin, _: Editor): Promise<void> {
   plugin.plugin.settings.ruleConfigs['add-blank-line-after-yaml'] = {
     'enabled': true,
   };
+
+  return;
 }
 
 export const obsidianYAMLRuleTestCases: IntegrationTestCase[] = [

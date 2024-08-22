@@ -1,4 +1,4 @@
-import {Editor, MarkdownView, Plugin, TFile, normalizePath} from 'obsidian';
+import {Editor, MarkdownView, Notice, Plugin, TFile, normalizePath} from 'obsidian';
 import LinterPlugin from 'src/main';
 import {obsidianModeTestCases} from './obsidian-mode.test';
 import {setWorkspaceItemMode} from './utils.test';
@@ -9,9 +9,9 @@ import expect from 'expect';
 export type IntegrationTestCase = {
   name: string,
   filePath: string,
-  setup?: (plugin: TestLinterPlugin, editor: Editor) => void,
+  setup?: (plugin: TestLinterPlugin, editor: Editor) => Promise<void>,
   assertions?: (editor: Editor) => void,
-  modifyExpected? (expectedText: string): string,
+  modifyExpected?: (expectedText: string) => string,
 }
 
 const testTimeout = 15000;
@@ -22,6 +22,7 @@ export default class TestLinterPlugin extends Plugin {
   plugin: LinterPlugin;
   private testsCompleted: number;
   private timeoutId: any = undefined;
+  private testRunNotice: Notice;
 
   async onload() {
     this.addCommand({
@@ -61,6 +62,8 @@ export default class TestLinterPlugin extends Plugin {
   }
 
   async runTests() {
+    this.testRunNotice = new Notice('Starting the Linter\'s Integration Tests', 0);
+
     const activeLeaf = this.getActiveLeaf();
     if (!activeLeaf) {
       console.error('failed to get active leaf');
@@ -80,7 +83,7 @@ export default class TestLinterPlugin extends Plugin {
 
       try {
         if (t.setup) {
-          t.setup(this, activeLeaf.editor);
+          await t.setup(this, activeLeaf.editor);
         }
 
         await this.plugin.runLinterEditor(activeLeaf.editor);
@@ -94,8 +97,12 @@ export default class TestLinterPlugin extends Plugin {
         this.testsCompleted++;
       }
 
-      console.log('resetting file contents for ' + t.filePath);
       await this.resetFileContents(activeLeaf, originalText);
+    }
+
+    if (this.testsCompleted != this.regularTests.length) {
+      console.log(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
+      return;
     }
 
     await this.runMetadataTests(this.afterCacheUpdateTests, activeLeaf);
@@ -134,12 +141,9 @@ export default class TestLinterPlugin extends Plugin {
       await that.resetFileContents(activeLeaf, originalText);
 
       originalText = null;
-      while (index+1 < tests.length && originalText == null) {
+      if (index+1 < tests.length) {
         originalText = await that.setupMetadataTest(that, tests[++index], activeLeaf);
-      }
-
-      // remove the custom commands callback once all tests have run
-      if (index >= tests.length && originalText == null) {
+      } else { // remove the custom commands callback once all tests have run
         that.plugin.setCustomCommandCallback(null);
       }
     });
@@ -158,7 +162,7 @@ export default class TestLinterPlugin extends Plugin {
 
     try {
       if (t.setup) {
-        t.setup(this, activeLeaf.editor);
+        await t.setup(this, activeLeaf.editor);
       }
 
       await testPlugin.plugin.runLinterEditor(activeLeaf.editor);
@@ -192,6 +196,8 @@ export default class TestLinterPlugin extends Plugin {
     }
 
     console.log('assertions complete for ' + t.filePath);
+
+    return;
   }
 
   private async resetFileContents(activeLeaf: MarkdownView, originalText: string) {
@@ -229,4 +235,8 @@ export default class TestLinterPlugin extends Plugin {
   private async resetSettings() {
     await this.plugin.loadSettings();
   }
+
+  // private updateNoticeText() {
+
+  // }
 }

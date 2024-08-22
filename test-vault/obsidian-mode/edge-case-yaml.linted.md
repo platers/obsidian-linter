@@ -14,7 +14,7 @@ readings:
   - "[[test]]"
   - "[[test 2#1.1 test chapter]]"
 
-created: {{created_date}}
+created: 2024-08-21
 last_modified: {{modified_date}}
 ---
 
