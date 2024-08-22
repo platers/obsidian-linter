@@ -1,27 +1,28 @@
 ---
 author:
-- Somebody
+  - Somebody
 citation: unknown
 cover: https:github.com
 datePub: 1993
 device:
-- dsi
+  - dsi
 format:
-- epub
+  - epub
 priority: 2
 publisher: Pokemon Publisher
 readingStatus: easy
-related:
+related: 
 researchArea:
-- scifi
-status:
-summary:
+  - scifi
+status: 
+summary: 
 tags:
-- pokemon
-- monsters
+  - pokemon
+  - monsters
 title: Pokemon
 total: 481
-withProject:
+withProject: 
 ---
 # Heading here...
+
 Some text here...

@@ -14,8 +14,8 @@ readings:
   - "[[test]]"
   - "[[test 2#1.1 test chapter]]"
 
-created: ${moment().format('YYYY-MM-DD')}
-last_modified: ${moment().format('YYYY-MM-DD')}
+created: {{created_date}}
+last_modified: {{modified_date}}
 ---
 
 - Focus on XYZ.

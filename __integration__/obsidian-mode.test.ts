@@ -2,6 +2,7 @@ import TestLinterPlugin, {IntegrationTestCase} from './main.test';
 import {Editor} from 'obsidian';
 import expect from 'expect';
 import {setWorkspaceItemMode} from './utils.test';
+import moment from 'moment';
 
 const cursorStart = 319;
 
@@ -20,6 +21,14 @@ function modeAssertions(editor: Editor) {
   // one character was added before the cursor
   expect(editor.posToOffset(editor.getCursor())).toBe(cursorStart+1);
 }
+
+function edgeCaseExpectedTextModifications(text: string):string {
+  text = text.replace('{{created_date}}', moment().format('YYYY-MM-DD'));
+  text = text.replace('{{modified_date}}', moment().format('YYYY-MM-DD'));
+
+  return text;
+}
+
 
 function edgeCaseSetup(plugin: TestLinterPlugin, _: Editor) {
   plugin.plugin.settings.ruleConfigs['yaml-timestamp'] = {
@@ -94,10 +103,12 @@ export const obsidianModeTestCases: IntegrationTestCase[] = [
       edgeCaseSetup(plugin, editor),
       await setWorkspaceItemMode(plugin.app, false);
     },
+    modifyExpected: edgeCaseExpectedTextModifications,
   },
   {
     name: 'Updating YAML in source mode does not break YAML when an update is being made to the end of the frontmatter',
     filePath: 'obsidian-mode/edge-case-yaml.md',
     setup: edgeCaseSetup,
+    modifyExpected: edgeCaseExpectedTextModifications,
   },
 ];

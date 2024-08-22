@@ -11,6 +11,7 @@ export type IntegrationTestCase = {
   filePath: string,
   setup?: (plugin: TestLinterPlugin, editor: Editor) => void,
   assertions?: (editor: Editor) => void,
+  modifyExpected? (expectedText: string): string,
 }
 
 const testTimeout = 15000;
@@ -84,10 +85,7 @@ export default class TestLinterPlugin extends Plugin {
         }
 
         await this.plugin.runLinterEditor(activeLeaf.editor);
-        expect(activeLeaf.editor).toBe(await this.getExpectedContents(t.filePath.replace('.md', '.linted.md')));
-        if (t.assertions) {
-          await t.assertions(activeLeaf.editor);
-        }
+        await this.handleAssertions(t, activeLeaf);
 
         console.log('✅', t.name);
         this.testsCompleted++;
@@ -123,10 +121,7 @@ export default class TestLinterPlugin extends Plugin {
 
       const t = tests[index];
       try {
-        expect(activeLeaf.editor).toBe(await this.getExpectedContents(t.filePath.replace('.md', '.linted.md')));
-        if (t.assertions) {
-          await t.assertions(activeLeaf.editor);
-        }
+        await this.handleAssertions(t, activeLeaf);
 
         console.log('✅', t.name);
         this.testsCompleted++;
@@ -182,6 +177,18 @@ export default class TestLinterPlugin extends Plugin {
   onunload(): void {
     if (this.plugin) {
       this.plugin.onunload();
+    }
+  }
+
+  private async handleAssertions(t: IntegrationTestCase, activeLeaf: MarkdownView) {
+    let expectedText = await this.getExpectedContents(t.filePath.replace('.md', '.linted.md'));
+    if (t.modifyExpected) {
+      expectedText = t.modifyExpected(expectedText);
+    }
+
+    expect(activeLeaf.editor.getValue()).toBe(expectedText);
+    if (t.assertions) {
+      await t.assertions(activeLeaf.editor);
     }
   }
 
