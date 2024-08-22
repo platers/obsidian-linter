@@ -4,13 +4,13 @@ import {obsidianModeTestCases} from './obsidian-mode.test';
 import {setWorkspaceItemMode} from './utils.test';
 import {customCommandTestCases} from './custom-commands.test';
 import {obsidianYAMLRuleTestCases} from './yaml-rule.test';
-import {sleep} from './utils.test';
+import expect from 'expect';
 
 export type IntegrationTestCase = {
   name: string,
   filePath: string,
   setup?: (plugin: TestLinterPlugin, editor: Editor) => void,
-  assertions: (editor: Editor) => void,
+  assertions?: (editor: Editor) => void,
 }
 
 const testTimeout = 15000;
@@ -42,8 +42,6 @@ export default class TestLinterPlugin extends Plugin {
             console.log(`✅ all ${expectedTestCount} tests have completed in the alloted time.`);
           }
         }, testTimeout);
-
-        await sleep(500);
 
         await this.runTests();
       },
@@ -86,7 +84,10 @@ export default class TestLinterPlugin extends Plugin {
         }
 
         await this.plugin.runLinterEditor(activeLeaf.editor);
-        await t.assertions(activeLeaf.editor);
+        expect(activeLeaf.editor).toBe(await this.getExpectedContents(t.filePath.replace('.md', '.linted.md')));
+        if (t.assertions) {
+          await t.assertions(activeLeaf.editor);
+        }
 
         console.log('✅', t.name);
         this.testsCompleted++;
@@ -122,7 +123,10 @@ export default class TestLinterPlugin extends Plugin {
 
       const t = tests[index];
       try {
-        await t.assertions(activeLeaf.editor);
+        expect(activeLeaf.editor).toBe(await this.getExpectedContents(t.filePath.replace('.md', '.linted.md')));
+        if (t.assertions) {
+          await t.assertions(activeLeaf.editor);
+        }
 
         console.log('✅', t.name);
         this.testsCompleted++;
@@ -192,6 +196,16 @@ export default class TestLinterPlugin extends Plugin {
     const activeLeaf = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!activeLeaf) return null;
     return activeLeaf;
+  }
+
+  private async getExpectedContents(filePath: string): Promise<string> {
+    const file = this.getFileFromPath(filePath);
+    if (!file) {
+      console.error('failed to get file: ' + filePath);
+      return;
+    }
+
+    return await this.app.vault.cachedRead(file);
   }
 
   private getFileFromPath(filePath: string): TFile {
