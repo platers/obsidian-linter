@@ -21,8 +21,7 @@ export default class TestLinterPlugin extends Plugin {
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
   private testsCompleted: number;
-  // eslint-disable-next-line no-undef
-  private timeoutId: Timeout = undefined;
+  private timeoutId: any = undefined;
 
   async onload() {
     this.addCommand({
@@ -81,7 +80,7 @@ export default class TestLinterPlugin extends Plugin {
 
       try {
         if (t.setup) {
-          await t.setup(this, activeLeaf.editor);
+          t.setup(this, activeLeaf.editor);
         }
 
         await this.plugin.runLinterEditor(activeLeaf.editor);
@@ -95,6 +94,7 @@ export default class TestLinterPlugin extends Plugin {
         this.testsCompleted++;
       }
 
+      console.log('resetting file contents for ' + t.filePath);
       await this.resetFileContents(activeLeaf, originalText);
     }
 
@@ -158,7 +158,7 @@ export default class TestLinterPlugin extends Plugin {
 
     try {
       if (t.setup) {
-        await t.setup(this, activeLeaf.editor);
+        t.setup(this, activeLeaf.editor);
       }
 
       await testPlugin.plugin.runLinterEditor(activeLeaf.editor);
@@ -174,9 +174,9 @@ export default class TestLinterPlugin extends Plugin {
     return originalText;
   }
 
-  onunload(): void {
+  async onunload(): Promise<void> {
     if (this.plugin) {
-      this.plugin.onunload();
+      await this.plugin.onunload();
     }
   }
 
@@ -188,8 +188,10 @@ export default class TestLinterPlugin extends Plugin {
 
     expect(activeLeaf.editor.getValue()).toBe(expectedText);
     if (t.assertions) {
-      await t.assertions(activeLeaf.editor);
+      t.assertions(activeLeaf.editor);
     }
+
+    console.log('assertions complete for ' + t.filePath);
   }
 
   private async resetFileContents(activeLeaf: MarkdownView, originalText: string) {

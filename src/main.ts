@@ -115,7 +115,7 @@ export default class LinterPlugin extends Plugin {
     }
 
     setLogLevel(this.settings.logLevel);
-    this.setOrUpdateMomentInstance();
+    await this.setOrUpdateMomentInstance();
 
     if (!this.settings.settingsConvertedToConfigKeyValues) {
       this.moveConfigValuesToKeyBasedFormat();
@@ -160,7 +160,7 @@ export default class LinterPlugin extends Plugin {
           return that.isMarkdownFile(ctx.file);
         }
 
-        that.runLinterEditor(editor);
+        void that.runLinterEditor(editor);
       },
       icon: iconInfo.file.id,
       hotkeys: [
@@ -180,7 +180,7 @@ export default class LinterPlugin extends Plugin {
         }
 
         if (!that.shouldIgnoreFile(ctx.file)) {
-          that.runLinterEditor(editor);
+          void that.runLinterEditor(editor);
         }
       },
       icon: iconInfo.file.id,
@@ -221,7 +221,7 @@ export default class LinterPlugin extends Plugin {
           return this.overridePaste;
         }
 
-        this.pasteAsPlainText(editor);
+        void this.pasteAsPlainText(editor);
       },
     });
   }
@@ -235,7 +235,7 @@ export default class LinterPlugin extends Plugin {
         return;
       }
 
-      this.modifyPasteEvent(clipboardEv);
+      void this.modifyPasteEvent(clipboardEv);
     });
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
@@ -270,7 +270,7 @@ export default class LinterPlugin extends Plugin {
           if (editor) {
             const file = this.app.workspace.getActiveFile();
             if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file)) {
-              this.runLinterEditor(editor);
+              void this.runLinterEditor(editor);
             }
           }
         }
@@ -289,11 +289,11 @@ export default class LinterPlugin extends Plugin {
     if (this.editorLintFiles.includes(file)) {
       this.editorLintFiles.remove(file);
 
-      this.runCustomCommands(file);
+      void this.runCustomCommands(file);
     } else if (this.fileLintFiles.has(file)) {
       this.fileLintFiles.delete(file);
 
-      this.runCustomCommandsInSidebar(file);
+      void this.runCustomCommandsInSidebar(file);
     }
   }
 
@@ -306,9 +306,9 @@ export default class LinterPlugin extends Plugin {
               const activeFile = this.app.workspace.getActiveFile();
               const editor = this.getEditor();
               if (activeFile === file && editor) {
-                this.runLinterEditor(editor);
+                void this.runLinterEditor(editor);
               } else {
-                this.runLinterFile(file);
+                void this.runLinterFile(file);
               }
             });
       });
@@ -545,7 +545,7 @@ export default class LinterPlugin extends Plugin {
 
     // run custom commands now since no change was made
     if (!charsAdded && !charsRemoved) {
-      this.runCustomCommands(file);
+      void this.runCustomCommands(file);
     } else {
       this.editorLintFiles.push(file);
     }
@@ -837,7 +837,7 @@ export default class LinterPlugin extends Plugin {
     }
 
     this.settings.settingsConvertedToConfigKeyValues = true;
-    this.saveSettings();
+    void this.saveSettings();
 
     setLanguage(window.localStorage.getItem('language'));
   }

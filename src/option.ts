@@ -61,7 +61,7 @@ export class BooleanOption extends Option {
           toggle.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
-            plugin.saveSettings();
+            void plugin.saveSettings();
           });
         });
 
@@ -79,7 +79,7 @@ export class TextOption extends Option {
           textbox.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
-            plugin.saveSettings();
+            void plugin.saveSettings();
           });
         });
 
@@ -97,7 +97,7 @@ export class TextAreaOption extends Option {
           textbox.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
-            plugin.saveSettings();
+            void plugin.saveSettings();
           });
         });
 
@@ -116,7 +116,7 @@ export class MomentFormatOption extends Option {
           format.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
-            plugin.saveSettings();
+            void plugin.saveSettings();
           });
         });
 
@@ -165,7 +165,7 @@ export class DropdownOption extends Option {
           dropdown.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
-            plugin.saveSettings();
+            void plugin.saveSettings();
           });
         });
 
@@ -183,7 +183,7 @@ export class MdFilePickerOption extends Option {
     settings.ruleConfigs[this.ruleAlias][this.configKey] = settings.ruleConfigs[this.ruleAlias][this.configKey] ?? [];
 
     new AutoCorrectFilesPickerOption(containerEl, plugin.settingsTab.component, settings.ruleConfigs[this.ruleAlias][this.configKey], plugin.app, () => {
-      plugin.saveSettings();
+      void plugin.saveSettings();
     }, this.nameKey, this.descriptionKey);
   }
 }

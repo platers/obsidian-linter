@@ -20,7 +20,7 @@ export class NumberInputSetting extends BaseSetting<number> {
           textbox
               .setValue(this.getNumber().toString())
               .onChange(async (value) => {
-                this.saveValue(parseInt(value));
+                void this.saveValue(parseInt(value));
               });
         });
   }
