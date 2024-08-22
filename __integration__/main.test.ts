@@ -60,7 +60,7 @@ export default class TestLinterPlugin extends Plugin {
           await t.setup(this, activeLeaf.editor);
         }
 
-        this.plugin.runLinterEditor(activeLeaf.editor);
+        await this.plugin.runLinterEditor(activeLeaf.editor);
         await t.assertions(activeLeaf.editor);
 
         console.log('✅', t.name);
@@ -133,7 +133,7 @@ export default class TestLinterPlugin extends Plugin {
         await t.setup(this, activeLeaf.editor);
       }
 
-      testPlugin.plugin.runLinterEditor(activeLeaf.editor);
+      await testPlugin.plugin.runLinterEditor(activeLeaf.editor);
     } catch (e) {
       console.log('❌', t.name);
       console.error(e);
