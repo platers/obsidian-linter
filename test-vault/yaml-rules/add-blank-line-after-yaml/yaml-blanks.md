@@ -1,0 +1,7 @@
+---
+key: value
+---
+
+
+
+No blank

@@ -3,6 +3,8 @@ import LinterPlugin from 'src/main';
 import {obsidianModeTestCases} from './obsidian-mode.test';
 import {setWorkspaceItemMode} from './utils.test';
 import {customCommandTestCases} from './custom-commands.test';
+import {obsidianYAMLRuleTestCases} from './yaml-rule.test';
+import {sleep} from './utils.test';
 
 export type IntegrationTestCase = {
   name: string,
@@ -11,17 +13,38 @@ export type IntegrationTestCase = {
   assertions: (editor: Editor) => void,
 }
 
+const testTimeout = 15000;
+
 export default class TestLinterPlugin extends Plugin {
-  regularTests: Array<IntegrationTestCase> = [...obsidianModeTestCases];
+  regularTests: Array<IntegrationTestCase> = [...obsidianModeTestCases, ...obsidianYAMLRuleTestCases];
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
+  private testsCompleted: number;
+  // eslint-disable-next-line no-undef
+  private timeoutId: Timeout = undefined;
 
   async onload() {
     this.addCommand({
       id: 'run-linter-tests',
       name: 'Run Linter Tests',
       callback: async () => {
+        if (this.timeoutId != undefined) {
+          clearTimeout(this.timeoutId);
+        }
+
         await this.setup();
+
+        this.timeoutId = setTimeout(() =>{
+          const expectedTestCount = this.regularTests.length + this.afterCacheUpdateTests.length;
+          if (this.testsCompleted != expectedTestCount) {
+            console.log('❌', `Tests took too long to run with only ${this.testsCompleted} of ${expectedTestCount} tests running in ${testTimeout/1000}s.`);
+          } else {
+            console.log(`✅ all ${expectedTestCount} tests have completed in the alloted time.`);
+          }
+        }, testTimeout);
+
+        await sleep(500);
+
         await this.runTests();
       },
     });
@@ -35,6 +58,8 @@ export default class TestLinterPlugin extends Plugin {
     } else {
       await this.resetSettings();
     }
+
+    this.testsCompleted = 0;
   }
 
   async runTests() {
@@ -64,9 +89,11 @@ export default class TestLinterPlugin extends Plugin {
         await t.assertions(activeLeaf.editor);
 
         console.log('✅', t.name);
+        this.testsCompleted++;
       } catch (e) {
         console.log('❌', t.name);
         console.error(e);
+        this.testsCompleted++;
       }
 
       await this.resetFileContents(activeLeaf, originalText);
@@ -98,9 +125,11 @@ export default class TestLinterPlugin extends Plugin {
         await t.assertions(activeLeaf.editor);
 
         console.log('✅', t.name);
+        this.testsCompleted++;
       } catch (e) {
         console.log('❌', t.name);
         console.error(e);
+        this.testsCompleted++;
       }
 
       await that.resetFileContents(activeLeaf, originalText);
@@ -135,6 +164,7 @@ export default class TestLinterPlugin extends Plugin {
 
       await testPlugin.plugin.runLinterEditor(activeLeaf.editor);
     } catch (e) {
+      this.testsCompleted++;
       console.log('❌', t.name);
       console.error(e);
       await testPlugin.resetFileContents(activeLeaf, originalText);
