@@ -465,10 +465,10 @@ export default {
     // heading-blank-lines.ts
     'heading-blank-lines': {
       'name': 'Heading blank lines',
-      'description': 'All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).',
+      'description': 'All headings have one blank line both before and after (except where the heading is at the beginning or end of the document).',
       'bottom': {
         'name': 'Bottom',
-        'description': 'Insert a blank line after headings',
+        'description': 'Ensures one blank line after headings',
       },
       'empty-line-after-yaml': {
         'name': 'Empty Line Between YAML and Header',

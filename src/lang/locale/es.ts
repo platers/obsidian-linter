@@ -344,7 +344,7 @@ export default {
       'description': 'Todos los encabezados tienen una línea en blanco antes y después (excepto cuando el encabezado está al principio o al final del documento).',
       'bottom': {
         'name': 'Abajo',
-        'description': 'Insertar una línea en blanco después de los encabezados',
+        'description': 'Asegura una línea en blanco después de los encabezados',
       },
       'empty-line-after-yaml': {
         'name': 'Línea vacía entre el YAML y el encabezado',
