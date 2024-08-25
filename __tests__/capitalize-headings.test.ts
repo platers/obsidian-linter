@@ -194,5 +194,19 @@ ruleTest({
         style: 'ALL CAPS',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1148
+      testName: `Make sure that a header with a dash or single quote as an entry before the first letter get skipped as the first letter`,
+      before: dedent`
+        # 135 - a Letter Arrived
+        # 135 ' a Letter Arrived
+      `,
+      after: dedent`
+        # 135 - A Letter Arrived
+        # 135 ' A Letter Arrived
+      `,
+      options: {
+        style: 'First letter',
+      },
+    },
   ],
 });
