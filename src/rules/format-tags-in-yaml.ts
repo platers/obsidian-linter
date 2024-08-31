@@ -21,7 +21,7 @@ export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOption
   apply(text: string, options: FormatTagsInYamlOptions): string {
     return formatYAML(text, (text) => {
       return text.replace(
-          new RegExp(`\\n(${OBSIDIAN_TAG_KEY_PLURAL}|${OBSIDIAN_TAG_KEY_SINGULAR}):(.*?)(?=\\n(?:[A-Za-z-]+?:|---))`, 's'),
+          new RegExp(`^(${OBSIDIAN_TAG_KEY_PLURAL}|${OBSIDIAN_TAG_KEY_SINGULAR}):[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm'),
           function(tagsYAML) {
             return tagsYAML.replaceAll('#', '');
           },
