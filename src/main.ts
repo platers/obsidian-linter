@@ -11,7 +11,7 @@ import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
-import {urlRegex} from './utils/regex';
+import {pasteUrlRegex} from './utils/regex';
 import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
@@ -615,9 +615,10 @@ export default class LinterPlugin extends Plugin {
 
     // Abort when clipboard has URL, to prevent conflict with the plugins
     // Auto Title Link & Paste URL into Selection
-    // has to search the entire clipboard (not surrounding the regex with ^$),
-    // because otherwise having 2 URLs cause Obsidian-breaking conflict
-    if (urlRegex.test(plainClipboard.trim())) {
+    // because otherwise having 2 URLs cause Obsidian-breaking conflict.
+    // Note: it looks like those two plugins look for an exact match for a URL,
+    // so we will too.
+    if (pasteUrlRegex.test(plainClipboard.trim())) {
       logWarn(getTextInLanguage('logs.paste-link-warning'));
       return;
     }
