@@ -677,13 +677,13 @@ More content here
 
 Alias: `heading-blank-lines`
 
-All headings have a blank line both before and after (except where the heading is at the beginning or end of the document).
+All headings have one blank line both before and after (except where the heading is at the beginning or end of the document).
 
 ### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Bottom` | Insert a blank line after headings | N/A | `true` |
+| `Bottom` | Ensures one blank line after headings | N/A | `true` |
 | `Empty Line Between YAML and Header` | Keep the empty line between the YAML frontmatter and header | N/A | `true` |
 
 ### Additional Info
