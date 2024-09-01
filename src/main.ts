@@ -11,7 +11,7 @@ import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
-import {pasteUrlRegex} from './utils/regex';
+import {urlRegex} from './utils/regex';
 import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
@@ -618,10 +618,14 @@ export default class LinterPlugin extends Plugin {
     // because otherwise having 2 URLs cause Obsidian-breaking conflict.
     // Note: it looks like those two plugins look for an exact match for a URL,
     // so we will too.
-    if (pasteUrlRegex.test(plainClipboard.trim())) {
+    const text = plainClipboard.trim();
+    if (urlRegex.test(text)) {
+      // debugger;
+      console.log('failed: "' + text + '"');
       logWarn(getTextInLanguage('logs.paste-link-warning'));
       return;
     }
+    console.log('passed: "' + text + '"');
 
     // prevent default pasting & abort when not successful
     clipboardEv.stopPropagation();
