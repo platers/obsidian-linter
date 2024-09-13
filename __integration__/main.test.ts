@@ -11,7 +11,7 @@ export type IntegrationTestCase = {
   filePath: string,
   setup?: (plugin: TestLinterPlugin, editor: Editor) => Promise<void>,
   assertions?: (editor: Editor) => void,
-  modifyExpected?: (expectedText: string) => string,
+  modifyExpected?: (expectedText: string, file: TFile) => string,
 }
 
 type testStatus = {
@@ -25,7 +25,6 @@ export default class TestLinterPlugin extends Plugin {
   regularTests: Array<IntegrationTestCase> = [...obsidianModeTestCases, ...obsidianYAMLRuleTestCases];
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
-  private testsCompleted: number;
   private timeoutId: any = undefined;
   private testRunNotice: Notice;
 
@@ -45,8 +44,13 @@ export default class TestLinterPlugin extends Plugin {
         this.timeoutId = setTimeout(() => {
           console.log(testStatuses);
           if (testStatuses.length != expectedTestCount) {
-            console.log('❌', `Tests took too long to run with only ${testStatuses.length} of ${expectedTestCount} tests running in ${testTimeout/1000}s.`);
+            if (this.testRunNotice) {
+              this.testRunNotice.setMessage(`❌: Tests took too long to run with only ${testStatuses.length} of ${expectedTestCount} tests running in ${testTimeout/1000}s.`);
+            } else {
+              console.log('❌', `Tests took too long to run with only ${testStatuses.length} of ${expectedTestCount} tests running in ${testTimeout/1000}s.`);
+            }
           } else {
+            this.handleTestFinalization(testStatuses);
             console.log(`✅ all ${expectedTestCount} tests have completed in the alloted time.`);
           }
         }, testTimeout);
@@ -64,8 +68,6 @@ export default class TestLinterPlugin extends Plugin {
     } else {
       await this.resetSettings();
     }
-
-    this.testsCompleted = 0;
   }
 
   async runTests(testStatuses: testStatus[], totalTestCount: number) {
@@ -96,23 +98,26 @@ export default class TestLinterPlugin extends Plugin {
         }
 
         await this.plugin.runLinterEditor(activeLeaf.editor);
-        await this.handleAssertions(t, activeLeaf);
+        await this.handleAssertions(t, activeLeaf, file);
 
-        this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
         console.log('✅', t.name);
-        // this.testsCompleted++;
+        this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
       } catch (e) {
         console.log('❌', t.name);
         console.error(e);
+
         this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
-        // this.testsCompleted++;
       }
 
       await this.resetFileContents(activeLeaf, originalText);
     }
 
     if (testStatuses.length != this.regularTests.length) {
-      console.log(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
+      if (this.testRunNotice) {
+        this.testRunNotice.setMessage(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
+      } else {
+        console.log(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
+      }
       return;
     }
 
@@ -139,24 +144,15 @@ export default class TestLinterPlugin extends Plugin {
 
       const t = tests[index];
       try {
-        await this.handleAssertions(t, activeLeaf);
+        await this.handleAssertions(t, activeLeaf, file);
 
-        this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
-        // testStatuses.push({
-        //   name: t.name,
-        //   succeeded: true,
-        // });
         console.log('✅', t.name);
-        // this.testsCompleted++;
+        this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
       } catch (e) {
-        // testStatuses.push({
-        //   name: t.name,
-        //   succeeded: false,
-        // });
-        this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
         console.log('❌', t.name);
         console.error(e);
-        // this.testsCompleted++;
+
+        this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
       }
 
       await that.resetFileContents(activeLeaf, originalText);
@@ -188,11 +184,8 @@ export default class TestLinterPlugin extends Plugin {
 
       await testPlugin.plugin.runLinterEditor(activeLeaf.editor);
     } catch (e) {
-      // testStatuses.push({
-      //   name: t.name,
-      //   succeeded: false,
-      // });
       this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+
       console.log('❌', t.name);
       console.error(e);
       await testPlugin.resetFileContents(activeLeaf, originalText);
@@ -209,10 +202,10 @@ export default class TestLinterPlugin extends Plugin {
     }
   }
 
-  private async handleAssertions(t: IntegrationTestCase, activeLeaf: MarkdownView) {
+  private async handleAssertions(t: IntegrationTestCase, activeLeaf: MarkdownView, file: TFile) {
     let expectedText = await this.getExpectedContents(t.filePath.replace('.md', '.linted.md'));
     if (t.modifyExpected) {
-      expectedText = t.modifyExpected(expectedText);
+      expectedText = t.modifyExpected(expectedText, file);
     }
 
     expect(activeLeaf.editor.getValue()).toBe(expectedText);
@@ -307,33 +300,33 @@ export default class TestLinterPlugin extends Plugin {
       let message = `Finished running the Linter's Integration Tests.`;
       message += '\nThere ';
 
-      // if (numberOfFailures == 1) {
-      //   message += 'was 1 failure';
-      // } else {
-      //   message += `have been ${numberOfFailures} failures`;
-      // }
+      let numberOfSuccesses = 0;
+      let numberOfFailures = 0;
+      for (const testResult of testStatuses) {
+        if (testResult.succeeded) {
+          numberOfSuccesses++;
+        } else {
+          numberOfFailures++;
+        }
+      }
 
-      // message += ' and there ';
+      if (numberOfFailures == 1) {
+        message += 'was 1 failure';
+      } else {
+        message += `have been ${numberOfFailures} failures`;
+      }
 
-      // if (numberOfSuccesses == 1) {
-      //   message += 'has been 1 success';
-      // } else {
-      //   message += `have been ${numberOfSuccesses} successes`;
-      // }
+      message += ' and there ';
 
-      // message += '.';
+      if (numberOfSuccesses == 1) {
+        message += 'has been 1 success';
+      } else {
+        message += `have been ${numberOfSuccesses} successes`;
+      }
+
+      message += '. See the console for more details.';
 
       this.testRunNotice.setMessage(message);
     }
-
-    // let numberOfSuccesses = 0;
-    // let numberOfFailures = 0;
-    // for (const testResult of testStatuses) {
-    //   if (testResult.succeeded) {
-    //     numberOfSuccesses++;
-    //   } else {
-    //     numberOfFailures++;
-    //   }
-    // }
   }
 }

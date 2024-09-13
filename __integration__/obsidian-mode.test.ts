@@ -1,5 +1,5 @@
 import TestLinterPlugin, {IntegrationTestCase} from './main.test';
-import {Editor} from 'obsidian';
+import {Editor, TFile} from 'obsidian';
 import expect from 'expect';
 import {setWorkspaceItemMode} from './utils.test';
 import moment from 'moment';
@@ -24,8 +24,8 @@ function modeAssertions(editor: Editor) {
   expect(editor.posToOffset(editor.getCursor())).toBe(cursorStart+1);
 }
 
-function edgeCaseExpectedTextModifications(text: string):string {
-  text = text.replace('{{created_date}}', moment().format('YYYY-MM-DD'));
+function edgeCaseExpectedTextModifications(text: string, file: TFile):string {
+  text = text.replace('{{created_date}}', moment(file.stat.ctime ?? '').format('YYYY-MM-DD'));
   text = text.replace('{{modified_date}}', moment().format('YYYY-MM-DD'));
 
   return text;
