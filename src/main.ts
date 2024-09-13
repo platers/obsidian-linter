@@ -620,12 +620,9 @@ export default class LinterPlugin extends Plugin {
     // so we will too.
     const text = plainClipboard.trim();
     if (urlRegex.test(text)) {
-      // debugger;
-      console.log('failed: "' + text + '"');
       logWarn(getTextInLanguage('logs.paste-link-warning'));
       return;
     }
-    console.log('passed: "' + text + '"');
 
     // prevent default pasting & abort when not successful
     clipboardEv.stopPropagation();
