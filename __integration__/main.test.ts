@@ -14,6 +14,11 @@ export type IntegrationTestCase = {
   modifyExpected?: (expectedText: string) => string,
 }
 
+type testStatus = {
+  name: string,
+  succeeded: boolean,
+}
+
 const testTimeout = 15000;
 
 export default class TestLinterPlugin extends Plugin {
@@ -35,16 +40,18 @@ export default class TestLinterPlugin extends Plugin {
 
         await this.setup();
 
-        this.timeoutId = setTimeout(() =>{
-          const expectedTestCount = this.regularTests.length + this.afterCacheUpdateTests.length;
-          if (this.testsCompleted != expectedTestCount) {
-            console.log('❌', `Tests took too long to run with only ${this.testsCompleted} of ${expectedTestCount} tests running in ${testTimeout/1000}s.`);
+        const testStatuses = [] as testStatus[];
+        const expectedTestCount = this.regularTests.length + this.afterCacheUpdateTests.length;
+        this.timeoutId = setTimeout(() => {
+          console.log(testStatuses);
+          if (testStatuses.length != expectedTestCount) {
+            console.log('❌', `Tests took too long to run with only ${testStatuses.length} of ${expectedTestCount} tests running in ${testTimeout/1000}s.`);
           } else {
             console.log(`✅ all ${expectedTestCount} tests have completed in the alloted time.`);
           }
         }, testTimeout);
 
-        await this.runTests();
+        await this.runTests(testStatuses, expectedTestCount);
       },
     });
   }
@@ -61,7 +68,7 @@ export default class TestLinterPlugin extends Plugin {
     this.testsCompleted = 0;
   }
 
-  async runTests() {
+  async runTests(testStatuses: testStatus[], totalTestCount: number) {
     this.testRunNotice = new Notice('Starting the Linter\'s Integration Tests', 0);
 
     const activeLeaf = this.getActiveLeaf();
@@ -74,6 +81,8 @@ export default class TestLinterPlugin extends Plugin {
       const file = this.getFileFromPath(t.filePath);
       if (!file) {
         console.error('failed to get file: ' + t.filePath);
+
+        this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
         continue;
       }
 
@@ -89,28 +98,30 @@ export default class TestLinterPlugin extends Plugin {
         await this.plugin.runLinterEditor(activeLeaf.editor);
         await this.handleAssertions(t, activeLeaf);
 
+        this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
         console.log('✅', t.name);
-        this.testsCompleted++;
+        // this.testsCompleted++;
       } catch (e) {
         console.log('❌', t.name);
         console.error(e);
-        this.testsCompleted++;
+        this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+        // this.testsCompleted++;
       }
 
       await this.resetFileContents(activeLeaf, originalText);
     }
 
-    if (this.testsCompleted != this.regularTests.length) {
+    if (testStatuses.length != this.regularTests.length) {
       console.log(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
       return;
     }
 
-    await this.runMetadataTests(this.afterCacheUpdateTests, activeLeaf);
+    await this.runMetadataTests(this.afterCacheUpdateTests, activeLeaf, testStatuses, totalTestCount);
   }
 
-  async runMetadataTests(tests: IntegrationTestCase[], activeLeaf: MarkdownView) {
+  async runMetadataTests(tests: IntegrationTestCase[], activeLeaf: MarkdownView, testStatuses: testStatus[], totalTestCount: number) {
     let index = 0;
-    let originalText = await this.setupMetadataTest(this, tests[index], activeLeaf);
+    let originalText = await this.setupMetadataTest(this, tests[index], activeLeaf, testStatuses, totalTestCount);
     if (originalText == null) {
       return;
     }
@@ -130,26 +141,36 @@ export default class TestLinterPlugin extends Plugin {
       try {
         await this.handleAssertions(t, activeLeaf);
 
+        this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
+        // testStatuses.push({
+        //   name: t.name,
+        //   succeeded: true,
+        // });
         console.log('✅', t.name);
-        this.testsCompleted++;
+        // this.testsCompleted++;
       } catch (e) {
+        // testStatuses.push({
+        //   name: t.name,
+        //   succeeded: false,
+        // });
+        this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
         console.log('❌', t.name);
         console.error(e);
-        this.testsCompleted++;
+        // this.testsCompleted++;
       }
 
       await that.resetFileContents(activeLeaf, originalText);
 
       originalText = null;
       if (index+1 < tests.length) {
-        originalText = await that.setupMetadataTest(that, tests[++index], activeLeaf);
+        originalText = await that.setupMetadataTest(that, tests[++index], activeLeaf, testStatuses, totalTestCount);
       } else { // remove the custom commands callback once all tests have run
         that.plugin.setCustomCommandCallback(null);
       }
     });
   }
 
-  async setupMetadataTest(testPlugin: TestLinterPlugin, t: IntegrationTestCase, activeLeaf: MarkdownView): Promise<string> {
+  async setupMetadataTest(testPlugin: TestLinterPlugin, t: IntegrationTestCase, activeLeaf: MarkdownView, testStatuses: testStatus[], totalTestCount: number): Promise<string> {
     const file = this.getFileFromPath(t.filePath);
     if (!file) {
       console.error('failed to get file: ' + t.filePath);
@@ -167,7 +188,11 @@ export default class TestLinterPlugin extends Plugin {
 
       await testPlugin.plugin.runLinterEditor(activeLeaf.editor);
     } catch (e) {
-      this.testsCompleted++;
+      // testStatuses.push({
+      //   name: t.name,
+      //   succeeded: false,
+      // });
+      this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
       console.log('❌', t.name);
       console.error(e);
       await testPlugin.resetFileContents(activeLeaf, originalText);
@@ -236,7 +261,79 @@ export default class TestLinterPlugin extends Plugin {
     await this.plugin.loadSettings();
   }
 
-  // private updateNoticeText() {
+  private handleTestCompletion(testName: string, succeeded: boolean, testStatuses: testStatus[], totalTestCount: number) {
+    testStatuses.push(
+        {
+          name: testName,
+          succeeded: succeeded,
+        });
 
-  // }
+    let numberOfSuccesses = 0;
+    let numberOfFailures = 0;
+    for (const testResult of testStatuses) {
+      if (testResult.succeeded) {
+        numberOfSuccesses++;
+      } else {
+        numberOfFailures++;
+      }
+    }
+
+    if (this.testRunNotice) {
+      let message = `Running the Linter's Integration Tests (${testStatuses.length}/${totalTestCount})`;
+      message += '\nSo far there ';
+
+      if (numberOfFailures == 1) {
+        message += 'has been 1 failure';
+      } else {
+        message += `have been ${numberOfFailures} failures`;
+      }
+
+      message += ' and there ';
+
+      if (numberOfSuccesses == 1) {
+        message += 'has been 1 success';
+      } else {
+        message += `have been ${numberOfSuccesses} successes`;
+      }
+
+      message += '.';
+
+      this.testRunNotice.setMessage(message);
+    }
+  }
+
+  private handleTestFinalization(testStatuses: testStatus[]) {
+    if (this.testRunNotice) {
+      let message = `Finished running the Linter's Integration Tests.`;
+      message += '\nThere ';
+
+      // if (numberOfFailures == 1) {
+      //   message += 'was 1 failure';
+      // } else {
+      //   message += `have been ${numberOfFailures} failures`;
+      // }
+
+      // message += ' and there ';
+
+      // if (numberOfSuccesses == 1) {
+      //   message += 'has been 1 success';
+      // } else {
+      //   message += `have been ${numberOfSuccesses} successes`;
+      // }
+
+      // message += '.';
+
+      this.testRunNotice.setMessage(message);
+    }
+
+    // let numberOfSuccesses = 0;
+    // let numberOfFailures = 0;
+    // for (const testResult of testStatuses) {
+    //   if (testResult.succeeded) {
+    //     numberOfSuccesses++;
+    //   } else {
+    //     numberOfFailures++;
+    //   }
+    // }
+  }
 }
