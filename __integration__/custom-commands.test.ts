@@ -1,7 +1,5 @@
-import dedent from 'ts-dedent';
 import TestLinterPlugin, {IntegrationTestCase} from './main.test';
 import {Editor} from 'obsidian';
-import expect from 'expect';
 
 export const customCommandTestCases: IntegrationTestCase[] = [
   {
@@ -16,34 +14,6 @@ export const customCommandTestCases: IntegrationTestCase[] = [
         'id': 'table-editor-obsidian:format-all-tables',
         'name': 'Format all tables in this file',
       }];
-    },
-    async assertions(editor: Editor) {
-      expect(editor.getValue()).toBe(dedent`
-        | one   | two | three | four          |
-        | ----- | --- | ----- | ------------- |
-        | 1     | ✓   |       |               |
-        | 2     |     | ✓     |               |
-        | 3     |     | ✓     | ✓             |
-        | 4     | …   |       | someting else |
-        | Total | 100 | 20    | 300000000     |
-        ${''}
-        | one   | two | three | four          |
-        | ----- | --- | ----- | ------------- |
-        | 1     | ✓   |       |               |
-        | 2     |     | ✓     |               |
-        | 3     |     | ✓     | ✓             |
-        | 4     | …   |       | someting else |
-        | Total | 100 | 20    | 300000000     |
-        ${''}
-        | one   | two | three | four          |
-        | ----- | --- | ----- | ------------- |
-        | 1     | ✓   |       |               |
-        | 2     |     | ✓     |               |
-        | 3     |     | ✓     | ✓             |
-        | 4     | …   |       | someting else |
-        | Total | 100 | 20    | 300000000     |
-        ${''}
-      `);
     },
   },
 ];

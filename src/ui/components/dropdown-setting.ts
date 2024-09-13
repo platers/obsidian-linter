@@ -26,7 +26,7 @@ export class DropdownSetting extends BaseSetting<string> {
 
           dropdown.setValue(this.getString());
           dropdown.onChange(async (value) => {
-            this.saveValue(value);
+            void this.saveValue(value);
           });
         });
   }

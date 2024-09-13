@@ -16,7 +16,7 @@ export class ToggleSetting extends BaseSetting<boolean> {
           toggle
               .setValue(this.getBoolean())
               .onChange(async (value) => {
-                this.saveValue(value);
+                void this.saveValue(value);
               });
         });
 
