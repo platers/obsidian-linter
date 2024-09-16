@@ -1,4 +1,4 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, MarkdownViewModeType, getFrontMatterInfo, FileView, normalizePath} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath} from 'obsidian';
 import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -18,6 +18,7 @@ import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 import AsyncLock from 'async-lock';
 import {warn} from 'loglevel';
 import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
+import {ChangeSpec} from '@codemirror/state';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -477,70 +478,45 @@ export default class LinterPlugin extends Plugin {
       return;
     }
 
-    const mode = this.getCurrentMode();
-
-    // Replace changed lines
     const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
     const changes = dmp.diff_main(oldText, newText);
     let curText = '';
-    let startingIndex = 0;
-    // in Live Preview mode, there is some wonkiness around how the frontmatter values are replaced.
-    // So if the frontmatter needs updating at all, we are treating it as the whole frontmatter needing
-    // to be replaced. Hopefully this will fix issues with the frontmatter getting mangled.
-    if (mode === 'preview') {
-      const oldTextFrontmatterInfo = getFrontMatterInfo(oldText);
-      const newTextFrontmatterInfo = getFrontMatterInfo(newText);
-
-      if (oldTextFrontmatterInfo.exists != newTextFrontmatterInfo.exists ||
-        oldTextFrontmatterInfo.from != newTextFrontmatterInfo.from ||
-        oldTextFrontmatterInfo.to != newTextFrontmatterInfo.to ||
-        oldTextFrontmatterInfo.frontmatter != newTextFrontmatterInfo.frontmatter) {
-        let newFrontmatter: string;
-        let offset = 0;
-        if (oldTextFrontmatterInfo.exists == false) {
-          newFrontmatter = `---\n${newTextFrontmatterInfo.frontmatter}---`;
-        } else {
-          newFrontmatter = newTextFrontmatterInfo.frontmatter;
-          offset += 3; // make sure we start after the ending --- for the frontmatter to avoid an edge case update breaking the frontmatter in live preview
-        }
-
-        editor.replaceRange(newFrontmatter, editor.offsetToPos(oldTextFrontmatterInfo.from), editor.offsetToPos(oldTextFrontmatterInfo.to));
-        startingIndex = oldTextFrontmatterInfo.from + newFrontmatter.length + offset;
-      }
-    }
-
-    let isBeforeStartIndex = false;
     changes.forEach((change) => {
-      let [type, value] = change;
-      isBeforeStartIndex = curText.length < startingIndex;
-      if (isBeforeStartIndex && curText.length + value.length >= startingIndex && type == DiffMatchPatch.DIFF_INSERT) {
-        const valueIndexStart = startingIndex - curText.length;
-        curText += value.substring(0, valueIndexStart);
-        value = value.substring(valueIndexStart);
-        isBeforeStartIndex = false;
-      }
+      const [type, value] = change;
 
-      // handle updates
-      if (!isBeforeStartIndex) {
-        if (type == DiffMatchPatch.DIFF_INSERT) {
-          editor.replaceRange(value, this.endOfDocument(curText));
-        } else if (type == DiffMatchPatch.DIFF_DELETE) {
-          const start = this.endOfDocument(curText);
-          let tempText = curText;
-          tempText += value;
-          const end = this.endOfDocument(tempText);
-          editor.replaceRange('', start, end);
-        }
-      }
+      if (type == DiffMatchPatch.DIFF_INSERT) {
+        // use codemirror dispatch in order to bypass the filter on transactions that causes editor.replaceRange not to not work in Live Preview
+        editor.cm.dispatch({
+          changes: [{
+            from: editor.posToOffset(this.endOfDocument(curText)),
+            insert: value,
+          } as ChangeSpec],
+          filter: false,
+        });
+        curText += value;
+      } else if (type == DiffMatchPatch.DIFF_DELETE) {
+        const start = this.endOfDocument(curText);
+        let tempText = curText;
+        tempText += value;
+        const end = this.endOfDocument(tempText);
 
-      // update current text
-      if (type != DiffMatchPatch.DIFF_DELETE) {
+        // use codemirror dispatch in order to bypass the filter on transactions that causes editor.replaceRange not to not work in Live Preview
+        editor.cm.dispatch({
+          changes: [{
+            from: editor.posToOffset(start),
+            to: editor.posToOffset(end),
+            insert: '',
+          } as ChangeSpec],
+          filter: false,
+        });
+      } else {
         curText += value;
       }
     });
 
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
+
     this.displayChangedMessage(charsAdded, charsRemoved);
 
     // run custom commands now since no change was made
@@ -771,27 +747,6 @@ export default class LinterPlugin extends Plugin {
     const activeLeaf = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!activeLeaf) return null;
     return activeLeaf.editor;
-  }
-
-  // Note that MarkdownViewModeType actually refers to editing mode versus source mode
-  // however the naming is so similar to live preview versus source mode that I am going
-  // to reuse this here. Please be careful with this logic.
-  private getCurrentMode(): MarkdownViewModeType {
-    const view: FileView = this.app.workspace.getActiveFileView();
-    if (!view) {
-      return;
-    }
-
-    const state = view.getState();
-    if (Object.hasOwn(state, 'source')) {
-      if (state.source) {
-        return 'source';
-      }
-
-      return 'preview';
-    }
-
-    return null;
   }
 
   /**

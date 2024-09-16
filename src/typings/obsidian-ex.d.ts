@@ -1,4 +1,5 @@
 import {Command} from 'obsidian';
+import {EditorView} from '@codemirror/view';
 
 export interface ObsidianCommandInterface {
   executeCommandById(id: string): void;
@@ -67,6 +68,13 @@ declare module 'obsidian' {
      */
     history: boolean;
   }
+
+  interface Editor {
+    /**
+     * CodeMirror editor instance
+     */
+    cm?: EditorView;
+}
 }
 
 
