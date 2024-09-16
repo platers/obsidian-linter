@@ -24,6 +24,7 @@
     "@babel/plugin-transform-private-methods": "^7.23.3",
     "@babel/preset-env": "^7.24.0",
     "@babel/preset-typescript": "^7.18.6",
+    "@codemirror/view": "^6.33.0",
     "@jest/types": "^29.5.0",
     "@types/async-lock": "^1.4.2",
     "@types/diff": "^5.0.9",

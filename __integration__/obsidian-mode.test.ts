@@ -84,6 +84,16 @@ function edgeCaseSetup(plugin: TestLinterPlugin, _: Editor): Promise<void> {
   return;
 }
 
+function moveToYamlSetup(plugin: TestLinterPlugin, _: Editor): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
+    'enabled': true,
+    'how-to-handle-existing-tags': 'Remove whole tag',
+    'tags-to-ignore': '',
+  };
+
+  return;
+}
+
 export const obsidianModeTestCases: IntegrationTestCase[] = [
   {
     name: 'Updating YAML in live preview mode does not break YAML and keeps cursor at the expected location',
@@ -114,5 +124,31 @@ export const obsidianModeTestCases: IntegrationTestCase[] = [
     filePath: 'obsidian-mode/edge-case-yaml.md',
     setup: edgeCaseSetup,
     modifyExpected: edgeCaseExpectedTextModifications,
+  },
+  {
+    name: 'Moving tag to YAML when just the tag is present works in live preview mode',
+    filePath: 'obsidian-mode/move-tag-to-yaml.md',
+    async setup(plugin: TestLinterPlugin, editor: Editor) {
+      await moveToYamlSetup(plugin, editor),
+      await setWorkspaceItemMode(plugin.app, false);
+    },
+  },
+  {
+    name: 'Moving tag to YAML when just the tag is present works in source mode',
+    filePath: 'obsidian-mode/move-tag-to-yaml.md',
+    setup: moveToYamlSetup,
+  },
+  {
+    name: 'Moving tag to YAML when some text and then a tag is present works in live preview mode',
+    filePath: 'obsidian-mode/move-tag-to-yaml-2.md',
+    async setup(plugin: TestLinterPlugin, editor: Editor) {
+      await moveToYamlSetup(plugin, editor),
+      await setWorkspaceItemMode(plugin.app, false);
+    },
+  },
+  {
+    name: 'Moving tag to YAML when some text and then a tag is present works in source mode',
+    filePath: 'obsidian-mode/move-tag-to-yaml-2.md',
+    setup: moveToYamlSetup,
   },
 ];
