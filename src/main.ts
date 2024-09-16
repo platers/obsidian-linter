@@ -158,7 +158,7 @@ export default class LinterPlugin extends Plugin {
       name: getTextInLanguage('commands.lint-file.name'),
       editorCheckCallback(checking, editor, ctx) {
         if (checking) {
-          return that.isMarkdownFile(ctx.file);
+          return that.isMarkdownFile(ctx.file) && editor.cm != null;
         }
 
         void that.runLinterEditor(editor);
@@ -180,7 +180,7 @@ export default class LinterPlugin extends Plugin {
           return that.isMarkdownFile(ctx.file);
         }
 
-        if (!that.shouldIgnoreFile(ctx.file)) {
+        if (!that.shouldIgnoreFile(ctx.file) && editor.cm) {
           void that.runLinterEditor(editor);
         }
       },
@@ -270,7 +270,7 @@ export default class LinterPlugin extends Plugin {
           const editor = this.getEditor();
           if (editor) {
             const file = this.app.workspace.getActiveFile();
-            if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file)) {
+            if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file) && editor.cm) {
               void this.runLinterEditor(editor);
             }
           }
@@ -306,7 +306,7 @@ export default class LinterPlugin extends Plugin {
             .onClick(() => {
               const activeFile = this.app.workspace.getActiveFile();
               const editor = this.getEditor();
-              if (activeFile === file && editor) {
+              if (activeFile === file && editor && editor.cm) {
                 void this.runLinterEditor(editor);
               } else {
                 void this.runLinterFile(file);
