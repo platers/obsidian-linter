@@ -386,6 +386,44 @@ var text = 'some string';
 ``````
 </details>
 
+## Empty Line Around Horizontal Rules
+
+Alias: `empty-line-around-horizontal-rules`
+
+Ensures that there is an empty line around horizontal rules unless they start or end a document.
+
+
+
+
+
+### Examples
+
+<details><summary>Horizontal rules that start a document do not get an empty line before them.</summary>
+
+Before:
+
+`````` markdown
+***
+
+
+asdf
+___
+qwer
+``````
+
+After:
+
+`````` markdown
+***
+
+asdf
+
+___
+
+qwer
+``````
+</details>
+
 ## Empty Line Around Math Blocks
 
 Alias: `empty-line-around-math-blocks`
