@@ -5,21 +5,23 @@ to values in the YAML frontmatter, and a syntax to ignore rules for part or all 
 
 ## Ignoring a Folder
 
-![Setting for ignoring specific folders](../assets/folders-to-ignore.png)
-
 There is a setting in the plugin for called `Folders to Ignore`. As the name suggests, this rule is meant
 to allow users to specify folders that they do not want the linting rules to affect.
 The values in the text box are expected to be folder paths from the base of the Obsidian vault.
 
-For example you could have the following as your value for folders to ignore:
-``` markdown
-Assets
-General/Projects
-Graphs
-```
+![Setting for ignoring specific folders](../assets/folders-to-ignore.jpg)
 
-In the example above, any files in the `Assets` folder, `Projects` folder in the `General` folder, and `Graphs` folder
-will be ignored when the Linter attempts to run its rules.
+For example, in the above image, the `templates` folder will be ignored when the Linter attempts to run its rules. Nested folders are also allowed as well.
+
+## Ignoring Files via Regex
+
+There is a setting in this plugin which allows you to be able to ignore files by providing a regex to match against.
+If a file matches the provided regex, it will go ahead and ignore that file before it even lints the file.
+
+![Setting for ignoring specific files via regex](../assets/files-to-ignore.png)
+
+For example, in the above image you can see that Excalidraw files which end in `.exclidraw.md` are being ignored
+using the regex `.*\.excalidraw\.md$`.
 
 ## File Specific Rule Disabling
 

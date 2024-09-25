@@ -164,7 +164,7 @@ export default {
   'options': {
     'custom-command': {
       'name': 'Comandos personalizados',
-      'description': 'Los comandos personalizados son comandos de Obsidian que se ejecutan después de que Linter termina de ejecutar sus reglas regulares. Esto significa que no se ejecutan antes de que se ejecute la lógica de marca de tiempo YAML, por lo que pueden hacer que la marca de tiempo de YAML se active en la siguiente ejecución del Linter. Solo puede seleccionar un comando de Obsidian una vez. **_Note que esto actualmente solo funciona para analizar el archivo actual._**',
+      'description': 'Los comandos personalizados son comandos de Obsidian que se ejecutan después de que Linter termina de ejecutar sus reglas regulares. Esto significa que no se ejecutan antes de que se ejecute la lógica de marca de tiempo YAML, por lo que pueden hacer que la marca de tiempo de YAML se active en la siguiente ejecución del Linter. Solo puede seleccionar un comando de Obsidian una vez.',
       'warning': 'Al seleccionar una opción, asegúrese de seleccionar la opción usando el ratón o presionando la clave Intro. Es posible que otros métodos de selección no funcionen y solo se guardarán las selecciones de un comando de Obsidian real o una cadena vacía.',
       'add-input-button-text': 'Agregar nuevo comando',
       'command-search-placeholder-text': 'Comando de Obsidian',
