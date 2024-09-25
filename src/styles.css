@@ -237,6 +237,15 @@ textarea.full-width {
 }
 
 /**
+* Settings item border bottom
+*/
+.linter-border-bottom {
+  border-top: 0px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: .75em;
+}
+
+/**
 * Custom row
 */
 .custom-row-description {

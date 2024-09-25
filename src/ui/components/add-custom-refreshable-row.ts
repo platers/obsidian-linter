@@ -2,10 +2,10 @@ import {Component, Setting} from 'obsidian';
 import {parseTextToHTMLWithoutOuterParagraph} from '../helpers';
 
 /**
- * AddCustomRow is meant to be used where you have a setting that needs a name a description, possibly a warning,
- * and a button that allows the user to add another entry.
+ * AddCustomRefreshableRow is meant to be used where you have a setting that needs a name a description, possibly a warning,
+ * a button that allows the user to add another entry, and an option to refresh the whole set of content.
  */
-export abstract class AddCustomRow {
+export abstract class AddCustomRefreshableRow {
   protected inputElDiv: HTMLDivElement;
 
   constructor(
@@ -14,9 +14,11 @@ export abstract class AddCustomRow {
     public name: string,
     public description: string,
     public warning: string,
-    private addInputBtnText: string,
+    private addInputTooltip: string,
+    private refreshBtnTooltip: string,
     protected saveSettings: () => void,
-    private onAddInput: () => void) {
+    private onAddInput: () => void,
+    private onRefresh: () => Promise<void>) {
   }
 
   display() {
@@ -29,8 +31,13 @@ export abstract class AddCustomRow {
     new Setting(this.containerEl)
         .addButton((cb)=>{
           cb.setIcon('plus-with-circle')
-              .setTooltip(this.addInputBtnText)
+              .setTooltip(this.addInputTooltip)
               .onClick(() => this.onAddInput());
+          cb.buttonEl.addClass('clickable-icon');
+        }).addButton((cb)=>{
+          cb.setIcon('reset')
+              .setTooltip(this.refreshBtnTooltip)
+              .onClick(() => this.onRefresh());
           cb.buttonEl.addClass('clickable-icon');
         })
         .setClass('linter-border-bottom')

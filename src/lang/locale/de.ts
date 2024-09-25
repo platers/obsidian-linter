@@ -194,7 +194,7 @@ export default {
     'custom-command': {
       // custom-command-option.ts
       'name': 'Benutzerdefinierte Befehle',
-      'description': 'Benutzerdefinierte Befehle sind Obsidian-Befehle, die ausgeführt werden, nachdem der Linter seine regulären Regeln ausgeführt hat. Dies bedeutet, dass sie nicht ausgeführt werden, bevor die YAML-Zeitstempellogik ausgeführt wird, sodass sie dazu führen können, dass der YAML-Zeitstempel bei der nächsten Ausführung des Linters ausgelöst wird. Sie können einen Obsidian-Befehl nur einmal auswählen. **_Beachten Sie, dass dies derzeit nur beim Linten der aktuellen Datei funktioniert._**',
+      'description': 'Benutzerdefinierte Befehle sind Obsidian-Befehle, die ausgeführt werden, nachdem der Linter seine regulären Regeln ausgeführt hat. Dies bedeutet, dass sie nicht ausgeführt werden, bevor die YAML-Zeitstempellogik ausgeführt wird, sodass sie dazu führen können, dass der YAML-Zeitstempel bei der nächsten Ausführung des Linters ausgelöst wird. Sie können einen Obsidian-Befehl nur einmal auswählen.',
       'warning': 'Wenn Sie eine Option auswählen, stellen Sie sicher, dass Sie die Option entweder mit der Maus oder durch Drücken der Eingabetaste auswählen. Andere Auswahlmethoden funktionieren möglicherweise nicht und es werden nur Auswahlen eines tatsächlichen Obsidian-Befehls oder einer leeren Zeichenfolge gespeichert.',
 
       'add-input-button-text': 'Neuen Befehl hinzufügen',

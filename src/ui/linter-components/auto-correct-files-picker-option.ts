@@ -1,13 +1,13 @@
 import {Setting, Component, App, TFile, normalizePath, ExtraButtonComponent} from 'obsidian';
 import {LanguageStringKey, getTextInLanguage} from '../../lang/helpers';
-import {AddCustomRow} from '../components/add-custom-row';
+import {AddCustomRefreshableRow} from '../components/add-custom-refreshable-row';
 import MdFileSuggester from '../suggesters/md-file-suggester';
 import {parseCustomReplacements, stripCr} from '../../utils/strings';
 import {ParseResultsModal} from '../modals/parse-results-modal';
 
 export type CustomAutoCorrectContent = {filePath: string, customReplacements: Map<string, string>};
 
-export class AutoCorrectFilesPickerOption extends AddCustomRow {
+export class AutoCorrectFilesPickerOption extends AddCustomRefreshableRow {
   private selectedFiles: string[] = [];
 
   constructor(containerEl: HTMLElement, parentComponent: Component, public filesPicked: CustomAutoCorrectContent[], private app: App, saveSettings: () => void, name: LanguageStringKey, description: LanguageStringKey) {
@@ -16,8 +16,9 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
         parentComponent,
         getTextInLanguage(name),
         getTextInLanguage(description),
-        null,
-        getTextInLanguage('options.custom-auto-correct.add-input-button-text'),
+        getTextInLanguage('options.custom-auto-correct.warning-text').replace('{NAME}', getTextInLanguage('rules.auto-correct-common-misspellings.name')),
+        getTextInLanguage('options.custom-auto-correct.add-new-replacement-file-tooltip'),
+        getTextInLanguage('options.custom-auto-correct.refresh-tooltip-text'),
         saveSettings,
         ()=>{
           this.selectedFiles = [];
@@ -30,6 +31,16 @@ export class AutoCorrectFilesPickerOption extends AddCustomRow {
           this.selectedFiles.push('');
           this.saveSettings();
           this.addPickedFile(newPickedFile, this.filesPicked.length - 1, true);
+        },
+        async () => {
+          for (const replacementFileInfo of this.filesPicked) {
+            if (replacementFileInfo.filePath != '') {
+              const file = this.getFileFromPath(replacementFileInfo.filePath);
+              if (file) {
+                replacementFileInfo.customReplacements = parseCustomReplacements(stripCr(await this.app.vault.cachedRead(file)));
+              }
+            }
+          }
         });
     this.display();
     this.inputElDiv.addClass('linter-folder-ignore-container');

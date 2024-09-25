@@ -217,7 +217,7 @@ export default {
     'custom-command': {
       // custom-command-option.ts
       'name': 'Custom Commands',
-      'description': 'Custom commands are Obsidian commands that get run after the linter is finished running its regular rules. This means that they do not run before the YAML timestamp logic runs, so they can cause YAML timestamp to be triggered on the next run of the linter. You may only select an Obsidian command once. **_Note that this currently only works on linting the current file._**',
+      'description': 'Custom commands are Obsidian commands that get run after the linter is finished running its regular rules. This means that they do not run before the YAML timestamp logic runs, so they can cause YAML timestamp to be triggered on the next run of the linter. You may only select an Obsidian command once.',
       'warning': 'When selecting an option, make sure to select the option either by using the mouse or by hitting the enter key. Other selection methods may not work and only selections of an actual Obsidian command or an empty string will be saved.',
 
       'add-input-button-text': 'Add new command',
@@ -245,7 +245,9 @@ export default {
       'show-parsed-contents-tooltip': 'View parsed replacements',
       'custom-row-parse-warning': '"{ROW}" is not a valid row with custom replacements. It must have only 2 columns.',
       'file-search-placeholder-text': 'File name',
-      'add-input-button-text': 'Add another custom file',
+      'add-new-replacement-file-tooltip': 'Add another custom file',
+      'warning-text': 'Selected files will automatically have {NAME} disabled.',
+      'refresh-tooltip-text': 'Reload custom replacements',
     },
   },
 

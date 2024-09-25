@@ -190,7 +190,7 @@ export default {
     'custom-command': {
       // custom-command-option.ts
       'name': '自定义命令',
-      'description': '自定义命令是在 Linter 完成格式化后运行的 Obsidian 命令。这意味着 Obsidian 命令会在 YAML 时间戳修改之后运行，因此它们可能会导致在下次运行 Linter 时触发 YAML 时间戳修改。一个 Obsidian 命令只能选择一次。**_注意，这目前仅适用于格式化当前文件_**',
+      'description': '自定义命令是在 Linter 完成格式化后运行的 Obsidian 命令。这意味着 Obsidian 命令会在 YAML 时间戳修改之后运行，因此它们可能会导致在下次运行 Linter 时触发 YAML 时间戳修改。一个 Obsidian 命令只能选择一次。',
       'warning': '选择命令时，请确保使用鼠标或按回车键选择该选项，其他选择方法可能不起作用。只有 Obsidian 命令或空字符串会被保存',
 
       'add-input-button-text': '添加新命令',

@@ -190,7 +190,7 @@ export default {
     'custom-command': {
       // custom-command-option.ts
       'name': 'Özel Komutlar',
-      'description': 'Özel komutlar, linter normal kurallarını çalıştırmayı bitirdikten sonra çalıştırılan Obsidyen komutlardır. Bu, YAML zaman damgası mantığı çalışmadan önce çalışmadıkları anlamına gelir, dolayısıyla linterin bir sonraki çalışmasında YAML zaman damgasının tetiklenmesine neden olabilirler. Bir Obsidyen komutunu yalnızca bir kez seçebilirsiniz. **_Bunun şu anda yalnızca geçerli dosyaya satır dizilirken çalıştığını unutmayın._**',
+      'description': 'Özel komutlar, linter normal kurallarını çalıştırmayı bitirdikten sonra çalıştırılan Obsidyen komutlardır. Bu, YAML zaman damgası mantığı çalışmadan önce çalışmadıkları anlamına gelir, dolayısıyla linterin bir sonraki çalışmasında YAML zaman damgasının tetiklenmesine neden olabilirler. Bir Obsidyen komutunu yalnızca bir kez seçebilirsiniz.',
       'warning': 'Bir seçeneği seçerken, seçeneği fareyi kullanarak veya enter tuşuna basarak seçtiğinizden emin olun. Diğer seçim yöntemleri çalışmayabilir ve yalnızca gerçek bir Obsidian komutunun veya boş bir dizinin seçimleri kaydedilir.',
 
       'add-input-button-text': 'Yeni komut ekle',

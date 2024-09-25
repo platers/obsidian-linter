@@ -28,6 +28,7 @@ import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
 import {LinterSettings} from './settings-data';
 import TrailingSpaces from './rules/trailing-spaces';
+import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -41,6 +42,7 @@ type FileInfo = {
   name: string,
   createdAtFormatted: string,
   modifiedAtFormatted: string,
+  path: string,
 }
 
 export class RulesRunner {
@@ -62,6 +64,14 @@ export class RulesRunner {
     let newText = this.runBeforeRegularRules(runOptions);
     timingEnd(preRuleText);
 
+    let hasCustomCorrections = false;
+    for (const replacementFileInfo of runOptions.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
+      if (replacementFileInfo.filePath != '') {
+        hasCustomCorrections = true;
+        break;
+      }
+    }
+
     const disabledRuleText = getTextInLanguage('logs.disabled-text');
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
@@ -70,6 +80,21 @@ export class RulesRunner {
         continue;
       } else if (rule.hasSpecialExecutionOrder || rule.type === RuleType.PASTE) {
         continue;
+      }
+
+      if (rule.alias === 'auto-correct-common-misspellings' && hasCustomCorrections) {
+        let skipRule = false;
+        for (const replacementFileInfo of runOptions.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
+          if (replacementFileInfo.filePath == runOptions.fileInfo.path) {
+            skipRule = true;
+            break;
+          }
+        }
+
+        if (skipRule) {
+          logDebug(rule.alias + ' ' + disabledRuleText);
+          continue;
+        }
       }
 
       [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, runOptions.settings, {
@@ -261,6 +286,7 @@ export function createRunLinterRulesOptions(text: string, file: TFile = null, mo
       name: file ? file.basename: '',
       createdAtFormatted: createdAtTime,
       modifiedAtFormatted: modifiedAtTime,
+      path: file ? file.path: '',
     },
     settings: settings,
     momentLocale: momentLocale,
