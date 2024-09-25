@@ -28,6 +28,7 @@ import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
 import {LinterSettings} from './settings-data';
 import TrailingSpaces from './rules/trailing-spaces';
+import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
 
 export type RunLinterRulesOptions = {
   oldText: string,
