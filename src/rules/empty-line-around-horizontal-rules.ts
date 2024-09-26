@@ -29,18 +29,85 @@ export default class EmptyLineAroundHorizontalRules extends RuleBuilder<EmptyLin
           ***
           ${''}
           ${''}
-          asdf
-          ___
-          qwer
+          Content
         `,
         after: dedent`
           ***
           ${''}
-          asdf
+          Content
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Horizontal rules that end a document do not get an empty line after them.',
+        before: dedent`
+          ***
+          ${''}
+          Content
+          ${''}
+          ***
+          ${''}
+        `,
+        after: dedent`
+          ***
+          ${''}
+          Content
+          ${''}
+          ***
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'All types of horizontal rules are affected by this rule',
+        before: dedent`
+          - Content 1
+          ***
+          - Content 2
+          ---
+          - Content 3
+          ___
+          - Content 4
+        `,
+        after: dedent`
+          - Content 1
+          ${''}
+          ***
+          ${''}
+          - Content 2
+          ${''}
+          ---
+          ${''}
+          - Content 3
           ${''}
           ___
           ${''}
-          qwer
+          - Content 4
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'YAML frontmatter is not affected by this rule',
+        before: dedent`
+          ---
+          prop: value
+          ---
+          ${''}
+          Content
+        `,
+        after: dedent`
+          ---
+          prop: value
+          ---
+          ${''}
+          Content
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Paragraphs above `---` are treated as a heading and not spaced apart',
+        before: dedent`
+          Content
+          ---
+        `,
+        after: dedent`
+          Content
+          ---
         `,
       }),
     ];
