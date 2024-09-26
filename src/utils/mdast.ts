@@ -70,11 +70,11 @@ function parseTextToAST(text: string): Root {
 
   // @ts-expect-error for some reason an overload is missing
   const ast = fromMarkdown(text, {
-    extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem(), frontmatter(['yaml', 'toml'])]), math()],
+    extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem(), frontmatter(['yaml'])]), math()],
     mdastExtensions: [[
       gfmFootnoteFromMarkdown(),
       gfmTaskListItemFromMarkdown,
-      frontmatterFromMarkdown(['yaml', 'toml']),
+      frontmatterFromMarkdown(['yaml']),
     ],
     mathFromMarkdown(),
     ],
