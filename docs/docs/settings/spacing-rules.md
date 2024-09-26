@@ -406,9 +406,7 @@ Before:
 ***
 
 
-asdf
-___
-qwer
+Content
 ``````
 
 After:
@@ -416,11 +414,97 @@ After:
 `````` markdown
 ***
 
-asdf
+Content
+``````
+</details>
+<details><summary>Horizontal rules that end a document do not get an empty line after them.</summary>
+
+Before:
+
+`````` markdown
+***
+Content
+***
+``````
+
+After:
+
+`````` markdown
+***
+
+Content
+
+***
+``````
+</details>
+<details><summary>All types of horizontal rules are affected by this rule</summary>
+
+Before:
+
+`````` markdown
+- Content 1
+***
+- Content 2
+---
+- Content 3
+___
+- Content 4
+``````
+
+After:
+
+`````` markdown
+- Content 1
+
+***
+
+- Content 2
+
+---
+
+- Content 3
 
 ___
 
-qwer
+- Content 4
+``````
+</details>
+<details><summary>YAML frontmatter is not affected by this rule</summary>
+
+Before:
+
+`````` markdown
+---
+prop: value
+---
+
+Content
+``````
+
+After:
+
+`````` markdown
+---
+prop: value
+---
+
+Content
+``````
+</details>
+<details><summary>Paragraphs above `---` are treated as a heading and not spaced apart</summary>
+
+Before:
+
+`````` markdown
+Content
+---
+``````
+
+After:
+
+`````` markdown
+Content
+---
 ``````
 </details>
 

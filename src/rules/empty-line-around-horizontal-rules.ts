@@ -41,11 +41,8 @@ export default class EmptyLineAroundHorizontalRules extends RuleBuilder<EmptyLin
         description: 'Horizontal rules that end a document do not get an empty line after them.',
         before: dedent`
           ***
-          ${''}
           Content
-          ${''}
           ***
-          ${''}
         `,
         after: dedent`
           ***
