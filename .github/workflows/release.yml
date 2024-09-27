@@ -5,6 +5,9 @@ on:
     tags:
       - "*"
 
+env:
+  PLUGIN_NAME: obsidian-linter
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,12 +18,18 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "16.x"
+          node-version: "18.x"
 
       - name: Build plugin
         run: |
           npm ci
           npm run build
+
+      - name: Create Manual Install Zip
+        run: |
+          mkdir ${{ env.PLUGIN_NAME }}
+          cp main.js manifest.json src/styles.css ${{ env.PLUGIN_NAME }}
+          zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
 
       - name: Create release
         env:
@@ -31,4 +40,4 @@ jobs:
           gh release create "$tag" \
             --title="$tag" \
             --draft \
-            main.js manifest.json src/styles.css
+            main.js manifest.json src/styles.css ${{ env.PLUGIN_NAME }}.zip
