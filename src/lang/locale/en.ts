@@ -142,7 +142,7 @@ export default {
         'description': 'Display the number of characters changed after linting',
       },
       'lint-on-file-change': {
-        'name': 'Lint on File Change',
+        'name': 'Lint on Focused File Change',
         'description': 'When the a file is closed or a new file is swapped to, the previous file is linted.',
       },
       'display-lint-on-file-change-message': {

@@ -2,10 +2,11 @@ import {Setting} from 'obsidian';
 import LinterPlugin from 'src/main';
 import {LinterSettingsKeys} from 'src/settings-data';
 import {BaseSetting} from './base-setting';
+import {LanguageStringKey} from 'src/lang/helpers';
 
 export class ToggleSetting extends BaseSetting<boolean> {
   setting: Setting;
-  constructor(containerEl: HTMLDivElement, name: string, description: string, keyToUpdate: LinterSettingsKeys, plugin: LinterPlugin) {
+  constructor(containerEl: HTMLDivElement, name: LanguageStringKey, description: LanguageStringKey, keyToUpdate: LinterSettingsKeys, plugin: LinterPlugin) {
     super(containerEl, name, description, keyToUpdate, plugin);
     this.display();
   }

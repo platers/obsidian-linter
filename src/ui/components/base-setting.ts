@@ -64,6 +64,7 @@ export abstract class BaseSetting<T> {
   protected parseNameAndDescription() {
     parseTextToHTMLWithoutOuterParagraph(this.plugin.app, this.name, this.setting.nameEl, this.plugin.settingsTab.component);
     parseTextToHTMLWithoutOuterParagraph(this.plugin.app, this.description, this.setting.descEl, this.plugin.settingsTab.component);
+    this.setting.descEl.addClass('linter-no-padding-top');
   }
 
   abstract display(): void;
