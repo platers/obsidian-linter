@@ -18,6 +18,7 @@ module.exports = {
     '@typescript-eslint',
     'jest',
     'unicorn',
+    "deprecation",
   ],
   'rules': {
     'camelcase': 'off',
@@ -37,5 +38,6 @@ module.exports = {
         'argsIgnorePattern': '(^_)|(options)',
       },
     ],
+    "deprecation/deprecation": "warn",
   },
 };
