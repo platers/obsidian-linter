@@ -265,6 +265,10 @@ export default {
         'name': 'Extra Auto-Correct Source Files',
         'description': 'These are files that have a markdown table in them that have the initial word and the word to correct it to (these are case insensitive corrections). **Note: the tables used should have the starting and ending `|` indicators present for each line.**',
       },
+      'skip-words-with-multiple-capitals': {
+        'name': 'Skip Words with Multiple Capitals',
+        'description': 'Will skip any files that have a capital letter in them other than as the first letter of the word, so acronyms and some other words can benefit from this. It may cause issues with proper nouns being properly fixed.',
+      },
     },
     // add-blank-line-after-yaml.ts
     'add-blank-line-after-yaml': {

@@ -1,6 +1,6 @@
 import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, MdFilePickerOptionBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MdFilePickerOptionBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {misspellingToCorrection} from '../utils/auto-correct-misspellings';
 import {wordRegex, wordSplitterRegex} from '../utils/regex';
@@ -9,6 +9,7 @@ import {CustomAutoCorrectContent} from '../ui/linter-components/auto-correct-fil
 class AutoCorrectCommonMisspellingsOptions implements Options {
   ignoreWords?: string[] = [];
   extraAutoCorrectFiles?: CustomAutoCorrectContent[] = [];
+  skipWordsWithMultipleCapitals?: boolean = false;
 }
 
 @RuleBuilder.register
@@ -29,7 +30,7 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
   }
   replaceWordWithCorrectCasing(word: string, options: AutoCorrectCommonMisspellingsOptions): string {
     const lowercasedWord = word.toLowerCase();
-    if (options.ignoreWords.includes(lowercasedWord)) {
+    if (options.ignoreWords.includes(lowercasedWord) || (options.skipWordsWithMultipleCapitals && word.length > 1 && lowercasedWord.substring(1) !== word.substring(1))) {
       return word;
     }
 
@@ -119,6 +120,22 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
           http://www.Absoltely.com should not be corrected
         `,
       }),
+      new ExampleBuilder({
+        description: 'Auto-correct misspellings skips words with multiple capital letters in them if `Skip Words with Multiple Capitals` is Enabled',
+        before: dedent`
+          HSA here will not be auto-corrected to Has since it has more than one capital letter.
+          aADD will not be converted to add.
+          But this also affects javaSrript(what should be JavaScript) and other proper names as well which will not be auto-corrected.
+        `,
+        after: dedent`
+          HSA here will not be auto-corrected to Has since it has more than one capital letter.
+          aADD will not be converted to add.
+          But this also affects javaSrript(what should be JavaScript) and other proper names as well which will not be auto-corrected.
+        `,
+        options: {
+          skipWordsWithMultipleCapitals: true,
+        },
+      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<AutoCorrectCommonMisspellingsOptions>[] {
@@ -137,6 +154,12 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
         descriptionKey: 'rules.auto-correct-common-misspellings.extra-auto-correct-files.description',
         // @ts-expect-error since it looks like there is an issue with the types here
         optionsKey: 'extraAutoCorrectFiles',
+      }),
+      new BooleanOptionBuilder({
+        OptionsClass: AutoCorrectCommonMisspellingsOptions,
+        nameKey: 'rules.auto-correct-common-misspellings.skip-words-with-multiple-capitals.name',
+        descriptionKey: 'rules.auto-correct-common-misspellings.skip-words-with-multiple-capitals.description',
+        optionsKey: 'skipWordsWithMultipleCapitals',
       }),
     ];
   }
