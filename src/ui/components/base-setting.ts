@@ -62,8 +62,8 @@ export abstract class BaseSetting<T> {
   }
 
   protected parseNameAndDescription() {
-    parseTextToHTMLWithoutOuterParagraph(this.name, this.setting.nameEl, this.plugin.settingsTab.component);
-    parseTextToHTMLWithoutOuterParagraph(this.description, this.setting.descEl, this.plugin.settingsTab.component);
+    parseTextToHTMLWithoutOuterParagraph(this.plugin.app, this.name, this.setting.nameEl, this.plugin.settingsTab.component);
+    parseTextToHTMLWithoutOuterParagraph(this.plugin.app, this.description, this.setting.descEl, this.plugin.settingsTab.component);
   }
 
   abstract display(): void;

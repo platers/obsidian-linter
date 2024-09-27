@@ -1,4 +1,4 @@
-import {Setting, Component} from 'obsidian';
+import {App, Setting, Component} from 'obsidian';
 import {getTextInLanguage} from 'src/lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 export type FileToIgnore = {label: string, match: string, flags: string};
@@ -6,7 +6,7 @@ export type FileToIgnore = {label: string, match: string, flags: string};
 const defaultFlags = 'i';
 
 export class FilesToIgnoreOption extends AddCustomRow {
-  constructor(containerEl: HTMLElement, parentComponent: Component, public filesToIgnore: FileToIgnore[], saveSettings: () => void) {
+  constructor(containerEl: HTMLElement, parentComponent: Component, public filesToIgnore: FileToIgnore[], app: App, saveSettings: () => void) {
     super(
         containerEl,
         parentComponent,
@@ -14,6 +14,7 @@ export class FilesToIgnoreOption extends AddCustomRow {
         getTextInLanguage('tabs.general.files-to-ignore.description'),
         getTextInLanguage('tabs.general.files-to-ignore.warning'),
         getTextInLanguage('tabs.general.files-to-ignore.add-input-button-text'),
+        app,
         saveSettings,
         ()=>{
           const newRegex = {label: '', match: '', flags: defaultFlags};

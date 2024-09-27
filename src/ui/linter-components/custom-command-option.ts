@@ -6,13 +6,14 @@ import CommandSuggester from '../suggesters/command-suggester';
 export type LintCommand = { id: string, name: string };
 
 export class CustomCommandOption extends AddCustomRow {
-  constructor(containerEl: HTMLElement, parentComponent: Component, public lintCommands: LintCommand[], private app: App, saveSettings: () => void) {
+  constructor(containerEl: HTMLElement, parentComponent: Component, public lintCommands: LintCommand[], app: App, saveSettings: () => void) {
     super(containerEl,
         parentComponent,
         getTextInLanguage('options.custom-command.name'),
         getTextInLanguage('options.custom-command.description'),
         getTextInLanguage('options.custom-command.warning'),
         getTextInLanguage('options.custom-command.add-input-button-text'),
+        app,
         saveSettings,
         () => {
           const newCommand = {id: '', name: ''};
