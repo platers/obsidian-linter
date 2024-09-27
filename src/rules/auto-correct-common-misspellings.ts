@@ -148,18 +148,18 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
         splitter: wordSplitterRegex,
         separator: ', ',
       }),
+      new BooleanOptionBuilder({
+        OptionsClass: AutoCorrectCommonMisspellingsOptions,
+        nameKey: 'rules.auto-correct-common-misspellings.skip-words-with-multiple-capitals.name',
+        descriptionKey: 'rules.auto-correct-common-misspellings.skip-words-with-multiple-capitals.description',
+        optionsKey: 'skipWordsWithMultipleCapitals',
+      }),
       new MdFilePickerOptionBuilder({
         OptionsClass: AutoCorrectCommonMisspellingsOptions,
         nameKey: 'rules.auto-correct-common-misspellings.extra-auto-correct-files.name',
         descriptionKey: 'rules.auto-correct-common-misspellings.extra-auto-correct-files.description',
         // @ts-expect-error since it looks like there is an issue with the types here
         optionsKey: 'extraAutoCorrectFiles',
-      }),
-      new BooleanOptionBuilder({
-        OptionsClass: AutoCorrectCommonMisspellingsOptions,
-        nameKey: 'rules.auto-correct-common-misspellings.skip-words-with-multiple-capitals.name',
-        descriptionKey: 'rules.auto-correct-common-misspellings.skip-words-with-multiple-capitals.description',
-        optionsKey: 'skipWordsWithMultipleCapitals',
       }),
     ];
   }

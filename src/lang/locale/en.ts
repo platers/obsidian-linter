@@ -267,7 +267,7 @@ export default {
       },
       'skip-words-with-multiple-capitals': {
         'name': 'Skip Words with Multiple Capitals',
-        'description': 'Will skip any files that have a capital letter in them other than as the first letter of the word, so acronyms and some other words can benefit from this. It may cause issues with proper nouns being properly fixed.',
+        'description': 'Will skip any files that have a capital letter in them other than as the first letter of the word. Acronyms and some other words can benefit from this. It may cause issues with proper nouns being properly fixed.',
       },
     },
     // add-blank-line-after-yaml.ts
