@@ -1,10 +1,10 @@
-import {Setting, Component, App} from 'obsidian';
+import {App, Setting, Component} from 'obsidian';
 import {getTextInLanguage} from 'src/lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 import FolderSuggester from '../suggesters/folder-suggester';
 
 export class FolderIgnoreOption extends AddCustomRow {
-  constructor(containerEl: HTMLElement, parentComponent: Component, public foldersToIgnore: string[], private app: App, saveSettings: () => void) {
+  constructor(containerEl: HTMLElement, parentComponent: Component, public foldersToIgnore: string[], app: App, saveSettings: () => void) {
     super(
         containerEl,
         parentComponent,
@@ -12,6 +12,7 @@ export class FolderIgnoreOption extends AddCustomRow {
         getTextInLanguage('tabs.general.folders-to-ignore.description'),
         null,
         getTextInLanguage('tabs.general.folders-to-ignore.add-input-button-text'),
+        app,
         saveSettings,
         ()=>{
           const newFolderToIgnore = '';

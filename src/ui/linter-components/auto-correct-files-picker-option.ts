@@ -10,7 +10,7 @@ export type CustomAutoCorrectContent = {filePath: string, customReplacements: Ma
 export class AutoCorrectFilesPickerOption extends AddCustomRefreshableRow {
   private selectedFiles: string[] = [];
 
-  constructor(containerEl: HTMLElement, parentComponent: Component, public filesPicked: CustomAutoCorrectContent[], private app: App, saveSettings: () => void, name: LanguageStringKey, description: LanguageStringKey) {
+  constructor(containerEl: HTMLElement, parentComponent: Component, public filesPicked: CustomAutoCorrectContent[], app: App, saveSettings: () => void, name: LanguageStringKey, description: LanguageStringKey) {
     super(
         containerEl,
         parentComponent,
@@ -19,6 +19,7 @@ export class AutoCorrectFilesPickerOption extends AddCustomRefreshableRow {
         getTextInLanguage('options.custom-auto-correct.warning-text').replace('{NAME}', getTextInLanguage('rules.auto-correct-common-misspellings.name')),
         getTextInLanguage('options.custom-auto-correct.add-new-replacement-file-tooltip'),
         getTextInLanguage('options.custom-auto-correct.refresh-tooltip-text'),
+        app,
         saveSettings,
         ()=>{
           this.selectedFiles = [];

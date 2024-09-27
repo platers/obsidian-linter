@@ -18,7 +18,7 @@ export class CustomTab extends Tab {
     this.addSettingSearchInfo(customCommandEl, customCommands.name, customCommands.description.replaceAll('\n', ' ') + customCommands.warning.replaceAll('\n', ' '));
 
     const customReplaceEl = this.contentEl.createDiv();
-    const customRegexes = new CustomReplaceOption(customReplaceEl, this.plugin.settingsTab.component, this.plugin.settings.customRegexes, () => {
+    const customRegexes = new CustomReplaceOption(customReplaceEl, this.plugin.settingsTab.component, this.plugin.settings.customRegexes, this.app, () => {
       void this.plugin.saveSettings();
     });
     this.addSettingSearchInfo(customReplaceEl, customRegexes.name, customRegexes.description.replaceAll('\n', ' ') + customRegexes.warning.replaceAll('\n', ' '));

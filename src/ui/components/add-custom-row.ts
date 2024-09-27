@@ -1,4 +1,4 @@
-import {Component, Setting} from 'obsidian';
+import {App, Component, Setting} from 'obsidian';
 import {parseTextToHTMLWithoutOuterParagraph} from '../helpers';
 
 /**
@@ -15,6 +15,7 @@ export abstract class AddCustomRow {
     public description: string,
     public warning: string,
     private addInputBtnText: string,
+    protected app: App,
     protected saveSettings: () => void,
     private onAddInput: () => void) {
   }
@@ -24,7 +25,7 @@ export abstract class AddCustomRow {
 
     const descriptionAndWarningContainer = this.containerEl.createDiv({cls: 'setting-item-description'});
 
-    parseTextToHTMLWithoutOuterParagraph(this.description, descriptionAndWarningContainer.createEl('p', {cls: 'custom-row-description'}), this.parentComponent);
+    parseTextToHTMLWithoutOuterParagraph(this.app, this.description, descriptionAndWarningContainer.createEl('p', {cls: 'custom-row-description'}), this.parentComponent);
 
     new Setting(this.containerEl)
         .addButton((cb)=>{

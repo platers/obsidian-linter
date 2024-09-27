@@ -104,7 +104,7 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfo(folderIgnoreEl, folderIgnore.name, folderIgnore.description.replaceAll('\n', ' '));
 
     const filesToIgnoreEl = this.contentEl.createDiv();
-    const filesToIgnore = new FilesToIgnoreOption(filesToIgnoreEl, this.plugin.settingsTab.component, this.plugin.settings.filesToIgnore, () => {
+    const filesToIgnore = new FilesToIgnoreOption(filesToIgnoreEl, this.plugin.settingsTab.component, this.plugin.settings.filesToIgnore, this.app, () => {
       void this.plugin.saveSettings();
     });
 

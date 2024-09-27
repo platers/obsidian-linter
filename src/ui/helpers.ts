@@ -1,7 +1,7 @@
-import {Component, MarkdownRenderer} from 'obsidian';
+import {App, Component, MarkdownRenderer} from 'obsidian';
 
-export function parseTextToHTMLWithoutOuterParagraph(text: string, containerEl: HTMLElement, component: Component) {
-  void MarkdownRenderer.renderMarkdown(text, containerEl, '', component);
+export function parseTextToHTMLWithoutOuterParagraph(app: App, text: string, containerEl: HTMLElement, component: Component) {
+  void MarkdownRenderer.render(app, text, containerEl, '', component);
 
   let htmlString = containerEl.innerHTML.trim();
   if (htmlString.startsWith('<p>')) {

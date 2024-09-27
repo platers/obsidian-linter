@@ -44,8 +44,8 @@ export abstract class Option {
   }
 
   protected parseNameAndDescriptionAndRemoveSettingBorder(setting: Setting, plugin: LinterPlugin) {
-    parseTextToHTMLWithoutOuterParagraph(this.getName(), setting.nameEl, plugin.settingsTab.component);
-    parseTextToHTMLWithoutOuterParagraph(this.getDescription(), setting.descEl, plugin.settingsTab.component);
+    parseTextToHTMLWithoutOuterParagraph(plugin.app, this.getName(), setting.nameEl, plugin.settingsTab.component);
+    parseTextToHTMLWithoutOuterParagraph(plugin.app, this.getDescription(), setting.descEl, plugin.settingsTab.component);
 
     setting.settingEl.addClass('linter-no-border');
   }

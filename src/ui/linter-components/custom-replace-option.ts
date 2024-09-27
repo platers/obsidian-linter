@@ -1,4 +1,4 @@
-import {Setting, Component} from 'obsidian';
+import {App, Setting, Component} from 'obsidian';
 import {getTextInLanguage} from 'src/lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 export type CustomReplace = {label: string, find: string, replace: string, flags: string};
@@ -6,7 +6,7 @@ export type CustomReplace = {label: string, find: string, replace: string, flags
 const defaultFlags = 'gm';
 
 export class CustomReplaceOption extends AddCustomRow {
-  constructor(containerEl: HTMLElement, parentComponent: Component, public regexes: CustomReplace[], saveSettings: () => void) {
+  constructor(containerEl: HTMLElement, parentComponent: Component, public regexes: CustomReplace[], app: App, saveSettings: () => void) {
     super(
         containerEl,
         parentComponent,
@@ -14,6 +14,7 @@ export class CustomReplaceOption extends AddCustomRow {
         getTextInLanguage('options.custom-replace.description'),
         getTextInLanguage('options.custom-replace.warning'),
         getTextInLanguage('options.custom-replace.add-input-button-text'),
+        app,
         saveSettings,
         ()=>{
           const newRegex = {label: '', find: '', replace: '', flags: defaultFlags};
