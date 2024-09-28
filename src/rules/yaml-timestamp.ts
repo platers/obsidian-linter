@@ -8,13 +8,17 @@ import {insert} from '../utils/strings';
 import parseFormat from 'moment-parseformat';
 import {getTextInLanguage} from '../lang/helpers';
 
+type DateCreatedSourceOfTruth = 'file system' | 'frontmatter';
+type DateModifiedSourceOfTruth = 'file system' | 'user or Linter edits';
+
 class YamlTimestampOptions implements Options {
   @RuleBuilder.noSettingControl()
     alreadyModified?: boolean;
 
   dateCreatedKey?: string = 'date created';
   dateCreated?: boolean = true;
-  forceRetentionOfCreatedValue?: boolean = false;
+  dateCreatedSourceOfTruth?: DateCreatedSourceOfTruth = 'file system';
+  dateModifiedSourceOfTruth?: DateModifiedSourceOfTruth = 'file system';
 
   @RuleBuilder.noSettingControl()
     fileCreatedTime?: string;
@@ -104,10 +108,8 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       textModified = true;
     } else if (keyWithValueFound) {
       const createdDateString = this.getYAMLTimestampString(text, created_match, options.dateCreatedKey);
-
-      // @ts-expect-error
       const actualFormat = parseFormat(createdDateString);
-      if (options.forceRetentionOfCreatedValue && options.format !== actualFormat) {
+      if (options.dateCreatedSourceOfTruth == 'frontmatter' && options.format !== actualFormat) {
         const yamlCreatedDateTime = this.parseValueToCurrentFormatIfPossible(createdDateString, options.format, options.locale, options.convertToUTC);
         if (yamlCreatedDateTime == null) {
           throw new Error(getTextInLanguage('logs.invalid-date-format-error').replace('{DATE}', createdDateString).replace('{FILE_NAME}', options.fileName));
@@ -124,7 +126,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
           textModified = true;
         }
-      } else if (!options.forceRetentionOfCreatedValue) {
+      } else if (options.dateCreatedSourceOfTruth != 'frontmatter') {
         const createdDateTime = moment(createdDateString, options.format, options.locale, true);
         if (createdDateTime == undefined || !createdDateTime.isValid()) {
           text = text.replace(
@@ -154,9 +156,15 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
     const keyWithValueFound = modified_match.test(text);
     if (keyWithValueFound) {
-      const modifiedDateTime = moment(text.match(modified_match)[0].replace(options.dateModifiedKey + ':', '').trim(), options.format, options.locale, true);
+      const modifiedDateTime = moment(this.getYAMLTimestampString(text, modified_match, options.dateModifiedKey), options.format, options.locale, true);
+      // conditions when update happens for date modified if the key already exists:
+      // 1. the text has been modified
+      // 2. the modified date in the frontmatter is not the same locale or format as the settings
+      // 3. the source of truth is not when a user or the Linter makes a change to the file and
+      // there is a more than 5 second difference between the date modified in the frontmatter and
+      // the filesystem
       if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() ||
-            this.getTimeDifferenceInSeconds(modifiedDateTime, modified_date, options) > 5
+            (options.dateModifiedSourceOfTruth != 'user or Linter edits' && this.getTimeDifferenceInSeconds(modifiedDateTime, modified_date, options) > 5)
       ) {
         text = text.replace(
             modified_match,
@@ -185,7 +193,6 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       return desiredFormatDate;
     }
 
-    // @ts-expect-error
     const actualFormat = parseFormat(timestamp);
     if (actualFormat != undefined) {
       const date = utc ? moment.utc(timestamp, actualFormat) : moment(timestamp, actualFormat);

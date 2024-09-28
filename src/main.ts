@@ -146,6 +146,7 @@ export default class LinterPlugin extends Plugin {
           this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = defaults['english-symbols-punctuation-after'];
         }
       }
+      // TODO: add logic for moving force retention pjk
     }
 
     this.updatePasteOverrideStatus();

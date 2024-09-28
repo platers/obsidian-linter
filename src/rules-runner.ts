@@ -288,7 +288,7 @@ export class RulesRunner {
 }
 
 export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings): RunLinterRulesOptions {
-  const createdAt = file ? moment(file.stat.ctime): moment();
+  const createdAt = (file && file.stat.ctime !== 0) ? moment(file.stat.ctime): moment();
   createdAt.locale(momentLocale);
   const modifiedAt = file ? moment(file.stat.mtime): moment();
   modifiedAt.locale(momentLocale);
