@@ -750,10 +750,6 @@ export default {
         'name': '创建日期键名',
         'description': '使用哪个 YAML 键来表示创建日期',
       },
-      'force-retention-of-create-value': {
-        'name': '强制保留创建日期值',
-        'description': '沿用 YAML Front-matter 中已有的创建日期，忽略文档元数据。对于文档元数据更改（比如复制文件）导致的创建时间更改非常有用',
-      },
       'date-modified': {
         'name': '修改日期',
         'description': '插入文件的最近一次的修改日期',

@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MomentFormatOptionBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, MomentFormatOptionBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML, initYAML} from '../utils/yaml';
 import {moment} from 'obsidian';
@@ -8,13 +8,17 @@ import {insert} from '../utils/strings';
 import parseFormat from 'moment-parseformat';
 import {getTextInLanguage} from '../lang/helpers';
 
+type DateCreatedSourceOfTruth = 'file system' | 'frontmatter';
+type DateModifiedSourceOfTruth = 'file system' | 'user or Linter edits';
+
 class YamlTimestampOptions implements Options {
   @RuleBuilder.noSettingControl()
     alreadyModified?: boolean;
 
   dateCreatedKey?: string = 'date created';
   dateCreated?: boolean = true;
-  forceRetentionOfCreatedValue?: boolean = false;
+  dateCreatedSourceOfTruth?: DateCreatedSourceOfTruth = 'file system';
+  dateModifiedSourceOfTruth?: DateModifiedSourceOfTruth = 'file system';
 
   @RuleBuilder.noSettingControl()
     fileCreatedTime?: string;
@@ -104,10 +108,8 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       textModified = true;
     } else if (keyWithValueFound) {
       const createdDateString = this.getYAMLTimestampString(text, created_match, options.dateCreatedKey);
-
-      // @ts-expect-error
       const actualFormat = parseFormat(createdDateString);
-      if (options.forceRetentionOfCreatedValue && options.format !== actualFormat) {
+      if (options.dateCreatedSourceOfTruth == 'frontmatter' && options.format !== actualFormat) {
         const yamlCreatedDateTime = this.parseValueToCurrentFormatIfPossible(createdDateString, options.format, options.locale, options.convertToUTC);
         if (yamlCreatedDateTime == null) {
           throw new Error(getTextInLanguage('logs.invalid-date-format-error').replace('{DATE}', createdDateString).replace('{FILE_NAME}', options.fileName));
@@ -124,7 +126,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
           textModified = true;
         }
-      } else if (!options.forceRetentionOfCreatedValue) {
+      } else if (options.dateCreatedSourceOfTruth != 'frontmatter') {
         const createdDateTime = moment(createdDateString, options.format, options.locale, true);
         if (createdDateTime == undefined || !createdDateTime.isValid()) {
           text = text.replace(
@@ -154,9 +156,15 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
     const keyWithValueFound = modified_match.test(text);
     if (keyWithValueFound) {
-      const modifiedDateTime = moment(text.match(modified_match)[0].replace(options.dateModifiedKey + ':', '').trim(), options.format, options.locale, true);
+      const modifiedDateTime = moment(this.getYAMLTimestampString(text, modified_match, options.dateModifiedKey), options.format, options.locale, true);
+      // conditions when update happens for date modified if the key already exists:
+      // 1. the text has been modified
+      // 2. the modified date in the frontmatter is not the same locale or format as the settings
+      // 3. the source of truth is not when a user or the Linter makes a change to the file and
+      // there is a more than 5 second difference between the date modified in the frontmatter and
+      // the filesystem
       if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() ||
-            this.getTimeDifferenceInSeconds(modifiedDateTime, modified_date, options) > 5
+            (options.dateModifiedSourceOfTruth != 'user or Linter edits' && this.getTimeDifferenceInSeconds(modifiedDateTime, modified_date, options) > 5)
       ) {
         text = text.replace(
             modified_match,
@@ -185,7 +193,6 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       return desiredFormatDate;
     }
 
-    // @ts-expect-error
     const actualFormat = parseFormat(timestamp);
     if (actualFormat != undefined) {
       const date = utc ? moment.utc(timestamp, actualFormat) : moment(timestamp, actualFormat);
@@ -392,11 +399,21 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         descriptionKey: 'rules.yaml-timestamp.date-created-key.description',
         optionsKey: 'dateCreatedKey',
       }),
-      new BooleanOptionBuilder({
+      new DropdownOptionBuilder<YamlTimestampOptions, DateCreatedSourceOfTruth>({
         OptionsClass: YamlTimestampOptions,
-        nameKey: 'rules.yaml-timestamp.force-retention-of-create-value.name',
-        descriptionKey: 'rules.yaml-timestamp.force-retention-of-create-value.description',
-        optionsKey: 'forceRetentionOfCreatedValue',
+        nameKey: 'rules.yaml-timestamp.date-created-source-of-truth.name',
+        descriptionKey: 'rules.yaml-timestamp.date-created-source-of-truth.description',
+        optionsKey: 'dateCreatedSourceOfTruth',
+        records: [
+          {
+            value: 'file system',
+            description: 'The file system date created value is used to set the value of date created in the frontmatter',
+          },
+          {
+            value: 'frontmatter',
+            description: 'When a value is present in the frontmatter for date created, this value is used as the value for the date created',
+          },
+        ],
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlTimestampOptions,
@@ -409,6 +426,22 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         nameKey: 'rules.yaml-timestamp.date-modified-key.name',
         descriptionKey: 'rules.yaml-timestamp.date-modified-key.description',
         optionsKey: 'dateModifiedKey',
+      }),
+      new DropdownOptionBuilder<YamlTimestampOptions, DateModifiedSourceOfTruth>({
+        OptionsClass: YamlTimestampOptions,
+        nameKey: 'rules.yaml-timestamp.date-modified-source-of-truth.name',
+        descriptionKey: 'rules.yaml-timestamp.date-modified-source-of-truth.description',
+        optionsKey: 'dateModifiedSourceOfTruth',
+        records: [
+          {
+            value: 'file system',
+            description: 'The file system date modified value is used to set the value of date modified in the frontmatter',
+          },
+          {
+            value: 'user or Linter edits',
+            description: 'When a value is present in the frontmatter for date modified, date modified is kept as is unless the user or the Linter makes a change to the file',
+          },
+        ],
       }),
       new MomentFormatOptionBuilder({
         OptionsClass: YamlTimestampOptions,

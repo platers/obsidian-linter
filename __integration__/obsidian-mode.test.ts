@@ -37,7 +37,7 @@ function edgeCaseSetup(plugin: TestLinterPlugin, _: Editor): Promise<void> {
     'enabled': true,
     'date-created': true,
     'date-created-key': 'created',
-    'force-retention-of-create-value': true,
+    'date-created-source-of-truth': 'file system',
     'date-modified': true,
     'date-modified-key': 'last_modified',
     'format': 'YYYY-MM-DD',

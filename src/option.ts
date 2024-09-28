@@ -48,6 +48,7 @@ export abstract class Option {
     parseTextToHTMLWithoutOuterParagraph(plugin.app, this.getDescription(), setting.descEl, plugin.settingsTab.component);
 
     setting.settingEl.addClass('linter-no-border');
+    setting.descEl.addClass('linter-no-padding-top');
   }
 }
 

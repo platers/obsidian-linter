@@ -246,6 +246,13 @@ textarea.full-width {
 }
 
 /**
+* Settings item padding top removal to make toggles and other elements line up with description when no info is present
+*/
+.linter-no-padding-top {
+  padding-top: 0px;
+}
+
+/**
 * Custom row
 */
 .custom-row-description {

@@ -686,10 +686,6 @@ export default {
         'name': 'Oluşturma Tarihi Anahtarı',
         'description': 'Oluşturma tarihi için hangi YAML anahtarını kullanacağı',
       },
-      'force-retention-of-create-value': {
-        'name': 'Oluşturma Tarihi Anahtar Değerinin Korunmasını Zorla',
-        'description': 'Dosya metadatası yerine YAML ön maddesindeki tarihi yeniden kullanır, bu da dosya metadatasındaki değişikliklerin değerin farklı bir değere değişmesine neden olmasını önler.',
-      },
       'date-modified': {
         'name': 'Değiştirme Tarihi',
         'description': 'Dosyanın son değiştirildiği tarihi ekler',

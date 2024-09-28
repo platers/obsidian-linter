@@ -1,4 +1,4 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer} from 'obsidian';
 import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -14,7 +14,7 @@ import {SettingTab} from './ui/settings';
 import {urlRegex} from './utils/regex';
 import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
-import {DEFAULT_SETTINGS, LinterSettings} from './settings-data';
+import {AfterFileChangeLintTimes, DEFAULT_SETTINGS, LinterSettings} from './settings-data';
 import AsyncLock from 'async-lock';
 import {warn} from 'loglevel';
 import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
@@ -48,6 +48,12 @@ const langToMomentLocale = {
 
 const userClickTimeout = 0;
 
+type FileChangeUpdateInfo = {
+  debounceFn: Debouncer<[TFile, Editor], Promise<void>>,
+  isRunning: boolean
+  originalText: string
+}
+
 export default class LinterPlugin extends Plugin {
   settings: LinterSettings;
   settingsTab: SettingTab;
@@ -68,6 +74,7 @@ export default class LinterPlugin extends Plugin {
   private fileLintFiles: Set<TFile> = new Set();
   private customCommandsCallback: (file: TFile) => Promise<void> = null;
   private currentlyOpeningSidebar: boolean = false;
+  private activeFileChangeDebouncer: Map<TFile, FileChangeUpdateInfo> = new Map();
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -137,6 +144,24 @@ export default class LinterPlugin extends Plugin {
 
         if (!('english-symbols-punctuation-after' in this.settings.ruleConfigs[rule.alias])) {
           this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = defaults['english-symbols-punctuation-after'];
+        }
+      } else if (rule.alias == 'yaml-timestamp') {
+        const defaults = rule.getDefaultOptions();
+        if ('force-retention-of-create-value' in this.settings.ruleConfigs[rule.alias]) {
+          if (!('date-created-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
+            if (this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value']) {
+              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = 'frontmatter';
+            } else {
+              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = defaults['date-created-source-of-truth'];
+            }
+          }
+
+
+          delete this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value'];
+        }
+
+        if (!('date-modified-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
+          this.settings.ruleConfigs[rule.alias]['date-modified-source-of-truth'] = defaults['date-modified-source-of-truth'];
         }
       }
     }
@@ -251,6 +276,33 @@ export default class LinterPlugin extends Plugin {
     this.eventRefs.push(eventRef);
 
     eventRef = this.app.metadataCache.on('changed', (file: TFile) => this.onMetadataCacheUpdatedCallback(file));
+    this.registerEvent(eventRef);
+    this.eventRefs.push(eventRef);
+
+    eventRef = this.app.workspace.on('editor-change', async (editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
+      if (this.settings.lintOnFileContentChangeDelay == AfterFileChangeLintTimes.Never) {
+        return;
+      }
+
+      if (this.shouldIgnoreFile(info.file) || !this.isMarkdownFile(info.file) || !editor.cm) {
+        return;
+      }
+
+      if (this.activeFileChangeDebouncer.has(info.file)) {
+        const activeFileChangeInfo = this.activeFileChangeDebouncer.get(info.file);
+        if (!activeFileChangeInfo.isRunning) {
+          this.activeFileChangeDebouncer.get(info.file).debounceFn(info.file, editor);
+        }
+      } else {
+        this.activeFileChangeDebouncer.set(info.file, {
+          debounceFn: this.createDebouncedFileUpdate(),
+          isRunning: false,
+          // do not use editor because it already has the change, so if the user removes all changes
+          // it would still make an update
+          originalText: await this.app.vault.cachedRead(info.file),
+        });
+      }
+    });
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
@@ -478,6 +530,98 @@ export default class LinterPlugin extends Plugin {
       return;
     }
 
+    const changes = this.updateEditor(oldText, newText, editor);
+    const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
+    const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
+
+    this.displayChangedMessage(charsAdded, charsRemoved);
+
+    // run custom commands now since no change was made
+    if (!charsAdded && !charsRemoved) {
+      void this.runCustomCommands(file);
+    } else {
+      this.editorLintFiles.push(file);
+    }
+
+    this.updateFileDebouncerText(file, newText);
+
+    setCollectLogs(false);
+  }
+
+  // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
+  async setOrUpdateMomentInstance() {
+    const obsidianLang: string = localStorage.getItem('language') || 'en';
+    const systemLang = navigator.language?.toLowerCase();
+
+    let momentLocale = langToMomentLocale[obsidianLang as keyof typeof langToMomentLocale];
+
+    if (this.settings.linterLocale !== 'system-default') {
+      momentLocale = this.settings.linterLocale;
+    } else if (systemLang.startsWith(obsidianLang)) {
+      // If the system locale is more specific (en-gb vs en), use the system locale.
+      momentLocale = systemLang;
+    }
+
+    this.momentLocale = momentLocale;
+    const oldLocale = moment.locale();
+    const currentLocale = moment.locale(momentLocale);
+    logDebug(getTextInLanguage('logs.moment-locale-not-found').replace('{MOMENT_LOCALE}', momentLocale).replace('{CURRENT_LOCALE}', currentLocale));
+
+    moment.locale(oldLocale);
+  }
+
+  private createDebouncedFileUpdate(): Debouncer<[TFile, Editor], Promise<void>> {
+    let delay = 5000;
+    switch (this.settings.lintOnFileContentChangeDelay) {
+      case AfterFileChangeLintTimes.After10Seconds:
+        delay = 10000;
+        break;
+      case AfterFileChangeLintTimes.After15Seconds:
+        delay = 15000;
+        break;
+      case AfterFileChangeLintTimes.After30Seconds:
+        delay = 30000;
+        break;
+      case AfterFileChangeLintTimes.After1Minute:
+        delay = 60000;
+        break;
+    }
+
+    return debounce(
+        async (file: TFile, editor: Editor) => {
+          if (!this.activeFileChangeDebouncer.has(file)) {
+            logWarn(getTextInLanguage('logs.file-change-yaml-lint-warning'));
+            return;
+          }
+
+          const activeFileChangeInfo = this.activeFileChangeDebouncer.get(file);
+          activeFileChangeInfo.isRunning = true;
+
+          const oldText = editor.getValue();
+          let newText = oldText;
+          if (oldText != activeFileChangeInfo.originalText ) {
+            logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
+            try {
+              newText = this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
+            } catch (error) {
+              this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+              return;
+            }
+
+            this.updateEditor(oldText, newText, editor);
+          } else {
+            logInfo(getTextInLanguage('logs.file-change-yaml-lint-skipped'));
+          }
+
+          activeFileChangeInfo.isRunning = false;
+          this.activeFileChangeDebouncer.delete(file);
+        },
+        delay,
+        true,
+    );
+  }
+
+  private updateEditor(oldText: string, newText: string, editor: Editor): DiffMatchPatch.Diff[] {
     const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
     const changes = dmp.diff_main(oldText, newText);
     let curText = '';
@@ -514,41 +658,7 @@ export default class LinterPlugin extends Plugin {
       }
     });
 
-    const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
-    const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
-
-    this.displayChangedMessage(charsAdded, charsRemoved);
-
-    // run custom commands now since no change was made
-    if (!charsAdded && !charsRemoved) {
-      void this.runCustomCommands(file);
-    } else {
-      this.editorLintFiles.push(file);
-    }
-
-    setCollectLogs(false);
-  }
-
-  // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
-  async setOrUpdateMomentInstance() {
-    const obsidianLang: string = localStorage.getItem('language') || 'en';
-    const systemLang = navigator.language?.toLowerCase();
-
-    let momentLocale = langToMomentLocale[obsidianLang as keyof typeof langToMomentLocale];
-
-    if (this.settings.linterLocale !== 'system-default') {
-      momentLocale = this.settings.linterLocale;
-    } else if (systemLang.startsWith(obsidianLang)) {
-      // If the system locale is more specific (en-gb vs en), use the system locale.
-      momentLocale = systemLang;
-    }
-
-    this.momentLocale = momentLocale;
-    const oldLocale = moment.locale();
-    const currentLocale = moment.locale(momentLocale);
-    logDebug(getTextInLanguage('logs.moment-locale-not-found').replace('{MOMENT_LOCALE}', momentLocale).replace('{CURRENT_LOCALE}', currentLocale));
-
-    moment.locale(oldLocale);
+    return changes;
   }
 
   private displayChangedMessage(charsAdded: number, charsRemoved: number) {
@@ -737,6 +847,8 @@ export default class LinterPlugin extends Plugin {
         await this.customCommandsCallback(file);
       }
     });
+
+    this.updateFileDebouncerText(file, stripCr(await this.app.vault.read(file)));
   }
 
   /**
@@ -857,5 +969,11 @@ export default class LinterPlugin extends Plugin {
     }
 
     return null;
+  }
+
+  private updateFileDebouncerText(file: TFile, newText: string) {
+    if (this.activeFileChangeDebouncer.has(file)) {
+      this.activeFileChangeDebouncer.get(file).originalText = newText;
+    }
   }
 }

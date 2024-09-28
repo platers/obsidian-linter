@@ -45,6 +45,9 @@ export default {
     'plugin-unload': 'Unloading plugin',
     'folder-lint': 'Linting folder ',
     'linter-run': 'Running linter',
+    'file-change-yaml-lint-run': 'Running editor content change YAML linting',
+    'file-change-yaml-lint-skipped': 'No file change detected, so YAML linting skipped',
+    'file-change-yaml-lint-warning': 'No file info is present, but debounce ran. Something went wrong somewhere.',
     'paste-link-warning': 'aborted paste lint as the clipboard content is a link and doing so will avoid conflicts with other plugins that modify pasting.',
     'see-console': 'See console for more details.',
     'unknown-error': 'An unknown error occurred during linting.',
@@ -142,12 +145,16 @@ export default {
         'description': 'Display the number of characters changed after linting',
       },
       'lint-on-file-change': {
-        'name': 'Lint on File Change',
+        'name': 'Lint on Focused File Change',
         'description': 'When the a file is closed or a new file is swapped to, the previous file is linted.',
       },
       'display-lint-on-file-change-message': {
         'name': 'Display Lint on File Change Message',
-        'description': 'Displays a message when `Lint on File Change` occurs',
+        'description': 'Displays a message when `Lint on Focused File Change` occurs',
+      },
+      'timestamp-update-on-file-contents-updated': {
+        'name': 'Update YAML Timestamp on File Contents Update',
+        'description': 'When the currently active file is modified, `YAML Timestamp` is run on the file. This should update the modified file timestamp if it is more than 5 seconds off from the current value.',
       },
       'folders-to-ignore': {
         'name': 'Folders to ignore',
@@ -806,9 +813,13 @@ export default {
         'name': 'Date Created Key',
         'description': 'Which YAML key to use for creation date',
       },
-      'force-retention-of-create-value': {
-        'name': 'Force Date Created Key Value Retention',
-        'description': 'Reuses the value in the YAML frontmatter for date created instead of the file metadata which is useful for preventing file metadata changes from causing the value to change to a different value.',
+      'date-created-source-of-truth': {
+        'name': 'Date Created Source of Truth',
+        'description': 'Specifies where to get the date created value from if it is already present in the frontmatter.',
+      },
+      'date-modified-source-of-truth': {
+        'name': 'Date Modified Source of Truth',
+        'description': 'Specifies what way should be used to determine when the date modified should be updated if it is already present in the frontmatter.',
       },
       'date-modified': {
         'name': 'Date Modified',
@@ -904,6 +915,17 @@ export default {
     'first-h1': 'First H1',
     'first-h1-or-filename-if-h1-missing': 'First H1 or Filename if H1 is Missing',
     'filename': 'Filename',
+    // settings-data.ts
+    'never': 'Never',
+    'after 5 seconds': 'After 5 seconds',
+    'after 10 seconds': 'After 10 seconds',
+    'after 15 seconds': 'After 15 seconds',
+    'after 30 seconds': 'After 30 seconds',
+    'after 1 minute': 'After 1 minute',
+    // yaml-timestamp.ts
+    'file system': 'File system',
+    'frontmatter': 'YAML frontmatter',
+    'user or Linter edits': 'Changes in Obsidian',
     // quote-style.ts
     '\'\'': '\'\'', // leave as is
     '‘’': '‘’', // leave as is
