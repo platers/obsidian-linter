@@ -148,11 +148,16 @@ export default class LinterPlugin extends Plugin {
       } else if (rule.alias == 'yaml-timestamp') {
         const defaults = rule.getDefaultOptions();
         if ('force-retention-of-create-value' in this.settings.ruleConfigs[rule.alias]) {
-          if (this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value']) {
-            this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = 'frontmatter';
-          } else {
-            this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = defaults['date-created-source-of-truth'];
+          if (!('date-created-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
+            if (this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value']) {
+              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = 'frontmatter';
+            } else {
+              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = defaults['date-created-source-of-truth'];
+            }
           }
+
+
+          delete this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value'];
         }
 
         if (!('date-modified-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
@@ -292,7 +297,9 @@ export default class LinterPlugin extends Plugin {
         this.activeFileChangeDebouncer.set(info.file, {
           debounceFn: this.createDebouncedFileUpdate(),
           isRunning: false,
-          originalText: editor.getValue(),
+          // do not use editor because it already has the change, so if the user removes all changes
+          // it would still make an update
+          originalText: await this.app.vault.cachedRead(info.file),
         });
       }
     });
@@ -607,14 +614,7 @@ export default class LinterPlugin extends Plugin {
           }
 
           activeFileChangeInfo.isRunning = false;
-          // update text value just in case we retain this and are forced to run another update. It will help weed out other changes.
-          activeFileChangeInfo.originalText = newText;
-
-          // retain active file debounce info, but all others should be safe to remove
-          const activeFile = this.app.workspace.getActiveFile();
-          if (!activeFile || activeFile != file) {
-            this.activeFileChangeDebouncer.delete(file);
-          }
+          this.activeFileChangeDebouncer.delete(file);
         },
         delay,
         true,
