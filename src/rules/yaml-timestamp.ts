@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MomentFormatOptionBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, MomentFormatOptionBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML, initYAML} from '../utils/yaml';
 import {moment} from 'obsidian';
@@ -399,11 +399,21 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         descriptionKey: 'rules.yaml-timestamp.date-created-key.description',
         optionsKey: 'dateCreatedKey',
       }),
-      new BooleanOptionBuilder({
+      new DropdownOptionBuilder<YamlTimestampOptions, DateCreatedSourceOfTruth>({
         OptionsClass: YamlTimestampOptions,
-        nameKey: 'rules.yaml-timestamp.force-retention-of-create-value.name',
-        descriptionKey: 'rules.yaml-timestamp.force-retention-of-create-value.description',
-        optionsKey: 'forceRetentionOfCreatedValue',
+        nameKey: 'rules.yaml-timestamp.date-created-source-of-truth.name',
+        descriptionKey: 'rules.yaml-timestamp.date-created-source-of-truth.description',
+        optionsKey: 'dateCreatedSourceOfTruth',
+        records: [
+          {
+            value: 'file system',
+            description: 'The file system date created value is used to set the value of date created in the frontmatter',
+          },
+          {
+            value: 'frontmatter',
+            description: 'When a value is present in the frontmatter for date created, this value is used as the value for the date created',
+          },
+        ],
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlTimestampOptions,
@@ -416,6 +426,22 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         nameKey: 'rules.yaml-timestamp.date-modified-key.name',
         descriptionKey: 'rules.yaml-timestamp.date-modified-key.description',
         optionsKey: 'dateModifiedKey',
+      }),
+      new DropdownOptionBuilder<YamlTimestampOptions, DateModifiedSourceOfTruth>({
+        OptionsClass: YamlTimestampOptions,
+        nameKey: 'rules.yaml-timestamp.date-modified-source-of-truth.name',
+        descriptionKey: 'rules.yaml-timestamp.date-modified-source-of-truth.description',
+        optionsKey: 'dateModifiedSourceOfTruth',
+        records: [
+          {
+            value: 'file system',
+            description: 'The file system date modified value is used to set the value of date modified in the frontmatter',
+          },
+          {
+            value: 'user or Linter edits',
+            description: 'When a value is present in the frontmatter for date modified, date modified is kept as is unless the user or the Linter makes a change to the file',
+          },
+        ],
       }),
       new MomentFormatOptionBuilder({
         OptionsClass: YamlTimestampOptions,

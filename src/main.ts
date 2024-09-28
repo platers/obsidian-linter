@@ -145,8 +145,20 @@ export default class LinterPlugin extends Plugin {
         if (!('english-symbols-punctuation-after' in this.settings.ruleConfigs[rule.alias])) {
           this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = defaults['english-symbols-punctuation-after'];
         }
+      } else if (rule.alias == 'yaml-timestamp') {
+        const defaults = rule.getDefaultOptions();
+        if ('force-retention-of-create-value' in this.settings.ruleConfigs[rule.alias]) {
+          if (this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value']) {
+            this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = 'frontmatter';
+          } else {
+            this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = defaults['date-created-source-of-truth'];
+          }
+        }
+
+        if (!('date-modified-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
+          this.settings.ruleConfigs[rule.alias]['date-modified-source-of-truth'] = defaults['date-modified-source-of-truth'];
+        }
       }
-      // TODO: add logic for moving force retention pjk
     }
 
     this.updatePasteOverrideStatus();

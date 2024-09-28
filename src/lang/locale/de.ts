@@ -690,10 +690,6 @@ export default {
         'name': 'Schlüssel für das Erstellungsdatum',
         'description': 'Der YAML-Schlüssel, der für das Erstellungsdatum verwendet werden soll',
       },
-      'force-retention-of-create-value': {
-        'name': 'Erzwinge die Beibehaltung des Schlüsselwertes für das Erstellungsdatum',
-        'description': 'Verwendet den Wert im YAML-Frontmatter für das Erstellungsdatum anstelle den Dateimetadaten, was nützlich ist, um zu verhindern, dass Änderungen an Dateimetadaten dazu führen, dass der Wert in einen anderen Wert geändert wird.',
-      },
       'date-modified': {
         'name': 'Änderungsdatum',
         'description': 'Geben Sie das Datum ein, an dem die Datei zuletzt geändert wurde',

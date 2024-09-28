@@ -813,9 +813,13 @@ export default {
         'name': 'Date Created Key',
         'description': 'Which YAML key to use for creation date',
       },
-      'force-retention-of-create-value': {
-        'name': 'Force Date Created Key Value Retention',
-        'description': 'Reuses the value in the YAML frontmatter for date created instead of the file metadata which is useful for preventing file metadata changes from causing the value to change to a different value.',
+      'date-created-source-of-truth': {
+        'name': 'Date Created Source of Truth',
+        'description': 'Specifies where to get the date created value from if it is already present in the frontmatter.',
+      },
+      'date-modified-source-of-truth': {
+        'name': 'Date Modified Source of Truth',
+        'description': 'Specifies what way should be used to determine when the date modified should be updated if it is already present in the frontmatter.',
       },
       'date-modified': {
         'name': 'Date Modified',
@@ -918,6 +922,10 @@ export default {
     'after 15 seconds': 'After 15 seconds',
     'after 30 seconds': 'After 30 seconds',
     'after 1 minute': 'After 1 minute',
+    // yaml-timestamp.ts
+    'file system': 'File system',
+    'frontmatter': 'YAML frontmatter',
+    'user or Linter edits': 'Changes in Obsidian',
     // quote-style.ts
     '\'\'': '\'\'', // leave as is
     '‘’': '‘’', // leave as is

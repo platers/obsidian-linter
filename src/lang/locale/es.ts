@@ -606,10 +606,6 @@ export default {
         'name': 'Clave de fecha de creación',
         'description': 'La clave de YAML para usar para la fecha de creación',
       },
-      'force-retention-of-create-value': {
-        'name': 'Forzar la fecha de creación de la retención del valor clave',
-        'description': 'Reutiliza el valor en el frontmatter del YAML para la fecha de creación en lugar de los metadatos del archivo, lo que es útil para evitar que los cambios en los metadatos del archivo provoquen que el valor cambie a un valor diferente.',
-      },
       'date-modified': {
         'name': 'Fecha modificada',
         'description': 'Inserte la fecha en que se modificó el archivo por última vez',
