@@ -14,6 +14,15 @@ export type CommonStyles = {
   removeUnnecessaryEscapeCharsForMultiLineArrays: boolean;
 }
 
+export enum AfterFileChangeLintTimes {
+  Never = 'never',
+  After5Seconds = 'after 5 seconds',
+  After10Seconds = 'after 10 seconds',
+  After15Seconds = 'after 15 seconds',
+  After30Seconds = 'after 30 seconds',
+  After1Minute = 'after 1 minute',
+}
+
 export interface LinterSettings {
   ruleConfigs: {
     [ruleName: string]: Options;
@@ -22,8 +31,9 @@ export interface LinterSettings {
   displayChanged: boolean;
   settingsConvertedToConfigKeyValues: boolean;
   recordLintOnSaveLogs: boolean;
-  lintOnFileChange: boolean,
-  displayLintOnFileChangeNotice: boolean,
+  lintOnFileChange: boolean;
+  displayLintOnFileChangeNotice: boolean;
+  lintOnFileContentChangeDelay: string;
   foldersToIgnore: string[];
   filesToIgnore: FileToIgnore[];
   linterLocale: string;
@@ -42,6 +52,7 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   displayChanged: true,
   lintOnFileChange: false,
   displayLintOnFileChangeNotice: false,
+  lintOnFileContentChangeDelay: AfterFileChangeLintTimes.Never,
   settingsConvertedToConfigKeyValues: false,
   foldersToIgnore: [],
   filesToIgnore: [],

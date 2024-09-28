@@ -270,6 +270,21 @@ export class RulesRunner {
 
     return newText;
   }
+
+  runYAMLTimestampByItself(runOptions: RunLinterRulesOptions): string {
+    let newText = runOptions.oldText;
+
+    const currentTime = runOptions.getCurrentTime();
+    [newText] = YamlTimestamp.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
+      fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
+      currentTime: currentTime,
+      alreadyModified: true,
+      locale: runOptions.momentLocale,
+    });
+
+    return newText;
+  }
 }
 
 export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings): RunLinterRulesOptions {
