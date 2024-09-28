@@ -1079,9 +1079,10 @@ Keep track of the date the file was last edited in the YAML front matter. Gets d
 | ---- | ----------- | ---------- | ------------- |
 | `Date Created` | Insert the file creation date | N/A | `true` |
 | `Date Created Key` | Which YAML key to use for creation date | N/A | `date created` |
-| `Force Date Created Key Value Retention` | Reuses the value in the YAML frontmatter for date created instead of the file metadata which is useful for preventing file metadata changes from causing the value to change to a different value. | N/A | false |
+| `Date Created Source of Truth` | Specifies where to get the date created value from if it is already present in the frontmatter. | `file system`: The file system date created value is used to set the value of date created in the frontmatter<br/><br/>`frontmatter`: When a value is present in the frontmatter for date created, this value is used as the value for the date created | `file system` |
 | `Date Modified` | Insert the date the file was last modified | N/A | `true` |
 | `Date Modified Key` | Which YAML key to use for modification date | N/A | `date modified` |
+| `Date Modified Source of Truth` | Specifies what way should be used to determine when the date modified should be updated if it is already present in the frontmatter. | `file system`: The file system date modified value is used to set the value of date modified in the frontmatter<br/><br/>`user or Linter edits`: When a value is present in the frontmatter for date modified, date modified is kept as is unless the user or the Linter makes a change to the file | `file system` |
 | `Format` | Moment date format to use (see [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/)) | N/A | `dddd, MMMM Do YYYY, h:mm:ss a` |
 | `Convert Local Time to UTC` | Uses UTC equivalent for saved dates instead of local time | N/A | false |
 

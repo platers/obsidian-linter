@@ -15,6 +15,7 @@ Uses a dictionary of common misspellings to automatically convert them to their 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Ignore Words` | A comma separated list of lowercased words to ignore when auto-correcting | N/A |  |
+| `Skip Words with Multiple Capitals` | Will skip any files that have a capital letter in them other than as the first letter of the word. Acronyms and some other words can benefit from this. It may cause issues with proper nouns being properly fixed. | N/A | false |
 | `Extra Auto-Correct Source Files` | These are files that have a markdown table in them that have the initial word and the word to correct it to (these are case insensitive corrections). **Note: the tables used should have the starting and ending `|` indicators present for each line.** | N/A |  |
 
 ### Additional Info
@@ -47,9 +48,8 @@ The following is a table with custom misspellings:
 
 ##### Current Limitations
 
-
-- The list of custom replacements is only loaded when the plugin first lints a file or when the file is added to the list of files that include custom misspellings
-    * This means that making a change to a file that is already in the list of custom misspelling files will not work unless the Linter is reloaded or the file is removed and re-added to the list of custom misspelling files
+- The list of custom replacements is only loaded automatically when the plugin first lints a file or when the file is added to the list of files that include custom misspellings
+    - There is an option to manually rerun the parse custom misspelling files from the Auto-Correct Common Misspellings settings
 - There is no way to specify that a word is to always be capitalized
     - This is due to how the auto-correct rule was designed as it sets the first letter of the replacement word to the case of the first letter of the word being replaced
 
@@ -132,6 +132,24 @@ After:
 
 `````` markdown
 http://www.Absoltely.com should not be corrected
+``````
+</details>
+<details><summary>Auto-correct misspellings skips words with multiple capital letters in them if `Skip Words with Multiple Capitals` is Enabled</summary>
+
+Before:
+
+`````` markdown
+HSA here will not be auto-corrected to Has since it has more than one capital letter.
+aADD will not be converted to add.
+But this also affects javaSrript(what should be JavaScript) and other proper names as well which will not be auto-corrected.
+``````
+
+After:
+
+`````` markdown
+HSA here will not be auto-corrected to Has since it has more than one capital letter.
+aADD will not be converted to add.
+But this also affects javaSrript(what should be JavaScript) and other proper names as well which will not be auto-corrected.
 ``````
 </details>
 
