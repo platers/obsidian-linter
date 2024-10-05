@@ -893,6 +893,7 @@ export default {
     'SILENT': 'silent',
     'ascending': 'ascending',
     'lazy': 'lazy',
+    'keep': 'keep',
     'Nothing': 'Nothing',
     'Remove hashtag': 'Remove hashtag',
     'Remove whole tag': 'Remove whole tag',

@@ -223,6 +223,28 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
           keepStart: true,
         },
       }),
+      new ExampleBuilder({
+        description: 'Ordered lists items are not modified when Number Style is `keep`',
+        before: dedent`
+          4. Item 4
+          2. Item 5
+            2. Subitem 2
+            5. Subitem 3
+            2. Subitem 4
+          4. Item 6
+        `,
+        after: dedent`
+          4. Item 4
+          2. Item 5
+            2. Subitem 2
+            5. Subitem 3
+            2. Subitem 4
+          4. Item 6
+        `,
+        options: {
+          numberStyle: OrderListItemStyles.Keep,
+        },
+      }),
     ];
   }
   get optionBuilders(): OptionBuilderBase<OrderedListStyleOptions>[] {
@@ -240,6 +262,10 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
           {
             value: OrderListItemStyles.Lazy,
             description: 'Makes sure ordered list item indicators all are the same',
+          },
+          {
+            value: OrderListItemStyles.Keep,
+            description: 'Keeps ordered list item indicators as they are',
           },
         ],
       }),
