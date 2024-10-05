@@ -551,6 +551,10 @@ export default {
         'name': 'Ordered List Indicator End Style',
         'description': 'The ending character of an ordered list indicator',
       },
+      'keep-start': {
+        'name': 'Keep Start',
+        'description': 'Whether to keep the starting number of an ordered list',
+      },
     },
     // paragraph-blank-lines.ts
     'paragraph-blank-lines': {
