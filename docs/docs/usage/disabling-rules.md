@@ -18,7 +18,7 @@ For example, in the above image, the `templates` folder will be ignored when the
 There is a setting in this plugin which allows you to be able to ignore files by providing a regex to match against.
 If a file matches the provided regex, it will go ahead and ignore that file before it even lints the file.
 
-![Setting for ignoring specific files via regex](../assets/files-to-ignore.png)
+![Setting for ignoring specific files via regex](../assets/files-to-ignore.jpg)
 
 For example, in the above image you can see that Excalidraw files which end in `.exclidraw.md` are being ignored
 using the regex `.*\.excalidraw\.md$`.
