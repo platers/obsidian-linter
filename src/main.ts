@@ -232,7 +232,11 @@ export default class LinterPlugin extends Plugin {
       icon: iconInfo.folder.id,
       editorCheckCallback: (checking: Boolean, _, ctx) => {
         if (checking) {
-          return !ctx.file.parent.isRoot();
+          if (ctx && ctx.file && ctx.file instanceof TFile && ctx.file.parent) {
+            return !ctx.file.parent.isRoot();
+          }
+
+          return false;
         }
 
         this.createFolderLintModal(ctx.file.parent);
