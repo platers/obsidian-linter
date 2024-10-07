@@ -2,12 +2,19 @@ import dedent from 'ts-dedent';
 import {Example, rules, RuleType} from '../src/rules';
 import {yamlRegex, escapeRegExp} from '../src/utils/regex';
 import '../src/rules-registry';
+import {defaultMisspellings} from './common';
 
 describe('Examples pass', () => {
   for (const rule of rules) {
     describe(rule.getName(), () => {
       test.each(rule.examples)('$description', (example: Example) => {
-        expect(rule.apply(example.before, example.options)).toBe(example.after);
+        const options = example.options;
+        // add default misspellings for auto-correct
+        if (rule.alias == 'auto-correct-common-misspellings') {
+          options.misspellingToCorrection = defaultMisspellings();
+        }
+
+        expect(rule.apply(example.before, options)).toBe(example.after);
       });
     });
   }
@@ -27,7 +34,14 @@ describe('Augmented examples pass', () => {
           `;
 
           const before = yaml + example.before;
-          expect(rule.apply(before, example.options)).toMatch(new RegExp(`${escapeRegExp(yaml)}\n?${escapeRegExp(example.after)}`));
+
+          const options = example.options;
+          // add default misspellings for auto-correct
+          if (rule.alias == 'auto-correct-common-misspellings') {
+            options.misspellingToCorrection = defaultMisspellings();
+          }
+
+          expect(rule.apply(before, options)).toMatch(new RegExp(`${escapeRegExp(yaml)}\n?${escapeRegExp(example.after)}`));
         }
       });
     });

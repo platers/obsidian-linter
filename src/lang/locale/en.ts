@@ -276,6 +276,9 @@ export default {
         'name': 'Skip Words with Multiple Capitals',
         'description': 'Will skip any files that have a capital letter in them other than as the first letter of the word. Acronyms and some other words can benefit from this. It may cause issues with proper nouns being properly fixed.',
       },
+      'default-install': 'You are using Auto-correct Common Misspellings. In order to do so, the default misspellings will be downloaded. This should only happen once. Please wait...',
+      'default-install-failed': 'Failed to download {URL}. Disabling Auto-correct Common Misspellings.',
+      'defaults-missing': 'Failed to find default common auto-correct file: {FILE}.',
     },
     // add-blank-line-after-yaml.ts
     'add-blank-line-after-yaml': {

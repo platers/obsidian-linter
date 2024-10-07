@@ -2,7 +2,6 @@ import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MdFilePickerOptionBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {misspellingToCorrection} from '../utils/auto-correct-misspellings';
 import {wordRegex, wordSplitterRegex} from '../utils/regex';
 import {CustomAutoCorrectContent} from '../ui/linter-components/auto-correct-files-picker-option';
 
@@ -10,6 +9,8 @@ class AutoCorrectCommonMisspellingsOptions implements Options {
   ignoreWords?: string[] = [];
   extraAutoCorrectFiles?: CustomAutoCorrectContent[] = [];
   skipWordsWithMultipleCapitals?: boolean = false;
+  @RuleBuilder.noSettingControl()
+    misspellingToCorrection?: Map<string, string> = new Map();
 }
 
 @RuleBuilder.register
@@ -19,6 +20,10 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
       nameKey: 'rules.auto-correct-common-misspellings.name',
       descriptionKey: 'rules.auto-correct-common-misspellings.description',
       type: RuleType.CONTENT,
+      // as a part of the logic to reduce the bundle and build size, we are moving the default list of replacements to
+      // a markdown file outside of the plugin source. It will be store in a map and should really only be passed into this
+      // rule.
+      hasSpecialExecutionOrder: true,
       ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.url],
     });
   }
@@ -34,8 +39,8 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
       return word;
     }
 
-    if (misspellingToCorrection.has(lowercasedWord)) {
-      return this.determineCorrectedWord(word, misspellingToCorrection.get(lowercasedWord));
+    if (options.misspellingToCorrection.has(lowercasedWord)) {
+      return this.determineCorrectedWord(word, options.misspellingToCorrection.get(lowercasedWord));
     }
 
     if (options.extraAutoCorrectFiles) {

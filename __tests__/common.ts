@@ -1,5 +1,18 @@
+import {readFileSync} from 'fs';
 import {Options} from '../src/rules';
 import RuleBuilder, {RuleBuilderBase} from '../src/rules/rule-builder';
+import {parseCustomReplacements} from '../src/utils/strings';
+
+let defaultMap: Map<string, string>;
+
+export function defaultMisspellings(): Map<string, string> {
+  if (!defaultMap) {
+    const data = readFileSync('src/utils/default-misspellings.md', 'utf8');
+    defaultMap = parseCustomReplacements(data);
+  }
+
+  return defaultMap;
+}
 
 type TestCase<TOptions extends Options> = {
   testName: string,

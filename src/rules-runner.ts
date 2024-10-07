@@ -29,13 +29,15 @@ import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators
 import {LinterSettings} from './settings-data';
 import TrailingSpaces from './rules/trailing-spaces';
 import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
+import AutoCorrectCommonMisspellings from './rules/auto-correct-common-misspellings';
 
 export type RunLinterRulesOptions = {
   oldText: string,
   fileInfo: FileInfo,
   settings: LinterSettings,
   momentLocale: string,
-  getCurrentTime: () => moment.Moment
+  getCurrentTime: () => moment.Moment,
+  defaultMisspellings: Map<string, string>,
 }
 
 type FileInfo = {
@@ -132,6 +134,10 @@ export class RulesRunner {
 
     [newText] = MoveMathBlockIndicatorsToOwnLine.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
+    });
+
+    [newText] = AutoCorrectCommonMisspellings.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      misspellingToCorrection: runOptions.defaultMisspellings,
     });
 
     return newText;
@@ -287,7 +293,7 @@ export class RulesRunner {
   }
 }
 
-export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings): RunLinterRulesOptions {
+export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings, defaultMisspellings: Map<string, string>): RunLinterRulesOptions {
   const createdAt = (file && file.stat.ctime !== 0) ? moment(file.stat.ctime): moment();
   createdAt.locale(momentLocale);
   const modifiedAt = file ? moment(file.stat.mtime): moment();
@@ -311,5 +317,6 @@ export function createRunLinterRulesOptions(text: string, file: TFile = null, mo
 
       return currentTime;
     },
+    defaultMisspellings: defaultMisspellings,
   };
 }
