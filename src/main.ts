@@ -3,7 +3,7 @@ import {Options, RuleType, ruleTypeToRules, rules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {parseCustomReplacements, stripCr} from './utils/strings';
-import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel, timingBegin, timingEnd} from './utils/logger';
+import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
 import {iconInfo} from './ui/icons';
@@ -79,44 +79,26 @@ export default class LinterPlugin extends Plugin {
   private hasLoadedMisspellingFiles = false;
 
   async onload() {
-    performance.mark('load-started');
-    timingBegin('onload');
-    timingBegin('initial setup');
     setLanguage(window.localStorage.getItem('language'));
     logInfo(getTextInLanguage('logs.plugin-load'));
 
     this.isEnabled = true;
-    timingEnd('initial setup');
-
-    timingBegin('svg load');
     // eslint-disable-next-line guard-for-in
     for (const key in iconInfo) {
       const svg = iconInfo[key];
       addIcon(svg.id, svg.source);
     }
-    timingEnd('svg load');
 
-    timingBegin('settings load');
     await this.loadSettings();
-    timingEnd('settings load');
 
-    timingBegin('add commands');
     this.addCommands();
-    timingEnd('add commands');
 
-    timingBegin('events and save');
     this.registerEventsAndSaveCallback();
-    timingEnd('events and save');
 
-    timingBegin('editor suggest');
     this.registerEditorSuggest(new RuleAliasSuggest(this));
-    timingEnd('editor suggest');
 
-    timingBegin('settings tab');
     this.settingsTab = new SettingTab(this.app, this);
     this.addSettingTab(this.settingsTab);
-    timingEnd('settings tab');
-    timingEnd('onload');
   }
 
   async onunload() {

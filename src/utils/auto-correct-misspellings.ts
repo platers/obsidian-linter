@@ -4,7 +4,7 @@ import {logError, logWarn} from './logger';
 import {getTextInLanguage} from 'src/lang/helpers';
 
 const defaultCustomMisspellingsFileName = 'default-misspellings.md';
-const defaultCustomAutoCorrectMisspellingsLocations = `https://github.com/platers/obsidian-linter/tree/master/src/utils/${defaultCustomMisspellingsFileName}`;
+const defaultCustomAutoCorrectMisspellingsLocations = `https://raw.githubusercontent.com/platers/obsidian-linter/refs/heads/master/src/utils/${defaultCustomMisspellingsFileName}`;
 
 export async function downloadMisspellings(plugin: Plugin, disableCustomAutoCorrect: (message: string) => Promise<void>): Promise<void> {
   const app = plugin.app;
