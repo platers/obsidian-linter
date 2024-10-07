@@ -21,7 +21,7 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
       descriptionKey: 'rules.auto-correct-common-misspellings.description',
       type: RuleType.CONTENT,
       // as a part of the logic to reduce the bundle and build size, we are moving the default list of replacements to
-      // a markdown file outside of the plugin source. It will be store in a map and should really only be passed into this
+      // a markdown file outside of the plugin source. It will be stored in a map and should really only be passed into this
       // rule.
       hasSpecialExecutionOrder: true,
       ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.url],
