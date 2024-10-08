@@ -386,6 +386,128 @@ var text = 'some string';
 ``````
 </details>
 
+## Empty Line Around Horizontal Rules
+
+Alias: `empty-line-around-horizontal-rules`
+
+Ensures that there is an empty line around horizontal rules unless they start or end a document.
+
+
+
+
+
+### Examples
+
+<details><summary>Horizontal rules that start a document do not get an empty line before them.</summary>
+
+Before:
+
+`````` markdown
+***
+
+
+Content
+``````
+
+After:
+
+`````` markdown
+***
+
+Content
+``````
+</details>
+<details><summary>Horizontal rules that end a document do not get an empty line after them.</summary>
+
+Before:
+
+`````` markdown
+***
+Content
+***
+``````
+
+After:
+
+`````` markdown
+***
+
+Content
+
+***
+``````
+</details>
+<details><summary>All types of horizontal rules are affected by this rule</summary>
+
+Before:
+
+`````` markdown
+- Content 1
+***
+- Content 2
+---
+- Content 3
+___
+- Content 4
+``````
+
+After:
+
+`````` markdown
+- Content 1
+
+***
+
+- Content 2
+
+---
+
+- Content 3
+
+___
+
+- Content 4
+``````
+</details>
+<details><summary>YAML frontmatter is not affected by this rule</summary>
+
+Before:
+
+`````` markdown
+---
+prop: value
+---
+
+Content
+``````
+
+After:
+
+`````` markdown
+---
+prop: value
+---
+
+Content
+``````
+</details>
+<details><summary>Paragraphs above `---` are treated as a heading and not spaced apart</summary>
+
+Before:
+
+`````` markdown
+Content
+---
+``````
+
+After:
+
+`````` markdown
+Content
+---
+``````
+</details>
+
 ## Empty Line Around Math Blocks
 
 Alias: `empty-line-around-math-blocks`
