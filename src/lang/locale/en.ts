@@ -622,6 +622,11 @@ export default {
       'name': 'Remove Empty List Markers',
       'description': 'Removes empty list markers, i.e. list items without content.',
     },
+    // empty-line-around-horizontal-rules.ts
+    'empty-line-around-horizontal-rules': {
+      'name': 'Empty Line Around Horizontal Rules',
+      'description': 'Ensures that there is an empty line around horizontal rules unless they start or end a document.',
+    },
     // remove-hyphenated-line-breaks.ts
     'remove-hyphenated-line-breaks': {
       'name': 'Remove Hyphenated Line Breaks',

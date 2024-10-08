@@ -5,6 +5,8 @@ import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replac
 import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
+import {frontmatter} from 'micromark-extension-frontmatter';
+import {frontmatterFromMarkdown} from 'mdast-util-frontmatter';
 import {combineExtensions} from 'micromark-util-combine-extensions';
 import {math} from 'micromark-extension-math';
 import {mathFromMarkdown} from 'mdast-util-math';
@@ -69,10 +71,11 @@ function parseTextToAST(text: string): Root {
 
   // @ts-expect-error for some reason an overload is missing
   const ast = fromMarkdown(text, {
-    extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem()]), math()],
+    extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem(), frontmatter(['yaml'])]), math()],
     mdastExtensions: [[
       gfmFootnoteFromMarkdown(),
       gfmTaskListItemFromMarkdown,
+      frontmatterFromMarkdown(['yaml']),
     ],
     mathFromMarkdown(),
     ],
@@ -657,6 +660,14 @@ export function ensureEmptyLinesAroundBlockquotes(text: string): string {
     text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, endIndex, true);
   }
 
+  return text;
+}
+
+export function ensureEmptyLinesAroundHorizontalRule(text: string): string {
+  const positions: Position[] = getPositions(MDAstTypes.HorizontalRule, text);
+  for (const position of positions) {
+    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+  }
   return text;
 }
 

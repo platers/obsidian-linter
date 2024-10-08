@@ -74,6 +74,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [convert-spaces-to-tabs](https://platers.github.io/obsidian-linter/settings/spacing-rules/#convert-spaces-to-tabs)
 - [empty-line-around-blockquotes](https://platers.github.io/obsidian-linter/settings/spacing-rules/#empty-line-around-blockquotes)
 - [empty-line-around-code-fences](https://platers.github.io/obsidian-linter/settings/spacing-rules/#empty-line-around-code-fences)
+- [empty-line-around-horizontal-rules](https://platers.github.io/obsidian-linter/settings/spacing-rules/#empty-line-around-horizontal-rules)
 - [empty-line-around-math-blocks](https://platers.github.io/obsidian-linter/settings/spacing-rules/#empty-line-around-math-blocks)
 - [empty-line-around-tables](https://platers.github.io/obsidian-linter/settings/spacing-rules/#empty-line-around-tables)
 - [heading-blank-lines](https://platers.github.io/obsidian-linter/settings/spacing-rules/#heading-blank-lines)
