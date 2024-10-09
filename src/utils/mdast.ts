@@ -41,7 +41,7 @@ export enum MDAstTypes {
 export enum OrderListItemStyles {
   Ascending = 'ascending',
   Lazy = 'lazy',
-  Keep = 'keep',
+  Preserve = 'preserve',
 }
 
 export enum OrderListItemEndOfIndicatorStyles {
@@ -671,7 +671,7 @@ export function ensureEmptyLinesAroundHorizontalRule(text: string): string {
   return text;
 }
 
-export function updateOrderedListItemIndicators(text: string, orderedListStyle: OrderListItemStyles, orderedListEndStyle: OrderListItemEndOfIndicatorStyles, keepStart: boolean): string {
+export function updateOrderedListItemIndicators(text: string, orderedListStyle: OrderListItemStyles, orderedListEndStyle: OrderListItemEndOfIndicatorStyles, preserveStart: boolean): string {
   const positions: Position[] = getPositions(MDAstTypes.List, text);
   if (!positions) {
     return text;
@@ -705,7 +705,7 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
 
     let lastItemListIndicatorLevel = -1;
     listText = listText.replace(/^(( |\t|> )*)((\d+(\.|\)))|[-*+])([^\n]*)$/gm, (listItem: string, $1: string = '', _$2: string, $3: string, _$4: string, _$5: string, $6: string) => {
-      let listItemIndicatorNumber = (orderedListStyle === OrderListItemStyles.Keep || keepStart) ? Number(_$4) : 1;
+      let listItemIndicatorNumber = (orderedListStyle === OrderListItemStyles.Preserve || preserveStart) ? Number(_$4) : 1;
       const listItemIndicatorLevel = getListItemLevel($1);
       // when dealing with a value that is not an int reset all values greater than or equal to the current list level
       if (!/^\d/.test($3)) {
@@ -719,7 +719,7 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
         if (orderedListStyle === OrderListItemStyles.Ascending) {
           listItemIndicatorNumber = preListIndicatorLevelsToIndicatorNumber.get(listItemIndicatorLevel) + 1;
           preListIndicatorLevelsToIndicatorNumber.set(listItemIndicatorLevel, listItemIndicatorNumber);
-        } else if (keepStart) {
+        } else if (preserveStart) {
           listItemIndicatorNumber = preListIndicatorLevelsToIndicatorNumber.get(listItemIndicatorLevel);
         }
       } else {

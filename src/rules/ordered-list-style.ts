@@ -7,7 +7,7 @@ import {OrderListItemEndOfIndicatorStyles, OrderListItemStyles, updateOrderedLis
 class OrderedListStyleOptions implements Options {
   numberStyle?: OrderListItemStyles = OrderListItemStyles.Ascending;
   listEndStyle?: OrderListItemEndOfIndicatorStyles = OrderListItemEndOfIndicatorStyles.Period;
-  keepStart?: boolean;
+  preserveStart?: boolean;
 }
 
 @RuleBuilder.register
@@ -24,7 +24,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
     return OrderedListStyleOptions;
   }
   apply(text: string, options: OrderedListStyleOptions): string {
-    return updateOrderedListItemIndicators(text, options.numberStyle, options.listEndStyle, options.keepStart);
+    return updateOrderedListItemIndicators(text, options.numberStyle, options.listEndStyle, options.preserveStart);
   }
   get exampleBuilders(): ExampleBuilder<OrderedListStyleOptions>[] {
     return [
@@ -133,7 +133,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         },
       }),
       new ExampleBuilder({
-        description: 'Ordered lists have list items set to ascending numerical order using initial indicator number when Number Style is `ascending` and `keepStart` is enabled',
+        description: 'Ordered lists have list items set to ascending numerical order using initial indicator number when Number Style is `ascending` and `preserveStart` is enabled',
         before: dedent`
           1. Item 1
           2. Item 2
@@ -158,11 +158,11 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         `,
         options: {
           numberStyle: OrderListItemStyles.Ascending,
-          keepStart: true,
+          preserveStart: true,
         },
       }),
       new ExampleBuilder({
-        description: 'Nested ordered lists have list items set to ascending numerical order using initial indicator number when Number Style is `ascending` and `keepStart` is enabled',
+        description: 'Nested ordered lists have list items set to ascending numerical order using initial indicator number when Number Style is `ascending` and `preserveStart` is enabled',
         before: dedent`
           4. Item 4
           2. Item 5
@@ -180,11 +180,11 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
           6. Item 6
         `,
         options: {
-          keepStart: true,
+          preserveStart: true,
         },
       }),
       new ExampleBuilder({
-        description: 'Ordered lists have list items set to initial indicator number when Number Style is `lazy` and `keepStart` is enabled',
+        description: 'Ordered lists have list items set to initial indicator number when Number Style is `lazy` and `preserveStart` is enabled',
         before: dedent`
           2. Item 2
           5. Item 3
@@ -197,11 +197,11 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         `,
         options: {
           numberStyle: OrderListItemStyles.Lazy,
-          keepStart: true,
+          preserveStart: true,
         },
       }),
       new ExampleBuilder({
-        description: 'Nested ordered lists have list items set to initial indicator number when Number Style is `lazy` and `keepStart` is enabled',
+        description: 'Nested ordered lists have list items set to initial indicator number when Number Style is `lazy` and `preserveStart` is enabled',
         before: dedent`
           4. Item 4
           2. Item 5
@@ -220,11 +220,11 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         `,
         options: {
           numberStyle: OrderListItemStyles.Lazy,
-          keepStart: true,
+          preserveStart: true,
         },
       }),
       new ExampleBuilder({
-        description: 'Ordered lists items are not modified when Number Style is `keep`',
+        description: 'Ordered lists items are not modified when Number Style is `preserve`',
         before: dedent`
           4. Item 4
           2. Item 5
@@ -242,7 +242,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
           4. Item 6
         `,
         options: {
-          numberStyle: OrderListItemStyles.Keep,
+          numberStyle: OrderListItemStyles.Preserve,
         },
       }),
     ];
@@ -264,8 +264,8 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
             description: 'Makes sure ordered list item indicators all are the same',
           },
           {
-            value: OrderListItemStyles.Keep,
-            description: 'Keeps ordered list item indicators as they are',
+            value: OrderListItemStyles.Preserve,
+            description: 'Preserves ordered list item indicators as they are',
           },
         ],
       }),
@@ -287,9 +287,9 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
       }),
       new BooleanOptionBuilder<OrderedListStyleOptions>({
         OptionsClass: OrderedListStyleOptions,
-        nameKey: 'rules.ordered-list-style.keep-start.name',
-        descriptionKey: 'rules.ordered-list-style.keep-start.description',
-        optionsKey: 'keepStart',
+        nameKey: 'rules.ordered-list-style.preserve-start.name',
+        descriptionKey: 'rules.ordered-list-style.preserve-start.description',
+        optionsKey: 'preserveStart',
       }),
     ];
   }

@@ -551,9 +551,9 @@ export default {
         'name': 'Ordered List Indicator End Style',
         'description': 'The ending character of an ordered list indicator',
       },
-      'keep-start': {
-        'name': 'Keep Start',
-        'description': 'Whether to keep the starting number of an ordered list',
+      'preserve-start': {
+        'name': 'Preserve Starting Number',
+        'description': 'Whether to preserve the starting number of an ordered list. This can be used to have an ordered list that has content in between the ordered list items.',
       },
     },
     // paragraph-blank-lines.ts
@@ -898,7 +898,7 @@ export default {
     'SILENT': 'silent',
     'ascending': 'ascending',
     'lazy': 'lazy',
-    'keep': 'keep',
+    'preserve': 'preserve',
     'Nothing': 'Nothing',
     'Remove hashtag': 'Remove hashtag',
     'Remove whole tag': 'Remove whole tag',
