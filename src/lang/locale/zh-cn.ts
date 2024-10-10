@@ -220,7 +220,7 @@ export default {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
       'name': '自动更正常见的拼写错误',
-      'description': '通过常见拼写错误字典自动将错误拼写更正为正确拼写。有关自动更正单词的完整列表，请参阅 [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts)',
+      'description': '通过常见拼写错误字典自动将错误拼写更正为正确拼写。有关自动更正单词的完整列表，请参阅 [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md)',
       'ignore-words': {
         'name': '忽略单词',
         'description': '以逗号分隔的小写单词列表，在自动更正时会忽略',

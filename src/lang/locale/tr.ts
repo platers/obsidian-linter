@@ -220,7 +220,7 @@ export default {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
       'name': 'Yaygın Yanlış Yazımları Otomatik Düzelt',
-      'description': 'Yaygın yanlış yazımların sözlüğünü kullanarak bunları doğru yazımlarına otomatik olarak dönüştürür. Otomatik düzeltilen kelimelerin tam listesi için [otomatik-düzeltme haritasına](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) bakın.',
+      'description': 'Yaygın yanlış yazımların sözlüğünü kullanarak bunları doğru yazımlarına otomatik olarak dönüştürür. Otomatik düzeltilen kelimelerin tam listesi için [otomatik-düzeltme haritasına](https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md) bakın.',
       'ignore-words': {
         'name': 'Kelimeleri Yoksay',
         'description': 'Otomatik düzeltme sırasında yoksayılacak küçük harfli kelimelerin virgülle ayrılmış listesi',
