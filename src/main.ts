@@ -19,6 +19,7 @@ import AsyncLock from 'async-lock';
 import {warn} from 'loglevel';
 import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
 import {ChangeSpec} from '@codemirror/state';
+import {downloadMisspellings, readInMisspellingsFile} from './utils/auto-correct-misspellings';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -64,7 +65,6 @@ export default class LinterPlugin extends Plugin {
   private lastActiveFile: TFile;
   private overridePaste: boolean = false;
   private hasCustomCommands: boolean = false;
-  private hasLoadedFiles: boolean = false;
   private customCommandsLock = new AsyncLock();
   private originalSaveCallback?: () => void = null;
   // The amount of files you can use editor lint on at once is pretty small, so we will use an array
@@ -75,6 +75,8 @@ export default class LinterPlugin extends Plugin {
   private customCommandsCallback: (file: TFile) => Promise<void> = null;
   private currentlyOpeningSidebar: boolean = false;
   private activeFileChangeDebouncer: Map<TFile, FileChangeUpdateInfo> = new Map();
+  private defaultAutoCorrectMisspellings: Map<string, string> = new Map();
+  private hasLoadedMisspellingFiles = false;
 
   async onload() {
     setLanguage(window.localStorage.getItem('language'));
@@ -171,6 +173,10 @@ export default class LinterPlugin extends Plugin {
   }
 
   async saveSettings() {
+    if (!this.hasLoadedMisspellingFiles) {
+      await this.loadAutoCorrectFiles();
+    }
+
     await this.saveData(this.settings);
     this.updatePasteOverrideStatus();
     this.updateHasCustomCommandStatus();
@@ -310,6 +316,10 @@ export default class LinterPlugin extends Plugin {
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
+    this.app.workspace.onLayoutReady(async () => {
+      await this.loadAutoCorrectFiles();
+    });
+
     // Source for save setting
     // https://github.com/hipstersmoothie/obsidian-plugin-prettier/blob/main/src/main.ts
     const saveCommandDefinition = this.app.commands?.commands?.[
@@ -352,6 +362,38 @@ export default class LinterPlugin extends Plugin {
 
       void this.runCustomCommandsInSidebar(file);
     }
+  }
+
+  async loadAutoCorrectFiles() {
+    const customAutoCorrectSettings = this.settings.ruleConfigs['auto-correct-common-misspellings'];
+    if (!customAutoCorrectSettings || !customAutoCorrectSettings.enabled) {
+      return;
+    }
+
+    await downloadMisspellings(this, async (message: string) => {
+      new Notice(message);
+
+      this.settings.ruleConfigs['auto-correct-common-misspellings'].enabled = false;
+      await this.saveSettings();
+    });
+
+    if (!this.settings.ruleConfigs['auto-correct-common-misspellings'].enabled) {
+      return;
+    }
+
+    this.defaultAutoCorrectMisspellings = parseCustomReplacements(stripCr(await readInMisspellingsFile(this)));
+
+    // load custom-auto-correct replacements if they exist
+    for (const replacementFileInfo of this.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
+      if (replacementFileInfo.filePath != '') {
+        const file = this.getFileFromPath(replacementFileInfo.filePath);
+        if (file) {
+          replacementFileInfo.customReplacements = parseCustomReplacements(stripCr(await this.app.vault.cachedRead(file)));
+        }
+      }
+    }
+
+    this.hasLoadedMisspellingFiles = true;
   }
 
   onMenuOpenCallback(menu: Menu, file: TAbstractFile, _source: string) {
@@ -426,12 +468,8 @@ export default class LinterPlugin extends Plugin {
   }
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
-    if (!this.hasLoadedFiles) {
-      await this.loadCustomReplacements();
-    }
-
     const oldText = stripCr(await this.app.vault.read(file));
-    const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
+    const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
 
     if (oldText != newText) {
       await this.app.vault.modify(file, newText);
@@ -520,15 +558,11 @@ export default class LinterPlugin extends Plugin {
 
     logInfo(getTextInLanguage('logs.linter-run'));
 
-    if (!this.hasLoadedFiles) {
-      await this.loadCustomReplacements();
-    }
-
     const file = this.app.workspace.getActiveFile();
     const oldText = editor.getValue();
     let newText: string;
     try {
-      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
+      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
     } catch (error) {
       this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;
@@ -606,7 +640,7 @@ export default class LinterPlugin extends Plugin {
           if (oldText != activeFileChangeInfo.originalText ) {
             logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
             try {
-              newText = this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings));
+              newText = this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
             } catch (error) {
               this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
               return;
@@ -730,7 +764,7 @@ export default class LinterPlugin extends Plugin {
       const cursorSelection = cursorSelections[0];
       clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection),
           editor.getSelection() ?? '',
-          createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings),
+          createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings, null),
       );
 
       editor.replaceSelection(clipboardText);
@@ -750,7 +784,7 @@ export default class LinterPlugin extends Plugin {
     const editorChange: EditorChange[] = [];
 
     cursorSelections.forEach((cursorSelection: EditorSelection, index: number) => {
-      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection), editor.getRange(cursorSelection.anchor, cursorSelection.head) ?? '', createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings));
+      clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection), editor.getRange(cursorSelection.anchor, cursorSelection.head) ?? '', createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings, null));
       editorChange.push({
         text: clipboardText,
         from: cursorSelection.anchor,
@@ -951,19 +985,6 @@ export default class LinterPlugin extends Plugin {
   private endOfDocument(doc: string) {
     const lines = doc.split('\n');
     return {line: lines.length - 1, ch: lines[lines.length - 1].length};
-  }
-
-  private async loadCustomReplacements() {
-    for (const replacementFileInfo of this.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
-      if (replacementFileInfo.filePath != '') {
-        const file = this.getFileFromPath(replacementFileInfo.filePath);
-        if (file) {
-          replacementFileInfo.customReplacements = parseCustomReplacements(stripCr(await this.app.vault.cachedRead(file)));
-        }
-      }
-    }
-
-    this.hasLoadedFiles = true;
   }
 
   private getFileFromPath(filePath: string): TFile {

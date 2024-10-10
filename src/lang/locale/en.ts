@@ -263,7 +263,7 @@ export default {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
       'name': 'Auto-correct Common Misspellings',
-      'description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) for the full list of auto-corrected words. **Note: this list can work on text from multiple languages, but this list is the same no matter what language is currently in use.**',
+      'description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md) for the full list of auto-corrected words. **Note: this list can work on text from multiple languages, but this list is the same no matter what language is currently in use.**',
       'ignore-words': {
         'name': 'Ignore Words',
         'description': 'A comma separated list of lowercased words to ignore when auto-correcting',
@@ -276,6 +276,9 @@ export default {
         'name': 'Skip Words with Multiple Capitals',
         'description': 'Will skip any files that have a capital letter in them other than as the first letter of the word. Acronyms and some other words can benefit from this. It may cause issues with proper nouns being properly fixed.',
       },
+      'default-install': 'You are using Auto-correct Common Misspellings. In order to do so, the default misspellings will be downloaded. This should only happen once. Please wait...',
+      'default-install-failed': 'Failed to download {URL}. Disabling Auto-correct Common Misspellings.',
+      'defaults-missing': 'Failed to find default common auto-correct file: {FILE}.',
     },
     // add-blank-line-after-yaml.ts
     'add-blank-line-after-yaml': {

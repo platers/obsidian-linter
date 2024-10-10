@@ -28,7 +28,7 @@ jobs:
       - name: Create Manual Install Zip
         run: |
           mkdir ${{ env.PLUGIN_NAME }}
-          cp main.js manifest.json src/styles.css ${{ env.PLUGIN_NAME }}
+          cp main.js manifest.json src/styles.css src/utils/default-misspellings.md ${{ env.PLUGIN_NAME }}
           zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
 
       - name: Create release

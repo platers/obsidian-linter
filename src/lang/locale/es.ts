@@ -189,7 +189,7 @@ export default {
   'rules': {
     'auto-correct-common-misspellings': {
       'name': 'Corrección automática de errores ortográficos comunes',
-      'description': 'Utiliza un diccionario de errores ortográficos comunes para convertirlos automáticamente a su ortografía correcta. Consulte [mapa de autocorrección](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) para obtener la lista completa de palabras corregidas automáticamente. **Nota: esta lista puede funcionar en texto de varios idiomas, pero esta lista es la misma sin importar qué idioma esté en uso actualmente.**',
+      'description': 'Utiliza un diccionario de errores ortográficos comunes para convertirlos automáticamente a su ortografía correcta. Consulte [mapa de autocorrección](https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md) para obtener la lista completa de palabras corregidas automáticamente. **Nota: esta lista puede funcionar en texto de varios idiomas, pero esta lista es la misma sin importar qué idioma esté en uso actualmente.**',
       'ignore-words': {
         'name': 'Ignorar palabras',
         'description': 'Una lista separada por comas de palabras en minúsculas para ignorar al corregir automáticamente',

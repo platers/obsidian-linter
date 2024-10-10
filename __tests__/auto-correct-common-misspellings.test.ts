@@ -1,6 +1,6 @@
 import AutoCorrectCommonMisspellings from '../src/rules/auto-correct-common-misspellings';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
+import {defaultMisspellings, ruleTest} from './common';
 
 ruleTest({
   RuleBuilderClass: AutoCorrectCommonMisspellings,
@@ -15,6 +15,9 @@ ruleTest({
         [[absoltely not a changed]]
         [absoltely not a changed](absoltely.not.changed.md)
       `,
+      options: {
+        misspellingToCorrection: defaultMisspellings(),
+      },
     },
     {
       testName: 'Doesn\'t auto-correct markdown and wiki images',
@@ -26,6 +29,9 @@ ruleTest({
         ![[absoltely.not.a.changed.jpg]]
         ![absoltely not a changed](absoltely.not.changed.md)
       `,
+      options: {
+        misspellingToCorrection: defaultMisspellings(),
+      },
     },
     {
       testName: 'Doesn\'t auto-correct words that start with unicode specific characters when not in correction list',
@@ -35,6 +41,9 @@ ruleTest({
       after: dedent`
         être
       `,
+      options: {
+        misspellingToCorrection: defaultMisspellings(),
+      },
     },
     {
       testName: 'Custom replacements should work on file content',
@@ -45,6 +54,7 @@ ruleTest({
         The cart is over there.
       `,
       options: {
+        misspellingToCorrection: defaultMisspellings(),
         extraAutoCorrectFiles: [{
           filePath: 'file_path',
           customReplacements: new Map<string, string>([['cartt', 'cart'], ['theree', 'there']]),

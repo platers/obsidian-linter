@@ -224,7 +224,7 @@ export default {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
       'name': 'Häufige Rechtschreibfehler automatisch korrigieren',
-      'description': 'Verwendet ein Wörterbuch mit häufigen Rechtschreibfehlern, um sie automatisch in die richtige Schreibweise umzuwandeln. Siehe [Autokorrekturkarte](https://github.com/platers/obsidian-linter/tree/master/src/utils/auto-correct-misspellings.ts) für die vollständige Liste der automatisch korrigierten Wörter.',
+      'description': 'Verwendet ein Wörterbuch mit häufigen Rechtschreibfehlern, um sie automatisch in die richtige Schreibweise umzuwandeln. Siehe [Autokorrekturkarte](https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md) für die vollständige Liste der automatisch korrigierten Wörter.',
       'ignore-words': {
         'name': 'Ignorieren Sie Wörter',
         'description': 'Eine durch Kommas getrennte Liste von Wörtern in Kleinbuchstaben, die bei der automatischen Korrektur ignoriert werden sollen',
