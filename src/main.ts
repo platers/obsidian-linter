@@ -127,8 +127,16 @@ export default class LinterPlugin extends Plugin {
     setLogLevel(this.settings.logLevel);
     await this.setOrUpdateMomentInstance();
 
+    let updateMade = false;
     if (!this.settings.settingsConvertedToConfigKeyValues) {
-      this.moveConfigValuesToKeyBasedFormat();
+      updateMade = await this.moveConfigValuesToKeyBasedFormat();
+    }
+
+    if ('lintOnFileContentChangeDelay' in this.settings) {
+      this.settings.ruleConfigs['yaml-timestamp']['update-on-file-contents-updated'] = this.settings['lintOnFileContentChangeDelay'];
+
+      delete this.settings['lintOnFileContentChangeDelay'];
+      updateMade = true;
     }
 
     // make sure to load the defaults of any missing rules to make sure they do not cause issues on the settings page
@@ -142,10 +150,12 @@ export default class LinterPlugin extends Plugin {
         const defaults = rule.getDefaultOptions();
         if (!('english-symbols-punctuation-before' in this.settings.ruleConfigs[rule.alias])) {
           this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-before'] = defaults['english-symbols-punctuation-before'];
+          updateMade = true;
         }
 
         if (!('english-symbols-punctuation-after' in this.settings.ruleConfigs[rule.alias])) {
           this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = defaults['english-symbols-punctuation-after'];
+          updateMade = true;
         }
       } else if (rule.alias == 'yaml-timestamp') {
         const defaults = rule.getDefaultOptions();
@@ -158,18 +168,23 @@ export default class LinterPlugin extends Plugin {
             }
           }
 
-
           delete this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value'];
+          updateMade = true;
         }
 
         if (!('date-modified-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
           this.settings.ruleConfigs[rule.alias]['date-modified-source-of-truth'] = defaults['date-modified-source-of-truth'];
+          updateMade = true;
         }
       }
     }
 
     this.updatePasteOverrideStatus();
     this.updateHasCustomCommandStatus();
+
+    if (updateMade) {
+      await this.saveSettings();
+    }
   }
 
   async saveSettings() {
@@ -290,7 +305,7 @@ export default class LinterPlugin extends Plugin {
     this.eventRefs.push(eventRef);
 
     eventRef = this.app.workspace.on('editor-change', async (editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
-      if (this.settings.lintOnFileContentChangeDelay == AfterFileChangeLintTimes.Never) {
+      if ((this.settings.ruleConfigs['yaml-timestamp']['update-on-file-contents-updated'] ?? AfterFileChangeLintTimes.Never) == AfterFileChangeLintTimes.Never) {
         return;
       }
 
@@ -610,7 +625,7 @@ export default class LinterPlugin extends Plugin {
 
   private createDebouncedFileUpdate(): Debouncer<[TFile, Editor], Promise<void>> {
     let delay = 5000;
-    switch (this.settings.lintOnFileContentChangeDelay) {
+    switch (this.settings.ruleConfigs['yaml-timestamp']['update-on-file-contents-updated'] ?? AfterFileChangeLintTimes.Never) {
       case AfterFileChangeLintTimes.After10Seconds:
         delay = 10000;
         break;
@@ -909,9 +924,10 @@ export default class LinterPlugin extends Plugin {
     return editor.getLine(selection.anchor.line);
   }
 
-  private moveConfigValuesToKeyBasedFormat() {
+  private async moveConfigValuesToKeyBasedFormat(): Promise<boolean> {
     setLanguage('en');
 
+    let updateMade = false;
     for (const rule of rules) {
       const ruleName = getTextInLanguage('rules.' + rule.alias + '.name' as LanguageStringKey);
       const ruleSettings = this.settings.ruleConfigs[ruleName];
@@ -935,13 +951,17 @@ export default class LinterPlugin extends Plugin {
 
         this.settings.ruleConfigs[rule.alias] = newSettingValues;
         delete this.settings.ruleConfigs[ruleName];
+
+        updateMade = true;
       }
     }
 
     this.settings.settingsConvertedToConfigKeyValues = true;
-    void this.saveSettings();
+    await this.saveSettings();
 
     setLanguage(window.localStorage.getItem('language'));
+
+    return updateMade;
   }
 
   private getAllFilesInFolder(startingFolder: TFolder): TFile[] {

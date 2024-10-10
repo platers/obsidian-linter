@@ -7,6 +7,7 @@ import {escapeDollarSigns} from '../utils/regex';
 import {insert} from '../utils/strings';
 import parseFormat from 'moment-parseformat';
 import {getTextInLanguage} from '../lang/helpers';
+import {AfterFileChangeLintTimes} from 'src/settings-data';
 
 type DateCreatedSourceOfTruth = 'file system' | 'frontmatter';
 type DateModifiedSourceOfTruth = 'file system' | 'user or Linter edits';
@@ -28,6 +29,10 @@ class YamlTimestampOptions implements Options {
   dateModifiedKey?: string = 'date modified';
 
   convertToUTC?: boolean = false;
+
+  // This is not used in the rule itself. It is used for running this rule as a standalone when
+  // editor content is updated.
+  timestampUpdateOnFileContentUpdated?: AfterFileChangeLintTimes =AfterFileChangeLintTimes.Never;
 
   @RuleBuilder.noSettingControl()
     fileModifiedTime?: string;
@@ -454,6 +459,38 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         nameKey: 'rules.yaml-timestamp.convert-to-utc.name',
         descriptionKey: 'rules.yaml-timestamp.convert-to-utc.description',
         optionsKey: 'convertToUTC',
+      }),
+      new DropdownOptionBuilder<YamlTimestampOptions, AfterFileChangeLintTimes>({
+        OptionsClass: YamlTimestampOptions,
+        nameKey: 'rules.yaml-timestamp.update-on-file-contents-updated.name',
+        descriptionKey: 'rules.yaml-timestamp.update-on-file-contents-updated.description',
+        optionsKey: 'timestampUpdateOnFileContentUpdated',
+        records: [
+          {
+            value: AfterFileChangeLintTimes.Never,
+            description: AfterFileChangeLintTimes.Never,
+          },
+          {
+            value: AfterFileChangeLintTimes.After5Seconds,
+            description: AfterFileChangeLintTimes.After5Seconds,
+          },
+          {
+            value: AfterFileChangeLintTimes.After10Seconds,
+            description: AfterFileChangeLintTimes.After10Seconds,
+          },
+          {
+            value: AfterFileChangeLintTimes.After15Seconds,
+            description: AfterFileChangeLintTimes.After15Seconds,
+          },
+          {
+            value: AfterFileChangeLintTimes.After30Seconds,
+            description: AfterFileChangeLintTimes.After30Seconds,
+          },
+          {
+            value: AfterFileChangeLintTimes.After1Minute,
+            description: AfterFileChangeLintTimes.After1Minute,
+          },
+        ],
       }),
     ];
   }

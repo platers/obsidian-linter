@@ -33,7 +33,6 @@ export interface LinterSettings {
   recordLintOnSaveLogs: boolean;
   lintOnFileChange: boolean;
   displayLintOnFileChangeNotice: boolean;
-  lintOnFileContentChangeDelay: string;
   foldersToIgnore: string[];
   filesToIgnore: FileToIgnore[];
   linterLocale: string;
@@ -52,7 +51,6 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   displayChanged: true,
   lintOnFileChange: false,
   displayLintOnFileChangeNotice: false,
-  lintOnFileContentChangeDelay: AfterFileChangeLintTimes.Never,
   settingsConvertedToConfigKeyValues: false,
   foldersToIgnore: [],
   filesToIgnore: [],

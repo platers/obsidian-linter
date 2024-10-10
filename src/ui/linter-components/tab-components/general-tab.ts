@@ -9,7 +9,6 @@ import {NumberInputSetting} from 'src/ui/components/number-input-setting';
 import {ToggleSetting} from 'src/ui/components/toggle-setting';
 import {FolderIgnoreOption} from '../folder-ignore-option';
 import {FilesToIgnoreOption} from '../files-to-ignore-option';
-import {AfterFileChangeLintTimes} from 'src/settings-data';
 
 export class GeneralTab extends Tab {
   constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin, private app: App) {
@@ -54,22 +53,6 @@ export class GeneralTab extends Tab {
     if (!lintOnActiveFileChangeSetting.getBoolean()) {
       displayLintOnActiveFileChangeSetting.hide();
     }
-
-    const yamlTimestampTimeOptions: DropdownRecordInfo = {
-      isForEnum: true,
-      values: [
-        AfterFileChangeLintTimes.Never,
-        AfterFileChangeLintTimes.After5Seconds,
-        AfterFileChangeLintTimes.After10Seconds,
-        AfterFileChangeLintTimes.After15Seconds,
-        AfterFileChangeLintTimes.After30Seconds,
-        AfterFileChangeLintTimes.After1Minute,
-      ],
-      descriptions: [],
-    };
-
-    tempDiv = this.contentEl.createDiv();
-    this.addSettingSearchInfoForGeneralSettings(new DropdownSetting(tempDiv, 'tabs.general.timestamp-update-on-file-contents-updated.name', 'tabs.general.timestamp-update-on-file-contents-updated.description', 'lintOnFileContentChangeDelay', this.plugin, yamlTimestampTimeOptions));
 
     const sysLocale = navigator.language?.toLowerCase();
     const localeValues = ['system-default'];
