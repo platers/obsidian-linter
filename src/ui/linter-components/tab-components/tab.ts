@@ -1,7 +1,7 @@
 import {iconInfo} from 'src/ui/icons';
 import LinterPlugin from 'src/main';
 import {RuleType} from 'src/rules';
-import {setIcon} from 'obsidian';
+import {setIcon, Setting} from 'obsidian';
 import {settingSearchInfo} from './tab-searcher';
 import {SearchOptionInfo} from 'src/option';
 import {hideEl, unhideEl} from 'src/ui/helpers';
@@ -59,7 +59,7 @@ export abstract class Tab {
     this.contentEl = settingsEl.createDiv('linter-tab-settings');
     this.contentEl.id = name.toLowerCase().replace(' ', '-');
 
-    this.headingEl = this.contentEl.createEl('h2', {text: nameInLanguage});
+    this.headingEl = new Setting(this.contentEl).setName(nameInLanguage).setHeading().nameEl;
     hideEl(this.headingEl);
   }
 

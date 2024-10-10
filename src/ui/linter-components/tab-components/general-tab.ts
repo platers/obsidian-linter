@@ -19,16 +19,41 @@ export class GeneralTab extends Tab {
 
   display(): void {
     let tempDiv = this.contentEl.createDiv();
-    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.lint-on-save.name', 'tabs.general.lint-on-save.description', 'lintOnSave', this.plugin));
+
+    let displayCharactersChangedSetting: ToggleSetting = null;
+    const lintOnSaveSetting = new ToggleSetting(tempDiv, 'tabs.general.lint-on-save.name', 'tabs.general.lint-on-save.description', 'lintOnSave', this.plugin, (value: boolean) => {
+      if (value) {
+        displayCharactersChangedSetting.unhide();
+      } else {
+        displayCharactersChangedSetting.hide();
+      }
+    });
+    this.addSettingSearchInfoForGeneralSettings(lintOnSaveSetting);
 
     tempDiv = this.contentEl.createDiv();
-    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.display-message.name', 'tabs.general.display-message.description', 'displayChanged', this.plugin));
+    displayCharactersChangedSetting = new ToggleSetting(tempDiv, 'tabs.general.display-message.name', 'tabs.general.display-message.description', 'displayChanged', this.plugin);
+    this.addSettingSearchInfoForGeneralSettings(displayCharactersChangedSetting);
+    if (!lintOnSaveSetting.getBoolean()) {
+      displayCharactersChangedSetting.hide();
+    }
+
+    let displayLintOnActiveFileChangeSetting: ToggleSetting = null;
+    tempDiv = this.contentEl.createDiv();
+    const lintOnActiveFileChangeSetting = new ToggleSetting(tempDiv, 'tabs.general.lint-on-file-change.name', 'tabs.general.lint-on-file-change.description', 'lintOnFileChange', this.plugin, (value: boolean) => {
+      if (value) {
+        displayLintOnActiveFileChangeSetting.unhide();
+      } else {
+        displayLintOnActiveFileChangeSetting.hide();
+      }
+    });
+    this.addSettingSearchInfoForGeneralSettings(lintOnActiveFileChangeSetting);
 
     tempDiv = this.contentEl.createDiv();
-    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.lint-on-file-change.name', 'tabs.general.lint-on-file-change.description', 'lintOnFileChange', this.plugin));
-
-    tempDiv = this.contentEl.createDiv();
-    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.display-lint-on-file-change-message.name', 'tabs.general.display-lint-on-file-change-message.description', 'displayLintOnFileChangeNotice', this.plugin));
+    displayLintOnActiveFileChangeSetting = new ToggleSetting(tempDiv, 'tabs.general.display-lint-on-file-change-message.name', 'tabs.general.display-lint-on-file-change-message.description', 'displayLintOnFileChangeNotice', this.plugin);
+    this.addSettingSearchInfoForGeneralSettings(displayLintOnActiveFileChangeSetting);
+    if (!lintOnActiveFileChangeSetting.getBoolean()) {
+      displayLintOnActiveFileChangeSetting.hide();
+    }
 
     const yamlTimestampTimeOptions: DropdownRecordInfo = {
       isForEnum: true,

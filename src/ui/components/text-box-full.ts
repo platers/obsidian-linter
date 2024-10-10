@@ -1,7 +1,9 @@
 import {Notice, setIcon} from 'obsidian';
 import {getTextInLanguage} from 'src/lang/helpers';
+import {hideEl, unhideEl} from '../helpers';
 
 export class TextBoxFull {
+  settingEl: HTMLDivElement;
   nameEl: HTMLDivElement;
   descEl: HTMLDivElement;
   inputContainerEl: HTMLDivElement;
@@ -13,8 +15,8 @@ export class TextBoxFull {
   }
 
   display() {
-    const settingEl = this.containerEl.createDiv();
-    const infoEl = settingEl.createDiv('setting-item-info');
+    this.settingEl = this.containerEl.createDiv();
+    const infoEl = this.settingEl.createDiv('setting-item-info');
 
     this.nameEl = infoEl.createDiv('setting-item-name');
     this.nameEl.setText(this.name);
@@ -22,7 +24,7 @@ export class TextBoxFull {
     this.descEl = infoEl.createDiv('setting-item-description');
     this.descEl.setText(this.description);
 
-    this.inputContainerEl = settingEl.createDiv('full-width-textbox-input-wrapper');
+    this.inputContainerEl = this.settingEl.createDiv('full-width-textbox-input-wrapper');
     this.inputContainerEl.onmouseover = () => {
       if (this.getInput().trim() != '') {
         this.copyEl.removeClass('linter-visually-hidden');
@@ -56,5 +58,13 @@ export class TextBoxFull {
     }, (reason: any) => {
       new Notice(`${getTextInLanguage('notice-text.copy-to-clipboard-failed') + reason}`, 0);
     });
+  }
+
+  hide() {
+    hideEl(this.settingEl);
+  }
+
+  unhide() {
+    unhideEl(this.settingEl);
   }
 }
