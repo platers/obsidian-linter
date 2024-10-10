@@ -7,7 +7,7 @@ import {escapeDollarSigns} from '../utils/regex';
 import {insert} from '../utils/strings';
 import parseFormat from 'moment-parseformat';
 import {getTextInLanguage} from '../lang/helpers';
-import {AfterFileChangeLintTimes} from 'src/settings-data';
+import {AfterFileChangeLintTimes} from '../settings-data';
 
 type DateCreatedSourceOfTruth = 'file system' | 'frontmatter';
 type DateModifiedSourceOfTruth = 'file system' | 'user or Linter edits';
