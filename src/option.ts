@@ -1,7 +1,7 @@
 import {Setting} from 'obsidian';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import LinterPlugin from './main';
-import {parseTextToHTMLWithoutOuterParagraph} from './ui/helpers';
+import {hideEl, parseTextToHTMLWithoutOuterParagraph, unhideEl} from './ui/helpers';
 import {LinterSettings} from './settings-data';
 import {AutoCorrectFilesPickerOption} from './ui/linter-components/auto-correct-files-picker-option';
 
@@ -11,6 +11,7 @@ export type SearchOptionInfo = {name: string, description: string, options?: Dro
 
 export abstract class Option {
   public ruleAlias: string;
+  protected setting: Setting;
 
   /**
    * Create an option
@@ -43,30 +44,47 @@ export abstract class Option {
     settings.ruleConfigs[this.ruleAlias][this.configKey] = value;
   }
 
-  protected parseNameAndDescriptionAndRemoveSettingBorder(setting: Setting, plugin: LinterPlugin) {
-    parseTextToHTMLWithoutOuterParagraph(plugin.app, this.getName(), setting.nameEl, plugin.settingsTab.component);
-    parseTextToHTMLWithoutOuterParagraph(plugin.app, this.getDescription(), setting.descEl, plugin.settingsTab.component);
+  protected parseNameAndDescriptionAndRemoveSettingBorder(plugin: LinterPlugin) {
+    parseTextToHTMLWithoutOuterParagraph(plugin.app, this.getName(), this.setting.nameEl, plugin.settingsTab.component);
+    parseTextToHTMLWithoutOuterParagraph(plugin.app, this.getDescription(), this.setting.descEl, plugin.settingsTab.component);
 
-    setting.settingEl.addClass('linter-no-border');
-    setting.descEl.addClass('linter-no-padding-top');
+    this.setting.settingEl.addClass('linter-no-border');
+    this.setting.descEl.addClass('linter-no-padding-top');
+  }
+
+  hide() {
+    hideEl(this.setting.settingEl);
+  }
+
+  unhide() {
+    unhideEl(this.setting.settingEl);
   }
 }
 
 export class BooleanOption extends Option {
   public defaultValue: boolean;
 
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: any, ruleAlias?: string | null, private onChange?: (value: boolean) => void) {
+    super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
+  }
+
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-    const setting = new Setting(containerEl)
+    this.setting = new Setting(containerEl)
         .addToggle((toggle) => {
           toggle.setValue(settings.ruleConfigs[this.ruleAlias][this.configKey]);
           toggle.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
+
+            if (this.onChange) {
+              this.onChange(value);
+            }
+
             void plugin.saveSettings();
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
+    this.parseNameAndDescriptionAndRemoveSettingBorder(plugin);
   }
 }
 
@@ -74,7 +92,7 @@ export class TextOption extends Option {
   public defaultValue: string;
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-    const setting = new Setting(containerEl)
+    this.setting = new Setting(containerEl)
         .addText((textbox) => {
           textbox.setValue(settings.ruleConfigs[this.ruleAlias][this.configKey]);
           textbox.onChange((value) => {
@@ -84,7 +102,7 @@ export class TextOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
+    this.parseNameAndDescriptionAndRemoveSettingBorder(plugin);
   }
 }
 
@@ -92,7 +110,7 @@ export class TextAreaOption extends Option {
   public defaultValue: string;
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-    const setting = new Setting(containerEl)
+    this.setting = new Setting(containerEl)
         .addTextArea((textbox) => {
           textbox.setValue(settings.ruleConfigs[this.ruleAlias][this.configKey]);
           textbox.onChange((value) => {
@@ -102,7 +120,7 @@ export class TextAreaOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
+    this.parseNameAndDescriptionAndRemoveSettingBorder(plugin);
   }
 }
 
@@ -110,7 +128,7 @@ export class MomentFormatOption extends Option {
   public defaultValue: boolean;
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-    const setting = new Setting(containerEl)
+    this.setting = new Setting(containerEl)
         .addMomentFormat((format) => {
           format.setValue(settings.ruleConfigs[this.ruleAlias][this.configKey]);
           format.setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a');
@@ -121,7 +139,7 @@ export class MomentFormatOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
+    this.parseNameAndDescriptionAndRemoveSettingBorder(plugin);
   }
 }
 
@@ -153,7 +171,7 @@ export class DropdownOption extends Option {
   }
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
-    const setting = new Setting(containerEl)
+    this.setting = new Setting(containerEl)
         .addDropdown((dropdown) => {
           // First, add all the available options
           for (const option of this.options) {
@@ -170,12 +188,13 @@ export class DropdownOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(setting, plugin);
+    this.parseNameAndDescriptionAndRemoveSettingBorder(plugin);
   }
 }
 
 
 export class MdFilePickerOption extends Option {
+  private settingEl: HTMLDivElement;
   constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, ruleAlias?: string | null) {
     super(configKey, nameKey, descriptionKey, [], ruleAlias);
   }
@@ -183,8 +202,18 @@ export class MdFilePickerOption extends Option {
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
     settings.ruleConfigs[this.ruleAlias][this.configKey] = settings.ruleConfigs[this.ruleAlias][this.configKey] ?? [];
 
-    new AutoCorrectFilesPickerOption(containerEl, plugin.settingsTab.component, settings.ruleConfigs[this.ruleAlias][this.configKey], plugin.app, () => {
+    this.settingEl = containerEl.createDiv();
+
+    new AutoCorrectFilesPickerOption(this.settingEl, plugin.settingsTab.component, settings.ruleConfigs[this.ruleAlias][this.configKey], plugin.app, () => {
       void plugin.saveSettings();
     }, this.nameKey, this.descriptionKey);
+  }
+
+  override hide() {
+    hideEl(this.settingEl);
+  }
+
+  override unhide() {
+    unhideEl(this.settingEl);
   }
 }

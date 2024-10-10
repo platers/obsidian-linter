@@ -152,10 +152,6 @@ export default {
         'name': 'Display Lint on File Change Message',
         'description': 'Displays a message when `Lint on Focused File Change` occurs',
       },
-      'timestamp-update-on-file-contents-updated': {
-        'name': 'Update YAML Timestamp on File Contents Update',
-        'description': 'When the currently active file is modified, `YAML Timestamp` is run on the file. This should update the modified file timestamp if it is more than 5 seconds off from the current value.',
-      },
       'folders-to-ignore': {
         'name': 'Folders to ignore',
         'description': 'Folders to ignore when linting all files or linting on save.',
@@ -848,6 +844,10 @@ export default {
       'convert-to-utc': {
         'name': 'Convert Local Time to UTC',
         'description': 'Uses UTC equivalent for saved dates instead of local time',
+      },
+      'update-on-file-contents-updated': {
+        'name': 'Update YAML Timestamp on File Contents Update',
+        'description': 'When the currently active note is modified, `YAML Timestamp` is run on the note. This should update the modified note timestamp if it is more than 5 seconds off from the current value.',
       },
     },
     // yaml-title-alias.ts

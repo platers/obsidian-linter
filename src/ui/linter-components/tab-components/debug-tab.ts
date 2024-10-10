@@ -36,16 +36,28 @@ export class DebugTab extends Tab {
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
 
+    let logDisplay: TextBoxFull = null;
     tempDiv = this.contentEl.createDiv();
-    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.debug.log-collection.name', 'tabs.debug.log-collection.description', 'recordLintOnSaveLogs', this.plugin));
+    const recordLintOnSaveLogsSetting = new ToggleSetting(tempDiv, 'tabs.debug.log-collection.name', 'tabs.debug.log-collection.description', 'recordLintOnSaveLogs', this.plugin, (value: boolean) => {
+      if (value) {
+        logDisplay.unhide();
+      } else {
+        logDisplay.hide();
+      }
+    });
+    this.addSettingSearchInfoForGeneralSettings(recordLintOnSaveLogsSetting);
 
     tempDiv = this.contentEl.createDiv();
     settingName = getTextInLanguage('tabs.debug.linter-logs.name');
     settingDesc = getTextInLanguage('tabs.debug.linter-logs.description');
-    const logDisplay = new TextBoxFull(tempDiv, settingName, '');
+    logDisplay = new TextBoxFull(tempDiv, settingName, '');
     logDisplay.inputEl.setText(logsFromLastRun.join('\n'));
 
     parseTextToHTMLWithoutOuterParagraph(this.plugin.app, settingDesc, logDisplay.descEl, this.plugin.settingsTab.component);
+
+    if (!recordLintOnSaveLogsSetting.getBoolean()) {
+      logDisplay.hide();
+    }
 
     this.addSettingSearchInfo(tempDiv, settingName, settingDesc);
   }
