@@ -189,7 +189,7 @@ export default {
   'rules': {
     'auto-correct-common-misspellings': {
       'name': 'Corrección automática de errores ortográficos comunes',
-      'description': 'Utiliza un diccionario de errores ortográficos comunes para convertirlos automáticamente a su ortografía correcta. Consulte [mapa de autocorrección](https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md) para obtener la lista completa de palabras corregidas automáticamente. **Nota: esta lista puede funcionar en texto de varios idiomas, pero esta lista es la misma sin importar qué idioma esté en uso actualmente.**',
+      'description': 'Utiliza un diccionario de errores ortográficos comunes para convertirlos automáticamente a su ortografía correcta. Consulte <a href="https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md">mapa de autocorrección</a> para obtener la lista completa de palabras corregidas automáticamente. <b>Nota: esta lista puede funcionar en texto de varios idiomas, pero esta lista es la misma sin importar qué idioma esté en uso actualmente.</b>',
       'ignore-words': {
         'name': 'Ignorar palabras',
         'description': 'Una lista separada por comas de palabras en minúsculas para ignorar al corregir automáticamente',
@@ -525,7 +525,7 @@ export default {
     },
     'remove-trailing-punctuation-in-heading': {
       'name': 'Eliminar la puntuación final en el encabezado',
-      'description': 'Elimina la puntuación especificada al final de los encabezados, asegurándose de ignorar el punto y coma al final de [referencias de entidades de HTML](https://es.wikipedia.org/wiki/Anexo:Referencias_a_entidades_de_caracteres_XML_y_HTML).',
+      'description': 'Elimina la puntuación especificada al final de los encabezados, asegurándose de ignorar el punto y coma al final de <a href="https://es.wikipedia.org/wiki/Anexo:Referencias_a_entidades_de_caracteres_XML_y_HTML">referencias de entidades de HTML</a>.',
       'punctuation-to-remove': {
         'name': 'Puntuación final',
         'description': 'La puntuación final que se eliminará de los encabezados del archivo.',
@@ -545,7 +545,7 @@ export default {
     },
     'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
       'name': 'Espacio entre chino japonés o coreano e inglés o números',
-      'description': 'Garantiza que el chino, el japonés o el coreano y el inglés o los números estén separados por un solo espacio. Sigue estas [directrices](https://github.com/sparanoid/chinese-copywriting-guidelines)',
+      'description': 'Garantiza que el chino, el japonés o el coreano y el inglés o los números estén separados por un solo espacio. Sigue estas <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">directrices</a>',
     },
     'strong-style': {
       'name': 'Estilo fuerte',

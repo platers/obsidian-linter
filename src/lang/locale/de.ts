@@ -122,7 +122,7 @@ export default {
       // general-tab.ts
       'lint-on-save': {
         'name': 'Linten beim Speichern',
-        'description': 'Linten der Datei beim manuellen Speichern (wenn `Strg + S` gedrückt wird oder wenn `:w` ausgeführt wird, während vim-Tastenkombinationen verwendet werden)',
+        'description': 'Linten der Datei beim manuellen Speichern (wenn <code>Strg + S</code> gedrückt wird oder wenn <code>:w</code> ausgeführt wird, während vim-Tastenkombinationen verwendet werden)',
       },
       'display-message': {
         'name': 'Meldung beim Linten anzeigen',
@@ -134,7 +134,7 @@ export default {
       },
       'display-lint-on-file-change-message': {
         'name': 'Nachricht beim Linten nach einer Dateiänderung anzeigen',
-        'description': 'Zeigt eine Meldung an, wenn `Linten bei Dateiänderungen` ausgelöst wurde',
+        'description': 'Zeigt eine Meldung an, wenn <code>Linten bei Dateiänderungen</code> ausgelöst wurde',
       },
       'folders-to-ignore': {
         'name': 'Ordner, die ignoriert werden sollen',
@@ -180,12 +180,12 @@ export default {
         'description': 'Der Inhalt der data.json für den Linter zum Zeitpunkt des Ladens der Einstellungsseite',
       },
       'log-collection': {
-        'name': 'Sammeln Sie Protokolle bei aktiviertem `Linten beim Speichern` und dem Linten der aktuellen Datei',
-        'description': 'Sammelt die Log-Meldungen, wenn Sie `Linten beim Speichern` aktiviert haben und die aktuelle Datei linten. Diese Protokolle können beim Debuggen und Erstellen von Fehlerberichten hilfreich sein.',
+        'name': 'Sammeln Sie Protokolle bei aktiviertem <code>Linten beim Speichern</code> und dem Linten der aktuellen Datei',
+        'description': 'Sammelt die Log-Meldungen, wenn Sie <code>Linten beim Speichern</code> aktiviert haben und die aktuelle Datei linten. Diese Protokolle können beim Debuggen und Erstellen von Fehlerberichten hilfreich sein.',
       },
       'linter-logs': {
         'name': 'Linter-Protokolle',
-        'description': 'Die Protokolle des letzten `Linten beim Speichern`-Durchlaufes oder dem letzten Linten der aktuellen Datei werden gesammelt, wenn die Option aktiviert ist.',
+        'description': 'Die Protokolle des letzten <code>Linten beim Speichern</code>-Durchlaufes oder dem letzten Linten der aktuellen Datei werden gesammelt, wenn die Option aktiviert ist.',
       },
     },
   },
@@ -224,7 +224,7 @@ export default {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
       'name': 'Häufige Rechtschreibfehler automatisch korrigieren',
-      'description': 'Verwendet ein Wörterbuch mit häufigen Rechtschreibfehlern, um sie automatisch in die richtige Schreibweise umzuwandeln. Siehe [Autokorrekturkarte](https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md) für die vollständige Liste der automatisch korrigierten Wörter.',
+      'description': 'Verwendet ein Wörterbuch mit häufigen Rechtschreibfehlern, um sie automatisch in die richtige Schreibweise umzuwandeln. Siehe <a href="https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md">Autokorrekturkarte</a> für die vollständige Liste der automatisch korrigierten Wörter.',
       'ignore-words': {
         'name': 'Ignorieren Sie Wörter',
         'description': 'Eine durch Kommas getrennte Liste von Wörtern in Kleinbuchstaben, die bei der automatischen Korrektur ignoriert werden sollen',
@@ -305,7 +305,7 @@ export default {
     // empty-line-around-blockquotes.ts
     'empty-line-around-blockquotes': {
       'name': 'Leere Zeile um Blockquotes',
-      'description': 'Stellt sicher, dass Blockzitate in einer leeren Zeile stehen, es sei denn, sie beginnen oder beenden ein Dokument. **Beachten Sie, dass eine leere Zeile entweder eine Verschachtelungsebene weniger für Blockzitate oder ein Zeilenumbruchzeichen ist.**',
+      'description': 'Stellt sicher, dass Blockzitate in einer leeren Zeile stehen, es sei denn, sie beginnen oder beenden ein Dokument. <b>Beachten Sie, dass eine leere Zeile entweder eine Verschachtelungsebene weniger für Blockzitate oder ein Zeilenumbruchzeichen ist.</b>',
     },
     // empty-line-around-code-fences.ts
     'empty-line-around-code-fences': {
@@ -315,7 +315,7 @@ export default {
     // empty-line-around-math-block.ts
     'empty-line-around-math-blocks': {
       'name': 'Leere Zeile um mathematische Blöcke',
-      'description': 'Stellt sicher, dass es eine leere Zeile um mathematische Blöcke gibt, indem `Anzahl der Dollarzeichen, die einen mathematischen Block anzeigen` verwendet wird, um zu bestimmen, wie viele Dollarzeichen einen mathematischen Block für einzeilige Mathematik anzeigen.',
+      'description': 'Stellt sicher, dass es eine leere Zeile um mathematische Blöcke gibt, indem <code>Anzahl der Dollarzeichen, die einen mathematischen Block anzeigen</code> verwendet wird, um zu bestimmen, wie viele Dollarzeichen einen mathematischen Block für einzeilige Mathematik anzeigen.',
     },
     // empty-line-around-tables.ts
     'empty-line-around-tables': {
@@ -358,10 +358,10 @@ export default {
     // format-yaml-array.ts
     'format-yaml-array': {
       'name': 'Formatieren des YAML-Arrays',
-      'description': 'Ermöglicht die Formatierung von regulären YAML-Arrays als mehrzeilig oder einzeilig und `tags` und `aliases` dürfen einige Obsidian-spezifische YAML-Formate haben. Beachten Sie, dass eine einzelne Zeichenfolge zu einer einzelnen Zeile von einem einzelnen Zeichenfolgeneintrag zu einem einzeiligen Array wechselt, wenn mehr als 1 Eintrag vorhanden ist. Das Gleiche gilt für eine einzelne Zeichenfolge bis zu einer mehrzeiligen Zeichenfolge, mit der Ausnahme, dass sie zu einem mehrzeiligen Array wird.',
+      'description': 'Ermöglicht die Formatierung von regulären YAML-Arrays als mehrzeilig oder einzeilig und <code>tags</code> und <code>aliases</code> dürfen einige Obsidian-spezifische YAML-Formate haben. Beachten Sie, dass eine einzelne Zeichenfolge zu einer einzelnen Zeile von einem einzelnen Zeichenfolgeneintrag zu einem einzeiligen Array wechselt, wenn mehr als 1 Eintrag vorhanden ist. Das Gleiche gilt für eine einzelne Zeichenfolge bis zu einer mehrzeiligen Zeichenfolge, mit der Ausnahme, dass sie zu einem mehrzeiligen Array wird.',
       'alias-key': {
         'name': 'Abschnitt "YAML-Aliase" formatieren',
-        'description': 'Aktiviert die Formatierung für den Abschnitt YAML-Aliase. Sie sollten diese Option nicht zusammen mit der Regel `YAML-Titel-Alias` aktivieren, da sie möglicherweise nicht gut zusammenarbeiten oder unterschiedliche Formatstile ausgewählt haben, was zu unerwarteten Ergebnissen führt.',
+        'description': 'Aktiviert die Formatierung für den Abschnitt YAML-Aliase. Sie sollten diese Option nicht zusammen mit der Regel <code>YAML-Titel-Alias</code> aktivieren, da sie möglicherweise nicht gut zusammenarbeiten oder unterschiedliche Formatstile ausgewählt haben, was zu unerwarteten Ergebnissen führt.',
       },
       'tag-key': {
         'name': 'Abschnitt "YAML-Tags formatieren"',
@@ -369,7 +369,7 @@ export default {
       },
       'default-array-style': {
         'name': 'Standardmäßiger YAML-Array-Abschnittsstil',
-        'description': 'Der Stil anderer YAML-Arrays, die nicht `tags` oder `aliases` sind oder bei `Erzwingt für Schlüsselwerte einzeilige Arrays` und `Erzwingt für Schlüsselwerte mehrzeilige Arrays`',
+        'description': 'Der Stil anderer YAML-Arrays, die nicht <code>tags</code> oder <code>aliases</code> sind oder bei <code>Erzwingt für Schlüsselwerte einzeilige Arrays</code> und <code>Erzwingt für Schlüsselwerte mehrzeilige Arrays</code>',
       },
       'default-array-keys': {
         'name': 'Formatieren von YAML-Array-Abschnitten',
@@ -433,7 +433,7 @@ export default {
     // move-math-block-indicators-to-their-own-line.ts
     'move-math-block-indicators-to-their-own-line': {
       'name': 'Verschieben Sie mathematische Blockindikatoren in eine eigene Zeile',
-      'description': 'Verschieben Sie alle Anfangs- und Endindikatoren für mathematische Blöcke in ihre eigenen Zeilen, indem Sie `Anzahl der Dollarzeichen, die einen mathematischen Block anzeigen` verwenden, um zu bestimmen, wie viele Dollarzeichen einen mathematischen Block für einzeilige Mathematik anzeigen.',
+      'description': 'Verschieben Sie alle Anfangs- und Endindikatoren für mathematische Blöcke in ihre eigenen Zeilen, indem Sie <code>Anzahl der Dollarzeichen, die einen mathematischen Block anzeigen</code> verwenden, um zu bestimmen, wie viele Dollarzeichen einen mathematischen Block für einzeilige Mathematik anzeigen.',
     },
     // move-tags-to-yaml.ts
     'move-tags-to-yaml': {
@@ -445,7 +445,7 @@ export default {
       },
       'tags-to-ignore': {
         'name': 'ignorierte Tags',
-        'description': 'Die Tags, die nicht in das Tags-Array verschoben oder aus dem Textinhalt entfernt werden, wenn `Entfernen Sie den Hashtag aus Tags im Inhaltstext` aktiviert ist. Jedes Tag sollte in einer neuen Zeile und ohne das `#`` stehen. **Stellen Sie sicher, dass Sie den Hashtag nicht in den Tag-Namen aufnehmen.**',
+        'description': 'Die Tags, die nicht in das Tags-Array verschoben oder aus dem Textinhalt entfernt werden, wenn <code>Entfernen Sie den Hashtag aus Tags im Inhaltstext</code> aktiviert ist. Jedes Tag sollte in einer neuen Zeile und ohne das <code>#</code> stehen. <b>Stellen Sie sicher, dass Sie den Hashtag nicht in den Tag-Namen aufnehmen.</b>',
       },
     },
     // no-bare-urls.ts
@@ -496,7 +496,7 @@ export default {
       'name': 'Zitatstil',
       'description': 'Aktualisiert die Anführungszeichen im Textkörperinhalt, sodass sie auf die angegebenen einfachen und doppelten Anführungszeichenstile aktualisiert werden.',
       'single-quote-enabled': {
-        'name': 'Aktivieren Sie `Stil für einfache Anführungszeichen`',
+        'name': 'Aktivieren Sie <code>Stil für einfache Anführungszeichen</code>',
         'description': 'Gibt an, dass der ausgewählte einfache Anführungszeichenstil verwendet werden soll.',
       },
       'single-quote-style': {
@@ -504,7 +504,7 @@ export default {
         'description': 'Der Stil der zu verwendenden einfachen Anführungszeichen.',
       },
       'double-quote-enabled': {
-        'name': 'Aktivieren Sie `Stil für doppelte Anführungszeichen`',
+        'name': 'Aktivieren Sie <code>Stil für doppelte Anführungszeichen</code>',
         'description': 'Gibt an, dass der ausgewählte doppelte Anführungszeichenstil verwendet werden soll.',
       },
       'double-quote-style': {
@@ -594,17 +594,17 @@ export default {
       'description': 'Entfernt Leerzeichen vor und nach den angegebenen Zeichen. Beachten Sie, dass dies in einigen Fällen zu Problemen mit dem Markdown-Format führen kann.',
       'characters-to-remove-space-before': {
         'name': 'Leerzeichen vor Zeichen entfernen',
-        'description': 'Entfernt Leerzeichen vor den angegebenen Zeichen. **Hinweis: Die Verwendung von `{` oder `}` in der Zeichenliste wirkt sich unerwartet auf Dateien aus, da es in der Ignoriersyntax hinter den Kulissen verwendet wird.**',
+        'description': 'Entfernt Leerzeichen vor den angegebenen Zeichen. <b>Hinweis: Die Verwendung von <code>{</code> oder <code>}</code> in der Zeichenliste wirkt sich unerwartet auf Dateien aus, da es in der Ignoriersyntax hinter den Kulissen verwendet wird.</b>',
       },
       'characters-to-remove-space-after': {
         'name': 'Leerzeichen nach Zeichen entfernen',
-        'description': 'Entfernt Leerzeichen vor den angegebenen Zeichen. **Hinweis: Die Verwendung von `{` oder `}` in der Zeichenliste wirkt sich unerwartet auf Dateien aus, da es in der Ignoriersyntax hinter den Kulissen verwendet wird.**',
+        'description': 'Entfernt Leerzeichen vor den angegebenen Zeichen. <b>Hinweis: Die Verwendung von <code>{</code> oder <code>}</code> in der Zeichenliste wirkt sich unerwartet auf Dateien aus, da es in der Ignoriersyntax hinter den Kulissen verwendet wird.</b>',
       },
     },
     // remove-trailing-punctuation-in-heading.ts
     'remove-trailing-punctuation-in-heading': {
       'name': 'Entfernen Sie nachgestellte Satzzeichen in der Überschrift',
-      'description': 'Entfernt die angegebene Interpunktion am Ende von Überschriften, wobei darauf zu achten ist, dass das Semikolon am Ende von [HTML-Entitätsreferenzen](https://de.wikipedia.org/wiki/Typografische_Zeichen_in_XML_und_HTML) ignoriert wird.',
+      'description': 'Entfernt die angegebene Interpunktion am Ende von Überschriften, wobei darauf zu achten ist, dass das Semikolon am Ende von <a href="https://de.wikipedia.org/wiki/Typografische_Zeichen_in_XML_und_HTML">HTML-Entitätsreferenzen</a> ignoriert wird.',
       'punctuation-to-remove': {
         'name': 'Nachfolgende Interpunktion',
         'description': 'Das nachfolgende Satzzeichen, das aus den Überschriften in der Datei entfernt werden soll.',
@@ -627,7 +627,7 @@ export default {
     // space-between-chinese-japanese-or-korean-and-english-or-numbers.ts
     'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
       'name': 'Leerzeichen zwischen Chinesisch, Japanisch oder Koreanisch und Englisch oder Zahlen',
-      'description': 'Stellt sicher, dass Chinesisch, Japanisch oder Koreanisch und Englisch oder Zahlen durch ein einziges Leerzeichen getrennt werden. Folgt diesen [Richtlinien](https://github.com/sparanoid/chinese-copywriting-guidelines)',
+      'description': 'Stellt sicher, dass Chinesisch, Japanisch oder Koreanisch und Englisch oder Zahlen durch ein einziges Leerzeichen getrennt werden. Folgt diesen <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">Richtlinien</a>',
     },
     // strong-style.ts
     'strong-style': {
@@ -700,7 +700,7 @@ export default {
       },
       'format': {
         'name': 'Format',
-        'description': 'Zu verwendendes Datumsformat für Moment.js (siehe [Momentformatoptionen](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
+        'description': 'Zu verwendendes Datumsformat für Moment.js (siehe <a href="https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/">Momentformatoptionen</a>)',
       },
     },
     // yaml-title-alias.ts
@@ -709,14 +709,14 @@ export default {
       'description': 'Fügt den Titel der Datei in den Aliasabschnitt des YAML-Frontmatters ein. Ruft den Titel aus dem ersten H1- oder Dateinamen ab.',
       'preserve-existing-alias-section-style': {
         'name': 'Vorhandenes Alias-Abschnittsformat beibehalten',
-        'description': 'Wenn diese Option festgelegt ist, gilt die Einstellung `YAML-Aliase-Abschnittsstil` nur für die neu erstellten Abschnitte',
+        'description': 'Wenn diese Option festgelegt ist, gilt die Einstellung <code>YAML-Aliase-Abschnittsstil</code> nur für die neu erstellten Abschnitte',
       },
       'keep-alias-that-matches-the-filename': {
         'name': 'Behalten Sie einen Alias bei, der mit dem Dateinamen übereinstimmt',
         'description': 'Solche Aliase sind in der Regel redundant',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': 'Verwenden Sie den YAML-Schlüssel `linter-yaml-title-alias`, um bei Änderungen von Dateinamen und Überschriften zu helfen',
+        'name': 'Verwenden Sie den YAML-Schlüssel <code>linter-yaml-title-alias</code>, um bei Änderungen von Dateinamen und Überschriften zu helfen',
         'description': 'Wenn sich die erste H1-Überschrift ändert oder der Dateiname geändert wird, wenn der erste H1 nicht vorhanden ist, wird der alte Alias, der in diesem Schlüssel gespeichert ist, durch den neuen Wert ersetzt, anstatt nur einen neuen Eintrag in das Alias-Array einzufügen',
       },
     },

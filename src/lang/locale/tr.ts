@@ -133,7 +133,7 @@ export default {
       },
       'display-lint-on-file-change-message': {
         'name': 'Dosya Değişikliğinde Düzeltme Mesajını Göster',
-        'description': '`Dosya Değişikliğinde Düzeltme` olduğunda bir mesaj gösterir',
+        'description': '<code>Dosya Değişikliğinde Düzeltme</code> olduğunda bir mesaj gösterir',
       },
       'folders-to-ignore': {
         'name': 'Yoksayılacak klasörler',
@@ -177,11 +177,11 @@ export default {
       },
       'log-collection': {
         'name': 'Kaydetme düzeltmesi ve mevcut dosyanın düzeltilmesi sırasında logları topla',
-        'description': '`Kaydetme düzeltmesi` yaptığınızda ve mevcut dosyayı düzeltirken logları toplar. Bu loglar hata ayıklama ve hata raporları oluşturma için yardımcı olabilir.',
+        'description': '<code>Kaydetme düzeltmesi</code> yaptığınızda ve mevcut dosyayı düzeltirken logları toplar. Bu loglar hata ayıklama ve hata raporları oluşturma için yardımcı olabilir.',
       },
       'linter-logs': {
         'name': 'Linter Logları',
-        'description': 'Son `Kaydetme düzeltmesi` veya son mevcut dosya çalıştırmasından elde edilen loglar (eğer etkinleştirilmişse).',
+        'description': 'Son <code>Kaydetme düzeltmesi</code> veya son mevcut dosya çalıştırmasından elde edilen loglar (eğer etkinleştirilmişse).',
       },
     },
   },
@@ -220,7 +220,7 @@ export default {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
       'name': 'Yaygın Yanlış Yazımları Otomatik Düzelt',
-      'description': 'Yaygın yanlış yazımların sözlüğünü kullanarak bunları doğru yazımlarına otomatik olarak dönüştürür. Otomatik düzeltilen kelimelerin tam listesi için [otomatik-düzeltme haritasına](https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md) bakın.',
+      'description': 'Yaygın yanlış yazımların sözlüğünü kullanarak bunları doğru yazımlarına otomatik olarak dönüştürür. Otomatik düzeltilen kelimelerin tam listesi için <a href="https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md">otomatik-düzeltme haritasına</a> bakın.',
       'ignore-words': {
         'name': 'Kelimeleri Yoksay',
         'description': 'Otomatik düzeltme sırasında yoksayılacak küçük harfli kelimelerin virgülle ayrılmış listesi',
@@ -301,7 +301,7 @@ export default {
     // empty-line-around-blockquotes.ts
     'empty-line-around-blockquotes': {
       'name': 'Alıntı Bloklarının Etrafında Boş Satır',
-      'description': 'Bir belgenin başını veya sonunu başlatmayan alıntı blokların etrafında boş bir satır olmalıdır. **Not: boş bir satır ya alıntı bloklar için bir seviye daha az girinti veya yeni bir satır karakteri demektir.**',
+      'description': 'Bir belgenin başını veya sonunu başlatmayan alıntı blokların etrafında boş bir satır olmalıdır.<b>Not: boş bir satır ya alıntı bloklar için bir seviye daha az girinti veya yeni bir satır karakteri demektir.</b>',
     },
     // empty-line-around-code-fences.ts
     'empty-line-around-code-fences': {
@@ -311,7 +311,7 @@ export default {
     // empty-line-around-math-block.ts
     'empty-line-around-math-blocks': {
       'name': 'Matematik Bloklarının Etrafında Boş Satır',
-      'description': 'Tek satırlık matematik için bir matematik bloğunu belirtmek için kaç dolar işareti olduğunu belirleyen `Dolar İşaretlerinin Sayısıyla Matematik Bloğunu Belirt` kullanılarak matematik bloklarının etrafında boş bir satır olmalıdır.',
+      'description': 'Tek satırlık matematik için bir matematik bloğunu belirtmek için kaç dolar işareti olduğunu belirleyen <code>Dolar İşaretlerinin Sayısıyla Matematik Bloğunu Belirt</code> kullanılarak matematik bloklarının etrafında boş bir satır olmalıdır.',
     },
     // empty-line-around-tables.ts
     'empty-line-around-tables': {
@@ -354,10 +354,10 @@ export default {
     // format-yaml-array.ts
     'format-yaml-array': {
       'name': 'YAML Dizisini Biçimlendir',
-      'description': 'Normal YAML dizilerinin çok satırlı veya tek satırlı olarak biçimlendirilmesine izin verir ve `tags` ve `aliases` bazı Obsidian özgü özelliklerine sahip YAML formatlarında bulunabilir. **Not: Tek girişli bir diziden birden fazla girişi olan tek satırlı bir diziye geçmek aynıdır, tek fark çok satırlı bir dizi olmasıdır.**',
+      'description': 'Normal YAML dizilerinin çok satırlı veya tek satırlı olarak biçimlendirilmesine izin verir ve <code>tags</code> ve <code>aliases</code> bazı Obsidian özgü özelliklerine sahip YAML formatlarında bulunabilir.<b>Not: Tek girişli bir diziden birden fazla girişi olan tek satırlı bir diziye geçmek aynıdır, tek fark çok satırlı bir dizi olmasıdır.</b>',
       'alias-key': {
         'name': 'YAML takma adları bölümünü biçimlendir',
-        'description': 'YAML takma adları bölümü için biçimlendirmeyi açar. Bu seçeneği `YAML Title Alias` kuralıyla birlikte kullanmamanız önerilir çünkü birlikte düzgün çalışmayabilir veya farklı biçimlendirme stilleri seçilmiş olabilir, bu beklenmeyen sonuçlara yol açabilir.',
+        'description': 'YAML takma adları bölümü için biçimlendirmeyi açar. Bu seçeneği <code>YAML Title Alias</code> kuralıyla birlikte kullanmamanız önerilir çünkü birlikte düzgün çalışmayabilir veya farklı biçimlendirme stilleri seçilmiş olabilir, bu beklenmeyen sonuçlara yol açabilir.',
       },
       'tag-key': {
         'name': 'YAML etiketleri bölümünü biçimlendir',
@@ -365,7 +365,7 @@ export default {
       },
       'default-array-style': {
         'name': 'Varsayılan YAML dizi bölümü stili',
-        'description': '`tags`, `aliases` veya `Force key values to be single-line arrays` ve `Force key values to be multi-line arrays` olmayan diğer YAML dizilerinin stili',
+        'description': '<code>tags</code>, <code>aliases</code> veya <code>Force key values to be single-line arrays</code> ve <code>Force key values to be multi-line arrays</code> olmayan diğer YAML dizilerinin stili',
       },
       'default-array-keys': {
         'name': 'YAML dizi bölümlerini biçimlendir',
@@ -441,7 +441,7 @@ export default {
       },
       'tags-to-ignore': {
         'name': 'Yoksayılacak etiketler',
-        'description': 'İçerik gövdesindeki hashtag\'lerden kaldırma etkinleştirilmişse, etiketler dizisine taşınmayacak veya içerik gövdesinden kaldırılmayacak etiketler. Her etiket yeni bir satırda ve `#` olmadan olmalıdır. **Etiket adında hashtag içermediğinizden emin olun.**',
+        'description': 'İçerik gövdesindeki hashtag\'lerden kaldırma etkinleştirilmişse, etiketler dizisine taşınmayacak veya içerik gövdesinden kaldırılmayacak etiketler. Her etiket yeni bir satırda ve <code>#</code> olmadan olmalıdır.<b>Etiket adında hashtag içermediğinizden emin olun.</b>',
       },
     },
     // no-bare-urls.ts
@@ -452,7 +452,7 @@ export default {
     // ordered-list-style.ts
     'ordered-list-style': {
       'name': 'Sıralı Liste Stili',
-      'description': 'Sıralı listelerin belirtilen stili izlemesini sağlar. **Not: 2 boşluk veya 1 sekme bir girinti seviyesi olarak kabul edilir.**',
+      'description': 'Sıralı listelerin belirtilen stili izlemesini sağlar.<b>Not: 2 boşluk veya 1 sekme bir girinti seviyesi olarak kabul edilir.</b>',
       'number-style': {
         'name': 'Numara Stili',
         'description': 'Sıralı liste göstergelerinde kullanılan numara stili',
@@ -492,7 +492,7 @@ export default {
       'name': 'üç nokta karakteriyle',
       'description': 'Gövde içeriğindeki alıntıları belirtilen tek ve çift alıntı stillerine günceller.',
       'single-quote-enabled': {
-        'name': '`Tek Alıntı Stili` Kullanımı',
+        'name': '<code>Tek Alıntı Stili</code> Kullanımı',
         'description': 'Seçilen tek alıntı stilinin kullanılacağını belirtir.',
       },
       'single-quote-style': {
@@ -500,7 +500,7 @@ export default {
         'description': 'Kullanılacak tek alıntı stilidir.',
       },
       'double-quote-enabled': {
-        'name': '`Çift Alıntı Stili` Kullanımı',
+        'name': '<code>Çift Alıntı Stili</code> Kullanımı',
         'description': 'Seçilen çift alıntı stilinin kullanılacağını belirtir.',
       },
       'double-quote-style': {
@@ -511,7 +511,7 @@ export default {
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': 'Dipnotları Yeniden İndeksle',
-      'description': 'Dipnot anahtarlarını ve dipnotları, oluşum sırasına göre yeniden indeksler. **Not: Bir anahtar için birden fazla dipnot varsa, bu kural çalışmaz.**',
+      'description': 'Dipnot anahtarlarını ve dipnotları, oluşum sırasına göre yeniden indeksler.<b>Not: Bir anahtar için birden fazla dipnot varsa, bu kural çalışmaz.</b>',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
@@ -566,7 +566,7 @@ export default {
     // remove-space-around-characters.ts
     'remove-space-around-characters': {
       'name': 'Karakterler Etrafındaki Boşluğu Kaldır',
-      'description': 'Belirli karakterlerin boşluklarla (tek boşluk veya sekme) çevrelenmemesini sağlar. **Not: Bu, bazı durumlarda indirim biçimiyle ilgili sorunlara neden olabilir.**',
+      'description': 'Belirli karakterlerin boşluklarla (tek boşluk veya sekme) çevrelenmemesini sağlar.<b>Not: Bu, bazı durumlarda indirim biçimiyle ilgili sorunlara neden olabilir.</b>',
       'include-fullwidth-forms': {
         'name': 'Tam Genişlikte Formları Dahil Et',
         'description': '<a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Tam Genişlikte Formlar Unicode bloğunu</a> dahil eder',
@@ -587,20 +587,20 @@ export default {
     // remove-space-before-or-after-characters.ts
     'remove-space-before-or-after-characters': {
       'name': 'Karakterlerden Önce veya Sonra Boşluğu Kaldır',
-      'description': 'Belirtilen karakterlerden önceki ve sonraki boşluğu kaldırır. **Not: bu durum bazı durumlarda markdown formatında sorunlara neden olabilir.**',
+      'description': 'Belirtilen karakterlerden önceki ve sonraki boşluğu kaldırır.<b>Not: bu durum bazı durumlarda markdown formatında sorunlara neden olabilir.</b>',
       'characters-to-remove-space-before': {
         'name': 'Önceki Boşluğu Kaldırılacak Karakterler',
-        'description': 'Belirtilen karakterlerden önceki boşluğu kaldırır. **Not: karakter listesinde `{` veya `}` kullanmak, sahne arkasında yoksayma sözdizimi kullanıldığı için dosyaları beklenmedik şekilde etkiler.**',
+        'description': 'Belirtilen karakterlerden önceki boşluğu kaldırır.<b>Not: karakter listesinde <code>{</code> veya <code>}</code> kullanmak, sahne arkasında yoksayma sözdizimi kullanıldığı için dosyaları beklenmedik şekilde etkiler.</b>',
       },
       'characters-to-remove-space-after': {
         'name': 'Sonraki Boşluğu Kaldırılacak Karakterler',
-        'description': 'Belirtilen karakterlerden sonraki boşluğu kaldırır. **Not: karakter listesinde `{` veya `}` kullanmak, sahne arkasında yoksayma sözdizimi kullanıldığı için dosyaları beklenmedik şekilde etkiler.**',
+        'description': 'Belirtilen karakterlerden sonraki boşluğu kaldırır.<b>Not: karakter listesinde <code>{</code> veya <code>}</code> kullanmak, sahne arkasında yoksayma sözdizimi kullanıldığı için dosyaları beklenmedik şekilde etkiler.</b>',
       },
     },
     // remove-trailing-punctuation-in-heading.ts
     'remove-trailing-punctuation-in-heading': {
       'name': 'Başlıklardaki Son Noktalama İşaretlerini Kaldır',
-      'description': 'Belirtilen noktalama işaretlerini başlıkların sonundan kaldırır ve [HTML varlık referanslarının](https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references) sonundaki noktalı virgülü yoksayar.',
+      'description': 'Belirtilen noktalama işaretlerini başlıkların sonundan kaldırır ve <a href="https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references">HTML varlık referanslarının</a> sonundaki noktalı virgülü yoksayar.',
       'punctuation-to-remove': {
         'name': 'Sondaki Noktalama',
         'description': 'Dosyadaki başlıklardan kaldırılacak noktalama işaretleri.',
@@ -623,7 +623,7 @@ export default {
     // space-between-chinese-japanese-or-korean-and-english-or-numbers.ts
     'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
       'name': 'Çince, Japonca veya Korece ve İngilizce veya Sayılar Arasında Boşluk',
-      'description': 'Çince, Japonca veya Korece ve İngilizce veya sayılar arasında tek bir boşluk olması gerektiğini sağlar. Bu [kuralları](https://github.com/sparanoid/chinese-copywriting-guidelines) takip eder',
+      'description': 'Çince, Japonca veya Korece ve İngilizce veya sayılar arasında tek bir boşluk olması gerektiğini sağlar. Bu <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">kuralları</a> takip eder',
     },
     // strong-style.ts
     'strong-style': {
@@ -660,7 +660,7 @@ export default {
     // yaml-key-sort.ts
     'yaml-key-sort': {
       'name': 'YAML Anahtar Sıralaması',
-      'description': 'YAML anahtarlarını belirtilen sıra ve önceliğe göre sıralar. **Not: boş satırları da kaldırabilir.**',
+      'description': 'YAML anahtarlarını belirtilen sıra ve önceliğe göre sıralar.<b>Not: boş satırları da kaldırabilir.</b>',
       'yaml-key-priority-sort-order': {
         'name': 'YAML Anahtar Öncelik Sıralama Düzeni',
         'description': 'Her satırda bir tane olacak şekilde anahtarların hangi sırayla sıralanacağı',
@@ -696,7 +696,7 @@ export default {
       },
       'format': {
         'name': 'Format',
-        'description': 'Kullanılacak Zaman formatı (bakınız [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
+        'description': 'Kullanılacak Zaman formatı (bakınız <a href="https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/">Moment format options</a>)',
       },
     },
     // yaml-title-alias.ts
@@ -705,14 +705,14 @@ export default {
       'description': 'Dosyanın başlığını YAML ön maddesinin takma adları bölümüne ekler. Başlığı ilk H1 veya dosya adından alır.',
       'preserve-existing-alias-section-style': {
         'name': 'Mevcut takma adlar bölüm stilini koru',
-        'description': 'Ayarlanırsa, `YAML takma adlar bölümü stili` ayarı yalnızca yeni oluşturulan bölümlere uygulanır',
+        'description': 'Ayarlanırsa, <code>YAML takma adlar bölümü stili</code> ayarı yalnızca yeni oluşturulan bölümlere uygulanır',
       },
       'keep-alias-that-matches-the-filename': {
         'name': 'Dosya adına uyan takma adı koru',
         'description': 'Bu tür takma adlar genellikle gereksizdir',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': '`linter-yaml-title-alias` YAML anahtarını kullanarak eski dosya adı ve başlık değişikliklerini takip et',
+        'name': '<code>linter-yaml-title-alias</code> YAML anahtarını kullanarak eski dosya adı ve başlık değişikliklerini takip et',
         'description': 'Ayarlanırsa, ilk H1 başlığı değiştiğinde veya ilk H1 yoksa dosya adı değiştiğinde, bu anahtarda saklanan eski takma ad, takma adlar dizisine yeni bir giriş eklemek yerine yeni değerle değiştirilir',
       },
     },
