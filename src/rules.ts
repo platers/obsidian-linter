@@ -166,7 +166,6 @@ export const ruleTypeToRules = new Map<RuleType, Rule[]>;
 
 export function registerRule(rule: Rule): void {
   rules.push(rule);
-  rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.settingsKey.localeCompare(b.settingsKey)));
   rulesDict[rule.alias] = rule;
 
   if (ruleTypeToRules.has(rule.type)) {
@@ -174,6 +173,10 @@ export function registerRule(rule: Rule): void {
   } else {
     ruleTypeToRules.set(rule.type, [rule]);
   }
+}
+
+export function sortRules(): void {
+  rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.settingsKey.localeCompare(b.settingsKey)));
 }
 
 export function wrapLintError(error: Error, ruleName: string) {

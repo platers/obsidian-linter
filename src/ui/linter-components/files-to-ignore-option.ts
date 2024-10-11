@@ -1,4 +1,4 @@
-import {App, Setting, Component} from 'obsidian';
+import {App, Setting} from 'obsidian';
 import {getTextInLanguage} from 'src/lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 export type FileToIgnore = {label: string, match: string, flags: string};
@@ -6,10 +6,9 @@ export type FileToIgnore = {label: string, match: string, flags: string};
 const defaultFlags = 'i';
 
 export class FilesToIgnoreOption extends AddCustomRow {
-  constructor(containerEl: HTMLElement, parentComponent: Component, public filesToIgnore: FileToIgnore[], app: App, saveSettings: () => void) {
+  constructor(containerEl: HTMLElement, public filesToIgnore: FileToIgnore[], app: App, saveSettings: () => void) {
     super(
         containerEl,
-        parentComponent,
         getTextInLanguage('tabs.general.files-to-ignore.name'),
         getTextInLanguage('tabs.general.files-to-ignore.description'),
         getTextInLanguage('tabs.general.files-to-ignore.warning'),

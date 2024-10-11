@@ -138,7 +138,7 @@ export default {
       // general-tab.ts
       'lint-on-save': {
         'name': 'Lint on save',
-        'description': 'Lint the file on manual save (when `Ctrl + S` is pressed or when `:w` is executed while using vim keybindings)',
+        'description': 'Lint the file on manual save (when <code>Ctrl + S</code> is pressed or when <code>:w</code> is executed while using vim keybindings)',
       },
       'display-message': {
         'name': 'Display message on lint',
@@ -150,7 +150,7 @@ export default {
       },
       'display-lint-on-file-change-message': {
         'name': 'Display Lint on File Change Message',
-        'description': 'Displays a message when `Lint on Focused File Change` occurs',
+        'description': 'Displays a message when <code>Lint on Focused File Change</code> occurs',
       },
       'folders-to-ignore': {
         'name': 'Folders to ignore',
@@ -207,11 +207,11 @@ export default {
       },
       'log-collection': {
         'name': 'Collect logs when linting on save and linting the current file',
-        'description': 'Goes ahead and collects logs when you `Lint on save` and linting the current file. These logs can be helpful for debugging and create bug reports.',
+        'description': 'Goes ahead and collects logs when you <code>Lint on save</code> and linting the current file. These logs can be helpful for debugging and create bug reports.',
       },
       'linter-logs': {
         'name': 'Linter Logs',
-        'description': 'The logs from the last `Lint on save` or the last lint current file run if enabled.',
+        'description': 'The logs from the last <code>Lint on save</code> or the last lint current file run if enabled.',
       },
     },
   },
@@ -259,14 +259,14 @@ export default {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
       'name': 'Auto-correct Common Misspellings',
-      'description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md) for the full list of auto-corrected words. **Note: this list can work on text from multiple languages, but this list is the same no matter what language is currently in use.**',
+      'description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See <a href="https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md">auto-correct map</a> for the full list of auto-corrected words. <b>Note: this list can work on text from multiple languages, but this list is the same no matter what language is currently in use.</b>',
       'ignore-words': {
         'name': 'Ignore Words',
         'description': 'A comma separated list of lowercased words to ignore when auto-correcting',
       },
       'extra-auto-correct-files': {
         'name': 'Extra Auto-Correct Source Files',
-        'description': 'These are files that have a markdown table in them that have the initial word and the word to correct it to (these are case insensitive corrections). **Note: the tables used should have the starting and ending `|` indicators present for each line.**',
+        'description': 'These are files that have a markdown table in them that have the initial word and the word to correct it to (these are case insensitive corrections). <b>Note: the tables used should have the starting and ending <code>|</code> indicators present for each line.</b>',
       },
       'skip-words-with-multiple-capitals': {
         'name': 'Skip Words with Multiple Capitals',
@@ -371,7 +371,7 @@ export default {
       'description': 'Add a default language to code fences that do not have a language specified.',
       'default-language': {
         'name': 'Programming Language',
-        'description': 'Leave empty to do nothing. Languages tags can be found [here](https://prismjs.com/#supported-languages).',
+        'description': 'Leave empty to do nothing. Languages tags can be found <a href="https://prismjs.com/#supported-languages">here</a>.',
       },
     },
     // emphasis-style.ts
@@ -386,7 +386,7 @@ export default {
     // empty-line-around-blockquotes.ts
     'empty-line-around-blockquotes': {
       'name': 'Empty Line Around Blockquotes',
-      'description': 'Ensures that there is an empty line around blockquotes unless they start or end a document. **Note: an empty line is either one less level of nesting for blockquotes or a newline character.**',
+      'description': 'Ensures that there is an empty line around blockquotes unless they start or end a document. <b>Note: an empty line is either one less level of nesting for blockquotes or a newline character.</b>',
     },
     // empty-line-around-code-fences.ts
     'empty-line-around-code-fences': {
@@ -396,7 +396,7 @@ export default {
     // empty-line-around-math-block.ts
     'empty-line-around-math-blocks': {
       'name': 'Empty Line Around Math Blocks',
-      'description': 'Ensures that there is an empty line around math blocks using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.',
+      'description': 'Ensures that there is an empty line around math blocks using <code>Number of Dollar Signs to Indicate a Math Block</code> to determine how many dollar signs indicates a math block for single-line math.',
     },
     // empty-line-around-tables.ts
     'empty-line-around-tables': {
@@ -439,10 +439,10 @@ export default {
     // format-yaml-array.ts
     'format-yaml-array': {
       'name': 'Format YAML Array',
-      'description': 'Allows for the formatting of regular YAML arrays as either multi-line or single-line and `tags` and `aliases` are allowed to have some Obsidian specific YAML formats. **Note: that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.**',
+      'description': 'Allows for the formatting of regular YAML arrays as either multi-line or single-line and <code>tags</code> and <code>aliases</code> are allowed to have some Obsidian specific YAML formats. <b>Note: that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.</b>',
       'alias-key': {
         'name': 'Format YAML aliases section',
-        'description': 'Turns on formatting for the YAML aliases section. You should not enable this option alongside the rule `YAML Title Alias` as they may not work well together or they may have different format styles selected causing unexpected results.',
+        'description': 'Turns on formatting for the YAML aliases section. You should not enable this option alongside the rule <code>YAML Title Alias</code> as they may not work well together or they may have different format styles selected causing unexpected results.',
       },
       'tag-key': {
         'name': 'Format YAML tags section',
@@ -450,7 +450,7 @@ export default {
       },
       'default-array-style': {
         'name': 'Default YAML array section style',
-        'description': 'The style of other YAML arrays that are not `tags`, `aliases` or  in `Force key values to be single-line arrays` and `Force key values to be multi-line arrays`',
+        'description': 'The style of other YAML arrays that are not <code>tags</code>, <code>aliases</code> or  in <code>Force key values to be single-line arrays</code> and <code>Force key values to be multi-line arrays</code>',
       },
       'default-array-keys': {
         'name': 'Format YAML array sections',
@@ -514,7 +514,7 @@ export default {
     // move-math-block-indicators-to-their-own-line.ts
     'move-math-block-indicators-to-their-own-line': {
       'name': 'Move Math Block Indicators to Their Own Line',
-      'description': 'Move all starting and ending math block indicators to their own lines using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.',
+      'description': 'Move all starting and ending math block indicators to their own lines using <code>Number of Dollar Signs to Indicate a Math Block</code> to determine how many dollar signs indicates a math block for single-line math.',
     },
     // move-tags-to-yaml.ts
     'move-tags-to-yaml': {
@@ -526,7 +526,7 @@ export default {
       },
       'tags-to-ignore': {
         'name': 'Tags to ignore',
-        'description': 'The tags that will not be moved to the tags array or removed from the body content if `Remove the hashtag from tags in content body` is enabled. Each tag should be on a new line and without the `#`. **Make sure not to include the hashtag in the tag name.**',
+        'description': 'The tags that will not be moved to the tags array or removed from the body content if <code>Remove the hashtag from tags in content body</code> is enabled. Each tag should be on a new line and without the <code>#</code>. <b>Make sure not to include the hashtag in the tag name.</b>',
       },
     },
     // no-bare-urls.ts
@@ -541,7 +541,7 @@ export default {
     // ordered-list-style.ts
     'ordered-list-style': {
       'name': 'Ordered List Style',
-      'description': 'Makes sure that ordered lists follow the style specified. **Note: that 2 spaces or 1 tab is considered to be an indentation level.**',
+      'description': 'Makes sure that ordered lists follow the style specified. <b>Note: that 2 spaces or 1 tab is considered to be an indentation level.</b>',
       'number-style': {
         'name': 'Number Style',
         'description': 'The number style used in ordered list indicators',
@@ -585,7 +585,7 @@ export default {
       'name': 'Quote Style',
       'description': 'Updates the quotes in the body content to be updated to the specified single and double quote styles.',
       'single-quote-enabled': {
-        'name': 'Enable `Single Quote Style`',
+        'name': 'Enable <code>Single Quote Style</code>',
         'description': 'Specifies that the selected single quote style should be used.',
       },
       'single-quote-style': {
@@ -593,7 +593,7 @@ export default {
         'description': 'The style of single quotes to use.',
       },
       'double-quote-enabled': {
-        'name': 'Enable `Double Quote Style`',
+        'name': 'Enable <code>Double Quote Style</code>',
         'description': 'Specifies that the selected double quote style should be used.',
       },
       'double-quote-style': {
@@ -604,7 +604,7 @@ export default {
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': 'Re-Index Footnotes',
-      'description': 'Re-indexes footnote keys and footnote, based on the order of occurrence. **Note: This rule does _not_ work if there is more than one footnote for a key.**',
+      'description': 'Re-indexes footnote keys and footnote, based on the order of occurrence. <b>Note: This rule does <i>not</i> work if there is more than one footnote for a key.</b>',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
@@ -664,7 +664,7 @@ export default {
     // remove-space-around-characters.ts
     'remove-space-around-characters': {
       'name': 'Remove Space around Characters',
-      'description': 'Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). **Note: this may causes issues with markdown format in some cases.**',
+      'description': 'Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). <b>Note: this may causes issues with markdown format in some cases.</b>',
       'include-fullwidth-forms': {
         'name': 'Include Fullwidth Forms',
         'description': 'Include <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Fullwidth Forms Unicode block</a>',
@@ -685,20 +685,20 @@ export default {
     // remove-space-before-or-after-characters.ts
     'remove-space-before-or-after-characters': {
       'name': 'Remove Space Before or After Characters',
-      'description': 'Removes space before the specified characters and after the specified characters. **Note: this may causes issues with markdown format in some cases.**',
+      'description': 'Removes space before the specified characters and after the specified characters. <b>Note: this may causes issues with markdown format in some cases.</b>',
       'characters-to-remove-space-before': {
         'name': 'Remove Space Before Characters',
-        'description': 'Removes space before the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.**',
+        'description': 'Removes space before the specified characters. <b>Note: using <code>{</code> or <code>}</code> in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.</b>',
       },
       'characters-to-remove-space-after': {
         'name': 'Remove Space After Characters',
-        'description': 'Removes space after the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.**',
+        'description': 'Removes space after the specified characters. <b>>Note: using <code>{</code> or <code>}</code> in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.</b>',
       },
     },
     // remove-trailing-punctuation-in-heading.ts
     'remove-trailing-punctuation-in-heading': {
       'name': 'Remove Trailing Punctuation in Heading',
-      'description': 'Removes the specified punctuation from the end of headings making sure to ignore the semicolon at the end of [HTML entity references](https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references).',
+      'description': 'Removes the specified punctuation from the end of headings making sure to ignore the semicolon at the end of <a href="https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references">HTML entity references</a>.',
       'punctuation-to-remove': {
         'name': 'Trailing Punctuation',
         'description': 'The trailing punctuation to remove from the headings in the file.',
@@ -746,14 +746,14 @@ export default {
     // space-between-chinese-japanese-or-korean-and-english-or-numbers.ts
     'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
       'name': 'Space between Chinese Japanese or Korean and English or numbers',
-      'description': 'Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)',
+      'description': 'Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">guidelines</a>',
       'english-symbols-punctuation-before': {
         'name': 'English Punctuations and Symbols Before CJK',
-        'description': 'The list of non-letter punctuation and symbols to consider to be from English when found before Chinese, Japanese, or Korean characters. **Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.**',
+        'description': 'The list of non-letter punctuation and symbols to consider to be from English when found before Chinese, Japanese, or Korean characters. <b>Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.</b>',
       },
       'english-symbols-punctuation-after': {
         'name': 'English Punctuations and Symbols After CJK',
-        'description': 'The list of non-letter punctuation and symbols to consider to be from English when found after Chinese, Japanese, or Korean characters. **Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.**',
+        'description': 'The list of non-letter punctuation and symbols to consider to be from English when found after Chinese, Japanese, or Korean characters. <b>Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.</b>',
       },
     },
     // strong-style.ts
@@ -795,7 +795,7 @@ export default {
     // yaml-key-sort.ts
     'yaml-key-sort': {
       'name': 'YAML Key Sort',
-      'description': 'Sorts the YAML keys based on the order and priority specified. **Note: may remove blank lines as well. Only works on non-nested keys.**',
+      'description': 'Sorts the YAML keys based on the order and priority specified. <b>Note: may remove blank lines as well. Only works on non-nested keys.</b>',
       'yaml-key-priority-sort-order': {
         'name': 'YAML Key Priority Sort Order',
         'description': 'The order in which to sort keys with one on each line where it sorts in the order found in the list',
@@ -839,7 +839,7 @@ export default {
       },
       'format': {
         'name': 'Format',
-        'description': 'Moment date format to use (see [Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/))',
+        'description': 'Moment date format to use (see <a href="https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/">Moment format options</a>)',
       },
       'convert-to-utc': {
         'name': 'Convert Local Time to UTC',
@@ -847,7 +847,7 @@ export default {
       },
       'update-on-file-contents-updated': {
         'name': 'Update YAML Timestamp on File Contents Update',
-        'description': 'When the currently active note is modified, `YAML Timestamp` is run on the note. This should update the modified note timestamp if it is more than 5 seconds off from the current value.',
+        'description': 'When the currently active note is modified, <code>YAML Timestamp</code> is run on the note. This should update the modified note timestamp if it is more than 5 seconds off from the current value.',
       },
     },
     // yaml-title-alias.ts
@@ -856,14 +856,14 @@ export default {
       'description': 'Inserts or updates the title of the file into the YAML frontmatter\'s aliases section. Gets the title from the first H1 or filename.',
       'preserve-existing-alias-section-style': {
         'name': 'Preserve existing aliases section style',
-        'description': 'If set, the `YAML aliases section style` setting applies only to the newly created sections',
+        'description': 'If set, the <code>YAML aliases section style</code> setting applies only to the newly created sections',
       },
       'keep-alias-that-matches-the-filename': {
         'name': 'Keep alias that matches the filename',
         'description': 'Such aliases are usually redundant',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': 'Use the YAML key specified by `Alias Helper Key` to help with filename and heading changes',
+        'name': 'Use the YAML key specified by <code>Alias Helper Key</code> to help with filename and heading changes',
         'description': 'If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array',
       },
       'alias-helper-key': {

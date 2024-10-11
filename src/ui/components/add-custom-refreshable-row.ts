@@ -1,5 +1,5 @@
-import {App, Component, Setting} from 'obsidian';
-import {parseTextToHTMLWithoutOuterParagraph} from '../helpers';
+import {App, Setting} from 'obsidian';
+import {setElContent} from '../helpers';
 
 /**
  * AddCustomRefreshableRow is meant to be used where you have a setting that needs a name a description, possibly a warning,
@@ -10,7 +10,6 @@ export abstract class AddCustomRefreshableRow {
 
   constructor(
     public containerEl: HTMLElement,
-    public parentComponent: Component,
     public name: string,
     public description: string,
     public warning: string,
@@ -26,8 +25,7 @@ export abstract class AddCustomRefreshableRow {
     this.containerEl.createDiv({cls: 'setting-item-name', text: this.name});
 
     const descriptionAndWarningContainer = this.containerEl.createDiv({cls: 'setting-item-description'});
-
-    parseTextToHTMLWithoutOuterParagraph(this.app, this.description, descriptionAndWarningContainer.createEl('p', {cls: 'custom-row-description'}), this.parentComponent);
+    setElContent(this.description, descriptionAndWarningContainer.createEl('p', {cls: 'custom-row-description'}));
 
     new Setting(this.containerEl)
         .addButton((cb)=>{

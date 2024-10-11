@@ -1,9 +1,9 @@
 import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer} from 'obsidian';
-import {Options, RuleType, ruleTypeToRules, rules} from './rules';
+import {Options, RuleType, ruleTypeToRules, rules, sortRules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {parseCustomReplacements, stripCr} from './utils/strings';
-import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel} from './utils/logger';
+import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel, timingBegin, timingEnd} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
 import {iconInfo} from './ui/icons';
@@ -79,6 +79,8 @@ export default class LinterPlugin extends Plugin {
   private hasLoadedMisspellingFiles = false;
 
   async onload() {
+    sortRules();
+
     setLanguage(window.localStorage.getItem('language'));
     logInfo(getTextInLanguage('logs.plugin-load'));
 
@@ -210,12 +212,6 @@ export default class LinterPlugin extends Plugin {
         void that.runLinterEditor(editor);
       },
       icon: iconInfo.file.id,
-      hotkeys: [
-        {
-          modifiers: ['Mod', 'Alt'],
-          key: 'L',
-        },
-      ],
     });
 
     this.addCommand({

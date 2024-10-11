@@ -15,7 +15,7 @@ export class RuleTab extends Tab {
       const ruleDiv = this.contentEl.createDiv();
       ruleDiv.id = rule.alias;
 
-      new Setting(ruleDiv).setHeading().settingEl.innerHTML = `<a href="${rule.getURL()}">${rule.getName()}</a>`;
+      new Setting(ruleDiv).setHeading().nameEl.createEl('a', {href: rule.getURL(), text: rule.getName()});
 
       const optionInfo = [] as SearchOptionInfo[];
       let isFirstOption = true;

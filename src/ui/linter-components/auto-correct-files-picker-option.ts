@@ -1,4 +1,4 @@
-import {Setting, Component, App, TFile, normalizePath, ExtraButtonComponent} from 'obsidian';
+import {Setting, App, TFile, normalizePath, ExtraButtonComponent} from 'obsidian';
 import {LanguageStringKey, getTextInLanguage} from '../../lang/helpers';
 import {AddCustomRefreshableRow} from '../components/add-custom-refreshable-row';
 import MdFileSuggester from '../suggesters/md-file-suggester';
@@ -10,10 +10,9 @@ export type CustomAutoCorrectContent = {filePath: string, customReplacements: Ma
 export class AutoCorrectFilesPickerOption extends AddCustomRefreshableRow {
   private selectedFiles: string[] = [];
 
-  constructor(containerEl: HTMLElement, parentComponent: Component, public filesPicked: CustomAutoCorrectContent[], app: App, saveSettings: () => void, name: LanguageStringKey, description: LanguageStringKey) {
+  constructor(containerEl: HTMLElement, public filesPicked: CustomAutoCorrectContent[], app: App, saveSettings: () => void, name: LanguageStringKey, description: LanguageStringKey) {
     super(
         containerEl,
-        parentComponent,
         getTextInLanguage(name),
         getTextInLanguage(description),
         getTextInLanguage('options.custom-auto-correct.warning-text').replace('{NAME}', getTextInLanguage('rules.auto-correct-common-misspellings.name')),
