@@ -121,7 +121,7 @@ export default {
       // general-tab.ts
       'lint-on-save': {
         'name': '保存时格式化文件',
-        'description': '手动保存时格式化文件（当按 `Ctrl + S` 时或在 vim 模式中使用 `:w` 时）',
+        'description': '手动保存时格式化文件（当按 <code>Ctrl + S</code> 时或在 vim 模式中使用 <code>:w</code> 时）',
       },
       'display-message': {
         'name': '格式化后显示消息',
@@ -133,7 +133,7 @@ export default {
       },
       'display-lint-on-file-change-message': {
         'name': '提醒文件修改时格式化',
-        'description': '当`文件修改时格式化`触发时，弹出一条提示信息',
+        'description': '当<code>文件修改时格式化</code>触发时，弹出一条提示信息',
       },
       'folders-to-ignore': {
         'name': '忽略文件夹',
@@ -220,7 +220,7 @@ export default {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
       'name': '自动更正常见的拼写错误',
-      'description': '通过常见拼写错误字典自动将错误拼写更正为正确拼写。有关自动更正单词的完整列表，请参阅 [auto-correct map](https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md)',
+      'description': '通过常见拼写错误字典自动将错误拼写更正为正确拼写。有关自动更正单词的完整列表，请参阅 <a href="https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md">auto-correct map</a>',
       'ignore-words': {
         'name': '忽略单词',
         'description': '以逗号分隔的小写单词列表，在自动更正时会忽略',
@@ -321,7 +321,7 @@ export default {
       'description': '为没有指定语言的代码块添加默认语言。',
       'default-language': {
         'name': '编程语言',
-        'description': '留空不进行任何操作。可以在[这里](https://prismjs.com/#supported-languages)找到语言标签。',
+        'description': '留空不进行任何操作。可以在<a href="https://prismjs.com/#supported-languages">这里</a>找到语言标签。',
       },
     },
     // emphasis-style.ts
@@ -336,7 +336,7 @@ export default {
     // empty-line-around-blockquotes.ts
     'empty-line-around-blockquotes': {
       'name': '引用块前后空行',
-      'description': '确保引用块前后有空行，除非它在文档的开头或结尾。**注意，这里嵌套引用块也会有对应的空行**',
+      'description': '确保引用块前后有空行，除非它在文档的开头或结尾。<b>注意，这里嵌套引用块也会有对应的空行</b>',
     },
     // empty-line-around-code-fences.ts
     'empty-line-around-code-fences': {
@@ -346,7 +346,7 @@ export default {
     // empty-line-around-math-block.ts
     'empty-line-around-math-blocks': {
       'name': 'Latex 块前后空行',
-      'description': '确保 Latex 块前后有空行。使用**指示 Latex 块的 `$` 符号数量**来确定单行 Latex 是否被认定为 Latex 块',
+      'description': '确保 Latex 块前后有空行。使用<b>指示 Latex 块的 <code>$</code> 符号数量</b>来确定单行 Latex 是否被认定为 Latex 块',
     },
     // empty-line-around-tables.ts
     'empty-line-around-tables': {
@@ -389,10 +389,10 @@ export default {
     // format-yaml-array.ts
     'format-yaml-array': {
       'name': '格式化 YAML 数组',
-      'description': '允许将常规 YAML 数组格式化为多行或单行，并允许部分数组(`tags`, `aliases`) 保留 Obsidian 原有的 YAML 格式。请注意，单字符串转换为单行，如果存在多个条目，则会变为单行数组。对于单字符串转换为多行，情况也是如此，只是它变成了多行数组',
+      'description': '允许将常规 YAML 数组格式化为多行或单行，并允许部分数组(<code>tags</code>, <code>aliases</code>) 保留 Obsidian 原有的 YAML 格式。请注意，单字符串转换为单行，如果存在多个条目，则会变为单行数组。对于单字符串转换为多行，情况也是如此，只是它变成了多行数组',
       'alias-key': {
         'name': '格式化 YAML aliases',
-        'description': '打开 YAML aliases 部分的格式设置。不应与规则`YAML 标题别名`同时启用，因为它们可能不会很好地协同工作，或者它们可能有不同的格式样式选择，从而导致意外结果',
+        'description': '打开 YAML aliases 部分的格式设置。不应与规则<code>YAML 标题别名</code>同时启用，因为它们可能不会很好地协同工作，或者它们可能有不同的格式样式选择，从而导致意外结果',
       },
       'tag-key': {
         'name': '格式化 YAML tags',
@@ -464,7 +464,7 @@ export default {
     // move-math-block-indicators-to-their-own-line.ts
     'move-math-block-indicators-to-their-own-line': {
       'name': '格式化 Latex 块标志',
-      'description': '将 Latex 块标志移到新行。使用**指示 Latex 块的 `$` 符号数量**来确定单行 Latex 是否被认定为 Latex 块',
+      'description': '将 Latex 块标志移到新行。使用<b>指示 Latex 块的 <code>$</code> 符号数量</b>来确定单行 Latex 是否被认定为 Latex 块',
     },
     // move-tags-to-yaml.ts
     'move-tags-to-yaml': {
@@ -476,7 +476,7 @@ export default {
       },
       'tags-to-ignore': {
         'name': '忽略的 tag',
-        'description': '这些 tags 不会被移动 YAML Front-matter 中。每个 tag 按行分隔，不要包含`#`',
+        'description': '这些 tags 不会被移动 YAML Front-matter 中。每个 tag 按行分隔，不要包含<code>#</code>',
       },
     },
     // no-bare-urls.ts
@@ -550,7 +550,7 @@ export default {
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': '重新索引脚注',
-      'description': '基于出现的顺序重新索引脚注。**注意，如果一个键对应多个脚注，则此规则不适用**',
+      'description': '基于出现的顺序重新索引脚注。<b>注意，如果一个键对应多个脚注，则此规则不适用</b>',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
@@ -605,7 +605,7 @@ export default {
     // remove-space-around-characters.ts
     'remove-space-around-characters': {
       'name': '移除字符周围的空格',
-      'description': '确保某些字符周围没有空格（包括单个空格或制表符）。**注意，这可能会在某些情况下影响 markdown 格式**',
+      'description': '确保某些字符周围没有空格（包括单个空格或制表符）。<b>注意，这可能会在某些情况下影响 markdown 格式</b>',
       'include-fullwidth-forms': {
         'name': '包括全角形式',
         'description': '包括<a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">全角形式Unicode块</a>',
@@ -626,20 +626,20 @@ export default {
     // remove-space-before-or-after-characters.ts
     'remove-space-before-or-after-characters': {
       'name': '移除字符前后的空格',
-      'description': '移除指定字符之前和指定字符之后的空格。 **注意，在某些情况下，这可能会导致 markdown 格式出现问题**',
+      'description': '移除指定字符之前和指定字符之后的空格。 <b>注意，在某些情况下，这可能会导致 markdown 格式出现问题</b>',
       'characters-to-remove-space-before': {
         'name': '移除字符前的空格',
-        'description': '移除指定字符前的空格。 **注意，在字符列表中使用`{`或`}`会意外影响文件，因为它在程序后台的忽略语法中使用**',
+        'description': '移除指定字符前的空格。 <b>注意，在字符列表中使用<code>{</code>或<code>}</code>会意外影响文件，因为它在程序后台的忽略语法中使用</b>',
       },
       'characters-to-remove-space-after': {
         'name': '移除字符后的空格',
-        'description': '移除指定字符后的空格。 **注意，在字符列表中使用`{`或`}`会意外影响文件，因为它在程序后台的忽略语法中使用**',
+        'description': '移除指定字符后的空格。 <b>注意，在字符列表中使用<code>{</code>或<code>}</code>会意外影响文件，因为它在程序后台的忽略语法中使用</b>',
       },
     },
     // remove-trailing-punctuation-in-heading.ts
     'remove-trailing-punctuation-in-heading': {
       'name': '移除标题中的结尾标点符号',
-      'description': '从标题的末尾删除指定的标点符号，确保忽略[HTML 字符实体](https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references)末尾的分号',
+      'description': '从标题的末尾删除指定的标点符号，确保忽略<a href="https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references">HTML 字符实体</a>末尾的分号',
       'punctuation-to-remove': {
         'name': '要删除的结尾标点符号',
         'description': '要从文件标题结尾中删除的标点符号',
@@ -687,7 +687,7 @@ export default {
     // space-between-chinese-japanese-or-korean-and-english-or-numbers.ts
     'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
       'name': '中日韩语与英语或数字之间的空格',
-      'description': '确保中文、日文或韩文和英文或数字由单个空格分隔. [参考链接](https://github.com/sparanoid/chinese-copywriting-guidelines)',
+      'description': '确保中文、日文或韩文和英文或数字由单个空格分隔. <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">参考链接</a>',
     },
     // strong-style.ts
     'strong-style': {
@@ -724,18 +724,18 @@ export default {
     // yaml-key-sort.ts
     'yaml-key-sort': {
       'name': 'YAML 键排序',
-      'description': '根据指定的顺序和优先级对 YAML 键进行排序。**注意，也许也会删除空行**',
+      'description': '根据指定的顺序和优先级对 YAML 键进行排序。<b>注意，也许也会删除空行</b>',
       'yaml-key-priority-sort-order': {
         'name': 'YAML 键优先级排序顺序',
         'description': '对键进行排序的顺序，每行一个键，按列表中的顺序进行排序',
       },
       'priority-keys-at-start-of-yaml': {
         'name': '排序键放在 YAML 开头',
-        'description': '按照 `YAML 键优先级排序顺序`将键放于 YAML Front-matter 开头',
+        'description': '按照 <code>YAML 键优先级排序顺序</code>将键放于 YAML Front-matter 开头',
       },
       'yaml-sort-order-for-other-keys': {
         'name': 'YAML 其它键的排序顺序',
-        'description': '对 `YAML 键优先级排序顺序`中未找到的键进行排序',
+        'description': '对 <code>YAML 键优先级排序顺序</code>中未找到的键进行排序',
       },
     },
     // yaml-timestamp.ts
@@ -760,7 +760,7 @@ export default {
       },
       'format': {
         'name': '格式',
-        'description': 'Moment.js 语法格式（详情设置见[Moment format options](https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/)',
+        'description': 'Moment.js 语法格式（详情设置见<a href="https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/">Moment format options</a>',
       },
     },
     // yaml-title-alias.ts
@@ -776,7 +776,7 @@ export default {
         'description': '这样的别名通常是冗余的',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': '使用 YAML 键 `linter-yaml-title-alias` 来保留标题修改记录',
+        'name': '使用 YAML 键 <code>linter-yaml-title-alias</code> 来保留标题修改记录',
         'description': '如果设置，当第一个 H1 标题更改或文档名更改时，此键中存储的旧 aliases 将替换为新值，而不仅仅是在 aliases 中插入新条目',
       },
     },
