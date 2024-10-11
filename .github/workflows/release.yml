@@ -20,15 +20,16 @@ jobs:
         with:
           node-version: "18.x"
 
-      - name: Build plugin
+      - name: Build plugin and minfy css
         run: |
           npm ci
           npm run build
+          npm run minify-css
 
       - name: Create Manual Install Zip
         run: |
           mkdir ${{ env.PLUGIN_NAME }}
-          cp main.js manifest.json src/styles.css src/utils/default-misspellings.md ${{ env.PLUGIN_NAME }}
+          cp main.js manifest.json styles.css src/utils/default-misspellings.md ${{ env.PLUGIN_NAME }}
           zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
 
       - name: Create release
@@ -40,4 +41,4 @@ jobs:
           gh release create "$tag" \
             --title="$tag" \
             --draft \
-            main.js manifest.json src/styles.css ${{ env.PLUGIN_NAME }}.zip
+            main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}.zip

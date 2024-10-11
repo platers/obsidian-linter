@@ -8,10 +8,10 @@ export class LintConfirmationModal extends Modal {
     super(app);
     this.modalEl.addClass('confirm-modal');
 
-    this.contentEl.createEl('h3', {text: getTextInLanguage('warning-text')}).style.textAlign = 'center';
+    this.contentEl.createEl('h3', {text: getTextInLanguage('warning-text'), cls: 'modal-heading'});
 
     if (showCustomCommandWarning) {
-      this.contentEl.createEl('p', {text: getTextInLanguage('custom-command-warning')}).style.fontWeight = 'bold';
+      this.contentEl.createEl('p', {text: getTextInLanguage('custom-command-warning'), cls: 'modal-warn'});
     }
 
     this.contentEl.createEl('p',

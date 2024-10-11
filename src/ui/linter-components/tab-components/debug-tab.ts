@@ -2,7 +2,7 @@ import log from 'loglevel';
 import LinterPlugin from 'src/main';
 import {Tab} from './tab';
 import {TextBoxFull} from 'src/ui/components/text-box-full';
-import {parseTextToHTMLWithoutOuterParagraph} from 'src/ui/helpers';
+import {setElContent} from 'src/ui/helpers';
 import {logsFromLastRun, setLogLevel} from 'src/utils/logger';
 import {getTextInLanguage} from 'src/lang/helpers';
 import {DropdownRecordInfo, DropdownSetting} from 'src/ui/components/dropdown-setting';
@@ -52,8 +52,7 @@ export class DebugTab extends Tab {
     settingDesc = getTextInLanguage('tabs.debug.linter-logs.description');
     logDisplay = new TextBoxFull(tempDiv, settingName, '');
     logDisplay.inputEl.setText(logsFromLastRun.join('\n'));
-
-    parseTextToHTMLWithoutOuterParagraph(this.plugin.app, settingDesc, logDisplay.descEl, this.plugin.settingsTab.component);
+    setElContent(settingDesc, logDisplay.descEl);
 
     if (!recordLintOnSaveLogsSetting.getBoolean()) {
       logDisplay.hide();

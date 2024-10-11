@@ -1,7 +1,7 @@
 import {Setting} from 'obsidian';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import LinterPlugin from './main';
-import {hideEl, parseTextToHTMLWithoutOuterParagraph, unhideEl} from './ui/helpers';
+import {hideEl, unhideEl, setElContent} from './ui/helpers';
 import {LinterSettings} from './settings-data';
 import {AutoCorrectFilesPickerOption} from './ui/linter-components/auto-correct-files-picker-option';
 
@@ -44,9 +44,9 @@ export abstract class Option {
     settings.ruleConfigs[this.ruleAlias][this.configKey] = value;
   }
 
-  protected parseNameAndDescriptionAndRemoveSettingBorder(plugin: LinterPlugin) {
-    parseTextToHTMLWithoutOuterParagraph(plugin.app, this.getName(), this.setting.nameEl, plugin.settingsTab.component);
-    parseTextToHTMLWithoutOuterParagraph(plugin.app, this.getDescription(), this.setting.descEl, plugin.settingsTab.component);
+  protected parseNameAndDescriptionAndRemoveSettingBorder() {
+    setElContent(this.getName(), this.setting.nameEl);
+    setElContent(this.getDescription(), this.setting.descEl);
 
     this.setting.settingEl.addClass('linter-no-border');
     this.setting.descEl.addClass('linter-no-padding-top');
@@ -84,7 +84,7 @@ export class BooleanOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(plugin);
+    this.parseNameAndDescriptionAndRemoveSettingBorder();
   }
 }
 
@@ -102,7 +102,7 @@ export class TextOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(plugin);
+    this.parseNameAndDescriptionAndRemoveSettingBorder();
   }
 }
 
@@ -120,7 +120,7 @@ export class TextAreaOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(plugin);
+    this.parseNameAndDescriptionAndRemoveSettingBorder();
   }
 }
 
@@ -139,7 +139,7 @@ export class MomentFormatOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(plugin);
+    this.parseNameAndDescriptionAndRemoveSettingBorder();
   }
 }
 
@@ -188,7 +188,7 @@ export class DropdownOption extends Option {
           });
         });
 
-    this.parseNameAndDescriptionAndRemoveSettingBorder(plugin);
+    this.parseNameAndDescriptionAndRemoveSettingBorder();
   }
 }
 
@@ -204,7 +204,7 @@ export class MdFilePickerOption extends Option {
 
     this.settingEl = containerEl.createDiv();
 
-    new AutoCorrectFilesPickerOption(this.settingEl, plugin.settingsTab.component, settings.ruleConfigs[this.ruleAlias][this.configKey], plugin.app, () => {
+    new AutoCorrectFilesPickerOption(this.settingEl, settings.ruleConfigs[this.ruleAlias][this.configKey], plugin.app, () => {
       void plugin.saveSettings();
     }, this.nameKey, this.descriptionKey);
   }

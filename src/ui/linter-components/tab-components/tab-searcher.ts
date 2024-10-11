@@ -21,7 +21,7 @@ export class TabSearcher {
 
   display() {
     const searchSetting = new Setting(this.containerEl);
-    searchSetting.settingEl.style.border = 'none';
+    searchSetting.settingEl.addClass('linter-no-border');
     searchSetting.addSearch((s: SearchComponent) => {
       this.search = s;
     });

@@ -122,14 +122,14 @@ export class GeneralTab extends Tab {
     this.addSettingSearchInfoForGeneralSettings(new NumberInputSetting(tempDiv, 'tabs.general.number-of-dollar-signs-to-indicate-math-block.name', 'tabs.general.number-of-dollar-signs-to-indicate-math-block.description', 'commonStyles.minimumNumberOfDollarSignsToBeAMathBlock', this.plugin));
 
     const folderIgnoreEl = this.contentEl.createDiv();
-    const folderIgnore = new FolderIgnoreOption(folderIgnoreEl, this.plugin.settingsTab.component, this.plugin.settings.foldersToIgnore, this.app, () => {
+    const folderIgnore = new FolderIgnoreOption(folderIgnoreEl, this.plugin.settings.foldersToIgnore, this.app, () => {
       void this.plugin.saveSettings();
     });
 
     this.addSettingSearchInfo(folderIgnoreEl, folderIgnore.name, folderIgnore.description.replaceAll('\n', ' '));
 
     const filesToIgnoreEl = this.contentEl.createDiv();
-    const filesToIgnore = new FilesToIgnoreOption(filesToIgnoreEl, this.plugin.settingsTab.component, this.plugin.settings.filesToIgnore, this.app, () => {
+    const filesToIgnore = new FilesToIgnoreOption(filesToIgnoreEl, this.plugin.settings.filesToIgnore, this.app, () => {
       void this.plugin.saveSettings();
     });
 

@@ -27,11 +27,11 @@ const mockedPlugins = [replace({
     // remove the use of obsidian in the options to allow for docs.js to run
     'import {Setting} from \'obsidian\';': '',
     // remove the use of obsidian in settings helper to allow for docs.js to run
-    'import {App, Component, MarkdownRenderer} from \'obsidian\';': '',
+    'import {App, MarkdownRenderer} from \'obsidian\';': '',
     // remove the use of obsidian in the auto-correct files picker to allow for docs.js to run
-    'import {Setting, Component, App, TFile, normalizePath, ExtraButtonComponent} from \'obsidian\';': '',
+    'import {Setting, App, TFile, normalizePath, ExtraButtonComponent} from \'obsidian\';': '',
     // remove the use of obsidian in add custom row to allow for docs.js to run
-    'import {App, Component, Setting} from \'obsidian\';': '',
+    'import {App, Setting} from \'obsidian\';': '',
     // remove the use of obsidian in suggest to allow for docs.js to run
     'import {App, ISuggestOwner, Scope} from \'obsidian\';': '',
     // remove the use of obsidian in md file suggester to allow for docs.js to run

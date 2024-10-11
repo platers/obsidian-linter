@@ -258,3 +258,14 @@ textarea.full-width {
 .custom-row-description {
   margin-top: 0px;
 }
+
+/**
+* Modal specific styles and search zero state
+*/
+.modal-warn, .search-zero-state {
+  font-weight: bold;
+}
+
+.modal-heading, .search-zero-state {
+  text-align: center;
+}

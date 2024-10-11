@@ -2,7 +2,7 @@ import {Setting} from 'obsidian';
 import LinterPlugin from 'src/main';
 import {DEFAULT_SETTINGS, LinterSettings, LinterSettingsKeys} from 'src/settings-data';
 import {getString, getBoolean, getNumber} from 'src/utils/nested-keyof';
-import {parseTextToHTMLWithoutOuterParagraph} from '../helpers';
+import {setElContent} from '../helpers';
 import {LanguageStringKey, getTextInLanguage} from 'src/lang/helpers';
 
 export type GenericSetting = {
@@ -62,8 +62,8 @@ export abstract class BaseSetting<T> {
   }
 
   protected parseNameAndDescription() {
-    parseTextToHTMLWithoutOuterParagraph(this.plugin.app, this.name, this.setting.nameEl, this.plugin.settingsTab.component);
-    parseTextToHTMLWithoutOuterParagraph(this.plugin.app, this.description, this.setting.descEl, this.plugin.settingsTab.component);
+    setElContent(this.name, this.setting.nameEl);
+    setElContent(this.description, this.setting.descEl);
     this.setting.descEl.addClass('linter-no-padding-top');
   }
 
