@@ -8,7 +8,7 @@ export class ParseResultsModal extends Modal {
     super(app);
     this.modalEl.addClass('confirm-modal');
 
-    this.contentEl.createEl('h3', {text: getTextInLanguage('parse-results-heading-text')}).style.textAlign = 'center';
+    this.contentEl.createEl('h3', {text: getTextInLanguage('parse-results-heading-text'), cls: 'modal-heading'});
 
     if (customAutoCorrectionInfo?.customReplacements.size > 0) {
       this.contentEl.createEl('p', {text: getTextInLanguage('file-parse-description-text').replace('{FILE}', customAutoCorrectionInfo.filePath)}).id = 'confirm-dialog';
@@ -25,7 +25,7 @@ export class ParseResultsModal extends Modal {
         tableRow.createEl('td', {text: replacementInfo[1]});
       }
     } else {
-      this.contentEl.createEl('p', {text: getTextInLanguage('no-parsed-values-found-text').replaceAll('{FILE}', customAutoCorrectionInfo.filePath)}).style.fontWeight = 'bold';
+      this.contentEl.createEl('p', {text: getTextInLanguage('no-parsed-values-found-text').replaceAll('{FILE}', customAutoCorrectionInfo.filePath), cls: 'modal-warn'});
     }
 
     this.contentEl.createDiv('modal-button-container', (buttonsEl) => {

@@ -38,7 +38,7 @@ export class SettingTab extends PluginSettingTab {
     this.tabNavEl = this.navContainer.createDiv('linter-setting-tab-group');
     this.settingsContentEl = containerEl.createDiv('linter-setting-content');
     this.addTabs(Platform.isMobile);
-    this.createSearchZeroState(Platform.isMobile);
+    this.createSearchZeroState();
     this.generateSearchBar(linterHeader);
 
     if (this.selectedTab == '') {
@@ -72,10 +72,10 @@ export class SettingTab extends PluginSettingTab {
     });
   }
 
-  private createSearchZeroState(isMobile: boolean) {
-    this.searchZeroState = this.settingsContentEl.createDiv();
+  private createSearchZeroState() {
+    this.searchZeroState = this.settingsContentEl.createDiv({cls: 'search-zero-state'});
     hideEl(this.searchZeroState);
-    this.searchZeroState.createEl(isMobile ? 'h3' : 'h2', {text: getTextInLanguage('empty-search-results-text')}).style.textAlign = 'center';
+    this.searchZeroState.createEl('p', {text: getTextInLanguage('empty-search-results-text')});
   }
 
   private addTab(tab: Tab) {

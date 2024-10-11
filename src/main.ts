@@ -3,7 +3,7 @@ import {Options, RuleType, ruleTypeToRules, rules, sortRules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {parseCustomReplacements, stripCr} from './utils/strings';
-import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel, timingBegin, timingEnd} from './utils/logger';
+import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
 import {iconInfo} from './ui/icons';
