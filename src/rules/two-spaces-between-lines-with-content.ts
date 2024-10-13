@@ -1,8 +1,11 @@
-import {Options, RuleType} from '../rules';
+import {Options, rulesDict, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {LineBreakIndicators, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent} from '../utils/mdast';
+import {BooleanOption} from '../option';
+import {getTextInLanguage} from '../lang/helpers';
+import {LinterSettings} from '../settings-data';
 
 class TwoSpacesBetweenLinesWithContentOptions implements Options {
   lineBreakIndicator?: LineBreakIndicators = LineBreakIndicators.TwoSpaces;
@@ -16,6 +19,27 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
       descriptionKey: 'rules.two-spaces-between-lines-with-content.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table],
+      disableConflictingOptions(value: boolean) {
+        const enableOption = rulesDict['paragraph-blank-lines'].options[0];
+        if (enableOption instanceof BooleanOption) {
+          // if the current value of paragraph blank lines with content is enabled, we cannot disable it
+          // the logic for onLayoutReady will handle that scenario
+          if (enableOption.getValue()) {
+            return;
+          }
+
+          enableOption.setDisabled(value, getTextInLanguage('disabled-rule-notice').replaceAll('{NAME}', getTextInLanguage('rules.two-spaces-between-lines-with-content.name')));
+        }
+      },
+      initiallyDisabled(settings: LinterSettings): [boolean, string] {
+        if (settings.ruleConfigs['paragraph-blank-lines'] && settings.ruleConfigs['paragraph-blank-lines'].enabled &&
+          (!settings.ruleConfigs['two-spaces-between-lines-with-content'] || !settings.ruleConfigs['two-spaces-between-lines-with-content'].enabled)
+        ) {
+          return [true, getTextInLanguage('disabled-rule-notice').replaceAll('{NAME}', getTextInLanguage('rules.paragraph-blank-lines.name'))];
+        }
+
+        return [false, ''];
+      },
     });
   }
   get OptionsClass(): new () => TwoSpacesBetweenLinesWithContentOptions {

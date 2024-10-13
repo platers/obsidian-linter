@@ -1,8 +1,11 @@
 import {IgnoreTypes} from '../utils/ignore-types';
 import {makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs} from '../utils/mdast';
-import {Options, RuleType} from '../rules';
+import {Options, rulesDict, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
+import {BooleanOption} from '../option';
+import {getTextInLanguage} from '../lang/helpers';
+import {LinterSettings} from '../settings-data';
 
 class ParagraphBlankLinesOptions implements Options {}
 
@@ -14,6 +17,27 @@ export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLines
       descriptionKey: 'rules.paragraph-blank-lines.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table],
+      disableConflictingOptions(value: boolean) {
+        const enableOption = rulesDict['two-spaces-between-lines-with-content'].options[0];
+        if (enableOption instanceof BooleanOption) {
+          // if the current value of two spaces between lines with content is enabled, we cannot disable it
+          // the logic for onLayoutReady will handle that scenario
+          if (enableOption.getValue()) {
+            return;
+          }
+
+          enableOption.setDisabled(value, getTextInLanguage('disabled-rule-notice').replaceAll('{NAME}', getTextInLanguage('rules.paragraph-blank-lines.name')));
+        }
+      },
+      initiallyDisabled(settings: LinterSettings): [boolean, string] {
+        if (settings.ruleConfigs['two-spaces-between-lines-with-content'] && settings.ruleConfigs['two-spaces-between-lines-with-content'].enabled &&
+          (!settings.ruleConfigs['paragraph-blank-lines'] || !settings.ruleConfigs['paragraph-blank-lines'].enabled)
+        ) {
+          return [true, getTextInLanguage('disabled-rule-notice').replaceAll('{NAME}', getTextInLanguage('rules.two-spaces-between-lines-with-content.name'))];
+        }
+
+        return [false, ''];
+      },
     });
   }
   get OptionsClass(): new () => ParagraphBlankLinesOptions {
@@ -52,16 +76,16 @@ export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLines
           # H2
         `,
         after: dedent`
-          # H1
-          ${''}
-          Content${'  '}
-          Paragraph content continued <br>
-          Paragraph content continued once more <br/>
-          Paragraph content yet again\\
-          Last line of paragraph
-          ${''}
-          A new paragraph
-          ${''}
+            # H1
+            ${''}
+            Content${'  '}
+            Paragraph content continued <br>
+            Paragraph content continued once more <br/>
+            Paragraph content yet again\\
+            Last line of paragraph
+            ${''}
+            A new paragraph
+            ${''}
           # H2
         `,
       }),

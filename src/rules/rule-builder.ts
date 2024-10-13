@@ -13,7 +13,7 @@ export abstract class RuleBuilderBase {
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
     if (!RuleBuilderBase.#ruleMap.has(this.name)) {
       const builder = new this();
-      const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder, builder.ignoreTypes);
+      const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder, builder.ignoreTypes, builder.disableConflictingOptions, builder.initiallyDisabled);
       RuleBuilderBase.#ruleMap.set(this.name, rule);
       RuleBuilderBase.#ruleBuilderMap.set(builder.alias, builder);
     }
@@ -67,6 +67,8 @@ type RuleBuilderConstructorArgs = {
   // ignore types to use on the entirety of the rule and not just a part
   // Note: this value should not contain custom ignore as that is added to all rules except Paste rules which do not use this property
   ruleIgnoreTypes?: IgnoreType[],
+  disableConflictingOptions?: (value: boolean) => void,
+  initiallyDisabled?: (settings: LinterSettings) => [boolean, string],
 };
 
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
@@ -77,6 +79,8 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   public type: RuleType;
   public hasSpecialExecutionOrder: boolean;
   public ignoreTypes: IgnoreType[];
+  public disableConflictingOptions: (value: boolean) => void;
+  public initiallyDisabled: (settings: LinterSettings) => [boolean, string];
   constructor(args: RuleBuilderConstructorArgs) {
     super();
 
@@ -87,6 +91,8 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     this.descriptionKey = args.descriptionKey;
     this.type = args.type;
     this.hasSpecialExecutionOrder = args.hasSpecialExecutionOrder ?? false;
+    this.disableConflictingOptions = args.disableConflictingOptions ?? null;
+    this.initiallyDisabled = args.initiallyDisabled ?? null;
 
     if (args.ruleIgnoreTypes) {
       this.ignoreTypes = [IgnoreTypes.customIgnore, ...args.ruleIgnoreTypes];

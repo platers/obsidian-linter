@@ -41,6 +41,8 @@ export class Rule {
    * @param {Array<Option>} [options=[]] - The options of the rule to be displayed in the documentation
    * @param {boolean} [hasSpecialExecutionOrder=false] - The rule has special execution order
    * @param {IgnoreType[]} [ignoreTypes=[]] - The types of elements to ignore for the rule
+   * @param {function(boolean):void} [disableConflictingOptions=null] - The function to disable conflicting rules or options when it is enabled
+   * @param {function(LinterSettings):[boolean,string]} [initiallyDisabled=null] - The function to evaluate if the rule needs to be disabled initially
    */
   constructor(
       private nameKey: LanguageStringKey,
@@ -53,6 +55,8 @@ export class Rule {
       public options: Array<Option> = [],
       public readonly hasSpecialExecutionOrder: boolean = false,
       public readonly ignoreTypes: IgnoreType[] = [],
+      disableConflictingOptions: (value: boolean) => void = null,
+      initiallyDisabled: (settings: LinterSettings) => [boolean, string] = null,
   ) {
     this.ruleHeading = this.getName().toLowerCase().replaceAll(' ', '-');
 
@@ -66,7 +70,11 @@ export class Rule {
           }
         }
       }
-    }));
+
+      if (disableConflictingOptions) {
+        disableConflictingOptions(value);
+      }
+    }, initiallyDisabled));
     for (const option of options) {
       option.ruleAlias = alias;
     }

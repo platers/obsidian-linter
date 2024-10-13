@@ -111,6 +111,8 @@ export default {
 
   'copy-aria-label': 'Copy',
 
+  'disabled-rule-notice': 'Disabled because it is incompatible with <code>{NAME}</code>. Please disable <code>{NAME}</code> if you would like to enable this rule.',
+
   // parse-results-modal.ts
   'parse-results-heading-text': 'Custom Parse Values',
   'file-parse-description-text': 'The following is the list of custom replacements found in {FILE}.',
