@@ -1030,7 +1030,7 @@ export default class LinterPlugin extends Plugin {
 
   private updatePasteOverrideStatus() {
     for (const rule of ruleTypeToRules.get(RuleType.PASTE)) {
-      if (rule.getOptions(this.settings)['enabled']) {
+      if (rule.getOptions(this.settings)?.enabled) {
         this.overridePaste = true;
         return;
       }
