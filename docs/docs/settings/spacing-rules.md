@@ -172,7 +172,7 @@ After:
 
 Alias: `empty-line-around-blockquotes`
 
-Ensures that there is an empty line around blockquotes unless they start or end a document. **Note: an empty line is either one less level of nesting for blockquotes or a newline character.**
+Ensures that there is an empty line around blockquotes unless they start or end a document. <b>Note: an empty line is either one less level of nesting for blockquotes or a newline character.</b>
 
 
 
@@ -512,7 +512,7 @@ Content
 
 Alias: `empty-line-around-math-blocks`
 
-Ensures that there is an empty line around math blocks using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.
+Ensures that there is an empty line around math blocks using <code>Number of Dollar Signs to Indicate a Math Block</code> to determine how many dollar signs indicates a math block for single-line math.
 
 
 
@@ -948,7 +948,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 Alias: `move-math-block-indicators-to-their-own-line`
 
-Move all starting and ending math block indicators to their own lines using `Number of Dollar Signs to Indicate a Math Block` to determine how many dollar signs indicates a math block for single-line math.
+Move all starting and ending math block indicators to their own lines using <code>Number of Dollar Signs to Indicate a Math Block</code> to determine how many dollar signs indicates a math block for single-line math.
 
 
 
@@ -1328,7 +1328,7 @@ After:
 
 Alias: `remove-space-around-characters`
 
-Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). **Note: this may causes issues with markdown format in some cases.**
+Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). <b>Note: this may causes issues with markdown format in some cases.</b>
 
 ### Options
 
@@ -1430,14 +1430,14 @@ After:
 
 Alias: `remove-space-before-or-after-characters`
 
-Removes space before the specified characters and after the specified characters. **Note: this may causes issues with markdown format in some cases.**
+Removes space before the specified characters and after the specified characters. <b>Note: this may causes issues with markdown format in some cases.</b>
 
 ### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Remove Space Before Characters` | Removes space before the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.** | N/A | `,!?;:).’”]` |
-| `Remove Space After Characters` | Removes space after the specified characters. **Note: using `{` or `}` in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.** | N/A | `¿¡‘“([` |
+| `Remove Space Before Characters` | Removes space before the specified characters. <b>Note: using <code>{</code> or <code>}</code> in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.</b> | N/A | `,!?;:).’”]` |
+| `Remove Space After Characters` | Removes space after the specified characters. <b>>Note: using <code>{</code> or <code>}</code> in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.</b> | N/A | `¿¡‘“([` |
 
 
 
@@ -1513,14 +1513,14 @@ After:
 
 Alias: `space-between-chinese-japanese-or-korean-and-english-or-numbers`
 
-Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these [guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)
+Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">guidelines</a>
 
 ### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `English Punctuations and Symbols Before CJK` | The list of non-letter punctuation and symbols to consider to be from English when found before Chinese, Japanese, or Korean characters. **Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.** | N/A | `-+;:'"°%$)]` |
-| `English Punctuations and Symbols After CJK` | The list of non-letter punctuation and symbols to consider to be from English when found after Chinese, Japanese, or Korean characters. **Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.** | N/A | `-+'"([¥$` |
+| `English Punctuations and Symbols Before CJK` | The list of non-letter punctuation and symbols to consider to be from English when found before Chinese, Japanese, or Korean characters. <b>Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.</b> | N/A | `-+;:'"°%$)]` |
+| `English Punctuations and Symbols After CJK` | The list of non-letter punctuation and symbols to consider to be from English when found after Chinese, Japanese, or Korean characters. <b>Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.</b> | N/A | `-+'"([¥$` |
 
 
 
