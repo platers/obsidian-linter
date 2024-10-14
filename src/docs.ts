@@ -91,7 +91,7 @@ function generateDocs() {
         defaultValue = `\`${defaultValue}\``;
       }
       const text = dedent`
-        | \`${option.getName().replaceAll('|', '\\|')}\` | ${option.getDescription().replaceAll('|', '\\|')}} | ${listItems} | ${defaultValue} |
+        | \`${option.getName().replaceAll('|', '\\|')}\` | ${option.getDescription().replaceAll('|', '\\|')} | ${listItems} | ${defaultValue} |
       `;
 
 
