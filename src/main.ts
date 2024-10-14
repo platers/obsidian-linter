@@ -581,6 +581,37 @@ export default class LinterPlugin extends Plugin {
       updateMade = true;
     }
 
+    // check for and fix invalid settings
+    let noticeText = 'Obsidian Linter:';
+    let conflictingRulePresent = false;
+    if (this.settings.ruleConfigs['header-increment'] && this.settings.ruleConfigs['header-increment'].enabled && this.settings.ruleConfigs['header-increment']['start-at-h2'] &&
+      this.settings.ruleConfigs['file-name-heading'] && this.settings.ruleConfigs['file-name-heading'].enabled
+    ) {
+      this.settings.ruleConfigs['header-increment']['start-at-h2'] = false;
+      updateMade = true;
+      conflictingRulePresent = true;
+
+      noticeText += '\n' + getTextInLanguage('disabled-conflicting-rule-notice').replace('{NAME_1}', getTextInLanguage('rules.header-increment.start-at-h2.name')).replace('{NAME_2}', getTextInLanguage('rules.file-name-heading.name'));
+    }
+
+    if (this.settings.ruleConfigs['paragraph-blank-lines'] && this.settings.ruleConfigs['paragraph-blank-lines'].enabled &&
+      this.settings.ruleConfigs['two-spaces-between-lines-with-content'] && this.settings.ruleConfigs['two-spaces-between-lines-with-content'].enabled
+    ) {
+      this.settings.ruleConfigs['paragraph-blank-lines'].enabled = false;
+      updateMade = true;
+
+      if (conflictingRulePresent) {
+        noticeText += '\n';
+      }
+      conflictingRulePresent = true;
+
+      noticeText += '\n' + getTextInLanguage('disabled-conflicting-rule-notice').replace('{NAME_1}', getTextInLanguage('rules.paragraph-blank-lines.name')).replace('{NAME_2}', getTextInLanguage('rules.two-spaces-between-lines-with-content.name'));
+    }
+
+    if (conflictingRulePresent) {
+      new Notice(noticeText, userClickTimeout);
+    }
+
     // make sure to load the defaults of any missing rules to make sure they do not cause issues on the settings page
     for (const rule of rules) {
       const ruleDefaults = rule.getDefaultOptions();
@@ -633,20 +664,6 @@ export default class LinterPlugin extends Plugin {
 
     if (updateMade) {
       await this.saveSettings();
-    }
-  }
-
-  private checkForConflictingRules() {
-    if (this.settings.ruleConfigs['header-increment'] && this.settings.ruleConfigs['header-increment'].enabled && this.settings.ruleConfigs['header-increment']['start-at-h2'] &&
-      this.settings.ruleConfigs['file-name-heading'] && this.settings.ruleConfigs['file-name-heading'].enabled
-    ) {
-      console.log('do something about this scenario...');
-    }
-
-    if (this.settings.ruleConfigs['paragraph-blank-lines'] && this.settings.ruleConfigs['paragraph-blank-lines'].enabled &&
-      this.settings.ruleConfigs['two-spaces-between-lines-with-content'] && this.settings.ruleConfigs['two-spaces-between-lines-with-content'].enabled
-    ) {
-      console.log('do something about this scenario...');
     }
   }
 

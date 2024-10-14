@@ -1,8 +1,11 @@
-import {Options, RuleType} from '../rules';
+import {Options, rulesDict, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex} from '../utils/regex';
+import {BooleanOption} from '../option';
+import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable';
+import {App} from 'obsidian';
 
 class HeaderIncrementOptions implements Options {
   startAtH2?: boolean = false;
@@ -169,6 +172,18 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
         nameKey: 'rules.header-increment.start-at-h2.name',
         descriptionKey: 'rules.header-increment.start-at-h2.description',
         optionsKey: 'startAtH2',
+        onChange(value: boolean, app: App): void {
+          const filenameHeadingEnableOption = rulesDict['file-name-heading'].options[0] as BooleanOption;
+
+          if (value && filenameHeadingEnableOption.getValue()) {
+            new ConfirmRuleDisableModal(app, 'rules.header-increment.start-at-h2.name', 'rules.file-name-heading.name', () => {
+              filenameHeadingEnableOption.setValue(false);
+            },
+            () => {
+              (rulesDict['header-increment'].options[1] as BooleanOption).setValue(false);
+            }).open();
+          }
+        },
       }),
     ];
   }

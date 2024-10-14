@@ -111,7 +111,8 @@ export default {
 
   'copy-aria-label': 'Copy',
 
-  'disabled-rule-notice': 'Disabled because it is incompatible with <code>{NAME}</code>. Please disable <code>{NAME}</code> if you would like to enable this rule.',
+  'disabled-other-rule-notice': 'If you enable <code>{NAME_1}</code>, it will disable <code>{NAME_2}</code>. Would you like to proceed?',
+  'disabled-conflicting-rule-notice': '{NAME_1}, conflicts with {NAME_2}, so it has been turned off. You can switch which setting is off in the settings tab.',
 
   // parse-results-modal.ts
   'parse-results-heading-text': 'Custom Parse Values',

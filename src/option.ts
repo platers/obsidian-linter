@@ -1,4 +1,4 @@
-import {setIcon, Setting, ToggleComponent} from 'obsidian';
+import {App, Setting, ToggleComponent} from 'obsidian';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import LinterPlugin from './main';
 import {hideEl, unhideEl, setElContent} from './ui/helpers';
@@ -63,10 +63,9 @@ export abstract class Option {
 
 export class BooleanOption extends Option {
   public defaultValue: boolean;
-  private warningEl: HTMLDivElement;
   private toggleComponent: ToggleComponent;
 
-  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: any, ruleAlias?: string | null, private onChange?: (value: boolean) => void, private isDisabled?: (settings: LinterSettings) => [boolean, string]) {
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: any, ruleAlias?: string | null, private onChange?: (value: boolean, app: App) => void) {
     super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
   }
 
@@ -81,7 +80,7 @@ export class BooleanOption extends Option {
             plugin.settings = settings;
 
             if (this.onChange) {
-              this.onChange(value);
+              this.onChange(value, plugin.app);
             }
 
             void plugin.saveSettings();
@@ -89,27 +88,14 @@ export class BooleanOption extends Option {
         });
 
     this.parseNameAndDescriptionAndRemoveSettingBorder();
-
-    if (this.isDisabled) {
-      const initiallyDisabledInfo = this.isDisabled(settings);
-      this.setDisabled(initiallyDisabledInfo[0], initiallyDisabledInfo[1]);
-    }
-  }
-
-  setDisabled(value: boolean, message: string) {
-    this.setting.setDisabled(value);
-    this.toggleComponent.setDisabled(value);
-    if (value) {
-      this.warningEl = this.setting.infoEl.createDiv('setting-item-disabled');
-      setIcon(this.warningEl.createSpan(), 'linter-warning');
-      setElContent(message, this.warningEl.createSpan());
-    } else if (this.warningEl) {
-      this.warningEl.detach();
-    }
   }
 
   getValue(): boolean {
     return this.toggleComponent.getValue();
+  }
+
+  setValue(value: boolean) {
+    this.toggleComponent.setValue(value);
   }
 }
 

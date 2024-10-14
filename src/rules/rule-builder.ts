@@ -4,6 +4,7 @@ import {logDebug, timingBegin, timingEnd} from '../utils/logger';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
 import {LinterSettings} from 'src/settings-data';
+import {App} from 'obsidian';
 
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
@@ -13,7 +14,7 @@ export abstract class RuleBuilderBase {
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
     if (!RuleBuilderBase.#ruleMap.has(this.name)) {
       const builder = new this();
-      const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder, builder.ignoreTypes, builder.disableConflictingOptions, builder.initiallyDisabled);
+      const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder, builder.ignoreTypes, builder.disableConflictingOptions);
       RuleBuilderBase.#ruleMap.set(this.name, rule);
       RuleBuilderBase.#ruleBuilderMap.set(builder.alias, builder);
     }
@@ -67,8 +68,7 @@ type RuleBuilderConstructorArgs = {
   // ignore types to use on the entirety of the rule and not just a part
   // Note: this value should not contain custom ignore as that is added to all rules except Paste rules which do not use this property
   ruleIgnoreTypes?: IgnoreType[],
-  disableConflictingOptions?: (value: boolean) => void,
-  initiallyDisabled?: (settings: LinterSettings) => [boolean, string],
+  disableConflictingOptions?: (value: boolean, app: App) => void,
 };
 
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
@@ -79,8 +79,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   public type: RuleType;
   public hasSpecialExecutionOrder: boolean;
   public ignoreTypes: IgnoreType[];
-  public disableConflictingOptions: (value: boolean) => void;
-  public initiallyDisabled: (settings: LinterSettings) => [boolean, string];
+  public disableConflictingOptions: (value: boolean, app: App) => void;
   constructor(args: RuleBuilderConstructorArgs) {
     super();
 
@@ -92,7 +91,6 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     this.type = args.type;
     this.hasSpecialExecutionOrder = args.hasSpecialExecutionOrder ?? false;
     this.disableConflictingOptions = args.disableConflictingOptions ?? null;
-    this.initiallyDisabled = args.initiallyDisabled ?? null;
 
     if (args.ruleIgnoreTypes) {
       this.ignoreTypes = [IgnoreTypes.customIgnore, ...args.ruleIgnoreTypes];
@@ -232,8 +230,16 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
 }
 
 export class BooleanOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, boolean> {
+  onChange?: (value: boolean, app: App) => void;
+  constructor(args: OptionBuilderConstructorArgs<TOptions, boolean> & {
+    onChange?: (value: boolean, app: App) => void,
+  }) {
+    super(args);
+    this.onChange = args.onChange ?? null;
+  }
+
   protected buildOption(): Option {
-    return new BooleanOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue);
+    return new BooleanOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue, null, this.onChange);
   }
 }
 
