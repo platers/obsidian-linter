@@ -1,5 +1,5 @@
 import {Modal, App} from 'obsidian';
-import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
+import {getTextInLanguage, LanguageStringKey} from '../../lang/helpers';
 import {setElContent} from '../helpers';
 
 // https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/src/modal.ts#L68
