@@ -39,7 +39,7 @@ when lowercased. Info added in these files generally include limitations and thi
 
 Currently there is 1 template file used for generating documentation with:
 
-1. [readme_template.md](https://github.com/platers/obsidian-linter/blob/master/docs/readme_template.md)
+1. [readme_template.md](https://github.com/platers/obsidian-linter/blob/master/docs/templates/readme_template.md)
   - This template is used for generating the [README](https://github.com/platers/obsidian-linter/blob/master/README.md) file and should be updated for changes that are not rules documentation links and their corresponding sections.
 
 You may also want to take a look at [docs.ts](https://github.com/platers/obsidian-linter/blob/master/src/docs.ts) to modify how the generated files are created.
