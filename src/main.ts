@@ -129,69 +129,13 @@ export default class LinterPlugin extends Plugin {
     setLogLevel(this.settings.logLevel);
     await this.setOrUpdateMomentInstance();
 
-    let updateMade = false;
-    if (!this.settings.settingsConvertedToConfigKeyValues) {
-      updateMade = await this.moveConfigValuesToKeyBasedFormat();
-    }
-
-    if ('lintOnFileContentChangeDelay' in this.settings) {
-      this.settings.ruleConfigs['yaml-timestamp']['update-on-file-contents-updated'] = this.settings['lintOnFileContentChangeDelay'];
-
-      delete this.settings['lintOnFileContentChangeDelay'];
-      updateMade = true;
-    }
-
-    // make sure to load the defaults of any missing rules to make sure they do not cause issues on the settings page
-    for (const rule of rules) {
-      if (!this.settings.ruleConfigs[rule.alias]) {
-        this.settings.ruleConfigs[rule.alias] = rule.getDefaultOptions();
-      }
-
-      // remove this after a reasonable amount of time
-      if (rule.alias == 'space-between-chinese-japanese-or-korean-and-english-or-numbers') {
-        const defaults = rule.getDefaultOptions();
-        if (!('english-symbols-punctuation-before' in this.settings.ruleConfigs[rule.alias])) {
-          this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-before'] = defaults['english-symbols-punctuation-before'];
-          updateMade = true;
-        }
-
-        if (!('english-symbols-punctuation-after' in this.settings.ruleConfigs[rule.alias])) {
-          this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = defaults['english-symbols-punctuation-after'];
-          updateMade = true;
-        }
-      } else if (rule.alias == 'yaml-timestamp') {
-        const defaults = rule.getDefaultOptions();
-        if ('force-retention-of-create-value' in this.settings.ruleConfigs[rule.alias]) {
-          if (!('date-created-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
-            if (this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value']) {
-              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = 'frontmatter';
-            } else {
-              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = defaults['date-created-source-of-truth'];
-            }
-          }
-
-          delete this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value'];
-          updateMade = true;
-        }
-
-        if (!('date-modified-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
-          this.settings.ruleConfigs[rule.alias]['date-modified-source-of-truth'] = defaults['date-modified-source-of-truth'];
-          updateMade = true;
-        }
-      }
-    }
-
     this.updatePasteOverrideStatus();
     this.updateHasCustomCommandStatus();
-
-    if (updateMade) {
-      await this.saveSettings();
-    }
   }
 
   async saveSettings() {
     if (!this.hasLoadedMisspellingFiles) {
-      await this.loadAutoCorrectFiles();
+      await this.loadAutoCorrectFiles(false);
     }
 
     await this.saveData(this.settings);
@@ -328,7 +272,8 @@ export default class LinterPlugin extends Plugin {
     this.eventRefs.push(eventRef);
 
     this.app.workspace.onLayoutReady(async () => {
-      await this.loadAutoCorrectFiles();
+      await this.makeSureSettingsFilledInAndCleanupSettings();
+      await this.loadAutoCorrectFiles(true);
     });
 
     // Source for save setting
@@ -375,13 +320,17 @@ export default class LinterPlugin extends Plugin {
     }
   }
 
-  async loadAutoCorrectFiles() {
+  async loadAutoCorrectFiles(isOnload: boolean) {
     const customAutoCorrectSettings = this.settings.ruleConfigs['auto-correct-common-misspellings'];
     if (!customAutoCorrectSettings || !customAutoCorrectSettings.enabled) {
       return;
     }
 
     await downloadMisspellings(this, async (message: string) => {
+      if (isOnload) {
+        message = 'Obsidian Linter:\n' + message;
+      }
+
       new Notice(message);
 
       this.settings.ruleConfigs['auto-correct-common-misspellings'].enabled = false;
@@ -617,6 +566,109 @@ export default class LinterPlugin extends Plugin {
     logDebug(getTextInLanguage('logs.moment-locale-not-found').replace('{MOMENT_LOCALE}', momentLocale).replace('{CURRENT_LOCALE}', currentLocale));
 
     moment.locale(oldLocale);
+  }
+
+  private async makeSureSettingsFilledInAndCleanupSettings() {
+    let updateMade = false;
+
+    // migrate settings over to the new format if they are using the now deprecated format that uses
+    // actual settings names for the key in the json
+    if (!this.settings.settingsConvertedToConfigKeyValues) {
+      updateMade = await this.moveConfigValuesToKeyBasedFormat();
+    }
+
+    // move a recently moved setting to its new location
+    if ('lintOnFileContentChangeDelay' in this.settings) {
+      this.settings.ruleConfigs['yaml-timestamp']['update-on-file-contents-updated'] = this.settings['lintOnFileContentChangeDelay'];
+
+      delete this.settings['lintOnFileContentChangeDelay'];
+      updateMade = true;
+    }
+
+    // check for and fix invalid settings
+    let noticeText = 'Obsidian Linter:';
+    let conflictingRulePresent = false;
+    if (this.settings.ruleConfigs['header-increment'] && this.settings.ruleConfigs['header-increment'].enabled && this.settings.ruleConfigs['header-increment']['start-at-h2'] &&
+      this.settings.ruleConfigs['file-name-heading'] && this.settings.ruleConfigs['file-name-heading'].enabled
+    ) {
+      this.settings.ruleConfigs['header-increment']['start-at-h2'] = false;
+      updateMade = true;
+      conflictingRulePresent = true;
+
+      noticeText += '\n' + getTextInLanguage('disabled-conflicting-rule-notice').replace('{NAME_1}', getTextInLanguage('rules.header-increment.start-at-h2.name')).replace('{NAME_2}', getTextInLanguage('rules.file-name-heading.name'));
+    }
+
+    if (this.settings.ruleConfigs['paragraph-blank-lines'] && this.settings.ruleConfigs['paragraph-blank-lines'].enabled &&
+      this.settings.ruleConfigs['two-spaces-between-lines-with-content'] && this.settings.ruleConfigs['two-spaces-between-lines-with-content'].enabled
+    ) {
+      this.settings.ruleConfigs['paragraph-blank-lines'].enabled = false;
+      updateMade = true;
+
+      if (conflictingRulePresent) {
+        noticeText += '\n';
+      }
+      conflictingRulePresent = true;
+
+      noticeText += '\n' + getTextInLanguage('disabled-conflicting-rule-notice').replace('{NAME_1}', getTextInLanguage('rules.paragraph-blank-lines.name')).replace('{NAME_2}', getTextInLanguage('rules.two-spaces-between-lines-with-content.name'));
+    }
+
+    if (conflictingRulePresent) {
+      new Notice(noticeText, userClickTimeout);
+    }
+
+    // make sure to load the defaults of any missing rules to make sure they do not cause issues on the settings page
+    for (const rule of rules) {
+      const ruleDefaults = rule.getDefaultOptions();
+      if (!this.settings.ruleConfigs[rule.alias]) {
+        this.settings.ruleConfigs[rule.alias] = ruleDefaults;
+        updateMade = true;
+        continue;
+      }
+
+      // remove this after a reasonable amount of time
+      if (rule.alias == 'space-between-chinese-japanese-or-korean-and-english-or-numbers') {
+        if (!('english-symbols-punctuation-before' in this.settings.ruleConfigs[rule.alias])) {
+          this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-before'] = ruleDefaults['english-symbols-punctuation-before'];
+          updateMade = true;
+        }
+
+        if (!('english-symbols-punctuation-after' in this.settings.ruleConfigs[rule.alias])) {
+          this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = ruleDefaults['english-symbols-punctuation-after'];
+          updateMade = true;
+        }
+      } else if (rule.alias == 'yaml-timestamp') {
+        const defaults = rule.getDefaultOptions();
+        if ('force-retention-of-create-value' in this.settings.ruleConfigs[rule.alias]) {
+          if (!('date-created-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
+            if (this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value']) {
+              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = 'frontmatter';
+            } else {
+              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = defaults['date-created-source-of-truth'];
+            }
+          }
+
+          delete this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value'];
+          updateMade = true;
+        }
+
+        if (!('date-modified-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
+          this.settings.ruleConfigs[rule.alias]['date-modified-source-of-truth'] = defaults['date-modified-source-of-truth'];
+          updateMade = true;
+        }
+      }
+
+      // make sure new/empty settings on a rule that exists get filled in with their default value as well
+      for (const key of Object.keys(ruleDefaults)) {
+        if (!Object.hasOwn(this.settings.ruleConfigs[rule.alias], key)) {
+          this.settings.ruleConfigs[rule.alias][key] = ruleDefaults[key];
+          updateMade = true;
+        }
+      }
+    }
+
+    if (updateMade) {
+      await this.saveSettings();
+    }
   }
 
   private createDebouncedFileUpdate(): Debouncer<[TFile, Editor], Promise<void>> {

@@ -1,8 +1,11 @@
-import {Options, RuleType} from '../rules';
+import {Options, rulesDict, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {insert} from '../utils/strings';
+import {App} from 'obsidian';
+import {BooleanOption} from '../option';
+import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 
 class FileNameHeadingOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -17,6 +20,19 @@ export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions>
       descriptionKey: 'rules.file-name-heading.description',
       type: RuleType.HEADING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      disableConflictingOptions(value: boolean, app: App): void {
+        const headerIncrementOptions = rulesDict['header-increment'];
+        const headerIncrementEnableOption = headerIncrementOptions.options[0] as BooleanOption;
+        const headerIncrementStartAtH2Option = headerIncrementOptions.options[1] as BooleanOption;
+        if (value && headerIncrementEnableOption.getValue()) {
+          new ConfirmRuleDisableModal(app, 'rules.file-name-heading.name', 'rules.header-increment.start-at-h2.name', () => {
+            headerIncrementStartAtH2Option.setValue(false);
+          },
+          () => {
+            (rulesDict['file-name-heading'].options[0] as BooleanOption).setValue(false);
+          }).open();
+        }
+      },
     });
   }
   get OptionsClass(): new () => FileNameHeadingOptions {

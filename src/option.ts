@@ -1,4 +1,4 @@
-import {Setting} from 'obsidian';
+import {App, Setting, ToggleComponent} from 'obsidian';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import LinterPlugin from './main';
 import {hideEl, unhideEl, setElContent} from './ui/helpers';
@@ -63,21 +63,24 @@ export abstract class Option {
 
 export class BooleanOption extends Option {
   public defaultValue: boolean;
+  private toggleComponent: ToggleComponent;
 
-  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: any, ruleAlias?: string | null, private onChange?: (value: boolean) => void) {
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: any, ruleAlias?: string | null, private onChange?: (value: boolean, app: App) => void) {
     super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
   }
 
   public display(containerEl: HTMLElement, settings: LinterSettings, plugin: LinterPlugin): void {
     this.setting = new Setting(containerEl)
         .addToggle((toggle) => {
+          this.toggleComponent = toggle;
+
           toggle.setValue(settings.ruleConfigs[this.ruleAlias][this.configKey]);
           toggle.onChange((value) => {
             this.setOption(value, settings);
             plugin.settings = settings;
 
             if (this.onChange) {
-              this.onChange(value);
+              this.onChange(value, plugin.app);
             }
 
             void plugin.saveSettings();
@@ -85,6 +88,14 @@ export class BooleanOption extends Option {
         });
 
     this.parseNameAndDescriptionAndRemoveSettingBorder();
+  }
+
+  getValue(): boolean {
+    return this.toggleComponent.getValue();
+  }
+
+  setValue(value: boolean) {
+    this.toggleComponent.setValue(value);
   }
 }
 

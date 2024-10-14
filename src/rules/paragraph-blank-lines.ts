@@ -1,8 +1,11 @@
 import {IgnoreTypes} from '../utils/ignore-types';
 import {makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs} from '../utils/mdast';
-import {Options, RuleType} from '../rules';
+import {Options, rulesDict, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
+import {BooleanOption} from '../option';
+import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
+import {App} from 'obsidian';
 
 class ParagraphBlankLinesOptions implements Options {}
 
@@ -14,6 +17,17 @@ export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLines
       descriptionKey: 'rules.paragraph-blank-lines.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table],
+      disableConflictingOptions(value: boolean, app: App): void {
+        const twoSpacesEnableOption = rulesDict['two-spaces-between-lines-with-content'].options[0] as BooleanOption;
+        if (value && twoSpacesEnableOption.getValue()) {
+          new ConfirmRuleDisableModal(app, 'rules.paragraph-blank-lines.name', 'rules.two-spaces-between-lines-with-content.name', () => {
+            twoSpacesEnableOption.setValue(false);
+          },
+          () => {
+            (rulesDict['paragraph-blank-lines'].options[0] as BooleanOption).setValue(false);
+          }).open();
+        }
+      },
     });
   }
   get OptionsClass(): new () => ParagraphBlankLinesOptions {

@@ -41,7 +41,7 @@
   }
 }
 
-.linter-navigation-item-icon {
+.linter-navigation-item-icon, .linter-warning {
   padding-top: 5px;
 }
 
@@ -269,3 +269,4 @@ textarea.full-width {
 .modal-heading, .search-zero-state {
   text-align: center;
 }
+
