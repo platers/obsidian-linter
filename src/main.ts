@@ -135,7 +135,7 @@ export default class LinterPlugin extends Plugin {
 
   async saveSettings() {
     if (!this.hasLoadedMisspellingFiles) {
-      await this.loadAutoCorrectFiles();
+      await this.loadAutoCorrectFiles(false);
     }
 
     await this.saveData(this.settings);
@@ -273,7 +273,7 @@ export default class LinterPlugin extends Plugin {
 
     this.app.workspace.onLayoutReady(async () => {
       await this.makeSureSettingsFilledInAndCleanupSettings();
-      await this.loadAutoCorrectFiles();
+      await this.loadAutoCorrectFiles(true);
     });
 
     // Source for save setting
@@ -320,13 +320,17 @@ export default class LinterPlugin extends Plugin {
     }
   }
 
-  async loadAutoCorrectFiles() {
+  async loadAutoCorrectFiles(isOnload: boolean) {
     const customAutoCorrectSettings = this.settings.ruleConfigs['auto-correct-common-misspellings'];
     if (!customAutoCorrectSettings || !customAutoCorrectSettings.enabled) {
       return;
     }
 
     await downloadMisspellings(this, async (message: string) => {
+      if (isOnload) {
+        message = 'Obsidian Linter:\n' + message;
+      }
+
       new Notice(message);
 
       this.settings.ruleConfigs['auto-correct-common-misspellings'].enabled = false;
