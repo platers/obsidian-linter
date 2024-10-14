@@ -4,7 +4,7 @@ import {Options, rulesDict, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {BooleanOption} from '../option';
-import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable';
+import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 import {App} from 'obsidian';
 
 class ParagraphBlankLinesOptions implements Options {}

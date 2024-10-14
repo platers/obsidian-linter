@@ -114,6 +114,9 @@ export default {
   'disabled-other-rule-notice': 'If you enable <code>{NAME_1}</code>, it will disable <code>{NAME_2}</code>. Would you like to proceed?',
   'disabled-conflicting-rule-notice': '{NAME_1}, conflicts with {NAME_2}, so it has been turned off. You can switch which setting is off in the settings tab.',
 
+  // confirm-rule-disable-modal.ts
+  'ok': 'Ok',
+
   // parse-results-modal.ts
   'parse-results-heading-text': 'Custom Parse Values',
   'file-parse-description-text': 'The following is the list of custom replacements found in {FILE}.',

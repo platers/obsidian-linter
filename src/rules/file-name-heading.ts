@@ -5,7 +5,7 @@ import {IgnoreTypes} from '../utils/ignore-types';
 import {insert} from '../utils/strings';
 import {App} from 'obsidian';
 import {BooleanOption} from '../option';
-import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable';
+import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 
 class FileNameHeadingOptions implements Options {
   @RuleBuilder.noSettingControl()

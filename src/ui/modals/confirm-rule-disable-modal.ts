@@ -24,7 +24,7 @@ export class ConfirmRuleDisableModal extends Modal {
       const btnSubmit = buttonsEl.createEl('button', {
         attr: {type: 'submit'},
         cls: 'mod-cta',
-        text: 'Ok',
+        text: getTextInLanguage('ok'),
       });
       btnSubmit.addEventListener('click', () => {
         this.close();

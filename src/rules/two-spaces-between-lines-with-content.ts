@@ -4,7 +4,7 @@ import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {LineBreakIndicators, addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent} from '../utils/mdast';
 import {BooleanOption} from '../option';
-import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable';
+import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 import {App} from 'obsidian';
 
 class TwoSpacesBetweenLinesWithContentOptions implements Options {

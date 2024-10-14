@@ -4,7 +4,7 @@ import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex} from '../utils/regex';
 import {BooleanOption} from '../option';
-import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable';
+import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 import {App} from 'obsidian';
 
 class HeaderIncrementOptions implements Options {
