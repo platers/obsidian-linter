@@ -152,7 +152,7 @@ export default {
       },
       'lint-on-file-change': {
         'name': 'Lint on Focused File Change',
-        'description': 'When the a file is closed or a new file is swapped to, the previous file is linted.',
+        'description': 'When a file is closed or a new file is swapped to, the previous file is linted.',
       },
       'display-lint-on-file-change-message': {
         'name': 'Display Lint on File Change Message',

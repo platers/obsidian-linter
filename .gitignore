@@ -42,3 +42,4 @@ yarn.lock
 !__mocks__/*.js
 !/.eslintrc.js
 !babel.config.js
+!postcss.config.js
