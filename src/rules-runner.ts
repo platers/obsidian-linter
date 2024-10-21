@@ -30,6 +30,8 @@ import {LinterSettings} from './settings-data';
 import TrailingSpaces from './rules/trailing-spaces';
 import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
 import AutoCorrectCommonMisspellings from './rules/auto-correct-common-misspellings';
+import {yamlRegex} from './utils/regex';
+import AddBlankLineAfterYAML from './rules/add-blank-line-after-yaml';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -169,6 +171,11 @@ export class RulesRunner {
 
     [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
+    const yaml = newText.match(yamlRegex);
+    if (yaml != null) {
+      [newText] = AddBlankLineAfterYAML.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+    }
+
     let currentTime = runOptions.getCurrentTime();
     // run YAML timestamp at the end to help determine if something has changed
     let isYamlTimestampEnabled;
@@ -179,6 +186,10 @@ export class RulesRunner {
       alreadyModified: originalText != newText,
       locale: runOptions.momentLocale,
     });
+
+    if (yaml === null) {
+      [newText] = AddBlankLineAfterYAML.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+    }
 
     const yamlTimestampOptions = YamlTimestamp.getRuleOptions(runOptions.settings);
 
@@ -191,6 +202,7 @@ export class RulesRunner {
       yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
       dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
     });
+
     timingEnd(postRuleLogText);
     timingEnd(getTextInLanguage('logs.rule-running'));
     return newText;

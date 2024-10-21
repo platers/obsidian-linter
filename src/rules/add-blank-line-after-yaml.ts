@@ -13,6 +13,8 @@ export default class AddBlankLineAfterYAML extends RuleBuilder<AddBlankLineAfter
       nameKey: 'rules.add-blank-line-after-yaml.name',
       descriptionKey: 'rules.add-blank-line-after-yaml.description',
       type: RuleType.YAML,
+      // needs to run before YAML timestamp if the YAML is present, but after it otherwise
+      hasSpecialExecutionOrder: true,
     });
   }
   get OptionsClass(): new () => AddBlankLineAfterYAMLOptions {
