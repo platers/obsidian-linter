@@ -259,13 +259,16 @@ export default class LinterPlugin extends Plugin {
           this.activeFileChangeDebouncer.get(info.file).debounceFn(info.file, editor);
         }
       } else {
-        this.activeFileChangeDebouncer.set(info.file, {
+        const activeFileDebounceInfo = {
           debounceFn: this.createDebouncedFileUpdate(),
           isRunning: false,
           // do not use editor because it already has the change, so if the user removes all changes
           // it would still make an update
           originalText: await this.app.vault.cachedRead(info.file),
-        });
+        };
+
+        this.activeFileChangeDebouncer.set(info.file, activeFileDebounceInfo);
+        activeFileDebounceInfo.debounceFn(info.file, editor);
       }
     });
     this.registerEvent(eventRef);
