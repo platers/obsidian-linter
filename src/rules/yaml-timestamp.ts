@@ -444,7 +444,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
           },
           {
             value: 'user or Linter edits',
-            description: 'When a value is present in the frontmatter for date modified, date modified is kept as is unless the Linter makes a change to the note or the user edits a note with the setting `{NAME}` set to something other than `{NEVER}`.'.replace('{NAME}', getTextInLanguage('rules.yaml-timestamp.update-on-file-contents-updated.name')).replace('{NEVER}', getTextInLanguage('enums.never')),
+            description: 'When a value is present in the frontmatter for date modified, date modified is kept as is unless the Linter makes a change to a note or the user edits a note with the setting `{NAME}` set to something other than `{NEVER}`.'.replace('{NAME}', getTextInLanguage('rules.yaml-timestamp.update-on-file-contents-updated.name')).replace('{NEVER}', getTextInLanguage('enums.never')),
           },
         ],
       }),
