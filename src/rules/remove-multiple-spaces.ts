@@ -1,7 +1,8 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {IgnoreTypes} from '../utils/ignore-types';
+import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {updateListItemText} from '../utils/mdast';
 
 class RemoveMultipleSpacesOptions implements Options {}
 
@@ -19,7 +20,13 @@ export default class RemoveMultipleSpaces extends RuleBuilder<RemoveMultipleSpac
     return RemoveMultipleSpacesOptions;
   }
   apply(text: string, options: RemoveMultipleSpacesOptions): string {
-    text = text.replace(/(?!^>)([^\s])( ){2,}([^\s])/gm, '$1 $3');
+    text = ignoreListOfTypes([IgnoreTypes.list], text, (text: string): string => {
+      return text.replace(/(?!^>)([^\s])( ){2,}([^\s])/gm, '$1 $3');
+    });
+
+    text = updateListItemText(text, (text: string): string => {
+      return text.replace(/([^\s])( ){2,}([^\s])/gm, '$1 $3');
+    });
 
     return text;
   }
