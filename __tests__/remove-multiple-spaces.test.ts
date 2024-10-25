@@ -210,6 +210,35 @@ ruleTest({
         $ x =  2y $
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1203
+      testName: 'A nested callout/blockquote should not have list item proceeding space removed',
+      before: dedent`
+        > [!goal]+ Two goals of object-oriented design
+        >
+        > > [!def]- Cohesion
+        > > - How strongly related the parts are inside a class
+        > > - About a class
+        > > - A class is *cohesive* if the data and behaviour of these objects makes sense
+        > > - **High cohesion**:
+        > >     - A class does one job, and does it well
+        > > - **Low cohesion**:
+        > >     - Class has parts that do not relate to each other
+        > > - e.g., \`Customer\` class might have \`getName\`, \`getAddress\`, but also \`sendEmail\` that sends an email to the customer → Weird; not a major responsibility of the customer → ==not cohesive
+      `,
+      after: dedent`
+        > [!goal]+ Two goals of object-oriented design
+        >
+        > > [!def]- Cohesion
+        > > - How strongly related the parts are inside a class
+        > > - About a class
+        > > - A class is *cohesive* if the data and behaviour of these objects makes sense
+        > > - **High cohesion**:
+        > >     - A class does one job, and does it well
+        > > - **Low cohesion**:
+        > >     - Class has parts that do not relate to each other
+        > > - e.g., \`Customer\` class might have \`getName\`, \`getAddress\`, but also \`sendEmail\` that sends an email to the customer → Weird; not a major responsibility of the customer → ==not cohesive
+      `,
+    },
   ],
 });
 
