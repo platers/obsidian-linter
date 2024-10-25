@@ -40,5 +40,6 @@ jobs:
 
           gh release create "$tag" \
             --title="$tag" \
+            --generate-notes \
             --draft \
             main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}.zip

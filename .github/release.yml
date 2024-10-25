@@ -1,0 +1,19 @@
+# .github/release.yml
+
+changelog:
+  categories:
+    - title: 'Features'
+      labels:
+        - 'enhancement'
+    - title: 'Bugs'
+      labels:
+        - 'bug'
+    - title: 'Documentation'
+      label: 'documentation'
+    - title: 'Maintenance'
+      labels:
+        - 'github'
+        - 'dependencies'
+    - title: Other Changes
+      labels:
+        - "*"
