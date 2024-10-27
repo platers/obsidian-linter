@@ -45,9 +45,12 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
 
     const yamlKeys: string[] = options.yamlKeyPrioritySortOrder;
     let index = 0;
-    for (const key of yamlKeys) {
+    for (let key of yamlKeys) {
+      key = key.trimEnd();
       if (key.endsWith(':')) {
         yamlKeys[index] = key.substring(0, key.length - 1);
+      } else if (key != yamlKeys[index]) {
+        yamlKeys[index] = key;
       }
 
       index++;
