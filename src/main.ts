@@ -407,7 +407,9 @@ export default class LinterPlugin extends Plugin {
 
   shouldIgnoreFile(file: TFile): boolean {
     for (const folder of this.settings.foldersToIgnore) {
-      if (folder.length > 0 && file.path.startsWith(folder)) {
+      // make sure that we check that the folder name is exactly at the start of the path
+      // which prevent incorrect matches see https://github.com/platers/obsidian-linter/issues/1208
+      if (folder.length > 0 && file.path.startsWith(normalizePath(folder)+ '/')) {
         return true;
       }
     }
