@@ -143,5 +143,61 @@ ruleTest({
         ],
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1202
+      testName: 'Make sure that settings that end in whitespace have them trimmed so they are properly recognized',
+      before: dedent`
+        ---
+        stakeholders:${' '}
+        pr-type:${' '}
+        date-created: Thursday, August 22nd 2024, 6:41:04 pm
+        pr-pipeline-stage:${' '}
+        pr-priority:${' '}
+        modified: Tuesday, October 22nd 2024, 10:58:16 am
+        pr-size:${' '}
+        pr-urgency:${' '}
+        pr-okr:${' '}
+        pr-due-date:${' '}
+        pr-completed-date:${' '}
+        template: "[[Pro New Project Outcome Template]]"
+        related-companies:${' '}
+        created-date: '[[<% tp.file.creation_date("YYYY-MM-DD") %>]]'
+        ---
+      `,
+      after: dedent`
+        ---
+        related-companies:${' '}
+        stakeholders:${' '}
+        pr-pipeline-stage:${' '}
+        pr-priority:${' '}
+        pr-size:${' '}
+        pr-urgency:${' '}
+        pr-type:${' '}
+        pr-okr:${' '}
+        pr-due-date:${' '}
+        pr-completed-date:${' '}
+        template: "[[Pro New Project Outcome Template]]"
+        created-date: '[[<% tp.file.creation_date("YYYY-MM-DD") %>]]'
+        modified: Tuesday, October 22nd 2024, 10:58:16 am
+        date-created: Thursday, August 22nd 2024, 6:41:04 pm
+        ---
+      `,
+      options: {
+        yamlKeyPrioritySortOrder: [
+          'related-companies: ',
+          'stakeholders: ',
+          'pr-pipeline-stage:',
+          'pr-priority:',
+          'pr-size:',
+          'pr-urgency:',
+          'pr-type: ',
+          'pr-okr:',
+          'pr-due-date:',
+          'pr-completed-date: ',
+          'template:',
+          'created-date:',
+          'modified:',
+        ],
+      },
+    },
   ],
 });
