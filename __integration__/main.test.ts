@@ -5,6 +5,7 @@ import {setWorkspaceItemMode} from './utils.test';
 import {customCommandTestCases} from './custom-commands.test';
 import {obsidianYAMLRuleTestCases} from './yaml-rule.test';
 import expect from 'expect';
+import {ignoreTestCases} from './ignore.test';
 
 export type IntegrationTestCase = {
   name: string,
@@ -12,6 +13,13 @@ export type IntegrationTestCase = {
   setup?: (plugin: TestLinterPlugin, editor: Editor) => Promise<void>,
   assertions?: (editor: Editor) => void,
   modifyExpected?: (expectedText: string, file: TFile) => string,
+}
+
+export type IntegrationIgnoreTestCase = {
+  name: string,
+  filePath: string,
+  setup?: (plugin: TestLinterPlugin) => Promise<void>,
+  expectedShouldIgnore: boolean
 }
 
 type testStatus = {
@@ -23,6 +31,7 @@ const testTimeout = 15000;
 
 export default class TestLinterPlugin extends Plugin {
   regularTests: Array<IntegrationTestCase> = [...obsidianModeTestCases, ...obsidianYAMLRuleTestCases];
+  ignoreTests: Array<IntegrationIgnoreTestCase> = ignoreTestCases;
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
   private timeoutId: any = undefined;
@@ -40,7 +49,7 @@ export default class TestLinterPlugin extends Plugin {
         await this.setup();
 
         const testStatuses = [] as testStatus[];
-        const expectedTestCount = this.regularTests.length + this.afterCacheUpdateTests.length;
+        const expectedTestCount = this.regularTests.length + this.ignoreTests.length + this.afterCacheUpdateTests.length;
         this.timeoutId = setTimeout(() => {
           console.log(testStatuses);
           if (testStatuses.length != expectedTestCount) {
@@ -112,9 +121,11 @@ export default class TestLinterPlugin extends Plugin {
       await this.resetFileContents(activeLeaf, originalText);
     }
 
-    if (testStatuses.length != this.regularTests.length) {
+    await this.runIgnoreTests(testStatuses, totalTestCount);
+
+    if (testStatuses.length != (this.regularTests.length + this.ignoreTests.length)) {
       if (this.testRunNotice) {
-        this.testRunNotice.setMessage(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
+        this.testRunNotice.setMessage(`❌ failed to run all ${this.regularTests.length + this.ignoreTests.length} regular and ignore tests before attempting to start the metadata tests.`);
       } else {
         console.log(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
       }
@@ -122,6 +133,39 @@ export default class TestLinterPlugin extends Plugin {
     }
 
     await this.runMetadataTests(this.afterCacheUpdateTests, activeLeaf, testStatuses, totalTestCount);
+  }
+
+  async runIgnoreTests(testStatuses: testStatus[], totalTestCount: number) {
+    for (const t of this.ignoreTests) {
+      const file = this.getFileFromPath(t.filePath);
+      if (!file) {
+        console.error('failed to get file: ' + t.filePath);
+
+        this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+        continue;
+      }
+
+      await this.resetSettings();
+
+      try {
+        if (t.setup) {
+          await t.setup(this);
+        }
+
+        if (this.plugin.shouldIgnoreFile(file) == t.expectedShouldIgnore) {
+          this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
+          console.log('✅', t.name);
+        } else {
+          this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+          console.log('❌', t.name);
+        }
+      } catch (e) {
+        console.log('❌', t.name);
+        console.error(e);
+
+        this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+      }
+    }
   }
 
   async runMetadataTests(tests: IntegrationTestCase[], activeLeaf: MarkdownView, testStatuses: testStatus[], totalTestCount: number) {
