@@ -74,7 +74,7 @@ export default class LinterPlugin extends Plugin {
   private fileLintFiles: Set<TFile> = new Set();
   private customCommandsCallback: (file: TFile) => Promise<void> = null;
   private currentlyOpeningSidebar: boolean = false;
-  private activeFileChangeDebouncer: Map<TFile, FileChangeUpdateInfo> = new Map();
+  private activeFileChangeDebouncer: Map<string, FileChangeUpdateInfo> = new Map();
   private defaultAutoCorrectMisspellings: Map<string, string> = new Map();
   private hasLoadedMisspellingFiles = false;
 
@@ -218,7 +218,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   registerEventsAndSaveCallback() {
-    let eventRef = this.app.workspace.on('editor-paste', (clipboardEv: ClipboardEvent) => {
+    let eventRef = this.app.workspace.on('editor-paste', (clipboardEv: ClipboardEvent, editor: Editor) => {
       // do not paste if another handler has already handled pasting text as that would likely cause a
       // double pasting of the clipboard contents
       // also skip if no paste rules are enabled
@@ -226,7 +226,7 @@ export default class LinterPlugin extends Plugin {
         return;
       }
 
-      void this.modifyPasteEvent(clipboardEv);
+      void this.modifyPasteEvent(clipboardEv, editor);
     });
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
@@ -253,21 +253,25 @@ export default class LinterPlugin extends Plugin {
         return;
       }
 
-      if (this.activeFileChangeDebouncer.has(info.file)) {
-        const activeFileChangeInfo = this.activeFileChangeDebouncer.get(info.file);
+      if (this.activeFileChangeDebouncer.has(info.file.path)) {
+        const activeFileChangeInfo = this.activeFileChangeDebouncer.get(info.file.path);
         if (!activeFileChangeInfo.isRunning) {
-          this.activeFileChangeDebouncer.get(info.file).debounceFn(info.file, editor);
+          this.activeFileChangeDebouncer.get(info.file.path).debounceFn(info.file, editor);
         }
       } else {
         const activeFileDebounceInfo = {
           debounceFn: this.createDebouncedFileUpdate(),
           isRunning: false,
-          // do not use editor because it already has the change, so if the user removes all changes
-          // it would still make an update
-          originalText: await this.app.vault.cachedRead(info.file),
+          // we set this value as empty initially due to an issue where the await time to
+          // read the file from the cache in some instances can allow another editor-change
+          // to check if the same file we already intend to add is in the map before we set
+          // the value in the map
+          originalText: '',
         };
-
-        this.activeFileChangeDebouncer.set(info.file, activeFileDebounceInfo);
+        this.activeFileChangeDebouncer.set(info.file.path, activeFileDebounceInfo);
+        // do not use editor because it already has the change, so if the user removes all changes
+        // it would still make an update. We do this here due to a race condition in some situations.
+        activeFileDebounceInfo.originalText =  await this.app.vault.cachedRead(info.file);
         activeFileDebounceInfo.debounceFn(info.file, editor);
       }
     });
@@ -695,32 +699,57 @@ export default class LinterPlugin extends Plugin {
 
     return debounce(
         async (file: TFile, editor: Editor) => {
-          if (!this.activeFileChangeDebouncer.has(file)) {
+          if (!this.activeFileChangeDebouncer.has(file.path)) {
             logWarn(getTextInLanguage('logs.file-change-yaml-lint-warning'));
             return;
           }
 
-          const activeFileChangeInfo = this.activeFileChangeDebouncer.get(file);
+          const activeFileChangeInfo = this.activeFileChangeDebouncer.get(file.path);
           activeFileChangeInfo.isRunning = true;
 
-          const oldText = editor.getValue();
-          let newText = oldText;
-          if (oldText != activeFileChangeInfo.originalText ) {
-            logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
-            try {
-              newText = this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
-            } catch (error) {
-              this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
-              return;
-            }
+          const editorValue = editor.getValue();
+          const cachedValue = await this.app.vault.cachedRead(file);
+          const editorIsWholeFile = editorValue === cachedValue;
 
-            this.updateEditor(oldText, newText, editor);
+          let oldText = '';
+          if (editorIsWholeFile) {
+            oldText = editorValue;
+
+            let newText = oldText;
+            if (oldText != activeFileChangeInfo.originalText ) {
+              logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
+              try {
+                newText = this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
+              } catch (error) {
+                this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+                return;
+              }
+
+              this.updateEditor(oldText, newText, editor);
+            } else {
+              logInfo(getTextInLanguage('logs.file-change-yaml-lint-skipped'));
+            }
           } else {
-            logInfo(getTextInLanguage('logs.file-change-yaml-lint-skipped'));
+            oldText = cachedValue;
+            if (oldText != activeFileChangeInfo.originalText) {
+              logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
+
+              await this.app.vault.process(file, (data: string) => {
+                logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
+                try {
+                  return this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
+                } catch (error) {
+                  this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+                  return data;
+                }
+              });
+            } else {
+              logInfo(getTextInLanguage('logs.file-change-yaml-lint-skipped'));
+            }
           }
 
+          this.activeFileChangeDebouncer.delete(file.path);
           activeFileChangeInfo.isRunning = false;
-          this.activeFileChangeDebouncer.delete(file);
         },
         delay,
         true,
@@ -796,9 +825,8 @@ export default class LinterPlugin extends Plugin {
 
   // based on https://github.com/chrisgrieser/obsidian-smarter-paste/blob/master/main.ts#L43-L79
   // INFO: to inspect clipboard content types, use https://evercoder.github.io/clipboard-inspector/
-  async modifyPasteEvent(clipboardEv: ClipboardEvent): Promise<void> {
+  async modifyPasteEvent(clipboardEv: ClipboardEvent, editor: Editor): Promise<void> {
     // abort when pane isn't markdown editor
-    const editor = this.getEditor();
     if (!editor) return;
     // abort when clipboard contains an image (or is empty)
     // check for plain text, since 'getData("text/html")' ignores plain-text
@@ -1070,8 +1098,8 @@ export default class LinterPlugin extends Plugin {
   }
 
   private updateFileDebouncerText(file: TFile, newText: string) {
-    if (this.activeFileChangeDebouncer.has(file)) {
-      this.activeFileChangeDebouncer.get(file).originalText = newText;
+    if (this.activeFileChangeDebouncer.has(file.path)) {
+      this.activeFileChangeDebouncer.get(file.path).originalText = newText;
     }
   }
 }
