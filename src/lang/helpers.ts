@@ -86,19 +86,20 @@ export const localeToFileName: { [k: string]: string} = {
 
 export type LanguageStringKey = NestedKeyOf<LanguageStrings>
 
-let lang = 'en';
+const defaultLang = 'en';
+let lang = defaultLang;
 let locale = localeMap[lang];
 
 export function setLanguage(newLang: string) {
   lang = newLang;
-  locale = localeMap[lang || 'en'];
+  locale = localeMap[lang];
+  if (!locale) {
+    logWarn(`locale not found for '${lang}'`);
+    locale = localeMap[defaultLang];
+  }
 }
 
 export function getTextInLanguage(str: LanguageStringKey): string {
-  if (!locale) {
-    logWarn(`locale not found for '${lang}'`);
-  }
-
   const text: unknown = (locale && getString<LanguageStrings>(locale, str)) || getString<LanguageStrings>(en, str);
 
   return text as string;
