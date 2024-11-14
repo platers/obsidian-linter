@@ -53,7 +53,7 @@ export default {
     'unknown-error': '格式化过程发生未知错误',
     'moment-locale-not-found': '尝试将 Moment.js 的默认地区语言切换到 {MOMENT_LOCALE}, 实际切换到 {CURRENT_LOCALE}',
     'file-change-lint-message-start': '格式化已完成',
-    'custom-command-callback-warning': 'Please only set the custom command callback for integration tests.', //not translate
+    'custom-command-callback-warning': 'Please only set the custom command callback for integration tests.', // not translated
 
     // rules-runner.ts
     'pre-rules': '比正常规则优先级更高的规则',
