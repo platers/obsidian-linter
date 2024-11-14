@@ -271,7 +271,7 @@ export default class LinterPlugin extends Plugin {
         this.activeFileChangeDebouncer.set(info.file.path, activeFileDebounceInfo);
         // do not use editor because it already has the change, so if the user removes all changes
         // it would still make an update. We do this here due to a race condition in some situations.
-        activeFileDebounceInfo.originalText =  await this.app.vault.cachedRead(info.file);
+        activeFileDebounceInfo.originalText = await this.app.vault.cachedRead(info.file);
         activeFileDebounceInfo.debounceFn(info.file, editor);
       }
     });
