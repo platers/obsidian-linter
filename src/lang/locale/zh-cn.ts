@@ -45,11 +45,15 @@ export default {
     'plugin-unload': '正在卸载插件',
     'folder-lint': '正在格式化文件夹',
     'linter-run': '正在运行 Linter',
+    'file-change-yaml-lint-run': '文件内容变更， 正在格式化 YAML',
+    'file-change-yaml-lint-skipped': '没有检测到文件内容变更, 跳过 YAML 格式化',
+    'file-change-yaml-lint-warning': '没有检测到文件内容变更, 但是 YAML 格式化被触发，请检查错误',
     'paste-link-warning': '中止粘贴格式化 ，因为剪贴板内容是一个链接，这样做将避免与其他修改粘贴行为的插件发生冲突',
     'see-console': '请查看控制台以获取更多信息',
     'unknown-error': '格式化过程发生未知错误',
     'moment-locale-not-found': '尝试将 Moment.js 的默认地区语言切换到 {MOMENT_LOCALE}, 实际切换到 {CURRENT_LOCALE}',
     'file-change-lint-message-start': '格式化已完成',
+    'custom-command-callback-warning': 'Please only set the custom command callback for integration tests.', // not translated
 
     // rules-runner.ts
     'pre-rules': '比正常规则优先级更高的规则',
@@ -81,7 +85,7 @@ export default {
     'too-many-footnotes-error-message': `脚注编号 '{FOOTNOTE_KEY}' 有超过1个脚注在使用，请修改脚注使得一个脚注编号对应一个脚注`,
 
     // rules.ts
-    'wrapper-yaml-error': 'yaml出现错误: {ERROR_MESSAGE}',
+    'wrapper-yaml-error': 'YAML 出现错误: {ERROR_MESSAGE}',
     'wrapper-unknown-error': '未知错误: {ERROR_MESSAGE}',
   },
 
@@ -89,6 +93,7 @@ export default {
     'empty-clipboard': '剪贴板为空',
     'characters-added': '个字符被添加',
     'characters-removed': '个字符被移除',
+    'copy-to-clipboard-failed': '将内容复制到剪贴板时失败: ',
   },
 
   // rule-alias-suggester.ts
@@ -101,6 +106,24 @@ export default {
   // lint-confirmation-modal.ts
   'warning-text': '警告',
   'file-backup-text': '请确保你已备份文件',
+  'custom-command-warning': '启用自定义命令时格式化多个文件需要启用侧边栏，同时会显著的更加耗时，请保持耐心',
+  'cancel-button-text': '取消',
+
+  'copy-aria-label': '复制',
+
+  'disabled-other-rule-notice': '如果启用规则 <code>{NAME_1}</code>，则将禁用规则 <code>{NAME_2}</code>。',
+  'disabled-conflicting-rule-notice': '{NAME_1} 因与 {NAME_2} 冲突而禁用。',
+
+  // confirm-rule-disable-modal.ts
+  'ok': '确定',
+
+  // parse-results-modal.ts
+  'parse-results-heading-text': 'Custom Parse Values',
+  'file-parse-description-text': 'The following is the list of custom replacements found in {FILE}.',
+  'no-parsed-values-found-text': 'There were no custom replacements found in {FILE}. Please make sure that all tables with custom replacements in {FILE} only have two columns and all rows start and end with a pipe (i.e. |).',
+  'find-header-text': 'Word to Find',
+  'replace-header-text': 'Replacement Word',
+  'close-button-text': 'Close',
 
   'tabs': {
     'names': {
@@ -138,6 +161,19 @@ export default {
       'folders-to-ignore': {
         'name': '忽略文件夹',
         'description': '需要忽略的文件夹（格式化所有文件或保存时格式化时生效），每行输入一个文件夹路径',
+        'folder-search-placeholder-text': '文件夹',
+        'add-input-button-text': '添加要忽略的文件夹',
+        'delete-tooltip': '删除',
+      },
+      'files-to-ignore': {
+        'name': '忽略文件',
+        'description': '需要忽略的文件（格式化所有文件或保存时格式化时生效）',
+        'file-search-placeholder-text': '正则表达式',
+        'add-input-button-text': '添加正则表达式',
+        'delete-tooltip': '删除',
+        'label-placeholder-text': '名称',
+        'flags-placeholder-text': '修饰符',
+        'warning': '如果您不知道正则表达式是什么，请谨慎使用。此外，如果在 iOS 移动设备上使用后行断言，请确保系统版本支持',
       },
       'override-locale': {
         'name': '覆盖默认地区语言',
@@ -161,7 +197,7 @@ export default {
         'description': 'YAML 多行数组的转义字符和 YAML 单行数组不同，因此在使用多行数组时，删除不必要的转义字符',
       },
       'number-of-dollar-signs-to-indicate-math-block': {
-        'name': '指示 Latex 块的 $ 符号数量',
+        'name': 'Latex 块标记符 $ 数量',
         'description': '将 Latex 内容视为 Latex 块而不是行内 Latex 的 $ 符号的数量',
       },
     },
@@ -169,19 +205,19 @@ export default {
       // debug-tab.ts
       'log-level': {
         'name': '日志级别',
-        'description': '允许打印的日志类型，默认是 ERROR',
+        'description': '允许输出的日志级别，默认是 ERROR',
       },
       'linter-config': {
-        'name': '格式化配置',
-        'description': '在设置页面加载时，Linter 中 data.json 的内容',
+        'name': 'Linter 配置',
+        'description': '打开设置页面后，Linter 加载的 data.json 中的内容',
       },
       'log-collection': {
-        'name': '在保存时格式化和格式化当前文件时收集日志',
-        'description': '在保存时格式化和格格式化当前文件时收集日志。这些日志有助于调试和创建错误报告',
+        'name': '格式化当前文件时收集日志',
+        'description': '在格式化当前文件时收集日志。这些日志有助于调试和创建错误报告',
       },
       'linter-logs': {
         'name': 'Linter 日志',
-        'description': '如果开启，则显示最后一次格式化时保存或者格式化当前文件时生成的日志',
+        'description': '如果开启，则显示最后一次格式化当前文件时生成的日志',
       },
     },
   },
@@ -203,15 +239,24 @@ export default {
       // custom-replace-option.ts
       'name': '自定义正则表达式替换',
       'description': '自定义正则表达式替换可将任意的正则匹配内容替换为指定值。查找值和替换值必须是有效的正则表达式',
-      'warning': '如果您不知道正则表达式是什么，请谨慎使用。另外，请确保您不要在 iOS 移动设备上使用后行断言，由于该平台不支持，会导致格式化失败',
+      'warning': '如果您不知道正则表达式是什么，请谨慎使用。此外，如果在 iOS 移动设备上使用后行断言，请确保系统版本支持',
       'add-input-button-text': '添加新的正则替换规则',
-      'regex-to-find-placeholder-text': '查找正则式',
-      'flags-placeholder-text': '参数',
-      'regex-to-replace-placeholder-text': '替换正则式',
-      'label-placeholder-text': '简称',
+      'regex-to-find-placeholder-text': '查找用正则表达式',
+      'flags-placeholder-text': '修饰符',
+      'regex-to-replace-placeholder-text': '替换用正则表达式',
+      'label-placeholder-text': '名称',
       'move-up-tooltip': '上移',
       'move-down-tooltip': '下移',
       'delete-tooltip': '删除',
+    },
+    'custom-auto-correct': {
+      'delete-tooltip': '删除',
+      'show-parsed-contents-tooltip': '查看加载的替换文件',
+      'custom-row-parse-warning': '"{ROW}" 格式错误，需要至少两列',
+      'file-search-placeholder-text': '文件名称',
+      'add-new-replacement-file-tooltip': '添加自定义文件',
+      'warning-text': '被选中的文件将自动关闭规则 {NAME}',
+      'refresh-tooltip-text': '重新加载自定义替换文件',
     },
   },
 
@@ -225,11 +270,22 @@ export default {
         'name': '忽略单词',
         'description': '以逗号分隔的小写单词列表，在自动更正时会忽略',
       },
+      'extra-auto-correct-files': {
+        'name': '额外自动更正原始文件',
+        'description': '文件中有一个 markdown 表格，其中包含初始单词和要更正的单词（不区分大小写）。 <b>注意：使用的表格应该对每行都有起始和结束的 <code>|</code> 标志</b>',
+      },
+      'skip-words-with-multiple-capitals': {
+        'name': '跳过有多个大写字母的单词',
+        'description': '跳过有多个大写字母的单词，首字母缩写词和其他一些单词可能会受益于此。这可能会导致专有名词无法正确修复',
+      },
+      'default-install': '正在下载默认的拼写错误修正数据，仅在第一次启用时下载，请等待...',
+      'default-install-failed': '下载 {URL} 失败。禁用自动更正常见的拼写错误',
+      'defaults-missing': '未找到默认的常见自动更正文件: {FILE}',
     },
     // add-blank-line-after-yaml.ts
     'add-blank-line-after-yaml': {
-      'name': '在 YAML 块后添加空行',
-      'description': '如果 YAML 块不处于文件末尾或 YAML 块后不存在至少一个空行时添加一个空行',
+      'name': 'YAML 块后空行',
+      'description': '确保 YAML 块后有空行，除非它在文档的结尾',
     },
     // blockquotify-on-paste.ts
     'add-blockquote-indentation-on-paste': {
@@ -287,11 +343,11 @@ export default {
     },
     // convert-spaces-to-tabs.ts
     'convert-spaces-to-tabs': {
-      'name': '转换空格为制表符',
+      'name': '空格转为制表符',
       'description': '将前导空格转换为制表符',
       'tabsize': {
         'name': '制表符宽度',
-        'description': '制表符对应的空格宽度',
+        'description': '制表符对应的空格数量',
       },
     },
     // dedupe-yaml-array-values.ts
@@ -346,7 +402,7 @@ export default {
     // empty-line-around-math-block.ts
     'empty-line-around-math-blocks': {
       'name': 'Latex 块前后空行',
-      'description': '确保 Latex 块前后有空行。使用<b>指示 Latex 块的 <code>$</code> 符号数量</b>来确定单行 Latex 是否被认定为 Latex 块',
+      'description': '确保 Latex 前后有空行，根据<b> Latex 块标记符 $ 数量</b>来确定单行 Latex 是否被认定为 Latex 块',
     },
     // empty-line-around-tables.ts
     'empty-line-around-tables': {
@@ -369,8 +425,8 @@ export default {
     },
     // footnote-after-punctuation.ts
     'footnote-after-punctuation': {
-      'name': '脚注在标点符号后',
-      'description': '确保脚注引用置于标点符号之后，而不是之前',
+      'name': '脚注引用移至标点符号后',
+      'description': '将脚注引用移至标点符号后',
     },
     // force-yaml-escape.ts
     'force-yaml-escape': {
@@ -421,15 +477,15 @@ export default {
       'description': '标题一次仅递增一个级别',
       'start-at-h2': {
         'name': '从 H2 标题开始递增',
-        'description': '使 H2 标题成为文件中的最小标题级别，其他级别的标题进行相应的递推',
+        'description': '使 H2 标题成为文件中的最高标题级别，其他级别的标题进行相应的递推',
       },
     },
     // heading-blank-lines.ts
     'heading-blank-lines': {
-      'name': '标题空行',
-      'description': '保证所有标题前后均有一个空行（除非标题位于文档开头或结尾处）',
+      'name': '标题前后空行',
+      'description': '确保标题前后有一个空行，除非它在文档的开头或结尾',
       'bottom': {
-        'name': '底部',
+        'name': '标题后空行',
         'description': '在标题后插入一个空行',
       },
       'empty-line-after-yaml': {
@@ -440,7 +496,7 @@ export default {
     // headings-start-line.ts
     'headings-start-line': {
       'name': '标题对齐行首',
-      'description': '将不以行首开始的标题前面的空白删除，标题能被正确识别',
+      'description': '将标题前的空格删除，使标题能被正确识别',
     },
     // insert-yaml-attributes.ts
     'insert-yaml-attributes': {
@@ -458,13 +514,13 @@ export default {
     },
     // move-footnotes-to-the-bottom.ts
     'move-footnotes-to-the-bottom': {
-      'name': '移动脚注至底部',
+      'name': '脚注移至文档底部',
       'description': '将所有脚注移动到文档底部',
     },
     // move-math-block-indicators-to-their-own-line.ts
     'move-math-block-indicators-to-their-own-line': {
-      'name': '格式化 Latex 块标志',
-      'description': '将 Latex 块标志移到新行。使用<b>指示 Latex 块的 <code>$</code> 符号数量</b>来确定单行 Latex 是否被认定为 Latex 块',
+      'name': '格式化 Latex 块标记',
+      'description': '将 Latex 块标记移到新行。根据<b> Latex 块标记符 $ 数量</b>来确定单行 Latex 是否被认定为 Latex 块',
     },
     // move-tags-to-yaml.ts
     'move-tags-to-yaml': {
@@ -482,10 +538,10 @@ export default {
     // no-bare-urls.ts
     'no-bare-urls': {
       'name': '禁止原始 URL',
-      'description': '除非被反引号、方括号或单引号/双引号包围，否则将原始 URL 用尖括号包围',
+      'description': '用尖括号包围原始 URL，除非 URL 在反引号、方括号或单引号/双引号范围内',
       'no-bare-uris': {
         'name': '禁止原始 URI',
-        'description': '除非被反引号、方括号或单引号/双引号包围，否则将原始 URI 用尖括号包围',
+        'description': '用尖括号包围原始 URI，除非 URI 在反引号、方括号或单引号/双引号范围内',
       },
     },
     // ordered-list-style.ts
@@ -500,6 +556,10 @@ export default {
         'name': '有序列表标志样式',
         'description': '有序列表标志样式',
       },
+      'preserve-start': {
+        'name': '保留起始值',
+        'description': '是否保留有序列表的起始值',
+      },
     },
     // paragraph-blank-lines.ts
     'paragraph-blank-lines': {
@@ -508,22 +568,22 @@ export default {
     },
     // prevent-double-checklist-indicator-on-paste.ts
     'prevent-double-checklist-indicator-on-paste': {
-      'name': '防止重复的 checklist 标志',
-      'description': '粘贴时，如果光标所在行有 checklist 标志，则从要粘贴的文本中移除 checklist 标志',
+      'name': '防止重复的清单标记',
+      'description': '粘贴时，如果光标所在行有清单标记，则从要粘贴的文本中移除清单标记',
     },
     // prevent-double-list-item-indicator-on-paste.ts
     'prevent-double-list-item-indicator-on-paste': {
-      'name': '防止重复的列表标志',
+      'name': '防止重复的列表标记',
       'description': '粘贴时，如果光标所在行有列表标志，则从要粘贴的文本中移除列表标志',
     },
     // proper-ellipsis-on-paste.ts
     'proper-ellipsis-on-paste': {
-      'name': '正确的省略号',
-      'description': '粘贴时，即使要粘贴的文本中有空格，也用省略号替换三个连续的点',
+      'name': '更正省略号',
+      'description': '粘贴时，用省略号替换三个连续的点（点之间有空格也会生效）',
     },
     // proper-ellipsis.ts
     'proper-ellipsis': {
-      'name': '正确的省略号',
+      'name': '更正省略号',
       'description': '用省略号替换三个连续的点',
     },
     // quote-style.ts
@@ -549,8 +609,8 @@ export default {
     },
     // re-index-footnotes.ts
     're-index-footnotes': {
-      'name': '重新索引脚注',
-      'description': '基于出现的顺序重新索引脚注。<b>注意，如果一个键对应多个脚注，则此规则不适用</b>',
+      'name': '脚注重新索引',
+      'description': '基于出现的顺序对脚注重新索引。<b>注意，如果一个引用对应多条脚注，则此规则失效</b>',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
@@ -566,6 +626,11 @@ export default {
     'remove-empty-list-markers': {
       'name': '移除空的列表标志',
       'description': '移除空的列表标志，比如列表后没内容',
+    },
+    // empty-line-around-horizontal-rules.ts
+    'empty-line-around-horizontal-rules': {
+      'name': '分隔线前后空行',
+      'description': '确保分隔线前后有空行，除非它在文档的开头或结尾',
     },
     // remove-hyphenated-line-breaks.ts
     'remove-hyphenated-line-breaks': {
@@ -584,8 +649,8 @@ export default {
     },
     // remove-leftover-footnotes-from-quote-on-paste.ts
     'remove-leftover-footnotes-from-quote-on-paste': {
-      'name': '移除多余脚注',
-      'description': '粘贴时，从要粘贴的文本中移除多余脚注',
+      'name': '移除脚注引用',
+      'description': '粘贴时，从要粘贴的文本中移除脚注引用',
     },
     // remove-link-spacing.ts
     'remove-link-spacing': {
@@ -639,7 +704,7 @@ export default {
     // remove-trailing-punctuation-in-heading.ts
     'remove-trailing-punctuation-in-heading': {
       'name': '移除标题中的结尾标点符号',
-      'description': '从标题的末尾删除指定的标点符号，确保忽略<a href="https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references">HTML 字符实体</a>末尾的分号',
+      'description': '从标题的末尾删除指定的标点符号，不会删除 <a href="https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references">HTML 字符实体</a>末尾的分号',
       'punctuation-to-remove': {
         'name': '要删除的结尾标点符号',
         'description': '要从文件标题结尾中删除的标点符号',
@@ -687,7 +752,15 @@ export default {
     // space-between-chinese-japanese-or-korean-and-english-or-numbers.ts
     'space-between-chinese-japanese-or-korean-and-english-or-numbers': {
       'name': '中日韩语与英语或数字之间的空格',
-      'description': '确保中文、日文或韩文和英文或数字由单个空格分隔. <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">参考链接</a>',
+      'description': '确保中日韩文与英文数字之间有一个空格 <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">参考链接</a>',
+      'english-symbols-punctuation-before': {
+        'name': 'English Punctuations and Symbols Before CJK',
+        'description': '被认为是英文的在中日韩文字符之"前"找到的非字母标点符号 <b>注意: "*" 会被认为是英文</b>',
+      },
+      'english-symbols-punctuation-after': {
+        'name': 'English Punctuations and Symbols After CJK',
+        'description': '被认为是英文的在中日韩文字符之"后"找到的非字母标点符号 <b>注意: "*" 会被认为是英文</b>',
+      },
     },
     // strong-style.ts
     'strong-style': {
@@ -709,8 +782,12 @@ export default {
     },
     // two-spaces-between-lines-with-content.ts
     'two-spaces-between-lines-with-content': {
-      'name': '内容间隔两个空格',
-      'description': '确保在段落、引用和列表项中，最后一行内容的行末添加两个空格',
+      'name': '不同内容间换行',
+      'description': '确保在段落、引用和列表项之间，每块内容的末尾有两个空格',
+      'line-break-indicator': {
+        'name': '换行标记',
+        'description': '要使用的换行标记',
+      },
     },
     // unordered-list-style.ts
     'unordered-list-style': {
@@ -750,6 +827,14 @@ export default {
         'name': '创建日期键名',
         'description': '使用哪个 YAML 键来表示创建日期',
       },
+      'date-created-source-of-truth': {
+        'name': '创建日期数据源',
+        'description': '如果 YAML Front-matter 中已经有创建时间，从哪里获取创建时间新值',
+      },
+      'date-modified-source-of-truth': {
+        'name': '修改日期数据源',
+        'description': '如果 YAML Front-matter 中已经有修改日期，从哪里获取修改时间新值',
+      },
       'date-modified': {
         'name': '修改日期',
         'description': '插入文件的最近一次的修改日期',
@@ -760,7 +845,15 @@ export default {
       },
       'format': {
         'name': '格式',
-        'description': 'Moment.js 语法格式（详情设置见<a href="https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/">Moment format options</a>',
+        'description': 'Moment.js 语法格式 <a href="https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/">说明</a>）',
+      },
+      'convert-to-utc': {
+        'name': '本地时间转为 UTC 时间',
+        'description': '本地时间转为 UTC 时间',
+      },
+      'update-on-file-contents-updated': {
+        'name': '文件内容变化时更新 YAML 时间戳',
+        'description': '当前活动笔记被修改时，<code>修改日期</code>将会实时更新。',
       },
     },
     // yaml-title-alias.ts
@@ -779,11 +872,15 @@ export default {
         'name': '使用 YAML 键 <code>linter-yaml-title-alias</code> 来保留标题修改记录',
         'description': '如果设置，当第一个 H1 标题更改或文档名更改时，此键中存储的旧 aliases 将替换为新值，而不仅仅是在 aliases 中插入新条目',
       },
+      'alias-helper-key': {
+        'name': '别名辅助键',
+        'description': '此键用于保存标题别名历史',
+      },
     },
     // yaml-title.ts
     'yaml-title': {
       'name': 'YAML 标题',
-      'description': '将文件的标题插入到 YAML Front-matter 中。 根据所选模式获取标题',
+      'description': '根据指定模式，将文件的标题插入到 YAML Front-matter 中',
       'title-key': {
         'name': '标题键',
         'description': '标题使用哪一个 YAML 键',
@@ -810,6 +907,7 @@ export default {
     'SILENT': 'SILENT',
     'ascending': '升序',
     'lazy': '全为1',
+    'preserve': '保持原样',
     'Nothing': '无',
     'Remove hashtag': '移除 hashtag',
     'Remove whole tag': '移除整个 tag',
@@ -836,6 +934,18 @@ export default {
     'first-h1': '第一个 H1 标题',
     'first-h1-or-filename-if-h1-missing': '第一个 H1 标题或文件名（第一个 H1 标题不存在时）',
     'filename': '文件名',
+    // settings-data.ts
+    'never': 'Never',
+    'after 5 seconds': '5 秒后',
+    'after 10 seconds': '10 秒后',
+    'after 15 seconds': '15 秒后',
+    'after 30 seconds': '30 秒后',
+    'after 1 minute': '1 分钟后',
+    // yaml-timestamp.ts
+    'file system': '系统',
+    'frontmatter': 'YAML Front-matter',
+    'user or Linter edits': 'Obsidian',
+    // quote-style.ts
     '\'\'': '\'\'', // leave as is
     '‘’': '‘’', // leave as is
     '""': '""', // leave as is
