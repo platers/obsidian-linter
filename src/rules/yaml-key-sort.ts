@@ -1,8 +1,8 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {getYAMLJSON as parseYaml, getYAMLText, getYamlSectionValue, loadYAML, removeYamlSection, setYamlSection} from '../utils/yaml';
-import {Document} from 'yaml';
+import {parseYAML, getYAMLText, loadYAML, setYamlSection, astToString} from '../utils/yaml';
+import {Document, YAMLMap} from 'yaml';
 
 type YamlSortOrderForOtherKeys = 'None' | 'Ascending Alphabetical' | 'Descending Alphabetical';
 
@@ -20,6 +20,18 @@ class YamlKeySortOptions implements Options {
 
   yamlKeyPrioritySortOrder?: string[] = [];
   yamlSortOrderForOtherKeys?: YamlSortOrderForOtherKeys = 'None';
+}
+
+interface Key {
+  value?: string;
+}
+
+interface Node {
+  constructor: { name: string };
+  key?: Key;
+  value?: any;
+  items?: [string, any][];
+  moved?: boolean;
 }
 
 @RuleBuilder.register
@@ -58,16 +70,15 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     }
 
     const yamlObject = loadYAML(yamlText);
-    const doc = parseYaml(yamlText);
-    const newDoc = new Document(null, yamlObject.options);
-    // newDoc.items.splice(0, 1);
-    let remainingKeys = this.getYAMLKeysSorted(yamlKeys, doc, newDoc);
-    // const priorityKeysSorted = sortKeysResult.sortedYamlKeyValues;
-    // yamlText = sortKeysResult.remainingYaml;
+    const doc = parseYAML(yamlText);
+    const startingPriorityKeys = new Document(yamlObject.options);
+    startingPriorityKeys.contents = new YAMLMap();
+
+    let remainingKeys = this.getYAMLKeysSorted(yamlKeys, doc, startingPriorityKeys);
 
     const sortOrder = options.yamlSortOrderForOtherKeys;
     if (yamlObject == null) {
-      return this.getTextWithNewYamlFrontmatter(text, oldYaml, newDoc.toString(), doc.toString(), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
+      return this.getTextWithNewYamlFrontmatter(text, oldYaml, astToString(startingPriorityKeys), astToString(doc), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
     }
 
     let sortMethod: (previousKey: string, currentKey: string) => number;
@@ -76,33 +87,34 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     } else if (sortOrder === 'Descending Alphabetical') {
       sortMethod = this.sortAlphabeticallyDesc;
     } else {
-      return this.getTextWithNewYamlFrontmatter(text, oldYaml, newDoc.toString(), doc.toString(), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
+      return this.getTextWithNewYamlFrontmatter(text, oldYaml, astToString(startingPriorityKeys), astToString(doc), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
     }
 
-    remainingKeys = remainingKeys.sort(sortMethod);
-    this.getYAMLKeysSorted(remainingKeys, doc, newDoc);
+    const remainingDocKeys = new Document(yamlObject.options);
+    remainingDocKeys.contents = new YAMLMap();
 
-    return this.getTextWithNewYamlFrontmatter(text, oldYaml, newDoc.toString(), doc.toString(), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
+    remainingKeys = remainingKeys.sort(sortMethod);
+    this.getYAMLKeysSorted(remainingKeys, doc, remainingDocKeys);
+
+    return this.getTextWithNewYamlFrontmatter(text, oldYaml, astToString(startingPriorityKeys), astToString(remainingDocKeys), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
   }
   getYAMLKeysSorted(keys: string[], yamlObject: Document, newDocument: Document): string[] {
-    // @ts-ignore TODO: fix the need for ts-ignore here
-    const initialKeys = yamlObject.contents.items as object[];
+    const initialKeys: Node[] = (yamlObject.contents as Node).items as Node[];
+    const remainingKeys: string[] = [];
+
     for (const key of keys) {
-      // we skip any nested elements when sorting to prevent issues where possible
       for (let i = 0; i < initialKeys.length; i++) {
-        // @ts-ignore TODO: fix the need for this ts ignore
-        if (initialKeys[i].key == key) {
-          newDocument.add(initialKeys[i]);
+        const node = initialKeys[i];
+        if (node.key.value === key) {
+          newDocument.add(node);
           initialKeys.splice(i, 1);
           break;
         }
       }
     }
 
-    const remainingKeys = [] as string[];
-    for (const val of initialKeys) {
-      // @ts-ignore TODO: fix the need for this ts ignore
-      remainingKeys.push(val.key as string);
+    for (const node of initialKeys) {
+      remainingKeys.push(node.key.value);
     }
 
     return remainingKeys;
@@ -247,16 +259,19 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
           status: WIP
           date: 02/15/2022
           ---
+          Any blank line is attached to the line that follows it
         `,
         after: dedent`
           ---
           tags: computer
+          ${''}
           status: WIP
           keywords: []
           date: 02/15/2022
           type: programming
           language: Typescript
           ---
+          Any blank line is attached to the line that follows it
         `,
         options: {
           yamlKeyPrioritySortOrder: [

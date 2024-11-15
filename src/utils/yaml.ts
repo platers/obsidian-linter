@@ -2,7 +2,7 @@ import {load, dump} from 'js-yaml';
 import {getTextInLanguage} from '../lang/helpers';
 import {escapeDollarSigns, yamlRegex} from './regex';
 import {isNumeric} from './strings';
-import YAML from 'yaml';
+import {parse, parseDocument, Document, stringify} from 'yaml';
 
 
 export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
@@ -94,7 +94,7 @@ export function loadYAML(yaml_text: string): any {
 
   // replacing tabs at the beginning of new lines with 2 spaces fixes loading YAML that has tabs at the start of a line
   // https://github.com/platers/obsidian-linter/issues/157
-  const parsed_yaml = load(yaml_text.replace(/\n(\t)+/g, '\n  ')) as {};
+  const parsed_yaml = parse(yaml_text.replace(/\n(\t)+/g, '\n  ')) as {};
   if (parsed_yaml == null) {
     return {};
   }
@@ -102,22 +102,27 @@ export function loadYAML(yaml_text: string): any {
   return parsed_yaml;
 }
 
-export function getYAMLJSON(yaml_text: string): YAML.Document {
+export function parseYAML(yaml_text: string): Document {
   if (yaml_text == null) {
     return null;
   }
 
   // replacing tabs at the beginning of new lines with 2 spaces fixes loading YAML that has tabs at the start of a line
   // https://github.com/platers/obsidian-linter/issues/157
-  const parsed_yaml = YAML.parseDocument(yaml_text.replace(/\n(\t)+/g, '\n  '));
+  const parsed_yaml = parseDocument(yaml_text.replace(/\n(\t)+/g, '\n  '));
   if (parsed_yaml == null) {
     return null;
   }
 
-  // console.log(parsed_yaml);
-  // console.log(parsed_yaml.toString());
-
   return parsed_yaml;
+}
+
+export function astToString(ast: Document): string {
+  if (!ast || !ast.contents || !ast.contents.items || ast.contents.items.length == 0) {
+    return '';
+  }
+
+  return ast.toString();
 }
 
 export enum TagSpecificArrayFormats {
@@ -401,7 +406,7 @@ export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeC
   }
 
   try {
-    const unescaped = load(basicEscape) as string;
+    const unescaped = parse(basicEscape) as string;
     if (unescaped === value) {
       return basicEscape;
     }
@@ -409,13 +414,13 @@ export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeC
     // invalid YAML
   }
 
-  const escapeWithDefaultCharacter = dump(value, {
+  const escapeWithDefaultCharacter = stringify(value, {
     lineWidth: -1,
     quotingType: defaultEscapeCharacter,
     forceQuotes: forceEscape,
   }).slice(0, -1);
 
-  const escapeWithOtherCharacter = dump(value, {
+  const escapeWithOtherCharacter = stringify(value, {
     lineWidth: -1,
     quotingType: defaultEscapeCharacter == '"' ? '\'' : '"',
     forceQuotes: forceEscape,
