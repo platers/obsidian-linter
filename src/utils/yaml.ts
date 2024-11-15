@@ -2,6 +2,7 @@ import {load, dump} from 'js-yaml';
 import {getTextInLanguage} from '../lang/helpers';
 import {escapeDollarSigns, yamlRegex} from './regex';
 import {isNumeric} from './strings';
+import YAML from 'yaml';
 
 
 export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
@@ -97,6 +98,24 @@ export function loadYAML(yaml_text: string): any {
   if (parsed_yaml == null) {
     return {};
   }
+
+  return parsed_yaml;
+}
+
+export function getYAMLJSON(yaml_text: string): YAML.Document {
+  if (yaml_text == null) {
+    return null;
+  }
+
+  // replacing tabs at the beginning of new lines with 2 spaces fixes loading YAML that has tabs at the start of a line
+  // https://github.com/platers/obsidian-linter/issues/157
+  const parsed_yaml = YAML.parseDocument(yaml_text.replace(/\n(\t)+/g, '\n  '));
+  if (parsed_yaml == null) {
+    return null;
+  }
+
+  // console.log(parsed_yaml);
+  // console.log(parsed_yaml.toString());
 
   return parsed_yaml;
 }

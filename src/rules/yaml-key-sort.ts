@@ -1,7 +1,8 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {getYAMLText, getYamlSectionValue, loadYAML, removeYamlSection, setYamlSection} from '../utils/yaml';
+import {getYAMLJSON as parseYaml, getYAMLText, getYamlSectionValue, loadYAML, removeYamlSection, setYamlSection} from '../utils/yaml';
+import {Document} from 'yaml';
 
 type YamlSortOrderForOtherKeys = 'None' | 'Ascending Alphabetical' | 'Descending Alphabetical';
 
@@ -40,7 +41,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
       return text;
     }
 
-    let yamlText = oldYaml;
+    const yamlText = oldYaml;
     const priorityAtStartOfYaml: boolean = options.priorityKeysAtStartOfYaml;
 
     const yamlKeys: string[] = options.yamlKeyPrioritySortOrder;
@@ -57,55 +58,54 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     }
 
     const yamlObject = loadYAML(yamlText);
-    const sortKeysResult = this.getYAMLKeysSorted(yamlText, yamlKeys, yamlObject);
-    const priorityKeysSorted = sortKeysResult.sortedYamlKeyValues;
-    yamlText = sortKeysResult.remainingYaml;
+    const doc = parseYaml(yamlText);
+    const newDoc = new Document(null, yamlObject.options);
+    // newDoc.items.splice(0, 1);
+    let remainingKeys = this.getYAMLKeysSorted(yamlKeys, doc, newDoc);
+    // const priorityKeysSorted = sortKeysResult.sortedYamlKeyValues;
+    // yamlText = sortKeysResult.remainingYaml;
 
     const sortOrder = options.yamlSortOrderForOtherKeys;
     if (yamlObject == null) {
-      return this.getTextWithNewYamlFrontmatter(text, oldYaml, priorityKeysSorted, yamlText, priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
+      return this.getTextWithNewYamlFrontmatter(text, oldYaml, newDoc.toString(), doc.toString(), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
     }
 
-    let remainingKeys = Object.keys(yamlObject);
     let sortMethod: (previousKey: string, currentKey: string) => number;
     if (sortOrder === 'Ascending Alphabetical') {
       sortMethod = this.sortAlphabeticallyAsc;
     } else if (sortOrder === 'Descending Alphabetical') {
       sortMethod = this.sortAlphabeticallyDesc;
     } else {
-      return this.getTextWithNewYamlFrontmatter(text, oldYaml, priorityKeysSorted, yamlText, priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
+      return this.getTextWithNewYamlFrontmatter(text, oldYaml, newDoc.toString(), doc.toString(), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
     }
 
     remainingKeys = remainingKeys.sort(sortMethod);
-    const remainingKeysSortResult = this.getYAMLKeysSorted(yamlText, remainingKeys, yamlObject);
+    this.getYAMLKeysSorted(remainingKeys, doc, newDoc);
 
-    return this.getTextWithNewYamlFrontmatter(text, oldYaml, priorityKeysSorted, remainingKeysSortResult.sortedYamlKeyValues, priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
+    return this.getTextWithNewYamlFrontmatter(text, oldYaml, newDoc.toString(), doc.toString(), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
   }
-  getYAMLKeysSorted(yaml: string, keys: string[], yamlObject: any): {remainingYaml: string, sortedYamlKeyValues: string} {
-    let specifiedYamlKeysSorted = '';
+  getYAMLKeysSorted(keys: string[], yamlObject: Document, newDocument: Document): string[] {
+    // @ts-ignore TODO: fix the need for ts-ignore here
+    const initialKeys = yamlObject.contents.items as object[];
     for (const key of keys) {
       // we skip any nested elements when sorting to prevent issues where possible
-      if (!(key in yamlObject)) {
-        continue;
-      }
-
-      const value = getYamlSectionValue(yaml, key, false);
-
-      if (value !== null) {
-        if (value.includes('\n')) {
-          specifiedYamlKeysSorted += `${key}:${value}\n`;
-        } else {
-          specifiedYamlKeysSorted += `${key}: ${value}\n`;
+      for (let i = 0; i < initialKeys.length; i++) {
+        // @ts-ignore TODO: fix the need for this ts ignore
+        if (initialKeys[i].key == key) {
+          newDocument.add(initialKeys[i]);
+          initialKeys.splice(i, 1);
+          break;
         }
-
-        yaml = removeYamlSection(yaml, key, false);
       }
     }
 
-    return {
-      remainingYaml: yaml,
-      sortedYamlKeyValues: specifiedYamlKeysSorted,
-    };
+    const remainingKeys = [] as string[];
+    for (const val of initialKeys) {
+      // @ts-ignore TODO: fix the need for this ts ignore
+      remainingKeys.push(val.key as string);
+    }
+
+    return remainingKeys;
   }
   updateDateModifiedIfYamlChanged(oldYaml: string, newYaml: string, dateModifiedKey: string, currentTimeFormatted: string): string {
     if (oldYaml == newYaml) {
