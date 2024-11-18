@@ -13,6 +13,7 @@ export default class ConsecutiveBlankLines extends RuleBuilder<ConsecutiveBlankL
       descriptionKey: 'rules.consecutive-blank-lines.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      hasSpecialExecutionOrder: true, // runs after most rules to cleanup any leftover spacing https://github.com/platers/obsidian-linter/issues/1225
     });
   }
   get OptionsClass(): new () => ConsecutiveBlankLinesOptions {

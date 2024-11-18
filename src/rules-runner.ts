@@ -32,6 +32,7 @@ import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-file
 import AutoCorrectCommonMisspellings from './rules/auto-correct-common-misspellings';
 import {yamlRegex} from './utils/regex';
 import AddBlankLineAfterYAML from './rules/add-blank-line-after-yaml';
+import ConsecutiveBlankLines from './rules/consecutive-blank-lines';
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -170,6 +171,8 @@ export class RulesRunner {
     });
 
     [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+
+    [newText] = ConsecutiveBlankLines.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
 
     const yaml = newText.match(yamlRegex);
     if (yaml != null) {
