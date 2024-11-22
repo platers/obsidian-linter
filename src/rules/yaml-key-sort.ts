@@ -3,6 +3,7 @@ import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder
 import dedent from 'ts-dedent';
 import {parseYAML, getYAMLText, loadYAML, setYamlSection, astToString} from '../utils/yaml';
 import {Document, YAMLMap} from 'yaml';
+import {YamlNode} from '../typings/yaml';
 
 type YamlSortOrderForOtherKeys = 'None' | 'Ascending Alphabetical' | 'Descending Alphabetical';
 
@@ -20,18 +21,6 @@ class YamlKeySortOptions implements Options {
 
   yamlKeyPrioritySortOrder?: string[] = [];
   yamlSortOrderForOtherKeys?: YamlSortOrderForOtherKeys = 'None';
-}
-
-interface Key {
-  value?: string;
-}
-
-interface Node {
-  constructor: { name: string };
-  key?: Key;
-  value?: any;
-  items?: [string, any][];
-  moved?: boolean;
 }
 
 @RuleBuilder.register
@@ -99,7 +88,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     return this.getTextWithNewYamlFrontmatter(text, oldYaml, astToString(startingPriorityKeys), astToString(remainingDocKeys), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
   }
   getYAMLKeysSorted(keys: string[], yamlObject: Document, newDocument: Document): string[] {
-    const initialKeys: Node[] = (yamlObject.contents as Node).items as Node[];
+    const initialKeys: YamlNode[] = (yamlObject.contents as YamlNode).items as YamlNode[];
     const remainingKeys: string[] = [];
 
     for (const key of keys) {

@@ -1,8 +1,8 @@
-import {load, dump} from 'js-yaml';
 import {getTextInLanguage} from '../lang/helpers';
 import {escapeDollarSigns, yamlRegex} from './regex';
 import {isNumeric} from './strings';
 import {parse, parseDocument, Document, stringify} from 'yaml';
+import {YamlNode} from 'src/typings/yaml';
 
 
 export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
@@ -118,7 +118,12 @@ export function parseYAML(yaml_text: string): Document {
 }
 
 export function astToString(ast: Document): string {
-  if (!ast || !ast.contents || !ast.contents.items || ast.contents.items.length == 0) {
+  if (!ast || !ast.contents) {
+    return '';
+  }
+
+  const items = (ast.contents as YamlNode).items as YamlNode[];
+  if (!items || items.length == 0) {
     return '';
   }
 
