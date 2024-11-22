@@ -255,6 +255,51 @@ ruleTest({
           -${' '}
         ---
       `, // note that this does look wonky, but it works the same in Obsidian, so I am going to consider this fine for now
+      // see https://github.com/eemeli/yaml/issues/590 for more information on this
+      options: {
+        yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/660
+      testName: 'Make sure that comments are not removed when sorting',
+      before: dedent`
+        ---
+        created: 2023-02-18T10:53:01+00:00
+        # Dont remove me
+        disabled rules: [capitalize-headings]
+        modified: 2023-03-20T14:53:42+00:00
+        ---
+      `,
+      after: dedent`
+        ---
+        created: 2023-02-18T10:53:01+00:00
+        # Dont remove me
+        disabled rules: [ capitalize-headings ]
+        modified: 2023-03-20T14:53:42+00:00
+        ---
+      `,
+      options: {
+        yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/660
+      testName: 'Make sure that scalars are not removed when sorting',
+      before: dedent`
+        ---
+        name: John
+        husband: Tim
+        biography: |
+          A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap.
+        ---
+      `,
+      after: dedent`
+        ---
+        biography: |
+          A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap.
+        husband: Tim
+        name: John
+        ---
+      `,
       options: {
         yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
       },
