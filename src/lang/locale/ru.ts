@@ -644,7 +644,7 @@ export default {
     },
     // remove-leading-or-trailing-whitespace-on-paste.ts
     'remove-leading-or-trailing-whitespace-on-paste': {
-      'name': 'Удалить начальные или конечные пробелы при вставке', 
+      'name': 'Удалить начальные или конечные пробелы при вставке',
       'description': 'Удаляет любые начальные нетабовые пробелы и все конечные пробелы для текста для вставки',
     },
     // remove-leftover-footnotes-from-quote-on-paste.ts
