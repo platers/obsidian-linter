@@ -17,6 +17,10 @@ export default class LineBreakAtDocumentEnd extends RuleBuilder<LineBreakAtDocum
     return LineBreakAtDocumentEndOptions;
   }
   apply(text: string, options: LineBreakAtDocumentEndOptions): string {
+    if (text.length === 0) {
+      return text;
+    }
+
     text = text.replace(/\n+$/g, '');
     text += '\n';
     return text;
@@ -45,6 +49,11 @@ export default class LineBreakAtDocumentEnd extends RuleBuilder<LineBreakAtDocum
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           ${''}
         `,
+      }),
+      new ExampleBuilder({ // https://github.com/platers/obsidian-linter/issues/1228
+        description: 'Empty files will not have a blank line added',
+        before: dedent``,
+        after: dedent``,
       }),
     ];
   }

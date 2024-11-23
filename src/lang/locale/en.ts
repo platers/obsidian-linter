@@ -510,7 +510,7 @@ export default {
     // line-break-at-document-end.ts
     'line-break-at-document-end': {
       'name': 'Line Break at Document End',
-      'description': 'Ensures that there is exactly one line break at the end of a document.',
+      'description': 'Ensures that there is exactly one line break at the end of a document if the note is not empty.',
     },
     // move-footnotes-to-the-bottom.ts
     'move-footnotes-to-the-bottom': {
