@@ -219,7 +219,7 @@ export class RulesRunner {
     logDebug(getTextInLanguage('logs.running-custom-lint-command'));
     const commandsRun = new Set<string>();
     for (const commandInfo of lintCommands) {
-      if (!commandInfo.id) {
+      if (!commandInfo.id || !commandInfo.enabled) {
         continue;
       } else if (commandsRun.has(commandInfo.id)) {
         logWarn(getTextInLanguage('logs.custom-lint-duplicate-warning').replace('{COMMAND_NAME}', commandInfo.name));
@@ -244,7 +244,7 @@ export class RulesRunner {
       for (const eachRegex of customRegexes) {
         const findIsEmpty = eachRegex.find === undefined || eachRegex.find == '' || eachRegex.find === null;
         const replaceIsEmpty = eachRegex.replace === undefined || eachRegex.replace === null;
-        if (findIsEmpty || replaceIsEmpty) {
+        if (findIsEmpty || replaceIsEmpty || !eachRegex.enabled) {
           continue;
         }
 

@@ -13,6 +13,7 @@ export const customCommandTestCases: IntegrationTestCase[] = [
       plugin.plugin.settings.lintCommands = [{
         'id': 'table-editor-obsidian:format-all-tables',
         'name': 'Format all tables in this file',
+        'enabled': true,
       }];
     },
   },

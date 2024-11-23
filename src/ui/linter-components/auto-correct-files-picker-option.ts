@@ -101,7 +101,7 @@ export class AutoCorrectFilesPickerOption extends AddCustomRefreshableRow {
           }
         })
         .addExtraButton((cb) => {
-          cb.setIcon('cross')
+          cb.setIcon('trash')
               .setTooltip(getTextInLanguage('options.custom-auto-correct.delete-tooltip'))
               .onClick(() => {
                 this.filesPicked.splice(index, 1);

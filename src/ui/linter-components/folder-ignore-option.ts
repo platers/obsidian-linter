@@ -52,7 +52,7 @@ export class FolderIgnoreOption extends AddCustomRow {
           }
         })
         .addExtraButton((cb) => {
-          cb.setIcon('cross')
+          cb.setIcon('trash')
               .setTooltip(getTextInLanguage('tabs.general.folders-to-ignore.delete-tooltip'))
               .onClick(() => {
                 this.foldersToIgnore.splice(index, 1);

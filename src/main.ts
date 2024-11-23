@@ -675,6 +675,22 @@ export default class LinterPlugin extends Plugin {
       }
     }
 
+    // make sure that all custom replacements have the enabled property
+    for (const customReplace of this.settings.customRegexes) {
+      if (!Object.hasOwn(customReplace, 'enabled')) {
+        customReplace.enabled = true;
+        updateMade = true;
+      }
+    }
+
+    // make sure that all custom commands have the enabled property
+    for (const customCommand of this.settings.lintCommands) {
+      if (!Object.hasOwn(customCommand, 'enabled')) {
+        customCommand.enabled = true;
+        updateMade = true;
+      }
+    }
+
     if (updateMade) {
       await this.saveSettings();
     }
@@ -1074,7 +1090,7 @@ export default class LinterPlugin extends Plugin {
 
   private updateHasCustomCommandStatus() {
     for (const customCommand of this.settings.lintCommands) {
-      if (customCommand.id && customCommand.id.trim() != '') {
+      if (customCommand.id && customCommand.id.trim() != '' && customCommand.enabled) {
         this.hasCustomCommands = true;
         return;
       }

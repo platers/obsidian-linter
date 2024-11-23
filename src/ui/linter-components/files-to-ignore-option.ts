@@ -64,7 +64,7 @@ export class FilesToIgnoreOption extends AddCustomRow {
 
       cb.inputEl.addClass('linter-files-to-ignore-flags');
     }).addExtraButton((cb)=>{
-      cb.setIcon('cross')
+      cb.setIcon('trash')
           .setTooltip(getTextInLanguage('tabs.general.files-to-ignore.delete-tooltip'))
           .onClick(()=>{
             this.filesToIgnore.splice(index, 1);

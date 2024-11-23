@@ -2,6 +2,7 @@ import {Command} from 'obsidian';
 import {RulesRunner} from '../src/rules-runner';
 import {CustomReplace} from '../src/ui/linter-components/custom-replace-option';
 import dedent from 'ts-dedent';
+import {LintCommand} from 'src/ui/linter-components/custom-command-option';
 
 const rulesRunner = new RulesRunner();
 const appCommandsMock = {
@@ -31,7 +32,7 @@ const appCommandsMock = {
 
 type CustomCommandTestCase = {
   testName: string,
-  listOfCommands: Command[],
+  listOfCommands: LintCommand[],
   expectedCommandCount: Map<string, number>;
   expectedNumberOfCommandsRun: number;
   skipFileValue: boolean
@@ -48,8 +49,8 @@ const customCommandTestCases: CustomCommandTestCase[] = [
   {
     testName: 'When an app lint command is run it should be executed',
     listOfCommands: [
-      {id: 'first id', name: 'command name'},
-      {id: 'second id', name: 'command name 2'},
+      {id: 'first id', name: 'command name', enabled: true},
+      {id: 'second id', name: 'command name 2', enabled: true},
     ],
     expectedCommandCount: new Map([
       ['first id', 1],
@@ -61,7 +62,7 @@ const customCommandTestCases: CustomCommandTestCase[] = [
   {
     testName: 'A lint command with an empty id should not get run',
     listOfCommands: [
-      {id: '', name: ''},
+      {id: '', name: '', enabled: true},
     ],
     expectedCommandCount: new Map([
       ['', 0],
@@ -72,8 +73,8 @@ const customCommandTestCases: CustomCommandTestCase[] = [
   {
     testName: 'When custom commands are run with two of the same command, the second command instance is skipped',
     listOfCommands: [
-      {id: 'first id', name: 'command name'},
-      {id: 'first id', name: 'command name'},
+      {id: 'first id', name: 'command name', enabled: true},
+      {id: 'first id', name: 'command name', enabled: true},
     ],
     expectedCommandCount: new Map([
       ['first id', 1],
@@ -84,12 +85,22 @@ const customCommandTestCases: CustomCommandTestCase[] = [
   {
     testName: 'When the file is listed to be skipped, no custom commands are run',
     listOfCommands: [
-      {id: 'first id', name: 'command name'},
-      {id: 'second id', name: 'command name 2'},
+      {id: 'first id', name: 'command name', enabled: true},
+      {id: 'second id', name: 'command name 2', enabled: true},
     ],
     expectedCommandCount: new Map<string, number>(),
     expectedNumberOfCommandsRun: 0,
     skipFileValue: true,
+  },
+  {
+    testName: 'When the custom commands are not enabled, nothing gets run',
+    listOfCommands: [
+      {id: 'first id', name: 'command name', enabled: false},
+      {id: 'second id', name: 'command name 2', enabled: false},
+    ],
+    expectedCommandCount: new Map<string, number>(),
+    expectedNumberOfCommandsRun: 0,
+    skipFileValue: false,
   },
 ];
 
@@ -106,7 +117,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace with no find value does not affect the text',
     listOfRegexReplacements: [
       {
-        label: '', find: '', replace: 'hello', flags: 'g',
+        label: '', find: '', replace: 'hello', flags: 'g', enabled: true,
       },
     ],
     before: dedent`
@@ -122,10 +133,10 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace with a null or undefined find value does not affect the text',
     listOfRegexReplacements: [
       {
-        label: '', find: 'How', replace: null, flags: '',
+        label: '', find: 'How', replace: null, flags: '', enabled: true,
       },
       {
-        label: 'Replace 2', find: 'look', replace: undefined, flags: '',
+        label: 'Replace 2', find: 'look', replace: undefined, flags: '', enabled: true,
       },
     ],
     before: dedent`
@@ -141,7 +152,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace searching for multiple blank lines in a row works (has proper escaping of a slash)',
     listOfRegexReplacements: [
       {
-        label: 'condense multiple blanks into 1', find: '\n{3,}', replace: '\n\n', flags: 'g',
+        label: 'condense multiple blanks into 1', find: '\n{3,}', replace: '\n\n', flags: 'g', enabled: true,
       },
     ],
     before: dedent`
@@ -160,7 +171,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace using capture groups works',
     listOfRegexReplacements: [
       {
-        label: 'Remove a question mark proceeded by a k or an e', find: '(k|e)(\\?)', replace: '$1', flags: 'g',
+        label: 'Remove a question mark proceeded by a k or an e', find: '(k|e)(\\?)', replace: '$1', flags: 'g', enabled: true,
       },
     ],
     before: dedent`
@@ -176,7 +187,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace using ^ and $ works',
     listOfRegexReplacements: [
       {
-        label: 'Replace Did at the start of a line or look? at the end of a line', find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm',
+        label: 'Replace Did at the start of a line or look? at the end of a line', find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm', enabled: true,
       },
     ],
     before: dedent`
@@ -192,7 +203,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace should respect linter ignore ranges',
     listOfRegexReplacements: [
       {
-        label: 'Replace Did at the start of a line or look? at the end of a line', find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm',
+        label: 'Replace Did at the start of a line or look? at the end of a line', find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm', enabled: true,
       },
     ],
     before: dedent`
@@ -212,15 +223,15 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace with an undefined label should still run.',
     listOfRegexReplacements: [
       {
-        label: undefined, find: 'lobo', replace: 'hello', flags: 'g',
+        label: undefined, find: 'lobo', replace: 'hello', flags: 'g', enabled: true,
       },
     ],
     before: dedent`
-      How does this look?
+      How does this lobo?
       Did it stay the same?
     `,
     after: dedent`
-      How does this look?
+      How does this hello?
       Did it stay the same?
     `,
   },
@@ -228,7 +239,7 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
     testName: 'A custom replace should respect linter ignore ranges that use the Obsidian comment format',
     listOfRegexReplacements: [
       {
-        label: 'Replace Did at the start of a line or look? at the end of a line', find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm',
+        label: 'Replace Did at the start of a line or look? at the end of a line', find: '(^Did)|(look\\?$)', replace: 'swapped', flags: 'gm', enabled: true,
       },
     ],
     before: dedent`
@@ -242,6 +253,22 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
       %% linter-disable %%
       Did it stay the same?
       %% linter-enable %%
+    `,
+  },
+  {
+    testName: 'A custom replace that is not enabled should not run',
+    listOfRegexReplacements: [
+      {
+        label: undefined, find: 'lobo', replace: 'hello', flags: 'g', enabled: false,
+      },
+    ],
+    before: dedent`
+      How does this look?
+      Did it stay the same?
+    `,
+    after: dedent`
+      How does this look?
+      Did it stay the same?
     `,
   },
 ];
