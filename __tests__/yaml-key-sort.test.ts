@@ -165,16 +165,16 @@ ruleTest({
       `,
       after: dedent`
         ---
-        related-companies:${' '}
-        stakeholders:${' '}
-        pr-pipeline-stage:${' '}
-        pr-priority:${' '}
-        pr-size:${' '}
-        pr-urgency:${' '}
-        pr-type:${' '}
-        pr-okr:${' '}
-        pr-due-date:${' '}
-        pr-completed-date:${' '}
+        related-companies:
+        stakeholders:
+        pr-pipeline-stage:
+        pr-priority:
+        pr-size:
+        pr-urgency:
+        pr-type:
+        pr-okr:
+        pr-due-date:
+        pr-completed-date:
         template: "[[Pro New Project Outcome Template]]"
         created-date: '[[<% tp.file.creation_date("YYYY-MM-DD") %>]]'
         modified: Tuesday, October 22nd 2024, 10:58:16 am
@@ -197,6 +197,111 @@ ruleTest({
           'created-date:',
           'modified:',
         ],
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1082
+      testName: 'Make sure that literal operator `|` is handled correctly',
+      before: dedent`
+        ---
+        sorting-spec: |
+          order-desc: a-z
+        first: alphabetical
+        ---
+      `,
+      after: dedent`
+        ---
+        first: alphabetical
+        sorting-spec: |
+          order-desc: a-z
+        ---
+      `,
+      options: {
+        yamlKeyPrioritySortOrder: [
+          'first',
+          'sorting-spec:',
+        ],
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/912
+      testName: 'Make sure that lots of nesting does not get broken',
+      before: dedent`
+        ---
+        AAA:
+          - BBB: x
+            CCC: x
+          - DDD: x
+            EEE: x
+            FFF:
+              - GGG: x
+              - HHH
+            III: x
+        FFF:
+          -${' '}
+        ---
+      `,
+      after: dedent`
+        ---
+        AAA:
+          - BBB: x
+            CCC: x
+          - DDD: x
+            EEE: x
+            FFF:
+              - GGG: x
+              - HHH
+            III: x
+        FFF:
+        ${'  '}
+          -${' '}
+        ---
+      `, // note that this does look wonky, but it works the same in Obsidian, so I am going to consider this fine for now
+      // see https://github.com/eemeli/yaml/issues/590 for more information on this
+      options: {
+        yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/660
+      testName: 'Make sure that comments are not removed when sorting',
+      before: dedent`
+        ---
+        created: 2023-02-18T10:53:01+00:00
+        # Dont remove me
+        disabled rules: [capitalize-headings]
+        modified: 2023-03-20T14:53:42+00:00
+        ---
+      `,
+      after: dedent`
+        ---
+        created: 2023-02-18T10:53:01+00:00
+        # Dont remove me
+        disabled rules: [ capitalize-headings ]
+        modified: 2023-03-20T14:53:42+00:00
+        ---
+      `,
+      options: {
+        yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/660
+      testName: 'Make sure that scalars are not removed when sorting',
+      before: dedent`
+        ---
+        name: John
+        husband: Tim
+        biography: |
+          A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap.
+        ---
+      `,
+      after: dedent`
+        ---
+        biography: |
+          A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap.
+        husband: Tim
+        name: John
+        ---
+      `,
+      options: {
+        yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
       },
     },
   ],
