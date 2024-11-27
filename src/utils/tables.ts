@@ -145,6 +145,9 @@ export class MarkdownTableFormatter {
       this.outputTable += " |\n";
     }
 
+    // Remove trailing empty lines
+    this.outputTable = this.outputTable.replace(/\n+$/, '');
+
     return this.outputTable;
   }
 }

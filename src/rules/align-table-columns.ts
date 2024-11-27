@@ -45,17 +45,51 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
         description: 'Make columns are aligned properly',
         before: dedent`
           | Column 1 | Column 2 |
-          |---|---|
-          |foo| bar|
-          |CJK      |你好|
-          | quux   | quuz 
+          |-------|-------|
+          | foo1| bar1|
+          | foo2 | bar2                  |
+          | foo3   | bar3    |
         `,
         after: dedent`
           | Column 1 | Column 2 |
           |----------|----------|
-          | foo      | bar      |
+          | foo1     | bar1     |
+          | foo2     | bar2     |
+          | foo3     | bar3     |
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Columns align with CJK characters',
+        before: dedent`
+          | Column 1 | Column 2 |
+          |-------|-------|
+          | foo1| bar1|
+          | CJK| 你好|
+          | foo3   | bar3    |
+        `,
+        after: dedent`
+          | Column 1 | Column 2 |
+          |----------|----------|
+          | foo1     | bar1     |
           | CJK      | 你好     |
-          | quux     | quuz     |
+          | foo3     | bar3     |
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'fill lossing separators',
+        before: dedent`
+          | Column 1 | Column 2 |
+          |-------|-------
+          | foo1| bar1
+          | CJK| 你好|
+          | foo3   | bar3    |
+        `,
+        after: dedent`
+          | Column 1 | Column 2 |
+          |----------|----------|
+          | foo1     | bar1     |
+          | CJK      | 你好     |
+          | foo3     | bar3     |
         `,
       }),
     ];
