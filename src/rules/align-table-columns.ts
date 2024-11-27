@@ -21,7 +21,6 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
     return AlignTableOptions;
   }
   apply(text: string, options: AlignTableOptions): string {
-
     const tablePositions = getAllTablesInText(text);
     let formatedTable = '';
     let fmt: MarkdownTableFormatter;
@@ -36,7 +35,7 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
       formatedTable = fmt.formatTable(tableText);
       text = text.replace(tableText, formatedTable);
     }
-    
+
     return text;
   }
   get exampleBuilders(): ExampleBuilder<AlignTableOptions>[] {
@@ -98,6 +97,3 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
     return [];
   }
 }
-
-
-

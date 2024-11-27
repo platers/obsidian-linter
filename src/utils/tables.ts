@@ -1,13 +1,12 @@
 // based on https://github.com/alanwsmith/markdown_table_formatter
 
-import { getEAW } from 'meaw';
+import {getEAW} from 'meaw';
 
 function computeWidth(str: string) {
   let width = 0;
   const normalized = str.normalize('NFC');
 
   for (const char of normalized) {
-
     switch (getEAW(char)) {
       case 'F':
       case 'W':
@@ -21,7 +20,6 @@ function computeWidth(str: string) {
     }
   }
   return width;
-
 }
 
 export class MarkdownTableFormatter {
@@ -34,7 +32,7 @@ export class MarkdownTableFormatter {
   constructor() {
     this.cells = [];
     this.columnWidths = [];
-    this.outputTable = "";
+    this.outputTable = '';
   }
 
   private getColumnWidths() {
@@ -50,7 +48,7 @@ export class MarkdownTableFormatter {
   }
 
   private importTable(table: string) {
-    const tableRows = table.split("\n");
+    const tableRows = table.split('\n');
 
     // Remove leading empty lines
     while (tableRows[0].indexOf('|') === -1) {
@@ -64,14 +62,14 @@ export class MarkdownTableFormatter {
 
       this.cells[row_i] = [];
 
-      const rowColumns = tableRows[row_i].split("\|");
+      const rowColumns = tableRows[row_i].split('|');
 
       for (let col_i = 0, col_l = rowColumns.length; col_i < col_l; col_i++) {
         this.cells[row_i][col_i] = rowColumns[col_i].trim();
 
         // If it's the separator row, parse down the dashes
         if (row_i === 1) {
-          this.cells[row_i][col_i] = this.cells[row_i][col_i].replace(/-+/g, "-");
+          this.cells[row_i][col_i] = this.cells[row_i][col_i].replace(/-+/g, '-');
         }
       }
     }
@@ -130,19 +128,19 @@ export class MarkdownTableFormatter {
     this.padCellsForOutput();
 
     // Header
-    this.outputTable = "| ";
-    this.outputTable += this.cells[0].join(" | ");
-    this.outputTable += " |\n";
+    this.outputTable = '| ';
+    this.outputTable += this.cells[0].join(' | ');
+    this.outputTable += ' |\n';
 
-    // Separator 
-    this.outputTable += "|-";
-    this.outputTable += this.cells[1].join("-|-");
-    this.outputTable += "-|\n";
+    // Separator
+    this.outputTable += '|-';
+    this.outputTable += this.cells[1].join('-|-');
+    this.outputTable += '-|\n';
 
     for (let row_i = 2, row_l = this.cells.length; row_i < row_l; row_i++) {
-      this.outputTable += "| ";
-      this.outputTable += this.cells[row_i].join(" | ");
-      this.outputTable += " |\n";
+      this.outputTable += '| ';
+      this.outputTable += this.cells[row_i].join(' | ');
+      this.outputTable += ' |\n';
     }
 
     // Remove trailing empty lines
