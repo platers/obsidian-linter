@@ -232,6 +232,27 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
     expectedTablesInText: 2,
     expectedPositions: [{startIndex: 35, endIndex: 112}, {startIndex: 0, endIndex: 33}],
   },
+  { // accounts for https://github.com/platers/obsidian-linter/issues/1235
+    name: 'handle tables with --- in a row',
+    text: dedent`
+      | test  |
+      |:-----:|
+      |  ---  |
+      |  one  |
+      |  two  |
+      |  ---  |
+      |  ---  |
+      | three |
+      |  ---  |
+      |  ---  |
+      |  ---  |
+      |  ---  |
+      | four  |
+      | five  |
+    `,
+    expectedTablesInText: 1,
+    expectedPositions: [{startIndex: 0, endIndex: 140}],
+  },
 ];
 
 describe('Get All Tables in Text', () => {

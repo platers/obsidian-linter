@@ -1000,6 +1000,17 @@ export function getAllTablesInText(text: string): {startIndex: number, endIndex:
       continue;
     }
 
+    // need to check that two lines before the separator line does not start and end with a pipe
+    if (startOfPreviousLine !== 0) {
+      const startOfTwoLinesPrior = getStartOfLineIndex(text, startOfPreviousLine - 1);
+      const twoLinesPrior = text.substring(startOfTwoLinesPrior, startOfPreviousLine - 1);
+      if (twoLinesPrior.startsWith('|') || twoLinesPrior.endsWith('|')) {
+        // the match is at best a row in a table
+        continue;
+      }
+    }
+
+
     let end = match.index + match[0].length;
 
     if (end >= text.length - 1) {
