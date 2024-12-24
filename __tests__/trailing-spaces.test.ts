@@ -98,5 +98,61 @@ ruleTest({
         [[File with  spaces]]
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/868
+      testName: 'A list item with no content should not have the space indicating it is a list item removed',
+      before: dedent`
+        - List item 1
+        -${' '}
+        -${'   '}
+      `,
+      after: dedent`
+        - List item 1
+        -${' '}
+        -${' '}
+      `,
+    },
+    { // relates to for https://github.com/platers/obsidian-linter/issues/868
+      testName: 'Make sure that checklists are properly handled with trailing spaces',
+      before: dedent`
+        - [ ] List item 1
+        - [ ]${' '}
+        - [ ] ${'   '}
+      `,
+      after: dedent`
+        - [ ] List item 1
+        - [ ]${' '}
+        - [ ]${' '}
+      `,
+    },
+    { // relates to for https://github.com/platers/obsidian-linter/issues/868
+      testName: 'Make sure that indented lists are properly handled with trailing spaces',
+      before: dedent`
+        Text here
+        - List item 1
+          -${' '}
+          -${'   '}
+      `,
+      after: dedent`
+        Text here
+        - List item 1
+          -${' '}
+          -${' '}
+      `,
+    },
+    { // relates to for https://github.com/platers/obsidian-linter/issues/868
+      testName: 'Make sure that ordered lists are properly handled with trailing spaces',
+      before: dedent`
+        Text here
+        1. List item 1
+        2.${' '}
+        3.${'   '}
+      `,
+      after: dedent`
+        Text here
+        1. List item 1
+        2.${' '}
+        3.${' '}
+      `,
+    },
   ],
 });
