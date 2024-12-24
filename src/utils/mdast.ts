@@ -19,6 +19,11 @@ import {getTextInLanguage} from '../lang/helpers';
 
 const LRU = new QuickLRU({maxSize: 200});
 
+type PositionPlusEmptyIndicator = {
+  position: Position,
+  isEmpty: boolean,
+}
+
 export enum MDAstTypes {
   Link = 'link',
   Footnote = 'footnoteDefinition',
@@ -107,27 +112,40 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
 /**
  * Gets the positions of the list item text in the given text.
  * @param {string} text - The markdown text
- * @return {Position[]} The positions of the list item text in the given text
+ * @param {boolean} includeEmptyNodes - Whether or not empty list items should be
+ * returned to be handled by the calling function
+ * @return {PositionPlusEmptyIndicator[]} The positions of the list item text in the given text
+ * with a status as to whether or not they are empty
  */
-function getListItemTextPositions(text: string): Position[] {
+function getListItemTextPositions(text: string, includeEmptyNodes: boolean = false): Position[] {
   const ast = parseTextToAST(text);
-  const positions: Position[] = [];
+  const positions: PositionPlusEmptyIndicator[] = [];
   visit(ast, MDAstTypes.ListItem as string, (node) => {
     // @ts-ignore the fact that not all nodes have a children property since I am skipping any that do not
-    if (!node.children) {
+    if (!node.children || node.children.length === 0) {
+      if (includeEmptyNodes) {
+        positions.push({
+          position: node.position,
+          isEmpty: true,
+        });
+      }
+
       return;
     }
 
     // @ts-ignore the fact that not all nodes have a children property since I have already exited the function if that is the case
     for (const childNode of node.children) {
       if (childNode.type === (MDAstTypes.Paragraph as string)) {
-        positions.push(childNode.position);
+        positions.push({
+          position: childNode.position,
+          isEmpty: false,
+        });
       }
     }
   });
 
   // Sort positions by start position in reverse order
-  positions.sort((a, b) => b.start.offset - a.start.offset);
+  positions.sort((a, b) => b.position.start.offset - a.position.start.offset);
   return positions;
 }
 
@@ -587,29 +605,40 @@ export function updateBoldText(text: string, func:(text: string) => string): str
   return text;
 }
 
-export function updateListItemText(text: string, func:(text: string) => string): string {
-  const positions: Position[] = getListItemTextPositions(text);
+export function updateListItemText(text: string, func:(text: string) => string, includeEmptyNodes: boolean = false): string {
+  const positions: PositionPlusEmptyIndicator[] = getListItemTextPositions(text, includeEmptyNodes);
 
   for (const position of positions) {
-    let startIndex = position.start.offset;
-    // get the actual start of the list item leaving only 1 whitespace between the indicator and the text
-    while (startIndex > 0 && text.charAt(startIndex - 1).trim() === '') {
-      startIndex--;
-    }
-    // keep a single space for the indicator
-    if (startIndex === 0 || text.charAt(startIndex - 1).trim() != '') {
+    let startIndex = position.position.start.offset;
+    if (position.isEmpty) {
+      // get the actual start of the list item leaving only 1 whitespace between the indicator and the text
+      while (startIndex < position.position.end.offset && text.charAt(startIndex).trim() !== '') {
+        startIndex++;
+      }
+
       startIndex++;
+    } else {
+      // get the actual start of the list item leaving only 1 whitespace between the indicator and the text
+      while (startIndex > 0 && text.charAt(startIndex - 1).trim() === '') {
+        startIndex--;
+      }
+
+      // keep a single space for the indicator
+      if (startIndex === 0 || text.charAt(startIndex - 1).trim() != '') {
+        startIndex++;
+      }
     }
 
-    let listText = text.substring(startIndex, position.end.offset);
+    let listText = text.substring(startIndex, position.position.end.offset);
     // for some reason some checklists are not getting treated as such and this causes the task indicator to be included in the text
     if (checklistBoxStartsTextRegex.test(listText)) {
       startIndex += 4;
       listText = listText.substring(4);
     }
+
     listText = func(listText);
 
-    text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, position.end.offset, listText);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, position.position.end.offset, listText);
   }
 
   return text;
