@@ -121,5 +121,40 @@ ruleTest({
         content
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1235
+      testName: 'Make sure that we do not break a table apart when it rows with just dashes in them',
+      before: dedent`
+        | test  |
+        |:-----:|
+        |  ---  |
+        |  one  |
+        |  two  |
+        |  ---  |
+        |  ---  |
+        | three |
+        |  ---  |
+        |  ---  |
+        |  ---  |
+        |  ---  |
+        | four  |
+        | five  |
+      `,
+      after: dedent`
+        | test  |
+        |:-----:|
+        |  ---  |
+        |  one  |
+        |  two  |
+        |  ---  |
+        |  ---  |
+        | three |
+        |  ---  |
+        |  ---  |
+        |  ---  |
+        |  ---  |
+        | four  |
+        | five  |
+      `,
+    },
   ],
 });
