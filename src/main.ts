@@ -11,7 +11,7 @@ import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
-import {urlRegex} from './utils/regex';
+import {escapeRegExp, urlRegex} from './utils/regex';
 import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {AfterFileChangeLintTimes, DEFAULT_SETTINGS, LinterSettings} from './settings-data';
@@ -215,6 +215,36 @@ export default class LinterPlugin extends Plugin {
         void this.pasteAsPlainText(editor);
       },
     });
+
+    this.addCommand({
+      id: 'ignore-folder',
+      name: getTextInLanguage('commands.ignore-folder.name'),
+      icon: iconInfo.ignoreFolder.id,
+      editorCheckCallback: (checking: boolean, _, ctx) => {
+        if (checking) {
+          if (ctx && ctx.file && ctx.file instanceof TFile && ctx.file.parent) {
+            return !ctx.file.parent.isRoot() && !this.settings.foldersToIgnore.includes(ctx.file.parent.path);
+          }
+
+          return false;
+        }
+
+        void this.addFolderToIgnoreList(ctx.file.parent);
+      },
+    });
+
+    this.addCommand({
+      id: 'ignore-file',
+      name: getTextInLanguage('commands.ignore-file.name'),
+      editorCheckCallback(checking, _, ctx) {
+        if (checking && ctx.file) {
+          return that.isMarkdownFile(ctx.file) && !that.shouldIgnoreFile(ctx.file);
+        }
+
+        void this.addFileToIgnoreList(ctx.file);
+      },
+      icon: iconInfo.ignoreFile.id,
+    });
   }
 
   registerEventsAndSaveCallback() {
@@ -365,26 +395,43 @@ export default class LinterPlugin extends Plugin {
 
   onMenuOpenCallback(menu: Menu, file: TAbstractFile, _source: string) {
     if (file instanceof TFile && this.isMarkdownFile(file)) {
-      menu.addItem((item) => {
-        item.setIcon(iconInfo.file.id)
-            .setTitle(getTextInLanguage('commands.lint-file-pop-up-menu-text.name'))
-            .onClick(() => {
-              const activeFile = this.app.workspace.getActiveFile();
-              const editor = this.getEditor();
-              if (activeFile === file && editor && editor.cm) {
-                void this.runLinterEditor(editor);
-              } else {
-                void this.runLinterFile(file);
-              }
-            });
-      });
+      if (!this.shouldIgnoreFile(file)) {
+        menu.addItem((item) => {
+          item.setIcon(iconInfo.file.id)
+              .setTitle(getTextInLanguage('commands.lint-file-pop-up-menu-text.name'))
+              .onClick(() => {
+                const activeFile = this.app.workspace.getActiveFile();
+                const editor = this.getEditor();
+                if (activeFile === file && editor && editor.cm) {
+                  void this.runLinterEditor(editor);
+                } else {
+                  void this.runLinterFile(file);
+                }
+              });
+        });
+
+        menu.addItem((item) => {
+          item.setIcon(iconInfo.ignoreFile.id)
+              .setTitle(getTextInLanguage('commands.ignore-file-pop-up-menu-text.name'))
+              .onClick(() => {
+                void this.addFileToIgnoreList(file);
+              });
+        });
+      }
     } else if (file instanceof TFolder) {
-      menu.addItem((item) => {
-        item
-            .setTitle(getTextInLanguage('commands.lint-folder-pop-up-menu-text.name'))
-            .setIcon(iconInfo.folder.id)
-            .onClick(() => this.createFolderLintModal(file));
-      });
+      if (!this.settings.foldersToIgnore.includes(file.path)) {
+        menu.addItem((item) => {
+          item.setTitle(getTextInLanguage('commands.lint-folder-pop-up-menu-text.name'))
+              .setIcon(iconInfo.folder.id)
+              .onClick(() => this.createFolderLintModal(file));
+        });
+
+        menu.addItem((item) => {
+          item.setTitle(getTextInLanguage('commands.ignore-folder-pop-up-menu-text.name'))
+              .setIcon(iconInfo.ignoreFolder.id)
+              .onClick(() => void this.addFolderToIgnoreList(file));
+        });
+      }
     }
   }
 
@@ -1117,5 +1164,21 @@ export default class LinterPlugin extends Plugin {
     if (this.activeFileChangeDebouncer.has(file.path)) {
       this.activeFileChangeDebouncer.get(file.path).originalText = newText;
     }
+  }
+
+  private async addFileToIgnoreList(file: TFile) {
+    this.settings.filesToIgnore.push({
+      match: '^' + escapeRegExp(file.path) + '$',
+      flags: '',
+      label: '',
+    });
+
+    await this.saveSettings();
+  }
+
+  private async addFolderToIgnoreList(folder: TFolder) {
+    this.settings.foldersToIgnore.push(folder.path);
+
+    await this.saveSettings();
   }
 }
