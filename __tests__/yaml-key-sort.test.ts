@@ -251,7 +251,6 @@ ruleTest({
               - HHH
             III: x
         FFF:
-        ${'  '}
           -${' '}
         ---
       `, // note that this does look wonky, but it works the same in Obsidian, so I am going to consider this fine for now
@@ -298,6 +297,63 @@ ruleTest({
           A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap. A very nice chap.
         husband: Tim
         name: John
+        ---
+      `,
+      options: {
+        yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1258
+      testName: 'Make sure that folded block scalars are not broken up when sorting',
+      before: dedent`
+        ---
+        aliases: []
+        tags:
+          - media/podcast/episode
+        description: >-
+          Follow our ad-free Rain Playlist here:
+        image: 'https://i.scdn.co/image/ab6765630000ba8a8d796ac81fdad1d895dd28a1'
+        links:
+          - https://open.spotify.com/episode/1LSnoZVPWB8ynOCMCwKw5S
+        showName: ASMR Rain Recordings
+        created: 11-05-2024 21:09
+        updated: 13-01-2025 08:16
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: []
+        created: 11-05-2024 21:09
+        description: >-
+          Follow our ad-free Rain Playlist here:
+        image: 'https://i.scdn.co/image/ab6765630000ba8a8d796ac81fdad1d895dd28a1'
+        links:
+          - https://open.spotify.com/episode/1LSnoZVPWB8ynOCMCwKw5S
+        showName: ASMR Rain Recordings
+        tags:
+          - media/podcast/episode
+        updated: 13-01-2025 08:16
+        ---
+      `,
+      options: {
+        yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/660
+      testName: 'Make sure that comments on an array do not cause issues when sorting',
+      before: dedent`
+        ---
+        Ingredients: # [\`<free text for ingredient>\`,\`<amount>\`, \`<unit>\`, \`<form>\`, \`<note>\`]
+          - [Watermelon, 80 g, cubed, note]
+          - [sugar, 20 g]
+        ---
+      `,
+      after: dedent`
+        ---
+        Ingredients:
+          # [\`<free text for ingredient>\`,\`<amount>\`, \`<unit>\`, \`<form>\`, \`<note>\`]
+          - [ Watermelon, 80 g, cubed, note ]
+          - [ sugar, 20 g ]
         ---
       `,
       options: {

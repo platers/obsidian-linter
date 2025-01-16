@@ -74,6 +74,6 @@
     "quick-lru": "^7.0.0",
     "ts-dedent": "^2.2.0",
     "unist-util-visit": "^5.0.0",
-    "yaml": "^2.6.0"
+    "yaml": "^2.7.0"
   }
 }
