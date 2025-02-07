@@ -1,9 +1,10 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {parseYAML, getYAMLText, loadYAML, setYamlSection, astToString} from '../utils/yaml';
-import {Document, YAMLMap} from 'yaml';
-import {YamlNode} from '../typings/yaml';
+import {parseYAML, getYAMLText, loadYAML, setYamlSection, astToString, getEmptyDocument} from '../utils/yaml';
+import {Document} from 'yaml';
+import {YamlCSTTokens, YamlNode} from '../typings/yaml';
+import {FlowCollection} from 'yaml/dist/parse/cst';
 
 type YamlSortOrderForOtherKeys = 'None' | 'Ascending Alphabetical' | 'Descending Alphabetical';
 
@@ -60,8 +61,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
 
     const yamlObject = loadYAML(yamlText);
     const doc = parseYAML(yamlText);
-    const startingPriorityKeys = new Document(yamlObject.options);
-    startingPriorityKeys.contents = new YAMLMap();
+    const startingPriorityKeys = getEmptyDocument(doc);
 
     let remainingKeys = this.getYAMLKeysSorted(yamlKeys, doc, startingPriorityKeys);
 
@@ -79,9 +79,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
       return this.getTextWithNewYamlFrontmatter(text, oldYaml, astToString(startingPriorityKeys), astToString(doc), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
     }
 
-    const remainingDocKeys = new Document(yamlObject.options);
-    remainingDocKeys.contents = new YAMLMap();
-
+    const remainingDocKeys = getEmptyDocument(doc);
     remainingKeys = remainingKeys.sort(sortMethod);
     this.getYAMLKeysSorted(remainingKeys, doc, remainingDocKeys);
 
@@ -97,6 +95,9 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
         if (node.key.value === key) {
           newDocument.add(node);
           initialKeys.splice(i, 1);
+          (newDocument.contents.srcToken as YamlCSTTokens).items.push((yamlObject.contents.srcToken as FlowCollection).items[i]);
+          (yamlObject.contents.srcToken as FlowCollection).items.splice(i, 1);
+
           break;
         }
       }

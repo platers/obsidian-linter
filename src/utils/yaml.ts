@@ -1,9 +1,9 @@
 import {getTextInLanguage} from '../lang/helpers';
 import {escapeDollarSigns, yamlRegex} from './regex';
 import {isNumeric} from './strings';
-import {parse, parseDocument, Document, stringify} from 'yaml';
+import {parse, parseDocument, Document, stringify, CST, YAMLMap} from 'yaml';
 import {YamlNode} from 'src/typings/yaml';
-
+import {FlowCollection} from 'yaml/dist/parse/cst';
 
 export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
 export const OBSIDIAN_TAG_KEY_PLURAL = 'tags';
@@ -109,12 +109,29 @@ export function parseYAML(yaml_text: string): Document {
 
   // replacing tabs at the beginning of new lines with 2 spaces fixes loading YAML that has tabs at the start of a line
   // https://github.com/platers/obsidian-linter/issues/157
-  const parsed_yaml = parseDocument(yaml_text.replace(/\n(\t)+/g, '\n  '));
+  const parsed_yaml = parseDocument(yaml_text.replace(/\n(\t)+/g, '\n  '), {keepSourceTokens: true});
   if (parsed_yaml == null) {
     return null;
   }
 
   return parsed_yaml;
+}
+
+export function getEmptyDocument(doc: Document): Document {
+  const newDocument = new Document(doc.options);
+  newDocument.contents = new YAMLMap();
+
+  const originalToken = doc.contents.srcToken as FlowCollection;
+  newDocument.contents.srcToken = {
+    offset: originalToken.offset,
+    type: originalToken.type,
+    indent: originalToken.indent,
+    start: originalToken.start,
+    end: originalToken.end,
+    items: [] as CST.CollectionItem[],
+  };
+
+  return newDocument;
 }
 
 export function astToString(ast: Document): string {
@@ -127,7 +144,7 @@ export function astToString(ast: Document): string {
     return '';
   }
 
-  return ast.toString();
+  return CST.stringify(ast.contents.srcToken);
 }
 
 export enum TagSpecificArrayFormats {

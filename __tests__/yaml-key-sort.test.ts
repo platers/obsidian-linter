@@ -165,16 +165,16 @@ ruleTest({
       `,
       after: dedent`
         ---
-        related-companies:
-        stakeholders:
-        pr-pipeline-stage:
-        pr-priority:
-        pr-size:
-        pr-urgency:
-        pr-type:
-        pr-okr:
-        pr-due-date:
-        pr-completed-date:
+        related-companies:${' '}
+        stakeholders:${' '}
+        pr-pipeline-stage:${' '}
+        pr-priority:${' '}
+        pr-size:${' '}
+        pr-urgency:${' '}
+        pr-type:${' '}
+        pr-okr:${' '}
+        pr-due-date:${' '}
+        pr-completed-date:${' '}
         template: "[[Pro New Project Outcome Template]]"
         created-date: '[[<% tp.file.creation_date("YYYY-MM-DD") %>]]'
         modified: Tuesday, October 22nd 2024, 10:58:16 am
@@ -273,7 +273,7 @@ ruleTest({
         ---
         created: 2023-02-18T10:53:01+00:00
         # Dont remove me
-        disabled rules: [ capitalize-headings ]
+        disabled rules: [capitalize-headings]
         modified: 2023-03-20T14:53:42+00:00
         ---
       `,
@@ -350,10 +350,9 @@ ruleTest({
       `,
       after: dedent`
         ---
-        Ingredients:
-          # [\`<free text for ingredient>\`,\`<amount>\`, \`<unit>\`, \`<form>\`, \`<note>\`]
-          - [ Watermelon, 80 g, cubed, note ]
-          - [ sugar, 20 g ]
+        Ingredients: # [\`<free text for ingredient>\`,\`<amount>\`, \`<unit>\`, \`<form>\`, \`<note>\`]
+          - [Watermelon, 80 g, cubed, note]
+          - [sugar, 20 g]
         ---
       `,
       options: {
