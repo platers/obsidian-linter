@@ -74,7 +74,7 @@ declare module 'obsidian' {
      * CodeMirror editor instance
      */
     cm?: EditorView;
-}
+  }
 }
 
 

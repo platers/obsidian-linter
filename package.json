@@ -31,7 +31,6 @@
     "@types/diff": "^5.0.9",
     "@types/diff-match-patch": "^1.0.32",
     "@types/jest": "^29.5.12",
-    "@types/js-yaml": "^4.0.5",
     "@types/node": "^20.11.28",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
@@ -61,7 +60,6 @@
     "@popperjs/core": "^2.11.6",
     "async-lock": "^1.4.1",
     "diff-match-patch": "^1.0.5",
-    "js-yaml": "^4.1.0",
     "loglevel": "^1.9.1",
     "mdast-util-from-markdown": "^2.0.0",
     "mdast-util-frontmatter": "^2.0.1",
@@ -75,6 +73,7 @@
     "moment-parseformat": "^4.0.0",
     "quick-lru": "^7.0.0",
     "ts-dedent": "^2.2.0",
-    "unist-util-visit": "^5.0.0"
+    "unist-util-visit": "^5.0.0",
+    "yaml": "^2.7.0"
   }
 }
