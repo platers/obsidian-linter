@@ -81,8 +81,12 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
  * @return {string[]} The mdast nodes values replaced
  */
 function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): IgnoreResults {
-  const positions: Position[] = getPositions(type, text);
+  let positions: Position[] = getPositions(type, text);
   const replacedValues: string[] = [];
+
+  if (type === MDAstTypes.List) {
+    positions = removeOverlappingPositions(positions);
+  }
 
   for (const position of positions) {
     const valueToReplace = text.substring(position.start.offset, position.end.offset);
@@ -196,4 +200,23 @@ function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): Ign
   }
 
   return {newText: text, replacedValues: replacedSections};
+}
+
+function removeOverlappingPositions(positions: Position[]): Position[] {
+  if (positions.length < 2) {
+    return positions;
+  }
+
+  let lastPosition: Position = positions.pop();
+  let currentPosition: Position = null;
+  const result: Position[] = [lastPosition];
+  while (positions.length > 0) {
+    currentPosition = positions.pop();
+    if (lastPosition.start.offset >= currentPosition.end.offset || currentPosition.start.offset >= lastPosition.end.offset) {
+      result.unshift(currentPosition);
+      lastPosition = currentPosition;
+    }
+  }
+
+  return result;
 }
