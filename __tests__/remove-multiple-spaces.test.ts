@@ -239,6 +239,21 @@ ruleTest({
         > > - e.g., \`Customer\` class might have \`getName\`, \`getAddress\`, but also \`sendEmail\` that sends an email to the customer → Weird; not a major responsibility of the customer → ==not cohesive
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1203
+      testName: 'A nested callout/blockquote should not have list item proceeding space removed',
+      before: dedent`
+        - first item
+             - xxxxxxxxxxxxxxxxxxxxxxxxx
+
+        test    test
+      `,
+      after: dedent`
+        - first item
+             - xxxxxxxxxxxxxxxxxxxxxxxxx
+
+        test test
+      `,
+    },
   ],
 });
 
