@@ -240,7 +240,7 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/1203
-      testName: 'A nested callout/blockquote should not have list item proceeding space removed',
+      testName: 'Make sure that remove multiple spaces works when it comes right after a list with a sublist in it',
       before: dedent`
         - first item
              - xxxxxxxxxxxxxxxxxxxxxxxxx
