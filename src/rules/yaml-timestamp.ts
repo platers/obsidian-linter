@@ -204,7 +204,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       date.locale(locale);
 
       const formattedDateStr = utc ? date.utc().format(format) : date.format(format);
-      return moment(formattedDateStr, format, locale, true);
+      return utc ? moment.utc(formattedDateStr, format, locale, true): moment(formattedDateStr, format, locale, true);
     }
 
     return null;
