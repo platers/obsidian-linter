@@ -437,29 +437,35 @@ export default class LinterPlugin extends Plugin {
   }
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
-    const oldText = stripCr(await this.app.vault.read(file));
-    const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
+    let modified = false;
+    await this.app.vault.process(file, (fileContent: string) => {
+      const oldText = stripCr(fileContent);
+      const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
+      if (oldText != newText) {
+        modified = true;
 
-    if (oldText != newText) {
-      await this.app.vault.modify(file, newText);
+        if (lintingLastActiveFile) {
+          const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + this.lastActiveFile.path;
+          if (this.settings.displayLintOnFileChangeNotice) {
+            new Notice(message);
+          }
 
-      if (lintingLastActiveFile) {
-        const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + this.lastActiveFile.path;
-        if (this.settings.displayLintOnFileChangeNotice) {
-          new Notice(message);
+          logInfo(message);
         }
 
-        logInfo(message);
+        // when a change is made to the file we know that the cache will update down the road
+        // so we can defer running the custom commands to the cache callback
+        this.fileLintFiles.add(file);
+
+        return newText;
+      } else {
+        return oldText;
       }
+    });
 
-      // when a change is made to the file we know that the cache will update down the road
-      // so we can defer running the custom commands to the cache callback
-      this.fileLintFiles.add(file);
-
-      return;
+    if (modified) {
+      await this.runCustomCommandsInSidebar(file);
     }
-
-    await this.runCustomCommandsInSidebar(file);
   }
 
   async runLinterAllFiles(app: App) {
