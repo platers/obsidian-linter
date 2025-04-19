@@ -19,12 +19,12 @@ The Linter follows the following basic steps when it is run on a file:
 
 ``` mermaid
 graph TD
-    start["1. User initiates linting of file or files"] --> run-linter-rules
-    run-linter-rules["2. If file is not ignored, run Linter rules and Custom Commands*"] --> handle-error
+    start[User initiates linting of file or files] --> run-linter-rules
+    run-linter-rules[If file is not ignored, run Linter rules and Custom Commands*] --> handle-error
     handle-error{Did an error happen?} -- No --> update-file
     handle-error -- Yes --> log-error
-    log-error["3. Display error and log to dev console"] --> done
-    update-file["3. Update file contents**"] --> done
+    log-error[Display error and log to dev console] --> done
+    update-file[Update file contents**] --> done
     done[Done]
 ```
 
