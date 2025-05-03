@@ -642,7 +642,7 @@ export default {
     'trailing-spaces': {
       'name': 'Nachgestellte Leerzeichen',
       'description': 'Entfernt zusätzliche Leerzeichen nach jeder Zeile.',
-      'twp-space-line-break': {
+      'two-space-line-break': {
         'name': 'Zwei Leerzeichen Zeilenumbruch',
         'description': 'Ignorieren Sie zwei Leerzeichen, gefolgt von einem Zeilenumbruch ("Zwei-Leerzeichen-Regel").',
       },

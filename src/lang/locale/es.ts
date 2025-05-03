@@ -558,7 +558,7 @@ export default {
     'trailing-spaces': {
       'name': 'Espacios finales',
       'description': 'Elimina espacios adicionales después de cada línea.',
-      'twp-space-line-break': {
+      'two-space-line-break': {
         'name': 'Salto de línea de dos espacios',
         'description': 'Ignore dos espacios seguidos de un salto de línea ("Regla de dos espacios").',
       },

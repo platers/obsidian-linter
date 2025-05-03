@@ -638,7 +638,7 @@ export default {
     'trailing-spaces': {
       'name': 'Sondaki boşluklar',
       'description': 'Her satırın sonundaki fazladan boşlukları kaldırır.',
-      'twp-space-line-break': {
+      'two-space-line-break': {
         'name': 'İki Boşluklu Satır Sonu',
         'description': 'Bir satır sonunu takiben iki boşluğu göz ardı et ("İki Boşluk Kuralı").',
       },
