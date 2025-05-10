@@ -51,7 +51,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
     title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter);
 
     return formatYAML(text, (text) => {
-      const title_match_str = `\n${options.titleKey}.*\n`;
+      const title_match_str = `\n${options.titleKey}:.*\n`;
       const title_match = new RegExp(title_match_str);
       if (title_match.test(text)) {
         text = text.replace(
