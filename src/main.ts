@@ -594,10 +594,9 @@ export default class LinterPlugin extends Plugin {
     if (!charsAdded && !charsRemoved) {
       void this.runCustomCommands(file);
     } else {
+      this.updateFileDebouncerText(file, newText);
       this.editorLintFiles.push(file);
     }
-
-    this.updateFileDebouncerText(file, newText);
 
     setCollectLogs(false);
   }
@@ -1052,8 +1051,6 @@ export default class LinterPlugin extends Plugin {
         await this.customCommandsCallback(file);
       }
     });
-
-    this.updateFileDebouncerText(file, stripCr(await this.app.vault.read(file)));
   }
 
   /**
