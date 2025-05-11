@@ -65,7 +65,7 @@ function edgeCaseSetup(plugin: TestLinterPlugin, _: Editor): Promise<void> {
   };
   plugin.plugin.settings.ruleConfigs['trailing-spaces'] = {
     'enabled': true,
-    'twp-space-line-break': false,
+    'two-space-line-break': false,
   };
   plugin.plugin.settings.ruleConfigs['convert-bullet-list-markers'] = {
     'enabled': true,

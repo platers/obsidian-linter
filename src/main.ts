@@ -641,6 +641,14 @@ export default class LinterPlugin extends Plugin {
       updateMade = true;
     }
 
+    // move the setting of typo rule name to its new name
+    if (this.settings.ruleConfigs['trailing-spaces'] && 'twp-space-line-break' in this.settings.ruleConfigs['trailing-spaces']) {
+      this.settings.ruleConfigs['trailing-spaces']['two-space-line-break'] = this.settings.ruleConfigs['trailing-spaces']['twp-space-line-break'];
+
+      delete this.settings.ruleConfigs['trailing-spaces']['twp-space-line-break'];
+      updateMade = true;
+    }
+
     // check for and fix invalid settings
     let noticeText = 'Obsidian Linter:';
     let conflictingRulePresent = false;

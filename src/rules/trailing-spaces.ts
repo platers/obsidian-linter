@@ -80,8 +80,8 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: TrailingSpacesOptions,
-        nameKey: 'rules.trailing-spaces.twp-space-line-break.name',
-        descriptionKey: 'rules.trailing-spaces.twp-space-line-break.description',
+        nameKey: 'rules.trailing-spaces.two-space-line-break.name',
+        descriptionKey: 'rules.trailing-spaces.two-space-line-break.description',
         optionsKey: 'twoSpaceLineBreak',
       }),
     ];

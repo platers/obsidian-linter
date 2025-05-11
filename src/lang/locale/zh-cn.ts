@@ -775,7 +775,7 @@ export default {
     'trailing-spaces': {
       'name': '末尾空格',
       'description': '移除每行末尾多余的空格',
-      'twp-space-line-break': {
+      'two-space-line-break': {
         'name': '两空格换行',
         'description': '忽略两个空格后接换行符的情况（"两空格规则"）',
       },

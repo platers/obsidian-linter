@@ -787,7 +787,7 @@ export default {
     'trailing-spaces': {
       'name': 'Trailing spaces',
       'description': 'Removes extra spaces after every line.',
-      'twp-space-line-break': {
+      'two-space-line-break': {
         'name': 'Two Space Linebreak',
         'description': 'Ignore two spaces followed by a line break ("Two Space Rule").',
       },
