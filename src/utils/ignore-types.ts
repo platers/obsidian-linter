@@ -3,7 +3,6 @@ import {getAllCustomIgnoreSectionsInText, getAllTablesInText, getPositions, MDAs
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
-// export type IgnoreResults = {replacedValues: string[], newText: string};
 export type IgnoreFunction = ((text: string, placeholder: string) => [string[], string]);
 export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string};
 
