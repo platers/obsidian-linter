@@ -6,6 +6,9 @@ import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
 import {LinterSettings} from 'src/settings-data';
 import {App} from 'obsidian';
 
+// limit the amount of text that can be written to the logs to try to prevent memory issues
+const maxFileSizeLength = 10000;
+
 export abstract class RuleBuilderBase {
   static #ruleMap = new Map<string, Rule>();
   static #ruleBuilderMap = new Map<string, RuleBuilderBase>();
@@ -32,7 +35,12 @@ export abstract class RuleBuilderBase {
       try {
         const newText = rule.apply(text, options);
         timingEnd(rule.alias);
-        logDebug(newText);
+
+        if (newText.length > maxFileSizeLength) {
+          logDebug(newText.slice(0, maxFileSizeLength -1) + '...');
+        } else {
+          logDebug(newText);
+        }
 
         return [newText, true];
       } catch (error) {
