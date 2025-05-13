@@ -70,9 +70,21 @@ const webWorkerIgnores = [replace({
     // update usage of moment from obsidian to the node implementation of moment we have
     'import {moment} from \'obsidian\';': '',
     // remove the use of obsidian in the options to allow for docs.js to run
-    'import {Setting} from \'obsidian\';': '',
+    'import {App, Setting, ToggleComponent} from \'obsidian\';': '',
     // remove the use of obsidian in settings helper to allow for docs.js to run
-    'import {Component, MarkdownRenderer} from \'obsidian\';': '',
+    'import {App, MarkdownRenderer} from \'obsidian\';': '',
+    // remove the use of obsidian in the auto-correct files picker to allow for docs.js to run
+    'import {Setting, App, TFile, normalizePath, ExtraButtonComponent} from \'obsidian\';': '',
+    // remove the use of obsidian in add custom row to allow for docs.js to run
+    'import {App, Setting} from \'obsidian\';': '',
+    // remove the use of obsidian in suggest to allow for docs.js to run
+    'import {App, ISuggestOwner, Scope} from \'obsidian\';': '',
+    // remove the use of obsidian in md file suggester to allow for docs.js to run
+    'import {App, TFile} from \'obsidian\';': '',
+    // remove the use of obsidian in parse results modal to allow for docs.js to run
+    'import {Modal, App} from \'obsidian\';': 'class Modal {}',
+    // remove the use of app from a couple of settings for docs.js to run
+    'import {App} from \'obsidian\';': '',
   },
   delimiters: ['', ''],
 })];
