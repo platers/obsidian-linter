@@ -85,6 +85,7 @@ const webWorkerIgnores = [replace({
     'import {Modal, App} from \'obsidian\';': 'class Modal {}',
     // remove the use of app from a couple of settings for docs.js to run
     'import {App} from \'obsidian\';': '',
+    'new Worker(url)': 'new Worker(url, \'linter-worker\')'
   },
   delimiters: ['', ''],
 })];

@@ -58,6 +58,7 @@ export type RunLinterRulesOptions = {
   skipFile: boolean,
   disabledRules: string[],
   logsFromRun: string[],
+  defaultMisspellings: Map<string, string>,
 }
 
 type FileInfo = {
