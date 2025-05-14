@@ -25,6 +25,7 @@ import MoveMathBlockIndicatorsToOwnLine from '../rules/move-math-block-indicator
 import {LinterSettings} from '../settings-data';
 import {RunLinterRulesOptions, TFile} from '../typings/worker';
 import TrailingSpaces from '../rules/trailing-spaces';
+import AutoCorrectCommonMisspellings from '../rules/auto-correct-common-misspellings';
 
 /**
  * Lints the text provided in runOptions.
@@ -81,6 +82,10 @@ function runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
 
   [newText] = MoveMathBlockIndicatorsToOwnLine.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules, {
     minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
+  });
+
+  [newText] = AutoCorrectCommonMisspellings.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules, {
+    misspellingToCorrection: runOptions.defaultMisspellings,
   });
 
   return newText;
@@ -168,7 +173,7 @@ export function runPasteLint(currentLine: string, selectedText: string, runOptio
   return newText;
 }
 
-export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings): RunLinterRulesOptions {
+export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings, defaultMisspellings: Map<string, string>): RunLinterRulesOptions {
   const createdAt = file ? moment(file.stat.ctime): moment();
   createdAt.locale(momentLocale);
   const modifiedAt = file ? moment(file.stat.mtime): moment();
@@ -190,5 +195,6 @@ export function createRunLinterRulesOptions(text: string, file: TFile = null, mo
     skipFile: false,
     disabledRules: [],
     logsFromRun: [],
+    defaultMisspellings: defaultMisspellings,
   };
 }

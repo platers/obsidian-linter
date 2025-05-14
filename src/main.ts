@@ -25,6 +25,7 @@ import {downloadMisspellings, readInMisspellingsFile} from './utils/auto-correct
 import {FileLintManager} from './rules-runner/file-lint-manager';
 import {RunLinterRulesOptions} from './typings/worker';
 import {runCustomCommands, runPasteLint, createRunLinterRulesOptions} from './rules-runner/rules-runner';
+import {runYAMLTimestampByItself} from './rules-runner/yaml-timestamp-by-itself';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -366,7 +367,7 @@ export default class LinterPlugin extends Plugin {
     if (this.editorLintFiles.includes(file)) {
       this.editorLintFiles.remove(file);
 
-      this.runCustomCommands(file);
+      void this.runCustomCommands(file);
     } else if (this.fileLintFiles.has(file)) {
       this.fileLintFiles.delete(file);
 
@@ -396,6 +397,8 @@ export default class LinterPlugin extends Plugin {
     }
 
     this.defaultAutoCorrectMisspellings = parseCustomReplacements(stripCr(await readInMisspellingsFile(this)));
+
+    this.lintFileManager.setDefaultMisspellings(this.defaultAutoCorrectMisspellings);
 
     // load custom-auto-correct replacements if they exist
     for (const replacementFileInfo of this.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
@@ -598,7 +601,7 @@ export default class LinterPlugin extends Plugin {
     const file = this.app.workspace.getActiveFile();
     try {
       // newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
-      this.lintFileManager.lintFile(file, (runOptions: RunLinterRulesOptions) => {
+      this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
         const changes = this.updateEditor(runOptions.oldText, runOptions.newText, editor);
         const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
         const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
@@ -808,10 +811,10 @@ export default class LinterPlugin extends Plugin {
             oldText = editorValue;
 
             let newText = oldText;
-            if (oldText != activeFileChangeInfo.originalText ) {
+            if (oldText != activeFileChangeInfo.originalText) {
               logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
               try {
-                newText = this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
+                newText = runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
               } catch (error) {
                 this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
                 return;
@@ -849,7 +852,7 @@ export default class LinterPlugin extends Plugin {
               await this.app.vault.process(file, (data: string) => {
                 logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
                 try {
-                  return this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
+                  return runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
                 } catch (error) {
                   this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
                   return data;
@@ -996,8 +999,7 @@ export default class LinterPlugin extends Plugin {
     const editorChange: EditorChange[] = [];
 
     cursorSelections.forEach((cursorSelection: EditorSelection, index: number) => {
-      // clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection), editor.getRange(cursorSelection.anchor, cursorSelection.head) ?? '', createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings, null));
-      clipboardText = runPasteLint(this.getLineContent(editor, cursorSelection), editor.getRange(cursorSelection.anchor, cursorSelection.head) ?? '', createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings));
+      clipboardText = runPasteLint(this.getLineContent(editor, cursorSelection), editor.getRange(cursorSelection.anchor, cursorSelection.head) ?? '', createRunLinterRulesOptions(pasteContentPerCursor[index], null, this.momentLocale, this.settings, null));
       editorChange.push({
         text: clipboardText,
         from: cursorSelection.anchor,
@@ -1082,7 +1084,7 @@ export default class LinterPlugin extends Plugin {
     this.currentlyOpeningSidebar = false;
   }
 
-  private async runCustomCommands(file: TFile, runOptions: RunLinterRulesOptions) {
+  private async runCustomCommands(file: TFile) {
     if (!this.settings.lintCommands || this.settings.lintCommands.length == 0 || !this.hasCustomCommands) {
       return;
     }
