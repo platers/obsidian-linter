@@ -579,13 +579,12 @@ export default class LinterPlugin extends Plugin {
   }
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
-    // const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
     this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
       if (runOptions.oldText != runOptions.newText) {
         await this.app.vault.modify(file, runOptions.newText);
 
         if (lintingLastActiveFile) {
-          const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + this.lastActiveFile.path;
+          const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + file.path;
           if (this.settings.displayLintOnFileChangeNotice) {
             new Notice(message);
           }
@@ -1166,7 +1165,8 @@ export default class LinterPlugin extends Plugin {
       this.currentlyOpeningSidebar = true;
 
       await sidebarTab.openFile(file, { active: true });
-      this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
+
+      runCustomCommands(this.settings.lintCommands, this.app.commands);
       if (this.customCommandsCallback) {
         await this.customCommandsCallback(file);
       }
