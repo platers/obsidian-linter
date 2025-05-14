@@ -24,4 +24,5 @@ onmessage = (event: WorkerMessage) => {
   }
 
   postMessage(event.data);
+  clearLogs();
 };

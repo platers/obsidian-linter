@@ -29,6 +29,7 @@ export class FileLintManager {
    * Note: this does not mean that the logic for running custom commands has run.
   */
   callbacks: Map<string, FileCallback>;
+  defaultMisspellings: Map<string, string>;
 
   public constructor(public numWorkers: number, public momentLocale: string, private settings: LinterSettings, private vault: Vault) {
     this.workers = [];
@@ -47,6 +48,10 @@ export class FileLintManager {
       this.workers.push(worker);
       this.busy.push(false);
     }
+  }
+
+  public setDefaultMisspellings(defaultMisspellings: Map<string, string>): void {
+    this.defaultMisspellings = defaultMisspellings;
   }
 
   public lintFile(file: TFile, callback: FileCallback): void {
@@ -129,8 +134,8 @@ export class FileLintManager {
   // /** Send a new task to the given worker ID. */
   private send(file: TFile, workerId: number) {
     this.busy[workerId] = true;
-    this.vault.read(file).then((oldText: string) => {
-      const lintRunnerSettings = createRunLinterRulesOptions(stripCr(oldText), file, this.momentLocale, this.settings);
+    void this.vault.read(file).then((oldText: string) => {
+      const lintRunnerSettings = createRunLinterRulesOptions(stripCr(oldText), file, this.momentLocale, this.settings, this.defaultMisspellings);
       this.workers[workerId].postMessage(lintRunnerSettings);
     });
   }
