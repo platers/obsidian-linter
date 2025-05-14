@@ -1021,7 +1021,7 @@ export default class LinterPlugin extends Plugin {
     await this.customCommandsLock.acquire('command', async () => {
       this.currentlyOpeningSidebar = true;
 
-      await sidebarTab.openFile(file);
+      await sidebarTab.openFile(file, {active: true});
       this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
       if (this.customCommandsCallback) {
         await this.customCommandsCallback(file);
