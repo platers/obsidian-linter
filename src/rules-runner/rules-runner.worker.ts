@@ -15,6 +15,7 @@ onmessage = (event: WorkerMessage) => {
   event.data.skipFile = skipFile;
   event.data.disabledRules = disabledRules;
 
+  event.data.newText = event.data.oldText;
   if (!skipFile) {
     event.data.newText = lintText(event.data);
   }

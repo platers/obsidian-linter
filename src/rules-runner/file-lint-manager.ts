@@ -95,29 +95,31 @@ export class FileLintManager {
       setLogs(data.logsFromRun);
     }
 
-    // run lint actions related to moment and other areas that cannot be run in the worker
-    let currentTime = moment();
-    currentTime.locale(data.momentLocale);
+    let newText = data.newText;
+    if (!data.skipFile) {
+      // run lint actions related to moment and other areas that cannot be run in the worker
+      let currentTime = moment();
+      currentTime.locale(data.momentLocale);
 
-    // run YAML timestamp at the end to help determine if something has changed
-    let isYamlTimestampEnabled: boolean;
-    let newText: string;
-    [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(data.newText, data.settings, data.disabledRules, {
-      fileCreatedTime: data.fileInfo.createdAtFormatted,
-      fileModifiedTime: data.fileInfo.modifiedAtFormatted,
-      currentTime: currentTime,
-      alreadyModified: data.oldText != data.newText,
-      locale: data.momentLocale,
-    });
+      // run YAML timestamp at the end to help determine if something has changed
+      let isYamlTimestampEnabled: boolean;
+      [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(data.newText, data.settings, data.disabledRules, {
+        fileCreatedTime: data.fileInfo.createdAtFormatted,
+        fileModifiedTime: data.fileInfo.modifiedAtFormatted,
+        currentTime: currentTime,
+        alreadyModified: data.oldText != data.newText,
+        locale: data.momentLocale,
+      });
 
-    const yamlTimestampOptions = YamlTimestamp.getRuleOptions(data.settings);
-    currentTime = moment();
-    currentTime.locale(data.momentLocale);
-    [newText] = YamlKeySort.applyIfEnabled(newText, data.settings, data.disabledRules, {
-      currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
-      yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
-      dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
-    });
+      const yamlTimestampOptions = YamlTimestamp.getRuleOptions(data.settings);
+      currentTime = moment();
+      currentTime.locale(data.momentLocale);
+      [newText] = YamlKeySort.applyIfEnabled(newText, data.settings, data.disabledRules, {
+        currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
+        yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
+        dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
+      });
+    }
 
     if (this.callbacks.has(data.fileInfo.path)) {
       const callback = this.callbacks.get(data.fileInfo.path);
