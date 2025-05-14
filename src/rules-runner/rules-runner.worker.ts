@@ -4,6 +4,7 @@ import {clearLogs, logsFromLastRun, setCollectLogs, setLogLevel} from '../utils/
 import {WorkerMessage} from '../typings/worker';
 import {getDisabledRules} from '../rules';
 import {lintText} from './rules-runner';
+import '../rules-registry';
 
 onmessage = (event: WorkerMessage) => {
   setLogLevel(event.data.settings.logLevel);
