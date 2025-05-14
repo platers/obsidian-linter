@@ -117,7 +117,7 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
  * @return {PositionPlusEmptyIndicator[]} The positions of the list item text in the given text
  * with a status as to whether or not they are empty
  */
-function getListItemTextPositions(text: string, includeEmptyNodes: boolean = false): Position[] {
+function getListItemTextPositions(text: string, includeEmptyNodes: boolean = false): PositionPlusEmptyIndicator[] {
   const ast = parseTextToAST(text);
   const positions: PositionPlusEmptyIndicator[] = [];
   visit(ast, MDAstTypes.ListItem as string, (node) => {
