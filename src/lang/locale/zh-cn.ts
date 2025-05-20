@@ -287,6 +287,11 @@ export default {
       'name': 'YAML 块后空行',
       'description': '确保 YAML 块后有空行，除非它在文档的结尾',
     },
+    // align-table-columns.ts
+    'align-table-columns': {
+      'name': '对齐表格列',
+      'description': '对齐表格列（CJK字符宽度为2）',
+    },
     // blockquotify-on-paste.ts
     'add-blockquote-indentation-on-paste': {
       'name': '添加引用块缩进',
@@ -754,11 +759,11 @@ export default {
       'name': '中日韩语与英语或数字之间的空格',
       'description': '确保中日韩文与英文数字之间有一个空格 <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">参考链接</a>',
       'english-symbols-punctuation-before': {
-        'name': 'English Punctuations and Symbols Before CJK',
+        'name': '中日韩文之前的英文标点',
         'description': '被认为是英文的在中日韩文字符之"前"找到的非字母标点符号 <b>注意: "*" 会被认为是英文</b>',
       },
       'english-symbols-punctuation-after': {
-        'name': 'English Punctuations and Symbols After CJK',
+        'name': '中日韩文之后的英文标点',
         'description': '被认为是英文的在中日韩文字符之"后"找到的非字母标点符号 <b>注意: "*" 会被认为是英文</b>',
       },
     },
