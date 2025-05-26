@@ -5,7 +5,7 @@ export interface ObsidianCommandInterface {
   executeCommandById(id: string): void;
   commands: {
     'editor:save-file': {
-      callback(): void;
+      checkCallback(): void;
     };
   };
   listCommands(): Command[];
