@@ -114,8 +114,8 @@ export default class LinterPlugin extends Plugin {
     const saveCommandDefinition = this.app.commands?.commands?.[
       'editor:save-file'
     ];
-    if (saveCommandDefinition && saveCommandDefinition.callback && this.originalSaveCallback) {
-      saveCommandDefinition.callback = this.originalSaveCallback;
+    if (saveCommandDefinition && saveCommandDefinition.checkCallback && this.originalSaveCallback) {
+      saveCommandDefinition.checkCallback = this.originalSaveCallback;
     }
   }
 
@@ -319,10 +319,10 @@ export default class LinterPlugin extends Plugin {
       'editor:save-file'
     ];
 
-    this.originalSaveCallback = saveCommandDefinition?.callback;
+    this.originalSaveCallback = saveCommandDefinition?.checkCallback;
 
     if (typeof this.originalSaveCallback === 'function') {
-      saveCommandDefinition.callback = () => {
+      saveCommandDefinition.checkCallback = () => {
         this.originalSaveCallback();
 
         if (this.settings.lintOnSave && this.isEnabled) {
