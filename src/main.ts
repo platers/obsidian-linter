@@ -323,20 +323,22 @@ export default class LinterPlugin extends Plugin {
 
     if (typeof this.originalSaveCallback === 'function') {
       saveCommandDefinition.checkCallback = (checking: boolean) => {
-        this.originalSaveCallback(checking);
 
-        if (this.settings.lintOnSave && this.isEnabled) {
+        if (checking) {
+          return this.originalSaveCallback(checking);
+        } else {
           const editor = this.getEditor();
-          if (editor) {
-            const file = this.app.workspace.getActiveFile();
-            if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file) && editor.cm) {
-              if (!checking) {
+          const file = this.app.workspace.getActiveFile();
+          if (this.settings.lintOnSave && this.isEnabled) {
+            if (editor) {
+              if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file) && editor.cm) {
                 void this.runLinterEditor(editor);
               }
-              return true;
             }
           }
         }
+
+
       };
     }
 
