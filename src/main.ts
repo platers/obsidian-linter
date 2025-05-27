@@ -331,7 +331,7 @@ export default class LinterPlugin extends Plugin {
             const file = this.app.workspace.getActiveFile();
             if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file) && editor.cm) {
               if (!checking) {
-                this.runLinterEditor(editor);
+                void this.runLinterEditor(editor);
               }
               return true;
             }
