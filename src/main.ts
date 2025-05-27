@@ -327,7 +327,7 @@ export default class LinterPlugin extends Plugin {
         if (checking) {
           return this.originalSaveCallback(checking);
         } else {
-          this.originalSaveCallback(checking)
+          this.originalSaveCallback(checking);
           if (this.settings.lintOnSave && this.isEnabled) {
             const editor = this.getEditor();
             if (editor) {
