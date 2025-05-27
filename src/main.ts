@@ -337,8 +337,6 @@ export default class LinterPlugin extends Plugin {
             }
           }
         }
-
-
       };
     }
 
