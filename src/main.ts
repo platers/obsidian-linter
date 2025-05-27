@@ -323,7 +323,6 @@ export default class LinterPlugin extends Plugin {
 
     if (typeof this.originalSaveCallback === 'function') {
       saveCommandDefinition.checkCallback = (checking: boolean) => {
-
         if (checking) {
           return this.originalSaveCallback(checking);
         } else {
