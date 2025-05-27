@@ -66,7 +66,7 @@ export default class LinterPlugin extends Plugin {
   private overridePaste: boolean = false;
   private hasCustomCommands: boolean = false;
   private customCommandsLock = new AsyncLock();
-  private originalSaveCallback?: () => void = null;
+  private originalSaveCallback?: (checking: boolean) => boolean | void = null;
   // The amount of files you can use editor lint on at once is pretty small, so we will use an array
   private editorLintFiles: TFile[] = [];
   // the amount of files that can be linted as a file can be quite large, so we will want to use a set to make
@@ -322,15 +322,18 @@ export default class LinterPlugin extends Plugin {
     this.originalSaveCallback = saveCommandDefinition?.checkCallback;
 
     if (typeof this.originalSaveCallback === 'function') {
-      saveCommandDefinition.checkCallback = () => {
-        this.originalSaveCallback();
+      saveCommandDefinition.checkCallback = (checking: boolean) => {
+        this.originalSaveCallback(checking);
 
         if (this.settings.lintOnSave && this.isEnabled) {
           const editor = this.getEditor();
           if (editor) {
             const file = this.app.workspace.getActiveFile();
             if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file) && editor.cm) {
-              void this.runLinterEditor(editor);
+              if (!checking) {
+                this.runLinterEditor(editor);
+              }
+              return true;
             }
           }
         }
