@@ -875,7 +875,11 @@ export default class LinterPlugin extends Plugin {
         ${charsAdded} ${getTextInLanguage('notice-text.characters-added')}
         ${charsRemoved} ${getTextInLanguage('notice-text.characters-removed')}
       `;
-      new Notice(message);
+
+      // Only show the notification if there are actual changes
+      if (charsRemoved + charsAdded > 0) {
+        new Notice(message);
+      }
     }
   }
 
