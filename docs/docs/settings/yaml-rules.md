@@ -1051,6 +1051,7 @@ keywords: []
 status: WIP
 date: 02/15/2022
 ---
+Any blank line is attached to the line that follows it
 ``````
 
 After:
@@ -1058,12 +1059,14 @@ After:
 `````` markdown
 ---
 tags: computer
+
 status: WIP
 keywords: []
 date: 02/15/2022
 type: programming
 language: Typescript
 ---
+Any blank line is attached to the line that follows it
 ``````
 </details>
 

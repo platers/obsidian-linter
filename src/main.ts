@@ -11,7 +11,7 @@ import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
-import {urlRegex} from './utils/regex';
+import {escapeRegExp, urlRegex} from './utils/regex';
 import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {AfterFileChangeLintTimes, DEFAULT_SETTINGS, LinterSettings} from './settings-data';
@@ -66,7 +66,7 @@ export default class LinterPlugin extends Plugin {
   private overridePaste: boolean = false;
   private hasCustomCommands: boolean = false;
   private customCommandsLock = new AsyncLock();
-  private originalSaveCallback?: () => void = null;
+  private originalSaveCallback?: (checking: boolean) => boolean | void = null;
   // The amount of files you can use editor lint on at once is pretty small, so we will use an array
   private editorLintFiles: TFile[] = [];
   // the amount of files that can be linted as a file can be quite large, so we will want to use a set to make
@@ -114,8 +114,8 @@ export default class LinterPlugin extends Plugin {
     const saveCommandDefinition = this.app.commands?.commands?.[
       'editor:save-file'
     ];
-    if (saveCommandDefinition && saveCommandDefinition.callback && this.originalSaveCallback) {
-      saveCommandDefinition.callback = this.originalSaveCallback;
+    if (saveCommandDefinition && saveCommandDefinition.checkCallback && this.originalSaveCallback) {
+      saveCommandDefinition.checkCallback = this.originalSaveCallback;
     }
   }
 
@@ -215,6 +215,36 @@ export default class LinterPlugin extends Plugin {
         void this.pasteAsPlainText(editor);
       },
     });
+
+    this.addCommand({
+      id: 'ignore-folder',
+      name: getTextInLanguage('commands.ignore-folder.name'),
+      icon: iconInfo.ignoreFolder.id,
+      editorCheckCallback: (checking: boolean, _, ctx) => {
+        if (checking) {
+          if (ctx && ctx.file && ctx.file instanceof TFile && ctx.file.parent) {
+            return !ctx.file.parent.isRoot() && !this.settings.foldersToIgnore.includes(ctx.file.parent.path);
+          }
+
+          return false;
+        }
+
+        void this.addFolderToIgnoreList(ctx.file.parent);
+      },
+    });
+
+    this.addCommand({
+      id: 'ignore-file',
+      name: getTextInLanguage('commands.ignore-file.name'),
+      editorCheckCallback(checking, _, ctx) {
+        if (checking && ctx.file) {
+          return that.isMarkdownFile(ctx.file) && !that.shouldIgnoreFile(ctx.file);
+        }
+
+        void this.addFileToIgnoreList(ctx.file);
+      },
+      icon: iconInfo.ignoreFile.id,
+    });
   }
 
   registerEventsAndSaveCallback() {
@@ -289,18 +319,21 @@ export default class LinterPlugin extends Plugin {
       'editor:save-file'
     ];
 
-    this.originalSaveCallback = saveCommandDefinition?.callback;
+    this.originalSaveCallback = saveCommandDefinition?.checkCallback;
 
     if (typeof this.originalSaveCallback === 'function') {
-      saveCommandDefinition.callback = () => {
-        this.originalSaveCallback();
-
-        if (this.settings.lintOnSave && this.isEnabled) {
-          const editor = this.getEditor();
-          if (editor) {
-            const file = this.app.workspace.getActiveFile();
-            if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file) && editor.cm) {
-              void this.runLinterEditor(editor);
+      saveCommandDefinition.checkCallback = (checking: boolean) => {
+        if (checking) {
+          return this.originalSaveCallback(checking);
+        } else {
+          this.originalSaveCallback(checking);
+          if (this.settings.lintOnSave && this.isEnabled) {
+            const editor = this.getEditor();
+            if (editor) {
+              const file = this.app.workspace.getActiveFile();
+              if (!this.shouldIgnoreFile(file) && this.isMarkdownFile(file) && editor.cm) {
+                void this.runLinterEditor(editor);
+              }
             }
           }
         }
@@ -365,26 +398,43 @@ export default class LinterPlugin extends Plugin {
 
   onMenuOpenCallback(menu: Menu, file: TAbstractFile, _source: string) {
     if (file instanceof TFile && this.isMarkdownFile(file)) {
-      menu.addItem((item) => {
-        item.setIcon(iconInfo.file.id)
-            .setTitle(getTextInLanguage('commands.lint-file-pop-up-menu-text.name'))
-            .onClick(() => {
-              const activeFile = this.app.workspace.getActiveFile();
-              const editor = this.getEditor();
-              if (activeFile === file && editor && editor.cm) {
-                void this.runLinterEditor(editor);
-              } else {
-                void this.runLinterFile(file);
-              }
-            });
-      });
+      if (!this.shouldIgnoreFile(file)) {
+        menu.addItem((item) => {
+          item.setIcon(iconInfo.file.id)
+              .setTitle(getTextInLanguage('commands.lint-file-pop-up-menu-text.name'))
+              .onClick(() => {
+                const activeFile = this.app.workspace.getActiveFile();
+                const editor = this.getEditor();
+                if (activeFile === file && editor && editor.cm) {
+                  void this.runLinterEditor(editor);
+                } else {
+                  void this.runLinterFile(file);
+                }
+              });
+        });
+
+        menu.addItem((item) => {
+          item.setIcon(iconInfo.ignoreFile.id)
+              .setTitle(getTextInLanguage('commands.ignore-file-pop-up-menu-text.name'))
+              .onClick(() => {
+                void this.addFileToIgnoreList(file);
+              });
+        });
+      }
     } else if (file instanceof TFolder) {
-      menu.addItem((item) => {
-        item
-            .setTitle(getTextInLanguage('commands.lint-folder-pop-up-menu-text.name'))
-            .setIcon(iconInfo.folder.id)
-            .onClick(() => this.createFolderLintModal(file));
-      });
+      if (!this.settings.foldersToIgnore.includes(file.path)) {
+        menu.addItem((item) => {
+          item.setTitle(getTextInLanguage('commands.lint-folder-pop-up-menu-text.name'))
+              .setIcon(iconInfo.folder.id)
+              .onClick(() => this.createFolderLintModal(file));
+        });
+
+        menu.addItem((item) => {
+          item.setTitle(getTextInLanguage('commands.ignore-folder-pop-up-menu-text.name'))
+              .setIcon(iconInfo.ignoreFolder.id)
+              .onClick(() => void this.addFolderToIgnoreList(file));
+        });
+      }
     }
   }
 
@@ -547,10 +597,9 @@ export default class LinterPlugin extends Plugin {
     if (!charsAdded && !charsRemoved) {
       void this.runCustomCommands(file);
     } else {
+      this.updateFileDebouncerText(file, newText);
       this.editorLintFiles.push(file);
     }
-
-    this.updateFileDebouncerText(file, newText);
 
     setCollectLogs(false);
   }
@@ -591,6 +640,14 @@ export default class LinterPlugin extends Plugin {
       this.settings.ruleConfigs['yaml-timestamp']['update-on-file-contents-updated'] = this.settings['lintOnFileContentChangeDelay'];
 
       delete this.settings['lintOnFileContentChangeDelay'];
+      updateMade = true;
+    }
+
+    // move the setting of typo rule name to its new name
+    if (this.settings.ruleConfigs['trailing-spaces'] && 'twp-space-line-break' in this.settings.ruleConfigs['trailing-spaces']) {
+      this.settings.ruleConfigs['trailing-spaces']['two-space-line-break'] = this.settings.ruleConfigs['trailing-spaces']['twp-space-line-break'];
+
+      delete this.settings.ruleConfigs['trailing-spaces']['twp-space-line-break'];
       updateMade = true;
     }
 
@@ -967,7 +1024,7 @@ export default class LinterPlugin extends Plugin {
     await this.customCommandsLock.acquire('command', async () => {
       this.currentlyOpeningSidebar = true;
 
-      await sidebarTab.openFile(file);
+      await sidebarTab.openFile(file, {active: true});
       this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
       if (this.customCommandsCallback) {
         await this.customCommandsCallback(file);
@@ -997,8 +1054,6 @@ export default class LinterPlugin extends Plugin {
         await this.customCommandsCallback(file);
       }
     });
-
-    this.updateFileDebouncerText(file, stripCr(await this.app.vault.read(file)));
   }
 
   /**
@@ -1117,5 +1172,21 @@ export default class LinterPlugin extends Plugin {
     if (this.activeFileChangeDebouncer.has(file.path)) {
       this.activeFileChangeDebouncer.get(file.path).originalText = newText;
     }
+  }
+
+  private async addFileToIgnoreList(file: TFile) {
+    this.settings.filesToIgnore.push({
+      match: '^' + escapeRegExp(file.path) + '$',
+      flags: '',
+      label: '',
+    });
+
+    await this.saveSettings();
+  }
+
+  private async addFolderToIgnoreList(folder: TFolder) {
+    this.settings.foldersToIgnore.push(folder.path);
+
+    await this.saveSettings();
   }
 }

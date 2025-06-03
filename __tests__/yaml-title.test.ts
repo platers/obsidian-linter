@@ -357,5 +357,22 @@ ruleTest({
         # [test \#4](github.com/platers/obsidian-linter)
       `,
     },
+    {
+      testName: 'Only matches and replaces the correct title key, not similar keys',
+      before: dedent`
+        ---
+        title2: ShouldNotChange
+        title: ShouldChange
+        ---
+        # Hello world
+      `,
+      after: dedent`
+        ---
+        title2: ShouldNotChange
+        title: Hello world
+        ---
+        # Hello world
+      `,
+    },
   ],
 });

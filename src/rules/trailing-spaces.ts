@@ -1,7 +1,8 @@
-import {IgnoreTypes} from '../utils/ignore-types';
+import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
+import {updateListItemText} from '../utils/mdast';
 
 class TrailingSpacesOptions implements Options {
   twoSpaceLineBreak: boolean = false;
@@ -22,14 +23,27 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
     return TrailingSpacesOptions;
   }
   apply(text: string, options: TrailingSpacesOptions): string {
-    if (!options.twoSpaceLineBreak) {
-      return text.replace(/[ \t]+$/gm, '');
-    } else {
-      text = text.replace(/(\S)[ \t]$/gm, '$1'); // one whitespace
-      text = text.replace(/(\S)[ \t]{3,}$/gm, '$1'); // three or more whitespaces
-      text = text.replace(/(\S)( ?\t\t? ?)$/gm, '$1'); // two whitespaces with at least one tab
-      return text;
-    }
+    text = ignoreListOfTypes([IgnoreTypes.list], text, (text: string): string => {
+      if (!options.twoSpaceLineBreak) {
+        return text.replace(/[ \t]+$/gm, '');
+      } else {
+        text = text.replace(/(\S)[ \t]$/gm, '$1'); // one whitespace
+        text = text.replace(/(\S)[ \t]{3,}$/gm, '$1'); // three or more whitespaces
+        text = text.replace(/(\S)( ?\t\t? ?)$/gm, '$1'); // two whitespaces with at least one tab
+        return text;
+      }
+    });
+
+    return updateListItemText(text, (text: string): string => {
+      if (!options.twoSpaceLineBreak) {
+        return text.replace(/[ \t]+$/gm, '');
+      } else {
+        text = text.replace(/(\S)[ \t]$/gm, '$1'); // one whitespace
+        text = text.replace(/(\S)[ \t]{3,}$/gm, '$1'); // three or more whitespaces
+        text = text.replace(/(\S)( ?\t\t? ?)$/gm, '$1'); // two whitespaces with at least one tab
+        return text;
+      }
+    }, true);
   }
   get exampleBuilders(): ExampleBuilder<TrailingSpacesOptions>[] {
     return [
@@ -66,8 +80,8 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
     return [
       new BooleanOptionBuilder({
         OptionsClass: TrailingSpacesOptions,
-        nameKey: 'rules.trailing-spaces.twp-space-line-break.name',
-        descriptionKey: 'rules.trailing-spaces.twp-space-line-break.description',
+        nameKey: 'rules.trailing-spaces.two-space-line-break.name',
+        descriptionKey: 'rules.trailing-spaces.two-space-line-break.description',
         optionsKey: 'twoSpaceLineBreak',
       }),
     ];

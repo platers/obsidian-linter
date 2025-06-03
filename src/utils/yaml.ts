@@ -1,8 +1,9 @@
-import {load, dump} from 'js-yaml';
 import {getTextInLanguage} from '../lang/helpers';
 import {escapeDollarSigns, yamlRegex} from './regex';
 import {isNumeric} from './strings';
-
+import {parse, parseDocument, Document, stringify, CST, YAMLMap} from 'yaml';
+import {YamlNode} from 'src/typings/yaml';
+import {FlowCollection} from 'yaml/dist/parse/cst';
 
 export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
 export const OBSIDIAN_TAG_KEY_PLURAL = 'tags';
@@ -93,12 +94,57 @@ export function loadYAML(yaml_text: string): any {
 
   // replacing tabs at the beginning of new lines with 2 spaces fixes loading YAML that has tabs at the start of a line
   // https://github.com/platers/obsidian-linter/issues/157
-  const parsed_yaml = load(yaml_text.replace(/\n(\t)+/g, '\n  ')) as {};
+  const parsed_yaml = parse(yaml_text.replace(/\n(\t)+/g, '\n  ')) as {};
   if (parsed_yaml == null) {
     return {};
   }
 
   return parsed_yaml;
+}
+
+export function parseYAML(yaml_text: string): Document {
+  if (yaml_text == null) {
+    return null;
+  }
+
+  // replacing tabs at the beginning of new lines with 2 spaces fixes loading YAML that has tabs at the start of a line
+  // https://github.com/platers/obsidian-linter/issues/157
+  const parsed_yaml = parseDocument(yaml_text.replace(/\n(\t)+/g, '\n  '), {keepSourceTokens: true});
+  if (parsed_yaml == null) {
+    return null;
+  }
+
+  return parsed_yaml;
+}
+
+export function getEmptyDocument(doc: Document): Document {
+  const newDocument = new Document(doc.options);
+  newDocument.contents = new YAMLMap();
+
+  const originalToken = doc.contents.srcToken as FlowCollection;
+  newDocument.contents.srcToken = {
+    offset: originalToken.offset,
+    type: originalToken.type,
+    indent: originalToken.indent,
+    start: originalToken.start,
+    end: originalToken.end,
+    items: [] as CST.CollectionItem[],
+  };
+
+  return newDocument;
+}
+
+export function astToString(ast: Document): string {
+  if (!ast || !ast.contents) {
+    return '';
+  }
+
+  const items = (ast.contents as YamlNode).items as YamlNode[];
+  if (!items || items.length == 0) {
+    return '';
+  }
+
+  return CST.stringify(ast.contents.srcToken);
 }
 
 export enum TagSpecificArrayFormats {
@@ -382,7 +428,7 @@ export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeC
   }
 
   try {
-    const unescaped = load(basicEscape) as string;
+    const unescaped = parse(basicEscape) as string;
     if (unescaped === value) {
       return basicEscape;
     }
@@ -390,13 +436,13 @@ export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeC
     // invalid YAML
   }
 
-  const escapeWithDefaultCharacter = dump(value, {
+  const escapeWithDefaultCharacter = stringify(value, {
     lineWidth: -1,
     quotingType: defaultEscapeCharacter,
     forceQuotes: forceEscape,
   }).slice(0, -1);
 
-  const escapeWithOtherCharacter = dump(value, {
+  const escapeWithOtherCharacter = stringify(value, {
     lineWidth: -1,
     quotingType: defaultEscapeCharacter == '"' ? '\'' : '"',
     forceQuotes: forceEscape,

@@ -5,7 +5,7 @@ export interface ObsidianCommandInterface {
   executeCommandById(id: string): void;
   commands: {
     'editor:save-file': {
-      callback(): void;
+      checkCallback(checking: boolean): boolean | void;
     };
   };
   listCommands(): Command[];
@@ -74,7 +74,7 @@ declare module 'obsidian' {
      * CodeMirror editor instance
      */
     cm?: EditorView;
-}
+  }
 }
 
 

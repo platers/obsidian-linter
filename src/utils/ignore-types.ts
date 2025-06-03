@@ -3,8 +3,7 @@ import {getAllCustomIgnoreSectionsInText, getAllTablesInText, getPositions, MDAs
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
-export type IgnoreResults = {replacedValues: string[], newText: string};
-export type IgnoreFunction = ((text: string, placeholder: string) => IgnoreResults);
+export type IgnoreFunction = ((text: string, placeholder: string) => [string[], string]);
 export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string};
 
 export const IgnoreTypes: Record<string, IgnoreType> = {
@@ -40,19 +39,18 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
   let setOfPlaceholders: {placeholder: string, replacedValues: string[]}[] = [];
 
   // replace ignore blocks with their placeholders
+  let replaceValues: string[] = [];
   for (const ignoreType of ignoreTypes) {
-    let ignoredResult: IgnoreResults;
     if (typeof ignoreType.replaceAction === 'string') { // mdast
-      ignoredResult = replaceMdastType(text, ignoreType.placeholder, ignoreType.replaceAction);
+      [replaceValues, text] = replaceMdastType(text, ignoreType.placeholder, ignoreType.replaceAction);
     } else if (ignoreType.replaceAction instanceof RegExp) {
-      ignoredResult = replaceRegex(text, ignoreType.placeholder, ignoreType.replaceAction);
+      [replaceValues, text] = replaceRegex(text, ignoreType.placeholder, ignoreType.replaceAction);
     } else if (typeof ignoreType.replaceAction === 'function') {
       const ignoreFunc: IgnoreFunction = ignoreType.replaceAction;
-      ignoredResult = ignoreFunc(text, ignoreType.placeholder);
+      [replaceValues, text] = ignoreFunc(text, ignoreType.placeholder);
     }
 
-    text = ignoredResult.newText;
-    setOfPlaceholders.push({replacedValues: ignoredResult.replacedValues, placeholder: ignoreType.placeholder});
+    setOfPlaceholders.push({replacedValues: replaceValues, placeholder: ignoreType.placeholder});
   }
 
   text = func(text);
@@ -80,20 +78,27 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
  * @return {string} The text with mdast nodes types specified replaced
  * @return {string[]} The mdast nodes values replaced
  */
-function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): IgnoreResults {
-  const positions: Position[] = getPositions(type, text);
+function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): [string[], string] {
+  let positions: Position[] = getPositions(type, text);
   const replacedValues: string[] = [];
+
+  if (type === MDAstTypes.List) {
+    positions = removeOverlappingPositions(positions);
+  }
 
   for (const position of positions) {
     const valueToReplace = text.substring(position.start.offset, position.end.offset);
     replacedValues.push(valueToReplace);
+  }
+
+  for (const position of positions) {
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, placeholder);
   }
 
   // Reverse the replaced values so that they are in the same order as the original text
   replacedValues.reverse();
 
-  return {newText: text, replacedValues};
+  return [replacedValues, text];
 }
 
 /**
@@ -104,7 +109,7 @@ function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): 
  * @return {string} The text with regex matches replaced
  * @return {string[]} The regex matches replaced
  */
-function replaceRegex(text: string, placeholder: string, regex: RegExp): IgnoreResults {
+function replaceRegex(text: string, placeholder: string, regex: RegExp): [string[], string] {
   const regexMatches = text.match(regex);
   const textMatches: string[] = [];
   if (regex.flags.includes('g')) {
@@ -123,7 +128,7 @@ function replaceRegex(text: string, placeholder: string, regex: RegExp): IgnoreR
     }
   }
 
-  return {newText: text, replacedValues: textMatches};
+  return [textMatches, text];
 }
 
 /**
@@ -133,10 +138,12 @@ function replaceRegex(text: string, placeholder: string, regex: RegExp): IgnoreR
  * @return {string} The text with links replaced
  * @return {string[]} The regular markdown links replaced
  */
-function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): IgnoreResults {
+function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): [string[], string] {
   const positions: Position[] = getPositions(MDAstTypes.Link, text);
   const replacedRegularLinks: string[] = [];
 
+
+  const positionsToReplace: Position [] = [];
   for (const position of positions) {
     if (position == undefined) {
       continue;
@@ -148,17 +155,21 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): Ign
       continue;
     }
 
+    positionsToReplace.push(position);
     replacedRegularLinks.push(regularLink);
+  }
+
+  for (const position of positionsToReplace) {
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, regularLinkPlaceholder);
   }
 
   // Reverse the regular links so that they are in the same order as the original text
   replacedRegularLinks.reverse();
 
-  return {newText: text, replacedValues: replacedRegularLinks};
+  return [replacedRegularLinks, text];
 }
 
-function replaceTags(text: string, placeholder: string): IgnoreResults {
+function replaceTags(text: string, placeholder: string): [string[], string] {
   const replacedValues: string[] = [];
 
   text = text.replace(tagWithLeadingWhitespaceRegex, (_, whitespace, tag) => {
@@ -166,10 +177,10 @@ function replaceTags(text: string, placeholder: string): IgnoreResults {
     return whitespace + placeholder;
   });
 
-  return {newText: text, replacedValues: replacedValues};
+  return [replacedValues, text];
 }
 
-function replaceTables(text: string, tablePlaceholder: string): IgnoreResults {
+function replaceTables(text: string, tablePlaceholder: string): [string[], string] {
   const tablePositions = getAllTablesInText(text);
 
   const replacedTables: string[] = new Array(tablePositions.length);
@@ -177,14 +188,17 @@ function replaceTables(text: string, tablePlaceholder: string): IgnoreResults {
   const length = replacedTables.length;
   for (const tablePosition of tablePositions) {
     replacedTables[length - 1 - index++] = text.substring(tablePosition.startIndex, tablePosition.endIndex);
+  }
+
+  for (const tablePosition of tablePositions) {
     text = replaceTextBetweenStartAndEndWithNewValue(text, tablePosition.startIndex, tablePosition.endIndex, tablePlaceholder);
   }
 
-  return {newText: text, replacedValues: replacedTables};
+  return [replacedTables, text];
 }
 
 
-function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): IgnoreResults {
+function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): [string[], string] {
   const customIgnorePositions = getAllCustomIgnoreSectionsInText(text);
 
   const replacedSections: string[] = new Array(customIgnorePositions.length);
@@ -192,8 +206,30 @@ function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): Ign
   const length = replacedSections.length;
   for (const customIgnorePosition of customIgnorePositions) {
     replacedSections[length - 1 - index++] = text.substring(customIgnorePosition.startIndex, customIgnorePosition.endIndex);
+  }
+
+  for (const customIgnorePosition of customIgnorePositions) {
     text = replaceTextBetweenStartAndEndWithNewValue(text, customIgnorePosition.startIndex, customIgnorePosition.endIndex, customIgnorePlaceholder);
   }
 
-  return {newText: text, replacedValues: replacedSections};
+  return [replacedSections, text];
+}
+
+function removeOverlappingPositions(positions: Position[]): Position[] {
+  if (positions.length < 2) {
+    return positions;
+  }
+
+  let lastPosition: Position = positions.pop();
+  let currentPosition: Position = null;
+  const result: Position[] = [lastPosition];
+  while (positions.length > 0) {
+    currentPosition = positions.pop();
+    if (lastPosition.start.offset >= currentPosition.end.offset || currentPosition.start.offset >= lastPosition.end.offset) {
+      result.unshift(currentPosition);
+      lastPosition = currentPosition;
+    }
+  }
+
+  return result;
 }

@@ -902,7 +902,7 @@ Paragraph here...
 
 Alias: `line-break-at-document-end`
 
-Ensures that there is exactly one line break at the end of a document.
+Ensures that there is exactly one line break at the end of a document if the note is not empty.
 
 
 
@@ -940,6 +940,20 @@ After:
 
 `````` markdown
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+``````
+</details>
+<details><summary>Empty files will not have a blank line added</summary>
+
+Before:
+
+`````` markdown
+
+``````
+
+After:
+
+`````` markdown
 
 ``````
 </details>

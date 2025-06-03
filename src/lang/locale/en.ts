@@ -32,11 +32,23 @@ export default {
     'paste-as-plain-text': {
       'name': 'Paste as Plain Text & without Modifications',
     },
+    'ignore-folder': {
+      'name': 'Ignore folder',
+    },
+    'ignore-file': {
+      'name': 'Ignore file',
+    },
     'lint-file-pop-up-menu-text': {
       'name': 'Lint file',
     },
     'lint-folder-pop-up-menu-text': {
       'name': 'Lint folder',
+    },
+    'ignore-file-pop-up-menu-text': {
+      'name': 'Ignore file in Linter',
+    },
+    'ignore-folder-pop-up-menu-text': {
+      'name': 'Ignore folder in Linter',
     },
   },
 
@@ -780,7 +792,7 @@ export default {
     'trailing-spaces': {
       'name': 'Trailing spaces',
       'description': 'Removes extra spaces after every line.',
-      'twp-space-line-break': {
+      'two-space-line-break': {
         'name': 'Two Space Linebreak',
         'description': 'Ignore two spaces followed by a line break ("Two Space Rule").',
       },
