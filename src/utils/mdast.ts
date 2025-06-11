@@ -616,7 +616,9 @@ export function updateListItemText(text: string, func:(text: string) => string, 
         startIndex++;
       }
 
-      startIndex++;
+      if (startIndex < position.position.end.offset) {
+        startIndex++;
+      }
     } else {
       // get the actual start of the list item leaving only 1 whitespace between the indicator and the text
       while (startIndex > 0 && text.charAt(startIndex - 1).trim() === '') {
