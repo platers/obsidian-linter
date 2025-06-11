@@ -5,7 +5,7 @@ import {ruleTest} from './common';
 ruleTest({
   RuleBuilderClass: RemoveConsecutiveListMarkers,
   testCases: [
-    {
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1278
       testName: 'Make sure consecutive list markers are removed when dealing with non-latin characters',
       before: dedent`
         - - test content
