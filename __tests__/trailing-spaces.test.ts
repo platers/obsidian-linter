@@ -154,5 +154,20 @@ ruleTest({
         3.${' '}
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1329
+      testName: 'Make sure that we properly handle an empty list item when it is empty and has no spaces in it',
+      before: dedent`
+        Some text
+        ${''}
+        -
+        ${''}
+      `,
+      after: dedent`
+        Some text
+        ${''}
+        -
+        ${''}
+      `,
+    },
   ],
 });
