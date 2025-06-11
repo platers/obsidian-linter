@@ -19,7 +19,7 @@ export default class RemoveConsecutiveListMarkers extends RuleBuilder<RemoveCons
     return RemoveConsecutiveListMarkersOptions;
   }
   apply(text: string, options: RemoveConsecutiveListMarkersOptions): string {
-    return text.replace(/^([ |\t]*)- - \b/gm, '$1- ');
+    return text.replace(/^([ |\t]*)- - (\p{L})/gmu, '$1- $2');
   }
   get exampleBuilders(): ExampleBuilder<RemoveConsecutiveListMarkersOptions>[] {
     return [
