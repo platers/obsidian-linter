@@ -6,12 +6,12 @@ import {
   Option,
   BooleanOption,
 } from './option';
-import {YAMLException} from 'js-yaml';
 import {LinterError} from './linter-error';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import {ignoreListOfTypes, IgnoreType} from './utils/ignore-types';
 import {LinterSettings} from './settings-data';
 import {App} from 'obsidian';
+import {YAMLParseError} from 'yaml';
 
 export type Options = { [optionName: string]: any};
 
@@ -188,12 +188,13 @@ export function sortRules(): void {
 
 export function wrapLintError(error: Error, ruleName: string) {
   let errorMessage: string;
-  if (error instanceof YAMLException) {
+  if (error instanceof YAMLParseError) {
     errorMessage = error.toString();
     errorMessage = getTextInLanguage('logs.wrapper-yaml-error').replace('{ERROR_MESSAGE}', errorMessage.substring(errorMessage.indexOf(':') + 1));
   } else {
     errorMessage = getTextInLanguage('logs.wrapper-unknown-error').replace('{ERROR_MESSAGE}', error.message);
   }
 
+  // TODO: clean this up, and see about replacing encountered an with the appropriate getTextInLanguage
   throw new LinterError(`"${ruleName}" encountered an ${errorMessage}`, error);
 }
