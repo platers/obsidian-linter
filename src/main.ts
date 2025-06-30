@@ -200,7 +200,7 @@ export default class LinterPlugin extends Plugin {
           return false;
         }
 
-        this.createFolderLintModal(ctx.file.parent);
+        that.createFolderLintModal(ctx.file.parent);
       },
     });
 
@@ -229,7 +229,7 @@ export default class LinterPlugin extends Plugin {
           return false;
         }
 
-        void this.addFolderToIgnoreList(ctx.file.parent);
+        void that.addFolderToIgnoreList(ctx.file.parent);
       },
     });
 
@@ -241,7 +241,7 @@ export default class LinterPlugin extends Plugin {
           return that.isMarkdownFile(ctx.file) && !that.shouldIgnoreFile(ctx.file);
         }
 
-        void this.addFileToIgnoreList(ctx.file);
+        void that.addFileToIgnoreList(ctx.file);
       },
       icon: iconInfo.ignoreFile.id,
     });
