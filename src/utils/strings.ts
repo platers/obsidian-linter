@@ -365,8 +365,6 @@ export function hashString53Bit(str: string, seed: number = 0): number {
  * @return {string} The string with the escape characters converted to their escape character form.
  */
 export function convertStringVersionOfEscapeCharactersToEscapeCharacters(val: string): string {
-  // replace string version of backspace character with the actual backspace character
-  val = val.replaceAll('\\b', '\b');
   // replace string version of form feed character with the actual form feed character
   val = val.replaceAll('\\f', '\f');
   // replace string version of new line character with the actual new line character
@@ -377,6 +375,8 @@ export function convertStringVersionOfEscapeCharactersToEscapeCharacters(val: st
   val = val.replaceAll('\\t', '\t');
   // replace string version of vertical tab character with the actual vertical tab character
   val = val.replaceAll('\\v', '\v');
+  // replace string version of escaped \ with the single instance of \
+  val = val.replaceAll('\\\\', '\\');
 
   return val;
 }
