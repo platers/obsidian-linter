@@ -13,7 +13,7 @@ export default class RemoveMultipleSpaces extends RuleBuilder<RemoveMultipleSpac
       nameKey: 'rules.remove-multiple-spaces.name',
       descriptionKey: 'rules.remove-multiple-spaces.description',
       type: RuleType.CONTENT,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.table],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.table, IgnoreTypes.image],
     });
   }
   get OptionsClass(): new () => RemoveMultipleSpacesOptions {

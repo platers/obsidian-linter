@@ -254,6 +254,15 @@ ruleTest({
         test test
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1346
+      testName: 'Make sure that spaces within an embed are preserved',
+      before: dedent`
+        ![](<./a  b.md>)
+      `,
+      after: dedent`
+        ![](<./a  b.md>)
+      `,
+    },
   ],
 });
 
