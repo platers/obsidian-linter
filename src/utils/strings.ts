@@ -359,7 +359,7 @@ export function hashString53Bit(str: string, seed: number = 0): number {
 }
 
 /**
- * Takes a string and converts string that have the string escaped form of escape characters such as new line, backspace,
+ * Takes a string and converts string that have the string escaped form of escape characters such as new line,
  * form feed, carriage return, horizontal tab, and vertical tab and makes sure they are their escaped character values.
  * @param {string} val - The string to make sure has the escape characters as escape characters rather than a stringified form.
  * @return {string} The string with the escape characters converted to their escape character form.

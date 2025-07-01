@@ -635,8 +635,6 @@ ruleTest({
         # Filename
       `,
       after: dedent`
-        ---
-        ---
         # Filename
       `,
       options: {
@@ -1062,8 +1060,6 @@ ruleTest({
         # Filename
       `,
       after: dedent`
-        ---
-        ---
         # Filename
       `,
       options: {
@@ -1411,6 +1407,43 @@ ruleTest({
         preserveExistingAliasesSectionStyle: true,
         aliasHelperKey: 'aliases2',
         keepAliasThatMatchesTheFilename: true,
+        fileName: 'Filename',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1293
+      testName: 'Make sure that a blank YAML block is not added when there is no value to be added by the rule',
+      before: dedent`
+        # Filename
+      `,
+      after: dedent`
+        # Filename
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        defaultEscapeCharacter: '"',
+        preserveExistingAliasesSectionStyle: true,
+        aliasHelperKey: 'aliases2',
+        keepAliasThatMatchesTheFilename: false,
+        fileName: 'Filename',
+      },
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/1293
+      testName: 'Make sure that a blank YAML block is not added when there is no value to be added by the rule and that extra space is removed before the first piece of content',
+      before: dedent`
+        ---
+        ---
+        ${''}
+        # Filename
+      `,
+      after: dedent`
+        # Filename
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        defaultEscapeCharacter: '"',
+        preserveExistingAliasesSectionStyle: true,
+        aliasHelperKey: 'aliases2',
+        keepAliasThatMatchesTheFilename: false,
         fileName: 'Filename',
       },
     },

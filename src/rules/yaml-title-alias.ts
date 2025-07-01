@@ -112,7 +112,17 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       newYaml = setYamlSection(newYaml, aliasHelperKey, ` ${title}`);
     }
 
-    text = text.replace(`---\n${yaml}---`, `---\n${newYaml}---`);
+    const oldYaml = `---\n${yaml}---`;
+    let newYamlValue = `---\n${newYaml}---`;
+    if (newYaml === '') {
+      newYamlValue = '';
+    }
+
+    text = text.replace(oldYaml, newYamlValue);
+
+    if (newYaml === '') {
+      text = text.trimStart();
+    }
 
     return text;
   }
