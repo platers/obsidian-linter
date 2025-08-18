@@ -19,6 +19,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   math: {replaceAction: MDAstTypes.Math, placeholder: '{MATH_PLACEHOLDER}'},
   inlineMath: {replaceAction: MDAstTypes.InlineMath, placeholder: '{INLINE_MATH_PLACEHOLDER}'},
   html: {replaceAction: MDAstTypes.Html, placeholder: '{HTML_PLACEHOLDER}'},
+  heading: {replaceAction: MDAstTypes.Heading, placeholder: '{HEADING_PLACEHOLDER}'},
   // RegExp
   yaml: {replaceAction: yamlRegex, placeholder: escapeDollarSigns('---\n---')},
   wikiLink: {replaceAction: wikiLinkRegex, placeholder: '{WIKI_LINK_PLACEHOLDER}'},
