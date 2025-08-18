@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {updateListItemText} from '../utils/mdast';
+import {updateHeaderText, updateListItemText} from '../utils/mdast';
 import {escapeRegExp} from '../utils/regex';
 
 class RemoveSpaceAroundCharactersOptions implements Options {
@@ -53,9 +53,10 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
       return text.replace(fullwidthCharacterWithTextAtStart, '$2').replace(fullwidthCharacterWithTextAtEnd, '$1');
     };
 
-    let newText = ignoreListOfTypes([IgnoreTypes.list], text, replaceWhitespaceAroundFullwidthCharacters);
+    let newText = ignoreListOfTypes([IgnoreTypes.list, IgnoreTypes.heading], text, replaceWhitespaceAroundFullwidthCharacters);
 
     newText = updateListItemText(newText, replaceWhitespaceAroundFullwidthCharacters);
+    newText = updateHeaderText(newText, replaceWhitespaceAroundFullwidthCharacters);
 
     return newText;
   }

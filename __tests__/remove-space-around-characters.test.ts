@@ -92,5 +92,17 @@ ruleTest({
         includeCJKSymbolsAndPunctuation: true,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1280
+      testName: 'Make sure that heading text is handled properly and keeps the heading as valid',
+      before: dedent`
+        ## 「example here」 More text here
+      `,
+      after: dedent`
+        ## 「example here」More text here
+      `,
+      options: {
+        includeCJKSymbolsAndPunctuation: true,
+      },
+    },
   ],
 });
