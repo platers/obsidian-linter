@@ -79,12 +79,12 @@ ruleTest({
         ${'\t'}
         - \`Map<K, V>\` represents a collection of **key-value pairs** (e.g., a phonebook: name → number).
         ${' \t'}
-        - \`List<E>\` ...
+        ${'  '}- \`List<E>\` ...
       `,
       after: dedent`
         - \`Collection<E>\` represents a group of **individual elements** (E, like a list of names).
         - \`Map<K, V>\` represents a collection of **key-value pairs** (e.g., a phonebook: name → number).
-        - \`List<E>\` ...
+        ${'  '}- \`List<E>\` ...
       `,
     },
   ],
