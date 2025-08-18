@@ -41,7 +41,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
     return this.replaceEmptyLinesBetweenList(text, splatMarkerRegexText);
   }
   replaceEmptyLinesBetweenList = function(text: string, listIndicatorRegexText: string): string {
-    const listRegex = new RegExp(`^${listIndicatorRegexText}\n{2,}${listIndicatorRegexText}$`, 'gm');
+    const listRegex = new RegExp(`^${listIndicatorRegexText}\n(?:(?:[\t\v\f\r \u00a0\u2000-\u200b\u2028-\u2029\u3000]+)?\n){1,}${listIndicatorRegexText}$`, 'gm');
     let match;
     let newText = text;
 
