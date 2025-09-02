@@ -150,6 +150,10 @@ export default {
         'name': '格式化后显示消息',
         'description': '格式化后显示修改了多少字符',
       },
+      'suppress-message-when-no-change': {
+        'name': '无修改时不显示消息',
+        'description': '开启后，若无实际改动发生则不显示消息。',
+      },
       'lint-on-file-change': {
         'name': '文件修改时格式化',
         'description': '当文件关闭或是切换到新文件时，格式化之前的文件',

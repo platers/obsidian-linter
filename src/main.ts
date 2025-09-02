@@ -122,6 +122,9 @@ export default class LinterPlugin extends Plugin {
   async loadSettings() {
     const data = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+    if (typeof this.settings.suppressMessageWhenNoChange !== 'boolean') {
+      this.settings.suppressMessageWhenNoChange = false;
+    }
     if (typeof this.settings.logLevel === 'number') {
       this.settings.logLevel = convertNumberToLogLevel(this.settings.logLevel);
     }
@@ -870,7 +873,11 @@ export default class LinterPlugin extends Plugin {
   }
 
   private displayChangedMessage(charsAdded: number, charsRemoved: number) {
+    const suppressMessageWhenNoChange = this.settings.suppressMessageWhenNoChange ?? false;
     if (this.settings.displayChanged) {
+      if (suppressMessageWhenNoChange && charsAdded + charsRemoved === 0) {
+        return;
+      }
       const message = dedent`
         ${charsAdded} ${getTextInLanguage('notice-text.characters-added')}
         ${charsRemoved} ${getTextInLanguage('notice-text.characters-removed')}

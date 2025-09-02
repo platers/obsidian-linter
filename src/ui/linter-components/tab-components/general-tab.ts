@@ -53,6 +53,16 @@ export class GeneralTab extends Tab {
     if (!lintOnActiveFileChangeSetting.getBoolean()) {
       displayLintOnActiveFileChangeSetting.hide();
     }
+    
+    tempDiv = this.contentEl.createDiv();
+    const suppressMessageWhenNoChangeSetting = new ToggleSetting(
+      tempDiv,
+      'tabs.general.suppress-message-when-no-change.name' as any,
+      'tabs.general.suppress-message-when-no-change.description' as any,
+      'suppressMessageWhenNoChange',
+      this.plugin
+    );
+    this.addSettingSearchInfoForGeneralSettings(suppressMessageWhenNoChangeSetting);
 
     const sysLocale = navigator.language?.toLowerCase();
     const localeValues = ['system-default'];
