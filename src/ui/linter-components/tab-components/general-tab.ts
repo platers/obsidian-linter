@@ -53,14 +53,14 @@ export class GeneralTab extends Tab {
     if (!lintOnActiveFileChangeSetting.getBoolean()) {
       displayLintOnActiveFileChangeSetting.hide();
     }
-    
+
     tempDiv = this.contentEl.createDiv();
     const suppressMessageWhenNoChangeSetting = new ToggleSetting(
       tempDiv,
       'tabs.general.suppress-message-when-no-change.name' as any,
       'tabs.general.suppress-message-when-no-change.description' as any,
       'suppressMessageWhenNoChange',
-      this.plugin
+      this.plugin,
     );
     this.addSettingSearchInfoForGeneralSettings(suppressMessageWhenNoChangeSetting);
 
