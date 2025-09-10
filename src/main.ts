@@ -298,7 +298,7 @@ export default class LinterPlugin extends Plugin {
           // to check if the same file we already intend to add is in the map before we set
           // the value in the map
           originalText: '',
-          fileView: info,
+          markdownInfo: info,
         };
         this.activeFileChangeDebouncer.set(info.file.path, activeFileDebounceInfo);
         // do not use editor because it already has the change, so if the user removes all changes
