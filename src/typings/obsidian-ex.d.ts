@@ -75,6 +75,10 @@ declare module 'obsidian' {
      */
     cm?: EditorView;
   }
+
+  interface WorkspaceLeaf{
+    rebuildView(): Promise<void>;
+  }
 }
 
 
