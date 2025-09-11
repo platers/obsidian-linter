@@ -31,7 +31,15 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
       return text;
     }
 
-    return text.replace(nonBlockquoteChecklistRegex, '');
+    const checklistContentMatch = options.lineContent.match(/^(\s*(>\s*)*-\s*\[.\]\s*)(.*)$/);
+    const hasContent = checklistContentMatch && checklistContentMatch[3].trim().length > 0;
+
+    if (!hasContent) {
+      return text.replace(nonBlockquoteChecklistRegex, '');
+    } else {
+      const cleanContent = text.replace(nonBlockquoteChecklistRegex, '');
+      return '\n- [ ] ' + cleanContent.trim();
+    }
   }
   get exampleBuilders(): ExampleBuilder<PreventDoubleChecklistIndicatorOnPasteOptions>[] {
     return [
@@ -64,7 +72,7 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         },
       }),
       new ExampleBuilder({
-        description: 'Line being pasted into a blockquote with a checklist indicator has its checklist indicator removed when current line is: `> - [x] `',
+        description: 'Line being pasted into a blockquote with empty checklist has its checklist indicator removed when current line is: `> - [x] `',
         before: dedent`
           - [ ] Checklist item contents here
           More content here
@@ -79,7 +87,7 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         },
       }),
       new ExampleBuilder({
-        description: 'Line being pasted with a checklist indicator has its checklist indicator removed when current line is: `- [ ] `',
+        description: 'Line being pasted into empty checklist has its checklist indicator removed when current line is: `- [ ] `',
         before: dedent`
           - [x] Checklist item 1
           - [ ] Checklist item 2
@@ -93,8 +101,57 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
           selectedText: '',
         },
       }),
+      new ExampleBuilder({
+        description: 'Line being pasted into non-empty checklist creates a new line when current line is: `- [ ] Existing content`',
+        before: dedent`
+          - [x] New checklist item
+        `,
+        after: dedent`
+
+          - [ ] New checklist item
+        `,
+        options: {
+          lineContent: '- [ ] Existing content',
+          selectedText: '',
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Multi-line paste into empty checklist: only first line checkbox removed, rest lines unchanged when current line is: `- [ ] `',
+        before: dedent`
+          - [x] First line content
+          - [ ] Second line content
+          Regular text line
+        `,
+        after: dedent`
+          First line content
+          - [ ] Second line content
+          Regular text line
+        `,
+        options: {
+          lineContent: '- [ ] ',
+          selectedText: '',
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Multi-line paste into non-empty checklist: creates new line, only first line becomes checklist when current line is: `- [ ] Existing`',
+        before: dedent`
+          - [x] First line content
+          - [ ] Second line content
+          Regular text line
+        `,
+        after: dedent`
+
+          - [ ] First line content
+          - [ ] Second line content
+          Regular text line
+        `,
+        options: {
+          lineContent: '- [ ] Existing',
+          selectedText: '',
+        },
+      }),
       new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/748
-        description: 'Line being pasted as a checklist indicator has its checklist indicator removed when current line is: `- [!] `',
+        description: 'Line being pasted into empty checklist has its checklist indicator removed when current line is: `- [!] `',
         before: dedent`
           - [x] Checklist item 1
           - [ ] Checklist item 2
@@ -121,6 +178,33 @@ export default class PreventDoubleChecklistIndicatorOnPaste extends RuleBuilder<
         options: {
           lineContent: '- [!] Some text here',
           selectedText: '- [!] Some text here',
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Non-empty checklist creates new line with standard checkbox: `- [!] Non-empty` with `- [x] Content`',
+        before: dedent`
+          - [x] Content to paste
+        `,
+        after: dedent`
+
+          - [ ] Content to paste
+        `,
+        options: {
+          lineContent: '- [!] Non-empty',
+          selectedText: '',
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Handles indented empty checklist correctly: `  - [ ] ` (with 2 spaces)',
+        before: dedent`
+          - [x] Indented content
+        `,
+        after: dedent`
+          Indented content
+        `,
+        options: {
+          lineContent: '  - [ ] ',
+          selectedText: '',
         },
       }),
     ];
