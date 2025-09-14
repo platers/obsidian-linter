@@ -1,6 +1,6 @@
 {
   "name": "obsidian-linter",
-  "version": "1.29.2",
+  "version": "1.30.0",
   "description": "Enforces consistent markdown styling for Obsidian (https://obsidian.md). It can be used to format YAML tags, aliases, arrays, and metadata; footnotes; headings; spacing; math blocks; regular markdown contents like list, italics, and bold styles; and more with the use of custom rule options as well.",
   "main": "main.js",
   "scripts": {
