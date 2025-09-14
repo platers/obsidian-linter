@@ -18,6 +18,7 @@ rm -f manifest.tmp.json
 # Rewrite versions in relevant files.
 jq ".version=\"${NEW_VERSION}\"" package.json > package.tmp.json && mv package.tmp.json package.json
 jq ".version=\"${NEW_VERSION}\"" manifest.json > manifest.tmp.json && mv manifest.tmp.json manifest.json
+jq ".version=\"${NEW_VERSION}\"" manifest-beta.json > manifest-beta.tmp.json && mv manifest-beta.tmp.json manifest-beta.json
 jq ". + {\"${NEW_VERSION}\": \"1.9.0\"}" versions.json > versions.tmp.json && mv versions.tmp.json versions.json
 
 npm run build && npm run docs
