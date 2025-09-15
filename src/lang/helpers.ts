@@ -24,7 +24,7 @@ import sq from './locale/sq';
 import tr from './locale/tr';
 import uk from './locale/uk';
 import zhCN from './locale/zh-cn';
-import zhTW from './locale/zh-tw';
+// import zhTW from './locale/zh-tw'; for now we will use Simplified Chinese instead of Traditional for both
 
 type LanguageStrings = typeof en;
 
@@ -53,7 +53,7 @@ export const localeMap: { [k: string]: LanguageLocale } = {
   sq,
   tr,
   uk,
-  'zh-TW': zhTW,
+  'zh-TW': zhCN,
   'zh': zhCN,
 };
 
