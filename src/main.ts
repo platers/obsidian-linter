@@ -53,6 +53,7 @@ type FileChangeUpdateInfo = {
   debounceFn: Debouncer<[TFile, Editor], Promise<void>>,
   isRunning: boolean
   originalText: string
+  markdownInfo: MarkdownView | MarkdownFileInfo
 }
 
 export default class LinterPlugin extends Plugin {
@@ -300,6 +301,7 @@ export default class LinterPlugin extends Plugin {
           // to check if the same file we already intend to add is in the map before we set
           // the value in the map
           originalText: '',
+          markdownInfo: info,
         };
         this.activeFileChangeDebouncer.set(info.file.path, activeFileDebounceInfo);
         // do not use editor because it already has the change, so if the user removes all changes
@@ -801,7 +803,27 @@ export default class LinterPlugin extends Plugin {
                 return;
               }
 
+              let markdownInfo: MarkdownView;
+              let modeNeedsResetting = false;
+              let originalState;
+              if (activeFileChangeInfo.markdownInfo instanceof MarkdownView) {
+                markdownInfo = activeFileChangeInfo.markdownInfo;
+                originalState = markdownInfo.getState();
+                modeNeedsResetting = originalState.mode !== 'source';
+                // if we are in reading mode, we need to change to source mode in order to make changes
+                if (modeNeedsResetting) {
+                  const newState = markdownInfo.getState();
+                  newState.mode = 'source';
+                  await markdownInfo.setState(newState, {history: false});
+                }
+              }
+
               this.updateEditor(oldText, newText, editor);
+
+              if (modeNeedsResetting) {
+                await markdownInfo.setState(originalState, {history: false});
+                await markdownInfo.leaf.rebuildView();
+              }
             } else {
               logInfo(getTextInLanguage('logs.file-change-yaml-lint-skipped'));
             }
