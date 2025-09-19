@@ -423,7 +423,7 @@ export default {
     // escape-yaml-special-characters.ts
     'escape-yaml-special-characters': {
       'name': '逸出 YAML 特殊字元',
-      'description': '在 YAML 中逸出後面有空格的冒號（: ）、單引號（\'）和雙引號（\"）。',
+      'description': '在 YAML 中逸出後面有空格的冒號（: ）、單引號（\'）和雙引號（"）。',
       'try-to-escape-single-line-arrays': {
         'name': '嘗試逸出單行陣列',
         'description': '假設陣列以 \'[\' 開頭，以 \']\' 結尾，且項目以 \',\' 分隔，嘗試逸出陣列值。',
