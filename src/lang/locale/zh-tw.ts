@@ -103,8 +103,8 @@ export default {
 
   'notice-text': {
     'empty-clipboard': '剪貼簿中沒有內容。',
-    'characters-added': '已新增字元',
-    'characters-removed': '已移除字元',
+    'characters-added': '個字元被添加',
+    'characters-removed': '個字元被移除',
     'copy-to-clipboard-failed': '將文字複製到剪貼簿失敗： ',
   },
 
