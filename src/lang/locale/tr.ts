@@ -127,6 +127,10 @@ export default {
         'name': 'Düzeltme sonrası mesajı göster',
         'description': 'Düzeltme sonrası değişen karakter sayısını gösterir',
       },
+      'suppress-message-when-no-change': {
+        'name': 'Değişiklik Olmadığında Mesajı Bastır',
+        'description': 'Etkinleştirildiğinde, gerçek değişiklikler olmadığında mesaj gösterilmez.',
+      },
       'lint-on-file-change': {
         'name': 'Dosya Değişikliğinde Düzeltme',
         'description': 'Bir dosya kapatıldığında veya yeni bir dosya açıldığında, önceki dosya düzeltilir.',
