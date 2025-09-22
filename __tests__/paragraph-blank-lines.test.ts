@@ -565,5 +565,23 @@ ruleTest({
         \t\tbb
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1395
+      testName: 'A paragraph starting with an asterisk for either italics or bold should have a blank line added',
+      before: dedent`
+        # Header
+        **emphasis** blah blah...
+        *italics* more content here...
+        abcabc
+      `,
+      after: dedent`
+        # Header
+        ${''}
+        **emphasis** blah blah...
+        ${''}
+        *italics* more content here...
+        ${''}
+        abcabc
+      `,
+    },
   ],
 });
