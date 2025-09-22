@@ -305,5 +305,25 @@ ruleTest({
         [^3]: [3333](333)
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1392
+      testName: 'Moving footnotes to the bottom of the file when including blank lines between footnotes should not change a file with footnotes at the end with blank lines between them already',
+      before: dedent`
+        This is the first footnote.[^1] This is the second.[^2]
+        ${''}
+        [^1]: Hey, I am a footnote!
+        ${''}
+        [^2]: Me too!
+      `,
+      after: dedent`
+        This is the first footnote.[^1] This is the second.[^2]
+        ${''}
+        [^1]: Hey, I am a footnote!
+        ${''}
+        [^2]: Me too!
+      `,
+      options: {
+        includeBlankLineBetweenFootnotes: true,
+      },
+    },
   ],
 });
