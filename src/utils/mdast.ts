@@ -186,9 +186,10 @@ function getHeaderTextPositions(text: string): PositionPlusText[] {
 /**
  * Moves footnote declarations to the end of the document.
  * @param {string} text The text to move footnotes in
+ * @param {boolean} includeBlankLinesBetweenFootnotes Whether to have a blank line between footnotes
  * @return {string} The text with footnote declarations moved to the end
  */
-export function moveFootnotesToEnd(text: string): string {
+export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnotes: boolean): string {
   const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
   let footnotes: string[] = [];
 
@@ -273,10 +274,17 @@ export function moveFootnotesToEnd(text: string): string {
 
   // Add the footnotes to the end of the document
   if (footnotes.length > 0) {
-    text = text.trimEnd() + '\n';
+    text = text.trimEnd();
   }
+  let whitespaceBetweenFootnotes = '\n';
+  if (includeBlankLinesBetweenFootnotes) {
+    whitespaceBetweenFootnotes = '\n\n';
+  } else {
+    text += '\n';
+  }
+
   for (const footnote of footnotes) {
-    text += '\n' + footnote;
+    text += whitespaceBetweenFootnotes + footnote;
   }
 
   return text;
