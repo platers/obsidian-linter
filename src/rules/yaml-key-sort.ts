@@ -63,9 +63,9 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     const doc = parseYAML(yamlText);
     const startingPriorityKeys = getEmptyDocument(doc);
 
-	if(doc.contents == null) {
-		return text;
-	}
+    if (doc.contents == null) {
+      return text;
+    }
 
     let remainingKeys = this.getYAMLKeysSorted(yamlKeys, doc, startingPriorityKeys);
 
