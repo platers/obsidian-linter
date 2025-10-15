@@ -132,8 +132,12 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
           textModified = true;
         }
       } else if (options.dateCreatedSourceOfTruth != 'frontmatter') {
-        const createdDateTime = moment(createdDateString, options.format, options.locale, true);
-        if (createdDateTime == undefined || !createdDateTime.isValid()) {
+        // due to how moment validation works for formats, we must check if the output string is the same for the provided value since
+        // parsing when it has escaped characters in it does not result in a valid value
+        // see https://github.com/platers/obsidian-linter/issues/1411
+        const createdDateTime = moment(createdDateString, options.format, options.locale);
+        // to keep backwards compatibility, we will just go ahead and say that the format output must be equal if the format is not blank
+        if (createdDateTime == undefined || !createdDateTime.isValid() || (options.format !== '' && createdDateTime.format(options.format) != createdDateString)) {
           text = text.replace(
               created_match,
               escapeDollarSigns(created_date_line) + '\n',
@@ -161,14 +165,18 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
 
     const keyWithValueFound = modified_match.test(text);
     if (keyWithValueFound) {
-      const modifiedDateTime = moment(this.getYAMLTimestampString(text, modified_match, options.dateModifiedKey), options.format, options.locale, true);
+      // due to how moment validation works for formats, we must check if the output string is the same for the provided value since
+      // parsing when it has escaped characters in it does not result in a valid value
+      // see https://github.com/platers/obsidian-linter/issues/1411
+      const originalString = this.getYAMLTimestampString(text, modified_match, options.dateModifiedKey);
+      const modifiedDateTime = moment(originalString, options.format, options.locale);
       // conditions when update happens for date modified if the key already exists:
       // 1. the text has been modified
       // 2. the modified date in the frontmatter is not the same locale or format as the settings
       // 3. the source of truth is not when a user or the Linter makes a change to the file and
       // there is a more than 5 second difference between the date modified in the frontmatter and
       // the filesystem
-      if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() ||
+      if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() || modifiedDateTime.format(options.format) != originalString ||
             (options.dateModifiedSourceOfTruth != 'user or Linter edits' && this.getTimeDifferenceInSeconds(modifiedDateTime, modified_date, options) > 5)
       ) {
         text = text.replace(
