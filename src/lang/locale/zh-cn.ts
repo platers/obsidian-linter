@@ -572,8 +572,8 @@ export default {
     },
     // prevent-double-checklist-indicator-on-paste.ts
     'prevent-double-checklist-indicator-on-paste': {
-      'name': '防止重复的清单标记',
-      'description': '粘贴时，如果光标所在行有清单标记，则从要粘贴的文本中移除清单标记',
+      'name': '防止重复的任务列表标记',
+      'description': '粘贴时，如果光标所在行有空的任务列表标记，则从要粘贴的文本中移除任务列表标记',
     },
     // prevent-double-list-item-indicator-on-paste.ts
     'prevent-double-list-item-indicator-on-paste': {
