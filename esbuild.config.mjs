@@ -65,7 +65,7 @@ const unusedCodeForProduction = [replace({
   delimiters: ['', ''],
 })];
 
-const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
+const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins, additionalExternal = []) {
   return {
     banner: {
       js: banner,
@@ -78,7 +78,8 @@ const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
     bundle: true,
     external: [
       'obsidian',
-      ...builtins],
+      ...builtins,
+      ...additionalExternal],
     format: 'cjs',
     target: 'es2020',
     sourcemap: prod ? false : 'inline',
@@ -92,7 +93,7 @@ const esbuildArgs = [
   createEsbuildArgs(banner, 'src/main.ts', 'main.js', unusedCodeForProduction),
   createEsbuildArgs(mockedBanner, 'src/docs.ts', 'docs.js', mockedPlugins),
   createEsbuildArgs(mockedBanner, 'src/translation-helper.ts', 'translation-helper.js', mockedPlugins),
-  createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []),
+  createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', [], ['expect']),
 ];
 
 for (let i = 0; i < esbuildArgs.length; i++) {
