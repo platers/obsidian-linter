@@ -26,6 +26,11 @@ import {LinterSettings} from '../settings-data';
 import {RunLinterRulesOptions, TFile} from '../typings/worker';
 import TrailingSpaces from '../rules/trailing-spaces';
 import AutoCorrectCommonMisspellings from '../rules/auto-correct-common-misspellings';
+import YamlTitle from 'src/rules/yaml-title';
+import YamlTitleAlias from 'src/rules/yaml-title-alias';
+import ConsecutiveBlankLines from 'src/rules/consecutive-blank-lines';
+import {yamlRegex} from 'src/utils/regex';
+import AddBlankLineAfterYAML from 'src/rules/add-blank-line-after-yaml';
 
 /**
  * Lints the text provided in runOptions.
@@ -92,10 +97,22 @@ function runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
 }
 
 function runAfterRegularRules(currentText: string, runOptions: RunLinterRulesOptions): string {
-  let newText = currentText;
+  let newText = runOptions.oldText;
   const postRuleLogText = getTextInLanguage('logs.post-rules');
   timingBegin(postRuleLogText);
   [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
+
+  [newText] = YamlTitle.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules, {
+    fileName: runOptions.fileInfo.name,
+    defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+  });
+
+  [newText] = YamlTitleAlias.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules, {
+    fileName: runOptions.fileInfo.name,
+    aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
+    defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+    removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
+  });
 
   [newText] = BlockquoteStyle.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
 
@@ -104,6 +121,13 @@ function runAfterRegularRules(currentText: string, runOptions: RunLinterRulesOpt
   });
 
   [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
+
+  [newText] = ConsecutiveBlankLines.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
+
+  const yaml = newText.match(yamlRegex);
+  if (yaml != null) {
+    [newText] = AddBlankLineAfterYAML.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
+  }
 
   timingEnd(postRuleLogText);
   timingEnd(getTextInLanguage('logs.rule-running'));
