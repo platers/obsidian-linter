@@ -1,5 +1,5 @@
 import {getAllTablesInText} from './mdast';
-import {makeSureContentHasEmptyLinesAddedBeforeAndAfter} from './strings';
+import {makeSureContentHasEmptyLinesAddedBeforeAndAfter, unescapeMarkdownSpecialCharacters} from './strings';
 
 // Useful regexes
 export const allHeadersRegex = /^([ \t]*)(#+)([ \t]+)([^\n\r]*?)([ \t]+#+)?$/gm;
@@ -123,7 +123,8 @@ export function getFirstHeaderOneText(text: string): string {
       return $2;
     });
 
-    return headerText.replaceAll(genericLinkRegex, '$2');
+    headerText = headerText.replaceAll(genericLinkRegex, '$2');
+    return unescapeMarkdownSpecialCharacters(headerText);
   }
 
   return '';

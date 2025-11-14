@@ -374,5 +374,17 @@ ruleTest({
         # Hello world
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1428
+      testName: 'Unescapes H1 markdown special characters',
+      before: dedent`
+        # Escape \\[\\_\\]
+      `,
+      after: dedent`
+        ---
+        title: Escape [_]
+        ---
+        # Escape \\[\\_\\]
+      `,
+    },
   ],
 });
