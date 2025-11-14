@@ -535,3 +535,18 @@ export function parseCustomReplacements(text: string): Map<string, string> {
 
   return customReplacements;
 }
+
+/**
+ * Escapes the markdown special characters in the provided text.
+ *
+ * @param text The text to escape the markdown special characters in.
+ * @return The text with the markdown special characters escaped.
+ *
+ * @example
+ * ```ts
+ * escapeMarkdownSpecialCharacters('Escape [_]'); // Escape \[\_\]
+ * ```
+ */
+export function escapeMarkdownSpecialCharacters(text: string): string {
+  return text.replace(/[\\[\]<>_*~=`$]/g, '\\$&');
+}

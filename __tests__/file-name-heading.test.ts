@@ -44,5 +44,16 @@ ruleTest({
         fileName: 'Test note',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1426
+      testName: 'Escapes the markdown special characters in the file name',
+      before: '',
+      after: dedent`
+        # Escape \\[\\_\\]
+        ${''}
+      `,
+      options: {
+        fileName: 'Escape [_]',
+      },
+    },
   ],
 });

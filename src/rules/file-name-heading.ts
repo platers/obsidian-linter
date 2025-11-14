@@ -2,7 +2,7 @@ import {Options, rulesDict, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
-import {insert} from '../utils/strings';
+import {escapeMarkdownSpecialCharacters, insert} from '../utils/strings';
 import {App} from 'obsidian';
 import {BooleanOption} from '../option';
 import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
@@ -51,7 +51,7 @@ export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions>
     yaml_end =
         yaml_end == -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
 
-    let header = `# ${fileName}\n`;
+    let header = `# ${escapeMarkdownSpecialCharacters(fileName)}\n`;
     if (text.length < yaml_end) {
       header = '\n' + header;
     }
