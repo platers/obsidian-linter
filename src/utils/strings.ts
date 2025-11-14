@@ -539,8 +539,8 @@ export function parseCustomReplacements(text: string): Map<string, string> {
 /**
  * Escapes the markdown special characters in the provided text.
  *
- * @param text The text to escape the markdown special characters in.
- * @return The text with the markdown special characters escaped.
+ * @param {string} text The text to escape the markdown special characters in.
+ * @return {string} The text with the markdown special characters escaped.
  *
  * @example
  * ```ts
