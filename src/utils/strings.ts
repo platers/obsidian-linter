@@ -535,3 +535,22 @@ export function parseCustomReplacements(text: string): Map<string, string> {
 
   return customReplacements;
 }
+
+/**
+ * Unescapes the markdown special characters in the provided text.
+ *
+ * @param {string} text - The text to unescape the markdown special characters in.
+ * @return {string} The text with the markdown special characters unescaped.
+ *
+ * @example
+ * ```ts
+ * unescapeMarkdownSpecialCharacters('Escape \\[\\_\\]'); // Escape [_]
+ * ```
+ */
+export function unescapeMarkdownSpecialCharacters(text: string): string {
+  return text.replace(/(\\+)([!"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~])/g, (_, backslashes, specialChar) => {
+    const backslashCount = backslashes.length;
+    const keepCount = Math.floor(backslashCount / 2);
+    return '\\'.repeat(keepCount) + specialChar;
+  });
+}
