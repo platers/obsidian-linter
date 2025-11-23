@@ -652,6 +652,11 @@ export default {
       'name': 'Empty Line Around Horizontal Rules',
       'description': 'Ensures that there is an empty line around horizontal rules unless they start or end a document.',
     },
+    // remove-horizontal-rules-outside-yaml.ts
+    'remove-horizontal-rules-outside-yaml': {
+      'name': 'Remove horizontal rules outside YAML',
+      'description': 'Removes horizontal rule separators (`---`) from document body content while preserving YAML frontmatter boundaries.',
+    },
     // remove-hyphenated-line-breaks.ts
     'remove-hyphenated-line-breaks': {
       'name': 'Remove Hyphenated Line Breaks',

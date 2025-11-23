@@ -35,6 +35,24 @@ export function getYAMLText(text: string): string | null {
   return yaml[1];
 }
 
+/**
+ * Splits text into YAML frontmatter and body content.
+ * @param {string} text - The text to split
+ * @return {{yaml: string | null, body: string}} An object with the YAML block (including fences) and the body content
+ */
+export function splitYamlAndBody(text: string): { yaml: string | null, body: string } {
+  const yamlMatch = text.match(yamlRegex);
+  if (!yamlMatch) {
+    return { yaml: null, body: text };
+  }
+
+  const yamlBlock = yamlMatch[0];
+  const bodyStartIndex = yamlMatch.index + yamlBlock.length;
+  const body = text.substring(bodyStartIndex);
+
+  return { yaml: yamlBlock, body: body };
+}
+
 export function formatYAML(text: string, func: (text: string) => string): string {
   if (!text.match(yamlRegex)) {
     return text;

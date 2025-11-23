@@ -636,6 +636,11 @@ export default {
       'name': 'Пустая строка вокруг горизонтальных правил',
       'description': 'Гарантирует, что есть пустая строка вокруг горизонтальных правил, если они не начинаются или не заканчиваются документом.',
     },
+    // remove-horizontal-rules-outside-yaml.ts
+    'remove-horizontal-rules-outside-yaml': {
+      'name': 'Удалить горизонтальные правила вне YAML',
+      'description': 'Удаляет разделители горизонтальных правил (`---`) из содержимого тела документа, сохраняя при этом границы YAML frontmatter.',
+    },
     // remove-hyphenated-line-breaks.ts
     'remove-hyphenated-line-breaks': {
       'name': 'Удалить гиперболические разрывы строк',
