@@ -55,5 +55,16 @@ ruleTest({
         fileName: 'Escape [_]',
       },
     },
+    {
+      testName: 'Better example to show why escaping is necessary',
+      before: '',
+      after: dedent`
+        # \\_just underscores, not italics\\_
+        ${''}
+      `,
+      options: {
+        fileName: '_just underscores, not italics_',
+      },
+    },
   ],
 });
