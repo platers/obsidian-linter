@@ -428,7 +428,7 @@ export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeC
   }
 
   try {
-    const unescaped = parse(basicEscape) as string;
+    const unescaped = parse(basicEscape, {logLevel: 'error'}) as string;
     if (unescaped === value) {
       return basicEscape;
     }
