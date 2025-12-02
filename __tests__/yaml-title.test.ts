@@ -1,6 +1,7 @@
 import YamlTitle from '../src/rules/yaml-title';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
+import process from 'node:process';
 
 ruleTest({
   RuleBuilderClass: YamlTitle,
@@ -396,8 +397,7 @@ describe('yaml-title', () => {
       process.emitWarning = jest.fn();
       YamlTitle.getRule().apply('# !wrong-yaml-string');
       expect(process.emitWarning).not.toHaveBeenCalled();
-    }
-    finally {
+    } finally {
       process.emitWarning = originalEmitWarning;
     }
   });
