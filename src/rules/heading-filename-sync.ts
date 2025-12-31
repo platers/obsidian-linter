@@ -1,4 +1,5 @@
-import {Options, RuleType} from '../rules';
+import {App} from 'obsidian';
+import {Options, rulesDict, RuleType} from '../rules';
 import RuleBuilder, {
   ExampleBuilder,
   OptionBuilderBase,
@@ -9,6 +10,8 @@ import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {escapeMarkdownSpecialCharacters, unescapeMarkdownSpecialCharacters, insert} from '../utils/strings';
 import {PendingRename} from '../rules-runner';
+import {BooleanOption} from '../option';
+import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 
 type SyncDirectionValues = 'filename-to-heading' | 'heading-to-filename' | 'bidirectional';
 
@@ -36,6 +39,21 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
       type: RuleType.HEADING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
       hasSpecialExecutionOrder: true,
+      disableConflictingOptions(value: boolean, app: App): void {
+        // Check for conflict with file-name-heading rule
+        const fileNameHeadingOptions = rulesDict['file-name-heading'];
+        if (!fileNameHeadingOptions) return;
+
+        const fileNameHeadingEnableOption = fileNameHeadingOptions.options[0] as BooleanOption;
+        if (value && fileNameHeadingEnableOption.getValue()) {
+          new ConfirmRuleDisableModal(app, 'rules.heading-filename-sync.name', 'rules.file-name-heading.name', () => {
+            fileNameHeadingEnableOption.setValue(false);
+          },
+          () => {
+            (rulesDict['heading-filename-sync'].options[0] as BooleanOption).setValue(false);
+          }).open();
+        }
+      },
     });
   }
 
@@ -175,7 +193,9 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
 
     // Signal the rename if we have the callback and path
     if (options.setPendingRename && options.filePath) {
-      const directory = options.filePath.substring(0, options.filePath.lastIndexOf('/'));
+      const lastSlashIndex = options.filePath.lastIndexOf('/');
+      const directory = lastSlashIndex > 0 ? options.filePath.substring(0, lastSlashIndex) : '';
+      // Obsidian uses forward slashes internally on all platforms
       const newPath = directory ? `${directory}/${newBasename}.md` : `${newBasename}.md`;
 
       if (newPath !== options.filePath) {
@@ -216,6 +236,8 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
     // Invalid chars: / \ : * ? " < > |
     return heading
         .replace(/[/\\:*?"<>|]/g, '-')
+        .replace(/-+/g, '-') // Collapse consecutive dashes
+        .replace(/^-+|-+$/g, '') // Remove leading/trailing dashes
         .replace(/\s+/g, ' ')
         .trim();
   }

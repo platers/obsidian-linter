@@ -521,6 +521,7 @@ export default class LinterPlugin extends Plugin {
         await this.app.fileManager.renameFile(file, newPath);
         logInfo(`Renamed file: ${oldPath} → ${newPath}`);
       } catch (error) {
+        new Notice(getTextInLanguage('logs.rename-failed').replace('{OLD_PATH}', oldPath).replace('{NEW_PATH}', newPath));
         logWarn(`Failed to rename file from '${oldPath}' to '${newPath}': ${error.message}`);
       }
 
@@ -621,6 +622,20 @@ export default class LinterPlugin extends Plugin {
     } else {
       this.updateFileDebouncerText(file, newText);
       this.editorLintFiles.push(file);
+    }
+
+    // Handle pending file rename (from heading-filename-sync rule)
+    if (this.rulesRunner.pendingRename) {
+      const {oldPath, newPath} = this.rulesRunner.pendingRename;
+      this.rulesRunner.pendingRename = null;
+
+      try {
+        await this.app.fileManager.renameFile(file, newPath);
+        logInfo(`Renamed file: ${oldPath} → ${newPath}`);
+      } catch (error) {
+        new Notice(getTextInLanguage('logs.rename-failed').replace('{OLD_PATH}', oldPath).replace('{NEW_PATH}', newPath));
+        logWarn(`Failed to rename file from '${oldPath}' to '${newPath}': ${error.message}`);
+      }
     }
 
     setCollectLogs(false);

@@ -1,6 +1,194 @@
 import HeadingFilenameSync from '../src/rules/heading-filename-sync';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
+import {PendingRename} from '../src/rules-runner';
+
+// Tests for rename callback
+describe('HeadingFilenameSync rename callback', () => {
+  const rule = HeadingFilenameSync.getRule();
+
+  it('calls setPendingRename with correct paths for heading-to-filename', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'folder/Old Name.md',
+      syncDirection: 'heading-to-filename' as const,
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # New Heading
+      Content here.
+    `, options);
+
+    expect(capturedRename).not.toBeNull();
+    expect(capturedRename?.oldPath).toBe('folder/Old Name.md');
+    expect(capturedRename?.newPath).toBe('folder/New Heading.md');
+  });
+
+  it('preserves prefix and suffix when renaming', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: '20231215_Old Name_DRAFT',
+      filePath: 'notes/20231215_Old Name_DRAFT.md',
+      filenamePrefix: '^\\d{8}_',
+      filenameSuffix: '_DRAFT$',
+      syncDirection: 'heading-to-filename' as const,
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # New Title
+      Content here.
+    `, options);
+
+    expect(capturedRename).not.toBeNull();
+    expect(capturedRename?.newPath).toBe('notes/20231215_New Title_DRAFT.md');
+  });
+
+  it('does not call setPendingRename when heading matches filename', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Same Name',
+      filePath: 'folder/Same Name.md',
+      syncDirection: 'heading-to-filename' as const,
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # Same Name
+      Content here.
+    `, options);
+
+    expect(capturedRename).toBeNull();
+  });
+
+  it('does not call setPendingRename when no H1 exists', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Some File',
+      filePath: 'folder/Some File.md',
+      syncDirection: 'heading-to-filename' as const,
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      ## Just H2
+      Content here.
+    `, options);
+
+    expect(capturedRename).toBeNull();
+  });
+
+  it('handles files in root directory', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'Old Name.md',
+      syncDirection: 'heading-to-filename' as const,
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # New Heading
+      Content.
+    `, options);
+
+    expect(capturedRename).not.toBeNull();
+    expect(capturedRename?.newPath).toBe('New Heading.md');
+  });
+
+  it('sanitizes invalid filename characters', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'folder/Old Name.md',
+      syncDirection: 'heading-to-filename' as const,
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # New: Title | With "Invalid" Chars
+      Content.
+    `, options);
+
+    expect(capturedRename).not.toBeNull();
+    // Should sanitize : | " to - and collapse consecutive dashes
+    expect(capturedRename?.newPath).toBe('folder/New- Title - With -Invalid- Chars.md');
+  });
+
+  it('collapses consecutive dashes in sanitized filename', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'folder/Old Name.md',
+      syncDirection: 'heading-to-filename' as const,
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # My::Heading::Title
+      Content.
+    `, options);
+
+    expect(capturedRename).not.toBeNull();
+    // :: should become - (not --)
+    expect(capturedRename?.newPath).toBe('folder/My-Heading-Title.md');
+  });
+
+  it('calls setPendingRename in bidirectional mode when H1 differs', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'folder/Old Name.md',
+      syncDirection: 'bidirectional' as const,
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # Different Heading
+      Content.
+    `, options);
+
+    expect(capturedRename).not.toBeNull();
+    expect(capturedRename?.newPath).toBe('folder/Different Heading.md');
+  });
+
+  it('does not call setPendingRename in bidirectional mode when no H1', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'My Note',
+      filePath: 'folder/My Note.md',
+      syncDirection: 'bidirectional' as const,
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    // Should insert H1, not rename file
+    rule.apply(dedent`
+      Some content without heading.
+    `, options);
+
+    expect(capturedRename).toBeNull();
+  });
+});
 
 ruleTest({
   RuleBuilderClass: HeadingFilenameSync,
