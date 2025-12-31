@@ -1,11 +1,6 @@
 import {App} from 'obsidian';
 import {Options, rulesDict, RuleType} from '../rules';
-import RuleBuilder, {
-  ExampleBuilder,
-  OptionBuilderBase,
-  TextOptionBuilder,
-  DropdownOptionBuilder,
-} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder, DropdownOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {escapeMarkdownSpecialCharacters, unescapeMarkdownSpecialCharacters, insert} from '../utils/strings';
@@ -158,15 +153,15 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
       return text.replace(/^#\s+.*$/m, newHeading);
     }
 
-    let yamlEnd = text.indexOf('\n---');
-    yamlEnd = yamlEnd === -1 || !text.startsWith('---\n') ? 0 : yamlEnd + 5;
+    let yaml_end = text.indexOf('\n---');
+    yaml_end = yaml_end === -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
 
     let header = `${newHeading}\n`;
-    if (text.length < yamlEnd) {
+    if (text.length < yaml_end) {
       header = '\n' + header;
     }
 
-    return insert(text, yamlEnd, header);
+    return insert(text, yaml_end, header);
   }
 
   private syncHeadingToFilename(
