@@ -513,18 +513,7 @@ export default class LinterPlugin extends Plugin {
     }
 
     // Handle pending file rename (from heading-filename-sync rule)
-    if (this.rulesRunner.pendingRename) {
-      const {oldPath, newPath} = this.rulesRunner.pendingRename;
-      this.rulesRunner.pendingRename = null;
-
-      try {
-        await this.app.fileManager.renameFile(file, newPath);
-        logInfo(`Renamed file: ${oldPath} → ${newPath}`);
-      } catch (error) {
-        new Notice(getTextInLanguage('logs.rename-failed').replace('{OLD_PATH}', oldPath).replace('{NEW_PATH}', newPath));
-        logWarn(`Failed to rename file from '${oldPath}' to '${newPath}': ${error.message}`);
-      }
-
+    if (await this.handlePendingRename(file)) {
       return;
     }
 
@@ -625,18 +614,7 @@ export default class LinterPlugin extends Plugin {
     }
 
     // Handle pending file rename (from heading-filename-sync rule)
-    if (this.rulesRunner.pendingRename) {
-      const {oldPath, newPath} = this.rulesRunner.pendingRename;
-      this.rulesRunner.pendingRename = null;
-
-      try {
-        await this.app.fileManager.renameFile(file, newPath);
-        logInfo(`Renamed file: ${oldPath} → ${newPath}`);
-      } catch (error) {
-        new Notice(getTextInLanguage('logs.rename-failed').replace('{OLD_PATH}', oldPath).replace('{NEW_PATH}', newPath));
-        logWarn(`Failed to rename file from '${oldPath}' to '${newPath}': ${error.message}`);
-      }
-    }
+    await this.handlePendingRename(file);
 
     setCollectLogs(false);
   }
@@ -1097,6 +1075,25 @@ export default class LinterPlugin extends Plugin {
     }
 
     this.currentlyOpeningSidebar = false;
+  }
+
+  private async handlePendingRename(file: TFile): Promise<boolean> {
+    if (!this.rulesRunner.pendingRename) {
+      return false;
+    }
+
+    const {oldPath, newPath} = this.rulesRunner.pendingRename;
+    this.rulesRunner.pendingRename = null;
+
+    try {
+      await this.app.fileManager.renameFile(file, newPath);
+      logInfo(`Renamed file: ${oldPath} → ${newPath}`);
+    } catch (error) {
+      new Notice(getTextInLanguage('logs.rename-failed').replace('{OLD_PATH}', oldPath).replace('{NEW_PATH}', newPath));
+      logWarn(`Failed to rename file from '${oldPath}' to '${newPath}': ${error.message}`);
+    }
+
+    return true;
   }
 
   private async runCustomCommands(file: TFile) {
