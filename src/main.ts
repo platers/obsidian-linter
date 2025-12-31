@@ -510,7 +510,24 @@ export default class LinterPlugin extends Plugin {
       // when a change is made to the file we know that the cache will update down the road
       // so we can defer running the custom commands to the cache callback
       this.fileLintFiles.add(file);
+    }
 
+    // Handle pending file rename (from heading-filename-sync rule)
+    if (this.rulesRunner.pendingRename) {
+      const {oldPath, newPath} = this.rulesRunner.pendingRename;
+      this.rulesRunner.pendingRename = null;
+
+      try {
+        await this.app.fileManager.renameFile(file, newPath);
+        logInfo(`Renamed file: ${oldPath} → ${newPath}`);
+      } catch (error) {
+        logWarn(`Failed to rename file from '${oldPath}' to '${newPath}': ${error.message}`);
+      }
+
+      return;
+    }
+
+    if (oldText != newText) {
       return;
     }
 

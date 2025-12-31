@@ -33,6 +33,12 @@ import AutoCorrectCommonMisspellings from './rules/auto-correct-common-misspelli
 import {yamlRegex} from './utils/regex';
 import AddBlankLineAfterYAML from './rules/add-blank-line-after-yaml';
 import ConsecutiveBlankLines from './rules/consecutive-blank-lines';
+import HeadingFilenameSync from './rules/heading-filename-sync';
+
+export type PendingRename = {
+  oldPath: string,
+  newPath: string,
+}
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -53,9 +59,11 @@ type FileInfo = {
 export class RulesRunner {
   private disabledRules: string[] = [];
   skipFile: boolean;
+  pendingRename: PendingRename | null = null;
 
   lintText(runOptions: RunLinterRulesOptions): string {
     this.skipFile = false;
+    this.pendingRename = null;
     const originalText = runOptions.oldText;
     [this.disabledRules, this.skipFile] = getDisabledRules(originalText);
     if (this.skipFile) {
@@ -151,6 +159,14 @@ export class RulesRunner {
     const postRuleLogText = getTextInLanguage('logs.post-rules');
     timingBegin(postRuleLogText);
     [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+
+    [newText] = HeadingFilenameSync.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      fileName: runOptions.fileInfo.name,
+      filePath: runOptions.fileInfo.path,
+      setPendingRename: (rename: PendingRename) => {
+        this.pendingRename = rename;
+      },
+    });
 
     [newText] = YamlTitle.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       fileName: runOptions.fileInfo.name,

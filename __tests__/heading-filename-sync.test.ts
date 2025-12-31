@@ -245,8 +245,9 @@ ruleTest({
         syncDirection: 'filename-to-heading',
       },
     },
+    // Heading-to-filename tests - text remains unchanged, rename is signaled via callback
     {
-      testName: 'Heading-to-filename direction returns unchanged text (Phase 2)',
+      testName: 'Heading-to-filename: text unchanged when H1 differs from filename',
       before: dedent`
         # My Custom Heading
         Some content.
@@ -261,7 +262,69 @@ ruleTest({
       },
     },
     {
-      testName: 'Bidirectional direction returns unchanged text (Phase 2)',
+      testName: 'Heading-to-filename: text unchanged when H1 matches filename',
+      before: dedent`
+        # Same Name
+        Some content.
+      `,
+      after: dedent`
+        # Same Name
+        Some content.
+      `,
+      options: {
+        fileName: 'Same Name',
+        syncDirection: 'heading-to-filename',
+      },
+    },
+    {
+      testName: 'Heading-to-filename: text unchanged when no H1 exists',
+      before: dedent`
+        ## Just H2
+        Some content.
+      `,
+      after: dedent`
+        ## Just H2
+        Some content.
+      `,
+      options: {
+        fileName: 'Some File',
+        syncDirection: 'heading-to-filename',
+      },
+    },
+    {
+      testName: 'Heading-to-filename: preserves prefix/suffix when heading differs',
+      before: dedent`
+        # New Title
+        Content.
+      `,
+      after: dedent`
+        # New Title
+        Content.
+      `,
+      options: {
+        fileName: '20231215_Old Title_DRAFT',
+        filenamePrefix: '^\\d{8}_',
+        filenameSuffix: '_DRAFT$',
+        syncDirection: 'heading-to-filename',
+      },
+    },
+    // Bidirectional tests - heading wins on conflict, inserts H1 when missing
+    {
+      testName: 'Bidirectional: inserts H1 when none exists (filename wins)',
+      before: dedent`
+        Some content without a heading.
+      `,
+      after: dedent`
+        # My Note
+        Some content without a heading.
+      `,
+      options: {
+        fileName: 'My Note',
+        syncDirection: 'bidirectional',
+      },
+    },
+    {
+      testName: 'Bidirectional: text unchanged when H1 differs (heading wins, rename signaled)',
       before: dedent`
         # My Custom Heading
         Some content.
@@ -273,6 +336,72 @@ ruleTest({
       options: {
         fileName: 'Different Filename',
         syncDirection: 'bidirectional',
+      },
+    },
+    {
+      testName: 'Bidirectional: text unchanged when already in sync',
+      before: dedent`
+        # Already Synced
+        Some content.
+      `,
+      after: dedent`
+        # Already Synced
+        Some content.
+      `,
+      options: {
+        fileName: 'Already Synced',
+        syncDirection: 'bidirectional',
+      },
+    },
+    {
+      testName: 'Bidirectional: inserts H1 after YAML when none exists',
+      before: dedent`
+        ---
+        tags: [note]
+        ---
+        Content here.
+      `,
+      after: dedent`
+        ---
+        tags: [note]
+        ---
+        # My Note
+        Content here.
+      `,
+      options: {
+        fileName: 'My Note',
+        syncDirection: 'bidirectional',
+      },
+    },
+    {
+      testName: 'Bidirectional: respects prefix/suffix patterns when inserting H1',
+      before: dedent`
+        Content without heading.
+      `,
+      after: dedent`
+        # Meeting Notes
+        Content without heading.
+      `,
+      options: {
+        fileName: '20231215_Meeting Notes_v2',
+        filenamePrefix: '^\\d{8}_',
+        filenameSuffix: '_v\\d+$',
+        syncDirection: 'bidirectional',
+      },
+    },
+    {
+      testName: 'Heading-to-filename: handles escaped markdown in heading',
+      before: dedent`
+        # Note \\[with brackets\\]
+        Content.
+      `,
+      after: dedent`
+        # Note \\[with brackets\\]
+        Content.
+      `,
+      options: {
+        fileName: 'Different Name',
+        syncDirection: 'heading-to-filename',
       },
     },
   ],

@@ -455,10 +455,6 @@ export default {
         'name': 'Filename Suffix Regex',
         'description': 'Regular expression pattern to strip from the end of the filename before syncing.',
       },
-      'update-yaml-title': {
-        'name': 'Also Update YAML Title',
-        'description': 'When enabled, also updates the YAML <code>title</code> key to match.',
-      },
     },
     // footnote-after-punctuation.ts
     'footnote-after-punctuation': {
