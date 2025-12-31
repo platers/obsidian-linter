@@ -20,7 +20,7 @@ class HeadingFilenameSyncOptions implements Options {
   @RuleBuilder.noSettingControl()
     setPendingRename: (rename: PendingRename) => void;
 
-  syncDirection?: SyncDirectionValues = 'filename-to-heading';
+  syncDirection?: SyncDirectionValues = 'heading-to-filename';
   filenamePrefix?: string = '';
   filenameSuffix?: string = '';
 }
@@ -315,12 +315,12 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
         optionsKey: 'syncDirection',
         records: [
           {
-            value: 'filename-to-heading',
-            description: 'Update the H1 heading to match the filename',
-          },
-          {
             value: 'heading-to-filename',
             description: 'Rename the file to match the H1 heading',
+          },
+          {
+            value: 'filename-to-heading',
+            description: 'Update the H1 heading to match the filename',
           },
           {
             value: 'bidirectional',

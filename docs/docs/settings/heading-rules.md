@@ -270,7 +270,7 @@ Keeps the first H1 heading synchronized with the filename. Supersedes the "File 
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Sync Direction` | The direction of synchronization between heading and filename. | `filename-to-heading`: Update the H1 heading to match the filename<br/><br/>`heading-to-filename`: Rename the file to match the H1 heading<br/><br/>`bidirectional`: Keep heading and filename in sync (heading wins on conflict) | `filename-to-heading` |
+| `Sync Direction` | The direction of synchronization between heading and filename. | `heading-to-filename`: Rename the file to match the H1 heading<br/><br/>`filename-to-heading`: Update the H1 heading to match the filename<br/><br/>`bidirectional`: Keep heading and filename in sync (heading wins on conflict) | `heading-to-filename` |
 | `Filename Prefix Regex` | Regular expression pattern to strip from the start of the filename before syncing (e.g., <code>^\d{12}_</code> for Zettelkasten timestamps). | N/A |  |
 | `Filename Suffix Regex` | Regular expression pattern to strip from the end of the filename before syncing. | N/A |  |
 
