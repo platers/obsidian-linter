@@ -1,6 +1,6 @@
 import {App} from 'obsidian';
 import {Options, rulesDict, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder, DropdownOptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder, TextAreaOptionBuilder, DropdownOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {escapeMarkdownSpecialCharacters, unescapeMarkdownSpecialCharacters, insert} from '../utils/strings';
@@ -23,6 +23,7 @@ class HeadingFilenameSyncOptions implements Options {
   syncDirection?: SyncDirectionValues = 'heading-to-filename';
   filenamePrefix?: string = '';
   filenameSuffix?: string = '';
+  ignoreRenameFiles?: string[] = [];
 }
 
 @RuleBuilder.register
@@ -186,8 +187,13 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
     const sanitizedHeading = this.sanitizeFilename(existingH1Unescaped);
     const newBasename = `${prefix}${sanitizedHeading}${suffix}`;
 
-    // Signal the rename if we have the callback and path
+    // Signal the rename if we have the callback and path, unless file is ignored
     if (options.setPendingRename && options.filePath) {
+      // Check if this file should be ignored for rename
+      if (this.shouldIgnoreFileForRename(options.filePath, options.ignoreRenameFiles)) {
+        return text;
+      }
+
       const lastSlashIndex = options.filePath.lastIndexOf('/');
       const directory = lastSlashIndex > 0 ? options.filePath.substring(0, lastSlashIndex) : '';
       // Obsidian uses forward slashes internally on all platforms
@@ -235,6 +241,32 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
         .replace(/^-+|-+$/g, '') // Remove leading/trailing dashes
         .replace(/\s+/g, ' ')
         .trim();
+  }
+
+  private shouldIgnoreFileForRename(
+      filePath: string,
+      ignorePatterns: string[],
+  ): boolean {
+    if (!ignorePatterns || ignorePatterns.length === 0) {
+      return false;
+    }
+
+    for (const pattern of ignorePatterns) {
+      if (!pattern || pattern.trim() === '') {
+        continue;
+      }
+
+      try {
+        const regex = new RegExp(pattern);
+        if (regex.test(filePath)) {
+          return true;
+        }
+      } catch (e) {
+        // Invalid regex, skip this pattern
+      }
+    }
+
+    return false;
   }
 
   get exampleBuilders(): ExampleBuilder<HeadingFilenameSyncOptions>[] {
@@ -339,6 +371,12 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
         nameKey: 'rules.heading-filename-sync.filename-suffix.name',
         descriptionKey: 'rules.heading-filename-sync.filename-suffix.description',
         optionsKey: 'filenameSuffix',
+      }),
+      new TextAreaOptionBuilder({
+        OptionsClass: HeadingFilenameSyncOptions,
+        nameKey: 'rules.heading-filename-sync.ignore-rename-files.name',
+        descriptionKey: 'rules.heading-filename-sync.ignore-rename-files.description',
+        optionsKey: 'ignoreRenameFiles',
       }),
     ];
   }

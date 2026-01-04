@@ -188,6 +188,152 @@ describe('HeadingFilenameSync rename callback', () => {
 
     expect(capturedRename).toBeNull();
   });
+
+  it('does not rename when file matches ignore pattern', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'templates/Old Name.md',
+      syncDirection: 'heading-to-filename' as const,
+      ignoreRenameFiles: ['templates/'],
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # New Heading
+      Content here.
+    `, options);
+
+    expect(capturedRename).toBeNull();
+  });
+
+  it('does not rename when file matches one of multiple ignore patterns', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'daily/2024-01-01.md',
+      syncDirection: 'heading-to-filename' as const,
+      ignoreRenameFiles: ['templates/', 'daily/', '^archive/'],
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # New Heading
+      Content here.
+    `, options);
+
+    expect(capturedRename).toBeNull();
+  });
+
+  it('renames when file does not match any ignore pattern', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'notes/Old Name.md',
+      syncDirection: 'heading-to-filename' as const,
+      ignoreRenameFiles: ['templates/', 'daily/'],
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # New Heading
+      Content here.
+    `, options);
+
+    expect(capturedRename).not.toBeNull();
+    expect(capturedRename?.newPath).toBe('notes/New Heading.md');
+  });
+
+  it('skips invalid regex patterns gracefully', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'folder/Old Name.md',
+      syncDirection: 'heading-to-filename' as const,
+      ignoreRenameFiles: ['[invalid', 'valid-folder/'],
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # New Heading
+      Content here.
+    `, options);
+
+    // Invalid regex is skipped, and file doesn't match 'valid-folder/', so rename happens
+    expect(capturedRename).not.toBeNull();
+    expect(capturedRename?.newPath).toBe('folder/New Heading.md');
+  });
+
+  it('does not rename in bidirectional mode when file matches ignore pattern', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Template Note',
+      filePath: 'templates/Template Note.md',
+      syncDirection: 'bidirectional' as const,
+      ignoreRenameFiles: ['templates/'],
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # Different Heading
+      Content here.
+    `, options);
+
+    expect(capturedRename).toBeNull();
+  });
+
+  it('handles empty ignore patterns array', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'folder/Old Name.md',
+      syncDirection: 'heading-to-filename' as const,
+      ignoreRenameFiles: [],
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # New Heading
+      Content here.
+    `, options);
+
+    expect(capturedRename).not.toBeNull();
+    expect(capturedRename?.newPath).toBe('folder/New Heading.md');
+  });
+
+  it('handles empty strings in ignore patterns', () => {
+    let capturedRename: PendingRename | null = null;
+    const options = {
+      fileName: 'Old Name',
+      filePath: 'folder/Old Name.md',
+      syncDirection: 'heading-to-filename' as const,
+      ignoreRenameFiles: ['', '  ', 'different-folder/'],
+      setPendingRename: (rename: PendingRename) => {
+        capturedRename = rename;
+      },
+    };
+
+    rule.apply(dedent`
+      # New Heading
+      Content here.
+    `, options);
+
+    // Empty patterns are skipped, file doesn't match 'different-folder/'
+    expect(capturedRename).not.toBeNull();
+    expect(capturedRename?.newPath).toBe('folder/New Heading.md');
+  });
 });
 
 ruleTest({

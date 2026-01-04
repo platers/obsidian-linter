@@ -273,6 +273,7 @@ Keeps the first H1 heading synchronized with the filename. Supersedes the "File 
 | `Sync Direction` | The direction of synchronization between heading and filename. | `heading-to-filename`: Rename the file to match the H1 heading<br/><br/>`filename-to-heading`: Update the H1 heading to match the filename<br/><br/>`bidirectional`: Keep heading and filename in sync (heading wins on conflict) | `heading-to-filename` |
 | `Filename Prefix Regex` | Regular expression pattern to strip from the start of the filename before syncing (e.g., <code>^\d{12}_</code> for Zettelkasten timestamps). | N/A |  |
 | `Filename Suffix Regex` | Regular expression pattern to strip from the end of the filename before syncing. | N/A |  |
+| `Ignore Files for Rename` | Regular expression patterns (one per line) to match file paths that should be excluded from file renaming. These files will still have their headings synced if applicable, but the file will not be renamed. | N/A |  |
 
 
 

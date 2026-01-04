@@ -55,7 +55,11 @@ Alias: `move-footnotes-to-the-bottom`
 
 Move all footnotes to the bottom of the document and makes sure they are sorted based on the order they are referenced in the file's body.
 
+### Options
 
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `Include Blank Line Between Footnotes` | Includes a blank line between footnotes when enabled. | N/A | false |
 
 
 
@@ -85,6 +89,34 @@ Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
 Maecenas malesuada dignissim purus ac volutpat.
 
 [^1]: first footnote
+[^2]: second footnote
+``````
+</details>
+<details><summary>Moving footnotes to the bottom with including a blank line between footnotes</summary>
+
+Before:
+
+`````` markdown
+Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
+
+[^1]: first footnote
+
+Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+[^2]: second footnote
+
+Maecenas malesuada dignissim purus ac volutpat.
+``````
+
+After:
+
+`````` markdown
+Lorem ipsum, consectetur adipiscing elit. [^1] Donec dictum turpis quis ipsum pellentesque.
+
+Quisque lorem est, fringilla sed enim at, sollicitudin lacinia nisi.[^2]
+Maecenas malesuada dignissim purus ac volutpat.
+
+[^1]: first footnote
+
 [^2]: second footnote
 ``````
 </details>

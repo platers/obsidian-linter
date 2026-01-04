@@ -456,6 +456,10 @@ export default {
         'name': 'Filename Suffix Regex',
         'description': 'Regular expression pattern to strip from the end of the filename before syncing.',
       },
+      'ignore-rename-files': {
+        'name': 'Ignore Files for Rename',
+        'description': 'Regular expression patterns (one per line) to match file paths that should be excluded from file renaming. These files will still have their headings synced if applicable, but the file will not be renamed.',
+      },
     },
     // footnote-after-punctuation.ts
     'footnote-after-punctuation': {
