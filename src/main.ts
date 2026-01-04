@@ -1087,7 +1087,21 @@ export default class LinterPlugin extends Plugin {
     const {oldPath, newPath} = pendingRename;
 
     try {
-      await this.app.fileManager.renameFile(file, newPath);
+      // Check if this is a case-only rename (e.g., "file.md" -> "File.md")
+      // On case-insensitive filesystems (macOS, Windows), direct rename fails
+      // because the OS sees them as the same file
+      if (oldPath.toLowerCase() === newPath.toLowerCase() && oldPath !== newPath) {
+        // Use a temporary intermediate name to work around case-insensitivity
+        const tempPath = newPath + '.linter-temp-rename';
+        await this.app.fileManager.renameFile(file, tempPath);
+        // Get the updated file reference after first rename
+        const tempFile = this.app.vault.getAbstractFileByPath(tempPath) as TFile;
+        if (tempFile) {
+          await this.app.fileManager.renameFile(tempFile, newPath);
+        }
+      } else {
+        await this.app.fileManager.renameFile(file, newPath);
+      }
       logInfo(`Renamed file: ${oldPath} → ${newPath}`);
     } catch (error) {
       new Notice(getTextInLanguage('logs.rename-failed').replace('{OLD_PATH}', oldPath).replace('{NEW_PATH}', newPath));
