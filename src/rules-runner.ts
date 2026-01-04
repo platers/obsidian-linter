@@ -40,6 +40,11 @@ export type PendingRename = {
   newPath: string,
 }
 
+export type LintResult = {
+  text: string,
+  pendingRename: PendingRename | null,
+}
+
 export type RunLinterRulesOptions = {
   oldText: string,
   fileInfo: FileInfo,
@@ -59,15 +64,14 @@ type FileInfo = {
 export class RulesRunner {
   private disabledRules: string[] = [];
   skipFile: boolean;
-  pendingRename: PendingRename | null = null;
 
-  lintText(runOptions: RunLinterRulesOptions): string {
+  lintText(runOptions: RunLinterRulesOptions): LintResult {
     this.skipFile = false;
-    this.pendingRename = null;
+    const renameResult: {value: PendingRename | null} = {value: null};
     const originalText = runOptions.oldText;
     [this.disabledRules, this.skipFile] = getDisabledRules(originalText);
     if (this.skipFile) {
-      return originalText;
+      return {text: originalText, pendingRename: null};
     }
 
     timingBegin(getTextInLanguage('logs.rule-running'));
@@ -130,7 +134,7 @@ export class RulesRunner {
 
     runOptions.oldText = newText;
 
-    return this.runAfterRegularRules(originalText, runOptions);
+    return this.runAfterRegularRules(originalText, runOptions, renameResult);
   }
 
   private runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
@@ -154,7 +158,7 @@ export class RulesRunner {
     return newText;
   }
 
-  private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
+  private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions, renameResult: {value: PendingRename | null}): LintResult {
     let newText = runOptions.oldText;
     const postRuleLogText = getTextInLanguage('logs.post-rules');
     timingBegin(postRuleLogText);
@@ -164,7 +168,7 @@ export class RulesRunner {
       fileName: runOptions.fileInfo.name,
       filePath: runOptions.fileInfo.path,
       setPendingRename: (rename: PendingRename) => {
-        this.pendingRename = rename;
+        renameResult.value = rename;
       },
     });
 
@@ -224,7 +228,7 @@ export class RulesRunner {
 
     timingEnd(postRuleLogText);
     timingEnd(getTextInLanguage('logs.rule-running'));
-    return newText;
+    return {text: newText, pendingRename: renameResult.value};
   }
 
   runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
