@@ -1074,5 +1074,39 @@ ruleTest({
         aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
       },
     },
+    { // relates to https://github.com/platers/obsidian-linter/issues/1434
+      testName: 'Converting from a multi-line array to a single comma delimited string should result in strings with commas in them being escaped',
+      before: dedent`
+        ---
+        aliases:
+          - Denver, Co
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: "Denver, Co"
+        ---
+      `,
+      options: {
+        aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
+      },
+    },
+    { // fixes https://github.com/platers/obsidian-linter/issues/1434
+      testName: 'Converting from a multi-line array to a single line array should result in strings with commas in them being escaped',
+      before: dedent`
+        ---
+        aliases:
+          - Denver, Co
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: ["Denver, Co"]
+        ---
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
+      },
+    },
   ],
 });

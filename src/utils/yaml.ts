@@ -211,6 +211,13 @@ export function formatYamlArrayValue(value: string | string[], format: NormalArr
         return ' ' + value[0];
       }
     case NormalArrayFormats.SingleLine:
+      // make sure that any values with a comma get properly escaped first
+      for (let i = 0; i < value.length; i++) {
+        if (value[i].includes(',') && !isValueEscapedAlready(value[i])) {
+          value[i] = escapeStringIfNecessaryAndPossible(value[i], defaultEscapeCharacter, true);
+        }
+      }
+
       return ' ' + convertStringArrayToSingleLineArray(value);
     case SpecialArrayFormats.SingleStringToMultiLine:
       if (value.length === 1) {
@@ -225,6 +232,13 @@ export function formatYamlArrayValue(value: string | string[], format: NormalArr
 
       return ' ' + value.join(' ');
     case SpecialArrayFormats.SingleStringCommaDelimited:
+      // make sure that any values with a comma get properly escaped first
+      for (let i = 0; i < value.length; i++) {
+        if (value[i].includes(',') && !isValueEscapedAlready(value[i])) {
+          value[i] = escapeStringIfNecessaryAndPossible(value[i], defaultEscapeCharacter, true);
+        }
+      }
+
       if (value.length === 1) {
         return ' ' + value[0];
       }
