@@ -941,6 +941,12 @@ export default class LinterPlugin extends Plugin {
     // Note: it looks like those two plugins look for an exact match for a URL,
     // so we will too.
     const text = plainClipboard.trim();
+    // fixes https://github.com/platers/obsidian-linter/issues/1446
+    // for some reason when you run a global regex on a string it keeps track
+    // of how far it got in that string the last time it ran on it. Hence
+    // pasting the same string 2 times results in 1 match and 1 non-match.
+    // Resetting last index handles this issue.
+    urlRegex.lastIndex = 0;
     if (urlRegex.test(text)) {
       logWarn(getTextInLanguage('logs.paste-link-warning'));
       return;
