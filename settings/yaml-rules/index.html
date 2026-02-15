@@ -1,0 +1,3877 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../general-settings/">
+      
+      
+        <link rel="next" href="../heading-rules/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/linter-icon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>YAML Rules - Linter</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#yaml-rules" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Linter" class="md-header__button md-logo" aria-label="Linter" data-md-component="logo">
+      
+  <img src="../../assets/linter-icon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Linter
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              YAML Rules
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/platers/obsidian-linter" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Linter" class="md-nav__button md-logo" aria-label="Linter" data-md-component="logo">
+      
+  <img src="../../assets/linter-icon.png" alt="logo">
+
+    </a>
+    Linter
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/platers/obsidian-linter" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/running-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/disabling-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disabling Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings and Rules
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Settings and Rules
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../general-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    General Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YAML Rules
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YAML Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#add-blank-line-after-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add Blank Line After YAML
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Add Blank Line After YAML">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dedupe-yaml-array-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dedupe YAML Array Values
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dedupe YAML Array Values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#escape-yaml-special-characters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Escape YAML Special Characters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Escape YAML Special Characters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#force-yaml-escape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Force YAML Escape
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Force YAML Escape">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#format-tags-in-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format Tags in YAML
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Format Tags in YAML">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#format-yaml-array" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format YAML Array
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Format YAML Array">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#insert-yaml-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Insert YAML attributes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Insert YAML attributes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#move-tags-to-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Move Tags to YAML
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Move Tags to YAML">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-yaml-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove YAML Keys
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remove YAML Keys">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sort-yaml-array-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sort YAML Array Values
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sort YAML Array Values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-key-sort" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YAML Key Sort
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="YAML Key Sort">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-timestamp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YAML Timestamp
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="YAML Timestamp">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-info" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Info
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional Info">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#date-modified-value-origin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Date Modified Value Origin
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YAML Title
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="YAML Title">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-title-alias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YAML Title Alias
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="YAML Title Alias">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-info_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Info
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../heading-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heading Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../footnote-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Footnote Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../content-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spacing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spacing Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paste-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Paste Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../debug-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debug Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/getting-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/adding-a-rule/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a Rule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/bug-fix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bug Fixes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/refactoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Refactoring Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/translation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Translating the Linter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documenting the Linter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/open-a-pr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Opening a Pull Request
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/releasing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating a Release
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../credits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#add-blank-line-after-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add Blank Line After YAML
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Add Blank Line After YAML">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dedupe-yaml-array-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dedupe YAML Array Values
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dedupe YAML Array Values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#escape-yaml-special-characters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Escape YAML Special Characters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Escape YAML Special Characters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#force-yaml-escape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Force YAML Escape
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Force YAML Escape">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#format-tags-in-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format Tags in YAML
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Format Tags in YAML">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#format-yaml-array" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format YAML Array
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Format YAML Array">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#insert-yaml-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Insert YAML attributes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Insert YAML attributes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#move-tags-to-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Move Tags to YAML
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Move Tags to YAML">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-yaml-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove YAML Keys
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remove YAML Keys">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sort-yaml-array-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sort YAML Array Values
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sort YAML Array Values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-key-sort" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YAML Key Sort
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="YAML Key Sort">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-timestamp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YAML Timestamp
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="YAML Timestamp">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-info" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Info
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional Info">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#date-modified-value-origin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Date Modified Value Origin
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YAML Title
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="YAML Title">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-title-alias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YAML Title Alias
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="YAML Title Alias">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-info_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Info
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->
+
+<h1 id="yaml-rules">YAML Rules</h1>
+<p>These rules try their best to work with YAML values in <a href="https://obsidian.md/">Obsidian.md</a>. There are a couple of things to keep in mind about these rules:</p>
+<ul>
+<li>The rules work on most YAML use cases, but it is not perfect</li>
+<li>There are certain formats of YAML that may have problems being parsed since the YAML keys have their values parsed via regex instead of a library at this time</li>
+<li>Comments in the value of a key may cause problems with things like sorting or properly grabbing a key's value</li>
+<li>Blank lines may be removed if you try sorting or making modifications to the order of keys in the YAML via the Linter</li>
+</ul>
+<h2 id="add-blank-line-after-yaml">Add Blank Line After YAML</h2>
+<p>Alias: <code>add-blank-line-after-yaml</code></p>
+<p>Adds a blank line after the YAML block if it does not end the current file or it is not already followed by at least 1 blank line</p>
+<h3 id="examples">Examples</h3>
+<details><summary>A file with just YAML in it does not get a blank line after the YAML</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">key: value</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">key: value</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>A file with YAML followed directly by content has an empty line added</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">key: value</span>
+<span class="gu">---</span>
+Here is some text
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">key: value</span>
+<span class="gu">---</span>
+
+Here is some text
+</code></pre></div>
+</details>
+<details><summary>A file with YAML that already has a blank line after it and before content has no empty line added</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">key: value</span>
+<span class="gu">---</span>
+
+Here is some text
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">key: value</span>
+<span class="gu">---</span>
+
+Here is some text
+</code></pre></div>
+</details>
+
+<h2 id="dedupe-yaml-array-values">Dedupe YAML Array Values</h2>
+<p>Alias: <code>dedupe-yaml-array-values</code></p>
+<p>Removes duplicate array values in a case sensitive manner.</p>
+<h3 id="options">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Dedupe YAML aliases section</code></td>
+<td>Turns on removing duplicate aliases.</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Dedupe YAML tags section</code></td>
+<td>Turns on removing duplicate tags.</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Dedupe YAML array sections</code></td>
+<td>Turns on removing duplicate values for regular YAML arrays</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>YAML Keys to Ignore</code></td>
+<td>A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them.</td>
+<td>N/A</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_1">Examples</h3>
+<details><summary>Dedupe YAML tags is case sensitive and will use your default format for tags.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research, computer, Computer]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="gu">  - Title2</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research, Computer]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="gu">  - Title2</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Dedupe YAML aliases is case sensitive and will use your default format for aliases.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title2
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title2
+<span class="gu">  - Title 3</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title2
+<span class="gu">  - Title 3</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Dedupe YAML array keys is case sensitive and will try to preserve the original array format.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title2
+arr1: [val, val1, val, val2, Val]
+arr2:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val2
+<span class="gu">  - Val2</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title2
+arr1: [val, val1, val2, Val]
+arr2:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val2
+<span class="gu">  - Val2</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Dedupe YAML respects list of keys to not remove duplicates of for normal arrays (keys to ignore is just `arr2` for this example)</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title2
+arr1: [val, val1, val, val2, Val]
+arr2:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val2
+<span class="gu">  - Val2</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title2
+arr1: [val, val1, val2, Val]
+arr2:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val2
+<span class="gu">  - Val2</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+
+<h2 id="escape-yaml-special-characters">Escape YAML Special Characters</h2>
+<p>Alias: <code>escape-yaml-special-characters</code></p>
+<p>Escapes colons with a space after them (: ), single quotes ('), and double quotes (") in YAML.</p>
+<h3 id="options_1">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Try to Escape Single Line Arrays</code></td>
+<td>Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",".</td>
+<td>N/A</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_2">Examples</h3>
+<details><summary>YAML without anything to escape</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+key: value
+<span class="gu">otherKey: []</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+key: value
+<span class="gu">otherKey: []</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>YAML with unescaped values</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+key: value: with colon in the middle
+secondKey: value with &#39; a single quote present
+thirdKey: &quot;already escaped: value&quot;
+fourthKey: value with &quot; a double quote present
+fifthKey: value with both &#39; &quot; a double and single quote present is not escaped, but is invalid YAML
+sixthKey: colon:between characters is fine
+<span class="gu">otherKey: []</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+key: &quot;value: with colon in the middle&quot;
+secondKey: &quot;value with &#39; a single quote present&quot;
+thirdKey: &quot;already escaped: value&quot;
+fourthKey: &#39;value with &quot; a double quote present&#39;
+fifthKey: value with both &#39; &quot; a double and single quote present is not escaped, but is invalid YAML
+sixthKey: colon:between characters is fine
+<span class="gu">otherKey: []</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>YAML with unescaped values in an expanded list with `Default Escape Character = '`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+key:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>value: with colon in the middle
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>value with &#39; a single quote present
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>&#39;already escaped: value&#39;
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>value with &quot; a double quote present
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>value with both &#39; &quot; a double and single quote present is not escaped, but is invalid YAML
+<span class="gu">  - colon:between characters is fine</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+key:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>&#39;value: with colon in the middle&#39;
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>&quot;value with &#39; a single quote present&quot;
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>&#39;already escaped: value&#39;
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>&#39;value with &quot; a double quote present&#39;
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>value with both &#39; &quot; a double and single quote present is not escaped, but is invalid YAML
+<span class="gu">  - colon:between characters is fine</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>YAML with unescaped values with arrays</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+array: [value: with colon in the middle, value with &#39; a single quote present, &quot;already escaped: value&quot;, value with &quot; a double quote present, value with both &#39; &quot; a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+nestedArray: [[value: with colon in the middle, value with &#39; a single quote present], [&quot;already escaped: value&quot;, value with &quot; a double quote present], value with both &#39; &quot; a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+<span class="gu">nestedArray2: [[value: with colon in the middle], value with &#39; a single quote present]</span>
+<span class="gu">---</span>
+
+<span class="ge">_Note that escaped commas in a YAML array will be treated as a separator._</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+array: [&quot;value: with colon in the middle&quot;, &quot;value with &#39; a single quote present&quot;, &quot;already escaped: value&quot;, &#39;value with &quot; a double quote present&#39;, value with both &#39; &quot; a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+nestedArray: [[&quot;value: with colon in the middle&quot;, &quot;value with &#39; a single quote present&quot;], [&quot;already escaped: value&quot;, &#39;value with &quot; a double quote present&#39;], value with both &#39; &quot; a double and single quote present is not escaped but is invalid YAML, colon:between characters is fine]
+<span class="gu">nestedArray2: [[&quot;value: with colon in the middle&quot;], &quot;value with &#39; a single quote present&quot;]</span>
+<span class="gu">---</span>
+
+<span class="ge">_Note that escaped commas in a YAML array will be treated as a separator._</span>
+</code></pre></div>
+</details>
+
+<h2 id="force-yaml-escape">Force YAML Escape</h2>
+<p>Alias: <code>force-yaml-escape</code></p>
+<p>Escapes the values for the specified YAML keys.</p>
+<h3 id="options_2">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Force YAML Escape on Keys</code></td>
+<td>Uses the YAML escape character on the specified YAML keys separated by a new line character if it is not already escaped. Do not use on YAML arrays.</td>
+<td>N/A</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_3">Examples</h3>
+<details><summary>YAML without anything to escape</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+key: value
+<span class="gu">otherKey: []</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+key: value
+<span class="gu">otherKey: []</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Force YAML keys to be escaped with double quotes where not already escaped with `Force YAML Escape on Keys = 'key'\n'title'\n'bool'`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+key: &#39;Already escaped value&#39;
+title: This is a title
+bool: false
+<span class="gu">unaffected: value</span>
+<span class="gu">---</span>
+
+<span class="ge">_Note that the force YAML key option should not be used with arrays._</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+key: &#39;Already escaped value&#39;
+title: &quot;This is a title&quot;
+bool: &quot;false&quot;
+<span class="gu">unaffected: value</span>
+<span class="gu">---</span>
+
+<span class="ge">_Note that the force YAML key option should not be used with arrays._</span>
+</code></pre></div>
+</details>
+
+<h2 id="format-tags-in-yaml">Format Tags in YAML</h2>
+<p>Alias: <code>format-tags-in-yaml</code></p>
+<p>Remove Hashtags from tags in the YAML frontmatter, as they make the tags there invalid.</p>
+<h3 id="examples_4">Examples</h3>
+<details><summary>Format Tags in YAML frontmatter</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: #one #two #three #nested/four/five</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: one two three nested/four/five</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Format tags in array</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: [#one #two #three]</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: [one two three]</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Format tags in array with `tag` as the tags key</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tag: [#one #two #three]</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tag: [one two three]</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Format tags in list</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+tags:
+<span class="k">-</span><span class="w"> </span><span class="ni">#tag1</span>
+<span class="gu">- #tag2</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+tags:
+<span class="k">-</span><span class="w"> </span>tag1
+<span class="gu">- tag2</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+
+<h2 id="format-yaml-array">Format YAML Array</h2>
+<p>Alias: <code>format-yaml-array</code></p>
+<p>Allows for the formatting of regular YAML arrays as either multi-line or single-line and <code>tags</code> and <code>aliases</code> are allowed to have some Obsidian specific YAML formats. <b>Note: that single string to single-line goes from a single string entry to a single-line array if more than 1 entry is present. The same is true for single string to multi-line except it becomes a multi-line array.</b></p>
+<h3 id="options_3">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Format YAML aliases section</code></td>
+<td>Turns on formatting for the YAML aliases section. You should not enable this option alongside the rule <code>YAML Title Alias</code> as they may not work well together or they may have different format styles selected causing unexpected results.</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Format YAML tags section</code></td>
+<td>Turns on formatting for the YAML tags section.</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Default YAML array section style</code></td>
+<td>The style of other YAML arrays that are not <code>tags</code>, <code>aliases</code> or  in <code>Force key values to be single-line arrays</code> and <code>Force key values to be multi-line arrays</code></td>
+<td><code>multi-line</code>: <code>key:\n  - value</code><br/><br/><code>single-line</code>: <code>key: [value]</code></td>
+<td><code>single-line</code></td>
+</tr>
+<tr>
+<td><code>Format YAML array sections</code></td>
+<td>Turns on formatting for regular YAML arrays</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Force key values to be single-line arrays</code></td>
+<td>Forces the YAML array for the new line separated keys to be in single-line format (leave empty to disable this option)</td>
+<td>N/A</td>
+<td></td>
+</tr>
+<tr>
+<td><code>Force key values to be multi-line arrays</code></td>
+<td>Forces the YAML array for the new line separated keys to be in multi-line format (leave empty to disable this option)</td>
+<td>N/A</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_5">Examples</h3>
+<details><summary>Format tags as a single-line array delimited by spaces and aliases as a multi-line array and format the key `test` to be a single-line array</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+tags:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>computer
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>research
+aliases: Title 1, Title2
+<span class="gu">test: this is a value</span>
+<span class="gu">---</span>
+
+<span class="gh"># Notes:</span>
+
+Nesting YAML arrays may result in unexpected results.
+
+Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid YAML unless it comes as the last entry in the array.
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title2
+<span class="gu">test: [this is a value]</span>
+<span class="gu">---</span>
+
+<span class="gh"># Notes:</span>
+
+Nesting YAML arrays may result in unexpected results.
+
+Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid YAML unless it comes as the last entry in the array.
+</code></pre></div>
+</details>
+<details><summary>Format tags as a single string with space delimiters, ignore aliases, and format regular YAML arrays as single-line arrays</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+aliases: Typescript
+types:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>thought provoking
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>peer reviewed
+<span class="gu">tags: [computer, science, trajectory]</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+aliases: Typescript
+types: [thought provoking, peer reviewed]
+<span class="gu">tags: computer science trajectory</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Arrays with dictionaries in them are ignored</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+gists:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>id: test123
+    url: &#39;some_url&#39;
+    filename: file.md
+<span class="gu">    isPublic: true</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+gists:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>id: test123
+    url: &#39;some_url&#39;
+    filename: file.md
+<span class="gu">    isPublic: true</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+
+<h2 id="insert-yaml-attributes">Insert YAML attributes</h2>
+<p>Alias: <code>insert-yaml-attributes</code></p>
+<p>Inserts the given YAML attributes into the YAML frontmatter. Put each attribute on a single line.</p>
+<h3 id="options_4">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Text to insert</code></td>
+<td>Text to insert into the YAML frontmatter</td>
+<td>N/A</td>
+<td>`aliases:</td>
+</tr>
+<tr>
+<td>tags: `</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_6">Examples</h3>
+<details><summary>Insert static lines into YAML frontmatter. Text to insert: `aliases:
+tags: doc
+animal: dog`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">animal: cat</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+aliases:
+tags: doc
+<span class="gu">animal: cat</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+
+<h2 id="move-tags-to-yaml">Move Tags to YAML</h2>
+<p>Alias: <code>move-tags-to-yaml</code></p>
+<p>Move all tags to YAML frontmatter of the document.</p>
+<h3 id="options_5">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Body tag operation</code></td>
+<td>What to do with non-ignored tags in the body of the file once they have been moved to the frontmatter</td>
+<td><code>Nothing</code>: Leaves tags in the body of the file alone<br/><br/><code>Remove hashtag</code>: Removes <code>#</code> from tags in content body after moving them to the YAML frontmatter<br/><br/><code>Remove whole tag</code>: Removes the whole tag in content body after moving them to the YAML frontmatter. <em>Note that this removes the first space prior to the tag as well</em></td>
+<td><code>Nothing</code></td>
+</tr>
+<tr>
+<td><code>Tags to ignore</code></td>
+<td>The tags that will not be moved to the tags array or removed from the body content if <code>Remove the hashtag from tags in content body</code> is enabled. Each tag should be on a new line and without the <code>#</code>. <b>Make sure not to include the hashtag in the tag name.</b></td>
+<td>N/A</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_7">Examples</h3>
+<details><summary>Move tags from body to YAML with `Tags to ignore = 'ignored-tag'`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>Text has to do with <span class="ni">#test</span> and <span class="ni">#markdown</span>
+
+<span class="gh">#test content here</span>
+<span class="sb">```</span>
+<span class="sb">#ignored</span>
+<span class="sb">Code block content is ignored</span>
+<span class="sb">```</span>
+
+This inline code <span class="sb">`#ignored content`</span>
+
+<span class="gh">#ignored-tag is ignored since it is in the ignored list</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: [test, markdown]</span>
+<span class="gu">---</span>
+Text has to do with <span class="ni">#test</span> and <span class="ni">#markdown</span>
+
+<span class="gh">#test content here</span>
+<span class="sb">```</span>
+<span class="sb">#ignored</span>
+<span class="sb">Code block content is ignored</span>
+<span class="sb">```</span>
+
+This inline code <span class="sb">`#ignored content`</span>
+
+<span class="gh">#ignored-tag is ignored since it is in the ignored list</span>
+</code></pre></div>
+</details>
+<details><summary>Move tags from body to YAML with existing tags retains the already existing ones and only adds new ones</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: [test, tag2]</span>
+<span class="gu">---</span>
+Text has to do with <span class="ni">#test</span> and <span class="ni">#markdown</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: [test, tag2, markdown]</span>
+<span class="gu">---</span>
+Text has to do with <span class="ni">#test</span> and <span class="ni">#markdown</span>
+</code></pre></div>
+</details>
+<details><summary>Move tags to YAML frontmatter and then remove hashtags in body content tags when `Body tag operation = 'Remove hashtag'` and `Tags to ignore = 'yet-another-ignored-tag'`.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: [test, tag2]</span>
+<span class="gu">---</span>
+Text has to do with <span class="ni">#test</span> and <span class="ni">#markdown</span>
+
+The tag at the end of this line stays as a tag since it is ignored <span class="ni">#yet</span>-another-ignored-tag
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: [test, tag2, markdown]</span>
+<span class="gu">---</span>
+Text has to do with test and markdown
+
+The tag at the end of this line stays as a tag since it is ignored <span class="ni">#yet</span>-another-ignored-tag
+</code></pre></div>
+</details>
+<details><summary>Move tags to YAML frontmatter and then remove body content tags when `Body tag operation = 'Remove whole tag'`.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: [test, tag2]</span>
+<span class="gu">---</span>
+This document will have <span class="ni">#tags</span> removed and spacing around tags is left alone except for the space prior to the hashtag <span class="ni">#warning</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">tags: [test, tag2, tags, warning]</span>
+<span class="gu">---</span>
+This document will have removed and spacing around tags is left alone except for the space prior to the hashtag
+</code></pre></div>
+</details>
+
+<h2 id="remove-yaml-keys">Remove YAML Keys</h2>
+<p>Alias: <code>remove-yaml-keys</code></p>
+<p>Removes the YAML keys specified</p>
+<h3 id="options_6">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>YAML Keys to Remove</code></td>
+<td>The YAML keys to remove from the YAML frontmatter with or without colons</td>
+<td>N/A</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_8">Examples</h3>
+<details><summary>Removes the values specified in `YAML Keys to Remove` = "status:
+keywords
+date"</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+language: Typescript
+type: programming
+tags: computer
+keywords:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>keyword1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>keyword2
+status: WIP
+<span class="gu">date: 02/15/2022</span>
+<span class="gu">---</span>
+
+<span class="gh"># Header Context</span>
+
+Text
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+language: Typescript
+type: programming
+<span class="gu">tags: computer</span>
+<span class="gu">---</span>
+
+<span class="gh"># Header Context</span>
+
+Text
+</code></pre></div>
+</details>
+
+<h2 id="sort-yaml-array-values">Sort YAML Array Values</h2>
+<p>Alias: <code>sort-yaml-array-values</code></p>
+<p>Sorts YAML array values based on the specified sort order.</p>
+<h3 id="options_7">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Sort YAML aliases section</code></td>
+<td>Turns on sorting aliases.</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Sort YAML tags section</code></td>
+<td>Turns on sorting tags.</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Sort YAML array sections</code></td>
+<td>Turns on sorting values for regular YAML arrays</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>YAML Keys to Ignore</code></td>
+<td>A list of YAML keys without the ending colon on their own lines that are not meant to have their values sorted.</td>
+<td>N/A</td>
+<td></td>
+</tr>
+<tr>
+<td><code>Sort Order</code></td>
+<td>The way to sort the YAML array values.</td>
+<td><code>Ascending Alphabetical</code>: Sorts the array values from a to z<br/><br/><code>Descending Alphabetical</code>: Sorts the array values from z to a</td>
+<td><code>Ascending Alphabetical</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_9">Examples</h3>
+<details><summary>Sorting YAML array values alphabetically</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research, androids, Computer]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="gu">  - Title 2</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [androids, computer, Computer, research]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="gu">  - Title 2</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Sorting YAML array values to be alphabetically descending</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research, androids, Computer]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="gu">  - Title 2</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [research, Computer, computer, androids]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 2
+<span class="gu">  - Title 1</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Sort YAML Arrays respects list of keys to not sort values of for normal arrays (keys to ignore is just `arr2` for this example)</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 2
+arr1: [val, val2, val1]
+arr2:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val2
+<span class="gu">  - val1</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+tags: [computer, research]
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 1
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Title 2
+arr1: [val, val1, val2]
+arr2:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>val2
+<span class="gu">  - val1</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+
+<h2 id="yaml-key-sort">YAML Key Sort</h2>
+<p>Alias: <code>yaml-key-sort</code></p>
+<p>Sorts the YAML keys based on the order and priority specified. <b>Note: may remove blank lines as well. Only works on non-nested keys.</b></p>
+<h3 id="options_8">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>YAML Key Priority Sort Order</code></td>
+<td>The order in which to sort keys with one on each line where it sorts in the order found in the list</td>
+<td>N/A</td>
+<td></td>
+</tr>
+<tr>
+<td><code>Priority Keys at Start of YAML</code></td>
+<td>YAML Key Priority Sort Order is placed at the start of the YAML frontmatter</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>YAML Sort Order for Other Keys</code></td>
+<td>The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area</td>
+<td><code>None</code>: No sorting other than what is in the YAML Key Priority Sort Order text area<br/><br/><code>Ascending Alphabetical</code>: Sorts the keys based on key value from a to z<br/><br/><code>Descending Alphabetical</code>: Sorts the keys based on key value from z to a</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_10">Examples</h3>
+<details><summary>Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+status: WIP
+<span class="gu">date: 02/15/2022</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+date: 02/15/2022
+type: programming
+language: Typescript
+tags: computer
+keywords: []
+<span class="gu">status: WIP</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Ascending Alphabetical`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+status: WIP
+<span class="gu">date: 02/15/2022</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+date: 02/15/2022
+type: programming
+language: Typescript
+keywords: []
+status: WIP
+<span class="gu">tags: computer</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Descending Alphabetical`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+status: WIP
+<span class="gu">date: 02/15/2022</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+date: 02/15/2022
+type: programming
+language: Typescript
+tags: computer
+status: WIP
+<span class="gu">keywords: []</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Descending Alphabetical` and `'Priority Keys at Start of YAML' = false`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+language: Typescript
+type: programming
+tags: computer
+keywords: []
+
+status: WIP
+<span class="gu">date: 02/15/2022</span>
+<span class="gu">---</span>
+Any blank line is attached to the line that follows it
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+tags: computer
+
+status: WIP
+keywords: []
+date: 02/15/2022
+type: programming
+<span class="gu">language: Typescript</span>
+<span class="gu">---</span>
+Any blank line is attached to the line that follows it
+</code></pre></div>
+</details>
+
+<h2 id="yaml-timestamp">YAML Timestamp</h2>
+<p>Alias: <code>yaml-timestamp</code></p>
+<p>Keep track of the date the file was last edited in the YAML front matter. Gets dates from file metadata.</p>
+<h3 id="options_9">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Date Created</code></td>
+<td>Insert the file creation date</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Date Created Key</code></td>
+<td>Which YAML key to use for creation date</td>
+<td>N/A</td>
+<td><code>date created</code></td>
+</tr>
+<tr>
+<td><code>Date Created Source of Truth</code></td>
+<td>Specifies where to get the date created value from if it is already present in the frontmatter.</td>
+<td><code>file system</code>: The file system date created value is used to set the value of date created in the frontmatter<br/><br/><code>frontmatter</code>: When a value is present in the frontmatter for date created, this value is used as the value for the date created</td>
+<td><code>file system</code></td>
+</tr>
+<tr>
+<td><code>Date Modified</code></td>
+<td>Insert the date the file was last modified</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Date Modified Key</code></td>
+<td>Which YAML key to use for modification date</td>
+<td>N/A</td>
+<td><code>date modified</code></td>
+</tr>
+<tr>
+<td><code>Date Modified Source of Truth</code></td>
+<td>Specifies what way should be used to determine when the date modified should be updated if it is already present in the frontmatter.</td>
+<td><code>file system</code>: The file system date modified value is used to set the value of date modified in the frontmatter<br/><br/><code>user or Linter edits</code>: When a value is present in the frontmatter for date modified, date modified is kept as is unless the Linter makes a change to a note or the user edits a note with the setting <code>Update YAML Timestamp on File Contents Update</code> set to something other than <code>Never</code>.</td>
+<td><code>file system</code></td>
+</tr>
+<tr>
+<td><code>Format</code></td>
+<td>Moment date format to use (see <a href="https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/">Moment format options</a>)</td>
+<td>N/A</td>
+<td><code>dddd, MMMM Do YYYY, h:mm:ss a</code></td>
+</tr>
+<tr>
+<td><code>Convert Local Time to UTC</code></td>
+<td>Uses UTC equivalent for saved dates instead of local time</td>
+<td>N/A</td>
+<td>false</td>
+</tr>
+<tr>
+<td><code>Update YAML Timestamp on File Contents Update</code></td>
+<td>When the currently active note is modified, <code>YAML Timestamp</code> is run on the note. This should update the modified note timestamp if it is more than 5 seconds off from the current value.</td>
+<td><code>never</code>: never<br/><br/><code>after 5 seconds</code>: after 5 seconds<br/><br/><code>after 10 seconds</code>: after 10 seconds<br/><br/><code>after 15 seconds</code>: after 15 seconds<br/><br/><code>after 30 seconds</code>: after 30 seconds<br/><br/><code>after 1 minute</code>: after 1 minute</td>
+<td><code>never</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="additional-info">Additional Info</h3>
+<h4 id="date-modified-value-origin">Date Modified Value Origin</h4>
+<p>The date modified is <em>not</em> based on the file date modified metadata. This is because the Linter only has access to the last
+date modified when it runs. This is not a problem or too noticeable when you modify a file frequently.
+However, when a file is rarely updated, the date modified could be very out of date.</p>
+<p>For example, say the date modified is January 22nd 2020. But you update the file on January 3rd 2021. The date modified in
+the YAML frontmatter would say January 22nd 2020 despite being updated in 2021. If you did not run the Linter
+against the file a 2nd time, it could be left with a very misleading value. As such, the date modified is the time when
+Linter asks to update the file via any rule except Custom Commands. This should be within about 5 seconds of the value in the file metadata.</p>
+<h3 id="examples_11">Examples</h3>
+<details><summary>Adds a header with the date.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+date created: Wednesday, January 1st 2020, 12:00:00 am
+<span class="gu">date modified: Thursday, January 2nd 2020, 12:00:05 am</span>
+<span class="gu">---</span>
+<span class="gh"># H1</span>
+</code></pre></div>
+</details>
+<details><summary>dateCreated option is false</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">date modified: Thursday, January 2nd 2020, 12:00:05 am</span>
+<span class="gu">---</span>
+<span class="gh"># H1</span>
+</code></pre></div>
+</details>
+<details><summary>Date Created Key is set</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">created: Wednesday, January 1st 2020, 12:00:00 am</span>
+<span class="gu">---</span>
+<span class="gh"># H1</span>
+</code></pre></div>
+</details>
+<details><summary>Date Modified Key is set</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">modified: Wednesday, January 1st 2020, 4:00:00 pm</span>
+<span class="gu">---</span>
+<span class="gh"># H1</span>
+</code></pre></div>
+</details>
+<details><summary>Header is set with convert to UTC option true</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+date created: 2020-01-01T14:00:00+00:00
+<span class="gu">date modified: 2020-01-02T02:00:05+00:00</span>
+<span class="gu">---</span>
+<span class="gh"># H1</span>
+</code></pre></div>
+</details>
+<details><summary>dateCreated option is false with convert to UTC option true</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">date modified: 2020-01-02T02:00:05+00:00</span>
+<span class="gu">---</span>
+<span class="gh"># H1</span>
+</code></pre></div>
+</details>
+<details><summary>Date Created Key is set with convert to UTC option true</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">created: 2020-01-01T14:00:00+00:00</span>
+<span class="gu">---</span>
+<span class="gh"># H1</span>
+</code></pre></div>
+</details>
+<details><summary>Date Modified Key is set with convert to UTC option true</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">modified: 2020-01-02T02:00:05+00:00</span>
+<span class="gu">---</span>
+<span class="gh"># H1</span>
+</code></pre></div>
+</details>
+
+<h2 id="yaml-title">YAML Title</h2>
+<p>Alias: <code>yaml-title</code></p>
+<p>Inserts the title of the file into the YAML frontmatter. Gets the title based on the selected mode.</p>
+<h3 id="options_10">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Title Key</code></td>
+<td>Which YAML key to use for title</td>
+<td>N/A</td>
+<td><code>title</code></td>
+</tr>
+<tr>
+<td><code>Mode</code></td>
+<td>The method to use to get the title</td>
+<td><code>first-h1-or-filename-if-h1-missing</code>: Uses the first H1 in the file or the filename of the file if there is not H1<br/><br/><code>filename</code>: Uses the filename as the title<br/><br/><code>first-h1</code>: Uses the first H1 in the file as the title</td>
+<td><code>first-h1-or-filename-if-h1-missing</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_12">Examples</h3>
+<details><summary>Adds a header with the title from heading when `mode = 'First H1 or Filename if H1 Missing'`.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Obsidian</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">title: Obsidian</span>
+<span class="gu">---</span>
+<span class="gh"># Obsidian</span>
+</code></pre></div>
+</details>
+<details><summary>Adds a header with the title when `mode = 'First H1 or Filename if H1 Missing'`.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">title: Filename</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Make sure that markdown links in headings are properly copied to the YAML as just the text when `mode = 'First H1 or Filename if H1 Missing'`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># This is a [Heading](test heading.md)</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">title: This is a Heading</span>
+<span class="gu">---</span>
+<span class="gh"># This is a [Heading](test heading.md)</span>
+</code></pre></div>
+</details>
+<details><summary>When `mode = 'First H1'`, title does not have a value if no H1 is present</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gu">## This is a Heading</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">title: &quot;&quot;</span>
+<span class="gu">---</span>
+<span class="gu">## This is a Heading</span>
+</code></pre></div>
+</details>
+<details><summary>When `mode = 'Filename'`, title uses the filename ignoring all H1s. Note: the filename is "Filename" in this example.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># This is a Heading</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">title: Filename</span>
+<span class="gu">---</span>
+<span class="gh"># This is a Heading</span>
+</code></pre></div>
+</details>
+
+<h2 id="yaml-title-alias">YAML Title Alias</h2>
+<p>Alias: <code>yaml-title-alias</code></p>
+<p>Inserts or updates the title of the file into the YAML frontmatter's aliases section. Gets the title from the first H1 or filename.</p>
+<h3 id="options_11">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Preserve existing aliases section style</code></td>
+<td>If set, the <code>YAML aliases section style</code> setting applies only to the newly created sections</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Keep alias that matches the filename</code></td>
+<td>Such aliases are usually redundant</td>
+<td>N/A</td>
+<td>false</td>
+</tr>
+<tr>
+<td><code>Use the YAML key specified by &lt;code&gt;Alias Helper Key&lt;/code&gt; to help with filename and heading changes</code></td>
+<td>If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Alias Helper Key</code></td>
+<td>The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule.</td>
+<td>N/A</td>
+<td><code>linter-yaml-title-alias</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="additional-info_1">Additional Info</h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An empty <code>Alias Helper Key</code> will be treated as if you are using <code>linter-yaml-title-alias</code> as the value.</p>
+</div>
+<h3 id="examples_13">Examples</h3>
+<details><summary>Adds a header with the title from heading.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Obsidian</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Obsidian
+<span class="gu">linter-yaml-title-alias: Obsidian</span>
+<span class="gu">---</span>
+<span class="gh"># Obsidian</span>
+</code></pre></div>
+</details>
+<details><summary>Adds a header with the title from heading without YAML key when the use of the YAML key is set to false.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Obsidian</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+aliases:
+<span class="gu">  - Obsidian</span>
+<span class="gu">---</span>
+<span class="gh"># Obsidian</span>
+</code></pre></div>
+</details>
+<details><summary>Adds a header with the title.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Filename
+<span class="gu">linter-yaml-title-alias: Filename</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Adds a header with the title without YAML key when the use of the YAML key is set to false.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+aliases:
+<span class="gu">  - Filename</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Replaces old filename with new filename when no header is present and filename is different than the old one listed in `linter-yaml-title-alias`.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Old Filename
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Alias 2
+<span class="gu">linter-yaml-title-alias: Old Filename</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Filename
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Alias 2
+<span class="gu">linter-yaml-title-alias: Filename</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Make sure that markdown and wiki links in first H1 get their values converted to text</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># This is a [Heading](markdown.md)</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>This is a Heading
+<span class="gu">linter-yaml-title-alias: This is a Heading</span>
+<span class="gu">---</span>
+<span class="gh"># This is a [Heading](markdown.md)</span>
+</code></pre></div>
+</details>
+<details><summary>Using `title` as `Alias Helper Key` sets the value of `title` to the alias.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+aliases:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Filename
+<span class="gu">title: Filename</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

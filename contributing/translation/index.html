@@ -1,0 +1,1594 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../testing/">
+      
+      
+        <link rel="next" href="../documentation/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/linter-icon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Translating the Linter - Linter</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#translating-the-linter" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Linter" class="md-header__button md-logo" aria-label="Linter" data-md-component="logo">
+      
+  <img src="../../assets/linter-icon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Linter
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Translating the Linter
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/platers/obsidian-linter" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Linter" class="md-nav__button md-logo" aria-label="Linter" data-md-component="logo">
+      
+  <img src="../../assets/linter-icon.png" alt="logo">
+
+    </a>
+    Linter
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/platers/obsidian-linter" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/running-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/disabling-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disabling Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings and Rules
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Settings and Rules
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/general-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    General Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/yaml-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YAML Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/heading-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heading Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/footnote-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Footnote Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/content-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/spacing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spacing Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/paste-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Paste Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/custom-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/debug-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debug Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-a-rule/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a Rule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bug-fix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bug Fixes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../refactoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Refactoring Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Translating the Linter
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Translating the Linter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-a-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is a Translation?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What is a Translation?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#translation-file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Translation File Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-are-partial-translations-handled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Are Partial Translations Handled?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#addingupdating-values-for-an-existing-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding/Updating Values for an Existing Language
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-language-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Language Translation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding a New Language Translation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-the-translation-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create the Translation File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-update-imports-in-language-helper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Update Imports in Language Helper
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-add-translations-to-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Add Translations to File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-open-a-pull-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Open a Pull Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documenting the Linter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../open-a-pr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Opening a Pull Request
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../releasing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating a Release
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../credits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-a-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is a Translation?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What is a Translation?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#translation-file-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Translation File Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-are-partial-translations-handled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Are Partial Translations Handled?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#addingupdating-values-for-an-existing-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding/Updating Values for an Existing Language
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-language-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Language Translation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding a New Language Translation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-the-translation-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create the Translation File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-update-imports-in-language-helper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Update Imports in Language Helper
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-add-translations-to-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Add Translations to File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-open-a-pull-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Open a Pull Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="translating-the-linter">Translating the Linter</h1>
+<p>If you would like to help out by translating the Linter there are several ways in which you can help out.
+The following instructions should help you with translating the Linter.</p>
+<div class="admonition note">
+<p class="admonition-title">Using translation helper</p>
+<p>Before being able to translate using the translation helper, you will need to make sure that you have setup the Linter for local use as described in the <a href="../getting-setup/">Setup Guide</a>.</p>
+</div>
+<p>Before we can make changes to a translation in the Linter, we will want to know what a translation is and how they work.</p>
+<h2 id="what-is-a-translation">What is a Translation?</h2>
+<p>A translation for the Linter is a language file that contains the string values of the text the Linter uses for logs and the UI in Obsidian.
+The files for the languages are located under <code>src/lang/locale/</code>. Each language has a file that is named using the 2 letter language abbreviation.
+If the language is for a specific dialect (i.e. simplified Chinese which or British English), make sure it starts with the
+2 letter language code followed by the 2 letter code for the language dialect in question.</p>
+<p>An example of a regular translation file with no dialect is <a href="https://github.com/platers/obsidian-linter/blob/master/src/lang/locale/en.ts">en.ts</a>.<br />
+An example of a translation file for a dialect is <a href="https://github.com/platers/obsidian-linter/blob/master/src/lang/locale/zh-cn.ts">zh-cn.ts</a>.</p>
+<h3 id="translation-file-structure">Translation File Structure</h3>
+<p>A translation file is a TypeScript file that is structured as a JSON object. That is to say it is a key value mapping with
+the nesting of values in it. The structures of all translation files are to follow the structure of <a href="https://github.com/platers/obsidian-linter/blob/master/src/lang/locale/en.ts">en.ts</a>
+which is the source of truth for the keys that exist for use in the Linter. So if you need to add a new value or change the
+structure of the existing values, you will first need to update them in this file.</p>
+<p>The following is the general structure of <code>en.ts</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// English</span>
+
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// UI text for the Obsidian commands that the Linter uses</span>
+<span class="w">  </span><span class="s1">&#39;commands&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{...},</span>
+
+<span class="w">  </span><span class="c1">// logs are general pieces of text to either partially include in the UI or to just put in the developer console.</span>
+<span class="w">  </span><span class="s1">&#39;logs&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{...},</span>
+
+<span class="w">  </span><span class="s1">&#39;notice-text&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;empty-clipboard&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;There is no clipboard content.&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;characters-added&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;characters added&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;characters-removed&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;characters removed&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+
+<span class="w">  </span><span class="c1">// settings.ts</span>
+<span class="w">  </span><span class="s1">&#39;linter-title&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Linter&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;empty-search-results-text&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;No settings match search&#39;</span><span class="p">,</span>
+
+<span class="w">  </span><span class="c1">// lint-confirmation-modal.ts</span>
+<span class="w">  </span><span class="s1">&#39;warning-text&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Warning&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;file-backup-text&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Make sure you have backed up your files.&#39;</span><span class="p">,</span>
+
+<span class="w">  </span><span class="c1">// tabs contains tab specific UI text and setting text (tab specific setting text is text not generated by rules)</span>
+<span class="w">  </span><span class="s1">&#39;tabs&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;names&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// tab.ts</span>
+<span class="w">      </span><span class="s1">&#39;general&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;General Settings&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;custom&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Custom Settings&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;yaml&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;YAML Settings&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;heading&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Heading Settings&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;content&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Content Settings&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;footnote&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Footnote Settings&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;spacing&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Spacing Settings&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;paste&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Paste Settings&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;debug&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Debug Settings&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="c1">// tab-searcher.ts</span>
+<span class="w">    </span><span class="s1">&#39;default-search-bar-text&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Search all settings&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;general&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{...},</span>
+<span class="w">    </span><span class="s1">&#39;debug&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{...},</span>
+<span class="w">  </span><span class="p">},</span>
+
+<span class="w">  </span><span class="c1">// options is for specific UI elements that help out with settings</span>
+<span class="w">  </span><span class="s1">&#39;options&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;custom-command&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{...},</span>
+<span class="w">    </span><span class="s1">&#39;custom-replace&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{...},</span>
+<span class="w">  </span><span class="p">},</span>
+
+<span class="w">  </span><span class="c1">// rules is where you put names and descriptions for rules and rule settings, but not dropdown record values</span>
+<span class="w">  </span><span class="s1">&#39;rules&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{...},</span>
+
+<span class="w">  </span><span class="c1">// These are the string values in the UI for enum values and thus they do not follow the key format as used above</span>
+<span class="w">  </span><span class="c1">// they are also for dropdown records that come from union types</span>
+<span class="w">  </span><span class="s1">&#39;enums&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{...},</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>As you can see the Linter is broken into the several sections which each have their own uses:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>commands</code></td>
+<td>The portion of the language text to use for Obsidian commands that the Linter creates.</td>
+</tr>
+<tr>
+<td><code>logs</code></td>
+<td>The portion of the language text to use for general pieces of text to either partially include in the UI or to just put in the developer console.</td>
+</tr>
+<tr>
+<td><code>notice-text</code></td>
+<td>The portion of the language text to use for notices that are used by the Linter to alert the user about something that is not an error.</td>
+</tr>
+<tr>
+<td><code>tabs</code></td>
+<td>The portion of the language text to use for tab specific UI text and setting text (tab specific setting text is text not generated by rules).</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td>The portion of the language text to use for custom Linter components that in general help out with settings. Things like custom commands and custom regex replace have components that have their text listed in this section.</td>
+</tr>
+<tr>
+<td><code>rules</code></td>
+<td>The portion of the language text to use for names and descriptions for rules and rule settings, but not dropdown record values.</td>
+</tr>
+<tr>
+<td><code>enums</code></td>
+<td>The portion of the language text to use for values in the UI for enum values and thus they do not follow the key format as used above. It is also for dropdown records that come from union types.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-are-partial-translations-handled">How Are Partial Translations Handled?</h3>
+<p>Any missing keys in a language will be defaulted to its English values which allows for partial translation of a language.
+This way you can add as many or as few translations to the translation file at any given time.</p>
+<h2 id="addingupdating-values-for-an-existing-language">Adding/Updating Values for an Existing Language</h2>
+<p>If you would like to add a translation to a language the Linter already has a file for under <code>src/lang/locale</code>,
+you can add values manually to the desired file or via running <code>npm run translate</code>. If you choose to use the script,
+you will be able to add a translation value for a specific language, list untranslated keys in a specified language,
+replace translated value with a new value for a specified key, translate all untranslated keys in a language one at a time</p>
+<p>If you choose to do so manually, you will need to copy the structure found in <a href="https://github.com/platers/obsidian-linter/blob/master/src/lang/locale/en.ts">en.ts</a> to the language that you want to add values for.</p>
+<div class="admonition note">
+<p class="admonition-title">Translation helper requirements</p>
+<p>The translation helper requires that you have already followed the steps to setup npm and have installed its dependencies for this project.</p>
+</div>
+<p>Once the translation(s) has/have been added, the translation(s) should be ready for review. So go on ahead and <a href="../open-a-pr/">open a pull request</a>.</p>
+<h2 id="adding-a-new-language-translation">Adding a New Language Translation</h2>
+<p>If you want to add language support for a language, but the file does not already exist, there are a couple of steps that need
+to be followed for adding that language to the Linter.</p>
+<h3 id="1-create-the-translation-file">1. Create the Translation File</h3>
+<p>Determine the name for the translation file as described by <a href="#what-is-a-translation">What is a Translation?</a>.
+Once you know what the name of the file should be, create a new file for it under <code>src/lang/locale/</code>. You will want to
+make sure that the new file follows the following format:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// {NAME_OF_LANGUAGE_IN_LANGUAGE_HERE}</span>
+
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{};</span>
+</code></pre></div>
+<p>We will use an example of adding Spanish as the new language. The 2 letter abbreviation for Spanish is <code>es</code> so the
+new file will be called <code>es.ts</code>.</p>
+<p>So we will create a file under <code>es.ts</code> that as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Español</span>
+
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{};</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The name of the language in the comment is the name used to refer to the language of Spanish in Spanish.
+Doing this helps native speakers better identify the language and dialect that the translation is for.</p>
+</div>
+<h3 id="2-update-imports-in-language-helper">2. Update Imports in Language Helper</h3>
+<p>Now that the language file has been created it exists and is ready to be used by the Linter.
+The only problem is that the Linter does not know that the file exists. So we need to update <a href="https://github.com/platers/obsidian-linter/blob/master/src/lang/helpers.ts">helpers.ts</a>
+and add the new file to the list of files it knows about. To do this add the following line to <a href="https://github.com/platers/obsidian-linter/blob/master/src/lang/helpers.ts">helpers.ts</a>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="nx">LANGUAGE_SHORT_CODE</span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;./locale/{LANGUAGE_SHORT_CODE}&#39;</span><span class="p">;</span>
+</code></pre></div>
+<p>Then the <code>localeMap</code> in <a href="https://github.com/platers/obsidian-linter/blob/master/src/lang/helpers.ts">helpers.ts</a> needs to
+have an entry added in it for the new language:</p>
+<div class="highlight"><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">localeMap</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="nx">k</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="nx">LanguageLocale</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">en</span><span class="p">,</span>
+<span class="w">  </span><span class="p">{</span><span class="nx">LANGUAGE_SHORT_CODE</span><span class="p">},</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>Lastly you will need to make sure that you add the proper value to the list of locales to their corresponding file names:</p>
+<div class="highlight"><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">localeToFileName</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="nx">k</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="s1">&#39;en&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;en&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;{LANGUAGE_SHORT_CODE}&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;{LANGUAGE_SHORT_CODE}&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Why add values to locale to file name object?</p>
+<p>This is is done because it allows the UTs to validate that there is a unique file that exists for each locale that the
+Linter users.</p>
+</div>
+<p>In the case of adding Spanish, we would make the following changes:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">es</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;./locale/es&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// import new language into helper file</span>
+<span class="p">...</span>
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">localeMap</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="nx">k</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="nx">LanguageLocale</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">en</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">es</span><span class="p">,</span><span class="w"> </span><span class="c1">// add new language to locale mapping</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="p">};</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">localeToFileName</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="nx">k</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="s1">&#39;en&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;en&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;es&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;es&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// add new language locale to file name mapping</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Special Considerations for Locale Map</p>
+<p>In some cases, the language name of the file and the language name of the Obsidian locale used are different.
+In these cases, you will want to make sure to map the Obsidian locale to the new language:</p>
+<div class="highlight"><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">localeMap</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="nx">k</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="nx">LanguageLocale</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">en</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">es</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;pt-BR&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">ptBR</span><span class="p">,</span><span class="w"> </span><span class="c1">// special mapping of Obsidian locale to language</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="s1">&#39;zh-TW&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">zhTW</span><span class="p">,</span><span class="w"> </span><span class="c1">// special mapping of Obsidian locale to language</span>
+<span class="w">  </span><span class="s1">&#39;zh&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">zhCN</span><span class="p">,</span><span class="w"> </span><span class="c1">// special mapping of Obsidian locale to language</span>
+<span class="p">};</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">localeToFileName</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="nx">k</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="s1">&#39;en&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;en&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;es&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;es&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;pt-BR&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;pt-br&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// special mapping of Obsidian locale to language file name</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="s1">&#39;zh-TW&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;zh-tw&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// special mapping of Obsidian locale to language file name</span>
+<span class="w">  </span><span class="s1">&#39;zh&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;zh-cn&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// special mapping of Obsidian locale to language file name</span>
+<span class="p">};</span>
+</code></pre></div>
+</div>
+<h3 id="3-add-translations-to-file">3. Add Translations to File</h3>
+<p>Now that the translation file has been created and the language helper knows about the new language and what Obsidian locale
+to use it for, the next thing to do is <a href="#addingupdating-values-for-an-existing-language">add translations</a> to the newly created file.</p>
+<h3 id="4-open-a-pull-request">4. Open a Pull Request</h3>
+<p>Once the translation(s) has/have been added, the new language addition should be ready for review. So go on ahead and <a href="../open-a-pr/">open a pull request</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

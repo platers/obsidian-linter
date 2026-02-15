@@ -1,0 +1,1863 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../refactoring/">
+      
+      
+        <link rel="next" href="../translation/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/linter-icon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Testing - Linter</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#testing" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Linter" class="md-header__button md-logo" aria-label="Linter" data-md-component="logo">
+      
+  <img src="../../assets/linter-icon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Linter
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Testing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/platers/obsidian-linter" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Linter" class="md-nav__button md-logo" aria-label="Linter" data-md-component="logo">
+      
+  <img src="../../assets/linter-icon.png" alt="logo">
+
+    </a>
+    Linter
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/platers/obsidian-linter" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/running-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/disabling-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disabling Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings and Rules
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Settings and Rules
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/general-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    General Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/yaml-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YAML Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/heading-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heading Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/footnote-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Footnote Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/content-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/spacing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spacing Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/paste-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Paste Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/custom-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../settings/debug-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debug Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-a-rule/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a Rule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bug-fix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bug Fixes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../refactoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Refactoring Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unit-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unit Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-do-unit-tests-look-like-in-the-linter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Do Unit Tests Look Like in the Linter?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What Do Unit Tests Look Like in the Linter?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-suites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Suites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Suites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-rule-test-suites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General Rule Test Suites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specific-test-suites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specific Test Suites
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#should-you-add-a-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Should You Add a Test?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Tests
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#all-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-specific-test-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A Specific Test Suite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Integration Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-should-i-do-integration-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When Should I Do Integration Testing?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../translation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Translating the Linter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documenting the Linter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../open-a-pr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Opening a Pull Request
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../releasing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating a Release
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../credits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unit-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unit Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-do-unit-tests-look-like-in-the-linter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Do Unit Tests Look Like in the Linter?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What Do Unit Tests Look Like in the Linter?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-suites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Suites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Suites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-rule-test-suites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General Rule Test Suites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specific-test-suites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specific Test Suites
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#should-you-add-a-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Should You Add a Test?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Tests
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#all-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-specific-test-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A Specific Test Suite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Integration Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-should-i-do-integration-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When Should I Do Integration Testing?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="testing">Testing</h1>
+<p>Before trying to run tests, make sure that you have setup the Linter for local use as described in the <a href="../getting-setup/">Setup Guide</a>.</p>
+<p>Testing the Linter is broken into unit tests that can be run against logic inside of the repository and integration testing
+which general applies to interacting with Obsidian, verifying how UI elements look, and making sure the plugin still loads.</p>
+<h2 id="unit-testing">Unit Testing</h2>
+<p>Unit tests are a great way to make sure that the rules and other logic within the Linter is working as intended and expected
+especially over time with code refactoring, logical changes, and bug fixes. This helps make sure that the logic still works
+like it did before changes were made.</p>
+<div class="admonition warning">
+<p class="admonition-title">Unit test reliability</p>
+<p>Unit tests are only as reliable as the quality of the tests. So if the tests are poor and barely test the
+functionality of the rules or logic in question, the unit tests can give a false impression that the code is working.</p>
+</div>
+<h3 id="what-do-unit-tests-look-like-in-the-linter">What Do Unit Tests Look Like in the Linter?</h3>
+<p>There are really 2 broad categories of unit tests in the Linter: rule examples and test suites.</p>
+<h4 id="rule-examples">Rule Examples</h4>
+<p>These are the examples that you find in the definition of rules themselves. You can find more on them in <a href="../adding-a-rule/#rule-examples">Rule Examples</a> under Adding a Rule.</p>
+<h4 id="test-suites">Test Suites</h4>
+<p>These are tests that reside in the <code>__tests__</code> directory. They can be broken into 2 categories themselves: general rule test
+suites and specific test suites.</p>
+<h5 id="general-rule-test-suites">General Rule Test Suites</h5>
+<p>As the name suggests, these are test suites that follow a general format and each one is specific to a rule. For example,
+<a href="https://github.com/platers/obsidian-linter/blob/master/__tests__/capitalize-headings.test.ts">capitalize-headings.test.ts</a>
+is a general rule test suite since it only has tests for <a href="../../settings/heading-rules/#capitalize-headings">Capitalize Headings</a>.</p>
+<p>These rules follow the same kind of format:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">CapitalizeHeadings</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../src/rules/capitalize-headings&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="nx">dedent</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;ts-dedent&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="nx">ruleTest</span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;./common&#39;</span><span class="p">;</span>
+
+<span class="nx">ruleTest</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">RuleBuilderClass</span><span class="o">:</span><span class="w"> </span><span class="kt">CapitalizeHeadings</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">testCases</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">testName</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Ignores not words&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">before</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">        # h1</span>
+<span class="sb">        ## a c++ lan</span>
+<span class="sb">        ## this is a sentence.</span>
+<span class="sb">        ## I can&#39;t do this</span>
+<span class="sb">        ## comma, comma, comma</span>
+<span class="sb">        ## 1.1 the Header</span>
+<span class="sb">        ## état</span>
+<span class="sb">        ## this état</span>
+<span class="sb">      `</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">after</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">        # H1</span>
+<span class="sb">        ## A c++ Lan</span>
+<span class="sb">        ## This is a Sentence.</span>
+<span class="sb">        ## I Can&#39;t Do This</span>
+<span class="sb">        ## Comma, Comma, Comma</span>
+<span class="sb">        ## 1.1 The Header</span>
+<span class="sb">        ## État</span>
+<span class="sb">        ## This État</span>
+<span class="sb">      `</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">options</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">style</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Title Case&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="c1">// accounts for https://github.com/platers/obsidian-linter/issues/601</span>
+<span class="w">      </span><span class="nx">testName</span><span class="o">:</span><span class="w"> </span><span class="sb">`Make sure that if the 1st word has a number in it, it will still be considered to be a word and have its first letter capitalized`</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">before</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">        # EC2 instance</span>
+<span class="sb">        ## EC2 lab05 load balancer</span>
+<span class="sb">        ### lab07 bread maker</span>
+<span class="sb">      `</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">after</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">        # EC2 instance</span>
+<span class="sb">        ## EC2 lab05 load balancer</span>
+<span class="sb">        ### Lab07 bread maker</span>
+<span class="sb">      `</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">options</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">style</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;First letter&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">ignoreCasedWords</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>The file starts off with the imports which includes the <a href="../adding-a-rule/#rule-options">Rule Options</a>, any type imports it may
+need, and the <code>ruleTest</code> method which basically sets up the tests to be run as an array of tests:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">CapitalizeHeadings</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../src/rules/capitalize-headings&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="nx">dedent</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;ts-dedent&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="nx">ruleTest</span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;./common&#39;</span><span class="p">;</span>
+</code></pre></div>
+<p>After that comes the list of tests being passed into <code>ruleTest</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">ruleTest</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">RuleBuilderClass</span><span class="o">:</span><span class="w"> </span><span class="kt">CapitalizeHeadings</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">testCases</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">testName</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Ignores not words&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">before</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">        # h1</span>
+<span class="sb">        ## a c++ lan</span>
+<span class="sb">        ## this is a sentence.</span>
+<span class="sb">        ## I can&#39;t do this</span>
+<span class="sb">        ## comma, comma, comma</span>
+<span class="sb">        ## 1.1 the Header</span>
+<span class="sb">        ## état</span>
+<span class="sb">        ## this état</span>
+<span class="sb">      `</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">after</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">        # H1</span>
+<span class="sb">        ## A c++ Lan</span>
+<span class="sb">        ## This is a Sentence.</span>
+<span class="sb">        ## I Can&#39;t Do This</span>
+<span class="sb">        ## Comma, Comma, Comma</span>
+<span class="sb">        ## 1.1 The Header</span>
+<span class="sb">        ## État</span>
+<span class="sb">        ## This État</span>
+<span class="sb">      `</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">options</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">style</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Title Case&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="c1">// accounts for https://github.com/platers/obsidian-linter/issues/601</span>
+<span class="w">      </span><span class="nx">testName</span><span class="o">:</span><span class="w"> </span><span class="sb">`Make sure that if the 1st word has a number in it, it will still be considered to be a word and have its first letter capitalized`</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">before</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">        # EC2 instance</span>
+<span class="sb">        ## EC2 lab05 load balancer</span>
+<span class="sb">        ### lab07 bread maker</span>
+<span class="sb">      `</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">after</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">        # EC2 instance</span>
+<span class="sb">        ## EC2 lab05 load balancer</span>
+<span class="sb">        ### Lab07 bread maker</span>
+<span class="sb">      `</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">options</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">style</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;First letter&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">ignoreCasedWords</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="p">});</span>
+</code></pre></div>
+<p><code>rulesTest</code> expects the <code>RuleBuilderClass</code> to be the rule options class reference and then <code>testCases</code> which is a list of
+test cases for the rule. The test cases are almost identical to <a href="../adding-a-rule/#rule-examples">Rule Examples</a> however they use <code>testName</code> instead of <code>description</code>.</p>
+<h5 id="specific-test-suites">Specific Test Suites</h5>
+<p>These test suites are generally tailored to a specific function that exists that is not a rule. They are generally meant to
+make sure that certain functions still work as intended. An example of a specific test suite is <a href="https://github.com/platers/obsidian-linter/blob/master/__tests__/get-all-custom-ignore-sections-in-text.test.ts">get-all-custom-ignore-sections-in-text.test.ts</a>.
+The logic for these tests tries to follow a similar setup to that of a general rule test suite, but is tailored to the needs
+of the specific function that is being tested:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="nx">getAllCustomIgnoreSectionsInText</span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../src/utils/mdast&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="nx">dedent</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;ts-dedent&#39;</span><span class="p">;</span>
+
+<span class="kr">type</span><span class="w"> </span><span class="nx">customIgnoresInTextTestCase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">expectedCustomIgnoresInText</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">expectedPositions</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">startIndex</span><span class="o">:</span><span class="kt">number</span><span class="p">,</span><span class="w"> </span><span class="nx">endIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">}[]</span>
+<span class="p">};</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">getCustomIgnoreSectionsInTextTestCases</span><span class="o">:</span><span class="w"> </span><span class="kt">customIgnoresInTextTestCase</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;when no custom ignore start indicator is present, no positions are returned&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">      Here is some text</span>
+<span class="sb">      Here is some more text</span>
+<span class="sb">    `</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedCustomIgnoresInText</span><span class="o">:</span><span class="w"> </span><span class="kt">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedPositions</span><span class="o">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;when no custom ignore start indicator is present, no positions are returned even if custom ignore end indicator is present&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">      Here is some text</span>
+<span class="sb">      &lt;!-- linter-enable --&gt;</span>
+<span class="sb">      Here is some more text</span>
+<span class="sb">    `</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedCustomIgnoresInText</span><span class="o">:</span><span class="w"> </span><span class="kt">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedPositions</span><span class="o">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;a simple example of a start and end custom ignore indicator results in the proper start and end positions for the ignore section&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">      Here is some text</span>
+<span class="sb">      &lt;!-- linter-disable --&gt;</span>
+<span class="sb">      This content will be ignored</span>
+<span class="sb">      So any format put here gets to stay as is</span>
+<span class="sb">      &lt;!-- linter-enable --&gt;</span>
+<span class="sb">      More text here...</span>
+<span class="sb">    `</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedCustomIgnoresInText</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedPositions</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="nx">startIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">18</span><span class="p">,</span><span class="w"> </span><span class="nx">endIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">135</span><span class="p">}],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;when a custom ignore start indicator is not followed by a custom ignore end indicator in the text, the end is considered to be the end of the text&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">      Here is some text</span>
+<span class="sb">      &lt;!-- linter-disable --&gt;</span>
+<span class="sb">      This content will be ignored</span>
+<span class="sb">      So any format put here gets to stay as is</span>
+<span class="sb">      More text here...</span>
+<span class="sb">    `</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedCustomIgnoresInText</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedPositions</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="nx">startIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">18</span><span class="p">,</span><span class="w"> </span><span class="nx">endIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">129</span><span class="p">}],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;when a custom ignore start indicator shows up midline, it ignores the part in question&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">      Here is some text&lt;!-- linter-disable --&gt;here is some ignored text&lt;!-- linter-enable --&gt;</span>
+<span class="sb">      This content will be ignored</span>
+<span class="sb">      So any format put here gets to stay as is</span>
+<span class="sb">      More text here...</span>
+<span class="sb">    `</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedCustomIgnoresInText</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedPositions</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="nx">startIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">17</span><span class="p">,</span><span class="w"> </span><span class="nx">endIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">87</span><span class="p">}],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;when a custom ignore start indicator does not follow the exact syntax, it is counted as existing when it is a single-line comment&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">      Here is some text&lt;!-- linter-disable--&gt;here is some ignored text&lt;!-------------         linter-enable ------&gt;</span>
+<span class="sb">      This content will be ignored</span>
+<span class="sb">      So any format put here gets to stay as is</span>
+<span class="sb">      More text here...</span>
+<span class="sb">    `</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedCustomIgnoresInText</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedPositions</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="nx">startIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">17</span><span class="p">,</span><span class="w"> </span><span class="nx">endIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">109</span><span class="p">}],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;multiple matches can be returned&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">      Here is some text&lt;!-- linter-disable --&gt;here is some ignored text&lt;!-- linter-enable --&gt;</span>
+<span class="sb">      This content will be ignored</span>
+<span class="sb">      So any format put here gets to stay as is</span>
+<span class="sb">      More text here...</span>
+<span class="sb">      </span><span class="si">${</span><span class="s1">&#39;&#39;</span><span class="si">}</span>
+<span class="sb">      &lt;!-- linter-disable --&gt;</span>
+<span class="sb">      We want to ignore the following as we want to preserve its format</span>
+<span class="sb">        -&gt; level 1</span>
+<span class="sb">          -&gt; level 1.3</span>
+<span class="sb">        -&gt; level 2</span>
+<span class="sb">      Finish</span>
+<span class="sb">    `</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedCustomIgnoresInText</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">expectedPositions</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="nx">startIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">17</span><span class="p">,</span><span class="w"> </span><span class="nx">endIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">87</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="nx">startIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">178</span><span class="p">,</span><span class="w"> </span><span class="nx">endIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">316</span><span class="p">}],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">];</span>
+
+<span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Get All Custom Ignore Sections in Text&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">testCase</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">getCustomIgnoreSectionsInTextTestCases</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">it</span><span class="p">(</span><span class="nx">testCase</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">customIgnorePositions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">getAllCustomIgnoreSectionsInText</span><span class="p">(</span><span class="nx">testCase</span><span class="p">.</span><span class="nx">text</span><span class="p">);</span>
+
+<span class="w">      </span><span class="nx">expect</span><span class="p">(</span><span class="nx">customIgnorePositions</span><span class="p">.</span><span class="nx">length</span><span class="p">).</span><span class="nx">toEqual</span><span class="p">(</span><span class="nx">testCase</span><span class="p">.</span><span class="nx">expectedCustomIgnoresInText</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">expect</span><span class="p">(</span><span class="nx">customIgnorePositions</span><span class="p">).</span><span class="nx">toEqual</span><span class="p">(</span><span class="nx">testCase</span><span class="p">.</span><span class="nx">expectedPositions</span><span class="p">);</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>These tests general start by importing the function to test followed by the format of how the test cases will be formatted:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="nx">getAllCustomIgnoreSectionsInText</span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../src/utils/mdast&#39;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="nx">dedent</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;ts-dedent&#39;</span><span class="p">;</span>
+
+<span class="kr">type</span><span class="w"> </span><span class="nx">customIgnoresInTextTestCase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">expectedCustomIgnoresInText</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">expectedPositions</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">startIndex</span><span class="o">:</span><span class="kt">number</span><span class="p">,</span><span class="w"> </span><span class="nx">endIndex</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">}[]</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>After that comes the test cases and then the running of the test cases:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Get All Custom Ignore Sections in Text&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">testCase</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">getCustomIgnoreSectionsInTextTestCases</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">it</span><span class="p">(</span><span class="nx">testCase</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">customIgnorePositions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">getAllCustomIgnoreSectionsInText</span><span class="p">(</span><span class="nx">testCase</span><span class="p">.</span><span class="nx">text</span><span class="p">);</span>
+
+<span class="w">      </span><span class="nx">expect</span><span class="p">(</span><span class="nx">customIgnorePositions</span><span class="p">.</span><span class="nx">length</span><span class="p">).</span><span class="nx">toEqual</span><span class="p">(</span><span class="nx">testCase</span><span class="p">.</span><span class="nx">expectedCustomIgnoresInText</span><span class="p">);</span>
+<span class="w">      </span><span class="nx">expect</span><span class="p">(</span><span class="nx">customIgnorePositions</span><span class="p">).</span><span class="nx">toEqual</span><span class="p">(</span><span class="nx">testCase</span><span class="p">.</span><span class="nx">expectedPositions</span><span class="p">);</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>This is the format you will want to use for specific test suites if at all possible. There are some scenarios where the test
+cases do vary so much that creating a type for the test case is not feasible and so individual tests are used like what
+<a href="https://github.com/platers/obsidian-linter/blob/master/__tests__/rules-runner.test.ts">rules-runner.test.ts</a> does.</p>
+<h3 id="should-you-add-a-test">Should You Add a Test?</h3>
+<p>You may be wondering whether you should or should not add a test to the Linter. If you do any of the following, you should add a unit test:</p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Tests to Include</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Add a new rule</td>
+<td>Examples on the rule that cover general use cases<br/><br/>Unit tests in a test suite for the new rule that cover cases that make the examples too long or that are edge cases</td>
+</tr>
+<tr>
+<td>Add a new option to a rule</td>
+<td>An example or examples on the rule to cover the general scenarios of the new option<br/><br/>Unit tests in a test suite for the rule that cover cases that make the examples too long or that are edge cases</td>
+</tr>
+<tr>
+<td>Refactoring code</td>
+<td>This may require a new test suite that is designed specifically for the refactored code (for example <a href="https://github.com/platers/obsidian-linter/blob/master/__tests__/get-all-tables-in-text.test.ts">get-all-tables-in-text.test.ts</a>) or new unit tests in a test suite that uses the logic that was refactored if it has changed the edge cases that are possible</td>
+</tr>
+<tr>
+<td>Fixing a bug</td>
+<td>When a bug directly affects a single rule and can be reproduced by setting up a case in the rule's test suite, add that rule with a comment referencing back to the issue that reported the problem*</td>
+</tr>
+</tbody>
+</table>
+<p>*Here is what an example of bug fix unit test looks like in a general rule test suite:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="c1">// accounts for https://github.com/platers/obsidian-linter/issues/412</span>
+<span class="w">  </span><span class="nx">testName</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;H1s become H2s and all other headers are shifted accordingly when an H1 starts a file&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">before</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">    # H1</span>
+<span class="sb">    ### H3</span>
+<span class="sb">    #### H4</span>
+<span class="sb">    # H1</span>
+<span class="sb">    #### H4</span>
+<span class="sb">    ###### H6</span>
+<span class="sb">  `</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">after</span><span class="o">:</span><span class="w"> </span><span class="kt">dedent</span><span class="sb">`</span>
+<span class="sb">    ## H1</span>
+<span class="sb">    ### H3</span>
+<span class="sb">    #### H4</span>
+<span class="sb">    ## H1</span>
+<span class="sb">    ### H4</span>
+<span class="sb">    #### H6</span>
+<span class="sb">  `</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">options</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">startAtH2</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">},</span>
+</code></pre></div>
+<h3 id="adding-tests">Adding Tests</h3>
+<p>Where to add a test depends on what kind of test you are adding. If it is an example, it should reside in the specific rule
+that it pertains to. If it is meant to be a bug fix, edge case test, a test for a non-rule function, or a large test, then
+adding it to an existing or new test suite makes the most sense.</p>
+<p>When adding an example test case, please follow the format described by <a href="../adding-a-rule/#rule-examples">Rule Examples</a>.
+When adding an test suite test case, please follow the format described above by <a href="#test-suites">Test Suites</a> making sure
+that any newly added test suites have dashes between words in the filename.</p>
+<p>Once a test is added, you will want to run the tests, see <a href="#running-tests">Running Tests</a>.</p>
+<h3 id="running-tests">Running Tests</h3>
+<p>Tests are run by jest and running them varies depending on whether you want to run all tests or one or more test suites.</p>
+<h4 id="all-tests">All Tests</h4>
+<p>They can be run by either running <code>npm run test</code> or <code>npm run compile</code>. The output will let
+you know how many of the tests passed and if any failed, why they failed using a visual comparison of what was expected
+versus what was received.</p>
+<div class="admonition note">
+<p class="admonition-title">Advanced tests</p>
+<p>When advanced tests fail, their output is harder to read since it uses a regex match. It is recommended that you use
+the output of the expected versus actual values for the normal tests to determine what went wrong with the test.</p>
+</div>
+<h4 id="a-specific-test-suite">A Specific Test Suite</h4>
+<p>If you know the suite of tests that you would like to run, you can use <code>npm run test-suite TEST_SUITE_HERE</code> to run just
+the desired test suite. The test suite names are the names of the files in <code>__tests</code> minus <code>.test.ts</code>. You only need to
+use part of a file name for a test suite to be used as it checks that the test suite name starts with the value of <code>TEST_SUITE_HERE</code>.</p>
+<p>So for example, <code>npm run test-suite format-yaml-arrays</code> would run the test suite for formatting YAML arrays since that is
+the only test suite that starts with <code>format-yaml-arrays</code>. While, <code>npm run test-suite header</code> would run all test suites
+that start with the word <code>header</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Running a test suite for a specific rule or rules does not run the examples for that rule(s) as all examples
+are bundled together in the examples test suite which can be run via <code>npm run test-suite examples</code>.</p>
+</div>
+<h2 id="integration-testing">Integration Testing</h2>
+<p>Integration tests are reserved for things that are not easily tested with unit tests. When doing these tests,
+you will need to load your local copy of the Linter into Obsidian and then run the Linter with the desired rules turned on.</p>
+<h3 id="when-should-i-do-integration-testing">When Should I Do Integration Testing?</h3>
+<p>When a rule is changed to run as part of the rules to run after or rules to run before the normal rules in <a href="https://github.com/platers/obsidian-linter/blob/master/src/rules-runner.ts">rules-runner.ts</a>.</p>
+<p>When a UI change is made. For example a wording change or a display element changes like CSS or HTML changes.</p>
+<p>When the issue was caused by multiple rules making changes to the contents of a file to create an issue.
+When this happens, the only way I have found to be reliable when testing that the issue is resolved is via integration testing.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

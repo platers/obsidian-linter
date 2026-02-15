@@ -1,0 +1,4026 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../content-rules/">
+      
+      
+        <link rel="next" href="../paste-rules/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/linter-icon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Spacing Rules - Linter</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#spacing-rules" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Linter" class="md-header__button md-logo" aria-label="Linter" data-md-component="logo">
+      
+  <img src="../../assets/linter-icon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Linter
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Spacing Rules
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/platers/obsidian-linter" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Linter" class="md-nav__button md-logo" aria-label="Linter" data-md-component="logo">
+      
+  <img src="../../assets/linter-icon.png" alt="logo">
+
+    </a>
+    Linter
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/platers/obsidian-linter" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/running-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/disabling-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disabling Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings and Rules
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Settings and Rules
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../general-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    General Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yaml-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YAML Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../heading-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heading Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../footnote-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Footnote Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../content-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spacing Rules
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spacing Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#compact-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compact YAML
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compact YAML">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consecutive-blank-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consecutive blank lines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consecutive blank lines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#convert-spaces-to-tabs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Convert Spaces to Tabs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Convert Spaces to Tabs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-line-around-blockquotes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Line Around Blockquotes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empty Line Around Blockquotes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-line-around-code-fences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Line Around Code Fences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empty Line Around Code Fences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-line-around-horizontal-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Line Around Horizontal Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empty Line Around Horizontal Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-line-around-math-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Line Around Math Blocks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empty Line Around Math Blocks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-line-around-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Line Around Tables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empty Line Around Tables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heading-blank-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Heading blank lines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Heading blank lines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-info" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Info
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#line-break-at-document-end" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Line Break at Document End
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Line Break at Document End">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#move-math-block-indicators-to-their-own-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Move Math Block Indicators to Their Own Line
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Move Math Block Indicators to Their Own Line">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paragraph-blank-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paragraph blank lines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Paragraph blank lines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#additional-info_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Info
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional Info">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-is-a-blank-line-added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When Is a Blank Line Added?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-empty-lines-between-list-markers-and-checklists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove Empty Lines Between List Markers and Checklists
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remove Empty Lines Between List Markers and Checklists">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-link-spacing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove link spacing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remove link spacing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-space-around-characters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove Space around Characters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remove Space around Characters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-space-before-or-after-characters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove Space Before or After Characters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remove Space Before or After Characters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#space-after-list-markers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Space after list markers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Space after list markers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#space-between-chinese-japanese-or-korean-and-english-or-numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Space between Chinese Japanese or Korean and English or numbers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Space between Chinese Japanese or Korean and English or numbers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trailing-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trailing spaces
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trailing spaces">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paste-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Paste Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../debug-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debug Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/getting-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/adding-a-rule/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a Rule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/bug-fix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bug Fixes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/refactoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Refactoring Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/translation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Translating the Linter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documenting the Linter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/open-a-pr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Opening a Pull Request
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/releasing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating a Release
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../credits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#compact-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compact YAML
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compact YAML">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consecutive-blank-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consecutive blank lines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consecutive blank lines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#convert-spaces-to-tabs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Convert Spaces to Tabs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Convert Spaces to Tabs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-line-around-blockquotes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Line Around Blockquotes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empty Line Around Blockquotes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-line-around-code-fences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Line Around Code Fences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empty Line Around Code Fences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-line-around-horizontal-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Line Around Horizontal Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empty Line Around Horizontal Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-line-around-math-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Line Around Math Blocks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empty Line Around Math Blocks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-line-around-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Line Around Tables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empty Line Around Tables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heading-blank-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Heading blank lines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Heading blank lines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-info" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Info
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#line-break-at-document-end" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Line Break at Document End
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Line Break at Document End">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#move-math-block-indicators-to-their-own-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Move Math Block Indicators to Their Own Line
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Move Math Block Indicators to Their Own Line">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paragraph-blank-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paragraph blank lines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Paragraph blank lines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#additional-info_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Info
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional Info">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-is-a-blank-line-added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When Is a Blank Line Added?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-empty-lines-between-list-markers-and-checklists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove Empty Lines Between List Markers and Checklists
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remove Empty Lines Between List Markers and Checklists">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-link-spacing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove link spacing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remove link spacing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-space-around-characters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove Space around Characters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remove Space around Characters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-space-before-or-after-characters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove Space Before or After Characters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remove Space Before or After Characters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#space-after-list-markers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Space after list markers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Space after list markers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#space-between-chinese-japanese-or-korean-and-english-or-numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Space between Chinese Japanese or Korean and English or numbers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Space between Chinese Japanese or Korean and English or numbers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trailing-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trailing spaces
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trailing spaces">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<!--- This file was automatically generated. See docs.ts and *_template.md files for the source. -->
+
+<h1 id="spacing-rules">Spacing Rules</h1>
+<h2 id="compact-yaml">Compact YAML</h2>
+<p>Alias: <code>compact-yaml</code></p>
+<p>Removes leading and trailing blank lines in the YAML front matter.</p>
+<h3 id="options">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Inner New Lines</code></td>
+<td>Remove new lines that are not at the start or the end of the YAML</td>
+<td>N/A</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples">Examples</h3>
+<details><summary>Remove blank lines at the start and end of the YAML</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+
+date: today
+
+title: unchanged without inner new lines turned on
+
+---
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+date: today
+
+<span class="gu">title: unchanged without inner new lines turned on</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+<details><summary>Remove blank lines anywhere in YAML with inner new lines set to true</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+
+date: today
+
+
+title: remove inner new lines
+
+---
+
+<span class="gh"># Header 1</span>
+
+
+Body content here.
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+date: today
+<span class="gu">title: remove inner new lines</span>
+<span class="gu">---</span>
+
+<span class="gh"># Header 1</span>
+
+
+Body content here.
+</code></pre></div>
+</details>
+
+<h2 id="consecutive-blank-lines">Consecutive blank lines</h2>
+<p>Alias: <code>consecutive-blank-lines</code></p>
+<p>There should be at most one consecutive blank line.</p>
+<h3 id="examples_1">Examples</h3>
+<details><summary>Consecutive blank lines are removed</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>Some text
+
+
+Some more text
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>Some text
+
+Some more text
+</code></pre></div>
+</details>
+
+<h2 id="convert-spaces-to-tabs">Convert Spaces to Tabs</h2>
+<p>Alias: <code>convert-spaces-to-tabs</code></p>
+<p>Converts leading spaces to tabs.</p>
+<h3 id="options_1">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Tabsize</code></td>
+<td>Number of spaces that will be converted to a tab</td>
+<td>N/A</td>
+<td><code>4</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_2">Examples</h3>
+<details><summary>Converting spaces to tabs with `tabsize = 3`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">-</span><span class="w"> </span>text with no indention
+<span class="w">   </span><span class="k">-</span><span class="w"> </span>text indented with 3 spaces
+<span class="k">-</span><span class="w"> </span>text with no indention
+<span class="w">      </span><span class="k">-</span><span class="w"> </span>text indented with 6 spaces
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">-</span><span class="w"> </span>text with no indention
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>text indented with 3 spaces
+<span class="k">-</span><span class="w"> </span>text with no indention
+<span class="w">        </span><span class="k">-</span><span class="w"> </span>text indented with 6 spaces
+</code></pre></div>
+</details>
+<details><summary>Converting spaces to tabs with `tabsize = 3` works in blockquotes</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">- text with no indention</span>
+<span class="k">&gt; </span><span class="ge">   - text indented with 3 spaces</span>
+<span class="k">&gt; </span><span class="ge">- text with no indention</span>
+<span class="k">&gt; </span><span class="ge">      - text indented with 6 spaces</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">- text with no indention</span>
+<span class="k">&gt; </span><span class="ge">  - text indented with 3 spaces</span>
+<span class="k">&gt; </span><span class="ge">- text with no indention</span>
+<span class="k">&gt; </span><span class="ge">      - text indented with 6 spaces</span>
+</code></pre></div>
+</details>
+
+<h2 id="empty-line-around-blockquotes">Empty Line Around Blockquotes</h2>
+<p>Alias: <code>empty-line-around-blockquotes</code></p>
+<p>Ensures that there is an empty line around blockquotes unless they start or end a document. <b>Note: an empty line is either one less level of nesting for blockquotes or a newline character.</b></p>
+<h3 id="examples_3">Examples</h3>
+<details><summary>Blockquotes that start a document do not get an empty line before them.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">Quote content here</span>
+<span class="k">&gt; </span><span class="ge">quote content continued</span>
+<span class="gh"># Title here</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">Quote content here</span>
+<span class="k">&gt; </span><span class="ge">quote content continued</span>
+
+<span class="gh"># Title here</span>
+</code></pre></div>
+</details>
+<details><summary>Blockquotes that end a document do not get an empty line after them.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Heading 1</span>
+<span class="k">&gt; </span><span class="ge">Quote content here</span>
+<span class="k">&gt; </span><span class="ge">quote content continued</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Heading 1</span>
+
+<span class="k">&gt; </span><span class="ge">Quote content here</span>
+<span class="k">&gt; </span><span class="ge">quote content continued</span>
+</code></pre></div>
+</details>
+<details><summary>Blockquotes that are nested have the proper empty line added</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Make sure that nested blockquotes are accounted for correctly</span>
+<span class="k">&gt; </span><span class="ge">Quote content here</span>
+<span class="k">&gt; </span><span class="ge">quote content continued</span>
+<span class="k">&gt; </span><span class="ge">&gt; Nested Blockquote</span>
+<span class="k">&gt; </span><span class="ge">&gt; content continued</span>
+
+<span class="gs">**Note that the empty line is either one less blockquote indicator if followed/proceeded by more blockquote content or it is an empty line**</span>
+
+<span class="gh"># Doubly nested code block</span>
+
+<span class="k">&gt; </span><span class="ge">&gt; Quote content here</span>
+<span class="k">&gt; </span><span class="ge">&gt; quote content continued</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Make sure that nested blockquotes are accounted for correctly</span>
+
+<span class="k">&gt; </span><span class="ge">Quote content here</span>
+<span class="k">&gt; </span><span class="ge">quote content continued</span>
+<span class="k">&gt;</span>
+<span class="ge">&gt; &gt; Nested Blockquote</span>
+<span class="k">&gt; </span><span class="ge">&gt; content continued</span>
+
+<span class="gs">**Note that the empty line is either one less blockquote indicator if followed/proceeded by more blockquote content or it is an empty line**</span>
+
+<span class="gh"># Doubly nested code block</span>
+
+<span class="k">&gt; </span><span class="ge">&gt; Quote content here</span>
+<span class="k">&gt; </span><span class="ge">&gt; quote content continued</span>
+</code></pre></div>
+</details>
+
+<h2 id="empty-line-around-code-fences">Empty Line Around Code Fences</h2>
+<p>Alias: <code>empty-line-around-code-fences</code></p>
+<p>Ensures that there is an empty line around code fences unless they start or end a document.</p>
+<h3 id="examples_4">Examples</h3>
+<details><summary>Fenced code blocks that start a document do not get an empty line before them.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>``` js
+var temp = &#39;text&#39;;
+// this is a code block
+```
+Text after code block.
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>``` js
+var temp = &#39;text&#39;;
+// this is a code block
+```
+
+Text after code block.
+</code></pre></div>
+</details>
+<details><summary>Fenced code blocks that end a document do not get an empty line after them.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Heading 1</span>
+<span class="sb">```</span>
+<span class="sb">Here is a code block</span>
+<span class="sb">```</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Heading 1</span>
+
+<span class="sb">```</span>
+<span class="sb">Here is a code block</span>
+<span class="sb">```</span>
+</code></pre></div>
+</details>
+<details><summary>Fenced code blocks that are in a blockquote have the proper empty line added</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Make sure that code blocks in blockquotes are accounted for correctly</span>
+<span class="k">&gt; </span><span class="ge">```js</span>
+<span class="k">&gt; </span><span class="ge">var text = &#39;this is some text&#39;;</span>
+<span class="k">&gt; </span><span class="ge">```</span>
+<span class="k">&gt;</span>
+<span class="ge">&gt; ```js</span>
+<span class="k">&gt; </span><span class="ge">var other text = &#39;this is more text&#39;;</span>
+<span class="k">&gt; </span><span class="ge">```</span>
+
+<span class="gs">**Note that the blanks blockquote lines added do not have whitespace after them**</span>
+
+<span class="gh"># Doubly nested code block</span>
+
+<span class="k">&gt; </span><span class="ge">&gt; ```js</span>
+<span class="k">&gt; </span><span class="ge">&gt; var other text = &#39;this is more text&#39;;</span>
+<span class="k">&gt; </span><span class="ge">&gt; ```</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Make sure that code blocks in blockquotes are accounted for correctly</span>
+
+<span class="k">&gt; </span><span class="ge">```js</span>
+<span class="k">&gt; </span><span class="ge">var text = &#39;this is some text&#39;;</span>
+<span class="k">&gt; </span><span class="ge">```</span>
+<span class="k">&gt;</span>
+<span class="ge">&gt; ```js</span>
+<span class="k">&gt; </span><span class="ge">var other text = &#39;this is more text&#39;;</span>
+<span class="k">&gt; </span><span class="ge">```</span>
+
+<span class="gs">**Note that the blanks blockquote lines added do not have whitespace after them**</span>
+
+<span class="gh"># Doubly nested code block</span>
+
+<span class="k">&gt; </span><span class="ge">&gt; ```js</span>
+<span class="k">&gt; </span><span class="ge">&gt; var other text = &#39;this is more text&#39;;</span>
+<span class="k">&gt; </span><span class="ge">&gt; ```</span>
+</code></pre></div>
+</details>
+<details><summary>Nested fenced code blocks get empty lines added around them</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="sb">```markdown</span>
+<span class="gh"># Header</span>
+
+````JavaScript
+var text = &#39;some string&#39;;
+````
+<span class="sb">```</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="sb">```markdown</span>
+<span class="gh"># Header</span>
+
+````JavaScript
+var text = &#39;some string&#39;;
+````
+
+<span class="sb">```</span>
+</code></pre></div>
+</details>
+
+<h2 id="empty-line-around-horizontal-rules">Empty Line Around Horizontal Rules</h2>
+<p>Alias: <code>empty-line-around-horizontal-rules</code></p>
+<p>Ensures that there is an empty line around horizontal rules unless they start or end a document.</p>
+<h3 id="examples_5">Examples</h3>
+<details><summary>Horizontal rules that start a document do not get an empty line before them.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>***
+
+
+Content
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>***
+
+Content
+</code></pre></div>
+</details>
+<details><summary>Horizontal rules that end a document do not get an empty line after them.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>***
+Content
+***
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>***
+
+Content
+
+***
+</code></pre></div>
+</details>
+<details><summary>All types of horizontal rules are affected by this rule</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">-</span><span class="w"> </span>Content 1
+***
+<span class="gu">- Content 2</span>
+<span class="gu">---</span>
+<span class="k">-</span><span class="w"> </span>Content 3
+___
+<span class="k">-</span><span class="w"> </span>Content 4
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">-</span><span class="w"> </span>Content 1
+
+***
+
+<span class="k">-</span><span class="w"> </span>Content 2
+
+---
+
+<span class="k">-</span><span class="w"> </span>Content 3
+
+___
+
+<span class="k">-</span><span class="w"> </span>Content 4
+</code></pre></div>
+</details>
+<details><summary>YAML frontmatter is not affected by this rule</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">prop: value</span>
+<span class="gu">---</span>
+
+Content
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">prop: value</span>
+<span class="gu">---</span>
+
+Content
+</code></pre></div>
+</details>
+<details><summary>Paragraphs above `---` are treated as a heading and not spaced apart</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gu">Content</span>
+<span class="gu">---</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gu">Content</span>
+<span class="gu">---</span>
+</code></pre></div>
+</details>
+
+<h2 id="empty-line-around-math-blocks">Empty Line Around Math Blocks</h2>
+<p>Alias: <code>empty-line-around-math-blocks</code></p>
+<p>Ensures that there is an empty line around math blocks using <code>Number of Dollar Signs to Indicate a Math Block</code> to determine how many dollar signs indicates a math block for single-line math.</p>
+<h3 id="examples_6">Examples</h3>
+<details><summary>Math blocks that start a document do not get an empty line before them.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+some more text
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+
+some more text
+</code></pre></div>
+</details>
+<details><summary>Math blocks that are singe-line are updated based on the value of `Number of Dollar Signs to Indicate a Math Block` (in this case its value is 2)</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+some more text
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+
+some more text
+</code></pre></div>
+</details>
+<details><summary>Math blocks that end a document do not get an empty line after them.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>Some text
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>Some text
+
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+</code></pre></div>
+</details>
+<details><summary>Math blocks that are not at the start or the end of the document will have an empty line added before and after them</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>Some text
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+some more text
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>Some text
+
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+
+some more text
+</code></pre></div>
+</details>
+<details><summary>Math blocks in callouts or blockquotes have the appropriately formatted blank lines added</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">Math block in blockquote</span>
+<span class="k">&gt; </span><span class="ge">$$</span>
+<span class="k">&gt; </span><span class="ge">\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}</span>
+<span class="k">&gt; </span><span class="ge">$$</span>
+
+More content here
+
+<span class="k">&gt; </span><span class="ge">Math block doubly nested in blockquote</span>
+<span class="k">&gt; </span><span class="ge">&gt; $$</span>
+<span class="k">&gt; </span><span class="ge">&gt; \boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}</span>
+<span class="k">&gt; </span><span class="ge">&gt; $$</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">Math block in blockquote</span>
+<span class="k">&gt;</span>
+<span class="ge">&gt; $$</span>
+<span class="k">&gt; </span><span class="ge">\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}</span>
+<span class="k">&gt; </span><span class="ge">$$</span>
+
+More content here
+
+<span class="k">&gt; </span><span class="ge">Math block doubly nested in blockquote</span>
+<span class="k">&gt;</span>
+<span class="ge">&gt; &gt; $$</span>
+<span class="k">&gt; </span><span class="ge">&gt; \boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}</span>
+<span class="k">&gt; </span><span class="ge">&gt; $$</span>
+</code></pre></div>
+</details>
+
+<h2 id="empty-line-around-tables">Empty Line Around Tables</h2>
+<p>Alias: <code>empty-line-around-tables</code></p>
+<p>Ensures that there is an empty line around github flavored tables unless they start or end a document.</p>
+<h3 id="examples_7">Examples</h3>
+<details><summary>Tables that start a document do not get an empty line before them.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>| Column 1 | Column 2 |
+|----------|----------|
+| foo      | bar      |
+| baz      | qux      |
+| quux     | quuz     |
+More text.
+<span class="gh"># Heading</span>
+
+<span class="gs">**Note that text directly following a table is considered part of a table according to github markdown**</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>| Column 1 | Column 2 |
+|----------|----------|
+| foo      | bar      |
+| baz      | qux      |
+| quux     | quuz     |
+
+More text.
+<span class="gh"># Heading</span>
+
+<span class="gs">**Note that text directly following a table is considered part of a table according to github markdown**</span>
+</code></pre></div>
+</details>
+<details><summary>Tables that end a document do not get an empty line after them.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Heading 1</span>
+| Column 1 | Column 2 |
+|----------|----------|
+| foo      | bar      |
+| baz      | qux      |
+| quux     | quuz     |
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Heading 1</span>
+
+| Column 1 | Column 2 |
+|----------|----------|
+| foo      | bar      |
+| baz      | qux      |
+| quux     | quuz     |
+</code></pre></div>
+</details>
+<details><summary>Tables that are not at the start or the end of the document will have an empty line added before and after them</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Table 1</span>
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| foo      | bar      | blob     |
+| baz      | qux      | trust    |
+| quux     | quuz     | glob     |
+<span class="gh"># Table 2 without Pipe at Start and End</span>
+| Column 1 | Column 2 |
+:-: | -----------:
+bar | baz
+foo | bar
+<span class="gh"># Header for more content</span>
+New paragraph.
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># Table 1</span>
+
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| foo      | bar      | blob     |
+| baz      | qux      | trust    |
+| quux     | quuz     | glob     |
+
+<span class="gh"># Table 2 without Pipe at Start and End</span>
+
+| Column 1 | Column 2 |
+:-: | -----------:
+bar | baz
+foo | bar
+
+<span class="gh"># Header for more content</span>
+New paragraph.
+</code></pre></div>
+</details>
+<details><summary>Tables in callouts or blockquotes have the appropriately formatted blank lines added</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">Table in blockquote</span>
+<span class="k">&gt; </span><span class="ge">| Column 1 | Column 2 | Column 3 |</span>
+<span class="k">&gt; </span><span class="ge">|----------|----------|----------|</span>
+<span class="k">&gt; </span><span class="ge">| foo      | bar      | blob     |</span>
+<span class="k">&gt; </span><span class="ge">| baz      | qux      | trust    |</span>
+<span class="k">&gt; </span><span class="ge">| quux     | quuz     | glob     |</span>
+
+More content here
+
+<span class="k">&gt; </span><span class="ge">Table doubly nested in blockquote</span>
+<span class="k">&gt; </span><span class="ge">&gt; | Column 1 | Column 2 | Column 3 |</span>
+<span class="k">&gt; </span><span class="ge">&gt; |----------|----------|----------|</span>
+<span class="k">&gt; </span><span class="ge">&gt; | foo      | bar      | blob     |</span>
+<span class="k">&gt; </span><span class="ge">&gt; | baz      | qux      | trust    |</span>
+<span class="k">&gt; </span><span class="ge">&gt; | quux     | quuz     | glob     |</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">Table in blockquote</span>
+<span class="k">&gt;</span>
+<span class="ge">&gt; | Column 1 | Column 2 | Column 3 |</span>
+<span class="k">&gt; </span><span class="ge">|----------|----------|----------|</span>
+<span class="k">&gt; </span><span class="ge">| foo      | bar      | blob     |</span>
+<span class="k">&gt; </span><span class="ge">| baz      | qux      | trust    |</span>
+<span class="k">&gt; </span><span class="ge">| quux     | quuz     | glob     |</span>
+
+More content here
+
+<span class="k">&gt; </span><span class="ge">Table doubly nested in blockquote</span>
+<span class="k">&gt;</span>
+<span class="ge">&gt; &gt; | Column 1 | Column 2 | Column 3 |</span>
+<span class="k">&gt; </span><span class="ge">&gt; |----------|----------|----------|</span>
+<span class="k">&gt; </span><span class="ge">&gt; | foo      | bar      | blob     |</span>
+<span class="k">&gt; </span><span class="ge">&gt; | baz      | qux      | trust    |</span>
+<span class="k">&gt; </span><span class="ge">&gt; | quux     | quuz     | glob     |</span>
+</code></pre></div>
+</details>
+
+<h2 id="heading-blank-lines">Heading blank lines</h2>
+<p>Alias: <code>heading-blank-lines</code></p>
+<p>All headings have one blank line both before and after (except where the heading is at the beginning or end of the document).</p>
+<h3 id="options_2">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Bottom</code></td>
+<td>Ensures one blank line after headings</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Empty Line Between YAML and Header</code></td>
+<td>Keep the empty line between the YAML frontmatter and header</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="additional-info">Additional Info</h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If <a href="#paragraph-blank-lines">paragraph blank lines</a> is on, a newline will still be added between a heading and a paragraph, even if <code>Bottom</code> is <code>false</code>. You can override this by adding a <a href="../custom-rules/#custom-regex-replacement">custom regex replacement rule</a> with the following settings:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">regex to find</th>
+<th style="text-align: left;">flags</th>
+<th style="text-align: left;">regex to replace</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>(^#+\s.*)\n+</code></td>
+<td style="text-align: left;"><code>gm</code></td>
+<td style="text-align: left;"><code>$1\n</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="examples_8">Examples</h3>
+<details><summary>Headings should be surrounded by blank lines</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+<span class="gu">## H2</span>
+
+
+<span class="gh"># H1</span>
+line
+<span class="gu">## H2</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+
+<span class="gu">## H2</span>
+
+<span class="gh"># H1</span>
+
+line
+
+<span class="gu">## H2</span>
+</code></pre></div>
+</details>
+<details><summary>With `Bottom=false`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+line
+<span class="gu">## H2</span>
+<span class="gh"># H1</span>
+line
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+line
+
+<span class="gu">## H2</span>
+<span class="gh"># H1</span>
+line
+</code></pre></div>
+</details>
+<details><summary>Empty line before header and after YAML is removed with `Empty Line Between YAML and Header=false`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">key: value</span>
+<span class="gu">---</span>
+
+<span class="gh"># Header</span>
+Paragraph here...
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>---
+<span class="gu">key: value</span>
+<span class="gu">---</span>
+<span class="gh"># Header</span>
+
+Paragraph here...
+</code></pre></div>
+</details>
+
+<h2 id="line-break-at-document-end">Line Break at Document End</h2>
+<p>Alias: <code>line-break-at-document-end</code></p>
+<p>Ensures that there is exactly one line break at the end of a document if the note is not empty.</p>
+<h3 id="examples_9">Examples</h3>
+<details><summary>Appending a line break to the end of the document.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+</code></pre></div>
+</details>
+<details><summary>Removing trailing line breaks to the end of the document, except one.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+</code></pre></div>
+</details>
+<details><summary>Empty files will not have a blank line added</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+</details>
+
+<h2 id="move-math-block-indicators-to-their-own-line">Move Math Block Indicators to Their Own Line</h2>
+<p>Alias: <code>move-math-block-indicators-to-their-own-line</code></p>
+<p>Move all starting and ending math block indicators to their own lines using <code>Number of Dollar Signs to Indicate a Math Block</code> to determine how many dollar signs indicates a math block for single-line math.</p>
+<h3 id="examples_10">Examples</h3>
+<details><summary>Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 2</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>This is left alone:
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+The following is updated:
+$$L = \frac{1}{2} \rho v^2 S C_L$$
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>This is left alone:
+$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+The following is updated:
+$$
+L = \frac{1}{2} \rho v^2 S C_L
+$$
+</code></pre></div>
+</details>
+<details><summary>Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 3 and opening indicator is on the same line as the start of the content</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>$$$\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$$
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>$$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$$
+</code></pre></div>
+</details>
+<details><summary>Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 2 and ending indicator is on the same line as the ending line of the content</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}$$
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>$$
+\boldsymbol{a}=\begin{bmatrix}a_x \\ a_y\end{bmatrix}
+$$
+</code></pre></div>
+</details>
+
+<h2 id="paragraph-blank-lines">Paragraph blank lines</h2>
+<p>Alias: <code>paragraph-blank-lines</code></p>
+<p>All paragraphs should have exactly one blank line both before and after.</p>
+<h3 id="additional-info_1">Additional Info</h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do not use with <a href="../content-rules/#two-spaces-between-lines-with-content">two spaces between lines with consecutive content</a>. They work differently and will result in unexpected results.</p>
+</div>
+<h4 id="when-is-a-blank-line-added">When Is a Blank Line Added?</h4>
+<p>When a paragraph has another line after the current one and it does not end in 2 or more spaces, <code>&lt;br&gt;</code>, <code>&lt;br/&gt;</code>, or <code>\</code>.</p>
+<h3 id="examples_11">Examples</h3>
+<details><summary>Paragraphs should be surrounded by blank lines</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+Newlines are inserted.
+A paragraph is a line that starts with a letter.
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+
+Newlines are inserted.
+
+A paragraph is a line that starts with a letter.
+</code></pre></div>
+</details>
+<details><summary>Paragraphs can be extended via the use of 2 or more spaces at the end of a line, a line break html or xml, or a backslash (\)</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+Content  
+Paragraph content continued &lt;br&gt;
+Paragraph content continued once more &lt;br/&gt;
+Paragraph content yet again\
+Last line of paragraph
+A new paragraph
+<span class="gh"># H2</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+
+Content  
+Paragraph content continued &lt;br&gt;
+Paragraph content continued once more &lt;br/&gt;
+Paragraph content yet again\
+Last line of paragraph
+
+A new paragraph
+
+<span class="gh"># H2</span>
+</code></pre></div>
+</details>
+
+<h2 id="remove-empty-lines-between-list-markers-and-checklists">Remove Empty Lines Between List Markers and Checklists</h2>
+<p>Alias: <code>remove-empty-lines-between-list-markers-and-checklists</code></p>
+<p>There should not be any empty lines between list markers and checklists.</p>
+<h3 id="examples_12">Examples</h3>
+<details><summary>Blank lines are removed between ordered list items</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">1.</span> Item 1
+
+<span class="k">2.</span> Item 2
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">1.</span> Item 1
+<span class="k">2.</span> Item 2
+</code></pre></div>
+</details>
+<details><summary>Blank lines are removed between list items when the list indicator is '-'</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">-</span><span class="w"> </span>Item 1
+
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>Subitem 1
+
+<span class="k">-</span><span class="w"> </span>Item 2
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">-</span><span class="w"> </span>Item 1
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>Subitem 1
+<span class="k">-</span><span class="w"> </span>Item 2
+</code></pre></div>
+</details>
+<details><summary>Blank lines are removed between checklist items</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">- [x]</span> Item 1
+
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>[!] Subitem 1
+
+<span class="k">- [ ]</span> Item 2
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">- [x]</span> Item 1
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>[!] Subitem 1
+<span class="k">- [ ]</span> Item 2
+</code></pre></div>
+</details>
+<details><summary>Blank lines are removed between list items when the list indicator is '+'</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>+ Item 1
+
+    + Subitem 1
+
++ Item 2
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>+ Item 1
+    + Subitem 1
++ Item 2
+</code></pre></div>
+</details>
+<details><summary>Blank lines are removed between list items when the list indicator is '*'</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">*</span><span class="w"> </span>Item 1
+
+<span class="w">    </span><span class="k">*</span><span class="w"> </span>Subitem 1
+
+<span class="k">*</span><span class="w"> </span>Item 2
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">*</span><span class="w"> </span>Item 1
+<span class="w">    </span><span class="k">*</span><span class="w"> </span>Subitem 1
+<span class="k">*</span><span class="w"> </span>Item 2
+</code></pre></div>
+</details>
+<details><summary>Blanks lines are removed between like list types (ordered, specific list item indicators, and checklists) while blanks are left between different kinds of list item indicators</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">1.</span> Item 1
+
+<span class="k">2.</span> Item 2
+
+<span class="k">-</span><span class="w"> </span>Item 1
+
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>Subitem 1
+
+<span class="k">-</span><span class="w"> </span>Item 2
+
+<span class="k">- [x]</span> Item 1
+
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>[f] Subitem 1
+
+<span class="k">- [ ]</span> Item 2
+
++ Item 1
+
+    + Subitem 1
+
++ Item 2
+
+<span class="k">*</span><span class="w"> </span>Item 1
+
+<span class="w">    </span><span class="k">*</span><span class="w"> </span>Subitem 1
+
+<span class="k">*</span><span class="w"> </span>Item 2
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">1.</span> Item 1
+<span class="k">2.</span> Item 2
+
+<span class="k">-</span><span class="w"> </span>Item 1
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>Subitem 1
+<span class="k">-</span><span class="w"> </span>Item 2
+
+<span class="k">- [x]</span> Item 1
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>[f] Subitem 1
+<span class="k">- [ ]</span> Item 2
+
++ Item 1
+    + Subitem 1
++ Item 2
+
+<span class="k">*</span><span class="w"> </span>Item 1
+<span class="w">    </span><span class="k">*</span><span class="w"> </span>Subitem 1
+<span class="k">*</span><span class="w"> </span>Item 2
+</code></pre></div>
+</details>
+
+<h2 id="remove-link-spacing">Remove link spacing</h2>
+<p>Alias: <code>remove-link-spacing</code></p>
+<p>Removes spacing around link text.</p>
+<h3 id="examples_13">Examples</h3>
+<details><summary>Space in regular markdown link text</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>[<span class="nt"> here is link text1 </span>](<span class="na">link_here</span>)
+[<span class="nt"> here is link text2</span>](<span class="na">link_here</span>)
+[<span class="nt">here is link text3 </span>](<span class="na">link_here</span>)
+[<span class="nt">here is link text4</span>](<span class="na">link_here</span>)
+[<span class="nt">   here is link text5  </span>](<span class="na">link_here</span>)
+[](link_here)
+<span class="gs">**Note that image markdown syntax does not get affected even if it is transclusion:**</span>
+![<span class="nt">  here is link text6 </span>](<span class="na">link_here</span>)
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>[<span class="nt">here is link text1</span>](<span class="na">link_here</span>)
+[<span class="nt">here is link text2</span>](<span class="na">link_here</span>)
+[<span class="nt">here is link text3</span>](<span class="na">link_here</span>)
+[<span class="nt">here is link text4</span>](<span class="na">link_here</span>)
+[<span class="nt">here is link text5</span>](<span class="na">link_here</span>)
+[](link_here)
+<span class="gs">**Note that image markdown syntax does not get affected even if it is transclusion:**</span>
+![<span class="nt">  here is link text6 </span>](<span class="na">link_here</span>)
+</code></pre></div>
+</details>
+<details><summary>Space in wiki link text</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>[[link_here| here is link text1 ]]
+[[link_here|here is link text2 ]]
+[[link_here| here is link text3]]
+[[link_here|here is link text4]]
+[[link_here|    here is link text5  ]]
+![[link_here|   here is link text6  ]]
+[[link_here]]
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>[[link_here|here is link text1]]
+[[link_here|here is link text2]]
+[[link_here|here is link text3]]
+[[link_here|here is link text4]]
+[[link_here|here is link text5]]
+![[link_here|here is link text6]]
+[[link_here]]
+</code></pre></div>
+</details>
+
+<h2 id="remove-space-around-characters">Remove Space around Characters</h2>
+<p>Alias: <code>remove-space-around-characters</code></p>
+<p>Ensures that certain characters are not surrounded by whitespace (either single spaces or a tab). <b>Note: this may causes issues with markdown format in some cases.</b></p>
+<h3 id="options_3">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Include Fullwidth Forms</code></td>
+<td>Include <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Fullwidth Forms Unicode block</a></td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Include CJK Symbols and Punctuation</code></td>
+<td>Include <a href="https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation">CJK Symbols and Punctuation Unicode block</a></td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Include Dashes</code></td>
+<td>Include en dash (–) and em dash (—)</td>
+<td>N/A</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>Other symbols</code></td>
+<td>Other symbols to include</td>
+<td>N/A</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_14">Examples</h3>
+<details><summary>Remove Spaces and Tabs around Fullwidth Characters</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>Full list of affected characters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
+This is a fullwidth period   。 with text after it.
+This is a fullwidth comma   ，  with text after it.
+This is a fullwidth left parenthesis （  with text after it.
+This is a fullwidth right parenthesis ）  with text after it.
+This is a fullwidth colon ：  with text after it.
+This is a fullwidth semicolon ；  with text after it.
+  Ｒemoves space at start of line
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>Full list of affected characters:０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
+This is a fullwidth period。with text after it.
+This is a fullwidth comma，with text after it.
+This is a fullwidth left parenthesis（with text after it.
+This is a fullwidth right parenthesis）with text after it.
+This is a fullwidth colon：with text after it.
+This is a fullwidth semicolon；with text after it.
+Ｒemoves space at start of line
+</code></pre></div>
+</details>
+<details><summary>Fullwidth Characters in List Do not Affect List Markdown Syntax</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># List indicators should not have the space after them removed if they are followed by a fullwidth character</span>
+
+<span class="k">-</span><span class="w"> </span>［ contents here］
+<span class="w">  </span><span class="k">-</span><span class="w"> </span> ［ more contents here］ more text here
++   ［ another item here］
+<span class="k">*</span><span class="w"> </span>［ one last item here］
+
+<span class="gh"># Nested in a blockquote</span>
+
+<span class="k">&gt; </span><span class="ge">- ［ contents here］</span>
+<span class="k">&gt; </span><span class="ge">  -  ［ more contents here］ more text here</span>
+<span class="k">&gt; </span><span class="ge">+  ［ another item here］</span>
+<span class="k">&gt; </span><span class="ge">* ［ one last item here］</span>
+
+<span class="gh"># Doubly nested in a blockquote</span>
+
+<span class="k">&gt; </span><span class="ge">The following is doubly nested</span>
+<span class="k">&gt; </span><span class="ge">&gt; - ［ contents here］</span>
+<span class="k">&gt; </span><span class="ge">&gt;   -   ［ more contents here］ more text here</span>
+<span class="k">&gt; </span><span class="ge">&gt; +  ［ another item here］</span>
+<span class="k">&gt; </span><span class="ge">&gt; * ［ one last item here］</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># List indicators should not have the space after them removed if they are followed by a fullwidth character</span>
+
+<span class="k">-</span><span class="w"> </span>［contents here］
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>［more contents here］more text here
++ ［another item here］
+<span class="k">*</span><span class="w"> </span>［one last item here］
+
+<span class="gh"># Nested in a blockquote</span>
+
+<span class="k">&gt; </span><span class="ge">- ［contents here］</span>
+<span class="k">&gt; </span><span class="ge">  - ［more contents here］more text here</span>
+<span class="k">&gt; </span><span class="ge">+ ［another item here］</span>
+<span class="k">&gt; </span><span class="ge">* ［one last item here］</span>
+
+<span class="gh"># Doubly nested in a blockquote</span>
+
+<span class="k">&gt; </span><span class="ge">The following is doubly nested</span>
+<span class="k">&gt; </span><span class="ge">&gt; - ［contents here］</span>
+<span class="k">&gt; </span><span class="ge">&gt;   - ［more contents here］more text here</span>
+<span class="k">&gt; </span><span class="ge">&gt; + ［another item here］</span>
+<span class="k">&gt; </span><span class="ge">&gt; * ［one last item here］</span>
+</code></pre></div>
+</details>
+
+<h2 id="remove-space-before-or-after-characters">Remove Space Before or After Characters</h2>
+<p>Alias: <code>remove-space-before-or-after-characters</code></p>
+<p>Removes space before the specified characters and after the specified characters. <b>Note: this may causes issues with markdown format in some cases.</b></p>
+<h3 id="options_4">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Remove Space Before Characters</code></td>
+<td>Removes space before the specified characters. <b>Note: using <code>{</code> or <code>}</code> in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.</b></td>
+<td>N/A</td>
+<td><code>,!?;:).’”]</code></td>
+</tr>
+<tr>
+<td><code>Remove Space After Characters</code></td>
+<td>Removes space after the specified characters. <b>&gt;Note: using <code>{</code> or <code>}</code> in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.</b></td>
+<td>N/A</td>
+<td><code>¿¡‘“([</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_15">Examples</h3>
+<details><summary>Remove Spaces and Tabs Before and After Default Symbol Set</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>In the end , the space gets removed  .
+The space before the question mark was removed right ?
+The space before the exclamation point gets removed !
+A semicolon ; and colon : have spaces removed before them
+‘ Text in single quotes ’
+“ Text in double quotes ”
+[ Text in square braces ]
+( Text in parenthesis )
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>In the end, the space gets removed.
+The space before the question mark was removed right?
+The space before the exclamation point gets removed!
+A semicolon; and colon: have spaces removed before them
+‘Text in single quotes’
+“Text in double quotes”
+[Text in square braces]
+(Text in parenthesis)
+</code></pre></div>
+</details>
+
+<h2 id="space-after-list-markers">Space after list markers</h2>
+<p>Alias: <code>space-after-list-markers</code></p>
+<p>There should be a single space after list markers and checkboxes.</p>
+<h3 id="examples_16">Examples</h3>
+<details><summary>A single space is left between the list marker and the text of the list item</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="k">1.</span>   Item 1
+<span class="k">2.</span>  Item 2
+
+<span class="k">-</span><span class="w"> </span>  [ ] Item 1
+<span class="k">- [x]</span>    Item 2
+<span class="w">    </span><span class="k">-</span><span class="w"> </span> [ ] Item 3
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="k">1.</span> Item 1
+<span class="k">2.</span> Item 2
+
+<span class="k">- [ ]</span> Item 1
+<span class="k">- [x]</span> Item 2
+<span class="w">    </span><span class="k">- [ ]</span> Item 3
+</code></pre></div>
+</details>
+
+<h2 id="space-between-chinese-japanese-or-korean-and-english-or-numbers">Space between Chinese Japanese or Korean and English or numbers</h2>
+<p>Alias: <code>space-between-chinese-japanese-or-korean-and-english-or-numbers</code></p>
+<p>Ensures that Chinese, Japanese, or Korean and English or numbers are separated by a single space. Follows these <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">guidelines</a></p>
+<h3 id="options_5">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>English Punctuations and Symbols Before CJK</code></td>
+<td>The list of non-letter punctuation and symbols to consider to be from English when found before Chinese, Japanese, or Korean characters. <b>Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.</b></td>
+<td>N/A</td>
+<td><code>-+;:'"°%$)]</code></td>
+</tr>
+<tr>
+<td><code>English Punctuations and Symbols After CJK</code></td>
+<td>The list of non-letter punctuation and symbols to consider to be from English when found after Chinese, Japanese, or Korean characters. <b>Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.</b></td>
+<td>N/A</td>
+<td><code>-+'"([¥$</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_17">Examples</h3>
+<details><summary>Space between Chinese and English</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>中文字符串english中文字符串。
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>中文字符串 english 中文字符串。
+</code></pre></div>
+</details>
+<details><summary>Space between Chinese and link</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>中文字符串[english](http://example.com)中文字符串。
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>中文字符串 [<span class="nt">english</span>](<span class="na">http://example.com</span>) 中文字符串。
+</code></pre></div>
+</details>
+<details><summary>Space between Chinese and inline code block</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>中文字符串`code`中文字符串。
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>中文字符串 <span class="sb">`code`</span> 中文字符串。
+</code></pre></div>
+</details>
+<details><summary>No space between Chinese and English in tag</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh">#标签A #标签2标签</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh">#标签A #标签2标签</span>
+</code></pre></div>
+</details>
+<details><summary>Make sure that spaces are not added between italics and chinese characters to preserve markdown syntax</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="ge">_这是一个数学公式_</span>
+<span class="ge">*这是一个数学公式english*</span>
+
+<span class="gh"># Handling bold and italics nested in each other is not supported at this time</span>
+
+<span class="gs">**_这是一_个数学公式**</span>
+<span class="ge">*这是一hello__个数学world公式__*</span>
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="ge">_这是一个数学公式_</span>
+<span class="ge">*这是一个数学公式 english*</span>
+
+<span class="gh"># Handling bold and italics nested in each other is not supported at this time</span>
+
+<span class="gs">**_ 这是一 _ 个数学公式**</span>
+<span class="ge">*这是一 hello__ 个数学 world 公式 __*</span>
+</code></pre></div>
+</details>
+<details><summary>Images and links are ignored</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>[[这是一个数学公式english]]
+![[这是一个数学公式english.jpg]]
+[<span class="nt">这是一个数学公式english</span>](<span class="na">这是一个数学公式english.md</span>)
+![<span class="nt">这是一个数学公式english</span>](<span class="na">这是一个数学公式english.jpg</span>)
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>[[这是一个数学公式english]]
+![[这是一个数学公式english.jpg]]
+[<span class="nt">这是一个数学公式english</span>](<span class="na">这是一个数学公式english.md</span>)
+![<span class="nt">这是一个数学公式english</span>](<span class="na">这是一个数学公式english.jpg</span>)
+</code></pre></div>
+</details>
+<details><summary>Space between CJK and English</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code>日本語englishひらがな
+カタカナenglishカタカナ
+ﾊﾝｶｸｶﾀｶﾅenglish１２３全角数字
+한글english한글
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code>日本語 english ひらがな
+カタカナ english カタカナ
+ﾊﾝｶｸｶﾀｶﾅ english１２３全角数字
+한글 english 한글
+</code></pre></div>
+</details>
+
+<h2 id="trailing-spaces">Trailing spaces</h2>
+<p>Alias: <code>trailing-spaces</code></p>
+<p>Removes extra spaces after every line.</p>
+<h3 id="options_6">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>List Items</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Two Space Linebreak</code></td>
+<td>Ignore two spaces followed by a line break ("Two Space Rule").</td>
+<td>N/A</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_18">Examples</h3>
+<details><summary>Removes trailing spaces and tabs.</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+Line with trailing spaces and tabs.         
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+Line with trailing spaces and tabs.
+</code></pre></div>
+</details>
+<details><summary>With `Two Space Linebreak = true`</summary>
+
+Before:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+Line with trailing spaces and tabs.  
+</code></pre></div>
+
+After:
+
+<div class="highlight"><pre><span></span><code><span class="gh"># H1</span>
+Line with trailing spaces and tabs.  
+</code></pre></div>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
