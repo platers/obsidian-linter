@@ -2,6 +2,7 @@ import esbuild from 'esbuild';
 import process from 'process';
 import builtins from 'builtin-modules';
 import importGlobPlugin from 'esbuild-plugin-import-glob';
+import inlineWorkerPlugin from 'esbuild-plugin-inline-worker';
 import {replace} from 'esbuild-plugin-replace';
 
 const banner =
@@ -11,7 +12,7 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `;
 
-const dummyMocksForDocs = `
+const dummyMocksForDocsAndWorker = `
 document = {
   createElement: function() {},
 };
@@ -19,7 +20,7 @@ document = {
 
 const prod = (process.argv[2] === 'production');
 
-const mockedBanner = banner + dummyMocksForDocs;
+const mockedBanner = banner + dummyMocksForDocsAndWorker;
 const mockedPlugins = [replace({
   values: {
     // update usage of moment from obsidian to the node implementation of moment we have
@@ -64,6 +65,49 @@ const unusedCodeForProduction = [replace({
   },
   delimiters: ['', ''],
 })];
+const webWorkerIgnores = [replace({
+  values: {
+    // update usage of moment from obsidian to the node implementation of moment we have
+    'import {moment} from \'obsidian\';': '',
+    // remove the use of obsidian in the options to allow for docs.js to run
+    'import {App, Setting, ToggleComponent} from \'obsidian\';': '',
+    // remove the use of obsidian in settings helper to allow for docs.js to run
+    'import {App, MarkdownRenderer} from \'obsidian\';': '',
+    // remove the use of obsidian in the auto-correct files picker to allow for docs.js to run
+    'import {Setting, App, TFile, normalizePath, ExtraButtonComponent} from \'obsidian\';': '',
+    // remove the use of obsidian in add custom row to allow for docs.js to run
+    'import {App, Setting} from \'obsidian\';': '',
+    // remove the use of obsidian in suggest to allow for docs.js to run
+    'import {App, ISuggestOwner, Scope} from \'obsidian\';': '',
+    // remove the use of obsidian in md file suggester to allow for docs.js to run
+    'import {App, TFile} from \'obsidian\';': '',
+    // remove the use of obsidian in parse results modal to allow for docs.js to run
+    'import {Modal, App} from \'obsidian\';': 'class Modal {}',
+    // remove the use of app from a couple of settings for docs.js to run
+    'import {App} from \'obsidian\';': '',
+    // remove values for examples as they are not necessary in the actual plugin when it goes out to users
+    'abstract get exampleBuilders(): ExampleBuilder<TOptions>[];': '',
+    // removes eslint disabling that was just meant for examples
+    '/* eslint-disable no-tabs */': '',
+    '/* eslint-disable no-mixed-spaces-and-tabs, no-tabs */': '',
+    // remove eslint enabling that was just meant for examples
+    '/* eslint-enable no-tabs */': '',
+    '/* eslint-enable no-mixed-spaces-and-tabs, no-tabs */': '',
+    // add the multiline comment to remove the examples
+    'get exampleBuilders():': '/*',
+    // add the ending of the multiline comment that will remove the examples
+    '}\n  get optionBuilders()': '*/ get optionBuilders()',
+    // removes the logic that adds the examples to the rule
+    'builder.exampleBuilders.map((b) => b.example),': '',
+    // removes the expectation that examples will exist on the rule class
+    'public examples: Array<Example>,': '',
+  },
+  delimiters: ['', ''],
+})];
+
+const externalPackages = [
+  'obsidian',
+  ...builtins];
 
 const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
   return {
@@ -73,12 +117,19 @@ const createEsbuildArgs = function(banner, entryPoint, outfile, extraPlugins) {
     entryPoints: [entryPoint],
     plugins: [
       importGlobPlugin.default(),
+      inlineWorkerPlugin({
+        banner:
+        {
+          js: dummyMocksForDocsAndWorker,
+        },
+        external: externalPackages,
+        format: 'cjs',
+        plugins: [importGlobPlugin.default(), ...webWorkerIgnores],
+      }),
       ...extraPlugins,
     ],
     bundle: true,
-    external: [
-      'obsidian',
-      ...builtins],
+    external: externalPackages,
     format: 'cjs',
     target: 'es2020',
     sourcemap: prod ? false : 'inline',

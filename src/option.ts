@@ -8,7 +8,6 @@ import {AutoCorrectFilesPickerOption} from './ui/linter-components/auto-correct-
 export type SearchOptionInfo = {name: string, description: string, options?: DropdownRecord[]}
 
 /** Class representing an option of a rule */
-
 export abstract class Option {
   public ruleAlias: string;
   protected setting: Setting;
