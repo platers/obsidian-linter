@@ -65,6 +65,7 @@ export default {
     'unknown-error': 'An unknown error occurred during linting.',
     'moment-locale-not-found': 'Trying to switch Moment.js locale to {MOMENT_LOCALE}, got {CURRENT_LOCALE}',
     'file-change-lint-message-start': 'Linted',
+    'rename-failed': 'Failed to rename file from \'{OLD_PATH}\' to \'{NEW_PATH}\'. The file may already exist or the name may contain invalid characters.',
     'custom-command-callback-warning': 'Please only set the custom command callback for integration tests.',
 
     // rules-runner.ts
@@ -437,7 +438,28 @@ export default {
     // file-name-heading.ts
     'file-name-heading': {
       'name': 'File Name Heading',
-      'description': 'Inserts the file name as a H1 heading if no H1 heading exists.',
+      'description': 'Inserts the file name as a H1 heading if no H1 heading exists. <b>Note: Consider using "Heading and Filename Sync" instead for more features including updating existing headings and regex prefix/suffix stripping.</b>',
+    },
+    // heading-filename-sync.ts
+    'heading-filename-sync': {
+      'name': 'Heading and Filename Sync',
+      'description': 'Keeps the first H1 heading synchronized with the filename. Supersedes the "File Name Heading" rule.',
+      'sync-direction': {
+        'name': 'Sync Direction',
+        'description': 'The direction of synchronization between heading and filename.',
+      },
+      'filename-prefix': {
+        'name': 'Filename Prefix Regex',
+        'description': 'Regular expression pattern to strip from the start of the filename before syncing (e.g., <code>^\\d{12}_</code> for Zettelkasten timestamps).',
+      },
+      'filename-suffix': {
+        'name': 'Filename Suffix Regex',
+        'description': 'Regular expression pattern to strip from the end of the filename before syncing.',
+      },
+      'ignore-rename-files': {
+        'name': 'Ignore Files for Rename',
+        'description': 'Regular expression patterns (one per line) to match file paths that should be excluded from file renaming. These files will still have their headings synced if applicable, but the file will not be renamed.',
+      },
     },
     // footnote-after-punctuation.ts
     'footnote-after-punctuation': {
@@ -954,6 +976,10 @@ export default {
     'first-h1': 'First H1',
     'first-h1-or-filename-if-h1-missing': 'First H1 or Filename if H1 is Missing',
     'filename': 'Filename',
+    // heading-filename-sync.ts
+    'filename-to-heading': 'Filename to Heading',
+    'heading-to-filename': 'Heading to Filename',
+    'bidirectional': 'Bidirectional',
     // settings-data.ts
     'never': 'Never',
     'after 5 seconds': 'After 5 seconds',

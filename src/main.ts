@@ -7,7 +7,7 @@ import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clear
 import {moment} from 'obsidian';
 import './rules-registry';
 import {iconInfo} from './ui/icons';
-import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
+import {createRunLinterRulesOptions, LintResult, PendingRename, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
@@ -493,7 +493,8 @@ export default class LinterPlugin extends Plugin {
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
     const oldText = stripCr(await this.app.vault.read(file));
-    const newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
+    const lintResult = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
+    const newText = lintResult.text;
 
     if (oldText != newText) {
       await this.app.vault.modify(file, newText);
@@ -510,7 +511,14 @@ export default class LinterPlugin extends Plugin {
       // when a change is made to the file we know that the cache will update down the road
       // so we can defer running the custom commands to the cache callback
       this.fileLintFiles.add(file);
+    }
 
+    // Handle pending file rename (from heading-filename-sync rule)
+    if (await this.handlePendingRename(file, lintResult.pendingRename)) {
+      return;
+    }
+
+    if (oldText != newText) {
       return;
     }
 
@@ -584,13 +592,14 @@ export default class LinterPlugin extends Plugin {
 
     const file = this.app.workspace.getActiveFile();
     const oldText = editor.getValue();
-    let newText: string;
+    let lintResult: LintResult;
     try {
-      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
+      lintResult = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
     } catch (error) {
       this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;
     }
+    const newText = lintResult.text;
 
     const changes = this.updateEditor(oldText, newText, editor);
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
@@ -605,6 +614,9 @@ export default class LinterPlugin extends Plugin {
       this.updateFileDebouncerText(file, newText);
       this.editorLintFiles.push(file);
     }
+
+    // Handle pending file rename (from heading-filename-sync rule)
+    await this.handlePendingRename(file, lintResult.pendingRename);
 
     setCollectLogs(false);
   }
@@ -1071,6 +1083,38 @@ export default class LinterPlugin extends Plugin {
     }
 
     this.currentlyOpeningSidebar = false;
+  }
+
+  private async handlePendingRename(file: TFile, pendingRename: PendingRename | null): Promise<boolean> {
+    if (!pendingRename) {
+      return false;
+    }
+
+    const {oldPath, newPath} = pendingRename;
+
+    try {
+      // Check if this is a case-only rename (e.g., "file.md" -> "File.md")
+      // On case-insensitive filesystems (macOS, Windows), direct rename fails
+      // because the OS sees them as the same file
+      if (oldPath.toLowerCase() === newPath.toLowerCase() && oldPath !== newPath) {
+        // Use a temporary intermediate name to work around case-insensitivity
+        const tempPath = newPath + '.linter-temp-rename';
+        await this.app.fileManager.renameFile(file, tempPath);
+        // Get the updated file reference after first rename
+        const tempFile = this.app.vault.getAbstractFileByPath(tempPath) as TFile;
+        if (tempFile) {
+          await this.app.fileManager.renameFile(tempFile, newPath);
+        }
+      } else {
+        await this.app.fileManager.renameFile(file, newPath);
+      }
+      logInfo(`Renamed file: ${oldPath} → ${newPath}`);
+    } catch (error) {
+      new Notice(getTextInLanguage('logs.rename-failed').replace('{OLD_PATH}', oldPath).replace('{NEW_PATH}', newPath));
+      logWarn(`Failed to rename file from '${oldPath}' to '${newPath}': ${error.message}`);
+    }
+
+    return true;
   }
 
   private async runCustomCommands(file: TFile) {

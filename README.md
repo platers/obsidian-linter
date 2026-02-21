@@ -39,6 +39,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [capitalize-headings](https://platers.github.io/obsidian-linter/settings/heading-rules/#capitalize-headings)
 - [file-name-heading](https://platers.github.io/obsidian-linter/settings/heading-rules/#file-name-heading)
 - [header-increment](https://platers.github.io/obsidian-linter/settings/heading-rules/#header-increment)
+- [heading-filename-sync](https://platers.github.io/obsidian-linter/settings/heading-rules/#heading-and-filename-sync)
 - [headings-start-line](https://platers.github.io/obsidian-linter/settings/heading-rules/#headings-start-line)
 - [remove-trailing-punctuation-in-heading](https://platers.github.io/obsidian-linter/settings/heading-rules/#remove-trailing-punctuation-in-heading)
 
