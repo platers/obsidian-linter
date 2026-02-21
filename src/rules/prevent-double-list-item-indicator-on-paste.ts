@@ -28,13 +28,21 @@ export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<P
     const listRegex = /^\s*[*+-] /;
 
     const isListLine = indentedOrBlockquoteNestedListIndicatorRegex.test(options.lineContent);
-    const selectedStartsWithListItem = indentedOrBlockquoteNestedListIndicatorRegex.test(options.selectedText);
+    const selectedTextStartsWithListItem = indentedOrBlockquoteNestedListIndicatorRegex.test(options.selectedText);
     const isListClipboard = listRegex.test(text);
-    if (selectedStartsWithListItem || !isListLine || !isListClipboard) {
+    if (!isListLine || !isListClipboard || selectedTextStartsWithListItem) {
       return text;
     }
 
-    return text.replace(listRegex, '');
+    const listContentMatch = options.lineContent.match(/^(\s*(>\s*)*[*+-]\s*)(.*)$/);
+    const hasContent = listContentMatch && listContentMatch[3].trim().length > 0;
+
+    if (!hasContent) {
+      return text.replace(listRegex, '');
+    } else {
+      const cleanContent = text.replace(listRegex, '');
+      return '\n- ' + cleanContent.trim();
+    }
   }
   get exampleBuilders(): ExampleBuilder<PreventDoubleListItemIndicatorOnPasteOptions>[] {
     return [
