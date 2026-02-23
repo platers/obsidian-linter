@@ -112,6 +112,13 @@ export default {
         'add-input-button-text': 'Agregar otra carpeta para ignorar',
         'delete-tooltip': 'Borrar',
       },
+      'additional-file-extensions': {
+        'name': 'Extensiones de archivo adicionales',
+        'description': 'Extensiones de archivo a analizar además de md. Por ejemplo, mdx o svx. No incluir el punto inicial. Nota: Solo se analizarán los archivos que Obsidian considera markdown (de forma nativa o mediante otros complementos), independientemente de las extensiones añadidas.',
+        'extension-placeholder': 'p. ej. mdx',
+        'add-input-button-text': 'Añadir otra extensión',
+        'delete-tooltip': 'Borrar',
+      },
       'lint-on-file-change': {
         'name': 'Analizar archivo en cambiar',
         'description': 'Cuando se cierra un archivo o se cambia a un nuevo archivo, el archivo anterior se analiza.',

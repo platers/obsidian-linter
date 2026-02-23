@@ -147,6 +147,13 @@ export default {
         'add-input-button-text': 'Einen anderen zu ignorierenden Ordner hinzufügen',
         'delete-tooltip': 'Löschen',
       },
+      'additional-file-extensions': {
+        'name': 'Zusätzliche Dateierweiterungen',
+        'description': 'Dateierweiterungen, die zusätzlich zu md gelinted werden sollen. Zum Beispiel mdx oder svx. Führenden Punkt nicht angeben. Hinweis: Es werden nur Dateien gelinted, die Obsidian als Markdown ansieht (nativ oder über andere Plugins), unabhängig von hinzugefügten Erweiterungen.',
+        'extension-placeholder': 'z.B. mdx',
+        'add-input-button-text': 'Weitere Erweiterung hinzufügen',
+        'delete-tooltip': 'Löschen',
+      },
       'override-locale': {
         'name': 'Gebietsschema überschreiben',
         'description': 'Legen Sie diese Option fest, wenn Sie ein anderes Gebietsschema als das Standardgebietsschema verwenden möchten',

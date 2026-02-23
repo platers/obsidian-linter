@@ -179,6 +179,13 @@ export default {
         'flags-placeholder-text': '修饰符',
         'warning': '如果您不知道正则表达式是什么，请谨慎使用。此外，如果在 iOS 移动设备上使用后行断言，请确保系统版本支持',
       },
+      'additional-file-extensions': {
+        'name': '额外文件扩展名',
+        'description': '除 md 外要参与 Lint 的文件扩展名。例如 mdx 或 svx。不要包含开头的点号。注意：无论添加何种扩展名，只有 Obsidian 视为 Markdown 的文件（无论是原生或通过其他插件）才会被 Lint。',
+        'extension-placeholder': '例如：mdx',
+        'add-input-button-text': '添加扩展名',
+        'delete-tooltip': '删除',
+      },
       'override-locale': {
         'name': '覆盖默认地区语言',
         'description': '使用不同于默认地区语言时需要设置此项',
