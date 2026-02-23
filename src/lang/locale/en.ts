@@ -191,6 +191,13 @@ export default {
         'flags-placeholder-text': 'flags',
         'warning': 'Use this with caution if you do not know regex. Also, please make sure that if you use lookbehinds in your regex on iOS mobile that you are on a version that supports using them.',
       },
+      'additional-file-extensions': {
+        'name': 'Additional file extensions',
+        'description': 'File extensions to lint in addition to md. For example, mdx or markdown. Do not include the leading dot. Note: Only files that Obsidian sees as markdown (whether natively or via other plugins) will be linted, regardless of extensions added.',
+        'extension-placeholder': 'e.g. mdx',
+        'add-input-button-text': 'Add another extension',
+        'delete-tooltip': 'Delete',
+      },
       'override-locale': {
         'name': 'Override locale',
         'description': 'Set this if you want to use a locale different from the default',
