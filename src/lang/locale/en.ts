@@ -193,7 +193,7 @@ export default {
       },
       'additional-file-extensions': {
         'name': 'Additional file extensions',
-        'description': 'File extensions to lint in addition to md. For example, mdx or svx. Do not include the leading dot. Note: Only files that Obsidian sees as markdown (whether natively or via other plugins) will be linted, regardless of extensions added.',
+        'description': 'File extensions to lint in addition to md. For example, mdx or svx. Do not include the leading dot. <b>Note: Only files that Obsidian sees as markdown (whether natively or via other plugins) will be linted, regardless of extensions added.</b>',
         'extension-placeholder': 'e.g. mdx',
         'add-input-button-text': 'Add another extension',
         'delete-tooltip': 'Delete',
