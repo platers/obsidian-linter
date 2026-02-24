@@ -189,7 +189,7 @@ export default {
       },
       'additional-file-extensions': {
         'name': '額外的檔案副檔名',
-        'description': '除了 md 之外要進行 Lint 的檔案副檔名。例如 mdx 或 svx。請勿包含開頭的點號。注意：不論新增哪些副檔名，只有 Obsidian 視為 Markdown 的檔案（無論是內建或透過其他外掛）才會被 Lint。',
+        'description': '除了 md 之外要進行 Lint 的檔案副檔名。例如 mdx 或 svx。請勿包含開頭的點號。<b>注意：不論新增哪些副檔名，只有 Obsidian 視為 Markdown 的檔案（無論是內建或透過其他外掛）才會被 Lint。</b>',
         'extension-placeholder': '例如：mdx',
         'add-input-button-text': '新增副檔名',
         'delete-tooltip': '刪除',
