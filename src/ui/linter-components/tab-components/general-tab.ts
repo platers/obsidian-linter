@@ -9,6 +9,7 @@ import {NumberInputSetting} from 'src/ui/components/number-input-setting';
 import {ToggleSetting} from 'src/ui/components/toggle-setting';
 import {FolderIgnoreOption} from '../folder-ignore-option';
 import {FilesToIgnoreOption} from '../files-to-ignore-option';
+import {AdditionalFileExtensionsOption} from '../additional-file-extensions-option';
 
 export class GeneralTab extends Tab {
   constructor(navEl: HTMLElement, settingsEl: HTMLElement, isMobile: boolean, plugin: LinterPlugin, private app: App) {
@@ -138,5 +139,12 @@ export class GeneralTab extends Tab {
     });
 
     this.addSettingSearchInfo(filesToIgnoreEl, filesToIgnore.name, filesToIgnore.description.replaceAll('\n', ' '));
+
+    const additionalFileExtensionsEl = this.contentEl.createDiv();
+    const additionalFileExtensions = new AdditionalFileExtensionsOption(additionalFileExtensionsEl, this.plugin.settings.additionalFileExtensions, this.app, () => {
+      void this.plugin.saveSettings();
+    });
+
+    this.addSettingSearchInfo(additionalFileExtensionsEl, additionalFileExtensions.name, additionalFileExtensions.description.replaceAll('\n', ' '));
   }
 }

@@ -143,6 +143,13 @@ export default {
         'name': 'Yoksayılacak klasörler',
         'description': 'Tüm dosyaları düzeltirken veya kaydederken düzeltme işleminin yoksayılacağı klasörler. Klasör yollarını yeni satırlarla ayırarak girin',
       },
+      'additional-file-extensions': {
+        'name': 'Ek dosya uzantıları',
+        'description': 'md dosyalarına ek olarak lintlenecek dosya uzantıları. Örneğin mdx veya svx. Baştaki noktayı eklemeyin. <b>Not: Yalnızca Obsidian\'ın markdown olarak gördüğü dosyalar (yerel veya diğer eklentiler aracılığıyla) lintlenecektir, eklenen uzantılardan bağımsız olarak.</b>',
+        'extension-placeholder': 'örn. mdx',
+        'add-input-button-text': 'Başka uzantı ekle',
+        'delete-tooltip': 'Sil',
+      },
       'override-locale': {
         'name': 'Yerel ayarların üzerine yaz',
         'description': 'Varsayılanın dışında bir yerel ayar kullanmak istiyorsanız bunu ayarlayın',

@@ -488,7 +488,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   isMarkdownFile(file: TFile): boolean {
-    return file && file.extension === 'md';
+    return file && (file.extension === 'md' || this.settings.additionalFileExtensions.includes(file.extension));
   }
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {

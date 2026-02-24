@@ -187,6 +187,13 @@ export default {
         'flags-placeholder-text': '旗標',
         'warning': '如果您不了解正規表示式，請謹慎使用。此外，請確保如果您在 iOS 行動裝置上的正規表示式中使用 lookbehind，您使用的版本支援它們。',
       },
+      'additional-file-extensions': {
+        'name': '額外的檔案副檔名',
+        'description': '除了 md 之外要進行 Lint 的檔案副檔名。例如 mdx 或 svx。請勿包含開頭的點號。<b>注意：不論新增哪些副檔名，只有 Obsidian 視為 Markdown 的檔案（無論是內建或透過其他外掛）才會被 Lint。</b>',
+        'extension-placeholder': '例如：mdx',
+        'add-input-button-text': '新增副檔名',
+        'delete-tooltip': '刪除',
+      },
       'override-locale': {
         'name': '覆寫地區設定',
         'description': '如果您想使用與預設值不同的地區設定，請設定此項',

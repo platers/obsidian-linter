@@ -191,6 +191,13 @@ export default {
         'flags-placeholder-text': 'フラグ',
         'warning': '正規表現を知らない場合は注意して使用してください。また、iOSモバイルで正規表現の後読みを使用する場合は、それをサポートするバージョンであることを確認してください。',
       },
+      'additional-file-extensions': {
+        'name': '追加のファイル拡張子',
+        'description': 'md に加えて Lint するファイル拡張子。例: mdx、svx。先頭のドットは含めません。<b>注: 追加した拡張子に関係なく、Obsidian が Markdown として認識するファイル（ネイティブまたは他のプラグイン経由）のみが Lint されます。</b>',
+        'extension-placeholder': '例: mdx',
+        'add-input-button-text': '拡張子を追加',
+        'delete-tooltip': '削除',
+      },
       'override-locale': {
         'name': 'ロケールを上書きする',
         'description': 'デフォルトとは異なるロケールを使用したい場合に設定します',
