@@ -145,7 +145,7 @@ export default {
       },
       'additional-file-extensions': {
         'name': 'Ek dosya uzantıları',
-        'description': 'md dosyalarına ek olarak lintlenecek dosya uzantıları. Örneğin mdx veya svx. Baştaki noktayı eklemeyin. Not: Yalnızca Obsidian\'ın markdown olarak gördüğü dosyalar (yerel veya diğer eklentiler aracılığıyla) lintlenecektir, eklenen uzantılardan bağımsız olarak.',
+        'description': 'md dosyalarına ek olarak lintlenecek dosya uzantıları. Örneğin mdx veya svx. Baştaki noktayı eklemeyin. <b>Not: Yalnızca Obsidian\'ın markdown olarak gördüğü dosyalar (yerel veya diğer eklentiler aracılığıyla) lintlenecektir, eklenen uzantılardan bağımsız olarak.</b>',
         'extension-placeholder': 'örn. mdx',
         'add-input-button-text': 'Başka uzantı ekle',
         'delete-tooltip': 'Sil',
