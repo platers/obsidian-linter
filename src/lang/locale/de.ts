@@ -149,7 +149,7 @@ export default {
       },
       'additional-file-extensions': {
         'name': 'Zusätzliche Dateierweiterungen',
-        'description': 'Dateierweiterungen, die zusätzlich zu md gelinted werden sollen. Zum Beispiel mdx oder svx. Führenden Punkt nicht angeben. Hinweis: Es werden nur Dateien gelinted, die Obsidian als Markdown ansieht (nativ oder über andere Plugins), unabhängig von hinzugefügten Erweiterungen.',
+        'description': 'Dateierweiterungen, die zusätzlich zu md gelinted werden sollen. Zum Beispiel mdx oder svx. Führenden Punkt nicht angeben. <b>Hinweis: Es werden nur Dateien gelinted, die Obsidian als Markdown ansieht (nativ oder über andere Plugins), unabhängig von hinzugefügten Erweiterungen.</b>',
         'extension-placeholder': 'z.B. mdx',
         'add-input-button-text': 'Weitere Erweiterung hinzufügen',
         'delete-tooltip': 'Löschen',
