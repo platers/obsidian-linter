@@ -114,7 +114,7 @@ export default {
       },
       'additional-file-extensions': {
         'name': 'Extensiones de archivo adicionales',
-        'description': 'Extensiones de archivo a analizar además de md. Por ejemplo, mdx o svx. No incluir el punto inicial. Nota: Solo se analizarán los archivos que Obsidian considera markdown (de forma nativa o mediante otros complementos), independientemente de las extensiones añadidas.',
+        'description': 'Extensiones de archivo a analizar además de md. Por ejemplo, mdx o svx. No incluir el punto inicial. <b>Nota: Solo se analizarán los archivos que Obsidian considera markdown (de forma nativa o mediante otros complementos), independientemente de las extensiones añadidas.</b>',
         'extension-placeholder': 'p. ej. mdx',
         'add-input-button-text': 'Añadir otra extensión',
         'delete-tooltip': 'Borrar',
