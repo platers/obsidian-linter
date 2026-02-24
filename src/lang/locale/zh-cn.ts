@@ -181,7 +181,7 @@ export default {
       },
       'additional-file-extensions': {
         'name': '额外文件扩展名',
-        'description': '除 md 外要参与 Lint 的文件扩展名。例如 mdx 或 svx。不要包含开头的点号。注意：无论添加何种扩展名，只有 Obsidian 视为 Markdown 的文件（无论是原生或通过其他插件）才会被 Lint。',
+        'description': '除 md 外要参与 Lint 的文件扩展名。例如 mdx 或 svx。不要包含开头的点号。<b>注意：无论添加何种扩展名，只有 Obsidian 视为 Markdown 的文件（无论是原生或通过其他插件）才会被 Lint。</b>',
         'extension-placeholder': '例如：mdx',
         'add-input-button-text': '添加扩展名',
         'delete-tooltip': '删除',
