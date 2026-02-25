@@ -410,7 +410,7 @@ export default {
       'description': 'Alle Überschriften haben sowohl davor als auch danach eine Leerzeile (außer wenn sich die Überschrift am Anfang oder Ende des Dokuments befindet).',
       'bottom': {
         'name': 'Darunter',
-        'description': 'Einfügen einer Leerzeile unter Überschriften',
+        'description': 'Einfügen einer Leerzeile unter Überschriften (Wenn diese Funktion deaktiviert ist, werden die Leerzeilen nach Überschriften nicht entfernt.)',
       },
       'empty-line-after-yaml': {
         'name': 'Leere Zeile zwischen YAML und Header',

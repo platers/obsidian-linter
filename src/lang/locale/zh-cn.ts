@@ -497,7 +497,7 @@ export default {
       'description': '确保标题前后有一个空行，除非它在文档的开头或结尾',
       'bottom': {
         'name': '标题后空行',
-        'description': '在标题后插入一个空行',
+        'description': '在标题后插入一个空行 （禁用此功能后，不会删除标题后的空行）',
       },
       'empty-line-after-yaml': {
         'name': 'YAML 与标题之间的空行',
