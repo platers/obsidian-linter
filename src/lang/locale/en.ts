@@ -509,7 +509,7 @@ export default {
       'description': 'All headings have one blank line both before and after (except where the heading is at the beginning or end of the document).',
       'bottom': {
         'name': 'Bottom',
-        'description': 'Ensures one blank line after headings',
+        'description': 'Ensures one blank line after headings (when disabled it does not remove blank lines after headings)',
       },
       'empty-line-after-yaml': {
         'name': 'Empty Line Between YAML and Header',

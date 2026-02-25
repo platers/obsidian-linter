@@ -406,7 +406,7 @@ export default {
       'description': 'Tüm başlıkların hem öncesinde hem de sonrasında birer boş satır olmalıdır (başlık belgenin başında veya sonunda olduğunda bu durum geçerli değildir).',
       'bottom': {
         'name': 'Alt',
-        'description': 'Başlıkların sonrasına boş satır ekler',
+        'description': 'Başlıkların sonrasına boş satır ekler (Devre dışı bırakıldığında, başlıkların ardından gelen boş satırları kaldırmaz)',
       },
       'empty-line-after-yaml': {
         'name': 'YAML ve Başlık Arasında Boş Satır',

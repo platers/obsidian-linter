@@ -504,7 +504,7 @@ export default {
       'description': '所有標題前後都有一個空白行（除非標題在文件的開頭或結尾）。',
       'bottom': {
         'name': '底部',
-        'description': '確保標題後有一個空白行',
+        'description': '確保標題後有一個空白行（停用此功能後，不會刪除標題後的空白行）',
       },
       'empty-line-after-yaml': {
         'name': 'YAML 和標題之間的空白行',

@@ -509,7 +509,7 @@ export default {
       'description': 'すべての見出しの前後に、1行の空白行を入れます（見出しが文書の先頭または末尾にある場合を除く）。',
       'bottom': {
         'name': '下部',
-        'description': '見出しの後に、1行の空白行を確保します',
+        'description': '見出しの後に、1行の空白行を確保します（無効にすると、見出しの後の空白行は削除されません）',
       },
       'empty-line-after-yaml': {
         'name': 'YAMLと見出しの間の空行',
