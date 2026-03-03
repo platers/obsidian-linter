@@ -120,6 +120,7 @@ export default {
   'file-backup-text': 'Make sure you have backed up your files.',
   'custom-command-warning': 'Linting multiple files with custom commands enabled is a slow process that requires the ability to open panes in the side panel. It is noticeably slower than running without custom commands enabled. Please proceed with caution.',
   'cancel-button-text': 'Cancel',
+  'do-not-show-again': 'Do not show this confirmation again',
 
   'copy-aria-label': 'Copy',
 

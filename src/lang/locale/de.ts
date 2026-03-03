@@ -102,6 +102,7 @@ export default {
   // lint-confirmation-modal.ts
   'warning-text': 'Warnung',
   'file-backup-text': 'Stellen Sie sicher, dass Sie Ihre Dateien gesichert haben.',
+  'do-not-show-again': 'Diese Bestätigung nicht mehr anzeigen',
 
   'tabs': {
     'names': {
