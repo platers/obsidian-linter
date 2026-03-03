@@ -131,10 +131,6 @@ export default {
         'name': 'Değişiklik Olmadığında Mesajı Bastır',
         'description': 'Etkinleştirildiğinde, gerçek değişiklikler olmadığında mesaj gösterilmez.',
       },
-      'suppress-lint-confirmation-modal': {
-        'name': 'Biçimlendirme Onay Penceresini Bastır',
-        'description': 'Etkinleştirildiğinde, tüm dosyaları biçimlendirme ve klasördeki tüm dosyaları biçimlendirme komutları çalıştırılırken onay penceresi gösterilmez. Bu, komutları Obsidian CLI veya diğer otomasyon araçları aracılığıyla çalıştırmak için kullanışlıdır.',
-      },
       'lint-on-file-change': {
         'name': 'Dosya Değişikliğinde Düzeltme',
         'description': 'Bir dosya kapatıldığında veya yeni bir dosya açıldığında, önceki dosya düzeltilir.',

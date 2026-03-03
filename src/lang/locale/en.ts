@@ -120,6 +120,7 @@ export default {
   'file-backup-text': 'Make sure you have backed up your files.',
   'custom-command-warning': 'Linting multiple files with custom commands enabled is a slow process that requires the ability to open panes in the side panel. It is noticeably slower than running without custom commands enabled. Please proceed with caution.',
   'cancel-button-text': 'Cancel',
+  'do-not-show-again': 'Do not show this confirmation again',
 
   'copy-aria-label': 'Copy',
 
@@ -165,10 +166,6 @@ export default {
       'suppress-message-when-no-change': {
         'name': 'Suppress Message When No Change',
         'description': 'If enabled, no message will be shown when no actual changes occur.',
-      },
-      'suppress-lint-confirmation-modal': {
-        'name': 'Suppress Lint Confirmation Modal',
-        'description': 'If enabled, the confirmation modal will not be shown when running the lint all files or lint all files in folder commands. This is useful for running these commands via the Obsidian CLI or other automation tools.',
       },
       'lint-on-file-change': {
         'name': 'Lint on Focused File Change',

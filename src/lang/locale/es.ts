@@ -105,10 +105,6 @@ export default {
         'name': 'Suprimir mensaje cuando no hay cambios',
         'description': 'Si está habilitado, no se mostrará ningún mensaje cuando no ocurran cambios reales.',
       },
-      'suppress-lint-confirmation-modal': {
-        'name': 'Suprimir diálogo de confirmación de formateo',
-        'description': 'Si está habilitado, no se mostrará el diálogo de confirmación al ejecutar los comandos de formatear todos los archivos o formatear todos los archivos en carpeta. Esto es útil para ejecutar estos comandos a través de la CLI de Obsidian u otras herramientas de automatización.',
-      },
       'folders-to-ignore': {
         'name': 'Carpetas para omitir',
         'description': 'Carpetas que se deben omitir al analizar todos los archivos o al guardar en línea.',

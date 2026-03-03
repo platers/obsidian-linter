@@ -192,7 +192,10 @@ export default class LinterPlugin extends Plugin {
         const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files.submit-button-notice-text');
         new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => {
           return this.runLinterAllFiles(this.app);
-        }, this.settings.lintCommands && this.settings.lintCommands.length > 0).open();
+        }, this.settings.lintCommands && this.settings.lintCommands.length > 0, async () => {
+          this.settings.suppressLintConfirmationModal = true;
+          await this.saveSettings();
+        }).open();
       },
     });
 
@@ -583,7 +586,10 @@ export default class LinterPlugin extends Plugin {
     const startMessage = getTextInLanguage('commands.lint-all-files-in-folder.start-message').replace('{FOLDER_NAME}', folder.name);
     const submitBtnText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-text').replace('{FOLDER_NAME}', folder.name);
     const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-notice-text').replace('{FOLDER_NAME}', folder.name);
-    new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder), this.settings.lintCommands && this.settings.lintCommands.length > 0).open();
+    new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder), this.settings.lintCommands && this.settings.lintCommands.length > 0, async () => {
+      this.settings.suppressLintConfirmationModal = true;
+      await this.saveSettings();
+    }).open();
   }
 
   async runLinterEditor(editor: Editor) {
