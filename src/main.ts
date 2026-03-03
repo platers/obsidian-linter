@@ -960,7 +960,10 @@ export default class LinterPlugin extends Plugin {
     // use Turndown via Obsidian API to emulate "Auto Convert HTML" setting
     const convertHtmlEnabled = this.app.vault.getConfig('autoConvertHtml');
     const htmlClipText = clipboardEv.clipboardData.getData('text/html');
-    let clipboardText = htmlClipText && convertHtmlEnabled ? htmlToMarkdown(htmlClipText) : plainClipboard;
+    // make sure that we skip handling Obsidian editor based html copied text as the plaintext is the way it will be pasted as as opposed
+    // to what is created by converting the provided HTML to markdown
+    // see https://github.com/platers/obsidian-linter/issues/1471
+    let clipboardText = htmlClipText && convertHtmlEnabled && !htmlClipText.startsWith('<!-- obsidian -->') ? htmlToMarkdown(htmlClipText) : plainClipboard;
 
     // if everything went well, run clipboard modifications (passing in current line and text to paste)
     const cursorSelections = editor.listSelections();
