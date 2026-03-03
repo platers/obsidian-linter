@@ -154,9 +154,9 @@ export default {
         'name': '无修改时不显示消息',
         'description': '开启后，若无实际改动发生则不显示消息。',
       },
-      'suppress-lint-all-files-confirmation-modal': {
-        'name': '隐藏格式化全部文件确认对话框',
-        'description': '开启后，运行格式化全部文件命令时不再显示确认对话框。适用于通过 Obsidian CLI 或其他自动化工具运行该命令的场景。',
+      'suppress-lint-confirmation-modal': {
+        'name': '隐藏格式化确认对话框',
+        'description': '开启后，运行格式化全部文件或格式化文件夹内全部文件命令时不再显示确认对话框。适用于通过 Obsidian CLI 或其他自动化工具运行这些命令的场景。',
       },
       'lint-on-file-change': {
         'name': '文件修改时格式化',

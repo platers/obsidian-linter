@@ -182,7 +182,7 @@ export default class LinterPlugin extends Plugin {
       name: getTextInLanguage('commands.lint-all-files.name'),
       icon: iconInfo.vault.id,
       callback: () => {
-        if (this.settings.suppressLintAllFilesConfirmationModal) {
+        if (this.settings.suppressLintConfirmationModal) {
           void this.runLinterAllFiles(this.app);
           return;
         }
@@ -575,6 +575,11 @@ export default class LinterPlugin extends Plugin {
 
   // handles the creation of the folder linting modal since this happens in multiple places and it should be consistent
   createFolderLintModal(folder: TFolder) {
+    if (this.settings.suppressLintConfirmationModal) {
+      void this.runLinterAllFilesInFolder(folder);
+      return;
+    }
+
     const startMessage = getTextInLanguage('commands.lint-all-files-in-folder.start-message').replace('{FOLDER_NAME}', folder.name);
     const submitBtnText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-text').replace('{FOLDER_NAME}', folder.name);
     const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-notice-text').replace('{FOLDER_NAME}', folder.name);

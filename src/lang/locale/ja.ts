@@ -166,9 +166,9 @@ export default {
         'name': '変更がない場合はメッセージを抑制',
         'description': '有効にすると、実際に変更がない場合はメッセージが表示されません。',
       },
-      'suppress-lint-all-files-confirmation-modal': {
-        'name': '全ファイル一括フォーマットの確認ダイアログを抑制',
-        'description': '有効にすると、全ファイル一括フォーマットコマンドの実行時に確認ダイアログが表示されなくなります。Obsidian CLIやその他の自動化ツールからコマンドを実行する場合に便利です。',
+      'suppress-lint-confirmation-modal': {
+        'name': 'フォーマット確認ダイアログを抑制',
+        'description': '有効にすると、全ファイル一括フォーマットおよびフォルダ内全ファイルフォーマットコマンドの実行時に確認ダイアログが表示されなくなります。Obsidian CLIやその他の自動化ツールからコマンドを実行する場合に便利です。',
       },
       'lint-on-file-change': {
         'name': 'フォーカスされたファイルの変更時にLintする',
