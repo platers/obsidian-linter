@@ -108,6 +108,7 @@ export default {
   'file-backup-text': '请确保你已备份文件',
   'custom-command-warning': '启用自定义命令时格式化多个文件需要启用侧边栏，同时会显著的更加耗时，请保持耐心',
   'cancel-button-text': '取消',
+  'do-not-show-again': '不再显示此确认',
 
   'copy-aria-label': '复制',
 

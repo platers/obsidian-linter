@@ -120,6 +120,7 @@ export default {
   'file-backup-text': 'ファイルのバックアップを取っていることを確認してください。',
   'custom-command-warning': 'カスタムコマンドが有効になっている状態で複数のファイルをLintするのは、サイドパネルでペインを開く能力が必要な遅いプロセスです。カスタムコマンドが無効な状態で実行するよりも明らかに遅くなります。注意して進めてください。',
   'cancel-button-text': 'キャンセル',
+  'do-not-show-again': 'この確認を今後表示しない',
 
   'copy-aria-label': 'コピー',
 

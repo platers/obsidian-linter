@@ -120,6 +120,7 @@ export default {
   'file-backup-text': '請確定您已備份檔案。',
   'custom-command-warning': '使用自訂命令格式化多個檔案是一個緩慢的過程，需要在側邊面板中開啟窗格。它的速度明顯慢於在未啟用自訂命令的情況下執行。請謹慎操作。',
   'cancel-button-text': '取消',
+  'do-not-show-again': '不再顯示此確認',
 
   'copy-aria-label': '複製',
 
