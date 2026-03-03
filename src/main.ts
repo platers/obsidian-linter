@@ -182,6 +182,11 @@ export default class LinterPlugin extends Plugin {
       name: getTextInLanguage('commands.lint-all-files.name'),
       icon: iconInfo.vault.id,
       callback: () => {
+        if (this.settings.suppressLintAllFilesConfirmationModal) {
+          void this.runLinterAllFiles(this.app);
+          return;
+        }
+
         const startMessage = getTextInLanguage('commands.lint-all-files.start-message');
         const submitBtnText = getTextInLanguage('commands.lint-all-files.submit-button-text');
         const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files.submit-button-notice-text');

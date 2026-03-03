@@ -59,6 +59,10 @@ export class GeneralTab extends Tab {
     const suppressMessageWhenNoChangeSetting = new ToggleSetting( tempDiv, 'tabs.general.suppress-message-when-no-change.name', 'tabs.general.suppress-message-when-no-change.description', 'suppressMessageWhenNoChange', this.plugin);
     this.addSettingSearchInfoForGeneralSettings(suppressMessageWhenNoChangeSetting);
 
+    tempDiv = this.contentEl.createDiv();
+    const suppressLintAllFilesConfirmationModalSetting = new ToggleSetting(tempDiv, 'tabs.general.suppress-lint-all-files-confirmation-modal.name', 'tabs.general.suppress-lint-all-files-confirmation-modal.description', 'suppressLintAllFilesConfirmationModal', this.plugin);
+    this.addSettingSearchInfoForGeneralSettings(suppressLintAllFilesConfirmationModalSetting);
+
     const sysLocale = navigator.language?.toLowerCase();
     const localeValues = ['system-default'];
     const localeDescriptions = [getTextInLanguage('tabs.general.same-as-system-locale').replace('{SYS_LOCALE}', sysLocale)];

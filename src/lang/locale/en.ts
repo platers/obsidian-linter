@@ -166,6 +166,10 @@ export default {
         'name': 'Suppress Message When No Change',
         'description': 'If enabled, no message will be shown when no actual changes occur.',
       },
+      'suppress-lint-all-files-confirmation-modal': {
+        'name': 'Suppress Lint All Files Confirmation Modal',
+        'description': 'If enabled, the confirmation modal will not be shown when running the lint all files command. This is useful for running the command via the Obsidian CLI or other automation tools.',
+      },
       'lint-on-file-change': {
         'name': 'Lint on Focused File Change',
         'description': 'When a file is closed or a new file is swapped to, the previous file is linted.',
