@@ -132,6 +132,10 @@ export default {
         'name': 'Meldung bei keiner Änderung unterdrücken',
         'description': 'Wenn aktiviert, wird keine Meldung angezeigt, wenn keine tatsächlichen Änderungen auftreten.',
       },
+      'suppress-lint-all-files-confirmation-modal': {
+        'name': 'Bestätigungsdialog für „Alle Dateien formatieren" unterdrücken',
+        'description': 'Wenn aktiviert, wird der Bestätigungsdialog beim Ausführen des Befehls „Alle Dateien formatieren" nicht angezeigt. Dies ist nützlich, um den Befehl über die Obsidian-CLI oder andere Automatisierungstools auszuführen.',
+      },
       'lint-on-file-change': {
         'name': 'Linten bei Dateiänderungen',
         'description': 'Wenn eine Datei geschlossen oder zu einer neuen Datei gewechselt wird, wird die vorherige Datei gelinted.',
