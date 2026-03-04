@@ -460,7 +460,7 @@ export default {
     },
     're-index-footnotes': {
       'name': 'Volver a indexar notas al pie',
-      'description': 'Vuelve a indexar las notas al pie de página y las notas al pie, según el orden de aparición (NOTA: esta regla *no* funciona si hay más de una nota al pie para una clave).',
+      'description': 'Vuelve a indexar las notas al pie de página y las notas al pie, según el orden de las referencias de notas al pie en el archivo. <b>NOTA: esta regla *no* funciona si hay más de una nota al pie para una clave.</b>',
     },
     'remove-consecutive-list-markers': {
       'name': 'Eliminar marcadores de lista consecutiva',
@@ -527,11 +527,11 @@ export default {
       'description': 'Elimina el espacio antes de los caracteres especificados y después de los caracteres especificados. Tenga en cuenta que esto puede causar problemas con el formato de descuento en algunos casos.',
       'characters-to-remove-space-before': {
         'name': 'Eliminar espacio antes de los caracteres',
-        'description': 'Elimina el espacio antes de los caracteres especificados. **Nota: el uso de `{` o `}` en la lista de caracteres afectará inesperadamente a los archivos, ya que se usa en la sintaxis de ignorar en segundo plano.**',
+        'description': 'Elimina el espacio antes de los caracteres especificados. <b>Nota: el uso de `{` o `}` en la lista de caracteres afectará inesperadamente a los archivos, ya que se usa en la sintaxis de ignorar en segundo plano.</b>',
       },
       'characters-to-remove-space-after': {
         'name': 'Eliminar espacio después de los caracteres',
-        'description': 'Elimina el espacio después de los caracteres especificados. **Nota: el uso de `{` o `}` en la lista de caracteres afectará inesperadamente a los archivos, ya que se usa en la sintaxis de ignorar en segundo plano.**',
+        'description': 'Elimina el espacio después de los caracteres especificados. <b>Nota: el uso de `{` o `}` en la lista de caracteres afectará inesperadamente a los archivos, ya que se usa en la sintaxis de ignorar en segundo plano.</b>',
       },
     },
     'remove-trailing-punctuation-in-heading': {
@@ -592,7 +592,7 @@ export default {
     },
     'yaml-key-sort': {
       'name': 'Clasificación de clave de YAML',
-      'description': 'Ordena las claves de YAML según el orden y la prioridad especificados. Nota: también puede eliminar las líneas en blanco.',
+      'description': 'Ordena las claves de YAML según el orden y la prioridad especificados. <b>Nota: también puede eliminar las líneas en blanco.</b>',
       'yaml-key-priority-sort-order': {
         'name': 'Orden de clasificación de prioridad de clave de YAML',
         'description': 'El orden en el que se ordenan las claves con una en cada línea donde se ordena en el orden que se encuentra en la lista',
