@@ -637,7 +637,7 @@ export default {
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': 'Re-Index Footnotes',
-      'description': 'Re-indexes footnote keys and footnote, based on the order of occurrence. <b>Note: This rule does <i>not</i> work if there is more than one footnote for a key.</b>',
+      'description': 'Re-indexes footnote keys and footnote, based on the order of footnote references in the file. <b>Note: This rule does <i>not</i> work if there is more than one footnote for a key.</b>',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
