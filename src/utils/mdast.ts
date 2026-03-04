@@ -279,7 +279,7 @@ export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnot
   let whitespaceBetweenFootnotes = '\n';
   if (includeBlankLinesBetweenFootnotes) {
     whitespaceBetweenFootnotes = '\n\n';
-  } else {
+  } else if (footnotes.length > 0) {
     text += '\n';
   }
 
