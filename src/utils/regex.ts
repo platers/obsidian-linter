@@ -50,6 +50,7 @@ export const nonBlockquoteChecklistRegex = new RegExp(`^\\s*- ${checklistBoxIndi
 export const startsWithListMarkerRegex = new RegExp(`^\\s*(- |\\* |\\+ |\\d+[.)] |- (${checklistBoxIndicator}) )`, 'm');
 
 export const footnoteDefinitionIndicatorAtStartOfLine = /^(\[\^[^\]]*\]) ?([,.;!:?])/gm;
+export const calloutTypeRegex = /^ ?\[![^\s]*\]/m;
 export const calloutRegex = /^(>\s*)+\[![^\s]*\]/m;
 export const codeBlockBlockquoteRegex = /^\n?(>\s*)+((```)|(~~~))/m;
 
