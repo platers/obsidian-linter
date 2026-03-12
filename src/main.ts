@@ -78,6 +78,9 @@ export default class LinterPlugin extends Plugin {
   private activeFileChangeDebouncer: Map<string, FileChangeUpdateInfo> = new Map();
   private defaultAutoCorrectMisspellings: Map<string, string> = new Map();
   private hasLoadedMisspellingFiles = false;
+  private saveSettingsDebounce = debounce(async (settings: LinterSettings) => {
+    await this.saveData(settings);
+  }, 5000);
 
   async onload() {
     sortRules();
@@ -142,7 +145,8 @@ export default class LinterPlugin extends Plugin {
       await this.loadAutoCorrectFiles(false);
     }
 
-    await this.saveData(this.settings);
+    void this.saveSettingsDebounce(this.settings);
+
     this.updatePasteOverrideStatus();
     this.updateHasCustomCommandStatus();
   }
