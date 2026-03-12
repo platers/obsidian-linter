@@ -55,6 +55,9 @@ export const calloutRegex = /^(>\s*)+\[![^\s]*\]/m;
 export const codeBlockBlockquoteRegex = /^\n?(>\s*)+((```)|(~~~))/m;
 
 export const unicodeLetterRegex = RegExp(/\p{L}/, 'u');
+// make sure to account for lines that are purely whitespace as well https://stackoverflow.com/a/3873354/8353749
+// make sure that the match ends in a newline
+export const multipleBlankLinesRegex = /(\n([\t\v\f\r \u00a0\u2000-\u200b\u2028-\u2029\u3000]+)?){2,}\n/g;
 
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string
