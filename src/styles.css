@@ -270,3 +270,10 @@ textarea.full-width {
   text-align: center;
 }
 
+.confirm-modal-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
