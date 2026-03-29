@@ -130,6 +130,14 @@ export default class LinterPlugin extends Plugin {
       this.settings.logLevel = convertNumberToLogLevel(this.settings.logLevel);
     }
 
+    // migrate old single suppress boolean to separate per-modal booleans
+    if (data && typeof data.suppressLintConfirmationModal === 'boolean') {
+      this.settings.suppressLintAllFilesConfirmationModal = data.suppressLintConfirmationModal;
+      this.settings.suppressLintAllFilesInFolderConfirmationModal = data.suppressLintConfirmationModal;
+      delete (this.settings as unknown as Record<string, unknown>).suppressLintConfirmationModal;
+      await this.saveSettings();
+    }
+
     setLogLevel(this.settings.logLevel);
     await this.setOrUpdateMomentInstance();
 
@@ -182,7 +190,7 @@ export default class LinterPlugin extends Plugin {
       name: getTextInLanguage('commands.lint-all-files.name'),
       icon: iconInfo.vault.id,
       callback: () => {
-        if (this.settings.suppressLintConfirmationModal) {
+        if (this.settings.suppressLintAllFilesConfirmationModal) {
           void this.runLinterAllFiles(this.app);
           return;
         }
@@ -193,7 +201,7 @@ export default class LinterPlugin extends Plugin {
         new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => {
           return this.runLinterAllFiles(this.app);
         }, this.settings.lintCommands && this.settings.lintCommands.length > 0, async () => {
-          this.settings.suppressLintConfirmationModal = true;
+          this.settings.suppressLintAllFilesConfirmationModal = true;
           await this.saveSettings();
         }).open();
       },
@@ -578,7 +586,7 @@ export default class LinterPlugin extends Plugin {
 
   // handles the creation of the folder linting modal since this happens in multiple places and it should be consistent
   createFolderLintModal(folder: TFolder) {
-    if (this.settings.suppressLintConfirmationModal) {
+    if (this.settings.suppressLintAllFilesInFolderConfirmationModal) {
       void this.runLinterAllFilesInFolder(folder);
       return;
     }
@@ -587,7 +595,7 @@ export default class LinterPlugin extends Plugin {
     const submitBtnText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-text').replace('{FOLDER_NAME}', folder.name);
     const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-notice-text').replace('{FOLDER_NAME}', folder.name);
     new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder), this.settings.lintCommands && this.settings.lintCommands.length > 0, async () => {
-      this.settings.suppressLintConfirmationModal = true;
+      this.settings.suppressLintAllFilesInFolderConfirmationModal = true;
       await this.saveSettings();
     }).open();
   }
