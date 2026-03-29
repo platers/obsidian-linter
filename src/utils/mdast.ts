@@ -2,7 +2,7 @@ import {visit} from 'unist-util-visit';
 import type {Position} from 'unist';
 import type {Root} from 'mdast';
 import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
-import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex} from './regex';
+import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
 import {frontmatter} from 'micromark-extension-frontmatter';
@@ -279,7 +279,7 @@ export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnot
   let whitespaceBetweenFootnotes = '\n';
   if (includeBlankLinesBetweenFootnotes) {
     whitespaceBetweenFootnotes = '\n\n';
-  } else {
+  } else if (footnotes.length > 0) {
     text += '\n';
   }
 
@@ -446,12 +446,23 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
       continue;
     }
 
-    for (let i = 0; i < lastLineIndex; i++) {
+    let startIndex = 0;
+    // if we are dealing with a blockquote and the first line is a callout indicator, skip the callout
+    if (calloutTypeRegex.test(paragraphLines[0]) && paragraphLines[1].startsWith('>')) {
+      startIndex = 1;
+
+      if (lastLineIndex < 2) {
+        continue;
+      }
+    }
+
+    for (let i = startIndex; i < lastLineIndex; i++) {
       const paragraphLine = paragraphLines[i];
 
       if (lineEndsInLineBreak(paragraphLine, indicator)) {
         continue;
       }
+
       paragraphLines[i] = addOrReplaceLineEnding(paragraphLine, indicator);
     }
 

@@ -527,7 +527,7 @@ export default {
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': 'Fußnoten neu indizieren',
-      'description': 'Indiziert Fußnotenschlüssel und Fußnoten basierend auf der Reihenfolge des Auftretens neu (HINWEIS: Diese Regel funktioniert *nicht*, wenn es mehr als eine Fußnote für einen Schlüssel gibt.)',
+      'description': 'Indiziert Fußnotenschlüssel und Fußnoten neu, basierend auf der Reihenfolge der Fußnotenverweise in der Datei. <b>HINWEIS: Diese Regel funktioniert <i>nicht</i>, wenn es mehr als eine Fußnote für einen Schlüssel gibt.</b>',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
@@ -676,7 +676,7 @@ export default {
     // yaml-key-sort.ts
     'yaml-key-sort': {
       'name': 'Sortierung von YAML-Schlüsseln',
-      'description': 'Sortiert die YAML-Schlüssel basierend auf der angegebenen Reihenfolge und Priorität. Hinweis: Kann auch Leerzeilen entfernen.',
+      'description': 'Sortiert die YAML-Schlüssel basierend auf der angegebenen Reihenfolge und Priorität. <b>Hinweis: Kann auch Leerzeilen entfernen.</b>',
       'yaml-key-priority-sort-order': {
         'name': 'Prioritätssortierreihenfolge der YAML-Schlüssel',
         'description': 'Die Reihenfolge, in der die Schlüssel sortiert werden sollen, wobei in jeder Zeile ein Schlüssel in der Reihenfolge der Liste sortiert wird',

@@ -78,6 +78,9 @@ export default class LinterPlugin extends Plugin {
   private activeFileChangeDebouncer: Map<string, FileChangeUpdateInfo> = new Map();
   private defaultAutoCorrectMisspellings: Map<string, string> = new Map();
   private hasLoadedMisspellingFiles = false;
+  private saveSettingsDebounce = debounce(async (settings: LinterSettings) => {
+    await this.saveData(settings);
+  }, 5000);
 
   async onload() {
     sortRules();
@@ -150,7 +153,8 @@ export default class LinterPlugin extends Plugin {
       await this.loadAutoCorrectFiles(false);
     }
 
-    await this.saveData(this.settings);
+    void this.saveSettingsDebounce(this.settings);
+
     this.updatePasteOverrideStatus();
     this.updateHasCustomCommandStatus();
   }
@@ -984,7 +988,10 @@ export default class LinterPlugin extends Plugin {
     // use Turndown via Obsidian API to emulate "Auto Convert HTML" setting
     const convertHtmlEnabled = this.app.vault.getConfig('autoConvertHtml');
     const htmlClipText = clipboardEv.clipboardData.getData('text/html');
-    let clipboardText = htmlClipText && convertHtmlEnabled ? htmlToMarkdown(htmlClipText) : plainClipboard;
+    // make sure that we skip handling Obsidian editor based html copied text as the plaintext is the way it will be pasted as as opposed
+    // to what is created by converting the provided HTML to markdown
+    // see https://github.com/platers/obsidian-linter/issues/1471
+    let clipboardText = htmlClipText && convertHtmlEnabled && htmlClipText.indexOf('<!-- obsidian -->') === -1 ? htmlToMarkdown(htmlClipText) : plainClipboard;
 
     // if everything went well, run clipboard modifications (passing in current line and text to paste)
     const cursorSelections = editor.listSelections();

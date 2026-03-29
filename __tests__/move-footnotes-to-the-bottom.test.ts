@@ -325,5 +325,19 @@ ruleTest({
         includeBlankLineBetweenFootnotes: true,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1481
+      testName: 'Moving footnotes to the bottom of the file when the file is empty should not add a blank line',
+      before: dedent``,
+      after: dedent``,
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/1481
+      testName: 'Moving footnotes to the bottom of the file when the file has no footnotes should not add a blank line',
+      before: dedent`
+        Here is some content
+      `,
+      after: dedent`
+        Here is some content
+      `,
+    },
   ],
 });

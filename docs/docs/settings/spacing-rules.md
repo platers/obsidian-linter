@@ -805,7 +805,7 @@ All headings have one blank line both before and after (except where the heading
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Bottom` | Ensures one blank line after headings | N/A | `true` |
+| `Bottom` | Ensures one blank line after headings (when disabled it does not remove blank lines after headings) | N/A | `true` |
 | `Empty Line Between YAML and Header` | Keep the empty line between the YAML frontmatter and header | N/A | `true` |
 
 ### Additional Info
