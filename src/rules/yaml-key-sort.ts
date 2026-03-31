@@ -8,6 +8,22 @@ import {FlowCollection} from 'yaml/dist/parse/cst';
 
 type YamlSortOrderForOtherKeys = 'None' | 'Ascending Alphabetical' | 'Descending Alphabetical';
 
+const OTHERS_TOKEN = '<others>';
+
+function normalizeYamlSortToken(token: string): string {
+  token = token.trim();
+
+  if (token === OTHERS_TOKEN) {
+    return token;
+  }
+
+  if (token.endsWith(':')) {
+    return token.substring(0, token.length - 1).trimEnd();
+  }
+
+  return token;
+}
+
 class YamlKeySortOptions implements Options {
   priorityKeysAtStartOfYaml?: boolean = true;
 
@@ -46,18 +62,9 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     const yamlText = oldYaml;
     const priorityAtStartOfYaml: boolean = options.priorityKeysAtStartOfYaml;
 
-    const yamlKeys: string[] = options.yamlKeyPrioritySortOrder;
-    let index = 0;
-    for (let key of yamlKeys) {
-      key = key.trimEnd();
-      if (key.endsWith(':')) {
-        yamlKeys[index] = key.substring(0, key.length - 1);
-      } else if (key != yamlKeys[index]) {
-        yamlKeys[index] = key;
-      }
-
-      index++;
-    }
+    const yamlKeys: string[] = (options.yamlKeyPrioritySortOrder ?? [])
+        .map(normalizeYamlSortToken)
+        .filter((token) => token.length > 0);
 
     const yamlObject = loadYAML(yamlText);
     const doc = parseYAML(yamlText);
@@ -67,27 +74,69 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
       return text;
     }
 
-    let remainingKeys = this.getYAMLKeysSorted(yamlKeys, doc, startingPriorityKeys);
-
     const sortOrder = options.yamlSortOrderForOtherKeys;
     if (yamlObject == null) {
-      return this.getTextWithNewYamlFrontmatter(text, oldYaml, astToString(startingPriorityKeys), astToString(doc), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
+      return this.getTextWithNewYamlFrontmatter(
+          text,
+          oldYaml,
+          astToString(startingPriorityKeys),
+          astToString(doc),
+          priorityAtStartOfYaml,
+          options.dateModifiedKey,
+          options.currentTimeFormatted,
+          options.yamlTimestampDateModifiedEnabled,
+      );
     }
 
-    let sortMethod: (previousKey: string, currentKey: string) => number;
-    if (sortOrder === 'Ascending Alphabetical') {
-      sortMethod = this.sortAlphabeticallyAsc;
-    } else if (sortOrder === 'Descending Alphabetical') {
-      sortMethod = this.sortAlphabeticallyDesc;
-    } else {
-      return this.getTextWithNewYamlFrontmatter(text, oldYaml, astToString(startingPriorityKeys), astToString(doc), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
+    const usedOthersToken = this.getYAMLKeysSortedWithOthers(
+        yamlKeys,
+        doc,
+        startingPriorityKeys,
+        sortOrder,
+    );
+
+    if (usedOthersToken) {
+      return this.getTextWithNewYamlFrontmatter(
+          text,
+          oldYaml,
+          astToString(startingPriorityKeys),
+          '',
+          true,
+          options.dateModifiedKey,
+          options.currentTimeFormatted,
+          options.yamlTimestampDateModifiedEnabled,
+      );
+    }
+
+    let remainingKeys = this.getYAMLKeysSorted(yamlKeys, doc, startingPriorityKeys);
+
+    if (sortOrder === 'None') {
+      return this.getTextWithNewYamlFrontmatter(
+          text,
+          oldYaml,
+          astToString(startingPriorityKeys),
+          astToString(doc),
+          priorityAtStartOfYaml,
+          options.dateModifiedKey,
+          options.currentTimeFormatted,
+          options.yamlTimestampDateModifiedEnabled,
+      );
     }
 
     const remainingDocKeys = getEmptyDocument(doc);
-    remainingKeys = remainingKeys.sort(sortMethod);
+    remainingKeys = this.sortRemainingKeys(remainingKeys, sortOrder);
     this.getYAMLKeysSorted(remainingKeys, doc, remainingDocKeys);
 
-    return this.getTextWithNewYamlFrontmatter(text, oldYaml, astToString(startingPriorityKeys), astToString(remainingDocKeys), priorityAtStartOfYaml, options.dateModifiedKey, options.currentTimeFormatted, options.yamlTimestampDateModifiedEnabled);
+    return this.getTextWithNewYamlFrontmatter(
+        text,
+        oldYaml,
+        astToString(startingPriorityKeys),
+        astToString(remainingDocKeys),
+        priorityAtStartOfYaml,
+        options.dateModifiedKey,
+        options.currentTimeFormatted,
+        options.yamlTimestampDateModifiedEnabled,
+    );
   }
   getYAMLKeysSorted(keys: string[], yamlObject: Document, newDocument: Document): string[] {
     const initialKeys: YamlNode[] = (yamlObject.contents as YamlNode).items as YamlNode[];
@@ -112,6 +161,75 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
     }
 
     return remainingKeys;
+  }
+  getYAMLKeysSortedWithOthers(tokens: string[], yamlObject: Document, newDocument: Document, sortOrder: YamlSortOrderForOtherKeys): boolean {
+    const firstOthersIndex = tokens.indexOf(OTHERS_TOKEN);
+
+    if (firstOthersIndex === -1) {
+      return false;
+    }
+
+    const initialKeys: YamlNode[] = (yamlObject.contents as YamlNode).items as YamlNode[];
+    const srcTokens = (yamlObject.contents.srcToken as FlowCollection).items;
+    let othersInserted = false;
+
+    const addNodeAtIndex = (index: number) => {
+      const node = initialKeys[index];
+      newDocument.add(node);
+      (newDocument.contents.srcToken as YamlCSTTokens).items.push(srcTokens[index]);
+      initialKeys.splice(index, 1);
+      srcTokens.splice(index, 1);
+    };
+
+    const addMatchingKey = (key: string) => {
+      for (let i = 0; i < initialKeys.length; i++) {
+        const node = initialKeys[i];
+        if (node.key.value === key) {
+          addNodeAtIndex(i);
+          break;
+        }
+      }
+    };
+
+    const addRemainingKeys = () => {
+      const explicitlyListedKeys = new Set(
+          tokens.filter((token) => token !== OTHERS_TOKEN),
+      );
+
+      const remainingKeys = initialKeys
+          .map((node) => node.key.value)
+          .filter((key) => !explicitlyListedKeys.has(key));
+
+      const sortedRemainingKeys = this.sortRemainingKeys(remainingKeys, sortOrder);
+
+      for (const key of sortedRemainingKeys) {
+        addMatchingKey(key);
+      }
+    };
+
+    for (const token of tokens) {
+      if (token === OTHERS_TOKEN) {
+        if (!othersInserted) {
+          addRemainingKeys();
+          othersInserted = true;
+        }
+      } else {
+        addMatchingKey(token);
+      }
+    }
+
+    return true;
+  }
+  sortRemainingKeys(keys: string[], sortOrder: YamlSortOrderForOtherKeys): string[] {
+    if (sortOrder === 'Ascending Alphabetical') {
+      return [...keys].sort(this.sortAlphabeticallyAsc);
+    }
+
+    if (sortOrder === 'Descending Alphabetical') {
+      return [...keys].sort(this.sortAlphabeticallyDesc);
+    }
+
+    return [...keys];
   }
   updateDateModifiedIfYamlChanged(oldYaml: string, newYaml: string, dateModifiedKey: string, currentTimeFormatted: string): string {
     if (oldYaml == newYaml) {
@@ -275,6 +393,39 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
           ],
           yamlSortOrderForOtherKeys: 'Descending Alphabetical',
           priorityKeysAtStartOfYaml: false,
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Sorts YAML keys with `<others>` inserted between priority groups',
+        before: dedent`
+          ---
+          tags: computer
+          keywords: []
+          status: WIP
+          type: programming
+          date: 02/15/2022
+          language: Typescript
+          ---
+        `,
+        after: dedent`
+          ---
+          date: 02/15/2022
+          type: programming
+          keywords: []
+          language: Typescript
+          status: WIP
+          tags: computer
+          ---
+        `,
+        options: {
+          yamlKeyPrioritySortOrder: [
+            'date',
+            'type',
+            '<others>',
+            'status',
+            'tags',
+          ],
+          yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
         },
       }),
     ];

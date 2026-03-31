@@ -945,7 +945,7 @@ Sorts the YAML keys based on the order and priority specified. <b>Note: may remo
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `YAML Key Priority Sort Order` | The order in which to sort keys with one on each line where it sorts in the order found in the list | N/A |  |
+| `YAML Key Priority Sort Order` | The order in which to sort keys, with one key per line. Use `<others>` to place unspecified keys at that position in the order. | N/A |  |
 | `Priority Keys at Start of YAML` | YAML Key Priority Sort Order is placed at the start of the YAML frontmatter | N/A | `true` |
 | `YAML Sort Order for Other Keys` | The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area | `None`: No sorting other than what is in the YAML Key Priority Sort Order text area<br/><br/>`Ascending Alphabetical`: Sorts the keys based on key value from a to z<br/><br/>`Descending Alphabetical`: Sorts the keys based on key value from z to a | `None` |
 
@@ -1067,6 +1067,34 @@ type: programming
 language: Typescript
 ---
 Any blank line is attached to the line that follows it
+``````
+</details>
+<details><summary>Sorts YAML keys with `<others>` inserted between priority groups</summary>
+
+Before:
+
+`````` markdown
+---
+tags: computer
+keywords: []
+status: WIP
+type: programming
+date: 02/15/2022
+language: Typescript
+---
+``````
+
+After:
+
+`````` markdown
+---
+date: 02/15/2022
+type: programming
+keywords: []
+language: Typescript
+status: WIP
+tags: computer
+---
 ``````
 </details>
 
