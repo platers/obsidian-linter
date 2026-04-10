@@ -4,7 +4,7 @@ import dedent from 'ts-dedent';
 type customIgnoresInTextTestCase = {
   name: string,
   text: string,
-  expectedTextAfterIgnore: string,
+  expectedTextAfterIgnore?: string,
   ignoreTypes: IgnoreType[];
 };
 
@@ -46,17 +46,6 @@ const ignoreListOfTypesTestCases: customIgnoresInTextTestCase[] = [
       ${''}
       content
     `,
-    expectedTextAfterIgnore: dedent`
-      content
-      ${''}
-      {CUSTOM_IGNORE_PLACEHOLDER}
-      ${''}
-      content
-      ${''}
-      {CUSTOM_IGNORE_PLACEHOLDER}
-      ${''}
-      content
-    `,
     ignoreTypes: [IgnoreTypes.customIgnore],
   },
   {
@@ -84,17 +73,6 @@ const ignoreListOfTypesTestCases: customIgnoresInTextTestCase[] = [
       ${''}
       content
     `,
-    expectedTextAfterIgnore: dedent`
-      content
-      ${''}
-      {CUSTOM_IGNORE_PLACEHOLDER}
-      ${''}
-      content
-      ${''}
-      {CUSTOM_IGNORE_PLACEHOLDER}
-      ${''}
-      content
-    `,
     ignoreTypes: [IgnoreTypes.customIgnore],
   },
 ];
@@ -103,7 +81,15 @@ describe('Ignore List of Types', () => {
   for (const testCase of ignoreListOfTypesTestCases) {
     it(testCase.name, () => {
       const text = ignoreListOfTypes(testCase.ignoreTypes, testCase.text, (text: string) => {
-        expect(text).toEqual(testCase.expectedTextAfterIgnore);
+        if (testCase.expectedTextAfterIgnore !== undefined) {
+          expect(text).toEqual(testCase.expectedTextAfterIgnore);
+        } else {
+          expect(text).not.toContain('$$\nabc\n$$');
+
+          const ignoreTokens = text.match(/IGNORE_TOKEN_[a-z0-9]+_\d+/g);
+          expect(ignoreTokens).toHaveLength(2);
+          expect(new Set(ignoreTokens).size).toBe(2);
+        }
 
         return text;
       } );
