@@ -53,6 +53,8 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
       [replaceValues, text] = ignoreFunc(text, ignoreType.placeholder);
     }
 
+    // Promote base placeholders to unique tokens so ignored values can still be restored after rules reorder parts of the document, such as moving footnotes.
+    // see https://github.com/platers/obsidian-linter/issues/1439
     const replacements = replaceValues.map((value: string, index: number) : IgnoredReplacement => {
       return {
         token: createIgnoreToken(ignoreSessionPrefix, index),
