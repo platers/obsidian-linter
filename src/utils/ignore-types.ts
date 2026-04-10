@@ -73,12 +73,12 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
 
   text = func(text);
 
-    setOfPlaceholders = setOfPlaceholders.reverse();
-  // add back values that were replaced with their placeholders
+  setOfPlaceholders = setOfPlaceholders.reverse();
+  // Restore ignored values by replacing each generated token with its original text.
   if (setOfPlaceholders != null && setOfPlaceholders.length > 0) {
     setOfPlaceholders.forEach((replacementGroup: {replacements: IgnoredReplacement[]}) => {
       replacementGroup.replacements.forEach((replacement: IgnoredReplacement) => {
-        // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
+        // Use a case-insensitive regex so ignored values can still be restored if another rule changes a generated token's casing.
         // see https://github.com/platers/obsidian-linter/issues/201
         text = text.replace(new RegExp(replacement.token, 'i'), escapeDollarSigns(replacement.original));
       });
