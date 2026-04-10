@@ -5,6 +5,7 @@ import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 export type IgnoreFunction = ((text: string, placeholder: string) => [string[], string]);
 export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string};
+export type IgnoredReplacement = {token: string, original: string};
 
 export const IgnoreTypes: Record<string, IgnoreType> = {
   // mdast node types
@@ -37,7 +38,8 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
 } as const;
 
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
-  let setOfPlaceholders: {placeholder: string, replacedValues: string[]}[] = [];
+  let setOfPlaceholders: {replacements: IgnoredReplacement[]}[] = [];
+  const ignoreSessionPrefix = createIgnoreSessionPrefix();
 
   // replace ignore blocks with their placeholders
   let replaceValues: string[] = [];
@@ -51,7 +53,18 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
       [replaceValues, text] = ignoreFunc(text, ignoreType.placeholder);
     }
 
-    setOfPlaceholders.push({replacedValues: replaceValues, placeholder: ignoreType.placeholder});
+    const replacements = replaceValues.map((value: string, index: number) : IgnoredReplacement => {
+      return {
+        token: createIgnoreToken(ignoreSessionPrefix, index),
+        original: value
+      };
+    });
+
+    for (const replacement of replacements) {
+      text = text.replace(ignoreType.placeholder, replacement.token);
+    }
+
+    setOfPlaceholders.push({replacements});
   }
 
   text = func(text);
@@ -59,16 +72,24 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
   setOfPlaceholders = setOfPlaceholders.reverse();
   // add back values that were replaced with their placeholders
   if (setOfPlaceholders != null && setOfPlaceholders.length > 0) {
-    setOfPlaceholders.forEach((replacedInfo: {placeholder: string, replacedValues: string[], replaceDollarSigns: boolean}) => {
-      replacedInfo.replacedValues.forEach((replacedValue: string) => {
+    setOfPlaceholders.forEach((replacementGroup: {replacements: IgnoredReplacement[]})  => {
+      replacementGroup.replacements.forEach((replacement: IgnoredReplacement) => {
         // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
         // see https://github.com/platers/obsidian-linter/issues/201
-        text = text.replace(new RegExp(replacedInfo.placeholder, 'i'), escapeDollarSigns(replacedValue));
+        text = text.replace(new RegExp(replacement.token, 'i'), escapeDollarSigns(replacement.original));
       });
     });
   }
 
   return text;
+}
+
+function createIgnoreSessionPrefix(): string {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+function createIgnoreToken(ignoreSessionPrefix: string, index: number): string {
+  return `IGNORE_TOKEN_${ignoreSessionPrefix}_${index}`;
 }
 
 /**
