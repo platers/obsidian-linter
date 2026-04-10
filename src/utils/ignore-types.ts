@@ -58,7 +58,7 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
     const replacements = replaceValues.map((value: string, index: number) : IgnoredReplacement => {
       return {
         token: createIgnoreToken(ignoreSessionPrefix, index),
-        original: value
+        original: value,
       };
     });
 
@@ -74,7 +74,7 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
   setOfPlaceholders = setOfPlaceholders.reverse();
   // Restore ignored values by replacing each generated token with its original text.
   if (setOfPlaceholders != null && setOfPlaceholders.length > 0) {
-    setOfPlaceholders.forEach((replacementGroup: {replacements: IgnoredReplacement[]})  => {
+    setOfPlaceholders.forEach((replacementGroup: {replacements: IgnoredReplacement[]}) => {
       replacementGroup.replacements.forEach((replacement: IgnoredReplacement) => {
         // Use a case-insensitive regex so ignored values can still be restored if another rule changes a generated token's casing.
         // see https://github.com/platers/obsidian-linter/issues/201
