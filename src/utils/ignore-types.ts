@@ -40,6 +40,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
   let setOfPlaceholders: {replacements: IgnoredReplacement[]}[] = [];
   const ignoreSessionPrefix = createIgnoreSessionPrefix();
+  let tokenIndex = 0;
 
   // replace ignore blocks with their placeholders
   let replaceValues: string[] = [];
@@ -53,11 +54,9 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
       [replaceValues, text] = ignoreFunc(text, ignoreType.placeholder);
     }
 
-    // Promote base placeholders to unique tokens so ignored values can still be restored after rules reorder parts of the document, such as moving footnotes.
-    // see https://github.com/platers/obsidian-linter/issues/1439
-    const replacements = replaceValues.map((value: string, index: number) : IgnoredReplacement => {
+    const replacements = replaceValues.map((value: string) : IgnoredReplacement => {
       return {
-        token: createIgnoreToken(ignoreSessionPrefix, index),
+        token: createUniqueToken(ignoreType.placeholder, ignoreSessionPrefix, tokenIndex++),
         original: value,
       };
     });
@@ -90,8 +89,13 @@ function createIgnoreSessionPrefix(): string {
   return Math.random().toString(36).slice(2, 10);
 }
 
-function createIgnoreToken(ignoreSessionPrefix: string, index: number): string {
-  return `IGNORE_TOKEN_${ignoreSessionPrefix}_${index}`;
+function createUniqueToken(placeholder: string, ignoreSessionPrefix: string, index: number): string {
+  if (placeholder.startsWith('{') && placeholder.endsWith('}')) {
+    // Make brace-format placeholders unique per occurrence so that restoration
+    // is order-independent after rules reorder content. See: #1439
+    return placeholder.slice(0, -1) + `_${ignoreSessionPrefix}_${index}}`;
+  }
+  return placeholder;
 }
 
 /**
