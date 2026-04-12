@@ -4,13 +4,16 @@ import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 export type IgnoreFunction = ((text: string, placeholder: string) => [string[], string]);
-export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string};
+export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string, useUniqueTokens?: boolean};
 export type IgnoredReplacement = {token: string, original: string};
+type IgnoredReplacementGroup =
+  | {mode: 'token', replacements: IgnoredReplacement[]}
+  | {mode: 'placeholder', placeholder: string, replacedValues: string[]};
 
 export const IgnoreTypes: Record<string, IgnoreType> = {
   // mdast node types
   code: {replaceAction: MDAstTypes.Code, placeholder: '{CODE_BLOCK_PLACEHOLDER}'},
-  inlineCode: {replaceAction: MDAstTypes.InlineCode, placeholder: '{INLINE_CODE_BLOCK_PLACEHOLDER}'},
+  inlineCode: {replaceAction: MDAstTypes.InlineCode, placeholder: '{INLINE_CODE_BLOCK_PLACEHOLDER}', useUniqueTokens: true},
   image: {replaceAction: MDAstTypes.Image, placeholder: '{IMAGE_PLACEHOLDER}'},
   thematicBreak: {replaceAction: MDAstTypes.HorizontalRule, placeholder: '{HORIZONTAL_RULE_PLACEHOLDER}'},
   italics: {replaceAction: MDAstTypes.Italics, placeholder: '{ITALICS_PLACEHOLDER}'},
@@ -38,8 +41,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
 } as const;
 
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
-  let setOfPlaceholders: {replacements: IgnoredReplacement[]}[] = [];
-  const ignoreSessionPrefix = createIgnoreSessionPrefix();
+  let ignoredReplacementGroups: IgnoredReplacementGroup[] = [];
   let tokenIndex = 0;
 
   // replace ignore blocks with their placeholders
@@ -54,48 +56,52 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
       [replaceValues, text] = ignoreFunc(text, ignoreType.placeholder);
     }
 
-    const replacements = replaceValues.map((value: string) : IgnoredReplacement => {
-      return {
-        token: createUniqueToken(ignoreType.placeholder, ignoreSessionPrefix, tokenIndex++),
-        original: value,
-      };
-    });
+    // Make brace-format placeholders unique per occurrence so that restoration is order-independent after rules reorder content.
+    // see https://github.com/platers/obsidian-linter/issues/1439
+    if (ignoreType.useUniqueTokens) {
+      const replacements = replaceValues.map((value: string) : IgnoredReplacement => {
+        return {
+          token: `${ignoreType.placeholder}_${tokenIndex++}`,
+          original: value,
+        };
+      });
 
-    for (const replacement of replacements) {
-      text = text.replace(ignoreType.placeholder, replacement.token);
+      const uniqueTokenRegex = new RegExp(`${ignoreType.placeholder}(?!_)`);
+      for (const replacement of replacements) {
+        text = text.replace(uniqueTokenRegex, replacement.token);
+      }
+
+      ignoredReplacementGroups.push({mode: 'token', replacements});
+    } else {
+      ignoredReplacementGroups.push({
+        mode: 'placeholder',
+        placeholder: ignoreType.placeholder,
+        replacedValues: replaceValues,
+      });
     }
-
-    setOfPlaceholders.push({replacements});
   }
 
   text = func(text);
 
-  setOfPlaceholders = setOfPlaceholders.reverse();
+  ignoredReplacementGroups = ignoredReplacementGroups.reverse();
   // Restore ignored values by replacing each generated token with its original text.
-  if (setOfPlaceholders != null && setOfPlaceholders.length > 0) {
-    setOfPlaceholders.forEach((replacementGroup: {replacements: IgnoredReplacement[]}) => {
-      replacementGroup.replacements.forEach((replacement: IgnoredReplacement) => {
-        // Use a case-insensitive regex so ignored values can still be restored if another rule changes a generated token's casing.
-        // see https://github.com/platers/obsidian-linter/issues/201
-        text = text.replace(new RegExp(replacement.token, 'i'), escapeDollarSigns(replacement.original));
-      });
+  if (ignoredReplacementGroups != null && ignoredReplacementGroups.length > 0) {
+    ignoredReplacementGroups.forEach((replacementGroup: IgnoredReplacementGroup) => {
+      if (replacementGroup.mode === 'token') {
+        replacementGroup.replacements.forEach((replacement: IgnoredReplacement) => {
+          // Use a case-insensitive regex so ignored values can still be restored if another rule changes a generated token's casing.
+          // see https://github.com/platers/obsidian-linter/issues/201
+          text = text.replace(new RegExp(replacement.token, 'i'), escapeDollarSigns(replacement.original));
+        });
+      } else {
+        replacementGroup.replacedValues.forEach((replacedValue: string) => {
+          text = text.replace(new RegExp(replacementGroup.placeholder, 'i'), escapeDollarSigns(replacedValue));
+        });
+      }
     });
   }
 
   return text;
-}
-
-function createIgnoreSessionPrefix(): string {
-  return Math.random().toString(36).slice(2, 10);
-}
-
-function createUniqueToken(placeholder: string, ignoreSessionPrefix: string, index: number): string {
-  if (placeholder.startsWith('{') && placeholder.endsWith('}')) {
-    // Make brace-format placeholders unique per occurrence so that restoration
-    // is order-independent after rules reorder content. See: #1439
-    return placeholder.slice(0, -1) + `_${ignoreSessionPrefix}_${index}}`;
-  }
-  return placeholder;
 }
 
 /**
