@@ -4,8 +4,9 @@ import dedent from 'ts-dedent';
 type customIgnoresInTextTestCase = {
   name: string,
   text: string,
-  expectedTextAfterIgnore: string,
+  expectedTextAfterIgnore?: string,
   ignoreTypes: IgnoreType[];
+  afterIgnoreAssert?: (text: string) => void,
 };
 
 const ignoreListOfTypesTestCases: customIgnoresInTextTestCase[] = [
@@ -97,13 +98,30 @@ const ignoreListOfTypesTestCases: customIgnoresInTextTestCase[] = [
     `,
     ignoreTypes: [IgnoreTypes.customIgnore],
   },
+  {
+    name: 'inline code ignore types are promoted to unique tokens',
+    text: dedent`
+      Before \`alpha\` and \`beta\`
+    `,
+    ignoreTypes: [IgnoreTypes.inlineCode],
+    afterIgnoreAssert: (text: string) => {
+      expect(text).toContain('{INLINE_CODE_BLOCK_PLACEHOLDER}_0');
+      expect(text).toContain('{INLINE_CODE_BLOCK_PLACEHOLDER}_1');
+      expect(text).not.toContain('`alpha`');
+      expect(text).not.toContain('`beta`');
+    },
+  },
 ];
 
 describe('Ignore List of Types', () => {
   for (const testCase of ignoreListOfTypesTestCases) {
     it(testCase.name, () => {
       const text = ignoreListOfTypes(testCase.ignoreTypes, testCase.text, (text: string) => {
-        expect(text).toEqual(testCase.expectedTextAfterIgnore);
+        if (testCase.afterIgnoreAssert) {
+          testCase.afterIgnoreAssert(text);
+        } else {
+          expect(text).toEqual(testCase.expectedTextAfterIgnore);
+        }
 
         return text;
       } );
