@@ -101,6 +101,7 @@ export default {
   // lint-confirmation-modal.ts
   'warning-text': 'Uyarı',
   'file-backup-text': 'Dosyalarınızın yedeğini aldığınızdan emin olun.',
+  'do-not-show-again': 'Bu onayı bir daha gösterme',
 
   'tabs': {
     'names': {
