@@ -133,14 +133,6 @@ export default class LinterPlugin extends Plugin {
       this.settings.logLevel = convertNumberToLogLevel(this.settings.logLevel);
     }
 
-    // migrate old single suppress boolean to separate per-modal booleans
-    if (data && typeof data.suppressLintConfirmationModal === 'boolean') {
-      this.settings.suppressLintAllFilesConfirmationModal = data.suppressLintConfirmationModal;
-      this.settings.suppressLintAllFilesInFolderConfirmationModal = data.suppressLintConfirmationModal;
-      delete (this.settings as unknown as Record<string, unknown>).suppressLintConfirmationModal;
-      await this.saveSettings();
-    }
-
     setLogLevel(this.settings.logLevel);
     await this.setOrUpdateMomentInstance();
 
