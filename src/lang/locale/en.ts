@@ -832,7 +832,7 @@ export default {
       'description': 'Sorts the YAML keys based on the order and priority specified. <b>Note: may remove blank lines as well. Only works on non-nested keys.</b>',
       'yaml-key-priority-sort-order': {
         'name': 'YAML Key Priority Sort Order',
-        'description': 'The order in which to sort keys with one on each line where it sorts in the order found in the list',
+        'description': 'The order in which to sort keys, with one key per line. Use `<others>` to place unspecified keys at that position in the order.',
       },
       'priority-keys-at-start-of-yaml': {
         'name': 'Priority Keys at Start of YAML',
