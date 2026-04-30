@@ -39,29 +39,29 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
 type placeholderInfo = {placeholder: string, replacedValue: string}
 
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
-  let setOfPlaceholders: placeholderInfo[] = [];
+  let placeholders: placeholderInfo[] = [];
 
   // replace ignore blocks with their placeholders
-  let placeholders: placeholderInfo[] = [];
+  let tempPlaceholders: placeholderInfo[] = [];
   for (const ignoreType of ignoreTypes) {
     if (typeof ignoreType.replaceAction === 'string') { // mdast
-      [placeholders, text] = replaceMdastType(text, ignoreType.placeholder, ignoreType.replaceAction);
+      [tempPlaceholders, text] = replaceMdastType(text, ignoreType.placeholder, ignoreType.replaceAction);
     } else if (ignoreType.replaceAction instanceof RegExp) {
-      [placeholders, text] = replaceRegex(text, ignoreType.placeholder, ignoreType.replaceAction);
+      [tempPlaceholders, text] = replaceRegex(text, ignoreType.placeholder, ignoreType.replaceAction);
     } else if (typeof ignoreType.replaceAction === 'function') {
       const ignoreFunc: IgnoreFunction = ignoreType.replaceAction;
-      [placeholders, text] = ignoreFunc(text, ignoreType.placeholder);
+      [tempPlaceholders, text] = ignoreFunc(text, ignoreType.placeholder);
     }
 
-    setOfPlaceholders.push(...placeholders);
+    placeholders.push(...tempPlaceholders);
   }
 
   text = func(text);
 
-  setOfPlaceholders = setOfPlaceholders.reverse();
+  placeholders = placeholders.reverse();
   // add back values that were replaced with their placeholders
-  if (setOfPlaceholders != null && setOfPlaceholders.length > 0) {
-    setOfPlaceholders.forEach((replacedInfo: placeholderInfo) => {
+  if (placeholders != null && placeholders.length > 0) {
+    placeholders.forEach((replacedInfo: placeholderInfo) => {
       // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
       // see https://github.com/platers/obsidian-linter/issues/201
       text = text.replace(new RegExp(replacedInfo.placeholder, 'i'), escapeDollarSigns(replacedInfo.replacedValue));
