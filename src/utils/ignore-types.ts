@@ -248,6 +248,7 @@ function getNewPlaceHolder(placeholder: string): string {
 
   // This is not a true uuid, but it gets the job done, so I will use this and avoid trying to figure out
   // how to use crypto with this logic here
+  // from https://gist.github.com/prashant1k99/e11b01a01dead835a1382a596d50e31d
   const uuid = Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
   if (placeholder.endsWith('}')) {
     return placeholder.replace('}', uuid + '}');
