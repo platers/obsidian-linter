@@ -86,6 +86,7 @@ export class CustomCommandOption extends AddCustomRow {
           cb.setValue(command.enabled)
               .onChange((status: boolean) => {
                 command.enabled = status;
+                this.saveSettings();
               });
         });
   }

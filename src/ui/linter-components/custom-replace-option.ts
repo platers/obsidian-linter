@@ -112,6 +112,7 @@ export class CustomReplaceOption extends AddCustomRow {
       cb.setValue(regex.enabled)
           .onChange((status: boolean) => {
             regex.enabled = status;
+            this.saveSettings();
           });
     });
 
