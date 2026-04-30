@@ -13,15 +13,14 @@ export default class ProperEllipsis extends RuleBuilder<ProperEllipsisOptions> {
       nameKey: 'rules.proper-ellipsis.name',
       descriptionKey: 'rules.proper-ellipsis.description',
       type: RuleType.CONTENT,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image],
     });
   }
   get OptionsClass(): new () => ProperEllipsisOptions {
     return ProperEllipsisOptions;
   }
   apply(text: string, options: ProperEllipsisOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image], text, (text) => {
-      return text.replaceAll(ellipsisRegex, '…');
-    });
+    return text.replaceAll(ellipsisRegex, '…');
   }
   get exampleBuilders(): ExampleBuilder<ProperEllipsisOptions>[] {
     return [

@@ -3,7 +3,7 @@ import {getAllCustomIgnoreSectionsInText, getAllTablesInText, getPositions, MDAs
 import type {Position} from 'unist';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
-export type IgnoreFunction = ((text: string, placeholder: string) => [string[], string]);
+export type IgnoreFunction = ((text: string, placeholder: string) => [placeholderInfo[], string]);
 export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string};
 
 export const IgnoreTypes: Record<string, IgnoreType> = {
@@ -36,22 +36,24 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   customIgnore: {replaceAction: replaceCustomIgnore, placeholder: '{CUSTOM_IGNORE_PLACEHOLDER}'},
 } as const;
 
+type placeholderInfo = {placeholder: string, replacedValue: string}
+
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
-  let setOfPlaceholders: {placeholder: string, replacedValues: string[]}[] = [];
+  let setOfPlaceholders: placeholderInfo[] = [];
 
   // replace ignore blocks with their placeholders
-  let replaceValues: string[] = [];
+  let placeholders: placeholderInfo[] = [];
   for (const ignoreType of ignoreTypes) {
     if (typeof ignoreType.replaceAction === 'string') { // mdast
-      [replaceValues, text] = replaceMdastType(text, ignoreType.placeholder, ignoreType.replaceAction);
+      [placeholders, text] = replaceMdastType(text, ignoreType.placeholder, ignoreType.replaceAction);
     } else if (ignoreType.replaceAction instanceof RegExp) {
-      [replaceValues, text] = replaceRegex(text, ignoreType.placeholder, ignoreType.replaceAction);
+      [placeholders, text] = replaceRegex(text, ignoreType.placeholder, ignoreType.replaceAction);
     } else if (typeof ignoreType.replaceAction === 'function') {
       const ignoreFunc: IgnoreFunction = ignoreType.replaceAction;
-      [replaceValues, text] = ignoreFunc(text, ignoreType.placeholder);
+      [placeholders, text] = ignoreFunc(text, ignoreType.placeholder);
     }
 
-    setOfPlaceholders.push({replacedValues: replaceValues, placeholder: ignoreType.placeholder});
+    setOfPlaceholders.push(...placeholders);
   }
 
   text = func(text);
@@ -59,12 +61,10 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
   setOfPlaceholders = setOfPlaceholders.reverse();
   // add back values that were replaced with their placeholders
   if (setOfPlaceholders != null && setOfPlaceholders.length > 0) {
-    setOfPlaceholders.forEach((replacedInfo: {placeholder: string, replacedValues: string[], replaceDollarSigns: boolean}) => {
-      replacedInfo.replacedValues.forEach((replacedValue: string) => {
-        // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
-        // see https://github.com/platers/obsidian-linter/issues/201
-        text = text.replace(new RegExp(replacedInfo.placeholder, 'i'), escapeDollarSigns(replacedValue));
-      });
+    setOfPlaceholders.forEach((replacedInfo: placeholderInfo) => {
+      // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
+      // see https://github.com/platers/obsidian-linter/issues/201
+      text = text.replace(new RegExp(replacedInfo.placeholder, 'i'), escapeDollarSigns(replacedInfo.replacedValue));
     });
   }
 
@@ -77,11 +77,11 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
  * @param {string} placeholder The placeholder to use
  * @param {MDAstTypes} type The type of node to ignore by replacing with the specified placeholder
  * @return {string} The text with mdast nodes types specified replaced
- * @return {string[]} The mdast nodes values replaced
+ * @return {placeholderInfo[]} The mdast nodes values replaced and generated placeholder
  */
-function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): [string[], string] {
+function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): [placeholderInfo[], string] {
   let positions: Position[] = getPositions(type, text);
-  const replacedValues: string[] = [];
+  const replacedValues: placeholderInfo[] = [];
 
   if (type === MDAstTypes.List) {
     positions = removeOverlappingPositions(positions);
@@ -89,11 +89,12 @@ function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): 
 
   for (const position of positions) {
     const valueToReplace = text.substring(position.start.offset, position.end.offset);
-    replacedValues.push(valueToReplace);
+    replacedValues.push({placeholder: getNewPlaceHolder(placeholder), replacedValue: valueToReplace});
   }
 
+  let i = 0;
   for (const position of positions) {
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, placeholder);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, replacedValues[i++].placeholder);
   }
 
   // Reverse the replaced values so that they are in the same order as the original text
@@ -108,25 +109,25 @@ function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): 
  * @param {string} placeholder The placeholder to use
  * @param {RegExp} regex The regex to use to find what to replace with the placeholder
  * @return {string} The text with regex matches replaced
- * @return {string[]} The regex matches replaced
+ * @return {placeholderInfo[]} The regex matches replaced and generated placeholder
  */
-function replaceRegex(text: string, placeholder: string, regex: RegExp): [string[], string] {
-  const regexMatches = text.match(regex);
-  const textMatches: string[] = [];
+function replaceRegex(text: string, placeholder: string, regex: RegExp): [placeholderInfo[], string] {
+  const textMatches: placeholderInfo[] = [];
+
   if (regex.flags.includes('g')) {
-    text = text.replaceAll(regex, placeholder);
+    text = text.replaceAll(regex, (match: string) => {
+      const id = getNewPlaceHolder(placeholder);
+      textMatches.push({placeholder: id, replacedValue: match});
 
-    if (regexMatches) {
-      for (const matchText of regexMatches) {
-        textMatches.push(matchText);
-      }
-    }
+      return id;
+    });
   } else {
-    text = text.replace(regex, placeholder);
+    text = text.replace(regex, (match: string) => {
+      const id = getNewPlaceHolder(placeholder);
+      textMatches.push({placeholder: id, replacedValue: match});
 
-    if (regexMatches) {
-      textMatches.push(regexMatches[0]);
-    }
+      return id;
+    });
   }
 
   return [textMatches, text];
@@ -137,11 +138,11 @@ function replaceRegex(text: string, placeholder: string, regex: RegExp): [string
  * @param {string} text The text to replace links in
  * @param {string} regularLinkPlaceholder The placeholder to use for regular markdown links
  * @return {string} The text with links replaced
- * @return {string[]} The regular markdown links replaced
+ * @return {placeholderInfo[]} The regular markdown links replaced and generated placeholder
  */
-function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): [string[], string] {
+function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): [placeholderInfo[], string] {
   const positions: Position[] = getPositions(MDAstTypes.Link, text);
-  const replacedRegularLinks: string[] = [];
+  const replacedRegularLinks: placeholderInfo[] = [];
 
 
   const positionsToReplace: Position [] = [];
@@ -157,11 +158,12 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): [st
     }
 
     positionsToReplace.push(position);
-    replacedRegularLinks.push(regularLink);
+    replacedRegularLinks.push({placeholder: getNewPlaceHolder(regularLinkPlaceholder), replacedValue: regularLink});
   }
 
+  let i = 0;
   for (const position of positionsToReplace) {
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, regularLinkPlaceholder);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, replacedRegularLinks[i++].placeholder);
   }
 
   // Reverse the regular links so that they are in the same order as the original text
@@ -170,47 +172,51 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): [st
   return [replacedRegularLinks, text];
 }
 
-function replaceTags(text: string, placeholder: string): [string[], string] {
-  const replacedValues: string[] = [];
+function replaceTags(text: string, placeholder: string): [placeholderInfo[], string] {
+  const replacedValues: placeholderInfo[] = [];
 
   text = text.replace(tagWithLeadingWhitespaceRegex, (_, whitespace, tag) => {
-    replacedValues.push(tag);
-    return whitespace + placeholder;
+    const id = getNewPlaceHolder(placeholder);
+
+    replacedValues.push({placeholder: id, replacedValue: tag});
+    return whitespace + id;
   });
 
   return [replacedValues, text];
 }
 
-function replaceTables(text: string, tablePlaceholder: string): [string[], string] {
+function replaceTables(text: string, tablePlaceholder: string): [placeholderInfo[], string] {
   const tablePositions = getAllTablesInText(text);
 
-  const replacedTables: string[] = new Array(tablePositions.length);
+  const replacedTables: placeholderInfo[] = new Array(tablePositions.length);
   let index = 0;
   const length = replacedTables.length;
   for (const tablePosition of tablePositions) {
-    replacedTables[length - 1 - index++] = text.substring(tablePosition.startIndex, tablePosition.endIndex);
+    replacedTables[length - 1 - index++] = {placeholder: getNewPlaceHolder(tablePlaceholder), replacedValue: text.substring(tablePosition.startIndex, tablePosition.endIndex)};
   }
 
+  let i = length -1;
   for (const tablePosition of tablePositions) {
-    text = replaceTextBetweenStartAndEndWithNewValue(text, tablePosition.startIndex, tablePosition.endIndex, tablePlaceholder);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, tablePosition.startIndex, tablePosition.endIndex, replacedTables[i--].placeholder);
   }
 
   return [replacedTables, text];
 }
 
 
-function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): [string[], string] {
+function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): [placeholderInfo[], string] {
   const customIgnorePositions = getAllCustomIgnoreSectionsInText(text);
 
-  const replacedSections: string[] = new Array(customIgnorePositions.length);
+  const replacedSections: placeholderInfo[] = new Array(customIgnorePositions.length);
   let index = 0;
   const length = replacedSections.length;
   for (const customIgnorePosition of customIgnorePositions) {
-    replacedSections[length - 1 - index++] = text.substring(customIgnorePosition.startIndex, customIgnorePosition.endIndex);
+    replacedSections[length - 1 - index++] = {placeholder: getNewPlaceHolder(customIgnorePlaceholder), replacedValue: text.substring(customIgnorePosition.startIndex, customIgnorePosition.endIndex)};
   }
 
+  let i = length - 1;
   for (const customIgnorePosition of customIgnorePositions) {
-    text = replaceTextBetweenStartAndEndWithNewValue(text, customIgnorePosition.startIndex, customIgnorePosition.endIndex, customIgnorePlaceholder);
+    text = replaceTextBetweenStartAndEndWithNewValue(text, customIgnorePosition.startIndex, customIgnorePosition.endIndex, replacedSections[i--].placeholder);
   }
 
   return [replacedSections, text];
@@ -233,4 +239,19 @@ function removeOverlappingPositions(positions: Position[]): Position[] {
   }
 
   return result;
+}
+
+function getNewPlaceHolder(placeholder: string): string {
+  if (placeholder.includes('---')) {
+    return placeholder;
+  }
+
+  // This is not a true uuid, but it gets the job done, so I will use this and avoid trying to figure out
+  // how to use crypto with this logic here
+  const uuid = Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
+  if (placeholder.endsWith('}')) {
+    return placeholder.replace('}', uuid + '}');
+  }
+
+  return placeholder + uuid;
 }

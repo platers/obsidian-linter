@@ -339,5 +339,86 @@ ruleTest({
         Here is some content
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1439
+      testName: 'Moving footnotes to the bottom preserves inline code values in the body when footnotes are interspersed',
+      before: dedent`
+        Here is \`first code\` in the body.[^1]
+        ${''}
+        [^1]: Footnote one.
+        ${''}
+        Here is \`second code\` in the body.[^2]
+        ${''}
+        [^2]: Footnote two.
+      `,
+      after: dedent`
+        Here is \`first code\` in the body.[^1]
+        ${''}
+        Here is \`second code\` in the body.[^2]
+        ${''}
+        [^1]: Footnote one.
+        [^2]: Footnote two.
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1439
+      testName: 'Moving footnotes to the bottom preserves inline code values inside footnotes',
+      before: dedent`
+        Body text.[^1]
+        ${''}
+        [^1]: Footnote with \`code inside\`.
+        ${''}
+        More body text.
+      `,
+      after: dedent`
+        Body text.[^1]
+        ${''}
+        More body text.
+        ${''}
+        [^1]: Footnote with \`code inside\`.
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1439
+      testName: 'Moving footnotes to the bottom does not mix inline code between body and footnotes with multiple occurrences',
+      before: dedent`
+        Body has \`alpha\` and \`beta\`.[^1]
+        ${''}
+        [^1]: Footnote has \`gamma\`.
+        ${''}
+        More body has \`delta\`.[^2]
+        ${''}
+        [^2]: Another footnote has \`epsilon\`.
+      `,
+      after: dedent`
+        Body has \`alpha\` and \`beta\`.[^1]
+        ${''}
+        More body has \`delta\`.[^2]
+        ${''}
+        [^1]: Footnote has \`gamma\`.
+        [^2]: Another footnote has \`epsilon\`.
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1439
+      testName: 'Moving footnotes to the bottom does not mix inline code between body and footnotes when includeBlankLineBetweenFootnotes is true',
+      before: dedent`
+        Body has \`body-code\`.[^1]
+        ${''}
+        [^1]: Footnote has \`footnote-code-1\`.
+        ${''}
+        More body.[^2]
+        ${''}
+        [^2]: Another footnote has \`footnote-code-2\`.
+      `,
+      after: dedent`
+        Body has \`body-code\`.[^1]
+        ${''}
+        More body.[^2]
+        ${''}
+        [^1]: Footnote has \`footnote-code-1\`.
+        ${''}
+        [^2]: Another footnote has \`footnote-code-2\`.
+      `,
+      options: {
+        includeBlankLineBetweenFootnotes: true,
+      },
+    },
   ],
 });

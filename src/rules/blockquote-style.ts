@@ -63,6 +63,9 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
     let startOfIndex = 0;
     let newBlockquote = blockquote;
     let breakOutOfLoop = false;
+    const mathPlaceHolderRegex = new RegExp(IgnoreTypes.math.placeholder.replace('}', '.+}'), '');
+    const codePlaceHolderRegex = new RegExp(IgnoreTypes.code.placeholder.replace('}', '.+}'), '');
+
     do {
       nextNewLine = newBlockquote.indexOf('\n', currentIndex);
       if (nextNewLine === -1) {
@@ -80,7 +83,7 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
 
       const restOfLine = newBlockquote.substring(startOfRestOfLine, endOfRestOfLine);
       // we need to ignore code and math blocks to prevent changing values in the display
-      if (restOfLine.includes(IgnoreTypes.math.placeholder) || restOfLine.includes(IgnoreTypes.code.placeholder)) {
+      if (restOfLine.match(mathPlaceHolderRegex) || restOfLine.match(codePlaceHolderRegex)) {
         currentIndex++;
         continue;
       }
