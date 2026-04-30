@@ -169,5 +169,28 @@ ruleTest({
         ${''}
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1505
+      testName: 'Make sure that whitespace only lines inside of lists are properly trimmed',
+      before: dedent`
+        Some text
+         ${''}
+        - List item 1
+         ${''}
+        1. List item 2
+         ${''}
+        > Blockquote
+         ${''}
+      `,
+      after: dedent`
+        Some text
+        ${''}
+        - List item 1
+        ${''}
+        1. List item 2
+        ${''}
+        > Blockquote
+        ${''}
+      `,
+    },
   ],
 });

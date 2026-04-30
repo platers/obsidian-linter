@@ -34,7 +34,7 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
       }
     });
 
-    return updateListItemText(text, (text: string): string => {
+    text = updateListItemText(text, (text: string): string => {
       if (!options.twoSpaceLineBreak) {
         return text.replace(/[ \t]+$/gm, '');
       } else {
@@ -44,6 +44,17 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
         return text;
       }
     }, true);
+
+    // lastly check for any empty lines that may have slipped through the cracks
+    if (!options.twoSpaceLineBreak) {
+      text = text.replace(/^[ \t]+$/gm, '');
+    } else {
+      text = text.replace(/^[ \t]$/gm, '$1'); // one whitespace
+      text = text.replace(/^[ \t]{3,}$/gm, '$1'); // three or more whitespaces
+      text = text.replace(/^( ?\t\t? ?)$/gm, '$1'); // two whitespaces with at least one tab
+    }
+
+    return text;
   }
   get exampleBuilders(): ExampleBuilder<TrailingSpacesOptions>[] {
     return [
