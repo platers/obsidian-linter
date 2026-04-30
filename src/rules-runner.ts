@@ -33,6 +33,17 @@ import AutoCorrectCommonMisspellings from './rules/auto-correct-common-misspelli
 import {yamlRegex} from './utils/regex';
 import AddBlankLineAfterYAML from './rules/add-blank-line-after-yaml';
 import ConsecutiveBlankLines from './rules/consecutive-blank-lines';
+import HeadingFilenameSync from './rules/heading-filename-sync';
+
+export type PendingRename = {
+  oldPath: string,
+  newPath: string,
+}
+
+export type LintResult = {
+  text: string,
+  pendingRename: PendingRename | null,
+}
 
 export type RunLinterRulesOptions = {
   oldText: string,
@@ -54,12 +65,13 @@ export class RulesRunner {
   private disabledRules: string[] = [];
   skipFile: boolean;
 
-  lintText(runOptions: RunLinterRulesOptions): string {
+  lintText(runOptions: RunLinterRulesOptions): LintResult {
     this.skipFile = false;
+    const renameResult: {value: PendingRename | null} = {value: null};
     const originalText = runOptions.oldText;
     [this.disabledRules, this.skipFile] = getDisabledRules(originalText);
     if (this.skipFile) {
-      return originalText;
+      return {text: originalText, pendingRename: null};
     }
 
     timingBegin(getTextInLanguage('logs.rule-running'));
@@ -122,7 +134,7 @@ export class RulesRunner {
 
     runOptions.oldText = newText;
 
-    return this.runAfterRegularRules(originalText, runOptions);
+    return this.runAfterRegularRules(originalText, runOptions, renameResult);
   }
 
   private runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
@@ -146,11 +158,19 @@ export class RulesRunner {
     return newText;
   }
 
-  private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions): string {
+  private runAfterRegularRules(originalText: string, runOptions: RunLinterRulesOptions, renameResult: {value: PendingRename | null}): LintResult {
     let newText = runOptions.oldText;
     const postRuleLogText = getTextInLanguage('logs.post-rules');
     timingBegin(postRuleLogText);
     [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+
+    [newText] = HeadingFilenameSync.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      fileName: runOptions.fileInfo.name,
+      filePath: runOptions.fileInfo.path,
+      setPendingRename: (rename: PendingRename) => {
+        renameResult.value = rename;
+      },
+    });
 
     [newText] = YamlTitle.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       fileName: runOptions.fileInfo.name,
@@ -208,7 +228,7 @@ export class RulesRunner {
 
     timingEnd(postRuleLogText);
     timingEnd(getTextInLanguage('logs.rule-running'));
-    return newText;
+    return {text: newText, pendingRename: renameResult.value};
   }
 
   runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
