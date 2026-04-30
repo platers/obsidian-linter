@@ -103,7 +103,9 @@ describe('Ignore List of Types', () => {
   for (const testCase of ignoreListOfTypesTestCases) {
     it(testCase.name, () => {
       const text = ignoreListOfTypes(testCase.ignoreTypes, testCase.text, (text: string) => {
-        expect(text).toEqual(testCase.expectedTextAfterIgnore);
+        // to make sure that the custom ignore matches the expected, we will go ahead and replace the "UUID" from the end of the indicator
+        const cleanedText = text.replaceAll(/{CUSTOM_IGNORE_PLACEHOLDER.+}/g, '{CUSTOM_IGNORE_PLACEHOLDER}');
+        expect(cleanedText).toEqual(testCase.expectedTextAfterIgnore);
 
         return text;
       } );
