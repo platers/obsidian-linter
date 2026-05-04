@@ -16,5 +16,45 @@ ruleTest({
       `,
       options: {style: 'asterisk'},
     },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/1503
+      // Math blocks with underscores inside should not be converted to emphasis
+      testName: 'Make sure math blocks are unaffected',
+      before: dedent`
+        adafsd$$
+        \begin{align}
+        \text{asfsss}_{}{d_{a}}
+        \end{align}
+        $$
+      `,
+      after: dedent`
+        adafsd$$
+        \begin{align}
+        \text{asfsss}_{}{d_{a}}
+        \end{align}
+        $$
+      `,
+      options: {style: 'asterisk'},
+    },
+    {
+      testName: 'Make sure multiline math block with align environment is unaffected',
+      before: dedent`
+        $$
+        \begin{align}
+        x_{test} &= some_long_equation \\
+        y_{other} &= another_equation
+        \end{align}
+        $$
+      `,
+      after: dedent`
+        $$
+        \begin{align}
+        x_{test} &= some_long_equation \\
+        y_{other} &= another_equation
+        \end{align}
+        $$
+      `,
+      options: {style: 'asterisk'},
+    },
   ],
 });
