@@ -59,6 +59,9 @@ export class GeneralTab extends Tab {
     const suppressMessageWhenNoChangeSetting = new ToggleSetting( tempDiv, 'tabs.general.suppress-message-when-no-change.name', 'tabs.general.suppress-message-when-no-change.description', 'suppressMessageWhenNoChange', this.plugin);
     this.addSettingSearchInfoForGeneralSettings(suppressMessageWhenNoChangeSetting);
 
+    tempDiv = this.contentEl.createDiv();
+    this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.enable-diff-preview-view.name', 'tabs.general.enable-diff-preview-view.description', 'enableDiffPreviewView', this.plugin));
+
     const sysLocale = navigator.language?.toLowerCase();
     const localeValues = ['system-default'];
     const localeDescriptions = [getTextInLanguage('tabs.general.same-as-system-locale').replace('{SYS_LOCALE}', sysLocale)];
