@@ -17,6 +17,7 @@ export const genericLinkRegex = /(!?)\[([^[]*)\](\(.*\))/g;
 export const tagWithLeadingWhitespaceRegex = /(\s|^)(#[\p{L}\-_\d/\p{Emoji_Presentation}]+)/gu;
 export const obsidianMultilineCommentRegex = /^%%\n[^%]*\n%%/gm;
 export const wordSplitterRegex = /[,\s]+/;
+export const whitespaceSplitterRegex = /\S+/g;
 export const ellipsisRegex = /(\. ?){2}\./g;
 export const lineStartingWithWhitespaceOrBlockquoteTemplate = `\\s*(>\\s*)*`;
 export const emptyLineMathBlockquoteRegex = /^(>( |\t)*)+\$*?$/m;

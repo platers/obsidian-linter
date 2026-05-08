@@ -208,5 +208,21 @@ ruleTest({
         style: 'First letter',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/619
+      testName: `When a word starts with a character in the list of startingWordIgnoreCharacters, then the second character should be capitalized instead of the first in that word`,
+      before: dedent`
+        # 1. "when there is a bug"
+        # 1. 'when there is a bug'
+        # 1. (when there is a bug)
+      `,
+      after: dedent`
+        # 1. "When there is a bug"
+        # 1. 'When there is a bug'
+        # 1. (When there is a bug)
+      `,
+      options: {
+        style: 'First letter',
+      },
+    },
   ],
 });
