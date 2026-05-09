@@ -1,9 +1,9 @@
 import {Setting} from 'obsidian';
-import LinterPlugin from 'src/main';
-import {DEFAULT_SETTINGS, LinterSettings, LinterSettingsKeys} from 'src/settings-data';
-import {getString, getBoolean, getNumber} from 'src/utils/nested-keyof';
+import LinterPlugin from '../../main';
+import {DEFAULT_SETTINGS, LinterSettings, LinterSettingsKeys} from '../../settings-data';
+import {getString, getBoolean, getNumber} from '../../utils/nested-keyof';
 import {setElContent} from '../helpers';
-import {LanguageStringKey, getTextInLanguage} from 'src/lang/helpers';
+import {LanguageStringKey, getTextInLanguage} from '../../lang/helpers';
 
 export type GenericSetting = {
   containerEl: HTMLDivElement

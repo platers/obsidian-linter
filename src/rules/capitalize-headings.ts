@@ -310,7 +310,7 @@ class CapitalizeHeadingsOptions implements Options {
     'it',
   ];
   startingWordIgnoreCharacters?: string = '\'"(‘“-';
-  endingWordIgnoreCharacters?: string = '.?!,:;\'")”’-';
+  endingWordIgnoreCharacters?: string = '.?!,:;\'")”’0123456789-';
   ignoreCasedWords?: boolean = true;
 }
 
@@ -342,7 +342,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       }
 
       const startingCustomRegexGroup = options.startingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.startingWordIgnoreCharacters!)}]?`;
-      const endingCustomRegexGroup = options.endingWordIgnoreCharacters?.length == 0 ? '[\\d]*' : `[\\d${escapeRegExp(options.endingWordIgnoreCharacters!)}]*`;
+      const endingCustomRegexGroup = options.endingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.endingWordIgnoreCharacters!)}]*`;
       const wordRegex = new RegExp(`^${startingCustomRegexGroup}[\\p{L}’'-]{1,}${endingCustomRegexGroup}$`, 'u');
       const keepCasing = options.ignoreWords;
       const ignoreShortWords = options.lowercaseWords;
@@ -496,14 +496,14 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       }),
       new TextOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
-        nameKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.english-symbols-punctuation-before.name',
-        descriptionKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.english-symbols-punctuation-before.description',
+        nameKey: 'rules.capitalize-headings.starting-word-ignore-characters.name',
+        descriptionKey: 'rules.capitalize-headings.starting-word-ignore-characters.description',
         optionsKey: 'startingWordIgnoreCharacters',
       }),
       new TextOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
-        nameKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.english-symbols-punctuation-before.name',
-        descriptionKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.english-symbols-punctuation-before.description',
+        nameKey: 'rules.capitalize-headings.ending-word-ignore-characters.name',
+        descriptionKey: 'rules.capitalize-headings.ending-word-ignore-characters.description',
         optionsKey: 'endingWordIgnoreCharacters',
       }),
     ];

@@ -1,7 +1,7 @@
 import {DropdownComponent, Setting} from 'obsidian';
-import {LanguageStringKey, getTextInLanguage} from 'src/lang/helpers';
-import LinterPlugin from 'src/main';
-import {LinterSettingsKeys} from 'src/settings-data';
+import {LanguageStringKey, getTextInLanguage} from '../../lang/helpers';
+import LinterPlugin from '../../main';
+import {LinterSettingsKeys} from '../../settings-data';
 import {BaseSetting} from './base-setting';
 
 export type DropdownRecordInfo = {

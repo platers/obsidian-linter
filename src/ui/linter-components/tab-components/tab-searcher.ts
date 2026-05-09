@@ -1,7 +1,7 @@
-// based on https://github.com/valentine195/obsidian-settings-search/blob/master/src/main.ts#L294-L308
+// based on https://github.com/valentine195/obsidian-settings-search/blob/master/../../../main.ts#L294-L308
 import {SearchComponent, Setting} from 'obsidian';
-import {getTextInLanguage} from 'src/lang/helpers';
-import {SearchOptionInfo} from 'src/option';
+import {getTextInLanguage} from '../../../lang/helpers';
+import {SearchOptionInfo} from '../../../option';
 import {hideEl, unhideEl} from '../../helpers';
 import {Tab} from './tab';
 

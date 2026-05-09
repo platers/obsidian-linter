@@ -1,12 +1,12 @@
 import log from 'loglevel';
-import LinterPlugin from 'src/main';
+import LinterPlugin from '../../../main';
 import {Tab} from './tab';
-import {TextBoxFull} from 'src/ui/components/text-box-full';
-import {setElContent} from 'src/ui/helpers';
-import {logsFromLastRun, setLogLevel} from 'src/utils/logger';
-import {getTextInLanguage} from 'src/lang/helpers';
-import {DropdownRecordInfo, DropdownSetting} from 'src/ui/components/dropdown-setting';
-import {ToggleSetting} from 'src/ui/components/toggle-setting';
+import {TextBoxFull} from '../../../ui/components/text-box-full';
+import {setElContent} from '../../../ui/helpers';
+import {logsFromLastRun, setLogLevel} from '../../../utils/logger';
+import {getTextInLanguage} from '../../../lang/helpers';
+import {DropdownRecordInfo, DropdownSetting} from '../../../ui/components/dropdown-setting';
+import {ToggleSetting} from '../../../ui/components/toggle-setting';
 
 const logLevels = Object.keys(log.levels) as string[];
 
