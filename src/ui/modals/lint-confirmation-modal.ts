@@ -1,7 +1,7 @@
 import {Notice, Modal, App} from 'obsidian';
-import {getTextInLanguage} from 'src/lang/helpers';
+import {getTextInLanguage} from '../../lang/helpers';
 
-// https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/src/modal.ts#L68
+// https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/../../modal.ts#L68
 export class LintConfirmationModal extends Modal {
   constructor(app: App, startModalMessageText: string, submitBtnText: string,
       submitBtnNoticeText: string, btnSubmitAction: () => Promise<void>, showCustomCommandWarning: boolean = false,

@@ -345,6 +345,14 @@ export default {
         'name': 'Lowercase words',
         'description': 'A comma separated list of words to keep lowercase',
       },
+      'starting-word-ignore-characters': {
+        'name': 'Characters to ignore at the start of potential words',
+        'description': 'Characters that by themselves may precede one or more letters, single quotes, and/or dashes and have it be considered a word',
+      },
+      'ending-word-ignore-characters': {
+        'name': 'Characters to ignore at the end of potential words',
+        'description': 'Characters that may follow one or more letters, single quotes, and/or dashes and have it be considered a word',
+      },
     },
     // compact-yaml.ts
     'compact-yaml': {

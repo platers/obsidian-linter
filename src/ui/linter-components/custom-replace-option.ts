@@ -1,5 +1,5 @@
 import {App, Setting} from 'obsidian';
-import {getTextInLanguage} from 'src/lang/helpers';
+import {getTextInLanguage} from '../../lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 export type CustomReplace = {label: string, find: string, replace: string, flags: string, enabled: boolean};
 

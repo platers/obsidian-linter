@@ -1,12 +1,12 @@
-import {iconInfo} from 'src/ui/icons';
-import LinterPlugin from 'src/main';
-import {RuleType} from 'src/rules';
+import {iconInfo} from '../../../ui/icons';
+import LinterPlugin from '../../../main';
+import {RuleType} from '../../../rules';
 import {setIcon, Setting} from 'obsidian';
 import {settingSearchInfo} from './tab-searcher';
-import {SearchOptionInfo} from 'src/option';
-import {hideEl, unhideEl} from 'src/ui/helpers';
-import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
-import {GenericSetting} from 'src/ui/components/base-setting';
+import {SearchOptionInfo} from '../../../option';
+import {hideEl, unhideEl} from '../../../ui/helpers';
+import {getTextInLanguage, LanguageStringKey} from '../../../lang/helpers';
+import {GenericSetting} from '../../../ui/components/base-setting';
 
 export enum SearchStatus {
   LeavingSearchMode = 'leaving search mode by selecting a tab',
@@ -65,7 +65,7 @@ export abstract class Tab {
 
   abstract display(): void;
 
-  addSettingSearchInfo(containerEl: HTMLDivElement, name: string = '', description: string = '', options: SearchOptionInfo[] = null, alias: string = null) {
+  addSettingSearchInfo(containerEl: HTMLDivElement, name: string = '', description: string = '', options: SearchOptionInfo[] = [], alias: string = undefined) {
     this.searchSettingInfo.push({
       containerEl: containerEl,
       name: name.toLowerCase(),
@@ -80,8 +80,8 @@ export abstract class Tab {
       containerEl: generalSetting.containerEl,
       name: generalSetting.name.toLowerCase(),
       description: generalSetting.description.toLowerCase(),
-      options: null,
-      alias: null,
+      options: [],
+      alias: undefined,
     });
   }
 

@@ -1,5 +1,5 @@
 import {App, Setting} from 'obsidian';
-import {getTextInLanguage} from 'src/lang/helpers';
+import {getTextInLanguage} from '../../lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 export type FileToIgnore = {label: string, match: string, flags: string};
 
