@@ -1,5 +1,5 @@
 // based on https://github.com/valentine195/obsidian-settings-search/blob/master/../../../main.ts#L294-L308
-import {SearchComponent, Setting} from 'obsidian';
+import {SearchComponent, Setting, debounce} from 'obsidian';
 import {getTextInLanguage} from '../../../lang/helpers';
 import {SearchOptionInfo} from '../../../option';
 import {hideEl, unhideEl} from '../../helpers';
@@ -10,6 +10,9 @@ export type settingSearchInfo = {containerEl: HTMLDivElement, name: string, desc
 export class TabSearcher {
   search: SearchComponent;
   private searchSettingInfo: Map<string, settingSearchInfo[]> = new Map();
+  private searchSettingsDebounce = debounce((searchValue: string) => {
+    this.searchSettings(searchValue);
+  }, 1000);
 
   constructor(public containerEl: HTMLDivElement, public searchZeroState: HTMLDivElement, private tabNameToTab: Map<string, Tab>, private onFocus: () => void) {
     for (const [tabName, tab] of tabNameToTab) {
@@ -33,7 +36,7 @@ export class TabSearcher {
     };
 
     this.search.onChange((value: string) => {
-      this.searchSettings(value.toLowerCase());
+      this.searchSettingsDebounce(value.toLowerCase());
     });
   }
 
@@ -53,7 +56,7 @@ export class TabSearcher {
         // Note: we check for an empty string for searchVal to see if the search is essentially empty which will display all rules
         if (searchVal.trim() === '' || settingInfo.alias?.includes(searchVal) || settingInfo.description.includes(searchVal) || settingInfo.name.includes(searchVal)) {
           showSearchResultAndAddTabToResultList(settingInfo.containerEl, tabName);
-        } else if (settingInfo.options) {
+        } else if (settingInfo.options && settingInfo.options.length > 0) {
           for (const optionInfo of settingInfo.options) {
             if (optionInfo.description.toLowerCase().includes(searchVal) || optionInfo.name.toLowerCase().includes(searchVal)) {
               showSearchResultAndAddTabToResultList(settingInfo.containerEl, tabName);
