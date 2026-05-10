@@ -47,7 +47,7 @@ export default class RemoveSpaceBeforeOrAfterCharacters extends RuleBuilder<Remo
   get exampleBuilders(): ExampleBuilder<RemoveSpaceBeforeOrAfterCharactersOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Remove Spaces and Tabs Before and After Default Symbol Set',
+        description: 'Remove spaces and tabs before and after default symbol set',
         before: dedent`
           In the end , the space gets removed\t .
           The space before the question mark was removed right ?

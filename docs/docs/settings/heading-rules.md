@@ -6,7 +6,7 @@
 A heading for the purpose of the Linter is an ATX header. It does _not_ currently support Setext headers (see [this issue](https://github.com/platers/obsidian-linter/issues/423)).
 
 
-## Capitalize Headings
+## Capitalize headings
 
 Alias: `capitalize-headings`
 
@@ -17,15 +17,15 @@ Headings should be formatted with capitalization
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Style` | The style of capitalization to use | `Title Case`: Capitalize Using Title Case Rules<br/><br/>`ALL CAPS`: CAPITALIZE THE WHOLE TITLE<br/><br/>`First letter`: Only capitalize the first letter | `Title Case` |
-| `Ignore Cased Words` | Only apply title case style to words that are all lowercase | N/A | `true` |
-| `Ignore Words` | A comma separated list of words to ignore when capitalizing | N/A | `macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript, I` |
-| `Lowercase Words` | A comma separated list of words to keep lowercase | N/A | `a, an, the, aboard, about, abt., above, abreast, absent, across, after, against, along, aloft, alongside, amid, amidst, mid, midst, among, amongst, anti, apropos, around, round, as, aslant, astride, at, atop, ontop, bar, barring, before, B4, behind, below, beneath, neath, beside, besides, between, 'tween, beyond, but, by, chez, circa, c., ca., come, concerning, contra, counting, cum, despite, spite, down, during, effective, ere, except, excepting, excluding, failing, following, for, from, in, including, inside, into, less, like, minus, modulo, mod, near, nearer, nearest, next, notwithstanding, of, o', off, offshore, on, onto, opposite, out, outside, over, o'er, pace, past, pending, per, plus, post, pre, pro, qua, re, regarding, respecting, sans, save, saving, short, since, sub, than, through, thru, throughout, thruout, till, times, to, t', touching, toward, towards, under, underneath, unlike, until, unto, up, upon, versus, vs., v., via, vice, vis-à-vis, wanting, with, w/, w., c̄, within, w/i, without, 'thout, w/o, abroad, adrift, aft, afterward, afterwards, ahead, apart, ashore, aside, away, back, backward, backwards, beforehand, downhill, downstage, downstairs, downstream, downward, downwards, downwind, east, eastward, eastwards, forth, forward, forwards, heavenward, heavenwards, hence, henceforth, here, hereby, herein, hereof, hereto, herewith, home, homeward, homewards, indoors, inward, inwards, leftward, leftwards, north, northeast, northward, northwards, northwest, now, onward, onwards, outdoors, outward, outwards, overboard, overhead, overland, overseas, rightward, rightwards, seaward, seawards, skywards, skyward, south, southeast, southwards, southward, southwest, then, thence, thenceforth, there, thereby, therein, thereof, thereto, therewith, together, underfoot, underground, uphill, upstage, upstairs, upstream, upward, upwards, upwind, west, westward, westwards, when, whence, where, whereby, wherein, whereto, wherewith, although, because, considering, given, granted, if, lest, once, provided, providing, seeing, so, supposing, though, unless, whenever, whereas, wherever, while, whilst, ago, inasmuch, even, whether, whose, whoever, why, how, whatever, what, both, and, or, either, neither, nor, just, rather, such, that, yet, is, it` |
+| `Ignore cased words` | Only apply title case style to words that are all lowercase | N/A | `true` |
+| `Ignore words` | A comma separated list of words to ignore when capitalizing | N/A | `macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript, I` |
+| `Lowercase words` | A comma separated list of words to keep lowercase | N/A | `a, an, the, aboard, about, abt., above, abreast, absent, across, after, against, along, aloft, alongside, amid, amidst, mid, midst, among, amongst, anti, apropos, around, round, as, aslant, astride, at, atop, ontop, bar, barring, before, B4, behind, below, beneath, neath, beside, besides, between, 'tween, beyond, but, by, chez, circa, c., ca., come, concerning, contra, counting, cum, despite, spite, down, during, effective, ere, except, excepting, excluding, failing, following, for, from, in, including, inside, into, less, like, minus, modulo, mod, near, nearer, nearest, next, notwithstanding, of, o', off, offshore, on, onto, opposite, out, outside, over, o'er, pace, past, pending, per, plus, post, pre, pro, qua, re, regarding, respecting, sans, save, saving, short, since, sub, than, through, thru, throughout, thruout, till, times, to, t', touching, toward, towards, under, underneath, unlike, until, unto, up, upon, versus, vs., v., via, vice, vis-à-vis, wanting, with, w/, w., c̄, within, w/i, without, 'thout, w/o, abroad, adrift, aft, afterward, afterwards, ahead, apart, ashore, aside, away, back, backward, backwards, beforehand, downhill, downstage, downstairs, downstream, downward, downwards, downwind, east, eastward, eastwards, forth, forward, forwards, heavenward, heavenwards, hence, henceforth, here, hereby, herein, hereof, hereto, herewith, home, homeward, homewards, indoors, inward, inwards, leftward, leftwards, north, northeast, northward, northwards, northwest, now, onward, onwards, outdoors, outward, outwards, overboard, overhead, overland, overseas, rightward, rightwards, seaward, seawards, skywards, skyward, south, southeast, southwards, southward, southwest, then, thence, thenceforth, there, thereby, therein, thereof, thereto, therewith, together, underfoot, underground, uphill, upstage, upstairs, upstream, upward, upwards, upwind, west, westward, westwards, when, whence, where, whereby, wherein, whereto, wherewith, although, because, considering, given, granted, if, lest, once, provided, providing, seeing, so, supposing, though, unless, whenever, whereas, wherever, while, whilst, ago, inasmuch, even, whether, whose, whoever, why, how, whatever, what, both, and, or, either, neither, nor, just, rather, such, that, yet, is, it` |
 
 
 
 ### Examples
 
-<details><summary>With `Title Case=true`, `Ignore Cased Words=false`</summary>
+<details><summary>With `Title case=true`, `Ignore cased words=false`</summary>
 
 Before:
 
@@ -43,7 +43,7 @@ After:
 ### A Heading 3
 ``````
 </details>
-<details><summary>With `Title Case=true`, `Ignore Cased Words=true`</summary>
+<details><summary>With `Title Case=true`, `Ignore cased words=true`</summary>
 
 Before:
 
@@ -94,7 +94,7 @@ After:
 ``````
 </details>
 
-## File Name Heading
+## File name heading
 
 Alias: `file-name-heading`
 
@@ -143,7 +143,7 @@ This is a line of text
 ``````
 </details>
 
-## Header Increment
+## Header increment
 
 Alias: `header-increment`
 
@@ -153,7 +153,7 @@ Heading levels should only increment by one level at a time
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Start Header Increment at Heading Level 2` | Makes heading level 2 the minimum heading level in a file for header increment and shifts all headings accordingly so they increment starting with a level 2 heading. | N/A | false |
+| `Start header increment at heading level 2` | Makes heading level 2 the minimum heading level in a file for header increment and shifts all headings accordingly so they increment starting with a level 2 heading. | N/A | false |
 
 
 
@@ -233,7 +233,7 @@ This resets the decrement section so the H6 below is decremented to an H3
 ## H6
 ``````
 </details>
-<details><summary>When `Start Header Increment at Heading Level 2 = true`, H1s become H2s and the other headers are incremented accordingly</summary>
+<details><summary>When `Start header increment at heading level 2 = true`, H1s become H2s and the other headers are incremented accordingly</summary>
 
 Before:
 
@@ -260,7 +260,7 @@ After:
 ``````
 </details>
 
-## Headings Start Line
+## Headings start line
 
 Alias: `headings-start-line`
 
@@ -305,7 +305,7 @@ After:
 ``````
 </details>
 
-## Remove Trailing Punctuation in Heading
+## Remove trailing punctuation in heading
 
 Alias: `remove-trailing-punctuation-in-heading`
 
@@ -315,7 +315,7 @@ Removes the specified punctuation from the end of headings making sure to ignore
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Trailing Punctuation` | The trailing punctuation to remove from the headings in the file. | N/A | `.,;:!。，；：！` |
+| `Trailing punctuation` | The trailing punctuation to remove from the headings in the file. | N/A | `.,;:!。，；：！` |
 
 
 

@@ -27,7 +27,7 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
   get exampleBuilders(): ExampleBuilder<UnorderedListStyleOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Unordered lists have their indicator updated to `*` when `List item style = \'consistent\'` and `*` is the first unordered list indicator',
+        description: 'Unordered lists have their marker updated to `*` when `List item style = \'consistent\'` and `*` is the first unordered list marker',
         before: dedent`
           1. ordered item 1
           2. ordered item 2
@@ -68,7 +68,7 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
         `,
       }),
       new ExampleBuilder({
-        description: 'Unordered lists have their indicator updated to `-` when `List item style = \'-\'`',
+        description: 'Unordered lists have their marker updated to `-` when `List item style = \'-\'`',
         before: dedent`
           - Item 1
             * Sublist 1 item 1
@@ -114,7 +114,7 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
         },
       }),
       new ExampleBuilder({
-        description: 'Unordered lists have their indicator updated to `*` when `List item style = \'*\'`',
+        description: 'Unordered lists have their marker updated to `*` when `List item style = \'*\'`',
         before: dedent`
           - Item 1
             * Sublist 1 item 1
@@ -144,7 +144,7 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
         },
       }),
       new ExampleBuilder({
-        description: 'Unordered list in blockquote has list item indicators set to `+` when `List item style = \'-\'`',
+        description: 'Unordered list in blockquote has list item markers set to `+` when `List item style = \'-\'`',
         before: dedent`
           > - Item 1
           > + Item 2
@@ -177,19 +177,19 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
         records: [
           {
             value: UnorderedListItemStyles.Consistent,
-            description: 'Makes sure unordered list items use a consistent list item indicator in the file which will be based on the first list item found',
+            description: 'Makes sure unordered list items use a consistent list item marker in the file which will be based on the first list item found',
           },
           {
             value: UnorderedListItemStyles.Dash,
-            description: 'Makes sure unordered list items use `-` as their indicator',
+            description: 'Makes sure unordered list items use `-` as their marker',
           },
           {
             value: UnorderedListItemStyles.Asterisk,
-            description: 'Makes sure unordered list items use `*` as their indicator',
+            description: 'Makes sure unordered list items use `*` as their marker',
           },
           {
             value: UnorderedListItemStyles.Plus,
-            description: 'Makes sure unordered list items use `+` as their indicator',
+            description: 'Makes sure unordered list items use `+` as their marker',
           },
         ],
       }),

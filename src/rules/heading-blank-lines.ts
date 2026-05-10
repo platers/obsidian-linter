@@ -90,7 +90,7 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
       }),
       new ExampleBuilder({
         // accounts for https://github.com/platers/obsidian-linter/issues/219
-        description: 'Empty line before header and after YAML is removed with `Empty Line Between YAML and Header=false`',
+        description: 'Empty line before header and after YAML is removed with `Empty line between YAML and header=false`',
         before: dedent`
           ---
           key: value

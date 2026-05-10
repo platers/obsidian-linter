@@ -44,7 +44,7 @@ export default class EmptyLineAroundMathBlock extends RuleBuilder<EmptyLineAroun
         `,
       }),
       new ExampleBuilder({
-        description: 'Math blocks that are singe-line are updated based on the value of `Number of Dollar Signs to Indicate a Math Block` (in this case its value is 2)',
+        description: 'Math blocks that are singe-line are updated based on the value of `Number of dollar signs to indicate a math block` (in this case its value is 2)',
         before: dedent`
           $$\\boldsymbol{a}=\\begin{bmatrix}a_x \\\\ a_y\\end{bmatrix}$$
           some more text

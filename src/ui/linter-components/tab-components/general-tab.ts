@@ -1,12 +1,12 @@
-import LinterPlugin from 'src/main';
+import LinterPlugin from '../../../main';
 import {Tab} from './tab';
 import {App} from 'obsidian';
 import {moment} from 'obsidian';
-import {getTextInLanguage} from 'src/lang/helpers';
-import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
-import {DropdownRecordInfo, DropdownSetting} from 'src/ui/components/dropdown-setting';
-import {NumberInputSetting} from 'src/ui/components/number-input-setting';
-import {ToggleSetting} from 'src/ui/components/toggle-setting';
+import {getTextInLanguage} from '../../../lang/helpers';
+import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '../../..//utils/yaml';
+import {DropdownRecordInfo, DropdownSetting} from '../../../ui/components/dropdown-setting';
+import {NumberInputSetting} from '../../../ui/components/number-input-setting';
+import {ToggleSetting} from '../../../ui/components/toggle-setting';
 import {FolderIgnoreOption} from '../folder-ignore-option';
 import {FilesToIgnoreOption} from '../files-to-ignore-option';
 import {AdditionalFileExtensionsOption} from '../additional-file-extensions-option';
@@ -20,12 +20,12 @@ export class GeneralTab extends Tab {
   display(): void {
     let tempDiv = this.contentEl.createDiv();
 
-    let displayCharactersChangedSetting: ToggleSetting = null;
+    let displayCharactersChangedSetting: ToggleSetting | null = null;
     const lintOnSaveSetting = new ToggleSetting(tempDiv, 'tabs.general.lint-on-save.name', 'tabs.general.lint-on-save.description', 'lintOnSave', this.plugin, (value: boolean) => {
       if (value) {
-        displayCharactersChangedSetting.unhide();
+        displayCharactersChangedSetting!.unhide();
       } else {
-        displayCharactersChangedSetting.hide();
+        displayCharactersChangedSetting!.hide();
       }
     });
     this.addSettingSearchInfoForGeneralSettings(lintOnSaveSetting);
@@ -37,13 +37,13 @@ export class GeneralTab extends Tab {
       displayCharactersChangedSetting.hide();
     }
 
-    let displayLintOnActiveFileChangeSetting: ToggleSetting = null;
+    let displayLintOnActiveFileChangeSetting: ToggleSetting | null = null;
     tempDiv = this.contentEl.createDiv();
     const lintOnActiveFileChangeSetting = new ToggleSetting(tempDiv, 'tabs.general.lint-on-file-change.name', 'tabs.general.lint-on-file-change.description', 'lintOnFileChange', this.plugin, (value: boolean) => {
       if (value) {
-        displayLintOnActiveFileChangeSetting.unhide();
+        displayLintOnActiveFileChangeSetting!.unhide();
       } else {
-        displayLintOnActiveFileChangeSetting.hide();
+        displayLintOnActiveFileChangeSetting!.hide();
       }
     });
     this.addSettingSearchInfoForGeneralSettings(lintOnActiveFileChangeSetting);

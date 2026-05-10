@@ -72,7 +72,7 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
         `,
       }),
       new ExampleBuilder({
-        description: 'With `Two Space Linebreak = true`',
+        description: 'With `Two space linebreak = true`',
         before: dedent`
           # H1
           Line with trailing spaces and tabs.  ${''}

@@ -14,7 +14,7 @@ Removes leading and trailing blank lines in the YAML front matter.
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Inner New Lines` | Remove new lines that are not at the start or the end of the YAML | N/A | false |
+| `Inner new lines` | Remove new lines that are not at the start or the end of the YAML | N/A | false |
 
 
 
@@ -111,7 +111,7 @@ Some more text
 ``````
 </details>
 
-## Convert Spaces to Tabs
+## Convert spaces to tabs
 
 Alias: `convert-spaces-to-tabs`
 
@@ -168,7 +168,7 @@ After:
 ``````
 </details>
 
-## Empty Line Around Blockquotes
+## Empty line around blockquotes
 
 Alias: `empty-line-around-blockquotes`
 
@@ -257,7 +257,7 @@ After:
 ``````
 </details>
 
-## Empty Line Around Code Fences
+## Empty line around code fences
 
 Alias: `empty-line-around-code-fences`
 
@@ -386,7 +386,7 @@ var text = 'some string';
 ``````
 </details>
 
-## Empty Line Around Horizontal Rules
+## Empty line around horizontal rules
 
 Alias: `empty-line-around-horizontal-rules`
 
@@ -508,11 +508,11 @@ Content
 ``````
 </details>
 
-## Empty Line Around Math Blocks
+## Empty line around math blocks
 
 Alias: `empty-line-around-math-blocks`
 
-Ensures that there is an empty line around math blocks using <code>Number of Dollar Signs to Indicate a Math Block</code> to determine how many dollar signs indicates a math block for single-line math.
+Ensures that there is an empty line around math blocks using <code>Number of dollar signs to indicate a math block</code> to determine how many dollar signs indicates a math block for single-line math.
 
 
 
@@ -541,7 +541,7 @@ $$
 some more text
 ``````
 </details>
-<details><summary>Math blocks that are singe-line are updated based on the value of `Number of Dollar Signs to Indicate a Math Block` (in this case its value is 2)</summary>
+<details><summary>Math blocks that are singe-line are updated based on the value of `Number of dollar signs to indicate a math block` (in this case its value is 2)</summary>
 
 Before:
 
@@ -640,7 +640,7 @@ More content here
 ``````
 </details>
 
-## Empty Line Around Tables
+## Empty line around tables
 
 Alias: `empty-line-around-tables`
 
@@ -806,7 +806,7 @@ All headings have one blank line both before and after (except where the heading
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Bottom` | Ensures one blank line after headings (when disabled it does not remove blank lines after headings) | N/A | `true` |
-| `Empty Line Between YAML and Header` | Keep the empty line between the YAML frontmatter and header | N/A | `true` |
+| `Empty line between YAML and header` | Keep the empty line between the YAML frontmatter and header | N/A | `true` |
 
 ### Additional Info
 
@@ -873,7 +873,7 @@ line
 line
 ``````
 </details>
-<details><summary>Empty line before header and after YAML is removed with `Empty Line Between YAML and Header=false`</summary>
+<details><summary>Empty line before header and after YAML is removed with `Empty line between YAML and header=false`</summary>
 
 Before:
 
@@ -898,7 +898,7 @@ Paragraph here...
 ``````
 </details>
 
-## Line Break at Document End
+## Line break at document end
 
 Alias: `line-break-at-document-end`
 
@@ -958,11 +958,11 @@ After:
 ``````
 </details>
 
-## Move Math Block Indicators to Their Own Line
+## Move math block indicators to their own line
 
 Alias: `move-math-block-indicators-to-their-own-line`
 
-Move all starting and ending math block indicators to their own lines using <code>Number of Dollar Signs to Indicate a Math Block</code> to determine how many dollar signs indicates a math block for single-line math.
+Move all starting and ending math block indicators to their own lines using <code>Number of dollar signs to indicate a math block</code> to determine how many dollar signs indicates a math block for single-line math.
 
 
 
@@ -970,7 +970,7 @@ Move all starting and ending math block indicators to their own lines using <cod
 
 ### Examples
 
-<details><summary>Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 2</summary>
+<details><summary>Moving math block indicator to its own line when `Number of dollar signs to indicate a math block` = 2</summary>
 
 Before:
 
@@ -996,7 +996,7 @@ L = \frac{1}{2} \rho v^2 S C_L
 $$
 ``````
 </details>
-<details><summary>Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 3 and opening indicator is on the same line as the start of the content</summary>
+<details><summary>Moving math block indicator to its own line when `Number of dollar signs to indicate a math block` = 3 and opening indicator is on the same line as the start of the content</summary>
 
 Before:
 
@@ -1013,7 +1013,7 @@ $$$
 $$$
 ``````
 </details>
-<details><summary>Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 2 and ending indicator is on the same line as the ending line of the content</summary>
+<details><summary>Moving math block indicator to its own line when `Number of dollar signs to indicate a math block` = 2 and ending indicator is on the same line as the ending line of the content</summary>
 
 Before:
 
@@ -1104,11 +1104,11 @@ A new paragraph
 ``````
 </details>
 
-## Remove Empty Lines Between List Markers and Checklists
+## Remove empty lines between list markers
 
 Alias: `remove-empty-lines-between-list-markers-and-checklists`
 
-There should not be any empty lines between list markers and checklists.
+There should not be any empty lines between list markers.
 
 
 
@@ -1133,7 +1133,7 @@ After:
 2. Item 2
 ``````
 </details>
-<details><summary>Blank lines are removed between list items when the list indicator is '-'</summary>
+<details><summary>Blank lines are removed between list items when the list marker is '-'</summary>
 
 Before:
 
@@ -1173,7 +1173,7 @@ After:
 - [ ] Item 2
 ``````
 </details>
-<details><summary>Blank lines are removed between list items when the list indicator is '+'</summary>
+<details><summary>Blank lines are removed between list items when the list marker is '+'</summary>
 
 Before:
 
@@ -1193,7 +1193,7 @@ After:
 + Item 2
 ``````
 </details>
-<details><summary>Blank lines are removed between list items when the list indicator is '*'</summary>
+<details><summary>Blank lines are removed between list items when the list marker is '*'</summary>
 
 Before:
 
@@ -1213,7 +1213,7 @@ After:
 * Item 2
 ``````
 </details>
-<details><summary>Blanks lines are removed between like list types (ordered, specific list item indicators, and checklists) while blanks are left between different kinds of list item indicators</summary>
+<details><summary>Blanks lines are removed between like list types (ordered, specific list item markers, and checklists) while blanks are left between different kinds of list item markers</summary>
 
 Before:
 
@@ -1338,7 +1338,7 @@ After:
 ``````
 </details>
 
-## Remove Space around Characters
+## Remove space around characters
 
 Alias: `remove-space-around-characters`
 
@@ -1348,16 +1348,16 @@ Ensures that certain characters are not surrounded by whitespace (either single 
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Include Fullwidth Forms` | Include <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Fullwidth Forms Unicode block</a> | N/A | `true` |
-| `Include CJK Symbols and Punctuation` | Include <a href="https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation">CJK Symbols and Punctuation Unicode block</a> | N/A | `true` |
-| `Include Dashes` | Include en dash (–) and em dash (—) | N/A | `true` |
+| `Include fullwidth forms` | Include <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">Fullwidth Forms Unicode block</a> | N/A | `true` |
+| `Include CJK symbols and punctuation` | Include <a href="https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation">CJK Symbols and Punctuation Unicode block</a> | N/A | `true` |
+| `Include dashes` | Include en dash (–) and em dash (—) | N/A | `true` |
 | `Other symbols` | Other symbols to include | N/A |  |
 
 
 
 ### Examples
 
-<details><summary>Remove Spaces and Tabs around Fullwidth Characters</summary>
+<details><summary>Remove spaces and tabs around fullwidth characters</summary>
 
 Before:
 
@@ -1385,12 +1385,12 @@ This is a fullwidth semicolon；with text after it.
 Ｒemoves space at start of line
 ``````
 </details>
-<details><summary>Fullwidth Characters in List Do not Affect List Markdown Syntax</summary>
+<details><summary>Fullwidth characters in list do not affect list markdown syntax</summary>
 
 Before:
 
 `````` markdown
-# List indicators should not have the space after them removed if they are followed by a fullwidth character
+# List markers should not have the space after them removed if they are followed by a fullwidth character
 
 - ［ contents here］
   -  ［ more contents here］ more text here
@@ -1416,7 +1416,7 @@ Before:
 After:
 
 `````` markdown
-# List indicators should not have the space after them removed if they are followed by a fullwidth character
+# List markers should not have the space after them removed if they are followed by a fullwidth character
 
 - ［contents here］
   - ［more contents here］more text here
@@ -1440,7 +1440,7 @@ After:
 ``````
 </details>
 
-## Remove Space Before or After Characters
+## Remove space before or after characters
 
 Alias: `remove-space-before-or-after-characters`
 
@@ -1450,14 +1450,14 @@ Removes space before the specified characters and after the specified characters
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Remove Space Before Characters` | Removes space before the specified characters. <b>Note: using <code>{</code> or <code>}</code> in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.</b> | N/A | `,!?;:).’”]` |
-| `Remove Space After Characters` | Removes space after the specified characters. <b>>Note: using <code>{</code> or <code>}</code> in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.</b> | N/A | `¿¡‘“([` |
+| `Remove space before characters` | Removes space before the specified characters. <b>Note: using <code>{</code> or <code>}</code> in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.</b> | N/A | `,!?;:).’”]` |
+| `Remove space after characters` | Removes space after the specified characters. <b>>Note: using <code>{</code> or <code>}</code> in the list of characters will unexpectedly affect files as it is used in the ignore syntax behind the scenes.</b> | N/A | `¿¡‘“([` |
 
 
 
 ### Examples
 
-<details><summary>Remove Spaces and Tabs Before and After Default Symbol Set</summary>
+<details><summary>Remove spaces and tabs before and after default symbol set</summary>
 
 Before:
 
@@ -1533,8 +1533,8 @@ Ensures that Chinese, Japanese, or Korean and English or numbers are separated b
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `English Punctuations and Symbols Before CJK` | The list of non-letter punctuation and symbols to consider to be from English when found before Chinese, Japanese, or Korean characters. <b>Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.</b> | N/A | `-+;:'"°%$)]` |
-| `English Punctuations and Symbols After CJK` | The list of non-letter punctuation and symbols to consider to be from English when found after Chinese, Japanese, or Korean characters. <b>Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.</b> | N/A | `-+'"([¥$` |
+| `English punctuations and symbols before CJK` | The list of non-letter punctuation and symbols to consider to be from English when found before Chinese, Japanese, or Korean characters. <b>Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.</b> | N/A | `-+;:'"°%$)]` |
+| `English punctuations and symbols after CJK` | The list of non-letter punctuation and symbols to consider to be from English when found after Chinese, Japanese, or Korean characters. <b>Note: "*" is always considered to be English and is necessary for handling some markdown syntaxes properly.</b> | N/A | `-+'"([¥$` |
 
 
 
@@ -1596,7 +1596,7 @@ After:
 #标签A #标签2标签
 ``````
 </details>
-<details><summary>Make sure that spaces are not added between italics and chinese characters to preserve markdown syntax</summary>
+<details><summary>Make sure that spaces are not added between italics and Chinese characters to preserve markdown syntax</summary>
 
 Before:
 
@@ -1673,7 +1673,7 @@ Removes extra spaces after every line.
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Two Space Linebreak` | Ignore two spaces followed by a line break ("Two Space Rule"). | N/A | false |
+| `Two space linebreak` | Ignore two spaces followed by a line break ("Two Space Rule"). | N/A | false |
 
 
 
@@ -1695,7 +1695,7 @@ After:
 Line with trailing spaces and tabs.
 ``````
 </details>
-<details><summary>With `Two Space Linebreak = true`</summary>
+<details><summary>With `Two space linebreak = true`</summary>
 
 Before:
 

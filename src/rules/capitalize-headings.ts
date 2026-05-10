@@ -1,8 +1,8 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
-import {allHeadersRegex, wordSplitterRegex} from '../utils/regex';
+import {allHeadersRegex, escapeRegExp, whitespaceSplitterRegex, wordSplitterRegex} from '../utils/regex';
 
 type Style = 'Title Case' | 'ALL CAPS' | 'First letter';
 
@@ -309,6 +309,8 @@ class CapitalizeHeadingsOptions implements Options {
     'is',
     'it',
   ];
+  startingWordIgnoreCharacters?: string = '\'"(‘“-';
+  endingWordIgnoreCharacters?: string = '.?!,:;\'")”’0123456789-';
   ignoreCasedWords?: boolean = true;
 }
 
@@ -334,15 +336,27 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
 
       const capitalizeJustFirstLetter = options.style === 'First letter';
       // split by whitespace
-      const headerWords = headerText.match(/\S+/g);
+      const headerWords = headerText.match(whitespaceSplitterRegex);
+      if (!headerWords) {
+        return headerText;
+      }
+
+      const startingCustomRegexGroup = options.startingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.startingWordIgnoreCharacters!)}]?`;
+      const endingCustomRegexGroup = options.endingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.endingWordIgnoreCharacters!)}]*`;
+      const wordRegex = new RegExp(`^${startingCustomRegexGroup}[\\p{L}’'-]{1,}${endingCustomRegexGroup}$`, 'u');
       const keepCasing = options.ignoreWords;
       const ignoreShortWords = options.lowercaseWords;
+      let indexToCapitalize = 0;
       let firstWord = true;
       for (let j = 1; j < headerWords.length; j++) {
         // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
-        const isWord = headerWords[j].match(/^[\p{L}'-]{1,}[.?!,:;\d]*$/u);
+        const isWord = headerWords[j].match(wordRegex);
         if (!isWord || headerWords[j] === '-' || headerWords[j] === '\'') {
           continue;
+        }
+
+        if (options.startingWordIgnoreCharacters?.includes(headerWords[j][0])) {
+          indexToCapitalize =1;
         }
 
         const ignoreCasedWord = options.ignoreCasedWords && headerWords[j] !== headerWords[j].toLowerCase();
@@ -351,7 +365,11 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
           headerWords[j] = headerWords[j].toLowerCase();
           const ignoreWord = ignoreShortWords.includes(headerWords[j]);
           if ((!ignoreWord && !capitalizeJustFirstLetter) || firstWord === true) {
-            headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+            if (indexToCapitalize === 0) {
+              headerWords[j] = headerWords[j][indexToCapitalize].toUpperCase() + headerWords[j].slice(indexToCapitalize+1);
+            } else {
+              headerWords[j] = headerWords[j][0] + headerWords[j][indexToCapitalize].toUpperCase() + headerWords[j].slice(indexToCapitalize+1);
+            }
           }
         }
 
@@ -369,7 +387,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
   get exampleBuilders(): ExampleBuilder<CapitalizeHeadingsOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'With `Title Case=true`, `Ignore Cased Words=false`',
+        description: 'With `Title case=true`, `Ignore cased words=false`',
         before: dedent`
           # this is a heading 1
           ## THIS IS A HEADING 2
@@ -386,7 +404,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
         },
       }),
       new ExampleBuilder({
-        description: 'With `Title Case=true`, `Ignore Cased Words=true`',
+        description: 'With `Title Case=true`, `Ignore cased words=true`',
         before: dedent`
           # this is a heading 1
           ## THIS IS A HEADING 2
@@ -475,6 +493,18 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
         optionsKey: 'lowercaseWords',
         splitter: wordSplitterRegex,
         separator: ', ',
+      }),
+      new TextOptionBuilder({
+        OptionsClass: CapitalizeHeadingsOptions,
+        nameKey: 'rules.capitalize-headings.starting-word-ignore-characters.name',
+        descriptionKey: 'rules.capitalize-headings.starting-word-ignore-characters.description',
+        optionsKey: 'startingWordIgnoreCharacters',
+      }),
+      new TextOptionBuilder({
+        OptionsClass: CapitalizeHeadingsOptions,
+        nameKey: 'rules.capitalize-headings.ending-word-ignore-characters.name',
+        descriptionKey: 'rules.capitalize-headings.ending-word-ignore-characters.description',
+        optionsKey: 'endingWordIgnoreCharacters',
       }),
     ];
   }

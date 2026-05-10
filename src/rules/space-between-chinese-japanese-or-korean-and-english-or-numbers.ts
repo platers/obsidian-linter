@@ -115,7 +115,7 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
       new ExampleBuilder({
         // accounts for https://github.com/platers/obsidian-linter/issues/301
         description:
-          'Make sure that spaces are not added between italics and chinese characters to preserve markdown syntax',
+          'Make sure that spaces are not added between italics and Chinese characters to preserve markdown syntax',
         before: dedent`
           _这是一个数学公式_
           *这是一个数学公式english*

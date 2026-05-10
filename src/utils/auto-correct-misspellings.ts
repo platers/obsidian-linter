@@ -1,7 +1,7 @@
 
 import {normalizePath, Notice, Plugin, requestUrl, RequestUrlResponse} from 'obsidian';
 import {logError, logWarn} from './logger';
-import {getTextInLanguage} from 'src/lang/helpers';
+import {getTextInLanguage} from '../lang/helpers';
 
 const defaultCustomMisspellingsFileName = 'default-misspellings.md';
 const defaultCustomAutoCorrectMisspellingsLocations = `https://raw.githubusercontent.com/platers/obsidian-linter/refs/heads/master/src/utils/${defaultCustomMisspellingsFileName}`;

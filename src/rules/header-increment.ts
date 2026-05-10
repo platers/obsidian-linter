@@ -140,7 +140,7 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
         `,
       }),
       new ExampleBuilder({
-        description: 'When `Start Header Increment at Heading Level 2 = true`, H1s become H2s and the other headers are incremented accordingly',
+        description: 'When `Start header increment at heading level 2 = true`, H1s become H2s and the other headers are incremented accordingly',
         before: dedent`
           # H1 becomes H2
           #### H4 becomes H3

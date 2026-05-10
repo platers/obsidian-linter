@@ -190,7 +190,7 @@ export default class RuleTemplate extends RuleBuilder<SortYamlArrayValuesOptions
         },
       }),
       new ExampleBuilder({
-        description: 'Sort YAML Arrays respects list of keys to not sort values of for normal arrays (keys to ignore is just `arr2` for this example)',
+        description: 'Sort YAML arrays respects list of keys to not sort values of for normal arrays (keys to ignore is just `arr2` for this example)',
         before: dedent`
           ---
           tags: [computer, research]

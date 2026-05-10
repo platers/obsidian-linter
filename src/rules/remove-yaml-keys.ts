@@ -44,7 +44,7 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
   get exampleBuilders(): ExampleBuilder<RemoveYamlKeysOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Removes the values specified in `YAML Keys to Remove` = "status:\nkeywords\ndate"',
+        description: 'Removes the values specified in `YAML keys to remove` = "status:\nkeywords\ndate"',
         before: dedent`
           ---
           language: Typescript

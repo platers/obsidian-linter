@@ -4,7 +4,7 @@
 # Footnote Rules
 
 
-## Footnote after Punctuation
+## Footnote after punctuation
 
 Alias: `footnote-after-punctuation`
 
@@ -49,7 +49,7 @@ After:
 ``````
 </details>
 
-## Move Footnotes to the bottom
+## Move footnotes to the bottom
 
 Alias: `move-footnotes-to-the-bottom`
 
@@ -59,7 +59,7 @@ Move all footnotes to the bottom of the document and makes sure they are sorted 
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Include Blank Line Between Footnotes` | Includes a blank line between footnotes when enabled. | N/A | false |
+| `Include blank line between footnotes` | Includes a blank line between footnotes when enabled. | N/A | false |
 
 
 
@@ -121,7 +121,7 @@ Maecenas malesuada dignissim purus ac volutpat.
 ``````
 </details>
 
-## Re-Index Footnotes
+## Re-index footnotes
 
 Alias: `re-index-footnotes`
 

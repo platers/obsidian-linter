@@ -295,7 +295,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         },
       }),
       new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/1044
-        description: 'Using `title` as `Alias Helper Key` sets the value of `title` to the alias.',
+        description: 'Using `title` as `Alias helper key` sets the value of `title` to the alias.',
         before: dedent`
           ${''}
         `,

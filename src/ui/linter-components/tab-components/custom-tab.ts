@@ -1,4 +1,4 @@
-import LinterPlugin from 'src/main';
+import LinterPlugin from '../../../main';
 import {Tab} from './tab';
 import {CustomCommandOption} from '../custom-command-option';
 import {CustomReplaceOption} from '../custom-replace-option';

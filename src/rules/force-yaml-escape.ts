@@ -59,7 +59,7 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
         `,
       }),
       new ExampleBuilder({
-        description: 'Force YAML keys to be escaped with double quotes where not already escaped with `Force YAML Escape on Keys = \'key\'\\n\'title\'\\n\'bool\'`',
+        description: 'Force YAML keys to be escaped with double quotes where not already escaped with `Force YAML escape on keys = \'key\'\\n\'title\'\\n\'bool\'`',
         before: dedent`
           ---
           key: 'Already escaped value'

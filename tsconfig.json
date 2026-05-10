@@ -1,13 +1,11 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "inlineSourceMap": true,
     "inlineSources": true,
-    "module": "esnext",
+    "module": "es2020",
     "target": "es6",
     "allowJs": true,
     "noImplicitAny": true,
-    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
     "experimentalDecorators": true,
@@ -20,7 +18,7 @@
     ]
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
   ],
   "exclude": [
     "node_modules/**/*",

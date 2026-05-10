@@ -29,7 +29,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
   get exampleBuilders(): ExampleBuilder<OrderedListStyleOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Ordered lists have list items set to ascending numerical order when Number Style is `ascending`.',
+        description: 'Ordered lists have list items set to ascending numerical order when Number style is `ascending`.',
         before: dedent`
           1. Item 1
           2. Item 2
@@ -54,7 +54,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         `,
       }),
       new ExampleBuilder({
-        description: 'Nested ordered lists have list items set to ascending numerical order when Number Style is `ascending`.',
+        description: 'Nested ordered lists have list items set to ascending numerical order when Number style is `ascending`.',
         before: dedent`
           1. Item 1
           2. Item 2
@@ -73,7 +73,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         `,
       }),
       new ExampleBuilder({
-        description: 'Ordered list in blockquote has list items set to \'1.\' when Number Style is `lazy`.',
+        description: 'Ordered list in blockquote has list items set to \'1.\' when Number style is `lazy`.',
         before: dedent`
           > 1. Item 1
           > 4. Item 2
@@ -93,7 +93,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         },
       }),
       new ExampleBuilder({
-        description: 'Ordered list in blockquote has list items set to ascending numerical order when Number Style is `ascending`.',
+        description: 'Ordered list in blockquote has list items set to ascending numerical order when Number style is `ascending`.',
         before: dedent`
           > 1. Item 1
           > 4. Item 2
@@ -110,7 +110,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         `,
       }),
       new ExampleBuilder({
-        description: 'Nested ordered list has list items set to \'1)\' when Number Style is `lazy` and Ordered List Indicator End Style is `)`.',
+        description: 'Nested ordered list has list items set to \'1)\' when Number style is `lazy` and Ordered list indicator end style is `)`.',
         before: dedent`
           1. Item 1
           2. Item 2
@@ -133,7 +133,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         },
       }),
       new ExampleBuilder({
-        description: 'Ordered lists have list items set to ascending numerical order using initial indicator number when Number Style is `ascending` and `preserveStart` is enabled',
+        description: 'Ordered lists have list items set to ascending numerical order using initial indicator number when Number style is `ascending` and `preserveStart` is enabled',
         before: dedent`
           1. Item 1
           2. Item 2
@@ -162,7 +162,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         },
       }),
       new ExampleBuilder({
-        description: 'Nested ordered lists have list items set to ascending numerical order using initial indicator number when Number Style is `ascending` and `preserveStart` is enabled',
+        description: 'Nested ordered lists have list items set to ascending numerical order using initial indicator number when Number style is `ascending` and `preserveStart` is enabled',
         before: dedent`
           4. Item 4
           2. Item 5
@@ -184,7 +184,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         },
       }),
       new ExampleBuilder({
-        description: 'Ordered lists have list items set to initial indicator number when Number Style is `lazy` and `preserveStart` is enabled',
+        description: 'Ordered lists have list items set to initial indicator number when Number style is `lazy` and `preserveStart` is enabled',
         before: dedent`
           2. Item 2
           5. Item 3
@@ -201,7 +201,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         },
       }),
       new ExampleBuilder({
-        description: 'Nested ordered lists have list items set to initial indicator number when Number Style is `lazy` and `preserveStart` is enabled',
+        description: 'Nested ordered lists have list items set to initial indicator number when Number style is `lazy` and `preserveStart` is enabled',
         before: dedent`
           4. Item 4
           2. Item 5
@@ -224,7 +224,7 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
         },
       }),
       new ExampleBuilder({
-        description: 'Ordered lists items are not modified when Number Style is `preserve`',
+        description: 'Ordered lists items are not modified when Number style is `preserve`',
         before: dedent`
           4. Item 4
           2. Item 5
