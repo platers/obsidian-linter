@@ -17,7 +17,7 @@ export default {
       'errors-message-singular': 'Linter executado em todos os arquivos com 1 erro.',
       'errors-message-plural': 'Linter executado em todos os arquivos com {NUM} erros.',
       'start-message': 'Isso editará todos os seus arquivos e pode introduzir erros.',
-      'submit-button-text': 'Executar o linter em Tudo',
+      'submit-button-text': 'Executar em Todos',
       'submit-button-notice-text': 'Executando o linter em todos os arquivos...',
     },
     'lint-all-files-in-folder': {
@@ -59,12 +59,12 @@ export default {
     'folder-lint': 'Executando linter na pasta ',
     'linter-run': 'Executando o linter',
     'file-change-yaml-lint-run': 'Executando linter de YAML nas alterações de conteúdo do editor',
-    'file-change-yaml-lint-skipped': 'Nenhuma alteração de arquivo detectada, portanto, o linter de YAML foi pulado',
+    'file-change-yaml-lint-skipped': 'Nenhuma alteração de arquivo detectada, portanto, o linter de YAML foi desconsiderado',
     'file-change-yaml-lint-warning': 'Nenhuma informação de arquivo presente, mas o debounce foi executado. Algo deu errado em algum lugar.',
     'paste-link-warning': 'execução do linter ao colar abortada pois o conteúdo da área de transferência é um link e isso evita conflitos com outros plugins que modificam a ação de colar.',
     'see-console': 'Verifique o console para mais detalhes.',
     'unknown-error': 'Ocorreu um erro desconhecido durante a execução do linter.',
-    'moment-locale-not-found': 'Tentando alterar a localidade do Moment.js para {MOMENT_LOCALE}, obteve {CURRENT_LOCALE}',
+    'moment-locale-not-found': 'Tentando alterar a localidade do Moment.js para {MOMENT_LOCALE}, obteve-se {CURRENT_LOCALE}',
     'file-change-lint-message-start': 'Linter executado',
     'custom-command-callback-warning': 'Por favor, defina o callback de comando personalizado apenas para testes de integração.',
 
@@ -126,7 +126,7 @@ export default {
   'copy-aria-label': 'Copiar',
 
   'disabled-other-rule-notice': 'Se você ativar <code>{NAME_1}</code>, isso desativará <code>{NAME_2}</code>. Deseja prosseguir?',
-  'disabled-conflicting-rule-notice': '{NAME_1} entra em conflito com {NAME_2}, portanto foi desativado. Você pode alternar qual configuração está desativada na aba de configurações.',
+  'disabled-conflicting-rule-notice': '{NAME_1} entra em conflito com {NAME_2}, portanto foi desativada. Você pode alternar qual configuração está desativada na aba de configurações.',
 
   // confirm-rule-disable-modal.ts
   'ok': 'Ok',
@@ -186,7 +186,7 @@ export default {
       'files-to-ignore': {
         'name': 'Arquivos a ignorar',
         'description': 'Arquivos a ignorar ao executar o linter em todos os arquivos ou ao salvar.',
-        'file-search-placeholder-text': 'regex para arquivo a ignorar',
+        'file-search-placeholder-text': 'regex para arquivos a ignorar',
         'add-input-button-text': 'Adicionar outra regex de arquivo para ignorar',
         'delete-tooltip': 'Excluir',
         'label-placeholder-text': 'rótulo',
@@ -218,8 +218,8 @@ export default {
         'description': 'O caractere padrão a ser usado para escapar valores no YAML quando aspas simples e duplas não estiverem presentes.',
       },
       'remove-unnecessary-escape-chars-in-multi-line-arrays': {
-        'name': 'Remover Caracteres de Escape Desnecessários em Formato de Array Multi-Linha',
-        'description': 'Caracteres de escape para arrays multi-linha no YAML não precisam do mesmo escape que arrays de linha única, portanto, ao estar em formato de multi-linha, os escapes extras desnecessários serão removidos',
+        'name': 'Remover Caracteres de Escape Desnecessários em Formato de Array Multilinha',
+        'description': 'Caracteres de escape para arrays multilinha no YAML não precisam do mesmo escape que arrays de linha única, portanto, ao estar em formato de multilinha, os escapes extras desnecessários serão removidos',
       },
       'number-of-dollar-signs-to-indicate-math-block': {
         'name': 'Número de Cifrões para Indicar Bloco Matemático',
@@ -251,7 +251,7 @@ export default {
     'custom-command': {
       // custom-command-option.ts
       'name': 'Comandos Personalizados',
-      'description': 'Comandos personalizados são comandos do Obsidian que são executados após o linter finalizar a execução de suas regras regulares. Isso significa que eles não são executados antes da lógicas de timestamp do YAML, então podem fazer com que o timestamp do YAML seja acionado na próxima execução do linter. Você pode selecionar um comando do Obsidian apenas uma vez.',
+      'description': 'Comandos personalizados são comandos do Obsidian que são executados após o linter finalizar a execução de suas regras regulares. Isso significa que eles não são executados antes da lógica de timestamp do YAML, então podem fazer com que o timestamp do YAML seja acionado na próxima execução do linter. Você pode selecionar um comando do Obsidian apenas uma vez.',
       'warning': 'Ao selecionar uma opção, certifique-se de usar o mouse ou pressionar a tecla Enter. Outros métodos de seleção podem não funcionar e apenas seleções de um comando real do Obsidian ou de uma string vazia serão salvas.',
 
       'add-input-button-text': 'Adicionar novo comando',
@@ -263,7 +263,7 @@ export default {
     'custom-replace': {
       // custom-replace-option.ts
       'name': 'Substituição de Regex Personalizada',
-      'description': 'A substituição de regex personalizada pode ser usada para substituir qualquer coisa que corresponda à regex de busca pelo valor de substituição. Os valore de substituição e de busca precisarão ser valores de regex válidos.',
+      'description': 'A substituição de regex personalizada pode ser usada para substituir qualquer coisa que corresponda à regex de busca pelo valor de substituição. Os valores de substituição e de busca precisarão ser valores de regex válidos.',
       'warning': 'Use com cautela se você não conhecer regex. Além disso, certifique-se de que, se você usar lookbehinds na sua regex no iOS (móvel), você esteja em uma versão que os suporte.',
       'add-input-button-text': 'Adicionar nova substituição de regex',
       'regex-to-find-placeholder-text': 'regex de busca',
@@ -280,7 +280,7 @@ export default {
       'custom-row-parse-warning': '"{ROW}" não é uma linha válida de substituições personalizadas. Ela deve ter exatamente 2 colunas.',
       'file-search-placeholder-text': 'Nome do arquivo',
       'add-new-replacement-file-tooltip': 'Adicionar outro arquivo personalizado',
-      'warning-text': 'Arquivos selecionados terão {NAME} desativado automaticamente.',
+      'warning-text': 'Arquivos selecionados terão {NAME} desativada automaticamente.',
       'refresh-tooltip-text': 'Recarregar substituições personalizadas',
     },
   },
@@ -297,7 +297,7 @@ export default {
       },
       'extra-auto-correct-files': {
         'name': 'Arquivos Extras de Correção Automática',
-        'description': 'Estes são arquivos que contêm uma tabela em markdown com a palavra inicial e a palavra para qual deve ser corrigida (são correções sem distinção de maiúsculas e minúsculas). <b>Nota: as tabelas utilizadas devem ter os indicadores <code>|</code> iniciais e finais presentes em cada linha.</b>',
+        'description': 'Estes são arquivos que contêm uma tabela em markdown com a palavra inicial e a palavra para a qual deve ser corrigida (são correções sem distinção de maiúsculas e minúsculas). <b>Nota: as tabelas utilizadas devem ter os indicadores <code>|</code> iniciais e finais presentes em cada linha.</b>',
       },
       'skip-words-with-multiple-capitals': {
         'name': 'Pular Palavras com Várias Maiúsculas',
@@ -346,11 +346,19 @@ export default {
         'name': 'Palavras em Minúsculas',
         'description': 'Uma lista separada por vírgulas de palavras a manter em minúsculas',
       },
+      'starting-word-ignore-characters': {
+        'name': 'Caracteres a ignorar no início de palavras potenciais',
+        'description': 'Caracteres que podem preceder uma ou mais letras, aspas simples ou traços para que o conjunto seja considerado uma palavra',
+      },
+      'ending-word-ignore-characters': {
+        'name': 'Caracteres a ignorar no final de palavras potenciais',
+        'description': 'Caracteres que podem seguir uma ou mais letras, aspas simples ou traços para que o conjunto seja considerado uma palavra',
+      },
     },
     // compact-yaml.ts
     'compact-yaml': {
       'name': 'YAML Compacto',
-      'description': 'Remove linhas em branco no início e no final do YAML frontmatter.',
+      'description': 'Remove linhas em branco no início e no final do frontmatter YAML.',
       'inner-new-lines': {
         'name': 'Novas Linhas Internas',
         'description': 'Remove novas linhas que não estão no início ou no final do YAML',
@@ -465,15 +473,15 @@ export default {
     // format-tags-in-yaml.ts
     'format-tags-in-yaml': {
       'name': 'Formatar Tags no YAML',
-      'description': 'Remove hashtags (#) das tags no YAML frontmatter, pois elas tornam as tags inválidas.',
+      'description': 'Remove hashtags (#) das tags no frontmatter YAML, pois elas tornam as tags inválidas.',
     },
     // format-yaml-array.ts
     'format-yaml-array': {
       'name': 'Formatar Array no YAML',
-      'description': 'Permite a formatação de arrays regulares no YAML como linha múltipla ou linha única e permite que <code>tags</code> e <code>aliases</code> tenham alguns formatos do YAML específico do Obsidian. <b>Nota: de string única para linha única converte uma entrada de string única em um array de linha única se houver mais de 1 entrada. O mesmo é válido de string única para múltiplas linhas, exceto que se torna um array de várias linhas.</b>',
+      'description': 'Permite a formatação de arrays regulares no YAML como linha múltipla ou linha única e permite que <code>tags</code> e <code>aliases</code> tenham alguns formatos do YAML específicos do Obsidian. <b>Nota: de string única para linha única converte uma entrada de string única em um array de linha única se houver mais de 1 entrada. O mesmo é válido de string única para múltiplas linhas, exceto que se torna um array multilinha.</b>',
       'alias-key': {
         'name': 'Formatar seção de aliases no YAML',
-        'description': 'Ativa a formatação para a seção de aliases do YAML. Você não deve ativar esta opção junto com a regra <code>Alias do Título no YAML</code>, pois podem não fucionar bem em conjunto ou podem ter estilos de formato diferentes selecionados causando resultados inesperados.',
+        'description': 'Ativa a formatação para a seção de aliases do YAML. Você não deve ativar esta opção junto com a regra <code>Alias do Título no YAML</code>, pois podem não funcionar bem em conjunto ou podem ter estilos de formato diferentes selecionados causando resultados inesperados.',
       },
       'tag-key': {
         'name': 'Formatar seção de tags no YAML',
@@ -515,7 +523,7 @@ export default {
       },
       'empty-line-after-yaml': {
         'name': 'Linha Vazia entre YAML e Cabeçalho',
-        'description': 'Mantém a linha em branco entre o YAML frontmatter e o cabeçalho',
+        'description': 'Mantém a linha em branco entre o frontmatter YAML e o cabeçalho',
       },
     },
     // headings-start-line.ts
@@ -526,10 +534,10 @@ export default {
     // insert-yaml-attributes.ts
     'insert-yaml-attributes': {
       'name': 'Inserir Atributos YAML',
-      'description': 'Insere os atributos YAML informados no YAML frontmatter. Coloque cada atributo em uma única linha.',
+      'description': 'Insere os atributos YAML informados no frontmatter YAML. Coloque cada atributo em uma única linha.',
       'text-to-insert': {
         'name': 'Texto a inserir',
-        'description': 'Texto a ser inserido no YAML frontmatter',
+        'description': 'Texto a ser inserido no frontmatter YAML',
       },
     },
     // line-break-at-document-end.ts
@@ -561,16 +569,16 @@ export default {
       },
       'tags-to-ignore': {
         'name': 'Tags a ignorar',
-        'description': 'As tags que não serão movidas para o array de tags ou removidas do conteúdo do corpo caso <code>Remover a hashtag de tags no corpo do conteúdo</code> esteja ativado. Cada tag deve estar em uma nova linha e sem o  <code>#</code>. <b>Certifique-se de não incluir a hashtag no nome da tag.</b>',
+        'description': 'As tags que não serão movidas para o array de tags ou removidas do conteúdo do corpo caso <code>Remover a hashtag de tags no corpo do conteúdo</code> esteja ativado. Cada tag deve estar em uma nova linha e sem o <code>#</code>. <b>Certifique-se de não incluir a hashtag no nome da tag.</b>',
       },
     },
     // no-bare-urls.ts
     'no-bare-urls': {
       'name': 'Sem URLs sem Delimitadores',
-      'description': 'Cerca as URLs soltas com sinais de menor e maior (< >) exceto quando em crases, colchetes, aspas simples ou aspas duplas.',
+      'description': 'Envolve as URLs soltas com sinais de menor e maior (< >) exceto quando em crases, colchetes, aspas simples ou aspas duplas.',
       'no-bare-uris': {
         'name': 'Sem URIs sem Delimitadores',
-        'description': 'Tenta envolver URIs soltas com suportes angulares (< >) exceto quando em crases, colchetes, aspas simples ou aspas duplas.',
+        'description': 'Tenta envolver URIs soltas com sinais de menor e maior (< >) exceto quando em crases, colchetes, aspas simples ou aspas duplas.',
       },
     },
     // ordered-list-style.ts
@@ -587,7 +595,7 @@ export default {
       },
       'preserve-start': {
         'name': 'Preservar Número Inicial',
-        'description': 'Se o número inicial de uma lista ordenada deve ser preservado. Isso pode ser usado para ter uma lista ordenada com conteúdos inseridos entre os itens da lista.',
+        'description': 'Se o número inicial de uma lista ordenada deve ser preservado. Isso pode ser usado para ter uma lista ordenada com conteúdo inserido entre os itens da lista.',
       },
     },
     // paragraph-blank-lines.ts
@@ -751,7 +759,7 @@ export default {
     // sort-yaml-array-values.ts
     'sort-yaml-array-values': {
       'name': 'Ordenar Valores de Array no YAML',
-      'description': 'Ordena os valores dos arrays no YAML com vbase na ordem de classificação especificada.',
+      'description': 'Ordena os valores dos arrays no YAML com base na ordem de classificação especificada.',
       'sort-alias-key': {
         'name': 'Ordenar a seção de aliases do YAML',
         'description': 'Ativa a ordenação de aliases.',
@@ -847,7 +855,7 @@ export default {
     // yaml-timestamp.ts
     'yaml-timestamp': {
       'name': 'Timestamp no YAML',
-      'description': 'Acompanha a data em que o arquivo foi editado pela última vez no YAML frontmatter. Obtém as datas a partir dos metadados do arquivo.',
+      'description': 'Acompanha a data em que o arquivo foi editado pela última vez no frontmatter YAML. Obtém as datas a partir dos metadados do arquivo.',
       'date-created': {
         'name': 'Data de Criação',
         'description': 'Inserir a data de criação do arquivo',
@@ -862,7 +870,7 @@ export default {
       },
       'date-modified-source-of-truth': {
         'name': 'Fonte da Verdade da Data de Modificação',
-        'description': 'Especifica qual maneira deve ser usada para determinar quando a data de modificação deve ser atualizada caso ela esteja presente no frontmatter.',
+        'description': 'Especifica qual método deve ser usado para determinar quando a data de modificação deve ser atualizada caso ela esteja presente no frontmatter.',
       },
       'date-modified': {
         'name': 'Data de Modificação',
@@ -888,7 +896,7 @@ export default {
     // yaml-title-alias.ts
     'yaml-title-alias': {
       'name': 'Alias do Título no YAML',
-      'description': 'Insere ou atualiza o título do arquivo na seção de aliases do YAML frontmatter. Obtém o título do primeiro H1 ou do nome do arquivo.',
+      'description': 'Insere ou atualiza o título do arquivo na seção de aliases do frontmatter YAML. Obtém o título do primeiro H1 ou do nome do arquivo.',
       'preserve-existing-alias-section-style': {
         'name': 'Preservar estilo da seção de aliases existentes',
         'description': 'Se definido, a configuração <code>Estilo da seção de aliases no YAML</code> será aplicada apenas nas seções recém-criadas',
@@ -909,7 +917,7 @@ export default {
     // yaml-title.ts
     'yaml-title': {
       'name': 'Título no YAML',
-      'description': 'Insere o título do arquivo no YAML frontmatter. Obtém o título baseando-se no modo selecionado.',
+      'description': 'Insere o título do arquivo no frontmatter YAML. Obtém o título baseando-se no modo selecionado.',
       'title-key': {
         'name': 'Chave de Título',
         'description': 'Qual chave do YAML usar para o título',
@@ -973,7 +981,7 @@ export default {
     // yaml-timestamp.ts
     'file system': 'Sistema de arquivos',
     'frontmatter': 'Frontmatter YAML',
-    'user or Linter edits': 'Edições do Usuário ou do Linter',
+    'user or Linter edits': 'Alterações no Obsidian',
     // quote-style.ts
     '\'\'': '\'\'', // leave as is
     '‘’': '‘’', // leave as is
