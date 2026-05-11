@@ -92,8 +92,11 @@ const esbuildArgs = [
   createEsbuildArgs(banner, 'src/main.ts', 'main.js', unusedCodeForProduction),
   createEsbuildArgs(mockedBanner, 'src/docs.ts', 'docs.js', mockedPlugins),
   createEsbuildArgs(mockedBanner, 'src/translation-helper.ts', 'translation-helper.js', mockedPlugins),
-  createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []),
 ];
+
+if (!prod) {
+  esbuildArgs.push(createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []));
+}
 
 for (let i = 0; i < esbuildArgs.length; i++) {
   if (prod) {
