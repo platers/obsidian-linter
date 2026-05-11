@@ -1,10 +1,6 @@
 import {App, ButtonComponent, DropdownComponent, Modal, Platform, setIcon, TextComponent, ToggleComponent} from 'obsidian';
 import {getTextInLanguage} from 'src/lang/helpers';
 
-// Local stand-in for the upcoming Obsidian FormModal API. Mirrors the core
-// implementation's surface so call sites match what we'll switch to once the
-// API lands.
-
 export class FormField {
   containerEl: HTMLElement;
   labelEl: HTMLLabelElement;
