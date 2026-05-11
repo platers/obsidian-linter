@@ -1,43 +1,34 @@
-import {TextInputSuggest} from './suggest';
-import {App, TFolder} from 'obsidian';
+import {AbstractInputSuggest, App, TFolder} from 'obsidian';
 
-export default class FolderSuggester extends TextInputSuggest<string> {
+export default class FolderSuggester extends AbstractInputSuggest<string> {
   constructor(
-    public app: App,
-    public inputEl: HTMLInputElement,
-    public valuesToExclude: string[] = [],
+      app: App,
+      public inputEl: HTMLInputElement,
+      public valuesToExclude: string[] = [],
   ) {
     super(app, inputEl);
   }
 
-  getSuggestions(input_str: string): string[] {
-    const all_folders = this.app.vault.getAllLoadedFiles().filter((f) => f instanceof TFolder && f.path !== '/').map((f) => f.path);
-    if (!all_folders) {
-      return [];
-    }
+  protected getSuggestions(inputStr: string): string[] {
+    const allFolders = this.app.vault.getAllLoadedFiles()
+        .filter((f): f is TFolder => f instanceof TFolder && f.path !== '/')
+        .map((f) => f.path);
 
-    const nonSelectedFolders = all_folders.filter((el: string) => {
-      return !this.valuesToExclude.includes(el) || el === this.inputEl.getAttribute('folderName');
+    const selected = this.inputEl.getAttribute('folderName');
+    const lower = inputStr.toLowerCase();
+    return allFolders.filter((path) => {
+      if (this.valuesToExclude.includes(path) && path !== selected) return false;
+      return path.toLowerCase().contains(lower);
     });
-
-    const folders: string[] = [];
-    const lower_input_str = input_str.toLowerCase();
-    nonSelectedFolders.forEach((folderPath: string) => {
-      if (folderPath.toLowerCase().contains(lower_input_str)) {
-        folders.push(folderPath);
-      }
-    });
-
-    return folders;
   }
 
   renderSuggestion(folderPath: string, el: HTMLElement): void {
     el.setText(folderPath);
   }
 
-  selectSuggestion(folderPath: string): void {
+  selectSuggestion(folderPath: string, _evt: MouseEvent | KeyboardEvent): void {
     this.inputEl.setAttribute('folderName', folderPath);
-    this.inputEl.value = folderPath;
+    this.setValue(folderPath);
     this.inputEl.trigger('input');
     this.close();
   }
