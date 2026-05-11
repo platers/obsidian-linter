@@ -2,7 +2,7 @@ import {App, ExtraButtonComponent, normalizePath, Setting, TFile, ToggleComponen
 import type {SettingDefinition, SettingDefinitionGroup, SettingDefinitionItem, SettingDefinitionPage} from 'obsidian';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import LinterPlugin from './main';
-import {hideEl, unhideEl, setElContent} from './ui/helpers';
+import {hideEl, unhideEl, setElContent, richDescription} from './ui/helpers';
 import {LinterSettings} from './settings-data';
 import {AutoCorrectFilesPickerOption, CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
 import MdFileSuggester from './ui/suggesters/md-file-suggester';
@@ -63,6 +63,7 @@ export abstract class Option {
   }
 
   protected async writeAndSave(value: any, plugin: LinterPlugin): Promise<void> {
+    plugin.settings.ruleConfigs[this.ruleAlias] ??= {};
     plugin.settings.ruleConfigs[this.ruleAlias][this.configKey] = value;
     await plugin.saveSettings();
   }
@@ -75,6 +76,7 @@ export abstract class Option {
     this.setting.descEl.addClass('linter-no-padding-top');
   }
 
+  // this.setting is unset on the declarative path (display() is bypassed).
   hide() {
     if (this.setting) hideEl(this.setting.settingEl);
   }
@@ -88,7 +90,7 @@ export class BooleanOption extends Option {
   public defaultValue: boolean;
   private toggleComponent: ToggleComponent;
 
-  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: any, ruleAlias?: string | null, private onChange?: (value: boolean, app: App) => void) {
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: any, ruleAlias?: string | null, public onChange?: (value: boolean, app: App) => void) {
     super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
   }
 
@@ -116,7 +118,7 @@ export class BooleanOption extends Option {
   public getSettingDefinition(plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
     return {
       name: this.getName(),
-      desc: this.getDescription(),
+      desc: richDescription(this.getDescription()),
       render: (setting) => {
         setting.addToggle((toggle) => toggle
             .setValue(this.getCurrentValue(plugin))
@@ -159,7 +161,7 @@ export class TextOption extends Option {
   public getSettingDefinition(plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
     return {
       name: this.getName(),
-      desc: this.getDescription(),
+      desc: richDescription(this.getDescription()),
       render: (setting) => {
         setting.addText((textbox) => textbox
             .setValue(this.getCurrentValue(plugin) ?? '')
@@ -191,7 +193,7 @@ export class TextAreaOption extends Option {
   public getSettingDefinition(plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
     return {
       name: this.getName(),
-      desc: this.getDescription(),
+      desc: richDescription(this.getDescription()),
       render: (setting) => {
         setting.addTextArea((textbox) => textbox
             .setValue(this.getCurrentValue(plugin) ?? '')
@@ -224,7 +226,7 @@ export class MomentFormatOption extends Option {
   public getSettingDefinition(plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
     return {
       name: this.getName(),
-      desc: this.getDescription(),
+      desc: richDescription(this.getDescription()),
       render: (setting) => {
         setting.addMomentFormat((format) => format
             .setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a')
@@ -288,7 +290,7 @@ export class DropdownOption extends Option {
   public getSettingDefinition(plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
     return {
       name: this.getName(),
-      desc: this.getDescription(),
+      desc: richDescription(this.getDescription()),
       render: (setting) => {
         setting.addDropdown((dropdown) => {
           for (const option of this.options) {
@@ -419,6 +421,7 @@ export class MdFilePickerOption extends Option {
     return page;
   }
 
+  // this.settingEl is unset on the declarative path (display() is bypassed).
   override hide() {
     if (this.settingEl) hideEl(this.settingEl);
   }

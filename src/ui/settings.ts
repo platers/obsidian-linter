@@ -25,9 +25,23 @@ import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
 import {LinterSettings} from 'src/settings-data';
 import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
 import {logsFromLastRun, setLogLevel} from 'src/utils/logger';
+import {Rule, RuleType, ruleTypeToRules} from 'src/rules';
+import {hideEl, richDescription} from './helpers';
+import {SearchStatus, Tab} from './linter-components/tab-components/tab';
+import {GeneralTab} from './linter-components/tab-components/general-tab';
+import {RuleTab} from './linter-components/tab-components/rule-tab';
+import {CustomTab} from './linter-components/tab-components/custom-tab';
+import {TabSearcher} from './linter-components/tab-components/tab-searcher';
+import {DebugTab} from './linter-components/tab-components/debug-tab';
+import {getTextInLanguage, LanguageStringKey} from 'src/lang/helpers';
+import {LinterSettings} from 'src/settings-data';
+import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
+import {logsFromLastRun, setLogLevel} from 'src/utils/logger';
 import CommandSuggester from './suggesters/command-suggester';
 import {LintCommand} from './linter-components/custom-command-option';
 import {AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal} from './modals/add-list-entry-modals';
+
+type LSKey = keyof LinterSettings & string;
 
 const tabNameKeys: Record<RuleType | 'Custom' | 'Debug', LanguageStringKey> = {
   [RuleType.YAML]: 'tabs.names.yaml',
@@ -141,40 +155,38 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     this.selectedTab = clickedTabName;
   }
 
-  // -------------------------------------------------------------------------
-  // Declarative settings (Obsidian 1.13.0+). On older versions display() runs
-  // instead — this method is silently absent at the call site.
-  // -------------------------------------------------------------------------
-
-  getSettingDefinitions(): SettingDefinitionItem<keyof LinterSettings & string>[] {
-    const items: SettingDefinitionItem<keyof LinterSettings & string>[] = [
+  // 1.12.x fallback lives in display() above.
+  // 1.12.x fallback lives in display() above.
+  getSettingDefinitions(): SettingDefinitionItem<LSKey>[] {
+    return [
       ...this.generalDefinitions(),
       this.commonStylesGroup(),
-      this.filesAndFoldersGroup(),
+      {
+        type: 'group',
+        heading: 'Files and folders',
+        items: [
+          this.foldersToIgnorePage(),
+          this.filesToIgnorePage(),
+          this.additionalFileExtensionsPage(),
+        ],
+      },
+      {
+        type: 'group',
+        heading: 'Rules',
+        items: Object.values(RuleType).map((rt) => this.rulePageFor(rt)),
+      },
+      this.customPage(),
+      this.debugPage(),
     ];
-
-    items.push(
-        {
-          type: 'group',
-          heading: 'Rules',
-          items: Object.values(RuleType).map((ruleType) => this.rulePageFor(ruleType)),
-        });
-
-    items.push(this.customPage());
-    items.push(this.debugPage());
-
-    return items;
   }
 
-  // ----- General settings -------------------------------------------------
-
-  private generalDefinitions(): SettingDefinitionItem<keyof LinterSettings & string>[] {
+  private generalDefinitions(): SettingDefinitionItem<LSKey>[] {
     const settings = this.plugin.settings;
-    const items: SettingDefinitionItem<keyof LinterSettings & string>[] = [];
+    const items: SettingDefinitionItem<LSKey>[] = [];
 
     items.push({
       name: getTextInLanguage('tabs.general.lint-on-save.name'),
-      desc: getTextInLanguage('tabs.general.lint-on-save.description'),
+      desc: richDescription(getTextInLanguage('tabs.general.lint-on-save.description')),
       render: (setting) => {
         setting.addToggle((tg) => tg
             .setValue(settings.lintOnSave)
@@ -189,14 +201,14 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     if (settings.lintOnSave) {
       items.push({
         name: getTextInLanguage('tabs.general.display-message.name'),
-        desc: getTextInLanguage('tabs.general.display-message.description'),
+        desc: richDescription(getTextInLanguage('tabs.general.display-message.description')),
         control: {type: 'toggle', key: 'displayChanged'},
       });
     }
 
     items.push({
       name: getTextInLanguage('tabs.general.lint-on-file-change.name'),
-      desc: getTextInLanguage('tabs.general.lint-on-file-change.description'),
+      desc: richDescription(getTextInLanguage('tabs.general.lint-on-file-change.description')),
       render: (setting) => {
         setting.addToggle((tg) => tg
             .setValue(settings.lintOnFileChange)
@@ -211,14 +223,14 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     if (settings.lintOnFileChange) {
       items.push({
         name: getTextInLanguage('tabs.general.display-lint-on-file-change-message.name'),
-        desc: getTextInLanguage('tabs.general.display-lint-on-file-change-message.description'),
+        desc: richDescription(getTextInLanguage('tabs.general.display-lint-on-file-change-message.description')),
         control: {type: 'toggle', key: 'displayLintOnFileChangeNotice'},
       });
     }
 
     items.push({
       name: getTextInLanguage('tabs.general.suppress-message-when-no-change.name'),
-      desc: getTextInLanguage('tabs.general.suppress-message-when-no-change.description'),
+      desc: richDescription(getTextInLanguage('tabs.general.suppress-message-when-no-change.description')),
       control: {type: 'toggle', key: 'suppressMessageWhenNoChange'},
     });
 
@@ -232,7 +244,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
 
     items.push({
       name: getTextInLanguage('tabs.general.override-locale.name'),
-      desc: getTextInLanguage('tabs.general.override-locale.description'),
+      desc: richDescription(getTextInLanguage('tabs.general.override-locale.description')),
       render: (setting) => {
         setting.addDropdown((dd) => {
           for (const [value, label] of Object.entries(localeOptions)) {
@@ -251,9 +263,8 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     return items;
   }
 
-  // ----- YAML common styles ----------------------------------------------
-
-  private commonStylesGroup(): SettingDefinitionGroup<keyof LinterSettings & string> {
+  // TODO(framework): collapse the body to `control` bindings once dotted keys land.
+  private commonStylesGroup(): SettingDefinitionGroup<LSKey> {
     const settings = this.plugin.settings;
     const aliasFormats = [
       NormalArrayFormats.MultiLine,
@@ -279,7 +290,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       items: [
         {
           name: getTextInLanguage('tabs.general.yaml-aliases-section-style.name'),
-          desc: getTextInLanguage('tabs.general.yaml-aliases-section-style.description'),
+          desc: richDescription(getTextInLanguage('tabs.general.yaml-aliases-section-style.description')),
           render: (setting) => {
             setting.addDropdown((dd) => {
               for (const v of aliasFormats) {
@@ -295,7 +306,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
         },
         {
           name: getTextInLanguage('tabs.general.yaml-tags-section-style.name'),
-          desc: getTextInLanguage('tabs.general.yaml-tags-section-style.description'),
+          desc: richDescription(getTextInLanguage('tabs.general.yaml-tags-section-style.description')),
           render: (setting) => {
             setting.addDropdown((dd) => {
               for (const v of tagFormats) {
@@ -311,7 +322,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
         },
         {
           name: getTextInLanguage('tabs.general.default-escape-character.name'),
-          desc: getTextInLanguage('tabs.general.default-escape-character.description'),
+          desc: richDescription(getTextInLanguage('tabs.general.default-escape-character.description')),
           render: (setting) => {
             setting.addDropdown((dd) => {
               for (const ch of escapeChars) {
@@ -327,7 +338,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
         },
         {
           name: getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.name'),
-          desc: getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.description'),
+          desc: richDescription(getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.description')),
           render: (setting) => {
             setting.addToggle((tg) => tg
                 .setValue(settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays)
@@ -339,7 +350,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
         },
         {
           name: getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.name'),
-          desc: getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.description'),
+          desc: richDescription(getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.description')),
           render: (setting) => {
             setting.addText((tx) => {
               tx.inputEl.type = 'number';
@@ -358,159 +369,111 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     };
   }
 
-  // ----- Editable lists in General ---------------------------------------
-
-  private filesAndFoldersGroup(): SettingDefinitionGroup<keyof LinterSettings & string> {
-    return {
+  private listManagementPage<T>(opts: {
+    name: string;
+    desc: string;
+    addButtonText: string;
+    emptyState: string;
+    values: T[];
+    openAddForm: () => void;
+    onDelete: (index: number) => void;
+    itemName: (entry: T) => string;
+    itemDesc?: (entry: T) => string | undefined;
+  }): SettingDefinitionPage<LSKey> {
+    const items: (SettingDefinition<LSKey> | SettingDefinitionGroup<LSKey>)[] = [];
+    if (Platform.isMobile) {
+      items.push({
+        name: opts.addButtonText,
+        searchable: false,
+        action: opts.openAddForm,
+      });
+    }
+    items.push({
       type: 'group',
-      heading: 'Files and folders',
-      items: [
-        this.foldersToIgnorePage(),
-        this.filesToIgnorePage(),
-        this.additionalFileExtensionsPage(),
+      cls: 'mod-list',
+      emptyState: opts.emptyState,
+      extraButtons: Platform.isMobile ? [] : [
+        (btn) => btn
+            .setIcon('lucide-plus')
+            .setTooltip(opts.addButtonText)
+            .onClick(opts.openAddForm),
       ],
+      onDelete: async (index) => {
+        opts.onDelete(index);
+        await this.plugin.saveSettings();
+        this.update();
+      },
+      items: opts.values.map((entry): SettingDefinition<LSKey> => ({
+        name: opts.itemName(entry),
+        desc: opts.itemDesc?.(entry),
+        searchable: false,
+      })),
+    });
+
+    return {
+      type: 'page',
+      name: opts.name,
+      desc: opts.desc,
+      items,
     };
   }
 
-  private foldersToIgnorePage(): SettingDefinitionPage<keyof LinterSettings & string> {
+  private foldersToIgnorePage(): SettingDefinitionPage<LSKey> {
     const folders = this.plugin.settings.foldersToIgnore;
-    const openAddForm = () => new AddFolderToIgnoreModal(this.app, folders, async (path) => {
-      folders.push(path);
-      await this.plugin.saveSettings();
-      this.update();
-    }).open();
-
-    const items: (SettingDefinition<keyof LinterSettings & string> | SettingDefinitionGroup<keyof LinterSettings & string>)[] = [];
-    if (Platform.isMobile) {
-      items.push({
-        name: getTextInLanguage('tabs.general.folders-to-ignore.add-input-button-text'),
-        searchable: false,
-        action: openAddForm,
-      });
-    }
-    items.push({
-      type: 'group',
-      cls: 'mod-list',
-      emptyState: 'No folders are being ignored yet.',
-      extraButtons: Platform.isMobile ? [] : [
-        (btn) => btn
-            .setIcon('lucide-plus')
-            .setTooltip(getTextInLanguage('tabs.general.folders-to-ignore.add-input-button-text'))
-            .onClick(openAddForm),
-      ],
-      onDelete: async (index) => {
-        folders.splice(index, 1);
-        await this.plugin.saveSettings();
-        this.update();
-      },
-      items: folders.map((folder): SettingDefinition<keyof LinterSettings & string> => ({
-        name: folder || getTextInLanguage('tabs.general.folders-to-ignore.folder-search-placeholder-text'),
-        searchable: false,
-      })),
-    });
-
-    return {
-      type: 'page',
+    return this.listManagementPage({
       name: getTextInLanguage('tabs.general.folders-to-ignore.name'),
-      desc: getTextInLanguage('tabs.general.folders-to-ignore.description'),
-      items,
-    };
+      desc: richDescription(getTextInLanguage('tabs.general.folders-to-ignore.description')),
+      addButtonText: getTextInLanguage('tabs.general.folders-to-ignore.add-input-button-text'),
+      emptyState: 'No folders are being ignored yet.',
+      values: folders,
+      openAddForm: () => new AddFolderToIgnoreModal(this.app, folders, async (path) => {
+        folders.push(path);
+        await this.plugin.saveSettings();
+        this.update();
+      }).open(),
+      onDelete: (index) => folders.splice(index, 1),
+      itemName: (folder) => folder || getTextInLanguage('tabs.general.folders-to-ignore.folder-search-placeholder-text'),
+    });
   }
 
-  private filesToIgnorePage(): SettingDefinitionPage<keyof LinterSettings & string> {
+  private filesToIgnorePage(): SettingDefinitionPage<LSKey> {
     const filesToIgnore = this.plugin.settings.filesToIgnore;
-    const openAddForm = () => new AddFileToIgnoreModal(this.app, async (entry) => {
-      filesToIgnore.push(entry);
-      await this.plugin.saveSettings();
-      this.update();
-    }).open();
-
-    const items: (SettingDefinition<keyof LinterSettings & string> | SettingDefinitionGroup<keyof LinterSettings & string>)[] = [];
-    if (Platform.isMobile) {
-      items.push({
-        name: getTextInLanguage('tabs.general.files-to-ignore.add-input-button-text'),
-        searchable: false,
-        action: openAddForm,
-      });
-    }
-    items.push({
-      type: 'group',
-      cls: 'mod-list',
-      emptyState: 'No files are being ignored yet.',
-      extraButtons: Platform.isMobile ? [] : [
-        (btn) => btn
-            .setIcon('lucide-plus')
-            .setTooltip(getTextInLanguage('tabs.general.files-to-ignore.add-input-button-text'))
-            .onClick(openAddForm),
-      ],
-      onDelete: async (index) => {
-        filesToIgnore.splice(index, 1);
-        await this.plugin.saveSettings();
-        this.update();
-      },
-      items: filesToIgnore.map((entry): SettingDefinition<keyof LinterSettings & string> => ({
-        name: entry.label || entry.match || getTextInLanguage('tabs.general.files-to-ignore.label-placeholder-text'),
-        desc: entry.label && entry.match ? entry.match : undefined,
-        searchable: false,
-      })),
-    });
-
-    return {
-      type: 'page',
+    return this.listManagementPage({
       name: getTextInLanguage('tabs.general.files-to-ignore.name'),
-      desc: getTextInLanguage('tabs.general.files-to-ignore.description'),
-      items,
-    };
-  }
-
-  private additionalFileExtensionsPage(): SettingDefinitionPage<keyof LinterSettings & string> {
-    const extensions = this.plugin.settings.additionalFileExtensions;
-    const openAddForm = () => new AddFileExtensionModal(this.app, extensions, async (ext) => {
-      extensions.push(ext);
-      await this.plugin.saveSettings();
-      this.update();
-    }).open();
-
-    const items: (SettingDefinition<keyof LinterSettings & string> | SettingDefinitionGroup<keyof LinterSettings & string>)[] = [];
-    if (Platform.isMobile) {
-      items.push({
-        name: getTextInLanguage('tabs.general.additional-file-extensions.add-input-button-text'),
-        searchable: false,
-        action: openAddForm,
-      });
-    }
-    items.push({
-      type: 'group',
-      cls: 'mod-list',
-      emptyState: 'No additional file extensions yet.',
-      extraButtons: Platform.isMobile ? [] : [
-        (btn) => btn
-            .setIcon('lucide-plus')
-            .setTooltip(getTextInLanguage('tabs.general.additional-file-extensions.add-input-button-text'))
-            .onClick(openAddForm),
-      ],
-      onDelete: async (index) => {
-        extensions.splice(index, 1);
+      desc: richDescription(getTextInLanguage('tabs.general.files-to-ignore.description')),
+      addButtonText: getTextInLanguage('tabs.general.files-to-ignore.add-input-button-text'),
+      emptyState: 'No files are being ignored yet.',
+      values: filesToIgnore,
+      openAddForm: () => new AddFileToIgnoreModal(this.app, async (entry) => {
+        filesToIgnore.push(entry);
         await this.plugin.saveSettings();
         this.update();
-      },
-      items: extensions.map((ext): SettingDefinition<keyof LinterSettings & string> => ({
-        name: ext || getTextInLanguage('tabs.general.additional-file-extensions.extension-placeholder'),
-        searchable: false,
-      })),
+      }).open(),
+      onDelete: (index) => filesToIgnore.splice(index, 1),
+      itemName: (entry) => entry.label || entry.match || getTextInLanguage('tabs.general.files-to-ignore.label-placeholder-text'),
+      itemDesc: (entry) => entry.label && entry.match ? entry.match : undefined,
     });
-
-    return {
-      type: 'page',
-      name: getTextInLanguage('tabs.general.additional-file-extensions.name'),
-      desc: getTextInLanguage('tabs.general.additional-file-extensions.description'),
-      items,
-    };
   }
 
-  // ----- Per-rule pages --------------------------------------------------
+  private additionalFileExtensionsPage(): SettingDefinitionPage<LSKey> {
+    const extensions = this.plugin.settings.additionalFileExtensions;
+    return this.listManagementPage({
+      name: getTextInLanguage('tabs.general.additional-file-extensions.name'),
+      desc: richDescription(getTextInLanguage('tabs.general.additional-file-extensions.description')),
+      addButtonText: getTextInLanguage('tabs.general.additional-file-extensions.add-input-button-text'),
+      emptyState: 'No additional file extensions yet.',
+      values: extensions,
+      openAddForm: () => new AddFileExtensionModal(this.app, extensions, async (ext) => {
+        extensions.push(ext);
+        await this.plugin.saveSettings();
+        this.update();
+      }).open(),
+      onDelete: (index) => extensions.splice(index, 1),
+      itemName: (ext) => ext || getTextInLanguage('tabs.general.additional-file-extensions.extension-placeholder'),
+    });
+  }
 
-  private rulePageFor(ruleType: RuleType): SettingDefinitionPage<keyof LinterSettings & string> {
+  private rulePageFor(ruleType: RuleType): SettingDefinitionPage<LSKey> {
     const rules = ruleTypeToRules.get(ruleType) ?? [];
     return {
       type: 'page',
@@ -519,16 +482,16 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     };
   }
 
-  private ruleToGroup(rule: Rule): SettingDefinitionGroup<keyof LinterSettings & string> {
+  private ruleToGroup(rule: Rule): SettingDefinitionGroup<LSKey> {
     const settings = this.plugin.settings;
     const enabled = !!settings.ruleConfigs[rule.alias]?.enabled;
 
-    const enabledItem: SettingGroupItem<keyof LinterSettings & string> = {
+    const enabledItem: SettingGroupItem<LSKey> = {
       name: rule.getName(),
       aliases: [rule.alias],
       render: (setting) => {
         setting
-            .setDesc(rule.getDescription())
+            .setDesc(richDescription(rule.getDescription()))
             .addExtraButton((component) => component
                 .setIcon('book-open')
                 .onClick(() => {
@@ -541,21 +504,17 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
                     settings.ruleConfigs[rule.alias] = rule.getDefaultOptions();
                   }
                   settings.ruleConfigs[rule.alias].enabled = value;
-                  // Replicate the auto-injected enabled option's onChange — it
-                  // calls disableConflictingOptions when present. The options[0]
-                  // BooleanOption holds that callback.
-                  const enabledOption = rule.options[0] as unknown as { onChange?: (v: boolean, app: App) => void };
-                  enabledOption.onChange?.(value, this.app);
+                  rule.runEnabledSideEffect(value, this.app);
                   await this.plugin.saveSettings();
                   this.update();
                 }));
       },
     };
 
-    const items: SettingGroupItem<keyof LinterSettings & string>[] = [enabledItem];
+    const items: SettingGroupItem<LSKey>[] = [enabledItem];
     if (enabled) {
       for (let i = 1; i < rule.options.length; i++) {
-        items.push(rule.options[i].getSettingDefinition(this.plugin, () => this.update()) as SettingGroupItem<keyof LinterSettings & string>);
+        items.push(rule.options[i].getSettingDefinition(this.plugin, () => this.update()) as SettingGroupItem<LSKey>);
       }
     }
 
@@ -565,9 +524,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     };
   }
 
-  // ----- Custom page -----------------------------------------------------
-
-  private customPage(): SettingDefinitionPage<keyof LinterSettings & string> {
+  private customPage(): SettingDefinitionPage<LSKey> {
     return {
       type: 'page',
       name: getTextInLanguage(tabNameKeys.Custom),
@@ -578,7 +535,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     };
   }
 
-  private customCommandsGroup(): SettingDefinitionGroup<keyof LinterSettings & string> {
+  private customCommandsGroup(): SettingDefinitionGroup<LSKey> {
     const lintCommands = this.plugin.settings.lintCommands;
     return {
       type: 'group',
@@ -632,7 +589,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     };
   }
 
-  private customRegexesGroup(): SettingDefinitionGroup<keyof LinterSettings & string> {
+  private customRegexesGroup(): SettingDefinitionGroup<LSKey> {
     const regexes = this.plugin.settings.customRegexes;
     const defaultFlags = 'gm';
     return {
@@ -702,14 +659,12 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     };
   }
 
-  // ----- Debug page ------------------------------------------------------
-
-  private debugPage(): SettingDefinitionPage<keyof LinterSettings & string> {
+  private debugPage(): SettingDefinitionPage<LSKey> {
     const settings = this.plugin.settings;
-    const items: SettingDefinition<keyof LinterSettings & string>[] = [
+    const items: SettingDefinition<LSKey>[] = [
       {
         name: getTextInLanguage('tabs.debug.log-level.name'),
-        desc: getTextInLanguage('tabs.debug.log-level.description'),
+        desc: richDescription(getTextInLanguage('tabs.debug.log-level.description')),
         render: (setting) => {
           setting.addDropdown((dd) => {
             for (const v of logLevels) {
@@ -726,7 +681,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       },
       {
         name: getTextInLanguage('tabs.debug.linter-config.name'),
-        desc: getTextInLanguage('tabs.debug.linter-config.description'),
+        desc: richDescription(getTextInLanguage('tabs.debug.linter-config.description')),
         render: (setting) => {
           setting.addTextArea((cb) => {
             cb.inputEl.readOnly = true;
@@ -737,7 +692,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       },
       {
         name: getTextInLanguage('tabs.debug.log-collection.name'),
-        desc: getTextInLanguage('tabs.debug.log-collection.description'),
+        desc: richDescription(getTextInLanguage('tabs.debug.log-collection.description')),
         render: (setting) => {
           setting.addToggle((tg) => tg
               .setValue(settings.recordLintOnSaveLogs)
@@ -753,7 +708,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     if (settings.recordLintOnSaveLogs) {
       items.push({
         name: getTextInLanguage('tabs.debug.linter-logs.name'),
-        desc: getTextInLanguage('tabs.debug.linter-logs.description'),
+        desc: richDescription(getTextInLanguage('tabs.debug.linter-logs.description')),
         render: (setting) => {
           setting.addTextArea((cb) => {
             cb.inputEl.readOnly = true;
