@@ -147,7 +147,7 @@ export default {
       'yaml': 'YAML',
       'heading': 'Cabeçalho',
       'content': 'Conteúdo',
-      'footnote': 'Nota de Rodapé',
+      'footnote': 'Nota de rodapé',
       'spacing': 'Espaçamento',
       'paste': 'Colar',
       'debug': 'Depuração',
@@ -214,26 +214,26 @@ export default {
         'description': 'O estilo da seção de tags do YAML',
       },
       'default-escape-character': {
-        'name': 'Caractere de Escape Padrão',
+        'name': 'Caractere de escape padrão',
         'description': 'O caractere padrão a ser usado para escapar valores no YAML quando aspas simples e duplas não estiverem presentes.',
       },
       'remove-unnecessary-escape-chars-in-multi-line-arrays': {
-        'name': 'Remover Caracteres de Escape Desnecessários em Formato de Array Multilinha',
+        'name': 'Remover caracteres de escape desnecessários em formato de array multilinha',
         'description': 'Caracteres de escape para arrays multilinha no YAML não precisam do mesmo escape que arrays de linha única, portanto, ao estar em formato de multilinha, os escapes extras desnecessários serão removidos',
       },
       'number-of-dollar-signs-to-indicate-math-block': {
-        'name': 'Número de Cifrões para Indicar Bloco Matemático',
+        'name': 'Número de cifrões para indicar bloco matemático',
         'description': 'A quantidade de cifrões para considerar o conteúdo matemático como um bloco matemático em vez de matemática inline',
       },
     },
     'debug': {
       // debug-tab.ts
       'log-level': {
-        'name': 'Nível de Log',
+        'name': 'Nível de log',
         'description': 'Os tipos de logs que o serviço terá permissão para registrar. O padrão é ERROR.',
       },
       'linter-config': {
-        'name': 'Configuração do Linter',
+        'name': 'Configuração do linter',
         'description': 'O conteúdo do data.json para o Linter no momento do carregamento da página de configurações',
       },
       'log-collection': {
@@ -241,7 +241,7 @@ export default {
         'description': 'Coleta logs quando você realiza <code>Executar linter ao salvar</code> e ao executar o linter no arquivo atual. Esses logs podem ser úteis para depuração e criação de relatórios de bugs.',
       },
       'linter-logs': {
-        'name': 'Logs do Linter',
+        'name': 'Logs do linter',
         'description': 'Os logs do último <code>Executar linter ao salvar</code> ou da última execução do linter no arquivo atual, se ativado.',
       },
     },
@@ -250,7 +250,7 @@ export default {
   'options': {
     'custom-command': {
       // custom-command-option.ts
-      'name': 'Comandos Personalizados',
+      'name': 'Comandos personalizados',
       'description': 'Comandos personalizados são comandos do Obsidian que são executados após o linter finalizar a execução de suas regras regulares. Isso significa que eles não são executados antes da lógica de timestamp do YAML, então podem fazer com que o timestamp do YAML seja acionado na próxima execução do linter. Você pode selecionar um comando do Obsidian apenas uma vez.',
       'warning': 'Ao selecionar uma opção, certifique-se de usar o mouse ou pressionar a tecla Enter. Outros métodos de seleção podem não funcionar e apenas seleções de um comando real do Obsidian ou de uma string vazia serão salvas.',
 
@@ -262,7 +262,7 @@ export default {
     },
     'custom-replace': {
       // custom-replace-option.ts
-      'name': 'Substituição de Regex Personalizada',
+      'name': 'Substituição de regex personalizada',
       'description': 'A substituição de regex personalizada pode ser usada para substituir qualquer coisa que corresponda à regex de busca pelo valor de substituição. Os valores de substituição e de busca precisarão ser valores de regex válidos.',
       'warning': 'Use com cautela se você não conhecer regex. Além disso, certifique-se de que, se você usar lookbehinds na sua regex no iOS (móvel), você esteja em uma versão que os suporte.',
       'add-input-button-text': 'Adicionar nova substituição de regex',
@@ -289,37 +289,37 @@ export default {
   'rules': {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
-      'name': 'Corrigir Automaticamente Erros Ortográficos Comuns',
+      'name': 'Corrigir automaticamente erros ortográficos comuns',
       'description': 'Usa um dicionário de erros ortográficos comuns para convertê-los automaticamente para a ortografia correta. Veja o <a href="https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md">mapa de correção automática</a> para a lista completa das palavras corrigidas automaticamente. <b>Nota: essa lista pode funcionar em texto de vários idiomas, mas esta mesma lista será aplicada, não importa o idioma que esteja em uso.</b>',
       'ignore-words': {
-        'name': 'Ignorar Palavras',
+        'name': 'Ignorar palavras',
         'description': 'Uma lista separada por vírgulas de palavras em minúsculas a serem ignoradas na correção automática',
       },
       'extra-auto-correct-files': {
-        'name': 'Arquivos Extras de Correção Automática',
+        'name': 'Arquivos extras de correção automática',
         'description': 'Estes são arquivos que contêm uma tabela em markdown com a palavra inicial e a palavra para a qual deve ser corrigida (são correções sem distinção de maiúsculas e minúsculas). <b>Nota: as tabelas utilizadas devem ter os indicadores <code>|</code> iniciais e finais presentes em cada linha.</b>',
       },
       'skip-words-with-multiple-capitals': {
-        'name': 'Pular Palavras com Várias Maiúsculas',
+        'name': 'Pular palavras com várias maiúsculas',
         'description': 'Irá ignorar quaisquer palavras que tenham uma letra maiúscula além da primeira letra. Acrônimos e algumas outras palavras podem se beneficiar disso. Isso pode causar problemas com a correção adequada de nomes próprios.',
       },
-      'default-install': 'Você está usando Corrigir Automaticamente Erros Ortográficos Comuns. Para isso, os erros ortográficos padrão serão baixados. Isso deve ocorrer apenas uma vez. Por favor, aguarde...',
-      'default-install-failed': 'Falha ao baixar {URL}. Desativando a Correção Automática de Erros Ortográficos Comuns.',
+      'default-install': 'Você está usando <code>Corrigir automaticamente erros ortográficos comuns</code>. Para isso, os erros ortográficos padrão serão baixados. Isso deve ocorrer apenas uma vez. Por favor, aguarde...',
+      'default-install-failed': 'Falha ao baixar {URL}. Desativando Corrigir automaticamente erros ortográficos comuns.',
       'defaults-missing': 'Falha ao encontrar o arquivo de correção automática padrão: {FILE}.',
     },
     // add-blank-line-after-yaml.ts
     'add-blank-line-after-yaml': {
-      'name': 'Adicionar Linha em Branco Após YAML',
+      'name': 'Adicionar linha em branco após YAML',
       'description': 'Adiciona uma linha em branco após o bloco YAML se ele não for o final do arquivo ou não for seguido por pelo menos 1 linha em branco',
     },
     // blockquotify-on-paste.ts
     'add-blockquote-indentation-on-paste': {
-      'name': 'Adicionar Recuo de Citação ao Colar',
+      'name': 'Adicionar recuo de citação ao colar',
       'description': 'Adiciona citações (blockquotes) a todas as linhas, exceto a primeira, quando o cursor estiver em uma linha de citação/destaque durante a colagem',
     },
     // blockquote-style.ts
     'blockquote-style': {
-      'name': 'Estilo de Citação',
+      'name': 'Estilo de citação',
       'description': 'Garante que o estilo de citação seja consistente.',
       'style': {
         'name': 'Estilo',
@@ -328,22 +328,22 @@ export default {
     },
     // capitalize-headings.ts
     'capitalize-headings': {
-      'name': 'Capitalizar Cabeçalhos',
+      'name': 'Capitalizar cabeçalhos',
       'description': 'Os cabeçalhos devem ser formatados com capitalização',
       'style': {
         'name': 'Estilo',
         'description': 'O estilo de capitalização a usar',
       },
       'ignore-case-words': {
-        'name': 'Ignorar Palavras com Maiúsculas',
+        'name': 'Ignorar palavras com maiúsculas',
         'description': 'Aplica o estilo Title Case apenas em palavras que estejam totalmente em minúsculas',
       },
       'ignore-words': {
-        'name': 'Ignorar Palavras',
+        'name': 'Ignorar palavras',
         'description': 'Uma lista separada por vírgulas de palavras a serem ignoradas na capitalização',
       },
       'lowercase-words': {
-        'name': 'Palavras em Minúsculas',
+        'name': 'Palavras em minúsculas',
         'description': 'Uma lista separada por vírgulas de palavras a manter em minúsculas',
       },
       'starting-word-ignore-characters': {
@@ -357,10 +357,10 @@ export default {
     },
     // compact-yaml.ts
     'compact-yaml': {
-      'name': 'YAML Compacto',
+      'name': 'YAML compacto',
       'description': 'Remove linhas em branco no início e no final do frontmatter YAML.',
       'inner-new-lines': {
-        'name': 'Novas Linhas Internas',
+        'name': 'Novas linhas internas',
         'description': 'Remove novas linhas que não estão no início ou no final do YAML',
       },
     },
@@ -371,21 +371,21 @@ export default {
     },
     // convert-bullet-list-markers.ts
     'convert-bullet-list-markers': {
-      'name': 'Converter Marcadores de Listas de Tópicos',
+      'name': 'Converter marcadores de listas de tópicos',
       'description': 'Converte símbolos de marcadores de lista comuns para marcadores de lista em markdown.',
     },
     // convert-spaces-to-tabs.ts
     'convert-spaces-to-tabs': {
-      'name': 'Converter Espaços em Tabs',
+      'name': 'Converter espaços em tabs',
       'description': 'Converte espaços iniciais em tabs.',
       'tabsize': {
-        'name': 'Tamanho do Tab',
+        'name': 'Tamanho do tab',
         'description': 'Número de espaços que serão convertidos para uma tabulação (tab)',
       },
     },
     // dedupe-yaml-array-values.ts
     'dedupe-yaml-array-values': {
-      'name': 'Desduplicar Valores de Array no YAML',
+      'name': 'Desduplicar valores de array no YAML',
       'description': 'Remove valores de array duplicados distinguindo maiúsculas de minúsculas.',
       'dedupe-alias-key': {
         'name': 'Desduplicar a seção de aliases no YAML',
@@ -400,22 +400,22 @@ export default {
         'description': 'Ativa a remoção de valores duplicados para arrays regulares no YAML',
       },
       'ignore-keys': {
-        'name': 'Chaves do YAML a Ignorar',
+        'name': 'Chaves do YAML a ignorar',
         'description': 'Uma lista de chaves do YAML, sem os dois pontos finais e em linhas separadas, cujos valores duplicados não devem ser removidos.',
       },
     },
     // default-language-for-code-fences.ts
     'default-language-for-code-fences': {
-      'name': 'Linguagem Padrão para Blocos de Código',
+      'name': 'Linguagem padrão para blocos de código',
       'description': 'Adiciona uma linguagem padrão a blocos de código que não têm uma linguagem especificada.',
       'default-language': {
-        'name': 'Linguagem de Programação',
+        'name': 'Linguagem de programação',
         'description': 'Deixe em branco para não fazer nada. Tags de linguagens podem ser encontradas <a href="https://prismjs.com/#supported-languages">aqui</a>.',
       },
     },
     // emphasis-style.ts
     'emphasis-style': {
-      'name': 'Estilo de Ênfase',
+      'name': 'Estilo de ênfase',
       'description': 'Garante que o estilo de ênfase (itálico) seja consistente.',
       'style': {
         'name': 'Estilo',
@@ -424,64 +424,64 @@ export default {
     },
     // empty-line-around-blockquotes.ts
     'empty-line-around-blockquotes': {
-      'name': 'Linha Vazia ao Redor de Citações',
+      'name': 'Linha vazia ao redor de citações',
       'description': 'Garante que haja uma linha vazia ao redor de citações (blockquotes) a menos que elas iniciem ou terminem um documento. <b>Nota: uma linha vazia é um nível a menos de aninhamento para citações ou um caractere de nova linha.</b>',
     },
     // empty-line-around-code-fences.ts
     'empty-line-around-code-fences': {
-      'name': 'Linha Vazia ao Redor de Blocos de Código',
+      'name': 'Linha vazia ao redor de blocos de código',
       'description': 'Garante que haja uma linha vazia ao redor de blocos de código a menos que eles iniciem ou terminem um documento.',
     },
     // empty-line-around-math-block.ts
     'empty-line-around-math-blocks': {
-      'name': 'Linha Vazia ao Redor de Blocos Matemáticos',
-      'description': 'Garante que haja uma linha vazia ao redor de blocos matemáticos usando <code>Número de Cifrões para Indicar Bloco Matemático</code> para determinar quantos cifrões indicam um bloco matemático em matemática de linha única.',
+      'name': 'Linha vazia ao redor de blocos matemáticos',
+      'description': 'Garante que haja uma linha vazia ao redor de blocos matemáticos usando <code>Número de cifrões para indicar bloco matemático</code> para determinar quantos cifrões indicam um bloco matemático em matemática de linha única.',
     },
     // empty-line-around-tables.ts
     'empty-line-around-tables': {
-      'name': 'Linha Vazia ao Redor de Tabelas',
+      'name': 'Linha vazia ao redor de tabelas',
       'description': 'Garante que haja uma linha vazia ao redor de tabelas no estilo GitHub, a menos que elas iniciem ou terminem um documento.',
     },
     // escape-yaml-special-characters.ts
     'escape-yaml-special-characters': {
-      'name': 'Escapar Caracteres Especiais no YAML',
+      'name': 'Escapar caracteres especiais no YAML',
       'description': 'Faz o escape de dois-pontos seguidos por um espaço (: ), aspas simples (\') e aspas duplas (") no YAML.',
       'try-to-escape-single-line-arrays': {
-        'name': 'Tentar Escapar Arrays de Linha Única',
+        'name': 'Tentar escapar arrays de linha única',
         'description': 'Tenta fazer o escape de valores de array presumindo que o array começa com "[", termina com "]" e possui itens delimitados por ",".',
       },
     },
     // file-name-heading.ts
     'file-name-heading': {
-      'name': 'Cabeçalho de Nome do Arquivo',
+      'name': 'Cabeçalho de nome do arquivo',
       'description': 'Insere o nome do arquivo como um cabeçalho H1 se nenhum cabeçalho H1 existir.',
     },
     // footnote-after-punctuation.ts
     'footnote-after-punctuation': {
-      'name': 'Nota de Rodapé após Pontuação',
+      'name': 'Nota de rodapé após pontuação',
       'description': 'Garante que as referências a notas de rodapé sejam colocadas após a pontuação, e não antes.',
     },
     // force-yaml-escape.ts
     'force-yaml-escape': {
-      'name': 'Forçar Escape no YAML',
+      'name': 'Forçar escape no YAML',
       'description': 'Faz o escape dos valores das chaves YAML especificadas.',
       'force-yaml-escape-keys': {
-        'name': 'Forçar Escape em Chaves do YAML',
+        'name': 'Forçar escape em chaves do YAML',
         'description': 'Usa o caractere de escape do YAML nas chaves especificadas, separadas por uma quebra de linha, se ainda não tiverem escape. Não use em arrays do YAML.',
       },
     },
     // format-tags-in-yaml.ts
     'format-tags-in-yaml': {
-      'name': 'Formatar Tags no YAML',
+      'name': 'Formatar tags no YAML',
       'description': 'Remove hashtags (#) das tags no frontmatter YAML, pois elas tornam as tags inválidas.',
     },
     // format-yaml-array.ts
     'format-yaml-array': {
-      'name': 'Formatar Array no YAML',
+      'name': 'Formatar array no YAML',
       'description': 'Permite a formatação de arrays regulares no YAML como linha múltipla ou linha única e permite que <code>tags</code> e <code>aliases</code> tenham alguns formatos do YAML específicos do Obsidian. <b>Nota: de string única para linha única converte uma entrada de string única em um array de linha única se houver mais de 1 entrada. O mesmo é válido de string única para múltiplas linhas, exceto que se torna um array multilinha.</b>',
       'alias-key': {
         'name': 'Formatar seção de aliases no YAML',
-        'description': 'Ativa a formatação para a seção de aliases do YAML. Você não deve ativar esta opção junto com a regra <code>Alias do Título no YAML</code>, pois podem não funcionar bem em conjunto ou podem ter estilos de formato diferentes selecionados causando resultados inesperados.',
+        'description': 'Ativa a formatação para a seção de aliases do YAML. Você não deve ativar esta opção junto com a regra <code>Alias do título no YAML</code>, pois podem não funcionar bem em conjunto ou podem ter estilos de formato diferentes selecionados causando resultados inesperados.',
       },
       'tag-key': {
         'name': 'Formatar seção de tags no YAML',
@@ -506,10 +506,10 @@ export default {
     },
     // header-increment.ts
     'header-increment': {
-      'name': 'Incremento de Cabeçalho',
+      'name': 'Incremento de cabeçalho',
       'description': 'Níveis de cabeçalho devem ser incrementados apenas em um nível por vez',
       'start-at-h2': {
-        'name': 'Iniciar Incremento de Cabeçalho a partir do Nível 2',
+        'name': 'Iniciar incremento de cabeçalho a partir do nível 2',
         'description': 'Torna o cabeçalho de nível 2 o nível mínimo em um arquivo para incremento e altera todos os cabeçalhos de acordo, de forma a começarem no mínimo a partir do nível 2.',
       },
     },
@@ -522,18 +522,18 @@ export default {
         'description': 'Garante uma linha em branco após os cabeçalhos (quando desativado não remove linhas em branco depois dos cabeçalhos)',
       },
       'empty-line-after-yaml': {
-        'name': 'Linha Vazia entre YAML e Cabeçalho',
+        'name': 'Linha vazia entre YAML e cabeçalho',
         'description': 'Mantém a linha em branco entre o frontmatter YAML e o cabeçalho',
       },
     },
     // headings-start-line.ts
     'headings-start-line': {
-      'name': 'Cabeçalhos no Início da Linha',
+      'name': 'Cabeçalhos no início da linha',
       'description': 'Cabeçalhos que não iniciam uma linha terão os espaços em branco precedentes removidos, garantindo que sejam reconhecidos como cabeçalhos.',
     },
     // insert-yaml-attributes.ts
     'insert-yaml-attributes': {
-      'name': 'Inserir Atributos YAML',
+      'name': 'Inserir atributos YAML',
       'description': 'Insere os atributos YAML informados no frontmatter YAML. Coloque cada atributo em uma única linha.',
       'text-to-insert': {
         'name': 'Texto a inserir',
@@ -542,26 +542,26 @@ export default {
     },
     // line-break-at-document-end.ts
     'line-break-at-document-end': {
-      'name': 'Quebra de Linha ao Final do Documento',
+      'name': 'Quebra de linha ao final do documento',
       'description': 'Garante que haja exatamente uma quebra de linha ao final do documento, se a nota não estiver vazia.',
     },
     // move-footnotes-to-the-bottom.ts
     'move-footnotes-to-the-bottom': {
-      'name': 'Mover Notas de Rodapé para o Fim',
+      'name': 'Mover notas de rodapé para o fim',
       'description': 'Move todas as notas de rodapé para o final do documento e garante que elas sejam organizadas com base na ordem em que são referenciadas no corpo do arquivo.',
       'include-blank-line-between-footnotes': {
-        'name': 'Incluir Linha em Branco entre Notas de Rodapé',
+        'name': 'Incluir linha em branco entre notas de rodapé',
         'description': 'Inclui uma linha em branco entre as notas de rodapé quando ativado.',
       },
     },
     // move-math-block-indicators-to-their-own-line.ts
     'move-math-block-indicators-to-their-own-line': {
-      'name': 'Mover Indicadores de Blocos Matemáticos para Linha Própria',
-      'description': 'Move todos os indicadores de início e fim de blocos matemáticos para suas próprias linhas, usando o <code>Número de Cifrões para Indicar Bloco Matemático</code> para determinar quantos cifrões indicam um bloco matemático para expressões em linha única.',
+      'name': 'Mover indicadores de blocos matemáticos para linha própria',
+      'description': 'Move todos os indicadores de início e fim de blocos matemáticos para suas próprias linhas, usando o <code>Número de cifrões para indicar bloco matemático</code> para determinar quantos cifrões indicam um bloco matemático para expressões em linha única.',
     },
     // move-tags-to-yaml.ts
     'move-tags-to-yaml': {
-      'name': 'Mover Tags para o YAML',
+      'name': 'Mover tags para o YAML',
       'description': 'Move todas as tags para o frontmatter YAML do documento.',
       'how-to-handle-existing-tags': {
         'name': 'Operação na tag no corpo do texto',
@@ -574,27 +574,27 @@ export default {
     },
     // no-bare-urls.ts
     'no-bare-urls': {
-      'name': 'Sem URLs sem Delimitadores',
+      'name': 'Sem URLs sem delimitadores',
       'description': 'Envolve as URLs soltas com sinais de menor e maior (< >) exceto quando em crases, colchetes, aspas simples ou aspas duplas.',
       'no-bare-uris': {
-        'name': 'Sem URIs sem Delimitadores',
+        'name': 'Sem URIs sem delimitadores',
         'description': 'Tenta envolver URIs soltas com sinais de menor e maior (< >) exceto quando em crases, colchetes, aspas simples ou aspas duplas.',
       },
     },
     // ordered-list-style.ts
     'ordered-list-style': {
-      'name': 'Estilo de Lista Ordenada',
+      'name': 'Estilo de lista ordenada',
       'description': 'Garante que as listas ordenadas sigam o estilo especificado. <b>Nota: 2 espaços ou 1 tabulação são considerados como um nível de indentação.</b>',
       'number-style': {
-        'name': 'Estilo Numérico',
+        'name': 'Estilo numérico',
         'description': 'O estilo numérico usado em indicadores de lista ordenada',
       },
       'list-end-style': {
-        'name': 'Estilo do Sufixo do Indicador de Lista',
+        'name': 'Estilo do sufixo do indicador de lista',
         'description': 'O caractere final do indicador de lista ordenada',
       },
       'preserve-start': {
-        'name': 'Preservar Número Inicial',
+        'name': 'Preservar número inicial',
         'description': 'Se o número inicial de uma lista ordenada deve ser preservado. Isso pode ser usado para ter uma lista ordenada com conteúdo inserido entre os itens da lista.',
       },
     },
@@ -605,160 +605,160 @@ export default {
     },
     // prevent-double-checklist-indicator-on-paste.ts
     'prevent-double-checklist-indicator-on-paste': {
-      'name': 'Prevenir Duplo Indicador de Checklist ao Colar',
+      'name': 'Prevenir duplo indicador de checklist ao colar',
       'description': 'Remove o indicador inicial de checklist do texto a colar se a linha onde o cursor está já tiver um indicador de checklist',
     },
     // prevent-double-list-item-indicator-on-paste.ts
     'prevent-double-list-item-indicator-on-paste': {
-      'name': 'Prevenir Duplo Indicador de Item de Lista ao Colar',
+      'name': 'Prevenir duplo indicador de item de lista ao colar',
       'description': 'Remove o indicador inicial de lista do texto a colar se a linha onde o cursor está já tiver um indicador de lista',
     },
     // proper-ellipsis-on-paste.ts
     'proper-ellipsis-on-paste': {
-      'name': 'Reticências Adequadas ao Colar',
+      'name': 'Reticências adequadas ao colar',
       'description': 'Substitui os três pontos consecutivos por reticências, mesmo que haja espaço entre elas, no texto a ser colado',
     },
     // proper-ellipsis.ts
     'proper-ellipsis': {
-      'name': 'Reticências Adequadas',
+      'name': 'Reticências adequadas',
       'description': 'Substitui três pontos consecutivos por reticências.',
     },
     // quote-style.ts
     'quote-style': {
-      'name': 'Estilo de Aspas',
+      'name': 'Estilo de aspas',
       'description': 'Atualiza as aspas no conteúdo do corpo para os estilos especificados de aspas simples e duplas.',
       'single-quote-enabled': {
-        'name': 'Ativar <code>Estilo de Aspas Simples</code>',
+        'name': 'Ativar <code>Estilo de aspas simples</code>',
         'description': 'Especifica que o estilo selecionado para aspas simples deve ser utilizado.',
       },
       'single-quote-style': {
-        'name': 'Estilo de Aspas Simples',
+        'name': 'Estilo de aspas simples',
         'description': 'O estilo de aspas simples a ser utilizado.',
       },
       'double-quote-enabled': {
-        'name': 'Ativar <code>Estilo de Aspas Duplas</code>',
+        'name': 'Ativar <code>Estilo de aspas duplas</code>',
         'description': 'Especifica que o estilo selecionado para aspas duplas deve ser utilizado.',
       },
       'double-quote-style': {
-        'name': 'Estilo de Aspas Duplas',
+        'name': 'Estilo de aspas duplas',
         'description': 'O estilo de aspas duplas a ser utilizado.',
       },
     },
     // re-index-footnotes.ts
     're-index-footnotes': {
-      'name': 'Reindexar Notas de Rodapé',
+      'name': 'Reindexar notas de rodapé',
       'description': 'Reindexa as chaves e notas de rodapé, baseando-se na ordem das referências no arquivo. <b>Nota: Esta regra <i>não</i> funciona se houver mais de uma nota de rodapé para a mesma chave.</b>',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
-      'name': 'Remover Marcadores de Lista Consecutivos',
+      'name': 'Remover marcadores de lista consecutivos',
       'description': 'Remove marcadores de lista consecutivos. Útil ao copiar e colar itens de lista.',
     },
     // remove-empty-lines-between-list-markers-and-checklists.ts
     'remove-empty-lines-between-list-markers-and-checklists': {
-      'name': 'Remover Linhas Vazias Entre Marcadores e Checklists',
+      'name': 'Remover linhas vazias entre marcadores e checklists',
       'description': 'Não deve haver linhas vazias entre marcadores de lista e checklists.',
     },
     // remove-empty-list-markers.ts
     'remove-empty-list-markers': {
-      'name': 'Remover Marcadores de Lista Vazios',
+      'name': 'Remover marcadores de lista vazios',
       'description': 'Remove marcadores de lista vazios, ou seja, itens de lista sem conteúdo.',
     },
     // empty-line-around-horizontal-rules.ts
     'empty-line-around-horizontal-rules': {
-      'name': 'Linha Vazia ao Redor de Réguas Horizontais',
+      'name': 'Linha vazia ao redor de réguas horizontais',
       'description': 'Garante que haja uma linha vazia ao redor das réguas horizontais a menos que iniciem ou terminem o documento.',
     },
     // remove-hyphenated-line-breaks.ts
     'remove-hyphenated-line-breaks': {
-      'name': 'Remover Quebras de Linha Hifenizadas',
+      'name': 'Remover quebras de linha hifenizadas',
       'description': 'Remove quebras de linha com hífen. Útil ao colar textos de livros.',
     },
     // remove-hyphens-on-paste.ts
     'remove-hyphens-on-paste': {
-      'name': 'Remover Hífens ao Colar',
+      'name': 'Remover hífens ao colar',
       'description': 'Remove hífens do texto ao colar',
     },
     // remove-leading-or-trailing-whitespace-on-paste.ts
     'remove-leading-or-trailing-whitespace-on-paste': {
-      'name': 'Remover Espaços em Branco Iniciais ou Finais ao Colar',
+      'name': 'Remover espaços em branco iniciais ou finais ao colar',
       'description': 'Remove quaisquer espaços em branco iniciais (exceto tabulações) e todos os espaços em branco finais do texto ao colar',
     },
     // remove-leftover-footnotes-from-quote-on-paste.ts
     'remove-leftover-footnotes-from-quote-on-paste': {
-      'name': 'Remover Notas de Rodapé Restantes em Citações ao Colar',
+      'name': 'Remover notas de rodapé restantes em citações ao colar',
       'description': 'Remove quaisquer referências a notas de rodapé restantes no texto a colar',
     },
     // remove-link-spacing.ts
     'remove-link-spacing': {
-      'name': 'Remover Espaçamento de Links',
+      'name': 'Remover espaçamento de links',
       'description': 'Remove o espaçamento ao redor do texto do link.',
     },
     // remove-multiple-blank-lines-on-paste.ts
     'remove-multiple-blank-lines-on-paste': {
-      'name': 'Remover Várias Linhas em Branco ao Colar',
+      'name': 'Remover várias linhas em branco ao colar',
       'description': 'Condensa várias linhas em branco em apenas uma para o texto a colar',
     },
     // remove-multiple-spaces.ts
     'remove-multiple-spaces': {
-      'name': 'Remover Espaços Múltiplos',
+      'name': 'Remover espaços múltiplos',
       'description': 'Remove dois ou mais espaços consecutivos. Ignora espaços no início e no fim da linha. ',
     },
     // remove-space-around-characters.ts
     'remove-space-around-characters': {
-      'name': 'Remover Espaço ao Redor de Caracteres',
+      'name': 'Remover espaço ao redor de caracteres',
       'description': 'Garante que determinados caracteres não estejam cercados por espaços em branco (seja espaço simples ou tabulação). <b>Nota: isso pode causar problemas de formatação no markdown em alguns casos.</b>',
       'include-fullwidth-forms': {
-        'name': 'Incluir Formas de Largura Completa (Fullwidth)',
+        'name': 'Incluir formas de largura completa (fullwidth)',
         'description': 'Inclui o <a href="https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)">bloco Unicode de Formas de Largura Meia e Completa</a>',
       },
       'include-cjk-symbols-and-punctuation': {
-        'name': 'Incluir Símbolos e Pontuação CJK',
+        'name': 'Incluir símbolos e pontuação CJK',
         'description': 'Inclui o <a href="https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation">bloco Unicode de Símbolos e Pontuação CJK</a>',
       },
       'include-dashes': {
-        'name': 'Incluir Traços',
+        'name': 'Incluir traços',
         'description': 'Inclui o traço curto (–) e o travessão (—)',
       },
       'other-symbols': {
-        'name': 'Outros Símbolos',
+        'name': 'Outros símbolos',
         'description': 'Outros símbolos a incluir',
       },
     },
     // remove-space-before-or-after-characters.ts
     'remove-space-before-or-after-characters': {
-      'name': 'Remover Espaço Antes ou Depois de Caracteres',
+      'name': 'Remover espaço antes ou depois de caracteres',
       'description': 'Remove o espaço antes e depois dos caracteres especificados. <b>Nota: isso pode causar problemas de formatação em markdown em alguns casos.</b>',
       'characters-to-remove-space-before': {
-        'name': 'Remover Espaço Antes de Caracteres',
+        'name': 'Remover espaço antes de caracteres',
         'description': 'Remove espaço antes dos caracteres especificados. <b>Nota: usar <code>{</code> ou <code>}</code> na lista de caracteres afetará inesperadamente os arquivos, pois são usados na sintaxe de ignorar nos bastidores.</b>',
       },
       'characters-to-remove-space-after': {
-        'name': 'Remover Espaço Após Caracteres',
+        'name': 'Remover espaço após caracteres',
         'description': 'Remove o espaço após os caracteres especificados. <b>Nota: usar <code>{</code> ou <code>}</code> na lista de caracteres afetará inesperadamente os arquivos, pois são usados na sintaxe de ignorar nos bastidores.</b>',
       },
     },
     // remove-trailing-punctuation-in-heading.ts
     'remove-trailing-punctuation-in-heading': {
-      'name': 'Remover Pontuação Final em Cabeçalhos',
+      'name': 'Remover pontuação final em cabeçalhos',
       'description': 'Remove as pontuações especificadas do fim dos cabeçalhos, certificando-se de ignorar o ponto e vírgula no fim de <a href="https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references">referências e entidades HTML</a>.',
       'punctuation-to-remove': {
-        'name': 'Pontuação Final',
+        'name': 'Pontuação final',
         'description': 'A pontuação final a ser removida dos cabeçalhos do arquivo.',
       },
     },
     // remove-yaml-keys.ts
     'remove-yaml-keys': {
-      'name': 'Remover Chaves do YAML',
+      'name': 'Remover chaves do YAML',
       'description': 'Remove as chaves especificadas do YAML',
       'yaml-keys-to-remove': {
-        'name': 'Chaves do YAML a Remover',
+        'name': 'Chaves do YAML a remover',
         'description': 'As chaves do YAML a serem removidas do frontmatter, com ou sem dois-pontos',
       },
     },
     // sort-yaml-array-values.ts
     'sort-yaml-array-values': {
-      'name': 'Ordenar Valores de Array no YAML',
+      'name': 'Ordenar valores de array no YAML',
       'description': 'Ordena os valores dos arrays no YAML com base na ordem de classificação especificada.',
       'sort-alias-key': {
         'name': 'Ordenar a seção de aliases do YAML',
@@ -773,11 +773,11 @@ export default {
         'description': 'Ativa a ordenação de valores para arrays regulares no YAML',
       },
       'ignore-keys': {
-        'name': 'Chaves do YAML a Ignorar',
+        'name': 'Chaves do YAML a ignorar',
         'description': 'Uma lista de chaves do YAML sem os dois pontos finais em linhas próprias que não devem ter seus valores ordenados.',
       },
       'sort-order': {
-        'name': 'Ordem de Classificação',
+        'name': 'Ordem de classificação',
         'description': 'A forma de ordenar os valores do array do YAML.',
       },
     },
@@ -791,17 +791,17 @@ export default {
       'name': 'Espaço entre Chinês, Japonês ou Coreano e Inglês ou números',
       'description': 'Garante que os idiomas Chinês, Japonês ou Coreano e Inglês ou números sejam separados por um único espaço. Segue essas <a href="https://github.com/sparanoid/chinese-copywriting-guidelines">diretrizes</a>',
       'english-symbols-punctuation-before': {
-        'name': 'Símbolos e Pontuações do Inglês Antes de CJK',
+        'name': 'Símbolos e pontuações do inglês antes de CJK',
         'description': 'A lista de pontuações e símbolos não-letras a considerar como sendo do Inglês quando encontrados antes de caracteres Chineses, Japoneses ou Coreanos. <b>Nota: "*" é sempre considerado como sendo Inglês e é necessário para lidar adequadamente com algumas sintaxes de markdown.</b>',
       },
       'english-symbols-punctuation-after': {
-        'name': 'Símbolos e Pontuações do Inglês Depois de CJK',
+        'name': 'Símbolos e pontuações do inglês depois de CJK',
         'description': 'A lista de pontuações e símbolos não-letras a considerar como sendo do Inglês quando encontrados depois de caracteres Chineses, Japoneses ou Coreanos. <b>Nota: "*" é sempre considerado como sendo Inglês e é necessário para lidar adequadamente com algumas sintaxes de markdown.</b>',
       },
     },
     // strong-style.ts
     'strong-style': {
-      'name': 'Estilo de Negrito',
+      'name': 'Estilo de negrito',
       'description': 'Garante que o estilo de negrito seja consistente.',
       'style': {
         'name': 'Estilo',
@@ -810,25 +810,25 @@ export default {
     },
     // trailing-spaces.ts
     'trailing-spaces': {
-      'name': 'Espaços Finais',
+      'name': 'Espaços finais',
       'description': 'Remove espaços extras no final de todas as linhas.',
       'two-space-line-break': {
-        'name': 'Quebra de Linha com Dois Espaços',
+        'name': 'Quebra de linha com dois espaços',
         'description': 'Ignora dois espaços seguidos de uma quebra de linha ("Regra dos Dois Espaços").',
       },
     },
     // two-spaces-between-lines-with-content.ts
     'two-spaces-between-lines-with-content': {
-      'name': 'Quebra de Linha Entre Linhas com Conteúdo',
+      'name': 'Quebra de linha entre linhas com conteúdo',
       'description': 'Garante que a quebra de linha especificada seja adicionada aos fins de linhas com conteúdo que continuam na próxima linha para parágrafos, blockquotes e itens de lista',
       'line-break-indicator': {
-        'name': 'Indicador de Quebra de Linha',
+        'name': 'Indicador de quebra de linha',
         'description': 'O indicador de quebra de linha a ser utilizado.',
       },
     },
     // unordered-list-style.ts
     'unordered-list-style': {
-      'name': 'Estilo de Lista Não Ordenada',
+      'name': 'Estilo de lista não ordenada',
       'description': 'Garante que as listas não ordenadas sigam o estilo especificado.',
       'list-style': {
         'name': 'Estilo de item de lista',
@@ -837,18 +837,18 @@ export default {
     },
     // yaml-key-sort.ts
     'yaml-key-sort': {
-      'name': 'Ordenar Chaves do YAML',
+      'name': 'Ordenar chaves do YAML',
       'description': 'Ordena as chaves do YAML baseando-se na ordem e prioridade especificadas. <b>Nota: também pode remover linhas em branco. Funciona apenas em chaves não aninhadas.</b>',
       'yaml-key-priority-sort-order': {
-        'name': 'Ordem de Classificação e Prioridade de Chaves do YAML',
+        'name': 'Ordem de classificação e prioridade de chaves do YAML',
         'description': 'A ordem pela qual classificar as chaves, colocando uma em cada linha, sendo ordenadas conforme aparecem na lista',
       },
       'priority-keys-at-start-of-yaml': {
-        'name': 'Chaves Prioritárias no Início do YAML',
+        'name': 'Chaves prioritárias no início do YAML',
         'description': 'Posiciona as chaves da "Ordem de Classificação de Chaves do YAML" no início do frontmatter YAML',
       },
       'yaml-sort-order-for-other-keys': {
-        'name': 'Ordem de Classificação do YAML para Outras Chaves',
+        'name': 'Ordem de classificação do YAML para outras chaves',
         'description': 'A forma de classificar as chaves que não se encontram na área de texto de Ordem de Classificação de Chaves do YAML',
       },
     },
@@ -857,27 +857,27 @@ export default {
       'name': 'Timestamp no YAML',
       'description': 'Acompanha a data em que o arquivo foi editado pela última vez no frontmatter YAML. Obtém as datas a partir dos metadados do arquivo.',
       'date-created': {
-        'name': 'Data de Criação',
+        'name': 'Data de criação',
         'description': 'Inserir a data de criação do arquivo',
       },
       'date-created-key': {
-        'name': 'Chave de Data de Criação',
+        'name': 'Chave de data de criação',
         'description': 'Qual chave do YAML usar para a data de criação',
       },
       'date-created-source-of-truth': {
-        'name': 'Fonte da Verdade da Data de Criação',
+        'name': 'Fonte da verdade da data de criação',
         'description': 'Especifica de onde obter o valor da data de criação se ela já estiver presente no frontmatter.',
       },
       'date-modified-source-of-truth': {
-        'name': 'Fonte da Verdade da Data de Modificação',
+        'name': 'Fonte da verdade da data de modificação',
         'description': 'Especifica qual método deve ser usado para determinar quando a data de modificação deve ser atualizada caso ela esteja presente no frontmatter.',
       },
       'date-modified': {
-        'name': 'Data de Modificação',
+        'name': 'Data de modificação',
         'description': 'Inserir a data em que o arquivo foi modificado pela última vez',
       },
       'date-modified-key': {
-        'name': 'Chave da Data de Modificação',
+        'name': 'Chave da data de modificação',
         'description': 'Qual chave do YAML usar para a data de modificação',
       },
       'format': {
@@ -885,17 +885,17 @@ export default {
         'description': 'Formato de data do Moment a utilizar (veja as <a href="https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/">opções de formato do Moment</a>)',
       },
       'convert-to-utc': {
-        'name': 'Converter Horário Local para UTC',
+        'name': 'Converter horário local para UTC',
         'description': 'Usa a equivalência em UTC para datas salvas em vez do horário local',
       },
       'update-on-file-contents-updated': {
-        'name': 'Atualizar Timestamp no YAML ao Atualizar o Conteúdo do Arquivo',
+        'name': 'Atualizar timestamp no YAML ao atualizar o conteúdo do arquivo',
         'description': 'Quando a nota atualmente ativa for modificada, o <code>Timestamp no YAML</code> será executado na nota. Isso deve atualizar o timestamp da nota se diferir do valor atual em mais de 5 segundos.',
       },
     },
     // yaml-title-alias.ts
     'yaml-title-alias': {
-      'name': 'Alias do Título no YAML',
+      'name': 'Alias do título no YAML',
       'description': 'Insere ou atualiza o título do arquivo na seção de aliases do frontmatter YAML. Obtém o título do primeiro H1 ou do nome do arquivo.',
       'preserve-existing-alias-section-style': {
         'name': 'Preservar estilo da seção de aliases existentes',
@@ -906,11 +906,11 @@ export default {
         'description': 'Tais aliases geralmente são redundantes',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': 'Usar a chave do YAML especificada por <code>Chave Auxiliar de Alias</code> para ajudar com alterações no nome do arquivo e cabeçalho',
+        'name': 'Usar a chave do YAML especificada por <code>Chave auxiliar de alias</code> para ajudar com alterações no nome do arquivo e cabeçalho',
         'description': 'Se ativado, ao alterar o primeiro cabeçalho H1 (ou o nome do arquivo, caso não haja H1), o alias antigo guardado nessa chave será substituído pelo novo valor em vez de apenas inserir uma nova entrada no array de aliases',
       },
       'alias-helper-key': {
-        'name': 'Chave Auxiliar de Alias',
+        'name': 'Chave auxiliar de alias',
         'description': 'A chave a ser utilizada para ajudar a rastrear qual foi o último nome de arquivo ou cabeçalho salvo no frontmatter por esta regra.',
       },
     },
@@ -919,7 +919,7 @@ export default {
       'name': 'Título no YAML',
       'description': 'Insere o título do arquivo no frontmatter YAML. Obtém o título baseando-se no modo selecionado.',
       'title-key': {
-        'name': 'Chave de Título',
+        'name': 'Chave de título',
         'description': 'Qual chave do YAML usar para o título',
       },
       'mode': {
@@ -970,7 +970,7 @@ export default {
     // yaml-title.ts
     'first-h1': 'Primeiro H1',
     'first-h1-or-filename-if-h1-missing': 'Primeiro H1 ou Nome do Arquivo se H1 estiver ausente',
-    'filename': 'Nome do Arquivo',
+    'filename': 'Nome do arquivo',
     // settings-data.ts
     'never': 'Nunca',
     'after 5 seconds': 'Após 5 segundos',
