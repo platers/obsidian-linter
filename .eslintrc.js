@@ -37,6 +37,7 @@ module.exports = {
       'error',
       {
         'argsIgnorePattern': '(^_)|(options)',
+        'varsIgnorePattern': '^_',
       },
     ],
     'deprecation/deprecation': 'warn',
