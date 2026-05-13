@@ -1,5 +1,5 @@
 import {App, displayTooltip} from 'obsidian';
-import {getTextInLanguage} from 'src/lang/helpers';
+import {getTextInLanguage} from '../../lang/helpers';
 import {FileToIgnore} from '../linter-components/files-to-ignore-option';
 import FolderSuggester from '../suggesters/folder-suggester';
 import {FormModal} from './form-modal';

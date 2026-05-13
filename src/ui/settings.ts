@@ -12,7 +12,7 @@ import {TabSearcher} from './linter-components/tab-components/tab-searcher';
 import {DebugTab} from './linter-components/tab-components/debug-tab';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 import {LinterSettings} from '../settings-data';
-import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from 'src/utils/yaml';
+import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '../utils/yaml';
 import {logsFromLastRun, setLogLevel} from '../utils/logger';
 import CommandSuggester from './suggesters/command-suggester';
 import {LintCommand} from './linter-components/custom-command-option';

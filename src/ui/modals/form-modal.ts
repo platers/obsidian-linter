@@ -1,5 +1,5 @@
 import {App, ButtonComponent, DropdownComponent, Modal, Platform, setIcon, TextComponent, ToggleComponent} from 'obsidian';
-import {getTextInLanguage} from 'src/lang/helpers';
+import {getTextInLanguage} from '../../lang/helpers';
 
 export class FormField {
   containerEl: HTMLElement;
