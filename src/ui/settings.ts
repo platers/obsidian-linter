@@ -133,14 +133,13 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
   }
 
   // 1.12.x fallback lives in display() above.
-  // 1.12.x fallback lives in display() above.
   getSettingDefinitions(): SettingDefinitionItem<LSKey>[] {
     return [
       ...this.generalDefinitions(),
       this.commonStylesGroup(),
       {
         type: 'group',
-        heading: 'Files and folders',
+        heading: getTextInLanguage('tabs.general.files-and-folders'),
         items: [
           this.foldersToIgnorePage(),
           this.filesToIgnorePage(),
@@ -149,7 +148,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       },
       {
         type: 'group',
-        heading: 'Rules',
+        heading: getTextInLanguage('tabs.general.rules'),
         items: Object.values(RuleType).map((rt) => this.rulePageFor(rt)),
       },
       this.customPage(),
@@ -263,7 +262,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
 
     return {
       type: 'group',
-      heading: 'YAML common styles',
+      heading: getTextInLanguage('tabs.general.yaml'),
       items: [
         {
           name: getTextInLanguage('tabs.general.yaml-aliases-section-style.name'),
@@ -401,7 +400,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       name: getTextInLanguage('tabs.general.folders-to-ignore.name'),
       desc: richDescription(getTextInLanguage('tabs.general.folders-to-ignore.description')),
       addButtonText: getTextInLanguage('tabs.general.folders-to-ignore.add-input-button-text'),
-      emptyState: 'No folders are being ignored yet.',
+      emptyState: getTextInLanguage('tabs.general.folders-to-ignore.empty-state'),
       values: folders,
       openAddForm: () => new AddFolderToIgnoreModal(this.app, folders, async (path) => {
         folders.push(path);
@@ -419,7 +418,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       name: getTextInLanguage('tabs.general.files-to-ignore.name'),
       desc: richDescription(getTextInLanguage('tabs.general.files-to-ignore.description')),
       addButtonText: getTextInLanguage('tabs.general.files-to-ignore.add-input-button-text'),
-      emptyState: 'No files are being ignored yet.',
+      emptyState: getTextInLanguage('tabs.general.files-to-ignore.empty-state'),
       values: filesToIgnore,
       openAddForm: () => new AddFileToIgnoreModal(this.app, async (entry) => {
         filesToIgnore.push(entry);
@@ -438,7 +437,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       name: getTextInLanguage('tabs.general.additional-file-extensions.name'),
       desc: richDescription(getTextInLanguage('tabs.general.additional-file-extensions.description')),
       addButtonText: getTextInLanguage('tabs.general.additional-file-extensions.add-input-button-text'),
-      emptyState: 'No additional file extensions yet.',
+      emptyState: getTextInLanguage('tabs.general.additional-file-extensions.empty-state'),
       values: extensions,
       openAddForm: () => new AddFileExtensionModal(this.app, extensions, async (ext) => {
         extensions.push(ext);
