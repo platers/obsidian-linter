@@ -44,11 +44,11 @@ export class AddFolderToIgnoreModal extends FormModal {
   onSubmit() {
     const value = this.value.trim();
     if (!value) {
-      if (this.inputEl) displayTooltip(this.inputEl, 'Required', {classes: ['mod-error']});
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});
       return;
     }
     if (this.existing.includes(value)) {
-      if (this.inputEl) displayTooltip(this.inputEl, 'Already in the list', {classes: ['mod-error']});
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('already-in-list'), {classes: ['mod-error']});
       return;
     }
     void this.onAdd(value);
@@ -109,7 +109,7 @@ export class AddFileToIgnoreModal extends FormModal {
   onSubmit() {
     const match = this.match.trim();
     if (!match) {
-      if (this.firstInputEl) displayTooltip(this.firstInputEl, 'Match pattern is required', {classes: ['mod-error']});
+      if (this.firstInputEl) displayTooltip(this.firstInputEl, getTextInLanguage('tabs.general.files-to-ignore.pattern-required'), {classes: ['mod-error']});
       return;
     }
     void this.onAdd({label: this.label.trim(), match, flags: this.flags.trim()});
@@ -154,11 +154,11 @@ export class AddFileExtensionModal extends FormModal {
   onSubmit() {
     const value = this.value.trim().toLowerCase().replace(/^\./, '');
     if (!value) {
-      if (this.inputEl) displayTooltip(this.inputEl, 'Required', {classes: ['mod-error']});
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});
       return;
     }
     if (this.existing.includes(value)) {
-      if (this.inputEl) displayTooltip(this.inputEl, 'Already in the list', {classes: ['mod-error']});
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('already-in-list'), {classes: ['mod-error']});
       return;
     }
     void this.onAdd(value);

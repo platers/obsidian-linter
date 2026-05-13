@@ -138,6 +138,10 @@ export default {
   'replace-header-text': 'Replacement Word',
   'close-button-text': 'Close',
 
+  // add-list-entry-modals.ts
+  'required': 'Required',
+  'already-in-list': 'Already in the list',
+
   'tabs': {
     'names': {
       // tab.ts
@@ -191,6 +195,7 @@ export default {
         'label-placeholder-text': 'label',
         'flags-placeholder-text': 'flags',
         'warning': 'Use this with caution if you do not know regex. Also, please make sure that if you use lookbehinds in your regex on iOS mobile that you are on a version that supports using them.',
+        'pattern-required': 'Match pattern is required',
       },
       'additional-file-extensions': {
         'name': 'Additional file extensions',

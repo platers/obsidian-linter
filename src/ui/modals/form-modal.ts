@@ -64,8 +64,7 @@ export class FormModal extends Modal {
     this.modalEl.addClass('mod-lg', 'mod-form-sheet');
 
     if (Platform.isPhone) {
-      // Modal.headerEl is not in the public API, but exists at runtime.
-      const headerEl = (this as unknown as {headerEl: HTMLElement}).headerEl;
+      const headerEl = this.headerEl;
       headerEl.createDiv(
           {cls: 'modal-header-button mod-raised clickable-icon mod-start'},
           (el) => {
@@ -109,8 +108,7 @@ export class FormModal extends Modal {
   }
 
   setCtaLoading(loading: boolean): this {
-    // ButtonComponent.setLoading is not on the public API yet — guard it.
-    const setLoading = (this.ctaButton as unknown as {setLoading?: (v: boolean) => void})?.setLoading;
+    const setLoading = this.ctaButton?.setLoading;
     setLoading?.call(this.ctaButton, loading);
     this.ctaEl.toggleClass('mod-loading', loading);
     return this;
