@@ -14,10 +14,7 @@ import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 import {LinterSettings} from '../settings-data';
 import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '../utils/yaml';
 import {logsFromLastRun, setLogLevel} from '../utils/logger';
-import CommandSuggester from './suggesters/command-suggester';
-import {LintCommand} from './linter-components/custom-command-option';
 import {AddCustomCommandModal, AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal} from './modals/add-list-entry-modals';
-import {escapeRegExp} from '../utils/regex';
 
 type LSKey = keyof LinterSettings & string;
 
