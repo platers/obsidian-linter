@@ -3,6 +3,8 @@ import {getTextInLanguage} from '../../lang/helpers';
 import {FileToIgnore} from '../linter-components/files-to-ignore-option';
 import FolderSuggester from '../suggesters/folder-suggester';
 import {FormModal} from './form-modal';
+import CommandSuggester from '../suggesters/command-suggester';
+import {LintCommand} from '../linter-components/custom-command-option';
 
 const filesToIgnoreDefaultFlags = 'i';
 
@@ -162,6 +164,61 @@ export class AddFileExtensionModal extends FormModal {
       return;
     }
     void this.onAdd(value);
+    this.close();
+  }
+}
+
+export class AddCustomCommandModal extends FormModal {
+  private value = '';
+  private inputEl: HTMLInputElement | undefined;
+
+  constructor(
+      app: App,
+      private existing: LintCommand[],
+      private onAdd: (command: LintCommand) => void | Promise<void>,
+  ) {
+    super(app);
+    this.setTitle(getTextInLanguage('options.custom-command.add-input-button-text'));
+
+    this.addField((field) => {
+      field.setName(getTextInLanguage('options.custom-command.command-search-placeholder-text'));
+      field.addText((cb) => {
+        new CommandSuggester(app, cb.inputEl, existing);
+        cb.setPlaceholder(getTextInLanguage('options.custom-command.command-search-placeholder-text'))
+            .onChange((v) => {
+              this.value = v;
+            });
+        cb.inputEl.addEventListener('keydown', (evt) => {
+          if (!evt.isComposing && evt.key === 'Enter') {
+            evt.preventDefault();
+            this.formSubmit();
+          }
+        });
+        this.inputEl = cb.inputEl;
+      });
+    });
+  }
+
+  onOpen() {
+    this.inputEl?.focus();
+  }
+
+  onSubmit() {
+    const value = this.value.trim();
+    const id = this.inputEl?.getAttribute('commandId');
+    if (!value || !id) {
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});
+      return;
+    }
+
+    for (const lintCommand of this.existing) {
+      if (lintCommand.id === id) {
+        if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('already-in-list'), {classes: ['mod-error']});
+        return;
+      }
+    }
+
+    void this.onAdd({enabled: true, id: id, name: value});
     this.close();
   }
 }

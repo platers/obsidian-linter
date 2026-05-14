@@ -16,7 +16,8 @@ import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '
 import {logsFromLastRun, setLogLevel} from '../utils/logger';
 import CommandSuggester from './suggesters/command-suggester';
 import {LintCommand} from './linter-components/custom-command-option';
-import {AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal} from './modals/add-list-entry-modals';
+import {AddCustomCommandModal, AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal} from './modals/add-list-entry-modals';
+import {escapeRegExp} from '../utils/regex';
 
 type LSKey = keyof LinterSettings & string;
 
@@ -347,7 +348,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
 
   private listManagementPage<T>(opts: {
     name: string;
-    desc: string;
+    desc: string | DocumentFragment;
     addButtonText: string;
     emptyState: string;
     values: T[];
@@ -355,6 +356,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     onDelete: (index: number) => void;
     itemName: (entry: T) => string;
     itemDesc?: (entry: T) => string | undefined;
+    allowReorder?: boolean | undefined;
   }): SettingDefinitionPage<LSKey> {
     const items: (SettingDefinition<LSKey> | SettingDefinitionGroup<LSKey>)[] = [];
     if (Platform.isMobile) {
@@ -377,6 +379,13 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       onDelete: async (index) => {
         opts.onDelete(index);
         await this.plugin.saveSettings();
+        this.update();
+      },
+      onReorder: !opts.allowReorder ? undefined : (oldIndex, newIndex) => {
+        const tempOld = opts.values[oldIndex];
+        opts.values[oldIndex] = opts.values[newIndex];
+        opts.values[newIndex] = tempOld;
+
         this.update();
       },
       items: opts.values.map((entry): SettingDefinition<LSKey> => ({
@@ -427,8 +436,12 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       }).open(),
       onDelete: (index) => filesToIgnore.splice(index, 1),
       itemName: (entry) => entry.label || entry.match || getTextInLanguage('tabs.general.files-to-ignore.label-placeholder-text'),
-      itemDesc: (entry) => entry.label && entry.match ? entry.match : undefined,
+      itemDesc: (entry) => entry.label && entry.match ? this.buildRegexDisplay(entry.match, entry.flags) : undefined,
     });
+  }
+
+  private buildRegexDisplay(match: string, flags: string, replace?: string): string {
+    return `/${match}/${replace != undefined ? replace + '/' : ''}${flags}`;
   }
 
   private additionalFileExtensionsPage(): SettingDefinitionPage<LSKey> {
@@ -505,64 +518,31 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       type: 'page',
       name: getTextInLanguage(tabNameKeys.Custom),
       items: [
-        this.customCommandsGroup(),
+        this.customCommandsPage(),
         this.customRegexesGroup(),
       ],
     };
   }
 
-  private customCommandsGroup(): SettingDefinitionGroup<LSKey> {
+  private customCommandsPage(): SettingDefinitionPage<LSKey> {
     const lintCommands = this.plugin.settings.lintCommands;
-    return {
-      type: 'group',
-      cls: 'mod-list',
-      heading: getTextInLanguage('options.custom-command.name'),
-      extraButtons: [
-        (btn) => btn
-            .setIcon('plus-with-circle')
-            .setTooltip(getTextInLanguage('options.custom-command.add-input-button-text'))
-            .onClick(async () => {
-              lintCommands.push({id: '', name: '', enabled: true});
-              await this.plugin.saveSettings();
-              this.update();
-            }),
-      ],
-      onReorder: async (fromIndex, toIndex) => {
-        const [moved] = lintCommands.splice(fromIndex, 1);
-        lintCommands.splice(toIndex, 0, moved);
-        await this.plugin.saveSettings();
-      },
-      onDelete: async (index) => {
-        lintCommands.splice(index, 1);
+    // TODO: needs enable, disable, and edit
+    return this.listManagementPage({
+      name: getTextInLanguage('options.custom-command.name'),
+      desc: richDescription(getTextInLanguage('options.custom-command.description')),
+      addButtonText: getTextInLanguage('options.custom-command.add-input-button-text'),
+      emptyState: getTextInLanguage('options.custom-command.empty-state'),
+      values: lintCommands,
+      allowReorder: true,
+      openAddForm: () => new AddCustomCommandModal(this.app, lintCommands, async (command) => {
+        lintCommands.push(command);
         await this.plugin.saveSettings();
         this.update();
-      },
-      items: lintCommands.map((command, index) => ({
-        name: command.name || getTextInLanguage('options.custom-command.command-search-placeholder-text'),
-        searchable: false,
-        render: (setting) => {
-          setting.addSearch((cb) => {
-            new CommandSuggester(this.app, cb.inputEl, lintCommands);
-            cb.setPlaceholder(getTextInLanguage('options.custom-command.command-search-placeholder-text'))
-                .setValue(command.name)
-                .onChange(async (newName) => {
-                  const id = cb.inputEl.getAttribute('commandId');
-                  const newCommand: LintCommand = {id, name: newName, enabled: command.enabled};
-                  if ((newName && id) || (!newName && !id)) {
-                    lintCommands[index] = newCommand;
-                    await this.plugin.saveSettings();
-                  }
-                });
-          });
-          setting.addToggle((tg) => tg
-              .setValue(command.enabled)
-              .onChange(async (value) => {
-                lintCommands[index].enabled = value;
-                await this.plugin.saveSettings();
-              }));
-        },
-      })),
-    };
+      }).open(),
+      onDelete: (index) => lintCommands.splice(index, 1),
+      itemName: (entry) => (entry && entry.name) || getTextInLanguage('options.custom-command.command-search-placeholder-text'),
+      itemDesc: (entry) => (entry && entry.id) || '',
+    });
   }
 
   private customRegexesGroup(): SettingDefinitionGroup<LSKey> {
