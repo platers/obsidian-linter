@@ -61,7 +61,7 @@ declare module 'obsidian' {
     setState(state: any, result: ViewStateResult): Promise<void>;
   }
 
-  export interface ViewStateResult {
+  interface ViewStateResult {
     /**
      * Set this to true to indicate that there is a state change which should be recorded in the navigation history.
      * @public
@@ -78,6 +78,14 @@ declare module 'obsidian' {
 
   interface WorkspaceLeaf{
     rebuildView(): Promise<void>;
+  }
+
+  interface Modal {
+    headerEl: HTMLElement;
+  }
+
+  interface ButtonComponent {
+    setLoading?: (v: boolean) => void
   }
 }
 

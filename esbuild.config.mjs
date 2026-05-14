@@ -15,6 +15,7 @@ const dummyMocksForDocs = `
 document = {
   createElement: function() {},
 };
+class AbstractInputSuggest {};
 `;
 
 const prod = (process.argv[2] === 'production');
@@ -25,7 +26,8 @@ const mockedPlugins = [replace({
     // update usage of moment from obsidian to the node implementation of moment we have
     'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
     // remove the use of obsidian in the options to allow for docs.js to run
-    'import {App, Setting, ToggleComponent} from \'obsidian\';': '',
+    'import {App, ExtraButtonComponent, normalizePath, Setting, TFile, ToggleComponent} from \'obsidian\';': '',
+    'import type {SettingDefinition, SettingDefinitionGroup, SettingDefinitionItem, SettingDefinitionPage} from \'obsidian\';': '',
     // remove the use of obsidian in settings helper to allow for docs.js to run
     'import {App, MarkdownRenderer} from \'obsidian\';': '',
     // remove the use of obsidian in the auto-correct files picker to allow for docs.js to run
@@ -35,7 +37,7 @@ const mockedPlugins = [replace({
     // remove the use of obsidian in suggest to allow for docs.js to run
     'import {App, ISuggestOwner, Scope} from \'obsidian\';': '',
     // remove the use of obsidian in md file suggester to allow for docs.js to run
-    'import {App, TFile} from \'obsidian\';': '',
+    'import {AbstractInputSuggest, App, TFile} from \'obsidian\';': '',
     // remove the use of obsidian in parse results modal to allow for docs.js to run
     'import {Modal, App} from \'obsidian\';': 'class Modal {}',
     // remove the use of app from a couple of settings for docs.js to run
@@ -92,8 +94,11 @@ const esbuildArgs = [
   createEsbuildArgs(banner, 'src/main.ts', 'main.js', unusedCodeForProduction),
   createEsbuildArgs(mockedBanner, 'src/docs.ts', 'docs.js', mockedPlugins),
   createEsbuildArgs(mockedBanner, 'src/translation-helper.ts', 'translation-helper.js', mockedPlugins),
-  createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []),
 ];
+
+if (!prod) {
+  esbuildArgs.push(createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []));
+}
 
 for (let i = 0; i < esbuildArgs.length; i++) {
   if (prod) {
