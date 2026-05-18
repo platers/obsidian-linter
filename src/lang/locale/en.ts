@@ -755,6 +755,19 @@ export default {
         'description': 'The YAML keys to remove from the YAML frontmatter with or without colons',
       },
     },
+    // sentence-per-line.ts
+    'sentence-per-line': {
+      'name': 'Sentence per line',
+      'description': 'Splits paragraph text so each sentence is on its own line, making line-based diffs localized to the edited sentence. With standard Markdown or Obsidian\'s <i>Strict line breaks</i> setting <b>on</b>, rendered output is unchanged; with Strict line breaks <b>off</b> (Obsidian\'s default) each sentence renders on its own line. Headings, lists, blockquotes, tables, code, math, and HTML blocks are left untouched. This is a heuristic; known limitations are listed in the <a href="https://platers.github.io/obsidian-linter/settings/content-rules/#sentence-per-line">rule docs</a>.',
+      'sentence-terminators': {
+        'name': 'Sentence terminators',
+        'description': 'The characters that end a sentence. Non-ASCII marks (such as the CJK/full-width <code>。！？</code>) split even without a following space; ASCII <code>.?!</code> require a following space or end of line. Leave empty to make this rule a no-op.',
+      },
+      'abbreviations': {
+        'name': 'Abbreviations',
+        'description': 'A newline-separated list of abbreviations (including their trailing period, e.g. <code>e.g.</code>, <code>U.S.</code>) that should not be treated as the end of a sentence.',
+      },
+    },
     // sort-yaml-array-values.ts
     'sort-yaml-array-values': {
       'name': 'Sort YAML array values',

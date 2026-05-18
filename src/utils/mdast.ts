@@ -16,6 +16,7 @@ import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
 import QuickLRU from 'quick-lru';
 import {countInstances} from './strings';
 import {getTextInLanguage} from '../lang/helpers';
+import {splitIntoSentences} from './sentence-splitting';
 
 const LRU = new QuickLRU({maxSize: 200});
 
@@ -1243,6 +1244,146 @@ export function updateHeaderText(text: string, func:(text: string) => string): s
 
   for (const headerUpdate of updateLocations) {
     text = replaceTextBetweenStartAndEndWithNewValue(text, headerUpdate.startIndex, headerUpdate.endIndex, headerUpdate.newText);
+  }
+
+  return text;
+}
+
+// A line whose trimmed content is exactly one opaque atom (a masked block
+// placeholder, a lone inline atom such as an autolink, an HTML comment, or an
+// inline HTML tag) is a structural divider: emitted verbatim, never merged with
+// an adjacent prose line, and the newline on each side of it is never collapsed.
+const singleAtomLineRegex = /^(?:\{[A-Z_]+[a-z0-9]+\}|#tag-placeholder[a-z0-9]+|<!--[\s\S]*?-->|<\/?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?>)$/;
+
+/**
+ * Detects whether a single source line ends in an author hard-break indicator,
+ * replicating the exact conditions and precedence of `lineEndsInLineBreak` plus
+ * `addOrReplaceLineEnding`'s character counts. Unlike those helpers it is an
+ * all-indicator detector and reports the exact raw indicator string so it can
+ * be stripped and re-emitted byte-for-byte (CommonMark hard breaks are
+ * spaces-only, so a trailing tab run is not an indicator).
+ * @param {string} line The source line to inspect (without its trailing newline)
+ * @return {{indicator: LineBreakIndicators, raw: string} | null} The detected
+ * indicator and its exact raw text, or null when the line has no hard break.
+ */
+export function detectTrailingLineBreakIndicator(line: string): {indicator: LineBreakIndicators, raw: string} | null {
+  if (line.endsWith('<br/>')) {
+    return {indicator: LineBreakIndicators.LineBreakHtml, raw: '<br/>'};
+  }
+
+  if (line.endsWith('<br>')) {
+    return {indicator: LineBreakIndicators.LineBreakHtmlNotXml, raw: '<br>'};
+  }
+
+  if (!line.endsWith('\\\\') && line.endsWith('\\')) {
+    return {indicator: LineBreakIndicators.Backslash, raw: '\\'};
+  }
+
+  let k = line.length;
+  while (k > 0 && line[k - 1] === ' ') {
+    k--;
+  }
+  if (line.length - k >= 2) {
+    return {indicator: LineBreakIndicators.TwoSpaces, raw: line.slice(k)};
+  }
+
+  return null;
+}
+
+function buildLogicalString(lines: string[]): string {
+  const lastIndex = lines.length - 1;
+  const stripped = lines.map((line, index) => {
+    let s = line;
+    if (index > 0) {
+      s = s.replace(/^[ \t]+/, '');
+    }
+    if (index < lastIndex) {
+      s = s.replace(/[ \t]+$/, '');
+    }
+    return s;
+  });
+  return stripped.join(' ');
+}
+
+function reflowProseRun(lines: string[], terminators: string, abbreviations: string[]): string {
+  type Segment = {lines: string[], indicator: string};
+  const segments: Segment[] = [];
+  let current: string[] = [];
+  for (const line of lines) {
+    const breakInfo = detectTrailingLineBreakIndicator(line);
+    if (breakInfo) {
+      current.push(line.slice(0, line.length - breakInfo.raw.length));
+      segments.push({lines: current, indicator: breakInfo.raw});
+      current = [];
+    } else {
+      current.push(line);
+    }
+  }
+  if (current.length > 0 || segments.length === 0) {
+    segments.push({lines: current, indicator: ''});
+  }
+
+  return segments
+      .map((segment) => {
+        const logical = buildLogicalString(segment.lines);
+        const sentences = splitIntoSentences(logical, terminators, abbreviations);
+        return sentences.join('\n') + segment.indicator;
+      })
+      .join('\n');
+}
+
+function reflowParagraph(raw: string, terminators: string, abbreviations: string[]): string {
+  const lines = raw.split('\n');
+  const groups: string[] = [];
+  let proseRun: string[] = [];
+
+  const flushProseRun = () => {
+    if (proseRun.length > 0) {
+      groups.push(reflowProseRun(proseRun, terminators, abbreviations));
+      proseRun = [];
+    }
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed === '' || singleAtomLineRegex.test(trimmed)) {
+      flushProseRun();
+      groups.push(line);
+    } else {
+      proseRun.push(line);
+    }
+  }
+  flushProseRun();
+
+  return groups.join('\n');
+}
+
+/**
+ * Reflows every root-level paragraph so that each sentence is on its own source
+ * line. Only the raw `[start, end)` span of each root-child `paragraph` node is
+ * rewritten (in reverse document order so earlier offsets stay valid), so
+ * blank lines, the trailing newline, and every non-paragraph construct (code,
+ * math, HTML blocks, headings, lists, blockquotes, footnote definitions, yaml)
+ * are left untouched by construction. Structural dividers inside a merged
+ * paragraph are preserved verbatim with their adjacent newlines intact.
+ * @param {string} text The placeholder-masked markdown text.
+ * @param {string} terminators The user-configured sentence terminators.
+ * @param {string[]} abbreviations The abbreviation suppression list.
+ * @return {string} The text with root-level paragraphs reflowed.
+ */
+export function reflowParagraphsOneSentencePerLine(text: string, terminators: string, abbreviations: string[]): string {
+  const ast = parseTextToAST(text);
+  const positions: Position[] = ast.children
+      .filter((node) => node.type === (MDAstTypes.Paragraph as string) && node.position != null)
+      .map((node) => node.position as Position)
+      .sort((a, b) => b.start.offset - a.start.offset);
+
+  for (const position of positions) {
+    const raw = text.substring(position.start.offset, position.end.offset);
+    const reflowed = reflowParagraph(raw, terminators, abbreviations);
+    if (reflowed !== raw) {
+      text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, reflowed);
+    }
   }
 
   return text;

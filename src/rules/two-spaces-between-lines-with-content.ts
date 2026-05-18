@@ -21,9 +21,17 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
       ruleIgnoreTypes: [IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table],
       disableConflictingOptions(value: boolean, app: App): void {
         const paragraphBlankLinesEnableOption = rulesDict['paragraph-blank-lines'].options[0] as BooleanOption;
+        const sentencePerLineEnableOption = rulesDict['sentence-per-line'].options[0] as BooleanOption;
         if (value && paragraphBlankLinesEnableOption.getValue()) {
           new ConfirmRuleDisableModal(app, 'rules.paragraph-blank-lines.name', 'rules.two-spaces-between-lines-with-content.name', () => {
             paragraphBlankLinesEnableOption.setValue(false);
+          },
+          () => {
+            (rulesDict['two-spaces-between-lines-with-content'].options[0] as BooleanOption).setValue(false);
+          }).open();
+        } else if (value && sentencePerLineEnableOption.getValue()) {
+          new ConfirmRuleDisableModal(app, 'rules.sentence-per-line.name', 'rules.two-spaces-between-lines-with-content.name', () => {
+            sentencePerLineEnableOption.setValue(false);
           },
           () => {
             (rulesDict['two-spaces-between-lines-with-content'].options[0] as BooleanOption).setValue(false);
