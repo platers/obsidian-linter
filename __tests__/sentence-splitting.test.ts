@@ -97,6 +97,25 @@ describe('splitIntoSentences', () => {
           splitIntoSentences('Keep <!-- e.g. a. b. --> together. Done.', T, A),
       ).toEqual(['Keep <!-- e.g. a. b. --> together.', 'Done.']);
     });
+
+    it('an angle-bracket-wrapped URL placeholder is one opaque atom', () => {
+      const AUTOLINK = `<${'{URL_PLACEHOLDER' + 'u9r1l2k3' + '}'}>`;
+      expect(
+          splitIntoSentences(`Before. ${AUTOLINK} starts here.`, T, A),
+      ).toEqual(['Before.', `${AUTOLINK} starts here.`]);
+    });
+
+    it('a raw URL autolink is one opaque atom', () => {
+      expect(
+          splitIntoSentences('See this. <https://example.com> is it.', T, A),
+      ).toEqual(['See this.', '<https://example.com> is it.']);
+    });
+
+    it('an email autolink is one opaque atom', () => {
+      expect(
+          splitIntoSentences('Email me. <foo@bar.com> works fine.', T, A),
+      ).toEqual(['Email me.', '<foo@bar.com> works fine.']);
+    });
   });
 
   describe('whitespace gate by terminator class (B4)', () => {
@@ -252,6 +271,16 @@ describe('splitIntoSentences', () => {
       expect(
           splitIntoSentences('Send to addr. Now please.', '.', []),
       ).toEqual(['Send to addr.', 'Now please.']);
+    });
+
+    it('astral (multi-code-unit) terminators are ignored, not silently broken', () => {
+      // an emoji terminator never matches; the rule degrades to a no-op rather
+      // than accepting-but-never-splitting on it
+      expect(splitIntoSentences('A😀 B😀 C', '😀', [])).toEqual(['A😀 B😀 C']);
+      // a BMP terminator alongside it still works; the emoji is plain text
+      expect(
+          splitIntoSentences('End😀 here. More here😀 done.', '.😀', []),
+      ).toEqual(['End😀 here.', 'More here😀 done.']);
     });
 
     it('DEFAULT_ABBREVIATIONS is a non-empty string array', () => {

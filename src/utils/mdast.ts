@@ -1253,7 +1253,7 @@ export function updateHeaderText(text: string, func:(text: string) => string): s
 // placeholder, a lone inline atom such as an autolink, an HTML comment, or an
 // inline HTML tag) is a structural divider: emitted verbatim, never merged with
 // an adjacent prose line, and the newline on each side of it is never collapsed.
-const singleAtomLineRegex = /^(?:\{[A-Z_]+[a-z0-9]+\}|#tag-placeholder[a-z0-9]+|<!--[\s\S]*?-->|<\/?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?>)$/;
+const singleAtomLineRegex = /^(?:\{[A-Z_]+[a-z0-9]+\}|#tag-placeholder[a-z0-9]+|<!--[\s\S]*?-->|<(?:\{[A-Z_]+[a-z0-9]+\}|[A-Za-z][A-Za-z0-9+.-]*:[^<>\s]*|[^<>\s@]+@[^<>\s]+)>|<\/?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?>)$/;
 
 /**
  * Detects whether a single source line ends in an author hard-break indicator,

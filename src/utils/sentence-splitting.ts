@@ -19,8 +19,10 @@ export const DEFAULT_ABBREVIATIONS: string[] = [
   'Inc.', 'Ltd.', 'Co.', 'U.S.', 'a.m.', 'p.m.',
 ];
 
-// Priority order: placeholder, HTML comment, inline HTML tag.
-const ATOM_RE = /\{[A-Z_]+[a-z0-9]+\}|#tag-placeholder[a-z0-9]+|---\n---|<!--[\s\S]*?-->|<\/?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?>/g;
+// Priority order: placeholder, HTML comment, CommonMark autolink (incl. an
+// angle-wrapped URL placeholder, since `url` masking leaves the `<>` behind),
+// inline HTML tag.
+const ATOM_RE = /\{[A-Z_]+[a-z0-9]+\}|#tag-placeholder[a-z0-9]+|---\n---|<!--[\s\S]*?-->|<(?:\{[A-Z_]+[a-z0-9]+\}|[A-Za-z][A-Za-z0-9+.-]*:[^<>\s]*|[^<>\s@]+@[^<>\s]+)>|<\/?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?>/g;
 
 const CLOSING_CHARS = '"\'”’)]}»›';
 const OPENING_CHARS = '"\'“‘([{«‹';
@@ -63,6 +65,12 @@ function sanitizeTerminators(terminators: string): Set<string> {
     const cp = ch.codePointAt(0) ?? 0;
     // drop control characters and ASCII whitespace
     if (cp < 0x20 || cp === 0x7f || ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
+      continue;
+    }
+    // the scan compares single UTF-16 code units, so an astral terminator
+    // (e.g. an emoji) could never match; ignore it rather than accept it and
+    // silently never split on it
+    if (ch.length > 1) {
       continue;
     }
     set.add(ch);

@@ -49,6 +49,10 @@ favor precision (not splitting where it would be wrong) over recall:
   is therefore **not** reflowed (a no-op, matching how other content rules
   treat HTML blocks).
 
+- Sentence terminators must be single Basic-Multilingual-Plane code points.
+  An astral character such as an emoji is ignored (it cannot reliably be
+  matched a code unit at a time), so it never acts as a terminator.
+
 The sentence terminators and the abbreviation list are both configurable to
 tune this behavior. Leaving the terminators empty makes the rule a no-op.
 

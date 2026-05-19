@@ -81,6 +81,28 @@ ruleTest({
       `,
     },
     {
+      testName: 'A URL autolink is opaque and a sentence can start with one',
+      before: dedent`
+        See this here. <https://example.com> is the source link.
+      `,
+      after: dedent`
+        See this here.
+        <https://example.com> is the source link.
+      `,
+    },
+    {
+      testName: 'A lone URL autolink line is a divider and is not merged into prose',
+      before: dedent`
+        <https://example.com>
+        Some text here. More text here.
+      `,
+      after: dedent`
+        <https://example.com>
+        Some text here.
+        More text here.
+      `,
+    },
+    {
       testName: 'M2: a "." inside an inline HTML attribute is opaque',
       before: dedent`
         Text <abbr title="e.g. foo. Bar">x</abbr>. Next sentence here.
