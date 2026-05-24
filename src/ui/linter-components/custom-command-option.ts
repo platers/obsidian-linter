@@ -1,5 +1,5 @@
 import {Setting, App} from 'obsidian';
-import {getTextInLanguage} from 'src/lang/helpers';
+import {getTextInLanguage} from '../../lang/helpers';
 import {AddCustomRow} from '../components/add-custom-row';
 import CommandSuggester from '../suggesters/command-suggester';
 
@@ -86,6 +86,7 @@ export class CustomCommandOption extends AddCustomRow {
           cb.setValue(command.enabled)
               .onChange((status: boolean) => {
                 command.enabled = status;
+                this.saveSettings();
               });
         });
   }

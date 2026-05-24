@@ -108,6 +108,7 @@ export default {
   'file-backup-text': '请确保你已备份文件',
   'custom-command-warning': '启用自定义命令时格式化多个文件需要启用侧边栏，同时会显著的更加耗时，请保持耐心',
   'cancel-button-text': '取消',
+  'do-not-show-again': '不再显示此确认',
 
   'copy-aria-label': '复制',
 
@@ -178,6 +179,13 @@ export default {
         'label-placeholder-text': '名称',
         'flags-placeholder-text': '修饰符',
         'warning': '如果您不知道正则表达式是什么，请谨慎使用。此外，如果在 iOS 移动设备上使用后行断言，请确保系统版本支持',
+      },
+      'additional-file-extensions': {
+        'name': '额外文件扩展名',
+        'description': '除 md 外要参与 Lint 的文件扩展名。例如 mdx 或 svx。不要包含开头的点号。<b>注意：无论添加何种扩展名，只有 Obsidian 视为 Markdown 的文件（无论是原生或通过其他插件）才会被 Lint。</b>',
+        'extension-placeholder': '例如：mdx',
+        'add-input-button-text': '添加扩展名',
+        'delete-tooltip': '删除',
       },
       'override-locale': {
         'name': '覆盖默认地区语言',
@@ -490,7 +498,7 @@ export default {
       'description': '确保标题前后有一个空行，除非它在文档的开头或结尾',
       'bottom': {
         'name': '标题后空行',
-        'description': '在标题后插入一个空行',
+        'description': '在标题后插入一个空行（禁用此功能后，不会删除标题后的空行）',
       },
       'empty-line-after-yaml': {
         'name': 'YAML 与标题之间的空行',

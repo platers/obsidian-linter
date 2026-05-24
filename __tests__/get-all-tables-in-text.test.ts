@@ -207,7 +207,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
     expectedPositions: [],
   },
   {
-    name: 'does not match an empty list indicator with a blank line before it',
+    name: 'does not match an empty list marker with a blank line before it',
     text: dedent`
       ## Attendees
       ${''}

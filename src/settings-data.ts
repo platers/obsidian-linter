@@ -30,10 +30,13 @@ export interface LinterSettings {
   lintOnSave: boolean;
   displayChanged: boolean;
   suppressMessageWhenNoChange?: boolean;
+  suppressLintAllFilesConfirmationModal?: boolean;
+  suppressLintAllFilesInFolderConfirmationModal?: boolean;
   settingsConvertedToConfigKeyValues: boolean;
   recordLintOnSaveLogs: boolean;
   lintOnFileChange: boolean;
   displayLintOnFileChangeNotice: boolean;
+  additionalFileExtensions: string[];
   foldersToIgnore: string[];
   filesToIgnore: FileToIgnore[];
   linterLocale: string;
@@ -51,9 +54,12 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   recordLintOnSaveLogs: false,
   displayChanged: true,
   suppressMessageWhenNoChange: false,
+  suppressLintAllFilesConfirmationModal: false,
+  suppressLintAllFilesInFolderConfirmationModal: false,
   lintOnFileChange: false,
   displayLintOnFileChangeNotice: false,
   settingsConvertedToConfigKeyValues: false,
+  additionalFileExtensions: [],
   foldersToIgnore: [],
   filesToIgnore: [],
   linterLocale: 'system-default',

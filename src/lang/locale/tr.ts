@@ -101,6 +101,7 @@ export default {
   // lint-confirmation-modal.ts
   'warning-text': 'Uyarı',
   'file-backup-text': 'Dosyalarınızın yedeğini aldığınızdan emin olun.',
+  'do-not-show-again': 'Bu onayı bir daha gösterme',
 
   'tabs': {
     'names': {
@@ -142,6 +143,13 @@ export default {
       'folders-to-ignore': {
         'name': 'Yoksayılacak klasörler',
         'description': 'Tüm dosyaları düzeltirken veya kaydederken düzeltme işleminin yoksayılacağı klasörler. Klasör yollarını yeni satırlarla ayırarak girin',
+      },
+      'additional-file-extensions': {
+        'name': 'Ek dosya uzantıları',
+        'description': 'md dosyalarına ek olarak lintlenecek dosya uzantıları. Örneğin mdx veya svx. Baştaki noktayı eklemeyin. <b>Not: Yalnızca Obsidian\'ın markdown olarak gördüğü dosyalar (yerel veya diğer eklentiler aracılığıyla) lintlenecektir, eklenen uzantılardan bağımsız olarak.</b>',
+        'extension-placeholder': 'örn. mdx',
+        'add-input-button-text': 'Başka uzantı ekle',
+        'delete-tooltip': 'Sil',
       },
       'override-locale': {
         'name': 'Yerel ayarların üzerine yaz',
@@ -399,7 +407,7 @@ export default {
       'description': 'Tüm başlıkların hem öncesinde hem de sonrasında birer boş satır olmalıdır (başlık belgenin başında veya sonunda olduğunda bu durum geçerli değildir).',
       'bottom': {
         'name': 'Alt',
-        'description': 'Başlıkların sonrasına boş satır ekler',
+        'description': 'Başlıkların sonrasına boş satır ekler (Devre dışı bırakıldığında, başlıkların ardından gelen boş satırları kaldırmaz)',
       },
       'empty-line-after-yaml': {
         'name': 'YAML ve Başlık Arasında Boş Satır',

@@ -78,6 +78,9 @@ export default class LinterPlugin extends Plugin {
   private activeFileChangeDebouncer: Map<string, FileChangeUpdateInfo> = new Map();
   private defaultAutoCorrectMisspellings: Map<string, string> = new Map();
   private hasLoadedMisspellingFiles = false;
+  private saveSettingsDebounce = debounce(async (settings: LinterSettings) => {
+    await this.saveData(settings);
+  }, 5000);
 
   async onload() {
     sortRules();
@@ -142,7 +145,8 @@ export default class LinterPlugin extends Plugin {
       await this.loadAutoCorrectFiles(false);
     }
 
-    await this.saveData(this.settings);
+    void this.saveSettingsDebounce(this.settings);
+
     this.updatePasteOverrideStatus();
     this.updateHasCustomCommandStatus();
   }
@@ -182,12 +186,20 @@ export default class LinterPlugin extends Plugin {
       name: getTextInLanguage('commands.lint-all-files.name'),
       icon: iconInfo.vault.id,
       callback: () => {
+        if (this.settings.suppressLintAllFilesConfirmationModal) {
+          void this.runLinterAllFiles(this.app);
+          return;
+        }
+
         const startMessage = getTextInLanguage('commands.lint-all-files.start-message');
         const submitBtnText = getTextInLanguage('commands.lint-all-files.submit-button-text');
         const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files.submit-button-notice-text');
         new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => {
           return this.runLinterAllFiles(this.app);
-        }, this.settings.lintCommands && this.settings.lintCommands.length > 0).open();
+        }, this.settings.lintCommands && this.settings.lintCommands.length > 0, async () => {
+          this.settings.suppressLintAllFilesConfirmationModal = true;
+          await this.saveSettings();
+        }).open();
       },
     });
 
@@ -488,7 +500,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   isMarkdownFile(file: TFile): boolean {
-    return file && file.extension === 'md';
+    return file && (file.extension === 'md' || this.settings.additionalFileExtensions.includes(file.extension));
   }
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
@@ -578,10 +590,18 @@ export default class LinterPlugin extends Plugin {
 
   // handles the creation of the folder linting modal since this happens in multiple places and it should be consistent
   createFolderLintModal(folder: TFolder) {
+    if (this.settings.suppressLintAllFilesInFolderConfirmationModal) {
+      void this.runLinterAllFilesInFolder(folder);
+      return;
+    }
+
     const startMessage = getTextInLanguage('commands.lint-all-files-in-folder.start-message').replace('{FOLDER_NAME}', folder.name);
     const submitBtnText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-text').replace('{FOLDER_NAME}', folder.name);
     const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-notice-text').replace('{FOLDER_NAME}', folder.name);
-    new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder), this.settings.lintCommands && this.settings.lintCommands.length > 0).open();
+    new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder), this.settings.lintCommands && this.settings.lintCommands.length > 0, async () => {
+      this.settings.suppressLintAllFilesInFolderConfirmationModal = true;
+      await this.saveSettings();
+    }).open();
   }
 
   async runLinterEditor(editor: Editor) {
@@ -953,6 +973,12 @@ export default class LinterPlugin extends Plugin {
     // Note: it looks like those two plugins look for an exact match for a URL,
     // so we will too.
     const text = plainClipboard.trim();
+    // fixes https://github.com/platers/obsidian-linter/issues/1446
+    // for some reason when you run a global regex on a string it keeps track
+    // of how far it got in that string the last time it ran on it. Hence
+    // pasting the same string 2 times results in 1 match and 1 non-match.
+    // Resetting last index handles this issue.
+    urlRegex.lastIndex = 0;
     if (urlRegex.test(text)) {
       logWarn(getTextInLanguage('logs.paste-link-warning'));
       return;
@@ -966,7 +992,10 @@ export default class LinterPlugin extends Plugin {
     // use Turndown via Obsidian API to emulate "Auto Convert HTML" setting
     const convertHtmlEnabled = this.app.vault.getConfig('autoConvertHtml');
     const htmlClipText = clipboardEv.clipboardData.getData('text/html');
-    let clipboardText = htmlClipText && convertHtmlEnabled ? htmlToMarkdown(htmlClipText) : plainClipboard;
+    // make sure that we skip handling Obsidian editor based html copied text as the plaintext is the way it will be pasted as as opposed
+    // to what is created by converting the provided HTML to markdown
+    // see https://github.com/platers/obsidian-linter/issues/1471
+    let clipboardText = htmlClipText && convertHtmlEnabled && htmlClipText.indexOf('<!-- obsidian -->') === -1 ? htmlToMarkdown(htmlClipText) : plainClipboard;
 
     // if everything went well, run clipboard modifications (passing in current line and text to paste)
     const cursorSelections = editor.listSelections();

@@ -348,7 +348,7 @@ This can be done using `ignoreListOfTypes` from
 [ignore-types.ts](https://github.com/platers/obsidian-linter/blob/master/src/utils/ignore-types.ts)
 which takes a list of `IgnoreTypes` and a function that takes the resulting string and returns another string.
 
-We have an example of this in [Remove Space Around Characters](https://github.com/platers/obsidian-linter/blob/master/src/rules/remove-space-around-characters.ts) where we needed to make sure we did not remove whitespace between a list indicator and the fullwidth or other characters in question so we had to ignore lists for the first regex replacement and then do the same regex replacement on just the list item text:
+We have an example of this in [Remove Space Around Characters](https://github.com/platers/obsidian-linter/blob/master/src/rules/remove-space-around-characters.ts) where we needed to make sure we did not remove whitespace between a list marker and the fullwidth or other characters in question so we had to ignore lists for the first regex replacement and then do the same regex replacement on just the list item text:
 
 ``` TypeScript
 const replaceWhitespaceAroundFullwidthCharacters = function(text: string): string {

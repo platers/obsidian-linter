@@ -1,6 +1,6 @@
 import {App, Platform, PluginSettingTab} from 'obsidian';
-import LinterPlugin from 'src/main';
-import {RuleType, ruleTypeToRules} from 'src/rules';
+import LinterPlugin from '../main';
+import {RuleType, ruleTypeToRules} from '../rules';
 import {hideEl} from './helpers';
 import {SearchStatus, Tab} from './linter-components/tab-components/tab';
 import {GeneralTab} from './linter-components/tab-components/general-tab';
@@ -8,7 +8,7 @@ import {RuleTab} from './linter-components/tab-components/rule-tab';
 import {CustomTab} from './linter-components/tab-components/custom-tab';
 import {TabSearcher} from './linter-components/tab-components/tab-searcher';
 import {DebugTab} from './linter-components/tab-components/debug-tab';
-import {getTextInLanguage} from 'src/lang/helpers';
+import {getTextInLanguage} from '../lang/helpers';
 
 export class SettingTab extends PluginSettingTab {
   navContainer: HTMLElement;

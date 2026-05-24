@@ -11,7 +11,7 @@ These rules try their best to work with YAML values in [Obsidian.md](https://obs
 - Blank lines may be removed if you try sorting or making modifications to the order of keys in the YAML via the Linter
 
 
-## Add Blank Line After YAML
+## Add blank line after YAML
 
 Alias: `add-blank-line-after-yaml`
 
@@ -85,7 +85,7 @@ Here is some text
 ``````
 </details>
 
-## Dedupe YAML Array Values
+## Dedupe YAML array values
 
 Alias: `dedupe-yaml-array-values`
 
@@ -98,7 +98,7 @@ Removes duplicate array values in a case sensitive manner.
 | `Dedupe YAML aliases section` | Turns on removing duplicate aliases. | N/A | `true` |
 | `Dedupe YAML tags section` | Turns on removing duplicate tags. | N/A | `true` |
 | `Dedupe YAML array sections` | Turns on removing duplicate values for regular YAML arrays | N/A | `true` |
-| `YAML Keys to Ignore` | A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them. | N/A |  |
+| `YAML keys to ignore` | A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them. | N/A |  |
 
 
 
@@ -232,7 +232,7 @@ arr2:
 ``````
 </details>
 
-## Escape YAML Special Characters
+## Escape YAML special characters
 
 Alias: `escape-yaml-special-characters`
 
@@ -242,7 +242,7 @@ Escapes colons with a space after them (: ), single quotes ('), and double quote
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Try to Escape Single Line Arrays` | Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",". | N/A | false |
+| `Try to escape single line arrays` | Tries to escape array values assuming that an array starts with "[", ends with "]", and has items that are delimited by ",". | N/A | false |
 
 
 
@@ -298,7 +298,7 @@ otherKey: []
 ---
 ``````
 </details>
-<details><summary>YAML with unescaped values in an expanded list with `Default Escape Character = '`</summary>
+<details><summary>YAML with unescaped values in an expanded list with `Default escape character = '`</summary>
 
 Before:
 
@@ -355,7 +355,7 @@ _Note that escaped commas in a YAML array will be treated as a separator._
 ``````
 </details>
 
-## Force YAML Escape
+## Force YAML escape
 
 Alias: `force-yaml-escape`
 
@@ -365,7 +365,7 @@ Escapes the values for the specified YAML keys.
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Force YAML Escape on Keys` | Uses the YAML escape character on the specified YAML keys separated by a new line character if it is not already escaped. Do not use on YAML arrays. | N/A |  |
+| `Force YAML escape on keys` | Uses the YAML escape character on the specified YAML keys separated by a new line character if it is not already escaped. Do not use on YAML arrays. | N/A |  |
 
 
 
@@ -391,7 +391,7 @@ otherKey: []
 ---
 ``````
 </details>
-<details><summary>Force YAML keys to be escaped with double quotes where not already escaped with `Force YAML Escape on Keys = 'key'\n'title'\n'bool'`</summary>
+<details><summary>Force YAML keys to be escaped with double quotes where not already escaped with `Force YAML escape on keys = 'key'\n'title'\n'bool'`</summary>
 
 Before:
 
@@ -420,7 +420,7 @@ _Note that the force YAML key option should not be used with arrays._
 ``````
 </details>
 
-## Format Tags in YAML
+## Format tags in YAML
 
 Alias: `format-tags-in-yaml`
 
@@ -432,7 +432,7 @@ Remove Hashtags from tags in the YAML frontmatter, as they make the tags there i
 
 ### Examples
 
-<details><summary>Format Tags in YAML frontmatter</summary>
+<details><summary>Format tags in YAML frontmatter</summary>
 
 Before:
 
@@ -509,7 +509,7 @@ tags:
 ``````
 </details>
 
-## Format YAML Array
+## Format YAML array
 
 Alias: `format-yaml-array`
 
@@ -519,7 +519,7 @@ Allows for the formatting of regular YAML arrays as either multi-line or single-
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Format YAML aliases section` | Turns on formatting for the YAML aliases section. You should not enable this option alongside the rule <code>YAML Title Alias</code> as they may not work well together or they may have different format styles selected causing unexpected results. | N/A | `true` |
+| `Format YAML aliases section` | Turns on formatting for the YAML aliases section. You should not enable this option alongside the rule <code>YAML title alias</code> as they may not work well together or they may have different format styles selected causing unexpected results. | N/A | `true` |
 | `Format YAML tags section` | Turns on formatting for the YAML tags section. | N/A | `true` |
 | `Default YAML array section style` | The style of other YAML arrays that are not <code>tags</code>, <code>aliases</code> or  in <code>Force key values to be single-line arrays</code> and <code>Force key values to be multi-line arrays</code> | `multi-line`: ```key:\n  - value```<br/><br/>`single-line`: ```key: [value]``` | `single-line` |
 | `Format YAML array sections` | Turns on formatting for regular YAML arrays | N/A | `true` |
@@ -659,7 +659,7 @@ animal: cat
 ``````
 </details>
 
-## Move Tags to YAML
+## Move tags to YAML
 
 Alias: `move-tags-to-yaml`
 
@@ -778,7 +778,7 @@ This document will have removed and spacing around tags is left alone except for
 ``````
 </details>
 
-## Remove YAML Keys
+## Remove YAML keys
 
 Alias: `remove-yaml-keys`
 
@@ -788,13 +788,13 @@ Removes the YAML keys specified
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `YAML Keys to Remove` | The YAML keys to remove from the YAML frontmatter with or without colons | N/A |  |
+| `YAML keys to remove` | The YAML keys to remove from the YAML frontmatter with or without colons | N/A |  |
 
 
 
 ### Examples
 
-<details><summary>Removes the values specified in `YAML Keys to Remove` = "status:
+<details><summary>Removes the values specified in `YAML keys to remove` = "status:
 keywords
 date"</summary>
 
@@ -832,7 +832,7 @@ Text
 ``````
 </details>
 
-## Sort YAML Array Values
+## Sort YAML array values
 
 Alias: `sort-yaml-array-values`
 
@@ -845,8 +845,8 @@ Sorts YAML array values based on the specified sort order.
 | `Sort YAML aliases section` | Turns on sorting aliases. | N/A | `true` |
 | `Sort YAML tags section` | Turns on sorting tags. | N/A | `true` |
 | `Sort YAML array sections` | Turns on sorting values for regular YAML arrays | N/A | `true` |
-| `YAML Keys to Ignore` | A list of YAML keys without the ending colon on their own lines that are not meant to have their values sorted. | N/A |  |
-| `Sort Order` | The way to sort the YAML array values. | `Ascending Alphabetical`: Sorts the array values from a to z<br/><br/>`Descending Alphabetical`: Sorts the array values from z to a | `Ascending Alphabetical` |
+| `YAML Keys to ignore` | A list of YAML keys without the ending colon on their own lines that are not meant to have their values sorted. | N/A |  |
+| `Sort order` | The way to sort the YAML array values. | `Ascending Alphabetical`: Sorts the array values from a to z<br/><br/>`Descending Alphabetical`: Sorts the array values from z to a | `Ascending Alphabetical` |
 
 
 
@@ -900,7 +900,7 @@ aliases:
 ---
 ``````
 </details>
-<details><summary>Sort YAML Arrays respects list of keys to not sort values of for normal arrays (keys to ignore is just `arr2` for this example)</summary>
+<details><summary>Sort YAML arrays respects list of keys to not sort values of for normal arrays (keys to ignore is just `arr2` for this example)</summary>
 
 Before:
 
@@ -935,7 +935,7 @@ arr2:
 ``````
 </details>
 
-## YAML Key Sort
+## YAML key sort
 
 Alias: `yaml-key-sort`
 
@@ -945,15 +945,15 @@ Sorts the YAML keys based on the order and priority specified. <b>Note: may remo
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `YAML Key Priority Sort Order` | The order in which to sort keys with one on each line where it sorts in the order found in the list | N/A |  |
-| `Priority Keys at Start of YAML` | YAML Key Priority Sort Order is placed at the start of the YAML frontmatter | N/A | `true` |
-| `YAML Sort Order for Other Keys` | The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area | `None`: No sorting other than what is in the YAML Key Priority Sort Order text area<br/><br/>`Ascending Alphabetical`: Sorts the keys based on key value from a to z<br/><br/>`Descending Alphabetical`: Sorts the keys based on key value from z to a | `None` |
+| `YAML key priority sort order` | The order in which to sort keys with one on each line where it sorts in the order found in the list | N/A |  |
+| `Priority keys at start of YAML` | YAML Key Priority Sort Order is placed at the start of the YAML frontmatter | N/A | `true` |
+| `YAML sort order for other keys` | The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area | `None`: No sorting other than what is in the YAML Key Priority Sort Order text area<br/><br/>`Ascending Alphabetical`: Sorts the keys based on key value from a to z<br/><br/>`Descending Alphabetical`: Sorts the keys based on key value from z to a | `None` |
 
 
 
 ### Examples
 
-<details><summary>Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language`</summary>
+<details><summary>Sorts YAML keys in order specified by `YAML key priority sort order` has a sort order of `date type language`</summary>
 
 Before:
 
@@ -981,7 +981,7 @@ status: WIP
 ---
 ``````
 </details>
-<details><summary>Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Ascending Alphabetical`</summary>
+<details><summary>Sorts YAML keys in order specified by `YAML key priority sort order` has a sort order of `date type language` with `'YAML sort order for other keys' = Ascending Alphabetical`</summary>
 
 Before:
 
@@ -1009,7 +1009,7 @@ tags: computer
 ---
 ``````
 </details>
-<details><summary>Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Descending Alphabetical`</summary>
+<details><summary>Sorts YAML keys in order specified by `YAML key priority sort order` has a sort order of `date type language` with `'YAML sort order for other keys' = Descending Alphabetical`</summary>
 
 Before:
 
@@ -1037,7 +1037,7 @@ keywords: []
 ---
 ``````
 </details>
-<details><summary>Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `'YAML Sort Order for Other Keys' = Descending Alphabetical` and `'Priority Keys at Start of YAML' = false`</summary>
+<details><summary>Sorts YAML keys in order specified by `YAML key priority sort order` has a sort order of `date type language` with `'YAML sort order for other keys' = Descending Alphabetical` and `'Priority keys at start of YAML' = false`</summary>
 
 Before:
 
@@ -1070,7 +1070,7 @@ Any blank line is attached to the line that follows it
 ``````
 </details>
 
-## YAML Timestamp
+## YAML timestamp
 
 Alias: `yaml-timestamp`
 
@@ -1080,15 +1080,15 @@ Keep track of the date the file was last edited in the YAML front matter. Gets d
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Date Created` | Insert the file creation date | N/A | `true` |
-| `Date Created Key` | Which YAML key to use for creation date | N/A | `date created` |
-| `Date Created Source of Truth` | Specifies where to get the date created value from if it is already present in the frontmatter. | `file system`: The file system date created value is used to set the value of date created in the frontmatter<br/><br/>`frontmatter`: When a value is present in the frontmatter for date created, this value is used as the value for the date created | `file system` |
-| `Date Modified` | Insert the date the file was last modified | N/A | `true` |
-| `Date Modified Key` | Which YAML key to use for modification date | N/A | `date modified` |
-| `Date Modified Source of Truth` | Specifies what way should be used to determine when the date modified should be updated if it is already present in the frontmatter. | `file system`: The file system date modified value is used to set the value of date modified in the frontmatter<br/><br/>`user or Linter edits`: When a value is present in the frontmatter for date modified, date modified is kept as is unless the Linter makes a change to a note or the user edits a note with the setting `Update YAML Timestamp on File Contents Update` set to something other than `Never`. | `file system` |
+| `Date created` | Insert the file creation date | N/A | `true` |
+| `Date created key` | Which YAML key to use for creation date | N/A | `date created` |
+| `Date created source of truth` | Specifies where to get the date created value from if it is already present in the frontmatter. | `file system`: The file system date created value is used to set the value of date created in the frontmatter<br/><br/>`frontmatter`: When a value is present in the frontmatter for date created, this value is used as the value for the date created | `file system` |
+| `Date modified` | Insert the date the file was last modified | N/A | `true` |
+| `Date modified key` | Which YAML key to use for modification date | N/A | `date modified` |
+| `Date modified source of truth` | Specifies what way should be used to determine when the date modified should be updated if it is already present in the frontmatter. | `file system`: The file system date modified value is used to set the value of date modified in the frontmatter<br/><br/>`user or Linter edits`: When a value is present in the frontmatter for date modified, date modified is kept as is unless the Linter makes a change to a note or the user edits a note with the setting `Update YAML timestamp on file contents update` set to something other than `Never`. | `file system` |
 | `Format` | Moment date format to use (see <a href="https://momentjscom.readthedocs.io/en/latest/moment/04-displaying/01-format/">Moment format options</a>) | N/A | `dddd, MMMM Do YYYY, h:mm:ss a` |
-| `Convert Local Time to UTC` | Uses UTC equivalent for saved dates instead of local time | N/A | false |
-| `Update YAML Timestamp on File Contents Update` | When the currently active note is modified, <code>YAML Timestamp</code> is run on the note. This should update the modified note timestamp if it is more than 5 seconds off from the current value. | `never`: never<br/><br/>`after 5 seconds`: after 5 seconds<br/><br/>`after 10 seconds`: after 10 seconds<br/><br/>`after 15 seconds`: after 15 seconds<br/><br/>`after 30 seconds`: after 30 seconds<br/><br/>`after 1 minute`: after 1 minute | `never` |
+| `Convert local time to UTC` | Uses UTC equivalent for saved dates instead of local time | N/A | false |
+| `Update YAML timestamp on file contents update` | When the currently active note is modified, <code>YAML timestamp</code> is run on the note. This should update the modified note timestamp if it is more than 5 seconds off from the current value. | `never`: never<br/><br/>`after 5 seconds`: after 5 seconds<br/><br/>`after 10 seconds`: after 10 seconds<br/><br/>`after 15 seconds`: after 15 seconds<br/><br/>`after 30 seconds`: after 30 seconds<br/><br/>`after 1 minute`: after 1 minute | `never` |
 
 ### Additional Info
 
@@ -1142,7 +1142,7 @@ date modified: Thursday, January 2nd 2020, 12:00:05 am
 # H1
 ``````
 </details>
-<details><summary>Date Created Key is set</summary>
+<details><summary>Date created key is set</summary>
 
 Before:
 
@@ -1159,7 +1159,7 @@ created: Wednesday, January 1st 2020, 12:00:00 am
 # H1
 ``````
 </details>
-<details><summary>Date Modified Key is set</summary>
+<details><summary>Date modified key is set</summary>
 
 Before:
 
@@ -1211,7 +1211,7 @@ date modified: 2020-01-02T02:00:05+00:00
 # H1
 ``````
 </details>
-<details><summary>Date Created Key is set with convert to UTC option true</summary>
+<details><summary>Date created key is set with convert to UTC option true</summary>
 
 Before:
 
@@ -1228,7 +1228,7 @@ created: 2020-01-01T14:00:00+00:00
 # H1
 ``````
 </details>
-<details><summary>Date Modified Key is set with convert to UTC option true</summary>
+<details><summary>Date modified key is set with convert to UTC option true</summary>
 
 Before:
 
@@ -1246,7 +1246,7 @@ modified: 2020-01-02T02:00:05+00:00
 ``````
 </details>
 
-## YAML Title
+## YAML title
 
 Alias: `yaml-title`
 
@@ -1256,14 +1256,14 @@ Inserts the title of the file into the YAML frontmatter. Gets the title based on
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Title Key` | Which YAML key to use for title | N/A | `title` |
+| `Title key` | Which YAML key to use for title | N/A | `title` |
 | `Mode` | The method to use to get the title | `first-h1-or-filename-if-h1-missing`: Uses the first H1 in the file or the filename of the file if there is not H1<br/><br/>`filename`: Uses the filename as the title<br/><br/>`first-h1`: Uses the first H1 in the file as the title | `first-h1-or-filename-if-h1-missing` |
 
 
 
 ### Examples
 
-<details><summary>Adds a header with the title from heading when `mode = 'First H1 or Filename if H1 Missing'`.</summary>
+<details><summary>Adds a header with the title from heading when `mode = 'First H1 or filename if H1 missing'`.</summary>
 
 Before:
 
@@ -1280,7 +1280,7 @@ title: Obsidian
 # Obsidian
 ``````
 </details>
-<details><summary>Adds a header with the title when `mode = 'First H1 or Filename if H1 Missing'`.</summary>
+<details><summary>Adds a header with the title when `mode = 'First H1 or filename if H1 missing'`.</summary>
 
 Before:
 
@@ -1297,7 +1297,7 @@ title: Filename
 
 ``````
 </details>
-<details><summary>Make sure that markdown links in headings are properly copied to the YAML as just the text when `mode = 'First H1 or Filename if H1 Missing'`</summary>
+<details><summary>Make sure that markdown links in headings are properly copied to the YAML as just the text when `mode = 'First H1 or filename if H1 missing'`</summary>
 
 Before:
 
@@ -1349,7 +1349,7 @@ title: Filename
 ``````
 </details>
 
-## YAML Title Alias
+## YAML title alias
 
 Alias: `yaml-title-alias`
 
@@ -1361,8 +1361,8 @@ Inserts or updates the title of the file into the YAML frontmatter's aliases sec
 | ---- | ----------- | ---------- | ------------- |
 | `Preserve existing aliases section style` | If set, the <code>YAML aliases section style</code> setting applies only to the newly created sections | N/A | `true` |
 | `Keep alias that matches the filename` | Such aliases are usually redundant | N/A | false |
-| `Use the YAML key specified by <code>Alias Helper Key</code> to help with filename and heading changes` | If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array | N/A | `true` |
-| `Alias Helper Key` | The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule. | N/A | `linter-yaml-title-alias` |
+| `Use the YAML key specified by <code>Alias helper key</code> to help with filename and heading changes` | If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array | N/A | `true` |
+| `Alias helper key` | The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule. | N/A | `linter-yaml-title-alias` |
 
 ### Additional Info
 
@@ -1492,7 +1492,7 @@ linter-yaml-title-alias: This is a Heading
 # This is a [Heading](markdown.md)
 ``````
 </details>
-<details><summary>Using `title` as `Alias Helper Key` sets the value of `title` to the alias.</summary>
+<details><summary>Using `title` as `Alias helper key` sets the value of `title` to the alias.</summary>
 
 Before:
 

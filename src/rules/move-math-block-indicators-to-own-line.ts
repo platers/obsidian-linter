@@ -29,7 +29,7 @@ export default class MoveMathBlockIndicatorsToOwnLine extends RuleBuilder<MoveMa
   get exampleBuilders(): ExampleBuilder<MoveMathBlockIndicatorsToOwnLineOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 2',
+        description: 'Moving math block indicator to its own line when `Number of dollar signs to indicate a math block` = 2',
         before: dedent`
           This is left alone:
           $$
@@ -50,7 +50,7 @@ export default class MoveMathBlockIndicatorsToOwnLine extends RuleBuilder<MoveMa
         `,
       }),
       new ExampleBuilder({
-        description: 'Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 3 and opening indicator is on the same line as the start of the content',
+        description: 'Moving math block indicator to its own line when `Number of dollar signs to indicate a math block` = 3 and opening indicator is on the same line as the start of the content',
         before: dedent`
           $$$\\boldsymbol{a}=\\begin{bmatrix}a_x \\\\ a_y\\end{bmatrix}
           $$$
@@ -62,7 +62,7 @@ export default class MoveMathBlockIndicatorsToOwnLine extends RuleBuilder<MoveMa
         `,
       }),
       new ExampleBuilder({
-        description: 'Moving math block indicator to its own line when `Number of Dollar Signs to Indicate a Math Block` = 2 and ending indicator is on the same line as the ending line of the content',
+        description: 'Moving math block indicator to its own line when `Number of dollar signs to indicate a math block` = 2 and ending indicator is on the same line as the ending line of the content',
         before: dedent`
           $$
           \\boldsymbol{a}=\\begin{bmatrix}a_x \\\\ a_y\\end{bmatrix}$$

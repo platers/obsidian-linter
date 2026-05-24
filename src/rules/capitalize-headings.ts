@@ -1,8 +1,8 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
-import {allHeadersRegex, wordSplitterRegex} from '../utils/regex';
+import {allHeadersRegex, escapeRegExp, whitespaceSplitterRegex, wordSplitterRegex} from '../utils/regex';
 
 type Style = 'Title Case' | 'ALL CAPS' | 'First letter';
 
@@ -286,113 +286,31 @@ class CapitalizeHeadingsOptions implements Options {
     'while',
     'whilst',
     'ago',
-    'according to',
-    'as regards',
-    'counter to',
-    'instead of',
-    'owing to',
-    'pertaining to',
-    'at the behest of',
-    'at the expense of',
-    'at the hands of',
-    'at risk of',
-    'at the risk of',
-    'at variance with',
-    'by dint of',
-    'by means of',
-    'by virtue of',
-    'by way of',
-    'for the sake of',
-    'for sake of',
-    'for lack of',
-    'for want of',
-    'from want of',
-    'in accordance with',
-    'in addition to',
-    'in case of',
-    'in charge of',
-    'in compliance with',
-    'in conformity with',
-    'in contact with',
-    'in exchange for',
-    'in favor of',
-    'in front of',
-    'in lieu of',
-    'in light of',
-    'in the light of',
-    'in line with',
-    'in place of',
-    'in point of',
-    'in quest of',
-    'in relation to',
-    'in regard to',
-    'with regard to',
-    'in respect to',
-    'with respect to',
-    'in return for',
-    'in search of',
-    'in step with',
-    'in touch with',
-    'in terms of',
-    'in the name of',
-    'in view of',
-    'on account of',
-    'on behalf of',
-    'on grounds of',
-    'on the grounds of',
-    'on the part of',
-    'on top of',
-    'with a view to',
-    'with the exception of',
-    'à la',
-    'a la',
-    'as soon as',
-    'as well as',
-    'close to',
-    'due to',
-    'far from',
-    'in case',
-    'other than',
-    'prior to',
-    'pursuant to',
-    'regardless of',
-    'subsequent to',
-    'as long as',
-    'as much as',
-    'as far as',
-    'by the time',
-    'in as much as',
     'inasmuch',
-    'in order to',
-    'in order that',
     'even',
-    'provide that',
-    'if only',
     'whether',
     'whose',
     'whoever',
     'why',
     'how',
-    'or not',
     'whatever',
     'what',
     'both',
     'and',
     'or',
-    'not only',
-    'but also',
     'either',
     'neither',
     'nor',
     'just',
     'rather',
-    'no sooner',
     'such',
     'that',
     'yet',
     'is',
     'it',
   ];
+  startingWordIgnoreCharacters?: string = '\'"(‘“-';
+  endingWordIgnoreCharacters?: string = '.?!,:;\'")”’0123456789-';
   ignoreCasedWords?: boolean = true;
 }
 
@@ -418,15 +336,27 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
 
       const capitalizeJustFirstLetter = options.style === 'First letter';
       // split by whitespace
-      const headerWords = headerText.match(/\S+/g);
+      const headerWords = headerText.match(whitespaceSplitterRegex);
+      if (!headerWords) {
+        return headerText;
+      }
+
+      const startingCustomRegexGroup = options.startingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.startingWordIgnoreCharacters!)}]?`;
+      const endingCustomRegexGroup = options.endingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.endingWordIgnoreCharacters!)}]*`;
+      const wordRegex = new RegExp(`^${startingCustomRegexGroup}[\\p{L}’'-]{1,}${endingCustomRegexGroup}$`, 'u');
       const keepCasing = options.ignoreWords;
       const ignoreShortWords = options.lowercaseWords;
+      let indexToCapitalize = 0;
       let firstWord = true;
       for (let j = 1; j < headerWords.length; j++) {
         // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
-        const isWord = headerWords[j].match(/^[\p{L}'-]{1,}[.?!,:;\d]*$/u);
+        const isWord = headerWords[j].match(wordRegex);
         if (!isWord || headerWords[j] === '-' || headerWords[j] === '\'') {
           continue;
+        }
+
+        if (options.startingWordIgnoreCharacters?.includes(headerWords[j][0])) {
+          indexToCapitalize =1;
         }
 
         const ignoreCasedWord = options.ignoreCasedWords && headerWords[j] !== headerWords[j].toLowerCase();
@@ -435,7 +365,11 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
           headerWords[j] = headerWords[j].toLowerCase();
           const ignoreWord = ignoreShortWords.includes(headerWords[j]);
           if ((!ignoreWord && !capitalizeJustFirstLetter) || firstWord === true) {
-            headerWords[j] = headerWords[j][0].toUpperCase() + headerWords[j].slice(1);
+            if (indexToCapitalize === 0) {
+              headerWords[j] = headerWords[j][indexToCapitalize].toUpperCase() + headerWords[j].slice(indexToCapitalize+1);
+            } else {
+              headerWords[j] = headerWords[j][0] + headerWords[j][indexToCapitalize].toUpperCase() + headerWords[j].slice(indexToCapitalize+1);
+            }
           }
         }
 
@@ -453,7 +387,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
   get exampleBuilders(): ExampleBuilder<CapitalizeHeadingsOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'With `Title Case=true`, `Ignore Cased Words=false`',
+        description: 'With `Title case=true`, `Ignore cased words=false`',
         before: dedent`
           # this is a heading 1
           ## THIS IS A HEADING 2
@@ -470,7 +404,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
         },
       }),
       new ExampleBuilder({
-        description: 'With `Title Case=true`, `Ignore Cased Words=true`',
+        description: 'With `Title Case=true`, `Ignore cased words=true`',
         before: dedent`
           # this is a heading 1
           ## THIS IS A HEADING 2
@@ -559,6 +493,18 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
         optionsKey: 'lowercaseWords',
         splitter: wordSplitterRegex,
         separator: ', ',
+      }),
+      new TextOptionBuilder({
+        OptionsClass: CapitalizeHeadingsOptions,
+        nameKey: 'rules.capitalize-headings.starting-word-ignore-characters.name',
+        descriptionKey: 'rules.capitalize-headings.starting-word-ignore-characters.description',
+        optionsKey: 'startingWordIgnoreCharacters',
+      }),
+      new TextOptionBuilder({
+        OptionsClass: CapitalizeHeadingsOptions,
+        nameKey: 'rules.capitalize-headings.ending-word-ignore-characters.name',
+        descriptionKey: 'rules.capitalize-headings.ending-word-ignore-characters.description',
+        optionsKey: 'endingWordIgnoreCharacters',
       }),
     ];
   }

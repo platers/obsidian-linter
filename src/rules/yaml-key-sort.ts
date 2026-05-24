@@ -147,7 +147,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
   get exampleBuilders(): ExampleBuilder<YamlKeySortOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language`',
+        description: 'Sorts YAML keys in order specified by `YAML key priority sort order` has a sort order of `date type language`',
         before: dedent`
           ---
           language: Typescript
@@ -179,7 +179,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `\'YAML Sort Order for Other Keys\' = Ascending Alphabetical`',
+        description: 'Sorts YAML keys in order specified by `YAML key priority sort order` has a sort order of `date type language` with `\'YAML sort order for other keys\' = Ascending Alphabetical`',
         before: dedent`
           ---
           language: Typescript
@@ -210,7 +210,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `\'YAML Sort Order for Other Keys\' = Descending Alphabetical`',
+        description: 'Sorts YAML keys in order specified by `YAML key priority sort order` has a sort order of `date type language` with `\'YAML sort order for other keys\' = Descending Alphabetical`',
         before: dedent`
           ---
           language: Typescript
@@ -242,7 +242,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Sorts YAML keys in order specified by `YAML Key Priority Sort Order` has a sort order of `date type language` with `\'YAML Sort Order for Other Keys\' = Descending Alphabetical` and `\'Priority Keys at Start of YAML\' = false`',
+        description: 'Sorts YAML keys in order specified by `YAML key priority sort order` has a sort order of `date type language` with `\'YAML sort order for other keys\' = Descending Alphabetical` and `\'Priority keys at start of YAML\' = false`',
         before: dedent`
           ---
           language: Typescript

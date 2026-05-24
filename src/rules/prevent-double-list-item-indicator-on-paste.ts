@@ -39,7 +39,7 @@ export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<P
   get exampleBuilders(): ExampleBuilder<PreventDoubleListItemIndicatorOnPasteOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Line being pasted is left alone when current line has no list indicator in it: `Regular text here`',
+        description: 'Line being pasted is left alone when current line has no list marker in it: `Regular text here`',
         before: dedent`
           - List item being pasted
         `,
@@ -52,7 +52,7 @@ export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<P
         },
       }),
       new ExampleBuilder({
-        description: 'Line being pasted into a blockquote without a list indicator is left alone when it lacks a list indicator: `> > `',
+        description: 'Line being pasted into a blockquote without a list marker is left alone when it lacks a list marker: `> > `',
         before: dedent`
           * List item contents here
           More content here
@@ -67,7 +67,7 @@ export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<P
         },
       }),
       new ExampleBuilder({
-        description: 'Line being pasted into a blockquote with a list indicator is has its list indicator removed when current line is: `> * `',
+        description: 'Line being pasted into a blockquote with a list marker is has its list marker removed when current line is: `> * `',
         before: dedent`
           + List item contents here
           More content here
@@ -82,7 +82,7 @@ export default class PreventDoubleListItemIndicatorOnPaste extends RuleBuilder<P
         },
       }),
       new ExampleBuilder({
-        description: 'Line being pasted with a list indicator is has its list indicator removed when current line is: `+ `',
+        description: 'Line being pasted with a list marker is has its list marker removed when current line is: `+ `',
         before: dedent`
           - List item 1
           - List item 2

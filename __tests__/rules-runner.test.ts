@@ -271,6 +271,20 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
       Did it stay the same?
     `,
   },
+  { // accounts for https://github.com/platers/obsidian-linter/issues/1508
+    testName: 'An escaped slash should be handled first before other escapes',
+    listOfRegexReplacements: [
+      {
+        label: undefined, find: '\\|([\\w\\d])>', replace: '$|$1 \\rangle$', flags: 'gm', enabled: true,
+      },
+    ],
+    before: dedent`
+      |x>
+    `,
+    after: dedent`
+      $|x \rangle$
+    `,
+  },
 ];
 
 describe('Rules Runner', () => {

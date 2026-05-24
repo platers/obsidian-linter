@@ -30,7 +30,7 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
     const head = this.buildHeadRegex(options.englishNonLetterCharactersAfterCJKCharacters);
     const tail = this.buildTailRegex(options.englishNonLetterCharactersBeforeCJKCharacters);
     // inline math, inline code, markdown links, and wiki links are an exception in that even though they are to be ignored we want to keep a space around these types when surrounded by CJK characters
-    const regexEscapedIgnoreExceptionPlaceHolders = `${IgnoreTypes.link.placeholder}|${IgnoreTypes.inlineMath.placeholder}|${IgnoreTypes.inlineCode.placeholder}|${IgnoreTypes.wikiLink.placeholder}`.replaceAll('{', '\\{').replaceAll('}', '\\}');
+    const regexEscapedIgnoreExceptionPlaceHolders = `${IgnoreTypes.link.placeholder}|${IgnoreTypes.inlineMath.placeholder}|${IgnoreTypes.inlineCode.placeholder}|${IgnoreTypes.wikiLink.placeholder}`.replaceAll('{', '\\{').replaceAll('}', '.+\\}');
     const ignoreExceptionsHead = new RegExp(`(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})( *)(${regexEscapedIgnoreExceptionPlaceHolders})`, 'gmu');
     const ignoreExceptionsTail = new RegExp(`(${regexEscapedIgnoreExceptionPlaceHolders})( *)(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})`, 'gmu');
     const addSpaceAroundChineseJapaneseKoreanAndEnglish = function(text: string): string {
@@ -115,7 +115,7 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
       new ExampleBuilder({
         // accounts for https://github.com/platers/obsidian-linter/issues/301
         description:
-          'Make sure that spaces are not added between italics and chinese characters to preserve markdown syntax',
+          'Make sure that spaces are not added between italics and Chinese characters to preserve markdown syntax',
         before: dedent`
           _这是一个数学公式_
           *这是一个数学公式english*

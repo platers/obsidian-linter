@@ -63,7 +63,7 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
   get exampleBuilders(): ExampleBuilder<RemoveSpaceAroundCharactersOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Remove Spaces and Tabs around Fullwidth Characters',
+        description: 'Remove spaces and tabs around fullwidth characters',
         before: dedent`
           Full list of affected characters: ０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ，．：；！？＂＇｀＾～￣＿＆＠＃％＋－＊＝＜＞（）［］｛｝｟｠｜￤／＼￢＄￡￠￦￥。、「」『』〔〕【】—…–《》〈〉
           This is a fullwidth period\t 。 with text after it.
@@ -86,9 +86,9 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
         `,
       }),
       new ExampleBuilder({
-        description: 'Fullwidth Characters in List Do not Affect List Markdown Syntax',
+        description: 'Fullwidth characters in list do not affect list markdown syntax',
         before: dedent`
-          # List indicators should not have the space after them removed if they are followed by a fullwidth character
+          # List markers should not have the space after them removed if they are followed by a fullwidth character
           ${''}
           - ［ contents here］
             -  ［ more contents here］ more text here
@@ -111,7 +111,7 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
           > > * ［ one last item here］
         `,
         after: dedent`
-          # List indicators should not have the space after them removed if they are followed by a fullwidth character
+          # List markers should not have the space after them removed if they are followed by a fullwidth character
           ${''}
           - ［contents here］
             - ［more contents here］more text here

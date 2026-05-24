@@ -167,5 +167,39 @@ ruleTest({
         lineBreakIndicator: LineBreakIndicators.TwoSpaces,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1243
+      testName: 'Make sure that a callout does not erroneously get its callout indicator line updated.',
+      before: dedent`
+        > [!NOTE]
+        > Callout!
+        > Callout2!
+      `,
+      after: dedent`
+        > [!NOTE]
+        > Callout!\\
+        > Callout2!
+      `,
+      options: {
+        lineBreakIndicator: LineBreakIndicators.Backslash,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1243
+      testName: 'Make sure that a nested callout does not erroneously get its callout indicator line updated.',
+      before: dedent`
+        > Something
+        > > [!NOTE]
+        > > Callout!
+        > > Callout2!
+      `,
+      after: dedent`
+        > Something
+        > > [!NOTE]
+        > > Callout!\\
+        > > Callout2!
+      `,
+      options: {
+        lineBreakIndicator: LineBreakIndicators.Backslash,
+      },
+    },
   ],
 });

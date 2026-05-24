@@ -120,6 +120,7 @@ export default {
   'file-backup-text': '請確定您已備份檔案。',
   'custom-command-warning': '使用自訂命令格式化多個檔案是一個緩慢的過程，需要在側邊面板中開啟窗格。它的速度明顯慢於在未啟用自訂命令的情況下執行。請謹慎操作。',
   'cancel-button-text': '取消',
+  'do-not-show-again': '不再顯示此確認',
 
   'copy-aria-label': '複製',
 
@@ -186,6 +187,13 @@ export default {
         'label-placeholder-text': '標籤',
         'flags-placeholder-text': '旗標',
         'warning': '如果您不了解正規表示式，請謹慎使用。此外，請確保如果您在 iOS 行動裝置上的正規表示式中使用 lookbehind，您使用的版本支援它們。',
+      },
+      'additional-file-extensions': {
+        'name': '額外的檔案副檔名',
+        'description': '除了 md 之外要進行 Lint 的檔案副檔名。例如 mdx 或 svx。請勿包含開頭的點號。<b>注意：不論新增哪些副檔名，只有 Obsidian 視為 Markdown 的檔案（無論是內建或透過其他外掛）才會被 Lint。</b>',
+        'extension-placeholder': '例如：mdx',
+        'add-input-button-text': '新增副檔名',
+        'delete-tooltip': '刪除',
       },
       'override-locale': {
         'name': '覆寫地區設定',
@@ -497,7 +505,7 @@ export default {
       'description': '所有標題前後都有一個空白行（除非標題在文件的開頭或結尾）。',
       'bottom': {
         'name': '底部',
-        'description': '確保標題後有一個空白行',
+        'description': '確保標題後有一個空白行（停用此功能後，不會刪除標題後的空白行）',
       },
       'empty-line-after-yaml': {
         'name': 'YAML 和標題之間的空白行',

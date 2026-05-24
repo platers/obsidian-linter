@@ -142,7 +142,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
         `,
       }),
       new ExampleBuilder({
-        description: 'YAML with unescaped values in an expanded list with `Default Escape Character = \'`',
+        description: 'YAML with unescaped values in an expanded list with `Default escape character = \'`',
         before: dedent`
           ---
           key:

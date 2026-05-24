@@ -2,7 +2,7 @@ import {Modal, App} from 'obsidian';
 import {getTextInLanguage, LanguageStringKey} from '../../lang/helpers';
 import {setElContent} from '../helpers';
 
-// https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/src/modal.ts#L68
+// https://github.com/nothingislost/obsidian-workspaces-plus/blob/bbba928ec64b30b8dec7fe8fc9e5d2d96543f1f3/../../modal.ts#L68
 export class ConfirmRuleDisableModal extends Modal {
   constructor(app: App, ruleBeingEnabledName: LanguageStringKey, ruleBeingDisabledName: LanguageStringKey, btnSubmitAction: () => void, btnCancelAction: () => void) {
     super(app);

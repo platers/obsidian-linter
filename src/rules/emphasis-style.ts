@@ -17,7 +17,7 @@ export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
       nameKey: 'rules.emphasis-style.name',
       descriptionKey: 'rules.emphasis-style.description',
       type: RuleType.CONTENT,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.inlineMath],
     });
   }
   get OptionsClass(): new () => EmphasisStyleOptions {

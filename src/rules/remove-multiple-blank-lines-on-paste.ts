@@ -1,4 +1,5 @@
 // based on https://github.com/chrisgrieser/obsidian-smarter-paste/blob/master/clipboardModification.ts#L14
+import {multipleBlankLinesRegex} from '../utils/regex';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
@@ -18,7 +19,7 @@ export default class RemoveMultipleBlankLinesOnPaste extends RuleBuilder<RemoveM
     return RemoveMultipleBlankLinesOnPasteOptions;
   }
   apply(text: string, options: RemoveMultipleBlankLinesOnPasteOptions): string {
-    return text.replace(/\n{3,}/g, '\n\n');
+    return text.replace(multipleBlankLinesRegex, '\n\n');
   }
   get exampleBuilders(): ExampleBuilder<RemoveMultipleBlankLinesOnPasteOptions>[] {
     return [
@@ -43,6 +44,22 @@ export default class RemoveMultipleBlankLinesOnPaste extends RuleBuilder<RemoveM
         before: dedent`
           First line.
           ${''}
+          Last line.
+        `,
+        after: dedent`
+          First line.
+          ${''}
+          Last line.
+        `,
+      }),
+      new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/1381
+        description: 'Text with blank lines present that also have tabs or other whitespace will also be considered blank lines',
+        before: dedent`
+          First line.
+          ${'\t'}
+          ${' '}
+          ${' \t'}
+          ${'\t '}
           Last line.
         `,
         after: dedent`

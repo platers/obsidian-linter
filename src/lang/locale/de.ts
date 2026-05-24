@@ -102,6 +102,7 @@ export default {
   // lint-confirmation-modal.ts
   'warning-text': 'Warnung',
   'file-backup-text': 'Stellen Sie sicher, dass Sie Ihre Dateien gesichert haben.',
+  'do-not-show-again': 'Diese Bestätigung nicht mehr anzeigen',
 
   'tabs': {
     'names': {
@@ -145,6 +146,13 @@ export default {
         'description': 'Ordner, die ignoriert werden sollen, wenn alle Dateien gelinted oder beim Speichern gelinted werden. Geben Sie Ordnerpfade ein, die durch Zeilenumbrüche getrennt sind',
         'folder-search-placeholder-text': 'Ordner-Name',
         'add-input-button-text': 'Einen anderen zu ignorierenden Ordner hinzufügen',
+        'delete-tooltip': 'Löschen',
+      },
+      'additional-file-extensions': {
+        'name': 'Zusätzliche Dateierweiterungen',
+        'description': 'Dateierweiterungen, die zusätzlich zu md gelinted werden sollen. Zum Beispiel mdx oder svx. Führenden Punkt nicht angeben. <b>Hinweis: Es werden nur Dateien gelinted, die Obsidian als Markdown ansieht (nativ oder über andere Plugins), unabhängig von hinzugefügten Erweiterungen.</b>',
+        'extension-placeholder': 'z.B. mdx',
+        'add-input-button-text': 'Weitere Erweiterung hinzufügen',
         'delete-tooltip': 'Löschen',
       },
       'override-locale': {
@@ -403,7 +411,7 @@ export default {
       'description': 'Alle Überschriften haben sowohl davor als auch danach eine Leerzeile (außer wenn sich die Überschrift am Anfang oder Ende des Dokuments befindet).',
       'bottom': {
         'name': 'Darunter',
-        'description': 'Einfügen einer Leerzeile unter Überschriften',
+        'description': 'Einfügen einer Leerzeile unter Überschriften (Wenn diese Funktion deaktiviert ist, werden die Leerzeilen nach Überschriften nicht entfernt.)',
       },
       'empty-line-after-yaml': {
         'name': 'Leere Zeile zwischen YAML und Header',
@@ -519,7 +527,7 @@ export default {
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': 'Fußnoten neu indizieren',
-      'description': 'Indiziert Fußnotenschlüssel und Fußnoten basierend auf der Reihenfolge des Auftretens neu (HINWEIS: Diese Regel funktioniert *nicht*, wenn es mehr als eine Fußnote für einen Schlüssel gibt.)',
+      'description': 'Indiziert Fußnotenschlüssel und Fußnoten neu, basierend auf der Reihenfolge der Fußnotenverweise in der Datei. <b>HINWEIS: Diese Regel funktioniert <i>nicht</i>, wenn es mehr als eine Fußnote für einen Schlüssel gibt.</b>',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
@@ -668,7 +676,7 @@ export default {
     // yaml-key-sort.ts
     'yaml-key-sort': {
       'name': 'Sortierung von YAML-Schlüsseln',
-      'description': 'Sortiert die YAML-Schlüssel basierend auf der angegebenen Reihenfolge und Priorität. Hinweis: Kann auch Leerzeilen entfernen.',
+      'description': 'Sortiert die YAML-Schlüssel basierend auf der angegebenen Reihenfolge und Priorität. <b>Hinweis: Kann auch Leerzeilen entfernen.</b>',
       'yaml-key-priority-sort-order': {
         'name': 'Prioritätssortierreihenfolge der YAML-Schlüssel',
         'description': 'Die Reihenfolge, in der die Schlüssel sortiert werden sollen, wobei in jeder Zeile ein Schlüssel in der Reihenfolge der Liste sortiert wird',

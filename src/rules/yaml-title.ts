@@ -72,7 +72,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
   get exampleBuilders(): ExampleBuilder<YamlTitleOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Adds a header with the title from heading when `mode = \'First H1 or Filename if H1 Missing\'`.',
+        description: 'Adds a header with the title from heading when `mode = \'First H1 or filename if H1 missing\'`.',
         before: dedent`
           # Obsidian
         `,
@@ -87,7 +87,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Adds a header with the title when `mode = \'First H1 or Filename if H1 Missing\'`.',
+        description: 'Adds a header with the title when `mode = \'First H1 or filename if H1 missing\'`.',
         before: dedent`
           ${''}
         `,
@@ -102,7 +102,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
         },
       }),
       new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/470
-        description: 'Make sure that markdown links in headings are properly copied to the YAML as just the text when `mode = \'First H1 or Filename if H1 Missing\'`',
+        description: 'Make sure that markdown links in headings are properly copied to the YAML as just the text when `mode = \'First H1 or filename if H1 missing\'`',
         before: dedent`
           # This is a [Heading](test heading.md)
         `,

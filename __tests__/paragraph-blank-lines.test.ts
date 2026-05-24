@@ -314,7 +314,7 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/704
-      testName: 'Make sure that an empty list indicator does not have an extra empty line added around it',
+      testName: 'Make sure that an empty list marker does not have an extra empty line added around it',
       before: dedent`
         ## Attendees
         ${''}
@@ -331,7 +331,7 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/787
-      testName: 'Make sure that an empty list indicator does not have an extra empty line added around it',
+      testName: 'Make sure that an empty list marker does not have an extra empty line added around it',
       before: dedent`
         - reference to footnote 1 [^1]
         - reference to footnote 2 [^2]

@@ -67,7 +67,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
         `,
       }),
       new ExampleBuilder({
-        description: 'Blank lines are removed between list items when the list indicator is \'-\'',
+        description: 'Blank lines are removed between list items when the list marker is \'-\'',
         before: dedent`
           - Item 1
           ${''}
@@ -97,7 +97,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
         `,
       }),
       new ExampleBuilder({
-        description: 'Blank lines are removed between list items when the list indicator is \'+\'',
+        description: 'Blank lines are removed between list items when the list marker is \'+\'',
         before: dedent`
           + Item 1
           ${''}
@@ -112,7 +112,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
         `,
       }),
       new ExampleBuilder({
-        description: 'Blank lines are removed between list items when the list indicator is \'*\'',
+        description: 'Blank lines are removed between list items when the list marker is \'*\'',
         before: dedent`
           * Item 1
           ${''}
@@ -127,7 +127,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
         `,
       }),
       new ExampleBuilder({
-        description: 'Blanks lines are removed between like list types (ordered, specific list item indicators, and checklists) while blanks are left between different kinds of list item indicators',
+        description: 'Blanks lines are removed between like list types (ordered, specific list item markers, and checklists) while blanks are left between different kinds of list item markers',
         before: dedent`
           1. Item 1
           ${''}

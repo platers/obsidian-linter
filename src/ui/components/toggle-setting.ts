@@ -1,8 +1,8 @@
 import {Setting} from 'obsidian';
-import LinterPlugin from 'src/main';
-import {LinterSettingsKeys} from 'src/settings-data';
+import LinterPlugin from '../../main';
+import {LinterSettingsKeys} from '../../settings-data';
 import {BaseSetting} from './base-setting';
-import {LanguageStringKey} from 'src/lang/helpers';
+import {LanguageStringKey} from '../../lang/helpers';
 import {hideEl, unhideEl} from '../helpers';
 
 export class ToggleSetting extends BaseSetting<boolean> {

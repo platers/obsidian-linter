@@ -1,7 +1,7 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {ellipsisRegex} from '../utils/regex';
 
 class ProperEllipsisOptions implements Options {}
@@ -13,15 +13,14 @@ export default class ProperEllipsis extends RuleBuilder<ProperEllipsisOptions> {
       nameKey: 'rules.proper-ellipsis.name',
       descriptionKey: 'rules.proper-ellipsis.description',
       type: RuleType.CONTENT,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image],
     });
   }
   get OptionsClass(): new () => ProperEllipsisOptions {
     return ProperEllipsisOptions;
   }
   apply(text: string, options: ProperEllipsisOptions): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image], text, (text) => {
-      return text.replaceAll(ellipsisRegex, '…');
-    });
+    return text.replaceAll(ellipsisRegex, '…');
   }
   get exampleBuilders(): ExampleBuilder<ProperEllipsisOptions>[] {
     return [

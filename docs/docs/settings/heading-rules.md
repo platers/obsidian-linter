@@ -6,7 +6,7 @@
 A heading for the purpose of the Linter is an ATX header. It does _not_ currently support Setext headers (see [this issue](https://github.com/platers/obsidian-linter/issues/423)).
 
 
-## Capitalize Headings
+## Capitalize headings
 
 Alias: `capitalize-headings`
 
@@ -17,15 +17,17 @@ Headings should be formatted with capitalization
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Style` | The style of capitalization to use | `Title Case`: Capitalize Using Title Case Rules<br/><br/>`ALL CAPS`: CAPITALIZE THE WHOLE TITLE<br/><br/>`First letter`: Only capitalize the first letter | `Title Case` |
-| `Ignore Cased Words` | Only apply title case style to words that are all lowercase | N/A | `true` |
-| `Ignore Words` | A comma separated list of words to ignore when capitalizing | N/A | `macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript, I` |
-| `Lowercase Words` | A comma separated list of words to keep lowercase | N/A | `a, an, the, aboard, about, abt., above, abreast, absent, across, after, against, along, aloft, alongside, amid, amidst, mid, midst, among, amongst, anti, apropos, around, round, as, aslant, astride, at, atop, ontop, bar, barring, before, B4, behind, below, beneath, neath, beside, besides, between, 'tween, beyond, but, by, chez, circa, c., ca., come, concerning, contra, counting, cum, despite, spite, down, during, effective, ere, except, excepting, excluding, failing, following, for, from, in, including, inside, into, less, like, minus, modulo, mod, near, nearer, nearest, next, notwithstanding, of, o', off, offshore, on, onto, opposite, out, outside, over, o'er, pace, past, pending, per, plus, post, pre, pro, qua, re, regarding, respecting, sans, save, saving, short, since, sub, than, through, thru, throughout, thruout, till, times, to, t', touching, toward, towards, under, underneath, unlike, until, unto, up, upon, versus, vs., v., via, vice, vis-à-vis, wanting, with, w/, w., c̄, within, w/i, without, 'thout, w/o, abroad, adrift, aft, afterward, afterwards, ahead, apart, ashore, aside, away, back, backward, backwards, beforehand, downhill, downstage, downstairs, downstream, downward, downwards, downwind, east, eastward, eastwards, forth, forward, forwards, heavenward, heavenwards, hence, henceforth, here, hereby, herein, hereof, hereto, herewith, home, homeward, homewards, indoors, inward, inwards, leftward, leftwards, north, northeast, northward, northwards, northwest, now, onward, onwards, outdoors, outward, outwards, overboard, overhead, overland, overseas, rightward, rightwards, seaward, seawards, skywards, skyward, south, southeast, southwards, southward, southwest, then, thence, thenceforth, there, thereby, therein, thereof, thereto, therewith, together, underfoot, underground, uphill, upstage, upstairs, upstream, upward, upwards, upwind, west, westward, westwards, when, whence, where, whereby, wherein, whereto, wherewith, although, because, considering, given, granted, if, lest, once, provided, providing, seeing, so, supposing, though, unless, whenever, whereas, wherever, while, whilst, ago, according to, as regards, counter to, instead of, owing to, pertaining to, at the behest of, at the expense of, at the hands of, at risk of, at the risk of, at variance with, by dint of, by means of, by virtue of, by way of, for the sake of, for sake of, for lack of, for want of, from want of, in accordance with, in addition to, in case of, in charge of, in compliance with, in conformity with, in contact with, in exchange for, in favor of, in front of, in lieu of, in light of, in the light of, in line with, in place of, in point of, in quest of, in relation to, in regard to, with regard to, in respect to, with respect to, in return for, in search of, in step with, in touch with, in terms of, in the name of, in view of, on account of, on behalf of, on grounds of, on the grounds of, on the part of, on top of, with a view to, with the exception of, à la, a la, as soon as, as well as, close to, due to, far from, in case, other than, prior to, pursuant to, regardless of, subsequent to, as long as, as much as, as far as, by the time, in as much as, inasmuch, in order to, in order that, even, provide that, if only, whether, whose, whoever, why, how, or not, whatever, what, both, and, or, not only, but also, either, neither, nor, just, rather, no sooner, such, that, yet, is, it` |
+| `Ignore cased words` | Only apply title case style to words that are all lowercase | N/A | `true` |
+| `Ignore words` | A comma separated list of words to ignore when capitalizing | N/A | `macOS, iOS, iPhone, iPad, JavaScript, TypeScript, AppleScript, I` |
+| `Lowercase words` | A comma separated list of words to keep lowercase | N/A | `a, an, the, aboard, about, abt., above, abreast, absent, across, after, against, along, aloft, alongside, amid, amidst, mid, midst, among, amongst, anti, apropos, around, round, as, aslant, astride, at, atop, ontop, bar, barring, before, B4, behind, below, beneath, neath, beside, besides, between, 'tween, beyond, but, by, chez, circa, c., ca., come, concerning, contra, counting, cum, despite, spite, down, during, effective, ere, except, excepting, excluding, failing, following, for, from, in, including, inside, into, less, like, minus, modulo, mod, near, nearer, nearest, next, notwithstanding, of, o', off, offshore, on, onto, opposite, out, outside, over, o'er, pace, past, pending, per, plus, post, pre, pro, qua, re, regarding, respecting, sans, save, saving, short, since, sub, than, through, thru, throughout, thruout, till, times, to, t', touching, toward, towards, under, underneath, unlike, until, unto, up, upon, versus, vs., v., via, vice, vis-à-vis, wanting, with, w/, w., c̄, within, w/i, without, 'thout, w/o, abroad, adrift, aft, afterward, afterwards, ahead, apart, ashore, aside, away, back, backward, backwards, beforehand, downhill, downstage, downstairs, downstream, downward, downwards, downwind, east, eastward, eastwards, forth, forward, forwards, heavenward, heavenwards, hence, henceforth, here, hereby, herein, hereof, hereto, herewith, home, homeward, homewards, indoors, inward, inwards, leftward, leftwards, north, northeast, northward, northwards, northwest, now, onward, onwards, outdoors, outward, outwards, overboard, overhead, overland, overseas, rightward, rightwards, seaward, seawards, skywards, skyward, south, southeast, southwards, southward, southwest, then, thence, thenceforth, there, thereby, therein, thereof, thereto, therewith, together, underfoot, underground, uphill, upstage, upstairs, upstream, upward, upwards, upwind, west, westward, westwards, when, whence, where, whereby, wherein, whereto, wherewith, although, because, considering, given, granted, if, lest, once, provided, providing, seeing, so, supposing, though, unless, whenever, whereas, wherever, while, whilst, ago, inasmuch, even, whether, whose, whoever, why, how, whatever, what, both, and, or, either, neither, nor, just, rather, such, that, yet, is, it` |
+| `Characters to ignore at the start of potential words` | Characters that by themselves may precede one or more letters, single quotes, and/or dashes and have it be considered a word | N/A | `'"(‘“-` |
+| `Characters to ignore at the end of potential words` | Characters that may follow one or more letters, single quotes, and/or dashes and have it be considered a word | N/A | `.?!,:;'")”’0123456789-` |
 
 
 
 ### Examples
 
-<details><summary>With `Title Case=true`, `Ignore Cased Words=false`</summary>
+<details><summary>With `Title case=true`, `Ignore cased words=false`</summary>
 
 Before:
 
@@ -43,7 +45,7 @@ After:
 ### A Heading 3
 ``````
 </details>
-<details><summary>With `Title Case=true`, `Ignore Cased Words=true`</summary>
+<details><summary>With `Title Case=true`, `Ignore cased words=true`</summary>
 
 Before:
 
@@ -94,11 +96,11 @@ After:
 ``````
 </details>
 
-## File Name Heading
+## File name heading
 
 Alias: `file-name-heading`
 
-Inserts the file name as a H1 heading if no H1 heading exists. <b>Note: Consider using "Heading and Filename Sync" instead for more features including updating existing headings and regex prefix/suffix stripping.</b>
+Inserts the file name as a H1 heading if no H1 heading exists. <b>Note: consider using "Heading and filename sync" instead for more features including updating existing headings and regex prefix/suffix stripping.</b>
 
 
 
@@ -143,7 +145,7 @@ This is a line of text
 ``````
 </details>
 
-## Header Increment
+## Header increment
 
 Alias: `header-increment`
 
@@ -153,7 +155,7 @@ Heading levels should only increment by one level at a time
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Start Header Increment at Heading Level 2` | Makes heading level 2 the minimum heading level in a file for header increment and shifts all headings accordingly so they increment starting with a level 2 heading. | N/A | false |
+| `Start header increment at heading level 2` | Makes heading level 2 the minimum heading level in a file for header increment and shifts all headings accordingly so they increment starting with a level 2 heading. | N/A | false |
 
 
 
@@ -233,7 +235,7 @@ This resets the decrement section so the H6 below is decremented to an H3
 ## H6
 ``````
 </details>
-<details><summary>When `Start Header Increment at Heading Level 2 = true`, H1s become H2s and the other headers are incremented accordingly</summary>
+<details><summary>When `Start header increment at heading level 2 = true`, H1s become H2s and the other headers are incremented accordingly</summary>
 
 Before:
 
@@ -260,20 +262,20 @@ After:
 ``````
 </details>
 
-## Heading and Filename Sync
+## Heading and filename sync
 
 Alias: `heading-filename-sync`
 
-Keeps the first H1 heading synchronized with the filename. Supersedes the "File Name Heading" rule.
+Keeps the first H1 heading synchronized with the filename. Supersedes the "File name heading" rule.
 
 ### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Sync Direction` | The direction of synchronization between heading and filename. | `heading-to-filename`: Rename the file to match the H1 heading<br/><br/>`filename-to-heading`: Update the H1 heading to match the filename<br/><br/>`bidirectional`: Keep heading and filename in sync (heading wins on conflict) | `heading-to-filename` |
-| `Filename Prefix Regex` | Regular expression pattern to strip from the start of the filename before syncing (e.g., <code>^\d{12}_</code> for Zettelkasten timestamps). | N/A |  |
-| `Filename Suffix Regex` | Regular expression pattern to strip from the end of the filename before syncing. | N/A |  |
-| `Ignore Files for Rename` | Regular expression patterns (one per line) to match file paths that should be excluded from file renaming. These files will still have their headings synced if applicable, but the file will not be renamed. | N/A |  |
+| `Sync direction` | The direction of synchronization between heading and filename. | `heading-to-filename`: Rename the file to match the H1 heading<br/><br/>`filename-to-heading`: Update the H1 heading to match the filename<br/><br/>`bidirectional`: Keep heading and filename in sync (heading wins on conflict) | `heading-to-filename` |
+| `Filename prefix regex` | Regular expression pattern to strip from the start of the filename before syncing (e.g., <code>^\d{12}_</code> for Zettelkasten timestamps). | N/A |  |
+| `Filename suffix regex` | Regular expression pattern to strip from the end of the filename before syncing. | N/A |  |
+| `Ignore files for rename` | Regular expression patterns (one per line) to match file paths that should be excluded from file renaming. These files will still have their headings synced if applicable, but the file will not be renamed. | N/A |  |
 
 
 
@@ -348,7 +350,7 @@ Content here.
 ``````
 </details>
 
-## Headings Start Line
+## Headings start line
 
 Alias: `headings-start-line`
 
@@ -393,7 +395,7 @@ After:
 ``````
 </details>
 
-## Remove Trailing Punctuation in Heading
+## Remove trailing punctuation in heading
 
 Alias: `remove-trailing-punctuation-in-heading`
 
@@ -403,7 +405,7 @@ Removes the specified punctuation from the end of headings making sure to ignore
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Trailing Punctuation` | The trailing punctuation to remove from the headings in the file. | N/A | `.,;:!。，；：！` |
+| `Trailing punctuation` | The trailing punctuation to remove from the headings in the file. | N/A | `.,;:!。，；：！` |
 
 
 

@@ -4,7 +4,7 @@
 # Content Rules
 
 
-## Auto-correct Common Misspellings
+## Auto-correct common misspellings
 
 Alias: `auto-correct-common-misspellings`
 
@@ -14,9 +14,9 @@ Uses a dictionary of common misspellings to automatically convert them to their 
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Ignore Words` | A comma separated list of lowercased words to ignore when auto-correcting | N/A |  |
-| `Skip Words with Multiple Capitals` | Will skip any files that have a capital letter in them other than as the first letter of the word. Acronyms and some other words can benefit from this. It may cause issues with proper nouns being properly fixed. | N/A | false |
-| `Extra Auto-Correct Source Files` | These are files that have a markdown table in them that have the initial word and the word to correct it to (these are case insensitive corrections). <b>Note: the tables used should have the starting and ending <code>\|</code> indicators present for each line.</b> | N/A |  |
+| `Ignore words` | A comma separated list of lowercased words to ignore when auto-correcting | N/A |  |
+| `Skip words with multiple capitals` | Will skip any files that have a capital letter in them other than as the first letter of the word. Acronyms and some other words can benefit from this. It may cause issues with proper nouns being properly fixed. | N/A | false |
+| `Extra auto-correct source files` | These are files that have a markdown table in them that have the initial word and the word to correct it to (these are case insensitive corrections). <b>Note: the tables used should have the starting and ending <code>\|</code> indicators present for each line.</b> | N/A |  |
 
 ### Additional Info
 
@@ -153,7 +153,7 @@ But this also affects javaSrript(what should be JavaScript) and other proper nam
 ``````
 </details>
 
-## Blockquote Style
+## Blockquote style
 
 Alias: `blockquote-style`
 
@@ -224,7 +224,7 @@ After:
 ``````
 </details>
 
-## Convert Bullet List Markers
+## Convert bullet list markers
 
 Alias: `convert-bullet-list-markers`
 
@@ -271,7 +271,7 @@ After:
 ``````
 </details>
 
-## Default Language For Code Fences
+## Default language for code fences
 
 Alias: `default-language-for-code-fences`
 
@@ -281,7 +281,7 @@ Add a default language to code fences that do not have a language specified.
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Programming Language` | Leave empty to do nothing. Languages tags can be found <a href="https://prismjs.com/#supported-languages">here</a>. | N/A |  |
+| `Programming language` | Leave empty to do nothing. Languages tags can be found <a href="https://prismjs.com/#supported-languages">here</a>. | N/A |  |
 
 
 
@@ -348,7 +348,7 @@ var temp = 'text';
 ``````
 </details>
 
-## Emphasis Style
+## Emphasis style
 
 Alias: `emphasis-style`
 
@@ -503,7 +503,7 @@ __Test bold__
 ``````
 </details>
 
-## No Bare URLs
+## No bare URLs
 
 Alias: `no-bare-urls`
 
@@ -513,7 +513,7 @@ Encloses bare URLs with angle brackets except when enclosed in back ticks, squar
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `No Bare URIs` | Attempts to enclose bare URIs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes. | N/A | false |
+| `No bare URIs` | Attempts to enclose bare URIs with angle brackets except when enclosed in back ticks, square braces, or single or double quotes. | N/A | false |
 
 
 
@@ -602,7 +602,7 @@ After:
 ``````
 </details>
 
-## Ordered List Style
+## Ordered list style
 
 Alias: `ordered-list-style`
 
@@ -612,15 +612,15 @@ Makes sure that ordered lists follow the style specified. <b>Note: that 2 spaces
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Number Style` | The number style used in ordered list indicators | `ascending`: Makes sure ordered list items are ascending (i.e. 1, 2, 3, etc.)<br/><br/>`lazy`: Makes sure ordered list item indicators all are the same<br/><br/>`preserve`: Preserves ordered list item indicators as they are | `ascending` |
-| `Ordered List Indicator End Style` | The ending character of an ordered list indicator | `.`: Makes sure ordered list items indicators end in '.' (i.e `1.`)<br/><br/>`)`: Makes sure ordered list item indicators end in ')' (i.e. `1)`) | `.` |
-| `Preserve Starting Number` | Whether to preserve the starting number of an ordered list. This can be used to have an ordered list that has content in between the ordered list items. | N/A | `undefined` |
+| `Number style` | The number style used in ordered list markers | `ascending`: Makes sure ordered list items are ascending (i.e. 1, 2, 3, etc.)<br/><br/>`lazy`: Makes sure ordered list item indicators all are the same<br/><br/>`preserve`: Preserves ordered list item indicators as they are | `ascending` |
+| `Ordered list marker end style` | The ending character of an ordered list marker | `.`: Makes sure ordered list items indicators end in '.' (i.e `1.`)<br/><br/>`)`: Makes sure ordered list item indicators end in ')' (i.e. `1)`) | `.` |
+| `Preserve starting number` | Whether to preserve the starting number of an ordered list. This can be used to have an ordered list that has content in between the ordered list items. | N/A | `undefined` |
 
 
 
 ### Examples
 
-<details><summary>Ordered lists have list items set to ascending numerical order when Number Style is `ascending`.</summary>
+<details><summary>Ordered lists have list items set to ascending numerical order when Number style is `ascending`.</summary>
 
 Before:
 
@@ -650,7 +650,7 @@ Some text here
 3. Item 3
 ``````
 </details>
-<details><summary>Nested ordered lists have list items set to ascending numerical order when Number Style is `ascending`.</summary>
+<details><summary>Nested ordered lists have list items set to ascending numerical order when Number style is `ascending`.</summary>
 
 Before:
 
@@ -674,7 +674,7 @@ After:
 3. Item 3
 ``````
 </details>
-<details><summary>Ordered list in blockquote has list items set to '1.' when Number Style is `lazy`.</summary>
+<details><summary>Ordered list in blockquote has list items set to '1.' when Number style is `lazy`.</summary>
 
 Before:
 
@@ -696,7 +696,7 @@ After:
 > > 1. Subitem 3
 ``````
 </details>
-<details><summary>Ordered list in blockquote has list items set to ascending numerical order when Number Style is `ascending`.</summary>
+<details><summary>Ordered list in blockquote has list items set to ascending numerical order when Number style is `ascending`.</summary>
 
 Before:
 
@@ -718,7 +718,7 @@ After:
 > > 3. Subitem 3
 ``````
 </details>
-<details><summary>Nested ordered list has list items set to '1)' when Number Style is `lazy` and Ordered List Indicator End Style is `)`.</summary>
+<details><summary>Nested ordered list has list items set to '1)' when Number style is `lazy` and Ordered list indicator end style is `)`.</summary>
 
 Before:
 
@@ -742,7 +742,7 @@ After:
 1) Item 3
 ``````
 </details>
-<details><summary>Ordered lists have list items set to ascending numerical order using initial indicator number when Number Style is `ascending` and `preserveStart` is enabled</summary>
+<details><summary>Ordered lists have list items set to ascending numerical order using initial indicator number when Number style is `ascending` and `preserveStart` is enabled</summary>
 
 Before:
 
@@ -772,7 +772,7 @@ Some text here
 6. Item 6
 ``````
 </details>
-<details><summary>Nested ordered lists have list items set to ascending numerical order using initial indicator number when Number Style is `ascending` and `preserveStart` is enabled</summary>
+<details><summary>Nested ordered lists have list items set to ascending numerical order using initial indicator number when Number style is `ascending` and `preserveStart` is enabled</summary>
 
 Before:
 
@@ -796,7 +796,7 @@ After:
 6. Item 6
 ``````
 </details>
-<details><summary>Ordered lists have list items set to initial indicator number when Number Style is `lazy` and `preserveStart` is enabled</summary>
+<details><summary>Ordered lists have list items set to initial indicator number when Number style is `lazy` and `preserveStart` is enabled</summary>
 
 Before:
 
@@ -814,7 +814,7 @@ After:
 2. Item 4
 ``````
 </details>
-<details><summary>Nested ordered lists have list items set to initial indicator number when Number Style is `lazy` and `preserveStart` is enabled</summary>
+<details><summary>Nested ordered lists have list items set to initial indicator number when Number style is `lazy` and `preserveStart` is enabled</summary>
 
 Before:
 
@@ -838,7 +838,7 @@ After:
 4. Item 6
 ``````
 </details>
-<details><summary>Ordered lists items are not modified when Number Style is `preserve`</summary>
+<details><summary>Ordered lists items are not modified when Number style is `preserve`</summary>
 
 Before:
 
@@ -863,7 +863,7 @@ After:
 ``````
 </details>
 
-## Proper Ellipsis
+## Proper ellipsis
 
 Alias: `proper-ellipsis`
 
@@ -890,7 +890,7 @@ Lorem (…) Impsum.
 ``````
 </details>
 
-## Quote Style
+## Quote style
 
 Alias: `quote-style`
 
@@ -900,10 +900,10 @@ Updates the quotes in the body content to be updated to the specified single and
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Enable <code>Single Quote Style</code>` | Specifies that the selected single quote style should be used. | N/A | `true` |
-| `Single Quote Style` | The style of single quotes to use. | `''`: Uses "'" instead of smart single quotes<br/><br/>`‘’`: Uses "‘" and "’" instead of straight single quotes | `''` |
-| `Enable <code>Double Quote Style</code>` | Specifies that the selected double quote style should be used. | N/A | `true` |
-| `Double Quote Style` | The style of double quotes to use. | `""`: Uses '"' instead of smart double quotes<br/><br/>`“”`: Uses '“' and '”' instead of straight double quotes | `""` |
+| `Enable <code>Single quote style</code>` | Specifies that the selected single quote style should be used. | N/A | `true` |
+| `Single quote style` | The style of single quotes to use. | `''`: Uses "'" instead of smart single quotes<br/><br/>`‘’`: Uses "‘" and "’" instead of straight single quotes | `''` |
+| `Enable <code>Double quote style</code>` | Specifies that the selected double quote style should be used. | N/A | `true` |
+| `Double quote style` | The style of double quotes to use. | `""`: Uses '"' instead of smart double quotes<br/><br/>`“”`: Uses '“' and '”' instead of straight double quotes | `""` |
 
 
 
@@ -968,7 +968,7 @@ once possessives and common contractions have been dealt with. If not, it will t
 ``````
 </details>
 
-## Remove Consecutive List Markers
+## Remove consecutive list markers
 
 Alias: `remove-consecutive-list-markers`
 
@@ -1003,7 +1003,7 @@ After:
 ``````
 </details>
 
-## Remove Empty List Markers
+## Remove empty list markers
 
 Alias: `remove-empty-list-markers`
 
@@ -1160,7 +1160,7 @@ After:
 ``````
 </details>
 
-## Remove Hyphenated Line Breaks
+## Remove hyphenated line breaks
 
 Alias: `remove-hyphenated-line-breaks`
 
@@ -1187,7 +1187,7 @@ This text has a linebreak.
 ``````
 </details>
 
-## Remove Multiple Spaces
+## Remove multiple spaces
 
 Alias: `remove-multiple-spaces`
 
@@ -1214,7 +1214,7 @@ Lorem ipsum dolor sit amet.
 ``````
 </details>
 
-## Strong Style
+## Strong style
 
 Alias: `strong-style`
 
@@ -1369,7 +1369,7 @@ __Test bold__
 ``````
 </details>
 
-## Line Break Between Lines with Content
+## Line break between lines with content
 
 Alias: `two-spaces-between-lines-with-content`
 
@@ -1379,7 +1379,7 @@ Makes sure that the specified line break is added to the ends of lines with cont
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Line Break Indicator` | The line break indicator to use. | `  `:   <br/><br/>`<br/>`: <br/><br/><br/>`<br>`: <br><br/><br/>`\`: \ | `  ` |
+| `Line break indicator` | The line break indicator to use. | `  `:   <br/><br/>`<br/>`: <br/><br/><br/>`<br>`: <br><br/><br/>`\`: \ | `  ` |
 
 ### Additional Info
 
@@ -1479,7 +1479,7 @@ Even more content here
 ``````
 </details>
 
-## Unordered List Style
+## Unordered list style
 
 Alias: `unordered-list-style`
 
@@ -1489,13 +1489,13 @@ Makes sure that unordered lists follow the style specified.
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `List item style` | The list item style to use in unordered lists | `consistent`: Makes sure unordered list items use a consistent list item indicator in the file which will be based on the first list item found<br/><br/>`-`: Makes sure unordered list items use `-` as their indicator<br/><br/>`*`: Makes sure unordered list items use `*` as their indicator<br/><br/>`+`: Makes sure unordered list items use `+` as their indicator | `consistent` |
+| `List item style` | The list item style to use in unordered lists | `consistent`: Makes sure unordered list items use a consistent list item marker in the file which will be based on the first list item found<br/><br/>`-`: Makes sure unordered list items use `-` as their marker<br/><br/>`*`: Makes sure unordered list items use `*` as their marker<br/><br/>`+`: Makes sure unordered list items use `+` as their marker | `consistent` |
 
 
 
 ### Examples
 
-<details><summary>Unordered lists have their indicator updated to `*` when `List item style = 'consistent'` and `*` is the first unordered list indicator</summary>
+<details><summary>Unordered lists have their marker updated to `*` when `List item style = 'consistent'` and `*` is the first unordered list marker</summary>
 
 Before:
 
@@ -1541,7 +1541,7 @@ Checklists should be ignored
 
 ``````
 </details>
-<details><summary>Unordered lists have their indicator updated to `-` when `List item style = '-'`</summary>
+<details><summary>Unordered lists have their marker updated to `-` when `List item style = '-'`</summary>
 
 Before:
 
@@ -1589,7 +1589,7 @@ See that the ordered list is ignored, but its sublist is not
   - Sub item 3
 ``````
 </details>
-<details><summary>Unordered lists have their indicator updated to `*` when `List item style = '*'`</summary>
+<details><summary>Unordered lists have their marker updated to `*` when `List item style = '*'`</summary>
 
 Before:
 
@@ -1621,7 +1621,7 @@ After:
 
 ``````
 </details>
-<details><summary>Unordered list in blockquote has list item indicators set to `+` when `List item style = '-'`</summary>
+<details><summary>Unordered list in blockquote has list item markers set to `+` when `List item style = '-'`</summary>
 
 Before:
 

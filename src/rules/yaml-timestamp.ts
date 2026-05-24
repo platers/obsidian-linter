@@ -271,7 +271,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Date Created Key is set',
+        description: 'Date created key is set',
         before: dedent`
           # H1
         `,
@@ -291,7 +291,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Date Modified Key is set',
+        description: 'Date modified key is set',
         before: dedent`
           # H1
         `,
@@ -353,7 +353,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Date Created Key is set with convert to UTC option true',
+        description: 'Date created key is set with convert to UTC option true',
         before: dedent`
           # H1
         `,
@@ -375,7 +375,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Date Modified Key is set with convert to UTC option true',
+        description: 'Date modified key is set with convert to UTC option true',
         before: dedent`
           # H1
         `,
