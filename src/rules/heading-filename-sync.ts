@@ -1,6 +1,6 @@
 import {App} from 'obsidian';
 import {Options, rulesDict, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder, TextAreaOptionBuilder, DropdownOptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder, DropdownOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {escapeMarkdownSpecialCharacters, unescapeMarkdownSpecialCharacters, insert} from '../utils/strings';
@@ -23,7 +23,6 @@ class HeadingFilenameSyncOptions implements Options {
   syncDirection?: SyncDirectionValues = 'heading-to-filename';
   filenamePrefix?: string = '';
   filenameSuffix?: string = '';
-  ignoreRenameFiles?: string[] = [];
 }
 
 @RuleBuilder.register
@@ -36,10 +35,7 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
       hasSpecialExecutionOrder: true,
       disableConflictingOptions(value: boolean, app: App): void {
-        // Check for conflict with file-name-heading rule
         const fileNameHeadingOptions = rulesDict['file-name-heading'];
-        if (!fileNameHeadingOptions) return;
-
         const fileNameHeadingEnableOption = fileNameHeadingOptions.options[0] as BooleanOption;
         if (value && fileNameHeadingEnableOption.getValue()) {
           new ConfirmRuleDisableModal(app, 'rules.heading-filename-sync.name', 'rules.file-name-heading.name', () => {
@@ -58,7 +54,7 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
   }
 
   apply(text: string, options: HeadingFilenameSyncOptions): string {
-    const semanticFilename = this.extractSemanticFilename(
+    const {prefix, semantic, suffix} = this.extractFilenameParts(
         options.fileName,
         options.filenamePrefix,
         options.filenameSuffix,
@@ -70,76 +66,53 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
     const existingH1Unescaped = existingH1Text ? unescapeMarkdownSpecialCharacters(existingH1Text) : null;
 
     if (options.syncDirection === 'filename-to-heading') {
-      return this.syncFilenameToHeading(text, semanticFilename, existingH1Match);
+      return this.syncFilenameToHeading(text, semantic, existingH1Match);
     } else if (options.syncDirection === 'heading-to-filename') {
-      return this.syncHeadingToFilename(text, options, existingH1Unescaped, semanticFilename);
+      return this.syncHeadingToFilename(text, options, existingH1Unescaped, semantic, prefix, suffix);
     } else if (options.syncDirection === 'bidirectional') {
-      return this.syncBidirectional(text, options, existingH1Match, existingH1Unescaped, semanticFilename);
+      return this.syncBidirectional(text, options, existingH1Match, existingH1Unescaped, semantic, prefix, suffix);
     }
 
     return text;
   }
 
-  private extractSemanticFilename(
+  // Anchored internally so user patterns don't need to include ^ / $ themselves.
+  private extractFilenameParts(
       fileName: string,
       prefixPattern: string,
       suffixPattern: string,
-  ): string {
-    let result = fileName;
+  ): {prefix: string, semantic: string, suffix: string} {
+    let prefix = '';
+    let suffix = '';
+    let semantic = fileName;
 
     if (prefixPattern) {
       try {
-        const prefixRegex = new RegExp(prefixPattern);
-        result = result.replace(prefixRegex, '');
+        const prefixRegex = new RegExp('^(?:' + prefixPattern + ')');
+        const match = semantic.match(prefixRegex);
+        if (match) {
+          prefix = match[0];
+          semantic = semantic.slice(prefix.length);
+        }
       } catch (e) {
-        // Invalid regex, skip prefix stripping
+        // Invalid regex, leave prefix empty and semantic untouched
       }
     }
 
     if (suffixPattern) {
       try {
-        const suffixRegex = new RegExp(suffixPattern + '$');
-        result = result.replace(suffixRegex, '');
+        const suffixRegex = new RegExp('(?:' + suffixPattern + ')$');
+        const match = semantic.match(suffixRegex);
+        if (match) {
+          suffix = match[0];
+          semantic = semantic.slice(0, semantic.length - suffix.length);
+        }
       } catch (e) {
-        // Invalid regex, skip suffix stripping
+        // Invalid regex, leave suffix empty and semantic untouched
       }
     }
 
-    return result;
-  }
-
-  private extractFilenamePrefix(
-      fileName: string,
-      prefixPattern: string,
-  ): string {
-    if (!prefixPattern) {
-      return '';
-    }
-
-    try {
-      const prefixRegex = new RegExp(prefixPattern);
-      const match = fileName.match(prefixRegex);
-      return match ? match[0] : '';
-    } catch (e) {
-      return '';
-    }
-  }
-
-  private extractFilenameSuffix(
-      fileName: string,
-      suffixPattern: string,
-  ): string {
-    if (!suffixPattern) {
-      return '';
-    }
-
-    try {
-      const suffixRegex = new RegExp(suffixPattern + '$');
-      const match = fileName.match(suffixRegex);
-      return match ? match[0] : '';
-    } catch (e) {
-      return '';
-    }
+    return {prefix, semantic, suffix};
   }
 
   private syncFilenameToHeading(
@@ -170,6 +143,8 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
       options: HeadingFilenameSyncOptions,
       existingH1Unescaped: string | null,
       semanticFilename: string,
+      prefix: string,
+      suffix: string,
   ): string {
     // If there's no H1, nothing to sync from
     if (!existingH1Unescaped) {
@@ -181,19 +156,10 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
       return text;
     }
 
-    // Build the new filename with preserved prefix/suffix
-    const prefix = this.extractFilenamePrefix(options.fileName, options.filenamePrefix);
-    const suffix = this.extractFilenameSuffix(options.fileName, options.filenameSuffix);
     const sanitizedHeading = this.sanitizeFilename(existingH1Unescaped);
     const newBasename = `${prefix}${sanitizedHeading}${suffix}`;
 
-    // Signal the rename if we have the callback and path, unless file is ignored
     if (options.setPendingRename && options.filePath) {
-      // Check if this file should be ignored for rename
-      if (this.shouldIgnoreFileForRename(options.filePath, options.ignoreRenameFiles)) {
-        return text;
-      }
-
       const lastSlashIndex = options.filePath.lastIndexOf('/');
       const directory = lastSlashIndex > 0 ? options.filePath.substring(0, lastSlashIndex) : '';
       // Obsidian uses forward slashes internally on all platforms
@@ -217,6 +183,8 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
       existingH1Match: RegExpMatchArray | null,
       existingH1Unescaped: string | null,
       semanticFilename: string,
+      prefix: string,
+      suffix: string,
   ): string {
     // If there's no H1, sync filename to heading (insert new heading)
     if (!existingH1Unescaped) {
@@ -225,7 +193,7 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
 
     // If H1 differs from filename, heading wins - rename file
     if (existingH1Unescaped !== semanticFilename) {
-      return this.syncHeadingToFilename(text, options, existingH1Unescaped, semanticFilename);
+      return this.syncHeadingToFilename(text, options, existingH1Unescaped, semanticFilename, prefix, suffix);
     }
 
     // Already in sync, nothing to do
@@ -241,32 +209,6 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
         .replace(/^-+|-+$/g, '') // Remove leading/trailing dashes
         .replace(/\s+/g, ' ')
         .trim();
-  }
-
-  private shouldIgnoreFileForRename(
-      filePath: string,
-      ignorePatterns: string[],
-  ): boolean {
-    if (!ignorePatterns || ignorePatterns.length === 0) {
-      return false;
-    }
-
-    for (const pattern of ignorePatterns) {
-      if (!pattern || pattern.trim() === '') {
-        continue;
-      }
-
-      try {
-        const regex = new RegExp(pattern);
-        if (regex.test(filePath)) {
-          return true;
-        }
-      } catch (e) {
-        // Invalid regex, skip this pattern
-      }
-    }
-
-    return false;
   }
 
   get exampleBuilders(): ExampleBuilder<HeadingFilenameSyncOptions>[] {
@@ -371,12 +313,6 @@ export default class HeadingFilenameSync extends RuleBuilder<HeadingFilenameSync
         nameKey: 'rules.heading-filename-sync.filename-suffix.name',
         descriptionKey: 'rules.heading-filename-sync.filename-suffix.description',
         optionsKey: 'filenameSuffix',
-      }),
-      new TextAreaOptionBuilder({
-        OptionsClass: HeadingFilenameSyncOptions,
-        nameKey: 'rules.heading-filename-sync.ignore-rename-files.name',
-        descriptionKey: 'rules.heading-filename-sync.ignore-rename-files.description',
-        optionsKey: 'ignoreRenameFiles',
       }),
     ];
   }
