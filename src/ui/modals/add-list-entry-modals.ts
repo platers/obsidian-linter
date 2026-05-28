@@ -5,8 +5,10 @@ import FolderSuggester from '../suggesters/folder-suggester';
 import {FormModal} from './form-modal';
 import CommandSuggester from '../suggesters/command-suggester';
 import {LintCommand} from '../linter-components/custom-command-option';
+import {CustomReplace} from '../linter-components/custom-replace-option';
 
 const filesToIgnoreDefaultFlags = 'i';
+const customRegexDefaultFlags = 'gm';
 
 export class AddFolderToIgnoreModal extends FormModal {
   private value = '';
@@ -219,6 +221,110 @@ export class AddCustomCommandModal extends FormModal {
     }
 
     void this.onAdd({enabled: true, id: id, name: value});
+    this.close();
+  }
+}
+
+// Add or edit a custom regex replacement. When `initial` is provided, the
+// modal pre-populates each field and the submit callback returns the updated
+// entry (preserving the original `enabled` flag).
+export class CustomRegexModal extends FormModal {
+  private label: string;
+  private find: string;
+  private flags: string;
+  private replace: string;
+  private findInputEl: HTMLInputElement | undefined;
+  private flagsInputEl: HTMLInputElement | undefined;
+
+  constructor(
+      app: App,
+      private initial: CustomReplace | null,
+      private onSubmitEntry: (entry: CustomReplace) => void | Promise<void>,
+  ) {
+    super(app);
+    this.label = initial?.label ?? '';
+    this.find = initial?.find ?? '';
+    this.flags = initial?.flags ?? customRegexDefaultFlags;
+    this.replace = initial?.replace ?? '';
+
+    this.setTitle(getTextInLanguage(initial
+      ? 'options.custom-replace.edit-tooltip'
+      : 'options.custom-replace.add-input-button-text'));
+
+    this.addField((field) => {
+      field.setName(getTextInLanguage('options.custom-replace.label-placeholder-text'));
+      field.addText((cb) => {
+        cb.setPlaceholder(getTextInLanguage('options.custom-replace.label-placeholder-text'))
+            .setValue(this.label)
+            .onChange((v) => {
+              this.label = v;
+            });
+      });
+    });
+
+    this.addField((field) => {
+      field.setName(getTextInLanguage('options.custom-replace.regex-to-find-placeholder-text'));
+      field.addText((cb) => {
+        cb.setPlaceholder(getTextInLanguage('options.custom-replace.regex-to-find-placeholder-text'))
+            .setValue(this.find)
+            .onChange((v) => {
+              this.find = v;
+            });
+        this.findInputEl = cb.inputEl;
+      });
+    });
+
+    this.addField((field) => {
+      field.setName(getTextInLanguage('options.custom-replace.flags-placeholder-text'));
+      field.addText((cb) => {
+        cb.setPlaceholder(getTextInLanguage('options.custom-replace.flags-placeholder-text'))
+            .setValue(this.flags)
+            .onChange((v) => {
+              this.flags = v;
+            });
+        this.flagsInputEl = cb.inputEl;
+      });
+    });
+
+    this.addField((field) => {
+      field.setName(getTextInLanguage('options.custom-replace.regex-to-replace-placeholder-text'));
+      field.addText((cb) => {
+        cb.setPlaceholder(getTextInLanguage('options.custom-replace.regex-to-replace-placeholder-text'))
+            .setValue(this.replace)
+            .onChange((v) => {
+              this.replace = v;
+            });
+      });
+    });
+  }
+
+  onOpen() {
+    this.findInputEl?.focus();
+  }
+
+  onSubmit() {
+    const find = this.find.trim();
+    if (!find) {
+      if (this.findInputEl) displayTooltip(this.findInputEl, getTextInLanguage('required'), {classes: ['mod-error']});
+      return;
+    }
+    try {
+      new RegExp(find, this.flags);
+    } catch (e) {
+      const target = e instanceof SyntaxError && /flags/i.test(e.message)
+        ? this.flagsInputEl
+        : this.findInputEl;
+      if (target) displayTooltip(target, getTextInLanguage('options.custom-replace.invalid-regex'), {classes: ['mod-error']});
+      return;
+    }
+
+    void this.onSubmitEntry({
+      label: this.label.trim(),
+      find,
+      flags: this.flags.trim(),
+      replace: this.replace,
+      enabled: this.initial?.enabled ?? true,
+    });
     this.close();
   }
 }

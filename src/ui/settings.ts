@@ -1,5 +1,5 @@
 import {App, Platform, PluginSettingTab, moment} from 'obsidian';
-import type {SettingDefinition, SettingDefinitionGroup, SettingDefinitionItem, SettingDefinitionPage, SettingGroupItem} from 'obsidian';
+import type {SettingDefinition, SettingDefinitionGroup, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage, SettingGroupItem} from 'obsidian';
 import log from 'loglevel';
 import LinterPlugin from '../main';
 import {Rule, RuleType, ruleTypeToRules} from '../rules';
@@ -11,12 +11,11 @@ import {CustomTab} from './linter-components/tab-components/custom-tab';
 import {TabSearcher} from './linter-components/tab-components/tab-searcher';
 import {DebugTab} from './linter-components/tab-components/debug-tab';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
-import {LinterSettings} from '../settings-data';
+import {LinterSettingsKeys} from '../settings-data';
 import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '../utils/yaml';
 import {logsFromLastRun, setLogLevel} from '../utils/logger';
-import {AddCustomCommandModal, AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal} from './modals/add-list-entry-modals';
-
-type LSKey = keyof LinterSettings & string;
+import {getPath, setPath} from '../utils/nested-keyof';
+import {AddCustomCommandModal, AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal, CustomRegexModal} from './modals/add-list-entry-modals';
 
 const tabNameKeys: Record<RuleType | 'Custom' | 'Debug', LanguageStringKey> = {
   [RuleType.YAML]: 'tabs.names.yaml',
@@ -31,7 +30,7 @@ const tabNameKeys: Record<RuleType | 'Custom' | 'Debug', LanguageStringKey> = {
 
 const logLevels = Object.keys(log.levels) as string[];
 
-export class SettingTab extends PluginSettingTab<LinterSettings> {
+export class SettingTab extends PluginSettingTab {
   navContainer: HTMLElement;
   tabNavEl: HTMLDivElement;
   settingsContentEl: HTMLDivElement;
@@ -41,7 +40,16 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
   private tabSearcher: TabSearcher;
 
   constructor(app: App, public plugin: LinterPlugin) {
-    super(app, plugin, plugin.settings);
+    super(app, plugin);
+  }
+
+  getControlValue(key: string): unknown {
+    return getPath(this.plugin.settings, key);
+  }
+
+  async setControlValue(key: string, value: unknown): Promise<void> {
+    setPath(this.plugin.settings, key, value);
+    await this.plugin.saveSettings();
   }
 
   display(): void {
@@ -131,7 +139,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
   }
 
   // 1.12.x fallback lives in display() above.
-  getSettingDefinitions(): SettingDefinitionItem<LSKey>[] {
+  getSettingDefinitions(): SettingDefinitionItem<LinterSettingsKeys>[] {
     return [
       ...this.generalDefinitions(),
       this.commonStylesGroup(),
@@ -154,9 +162,9 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     ];
   }
 
-  private generalDefinitions(): SettingDefinitionItem<LSKey>[] {
+  private generalDefinitions(): SettingDefinitionItem<LinterSettingsKeys>[] {
     const settings = this.plugin.settings;
-    const items: SettingDefinitionItem<LSKey>[] = [];
+    const items: SettingDefinitionItem<LinterSettingsKeys>[] = [];
 
     items.push({
       name: getTextInLanguage('tabs.general.lint-on-save.name'),
@@ -167,18 +175,17 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
             .onChange(async (value) => {
               settings.lintOnSave = value;
               await this.plugin.saveSettings();
-              this.update();
+              this.refreshDomState();
             }));
       },
     });
 
-    if (settings.lintOnSave) {
-      items.push({
-        name: getTextInLanguage('tabs.general.display-message.name'),
-        desc: richDescription(getTextInLanguage('tabs.general.display-message.description')),
-        control: {type: 'toggle', key: 'displayChanged'},
-      });
-    }
+    items.push({
+      name: getTextInLanguage('tabs.general.display-message.name'),
+      desc: richDescription(getTextInLanguage('tabs.general.display-message.description')),
+      visible: () => settings.lintOnSave,
+      control: {type: 'toggle', key: 'displayChanged'},
+    });
 
     items.push({
       name: getTextInLanguage('tabs.general.lint-on-file-change.name'),
@@ -189,18 +196,17 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
             .onChange(async (value) => {
               settings.lintOnFileChange = value;
               await this.plugin.saveSettings();
-              this.update();
+              this.refreshDomState();
             }));
       },
     });
 
-    if (settings.lintOnFileChange) {
-      items.push({
-        name: getTextInLanguage('tabs.general.display-lint-on-file-change-message.name'),
-        desc: richDescription(getTextInLanguage('tabs.general.display-lint-on-file-change-message.description')),
-        control: {type: 'toggle', key: 'displayLintOnFileChangeNotice'},
-      });
-    }
+    items.push({
+      name: getTextInLanguage('tabs.general.display-lint-on-file-change-message.name'),
+      desc: richDescription(getTextInLanguage('tabs.general.display-lint-on-file-change-message.description')),
+      visible: () => settings.lintOnFileChange,
+      control: {type: 'toggle', key: 'displayLintOnFileChangeNotice'},
+    });
 
     items.push({
       name: getTextInLanguage('tabs.general.suppress-message-when-no-change.name'),
@@ -237,26 +243,14 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     return items;
   }
 
-  // TODO(framework): collapse the body to `control` bindings once dotted keys land.
-  private commonStylesGroup(): SettingDefinitionGroup<LSKey> {
-    const settings = this.plugin.settings;
-    const aliasFormats = [
-      NormalArrayFormats.MultiLine,
-      NormalArrayFormats.SingleLine,
-      SpecialArrayFormats.SingleStringCommaDelimited,
-      SpecialArrayFormats.SingleStringToSingleLine,
-      SpecialArrayFormats.SingleStringToMultiLine,
-    ];
-    const tagFormats = [
-      NormalArrayFormats.MultiLine,
-      NormalArrayFormats.SingleLine,
-      SpecialArrayFormats.SingleStringToSingleLine,
-      SpecialArrayFormats.SingleStringToMultiLine,
-      TagSpecificArrayFormats.SingleLineSpaceDelimited,
-      TagSpecificArrayFormats.SingleStringSpaceDelimited,
-      SpecialArrayFormats.SingleStringCommaDelimited,
-    ];
-    const escapeChars = ['"', '\''];
+  private commonStylesGroup(): SettingDefinitionGroup<LinterSettingsKeys> {
+    const enumOptions = (values: string[]): Record<string, string> => {
+      const options: Record<string, string> = {};
+      for (const v of values) {
+        options[v] = getTextInLanguage(('enums.' + v) as LanguageStringKey);
+      }
+      return options;
+    };
 
     return {
       type: 'group',
@@ -265,78 +259,57 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
         {
           name: getTextInLanguage('tabs.general.yaml-aliases-section-style.name'),
           desc: richDescription(getTextInLanguage('tabs.general.yaml-aliases-section-style.description')),
-          render: (setting) => {
-            setting.addDropdown((dd) => {
-              for (const v of aliasFormats) {
-                dd.addOption(v as string, getTextInLanguage(('enums.' + v) as LanguageStringKey));
-              }
-              dd.setValue(settings.commonStyles.aliasArrayStyle);
-              dd.onChange(async (value) => {
-                settings.commonStyles.aliasArrayStyle = value as NormalArrayFormats | SpecialArrayFormats;
-                await this.plugin.saveSettings();
-              });
-            });
+          control: {
+            type: 'dropdown',
+            key: 'commonStyles.aliasArrayStyle',
+            options: enumOptions([
+              NormalArrayFormats.MultiLine,
+              NormalArrayFormats.SingleLine,
+              SpecialArrayFormats.SingleStringCommaDelimited,
+              SpecialArrayFormats.SingleStringToSingleLine,
+              SpecialArrayFormats.SingleStringToMultiLine,
+            ]),
           },
         },
         {
           name: getTextInLanguage('tabs.general.yaml-tags-section-style.name'),
           desc: richDescription(getTextInLanguage('tabs.general.yaml-tags-section-style.description')),
-          render: (setting) => {
-            setting.addDropdown((dd) => {
-              for (const v of tagFormats) {
-                dd.addOption(v as string, getTextInLanguage(('enums.' + v) as LanguageStringKey));
-              }
-              dd.setValue(settings.commonStyles.tagArrayStyle);
-              dd.onChange(async (value) => {
-                settings.commonStyles.tagArrayStyle = value as NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats;
-                await this.plugin.saveSettings();
-              });
-            });
+          control: {
+            type: 'dropdown',
+            key: 'commonStyles.tagArrayStyle',
+            options: enumOptions([
+              NormalArrayFormats.MultiLine,
+              NormalArrayFormats.SingleLine,
+              SpecialArrayFormats.SingleStringToSingleLine,
+              SpecialArrayFormats.SingleStringToMultiLine,
+              TagSpecificArrayFormats.SingleLineSpaceDelimited,
+              TagSpecificArrayFormats.SingleStringSpaceDelimited,
+              SpecialArrayFormats.SingleStringCommaDelimited,
+            ]),
           },
         },
         {
           name: getTextInLanguage('tabs.general.default-escape-character.name'),
           desc: richDescription(getTextInLanguage('tabs.general.default-escape-character.description')),
-          render: (setting) => {
-            setting.addDropdown((dd) => {
-              for (const ch of escapeChars) {
-                dd.addOption(ch, ch);
-              }
-              dd.setValue(settings.commonStyles.escapeCharacter);
-              dd.onChange(async (value) => {
-                settings.commonStyles.escapeCharacter = value as '"' | '\'';
-                await this.plugin.saveSettings();
-              });
-            });
+          control: {
+            type: 'dropdown',
+            key: 'commonStyles.escapeCharacter',
+            options: {'"': '"', '\'': '\''},
           },
         },
         {
           name: getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.name'),
           desc: richDescription(getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.description')),
-          render: (setting) => {
-            setting.addToggle((tg) => tg
-                .setValue(settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays)
-                .onChange(async (value) => {
-                  settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays = value;
-                  await this.plugin.saveSettings();
-                }));
-          },
+          control: {type: 'toggle', key: 'commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays'},
         },
         {
           name: getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.name'),
           desc: richDescription(getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.description')),
-          render: (setting) => {
-            setting.addText((tx) => {
-              tx.inputEl.type = 'number';
-              tx.setValue(String(settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock));
-              tx.onChange(async (value) => {
-                const parsed = parseInt(value);
-                if (!Number.isNaN(parsed)) {
-                  settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock = parsed;
-                  await this.plugin.saveSettings();
-                }
-              });
-            });
+          control: {
+            type: 'number',
+            key: 'commonStyles.minimumNumberOfDollarSignsToBeAMathBlock',
+            min: 1,
+            validate: (value) => Number.isInteger(value) && value >= 1 ? undefined : getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.invalid'),
           },
         },
       ],
@@ -354,53 +327,58 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     itemName: (entry: T) => string;
     itemDesc?: (entry: T) => string | undefined;
     allowReorder?: boolean | undefined;
-  }): SettingDefinitionPage<LSKey> {
-    const items: (SettingDefinition<LSKey> | SettingDefinitionGroup<LSKey>)[] = [];
-    if (Platform.isMobile) {
-      items.push({
-        name: opts.addButtonText,
-        searchable: false,
-        action: opts.openAddForm,
-      });
-    }
-    items.push({
-      type: 'group',
-      cls: 'mod-list',
+    openEditForm?: (entry: T, index: number) => void;
+    editTooltip?: string;
+  }): SettingDefinitionPage<LinterSettingsKeys> {
+    const list: SettingDefinitionList<LinterSettingsKeys> = {
+      type: 'list',
       emptyState: opts.emptyState,
-      extraButtons: Platform.isMobile ? [] : [
-        (btn) => btn
-            .setIcon('lucide-plus')
-            .setTooltip(opts.addButtonText)
-            .onClick(opts.openAddForm),
-      ],
+      addItem: {
+        name: opts.addButtonText,
+        action: opts.openAddForm,
+      },
       onDelete: async (index) => {
         opts.onDelete(index);
         await this.plugin.saveSettings();
         this.update();
       },
-      onReorder: !opts.allowReorder ? undefined : (oldIndex, newIndex) => {
-        const tempOld = opts.values[oldIndex];
-        opts.values[oldIndex] = opts.values[newIndex];
-        opts.values[newIndex] = tempOld;
-
-        this.update();
+      onReorder: !opts.allowReorder ? undefined : async (oldIndex, newIndex) => {
+        const [moved] = opts.values.splice(oldIndex, 1);
+        opts.values.splice(newIndex, 0, moved);
+        await this.plugin.saveSettings();
       },
-      items: opts.values.map((entry): SettingDefinition<LSKey> => ({
-        name: opts.itemName(entry),
-        desc: opts.itemDesc?.(entry),
-        searchable: false,
-      })),
-    });
+      items: opts.values.map((entry): SettingDefinition<LinterSettingsKeys> => {
+        const base = {
+          name: opts.itemName(entry),
+          desc: opts.itemDesc?.(entry),
+          searchable: false,
+        } as const;
+        if (!opts.openEditForm) return base;
+        return {
+          ...base,
+          render: (setting) => {
+            setting.setName(base.name);
+            if (base.desc !== undefined) setting.setDesc(base.desc);
+            setting.addExtraButton((cb) => cb
+                .setIcon('lucide-pencil')
+                .setTooltip(opts.editTooltip ?? 'Edit')
+                // Resolve the live index at click time — a captured map index
+                // goes stale after a reorder or delete.
+                .onClick(() => opts.openEditForm!(entry, opts.values.indexOf(entry))));
+          },
+        };
+      }),
+    };
 
     return {
       type: 'page',
       name: opts.name,
       desc: opts.desc,
-      items,
+      items: [list],
     };
   }
 
-  private foldersToIgnorePage(): SettingDefinitionPage<LSKey> {
+  private foldersToIgnorePage(): SettingDefinitionPage<LinterSettingsKeys> {
     const folders = this.plugin.settings.foldersToIgnore;
     return this.listManagementPage({
       name: getTextInLanguage('tabs.general.folders-to-ignore.name'),
@@ -418,7 +396,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     });
   }
 
-  private filesToIgnorePage(): SettingDefinitionPage<LSKey> {
+  private filesToIgnorePage(): SettingDefinitionPage<LinterSettingsKeys> {
     const filesToIgnore = this.plugin.settings.filesToIgnore;
     return this.listManagementPage({
       name: getTextInLanguage('tabs.general.files-to-ignore.name'),
@@ -441,7 +419,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     return `/${match}/${replace != undefined ? replace + '/' : ''}${flags}`;
   }
 
-  private additionalFileExtensionsPage(): SettingDefinitionPage<LSKey> {
+  private additionalFileExtensionsPage(): SettingDefinitionPage<LinterSettingsKeys> {
     const extensions = this.plugin.settings.additionalFileExtensions;
     return this.listManagementPage({
       name: getTextInLanguage('tabs.general.additional-file-extensions.name'),
@@ -459,7 +437,7 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     });
   }
 
-  private rulePageFor(ruleType: RuleType): SettingDefinitionPage<LSKey> {
+  private rulePageFor(ruleType: RuleType): SettingDefinitionPage<LinterSettingsKeys> {
     const rules = ruleTypeToRules.get(ruleType) ?? [];
     return {
       type: 'page',
@@ -468,11 +446,11 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     };
   }
 
-  private ruleToGroup(rule: Rule): SettingDefinitionGroup<LSKey> {
+  private ruleToGroup(rule: Rule): SettingDefinitionGroup<LinterSettingsKeys> {
     const settings = this.plugin.settings;
     const enabled = !!settings.ruleConfigs[rule.alias]?.enabled;
 
-    const enabledItem: SettingGroupItem<LSKey> = {
+    const enabledItem: SettingGroupItem<LinterSettingsKeys> = {
       name: rule.getName(),
       aliases: [rule.alias],
       render: (setting) => {
@@ -497,10 +475,10 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
       },
     };
 
-    const items: SettingGroupItem<LSKey>[] = [enabledItem];
+    const items: SettingGroupItem<LinterSettingsKeys>[] = [enabledItem];
     if (enabled) {
       for (let i = 1; i < rule.options.length; i++) {
-        items.push(rule.options[i].getSettingDefinition(this.plugin, () => this.update()) as SettingGroupItem<LSKey>);
+        items.push(rule.options[i].getSettingDefinition(this.plugin, () => this.update()) as SettingGroupItem<LinterSettingsKeys>);
       }
     }
 
@@ -510,18 +488,18 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     };
   }
 
-  private customPage(): SettingDefinitionPage<LSKey> {
+  private customPage(): SettingDefinitionPage<LinterSettingsKeys> {
     return {
       type: 'page',
       name: getTextInLanguage(tabNameKeys.Custom),
       items: [
         this.customCommandsPage(),
-        this.customRegexesGroup(),
+        this.customRegexesPage(),
       ],
     };
   }
 
-  private customCommandsPage(): SettingDefinitionPage<LSKey> {
+  private customCommandsPage(): SettingDefinitionPage<LinterSettingsKeys> {
     const lintCommands = this.plugin.settings.lintCommands;
     // TODO: needs enable, disable, and edit
     return this.listManagementPage({
@@ -542,79 +520,35 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
     });
   }
 
-  private customRegexesGroup(): SettingDefinitionGroup<LSKey> {
+  private customRegexesPage(): SettingDefinitionPage<LinterSettingsKeys> {
     const regexes = this.plugin.settings.customRegexes;
-    const defaultFlags = 'gm';
-    return {
-      type: 'group',
-      cls: 'mod-list',
-      heading: getTextInLanguage('options.custom-replace.name'),
-      extraButtons: [
-        (btn) => btn
-            .setIcon('plus-with-circle')
-            .setTooltip(getTextInLanguage('options.custom-replace.add-input-button-text'))
-            .onClick(async () => {
-              regexes.push({label: '', find: '', replace: '', flags: defaultFlags, enabled: true});
-              await this.plugin.saveSettings();
-              this.update();
-            }),
-      ],
-      onReorder: async (fromIndex, toIndex) => {
-        const [moved] = regexes.splice(fromIndex, 1);
-        regexes.splice(toIndex, 0, moved);
-        await this.plugin.saveSettings();
-      },
-      onDelete: async (index) => {
-        regexes.splice(index, 1);
+    return this.listManagementPage({
+      name: getTextInLanguage('options.custom-replace.name'),
+      desc: richDescription(getTextInLanguage('options.custom-replace.description')),
+      addButtonText: getTextInLanguage('options.custom-replace.add-input-button-text'),
+      emptyState: getTextInLanguage('options.custom-replace.empty-state'),
+      values: regexes,
+      allowReorder: true,
+      openAddForm: () => new CustomRegexModal(this.app, null, async (entry) => {
+        regexes.push(entry);
         await this.plugin.saveSettings();
         this.update();
-      },
-      items: regexes.map((regex, index) => ({
-        name: regex.label || getTextInLanguage('options.custom-replace.label-placeholder-text'),
-        searchable: false,
-        render: (setting) => {
-          setting.addText((cb) => cb
-              .setPlaceholder(getTextInLanguage('options.custom-replace.label-placeholder-text'))
-              .setValue(regex.label)
-              .onChange(async (value) => {
-                regexes[index].label = value;
-                await this.plugin.saveSettings();
-              }));
-          setting.addText((cb) => cb
-              .setPlaceholder(getTextInLanguage('options.custom-replace.regex-to-find-placeholder-text'))
-              .setValue(regex.find)
-              .onChange(async (value) => {
-                regexes[index].find = value;
-                await this.plugin.saveSettings();
-              }));
-          setting.addText((cb) => cb
-              .setPlaceholder(getTextInLanguage('options.custom-replace.flags-placeholder-text'))
-              .setValue(regex.flags)
-              .onChange(async (value) => {
-                regexes[index].flags = value;
-                await this.plugin.saveSettings();
-              }));
-          setting.addText((cb) => cb
-              .setPlaceholder(getTextInLanguage('options.custom-replace.regex-to-replace-placeholder-text'))
-              .setValue(regex.replace)
-              .onChange(async (value) => {
-                regexes[index].replace = value;
-                await this.plugin.saveSettings();
-              }));
-          setting.addToggle((tg) => tg
-              .setValue(regex.enabled)
-              .onChange(async (value) => {
-                regexes[index].enabled = value;
-                await this.plugin.saveSettings();
-              }));
-        },
-      })),
-    };
+      }).open(),
+      openEditForm: (entry, index) => new CustomRegexModal(this.app, entry, async (updated) => {
+        regexes[index] = updated;
+        await this.plugin.saveSettings();
+        this.update();
+      }).open(),
+      editTooltip: getTextInLanguage('options.custom-replace.edit-tooltip'),
+      onDelete: (index) => regexes.splice(index, 1),
+      itemName: (entry) => entry.label || entry.find || getTextInLanguage('options.custom-replace.label-placeholder-text'),
+      itemDesc: (entry) => entry.find && entry.label ? entry.find : undefined,
+    });
   }
 
-  private debugPage(): SettingDefinitionPage<LSKey> {
+  private debugPage(): SettingDefinitionPage<LinterSettingsKeys> {
     const settings = this.plugin.settings;
-    const items: SettingDefinition<LSKey>[] = [
+    const items: SettingDefinition<LinterSettingsKeys>[] = [
       {
         name: getTextInLanguage('tabs.debug.log-level.name'),
         desc: richDescription(getTextInLanguage('tabs.debug.log-level.description')),
@@ -652,16 +586,14 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
               .onChange(async (value) => {
                 settings.recordLintOnSaveLogs = value;
                 await this.plugin.saveSettings();
-                this.update();
+                this.refreshDomState();
               }));
         },
       },
-    ];
-
-    if (settings.recordLintOnSaveLogs) {
-      items.push({
+      {
         name: getTextInLanguage('tabs.debug.linter-logs.name'),
         desc: richDescription(getTextInLanguage('tabs.debug.linter-logs.description')),
+        visible: () => settings.recordLintOnSaveLogs,
         render: (setting) => {
           setting.addTextArea((cb) => {
             cb.inputEl.readOnly = true;
@@ -669,8 +601,8 @@ export class SettingTab extends PluginSettingTab<LinterSettings> {
             cb.inputEl.addClass('linter-debug-readonly');
           });
         },
-      });
-    }
+      },
+    ];
 
     return {
       type: 'page',

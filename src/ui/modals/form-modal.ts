@@ -81,7 +81,7 @@ export class FormModal extends Modal {
       this.buttonContainerEl = this.modalEl.createDiv({cls: 'modal-button-container'});
       this.ctaButton = new ButtonComponent(this.buttonContainerEl)
           .setCta()
-          .setButtonText('Done')
+          .setButtonText('Save')
           .onClick(() => this.formSubmit());
       this.ctaEl = this.ctaButton.buttonEl;
       new ButtonComponent(this.buttonContainerEl)

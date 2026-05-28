@@ -1,5 +1,5 @@
 import {App, ExtraButtonComponent, normalizePath, Setting, TFile, ToggleComponent} from 'obsidian';
-import type {SettingDefinition, SettingDefinitionGroup, SettingDefinitionItem, SettingDefinitionPage} from 'obsidian';
+import type {SettingDefinition, SettingDefinitionItem, SettingDefinitionList} from 'obsidian';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import LinterPlugin from './main';
 import {hideEl, unhideEl, setElContent, richDescription} from './ui/helpers';
@@ -56,6 +56,13 @@ export abstract class Option {
 
   protected setOption(value: any, settings: LinterSettings): void {
     settings.ruleConfigs[this.ruleAlias][this.configKey] = value;
+  }
+
+  // Dot-path into ruleConfigs for the declarative control binding. Resolved by
+  // SettingTab's getControlValue/setControlValue. Aliases and configKeys are
+  // slug-shaped (no dots), so splitting on '.' is safe.
+  protected controlKey(): string {
+    return `ruleConfigs.${this.ruleAlias}.${this.configKey}`;
   }
 
   protected getCurrentValue(plugin: LinterPlugin): any {
@@ -116,19 +123,27 @@ export class BooleanOption extends Option {
   }
 
   public getSettingDefinition(plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
+    // An onChange side effect can't be expressed through a control binding, so
+    // those (rare) options stay render-based.
+    if (this.onChange) {
+      return {
+        name: this.getName(),
+        desc: richDescription(this.getDescription()),
+        render: (setting) => {
+          setting.addToggle((toggle) => toggle
+              .setValue(this.getCurrentValue(plugin))
+              .onChange(async (value) => {
+                await this.writeAndSave(value, plugin);
+                this.onChange?.(value, plugin.app);
+              }));
+        },
+      };
+    }
+
     return {
       name: this.getName(),
       desc: richDescription(this.getDescription()),
-      render: (setting) => {
-        setting.addToggle((toggle) => toggle
-            .setValue(this.getCurrentValue(plugin))
-            .onChange(async (value) => {
-              await this.writeAndSave(value, plugin);
-              if (this.onChange) {
-                this.onChange(value, plugin.app);
-              }
-            }));
-      },
+      control: {type: 'toggle', key: this.controlKey(), defaultValue: this.defaultValue},
     };
   }
 
@@ -158,17 +173,11 @@ export class TextOption extends Option {
     this.parseNameAndDescriptionAndRemoveSettingBorder();
   }
 
-  public getSettingDefinition(plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
+  public getSettingDefinition(_plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
     return {
       name: this.getName(),
       desc: richDescription(this.getDescription()),
-      render: (setting) => {
-        setting.addText((textbox) => textbox
-            .setValue(this.getCurrentValue(plugin) ?? '')
-            .onChange(async (value) => {
-              await this.writeAndSave(value, plugin);
-            }));
-      },
+      control: {type: 'text', key: this.controlKey(), defaultValue: this.defaultValue ?? ''},
     };
   }
 }
@@ -190,17 +199,11 @@ export class TextAreaOption extends Option {
     this.parseNameAndDescriptionAndRemoveSettingBorder();
   }
 
-  public getSettingDefinition(plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
+  public getSettingDefinition(_plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
     return {
       name: this.getName(),
       desc: richDescription(this.getDescription()),
-      render: (setting) => {
-        setting.addTextArea((textbox) => textbox
-            .setValue(this.getCurrentValue(plugin) ?? '')
-            .onChange(async (value) => {
-              await this.writeAndSave(value, plugin);
-            }));
-      },
+      control: {type: 'textarea', key: this.controlKey(), defaultValue: this.defaultValue ?? ''},
     };
   }
 }
@@ -287,21 +290,15 @@ export class DropdownOption extends Option {
     this.parseNameAndDescriptionAndRemoveSettingBorder();
   }
 
-  public getSettingDefinition(plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
+  public getSettingDefinition(_plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
+    const options: Record<string, string> = {};
+    for (const option of this.options) {
+      options[option.value.replace('enums.', '')] = option.getDisplayValue();
+    }
     return {
       name: this.getName(),
       desc: richDescription(this.getDescription()),
-      render: (setting) => {
-        setting.addDropdown((dropdown) => {
-          for (const option of this.options) {
-            dropdown.addOption(option.value.replace('enums.', ''), option.getDisplayValue());
-          }
-          dropdown.setValue(this.getCurrentValue(plugin) ?? this.defaultValue);
-          dropdown.onChange(async (value) => {
-            await this.writeAndSave(value, plugin);
-          });
-        });
-      },
+      control: {type: 'dropdown', key: this.controlKey(), defaultValue: this.defaultValue, options},
     };
   }
 }
@@ -376,19 +373,18 @@ export class MdFilePickerOption extends Option {
       },
     }));
 
-    const group: SettingDefinitionGroup = {
-      type: 'group',
-      cls: 'mod-list',
+    const list: SettingDefinitionList = {
+      type: 'list',
       heading,
+      addItem: {
+        name: getTextInLanguage('options.custom-auto-correct.add-new-replacement-file-tooltip'),
+        action: async () => {
+          filesPicked.push({filePath: '', customReplacements: null});
+          await plugin.saveSettings();
+          update();
+        },
+      },
       extraButtons: [
-        (btn) => btn
-            .setIcon('plus-with-circle')
-            .setTooltip(getTextInLanguage('options.custom-auto-correct.add-new-replacement-file-tooltip'))
-            .onClick(async () => {
-              filesPicked.push({filePath: '', customReplacements: null});
-              await plugin.saveSettings();
-              update();
-            }),
         (btn) => btn
             .setIcon('refresh-cw')
             .setTooltip(getTextInLanguage('options.custom-auto-correct.refresh-tooltip-text'))
@@ -412,13 +408,12 @@ export class MdFilePickerOption extends Option {
       items: fileRows,
     };
 
-    const page: SettingDefinitionPage = {
+    return {
       type: 'page',
       name: this.getName(),
       desc: warning,
-      items: [group],
+      items: [list],
     };
-    return page;
   }
 
   // this.settingEl is unset on the declarative path (display() is bypassed).

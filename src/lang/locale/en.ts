@@ -236,6 +236,7 @@ export default {
       'number-of-dollar-signs-to-indicate-math-block': {
         'name': 'Number of dollar signs to indicate math block',
         'description': 'The amount of dollar signs to consider the math content to be a math block instead of inline math',
+        'invalid': 'Enter a whole number of 1 or greater.',
       },
     },
     'debug': {
@@ -286,6 +287,9 @@ export default {
       'move-up-tooltip': 'Move up',
       'move-down-tooltip': 'Move down',
       'delete-tooltip': 'Delete',
+      'edit-tooltip': 'Edit',
+      'empty-state': 'No custom regex replacements have been added yet.',
+      'invalid-regex': 'Invalid regex',
     },
     'custom-auto-correct': {
       'delete-tooltip': 'Delete',
