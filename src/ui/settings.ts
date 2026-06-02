@@ -15,7 +15,7 @@ import {LinterSettingsKeys} from '../settings-data';
 import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '../utils/yaml';
 import {logsFromLastRun, setLogLevel} from '../utils/logger';
 import {getPath, setPath} from '../utils/nested-keyof';
-import {AddCustomCommandModal, AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal, CustomRegexModal} from './modals/add-list-entry-modals';
+import {CustomCommandModal, AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal, CustomRegexModal} from './modals/add-list-entry-modals';
 
 const tabNameKeys: Record<RuleType | 'Custom' | 'Debug', LanguageStringKey> = {
   [RuleType.YAML]: 'tabs.names.yaml',
@@ -326,6 +326,7 @@ export class SettingTab extends PluginSettingTab {
     onDelete: (index: number) => void;
     itemName: (entry: T) => string;
     itemDesc?: (entry: T) => string | undefined;
+    itemIsDisabled?: (entry: T) => boolean;
     allowReorder?: boolean | undefined;
     openEditForm?: (entry: T, index: number) => void;
     editTooltip?: string;
@@ -337,12 +338,12 @@ export class SettingTab extends PluginSettingTab {
         name: opts.addButtonText,
         action: opts.openAddForm,
       },
-      onDelete: async (index) => {
+      onDelete: async (index: number) => {
         opts.onDelete(index);
         await this.plugin.saveSettings();
         this.update();
       },
-      onReorder: !opts.allowReorder ? undefined : async (oldIndex, newIndex) => {
+      onReorder: !opts.allowReorder ? undefined : async (oldIndex: number, newIndex: number) => {
         const [moved] = opts.values.splice(oldIndex, 1);
         opts.values.splice(newIndex, 0, moved);
         await this.plugin.saveSettings();
@@ -359,6 +360,10 @@ export class SettingTab extends PluginSettingTab {
           render: (setting) => {
             setting.setName(base.name);
             if (base.desc !== undefined) setting.setDesc(base.desc);
+            if (opts.itemIsDisabled && opts.itemIsDisabled(entry)) {
+              setting.nameEl.addClass('disabled-list-entry');
+              setting.descEl.addClass('disabled-list-entry');
+            }
             setting.addExtraButton((cb) => cb
                 .setIcon('lucide-pencil')
                 .setTooltip(opts.editTooltip ?? 'Edit')
@@ -509,7 +514,7 @@ export class SettingTab extends PluginSettingTab {
       emptyState: getTextInLanguage('options.custom-command.empty-state'),
       values: lintCommands,
       allowReorder: true,
-      openAddForm: () => new AddCustomCommandModal(this.app, lintCommands, async (command) => {
+      openAddForm: () => new CustomCommandModal(this.app, lintCommands, async (command) => {
         lintCommands.push(command);
         await this.plugin.saveSettings();
         this.update();
@@ -543,6 +548,7 @@ export class SettingTab extends PluginSettingTab {
       onDelete: (index) => regexes.splice(index, 1),
       itemName: (entry) => entry.label || entry.find || getTextInLanguage('options.custom-replace.label-placeholder-text'),
       itemDesc: (entry) => entry.find && entry.label ? entry.find : undefined,
+      itemIsDisabled: (entry) => !entry.enabled,
     });
   }
 

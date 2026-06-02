@@ -170,16 +170,22 @@ export class AddFileExtensionModal extends FormModal {
   }
 }
 
-export class AddCustomCommandModal extends FormModal {
+export class CustomCommandModal extends FormModal {
   private value = '';
+  private enabled: boolean;
   private inputEl: HTMLInputElement | undefined;
 
   constructor(
       app: App,
+      initial: LintCommand | null,
       private existing: LintCommand[],
-      private onAdd: (command: LintCommand) => void | Promise<void>,
+      private onSubmitEntry: (command: LintCommand) => void | Promise<void>,
   ) {
     super(app);
+    this.value = initial?.name ?? '';
+    this.enabled = initial?.enabled ?? true;
+
+    // TODO: add edit tooltip
     this.setTitle(getTextInLanguage('options.custom-command.add-input-button-text'));
 
     this.addField((field) => {
@@ -220,25 +226,26 @@ export class AddCustomCommandModal extends FormModal {
       }
     }
 
-    void this.onAdd({enabled: true, id: id, name: value});
+    void this.onSubmitEntry({enabled: true, id: id, name: value});
     this.close();
   }
 }
 
 // Add or edit a custom regex replacement. When `initial` is provided, the
 // modal pre-populates each field and the submit callback returns the updated
-// entry (preserving the original `enabled` flag).
+// entry
 export class CustomRegexModal extends FormModal {
   private label: string;
   private find: string;
   private flags: string;
   private replace: string;
+  private enabled: boolean;
   private findInputEl: HTMLInputElement | undefined;
   private flagsInputEl: HTMLInputElement | undefined;
 
   constructor(
       app: App,
-      private initial: CustomReplace | null,
+      initial: CustomReplace | null,
       private onSubmitEntry: (entry: CustomReplace) => void | Promise<void>,
   ) {
     super(app);
@@ -246,6 +253,7 @@ export class CustomRegexModal extends FormModal {
     this.find = initial?.find ?? '';
     this.flags = initial?.flags ?? customRegexDefaultFlags;
     this.replace = initial?.replace ?? '';
+    this.enabled = initial?.enabled ?? true;
 
     this.setTitle(getTextInLanguage(initial ? 'options.custom-replace.edit-tooltip' : 'options.custom-replace.add-input-button-text'));
 
@@ -294,6 +302,16 @@ export class CustomRegexModal extends FormModal {
             });
       });
     });
+
+    this.addField((field) => {
+      field.setName(getTextInLanguage('options.custom-replace.enabled'));
+      field.addToggle((cb) => {
+        cb.setValue(this.enabled)
+            .onChange((b) => {
+              this.enabled = b;
+            });
+      });
+    });
   }
 
   onOpen() {
@@ -319,7 +337,7 @@ export class CustomRegexModal extends FormModal {
       find,
       flags: this.flags.trim(),
       replace: this.replace,
-      enabled: this.initial?.enabled ?? true,
+      enabled: this.enabled,
     });
     this.close();
   }

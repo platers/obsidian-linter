@@ -290,6 +290,7 @@ export default {
       'edit-tooltip': 'Edit',
       'empty-state': 'No custom regex replacements have been added yet.',
       'invalid-regex': 'Invalid regex',
+      'enabled': 'Enabled',
     },
     'custom-auto-correct': {
       'delete-tooltip': 'Delete',
