@@ -247,9 +247,7 @@ export class CustomRegexModal extends FormModal {
     this.flags = initial?.flags ?? customRegexDefaultFlags;
     this.replace = initial?.replace ?? '';
 
-    this.setTitle(getTextInLanguage(initial
-      ? 'options.custom-replace.edit-tooltip'
-      : 'options.custom-replace.add-input-button-text'));
+    this.setTitle(getTextInLanguage(initial ? 'options.custom-replace.edit-tooltip' : 'options.custom-replace.add-input-button-text'));
 
     this.addField((field) => {
       field.setName(getTextInLanguage('options.custom-replace.label-placeholder-text'));
@@ -311,9 +309,7 @@ export class CustomRegexModal extends FormModal {
     try {
       new RegExp(find, this.flags);
     } catch (e) {
-      const target = e instanceof SyntaxError && /flags/i.test(e.message)
-        ? this.flagsInputEl
-        : this.findInputEl;
+      const target = e instanceof SyntaxError && /flags/i.test(e.message) ? this.flagsInputEl : this.findInputEl;
       if (target) displayTooltip(target, getTextInLanguage('options.custom-replace.invalid-regex'), {classes: ['mod-error']});
       return;
     }
