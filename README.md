@@ -81,7 +81,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [line-break-at-document-end](https://platers.github.io/obsidian-linter/settings/spacing-rules/#line-break-at-document-end)
 - [move-math-block-indicators-to-their-own-line](https://platers.github.io/obsidian-linter/settings/spacing-rules/#move-math-block-indicators-to-their-own-line)
 - [paragraph-blank-lines](https://platers.github.io/obsidian-linter/settings/spacing-rules/#paragraph-blank-lines)
-- [remove-empty-lines-between-list-markers-and-checklists](https://platers.github.io/obsidian-linter/settings/spacing-rules/#remove-empty-lines-between-list-markers-and-checklists)
+- [remove-empty-lines-between-list-markers-and-checklists](https://platers.github.io/obsidian-linter/settings/spacing-rules/#remove-empty-lines-between-list-markers)
 - [remove-link-spacing](https://platers.github.io/obsidian-linter/settings/spacing-rules/#remove-link-spacing)
 - [remove-space-around-characters](https://platers.github.io/obsidian-linter/settings/spacing-rules/#remove-space-around-characters)
 - [remove-space-before-or-after-characters](https://platers.github.io/obsidian-linter/settings/spacing-rules/#remove-space-before-or-after-characters)
@@ -92,8 +92,8 @@ Each rule is its own set of logic and is designed to be run independently. This 
 ### Paste rules
 
 - [add-blockquote-indentation-on-paste](https://platers.github.io/obsidian-linter/settings/paste-rules/#add-blockquote-indentation-on-paste)
-- [prevent-double-checklist-indicator-on-paste](https://platers.github.io/obsidian-linter/settings/paste-rules/#prevent-double-checklist-indicator-on-paste)
-- [prevent-double-list-item-indicator-on-paste](https://platers.github.io/obsidian-linter/settings/paste-rules/#prevent-double-list-item-indicator-on-paste)
+- [prevent-double-checklist-indicator-on-paste](https://platers.github.io/obsidian-linter/settings/paste-rules/#prevent-double-checklist-marker-on-paste)
+- [prevent-double-list-item-indicator-on-paste](https://platers.github.io/obsidian-linter/settings/paste-rules/#prevent-double-list-item-marker-on-paste)
 - [proper-ellipsis-on-paste](https://platers.github.io/obsidian-linter/settings/paste-rules/#proper-ellipsis-on-paste)
 - [remove-hyphens-on-paste](https://platers.github.io/obsidian-linter/settings/paste-rules/#remove-hyphens-on-paste)
 - [remove-leading-or-trailing-whitespace-on-paste](https://platers.github.io/obsidian-linter/settings/paste-rules/#remove-leading-or-trailing-whitespace-on-paste)
