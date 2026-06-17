@@ -138,6 +138,10 @@ export default {
   'replace-header-text': 'Replacement Word',
   'close-button-text': 'Close',
 
+  // add-list-entry-modals.ts
+  'required': 'Required',
+  'already-in-list': 'Already in the list',
+
   'tabs': {
     'names': {
       // tab.ts
@@ -154,6 +158,11 @@ export default {
     // tab-searcher.ts
     'default-search-bar-text': 'Search all settings',
     'general': {
+      // settings.ts
+      'yaml': 'YAML common styles',
+      'files-and-folders': 'Files and folders',
+      'rules': 'Rules',
+
       // general-tab.ts
       'lint-on-save': {
         'name': 'Lint on save',
@@ -181,6 +190,7 @@ export default {
         'folder-search-placeholder-text': 'Folder name',
         'add-input-button-text': 'Add another folder to ignore',
         'delete-tooltip': 'Delete',
+        'empty-state': 'No folders are being ignored yet.',
       },
       'files-to-ignore': {
         'name': 'Files to ignore',
@@ -191,6 +201,8 @@ export default {
         'label-placeholder-text': 'label',
         'flags-placeholder-text': 'flags',
         'warning': 'Use this with caution if you do not know regex. Also, please make sure that if you use lookbehinds in your regex on iOS mobile that you are on a version that supports using them.',
+        'pattern-required': 'Match pattern is required',
+        'empty-state': 'No files are being ignored yet.',
       },
       'additional-file-extensions': {
         'name': 'Additional file extensions',
@@ -198,6 +210,7 @@ export default {
         'extension-placeholder': 'e.g. mdx',
         'add-input-button-text': 'Add another extension',
         'delete-tooltip': 'Delete',
+        'empty-state': 'No additional file extensions yet.',
       },
       'override-locale': {
         'name': 'Override locale',
@@ -223,6 +236,7 @@ export default {
       'number-of-dollar-signs-to-indicate-math-block': {
         'name': 'Number of dollar signs to indicate math block',
         'description': 'The amount of dollar signs to consider the math content to be a math block instead of inline math',
+        'invalid': 'Enter a whole number of 1 or greater.',
       },
     },
     'debug': {
@@ -258,6 +272,7 @@ export default {
       'move-up-tooltip': 'Move up',
       'move-down-tooltip': 'Move down',
       'delete-tooltip': 'Delete',
+      'empty-state': 'No custom commands have been added yet.',
     },
     'custom-replace': {
       // custom-replace-option.ts
@@ -272,6 +287,10 @@ export default {
       'move-up-tooltip': 'Move up',
       'move-down-tooltip': 'Move down',
       'delete-tooltip': 'Delete',
+      'edit-tooltip': 'Edit',
+      'empty-state': 'No custom regex replacements have been added yet.',
+      'invalid-regex': 'Invalid regex',
+      'enabled': 'Enabled',
     },
     'custom-auto-correct': {
       'delete-tooltip': 'Delete',

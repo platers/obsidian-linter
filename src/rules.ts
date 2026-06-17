@@ -109,6 +109,11 @@ export class Rule {
     return this.options[0].configKey;
   }
 
+  public runEnabledSideEffect(value: boolean, app: App): void {
+    const enabled = this.options[0] as BooleanOption;
+    enabled.onChange?.(value, app);
+  }
+
   public apply(text: string, options?: Options): string {
     return ignoreListOfTypes(this.ignoreTypes, text, (textAfterIgnore: string) => {
       return this.applyAfterIgnore(textAfterIgnore, options);

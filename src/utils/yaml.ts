@@ -2,7 +2,7 @@ import {getTextInLanguage} from '../lang/helpers';
 import {escapeDollarSigns, yamlRegex} from './regex';
 import {isNumeric} from './strings';
 import {parse, parseDocument, Document, stringify, CST, YAMLMap} from 'yaml';
-import {YamlNode} from 'src/typings/yaml';
+import {YamlNode} from '../typings/yaml';
 import {FlowCollection} from 'yaml/dist/parse/cst';
 
 export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
