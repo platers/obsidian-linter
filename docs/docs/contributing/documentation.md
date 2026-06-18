@@ -37,10 +37,12 @@ when lowercased. Info added in these files generally include limitations and thi
 
 ## Documentation Templates
 
-Currently there is 1 template file used for generating documentation with:
+Currently there are 2 template files used for generating documentation with:
 
 1. [readme_template.md](https://github.com/platers/obsidian-linter/blob/master/docs/templates/readme_template.md)
   - This template is used for generating the [README](https://github.com/platers/obsidian-linter/blob/master/README.md) file and should be updated for changes that are not rules documentation links and their corresponding sections.
+2. [contributing_template.md](https://github.com/platers/obsidian-linter/blob/master/docs/templates/contributing_template.md)
+  - This template is used for generating the [CONTRIBUTING.md](https://github.com/platers/obsidian-linter/blob/master/CONTRIBUTING.md]) file and should be updated for changes that are not meant for the documentation website, but are meant for contributing documentation.
 
 You may also want to take a look at [docs.ts](https://github.com/platers/obsidian-linter/blob/master/src/docs.ts) to modify how the generated files are created.
 

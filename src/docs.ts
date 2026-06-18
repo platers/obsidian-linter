@@ -18,6 +18,10 @@ generateReadme();
 
 generateDocs();
 
+// Contributing docs
+
+generateContributing();
+
 function generateReadme() {
   const readme_template = readFileSync(`${pathToDocsFolder}/templates/readme_template.md`, 'utf8');
 
@@ -182,4 +186,74 @@ function getRuleAdditionalInfo(ruleAlias: string): string {
   }
 
   return ruleAdditionAlInfo;
+}
+
+function generateContributing() {
+  const contributing_template = readFileSync(`${pathToDocsFolder}/templates/contributing_template.md`, 'utf8');
+
+  const filesInOrder = [
+    'ai-usage.md',
+    'getting-setup.md',
+    'documentation.md',
+    'translation.md',
+    'bug-fix.md',
+    'refactoring.md',
+    'adding-a-rule.md',
+    'testing.md',
+    'open-a-pr.md',
+    'releasing.md',
+  ];
+
+  const fileToHeader = new Map<string, string>();
+  const fileToContent = new Map<string, string>();
+
+  for (const file of filesInOrder) {
+    const content = readFileSync(`${pathToDocsFolder}/docs/contributing/${file}`, 'utf8');
+
+    fileToHeader.set(file, getFirstHeaderLink(content));
+    fileToContent.set(file, content);
+  }
+
+  let actualSections = '';
+
+  for (const file of filesInOrder) {
+    let sectionContent = fileToContent.get(file);
+    sectionContent = incrementHeaders(sectionContent);
+
+    actualSections += sectionContent + '\n';
+  }
+
+  for (const referencedFile of filesInOrder) {
+    actualSections = actualSections.replaceAll(referencedFile + '#', '#');
+
+    const header = fileToHeader.get(referencedFile)!;
+    actualSections = actualSections.replaceAll(referencedFile, header);
+  }
+
+
+  actualSections = actualSections.replaceAll('https://github.com/platers/obsidian-linter/blob/master/', '');
+
+  const contributing = autogen_warning + contributing_template + actualSections;
+  writeFileSync('CONTRIBUTING.md', contributing);
+  console.log('CONTRIBUTING.md updated');
+}
+
+function incrementHeaders(markdown: string) {
+  return markdown.replace(/^(#{1,5})(\s+)/gm, '$1#$2');
+}
+
+function getFirstHeaderLink(content: string): string {
+  const match = content.match(/^#\s+(.+)$/m);
+  if (!match) {
+    return '';
+  }
+
+  return (
+    '#' +
+    match[1]
+        .trim()
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '') // remove punctuation
+        .replace(/\s+/g, '-') // spaces -> dashes
+  );
 }
