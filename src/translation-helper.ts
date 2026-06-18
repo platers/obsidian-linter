@@ -1,6 +1,7 @@
 import * as readline from 'readline';
 import {stdout, stdin, exit} from 'process';
 import {LanguageStringKey, setLanguage, getTextInLanguage, localeHasKey, localeMap, LanguageLocale, getLanguageSourceFile} from './lang/helpers';
+import {getString} from './utils/nested-keyof';
 import * as fs from 'fs';
 import {ValidationInfo, validateSelectedKey, validateLanguageSelected} from './lang/validation';
 import dedent from 'ts-dedent';
@@ -96,29 +97,35 @@ function replaceLanguageKeyWithANewValue(language: string, selectedLanguage: Lan
 }
 
 function listUntranslatedKeysInALanguage(language: string, selectedLanguage: LanguageLocale) {
-  const missingKeys = getMissingKeysInLanguage(selectedLanguage);
+  const missingKeys = getMissingKeysInLanguage(selectedLanguage, language);
 
   if (missingKeys.length === 0) {
     console.log('"' + language + '" has no values that need translating.');
+    endProgram();
   } else {
     const keyText = missingKeys.length > 1 ? 'keys' : 'key';
-    console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}:`);
-    missingKeys.forEach((element) => {
-      console.log(`${element}: ` + getTextInLanguage(element as LanguageStringKey) );
+    console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}.`);
+    getUserInput('Would you like to list the missing keys? (y/n) ', (answer: string) => {
+      if (answer.toLowerCase() === 'y') {
+        missingKeys.forEach((element) => {
+          console.log(`${element}: ` + getTextInLanguage(element as LanguageStringKey) );
+        });
+      }
+
+      endProgram();
     });
   }
-
-  endProgram();
 }
 
 function translateAllKeysInALanguage(language: string, selectedLanguage: LanguageLocale) {
-  const missingKeys = getMissingKeysInLanguage(selectedLanguage);
+  const missingKeys = getMissingKeysInLanguage(selectedLanguage, language);
 
   if (missingKeys.length === 0) {
     console.log('"' + language + '" has no values that need translating.');
+    endProgram();
   } else {
     const keyText = missingKeys.length > 1 ? 'keys' : 'key';
-    console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}:`);
+    console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}.`);
 
     const firstElement = missingKeys.shift();
     getNextTranslation(missingKeys, firstElement, language);
@@ -166,11 +173,15 @@ function setValueInLanguage(language: string, key: string, value: string) {
   });
 }
 
-function getMissingKeysInLanguage(selectedLanguage: LanguageLocale): string[] {
+function getMissingKeysInLanguage(selectedLanguage: LanguageLocale, language: string): string[] {
   const missingKeys = [] as string[];
   for (const nestedKey of englishKeys) {
-    if (!localeHasKey(selectedLanguage, nestedKey as LanguageStringKey) && localeHasKey(localeMap['en'], nestedKey as LanguageStringKey)) {
-      missingKeys.push(nestedKey);
+    if (localeHasKey(localeMap['en'], nestedKey as LanguageStringKey)) {
+      const isMissingInLanguage = !localeHasKey(selectedLanguage, nestedKey as LanguageStringKey);
+      const isSameAsEnglish = language != 'en' && getString(selectedLanguage, nestedKey) === getString(localeMap['en'], nestedKey);
+      if (isMissingInLanguage || isSameAsEnglish) {
+        missingKeys.push(nestedKey);
+      }
     }
   }
 
