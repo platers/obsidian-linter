@@ -251,9 +251,9 @@ function getFirstHeaderLink(content: string): string {
   return (
     '#' +
     match[1]
-      .trim()
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '') // remove punctuation
-      .replace(/\s+/g, '-')     // spaces -> dashes
+        .trim()
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '') // remove punctuation
+        .replace(/\s+/g, '-')     // spaces -> dashes
   );
 }
