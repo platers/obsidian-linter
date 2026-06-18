@@ -31,6 +31,21 @@ export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions>
           () => {
             (rulesDict['file-name-heading'].options[0] as BooleanOption).setValue(false);
           }).open();
+          return;
+        }
+
+        // Check for conflict with heading-filename-sync rule
+        const headingFilenameSyncOptions = rulesDict['heading-filename-sync'];
+        if (!headingFilenameSyncOptions) return;
+
+        const headingFilenameSyncEnableOption = headingFilenameSyncOptions.options[0] as BooleanOption;
+        if (value && headingFilenameSyncEnableOption.getValue()) {
+          new ConfirmRuleDisableModal(app, 'rules.file-name-heading.name', 'rules.heading-filename-sync.name', () => {
+            headingFilenameSyncEnableOption.setValue(false);
+          },
+          () => {
+            (rulesDict['file-name-heading'].options[0] as BooleanOption).setValue(false);
+          }).open();
         }
       },
     });
