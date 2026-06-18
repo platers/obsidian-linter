@@ -703,6 +703,20 @@ export default class LinterPlugin extends Plugin {
       noticeText += '\n' + getTextInLanguage('disabled-conflicting-rule-notice').replace('{NAME_1}', getTextInLanguage('rules.paragraph-blank-lines.name')).replace('{NAME_2}', getTextInLanguage('rules.two-spaces-between-lines-with-content.name'));
     }
 
+    if (this.settings.ruleConfigs['sentence-per-line'] && this.settings.ruleConfigs['sentence-per-line'].enabled &&
+      this.settings.ruleConfigs['two-spaces-between-lines-with-content'] && this.settings.ruleConfigs['two-spaces-between-lines-with-content'].enabled
+    ) {
+      this.settings.ruleConfigs['two-spaces-between-lines-with-content'].enabled = false;
+      updateMade = true;
+
+      if (conflictingRulePresent) {
+        noticeText += '\n';
+      }
+      conflictingRulePresent = true;
+
+      noticeText += '\n' + getTextInLanguage('disabled-conflicting-rule-notice').replace('{NAME_1}', getTextInLanguage('rules.two-spaces-between-lines-with-content.name')).replace('{NAME_2}', getTextInLanguage('rules.sentence-per-line.name'));
+    }
+
     if (conflictingRulePresent) {
       new Notice(noticeText, userClickTimeout);
     }
