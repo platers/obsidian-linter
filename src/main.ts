@@ -1,4 +1,4 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer, getLanguage} from 'obsidian';
+import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, WorkspaceLeaf, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer, getLanguage} from 'obsidian';
 import {Options, RuleType, ruleTypeToRules, rules, sortRules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -20,6 +20,7 @@ import {warn} from 'loglevel';
 import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
 import {ChangeSpec} from '@codemirror/state';
 import {downloadMisspellings, readInMisspellingsFile} from './utils/auto-correct-misspellings';
+import {DiffPreviewView, diffPreviewViewType} from './ui/views/diff-preview-view';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -48,6 +49,7 @@ const langToMomentLocale = {
 };
 
 const userClickTimeout = 0;
+const previewLintFileCommandId = 'preview-lint-file';
 
 type FileChangeUpdateInfo = {
   debounceFn: Debouncer<[TFile, Editor], Promise<void>>,
@@ -78,6 +80,7 @@ export default class LinterPlugin extends Plugin {
   private activeFileChangeDebouncer: Map<string, FileChangeUpdateInfo> = new Map();
   private defaultAutoCorrectMisspellings: Map<string, string> = new Map();
   private hasLoadedMisspellingFiles = false;
+  private diffPreviewCommandsRegistered = false;
   private saveSettingsDebounce = debounce(async (settings: LinterSettings) => {
     await this.saveData(settings);
   }, 5000);
@@ -98,6 +101,8 @@ export default class LinterPlugin extends Plugin {
     await this.loadSettings();
 
     this.addCommands();
+    this.registerView(diffPreviewViewType, (leaf) => new DiffPreviewView(leaf));
+    this.updateDiffPreviewViewStatus();
 
     this.registerEventsAndSaveCallback();
 
@@ -129,6 +134,9 @@ export default class LinterPlugin extends Plugin {
     if (typeof this.settings.suppressMessageWhenNoChange !== 'boolean') {
       this.settings.suppressMessageWhenNoChange = false;
     }
+    if (typeof this.settings.enableDiffPreviewView !== 'boolean') {
+      this.settings.enableDiffPreviewView = true;
+    }
     if (typeof this.settings.logLevel === 'number') {
       this.settings.logLevel = convertNumberToLogLevel(this.settings.logLevel);
     }
@@ -140,6 +148,16 @@ export default class LinterPlugin extends Plugin {
     this.updateHasCustomCommandStatus();
   }
 
+  updateDiffPreviewViewStatus() {
+    if (this.settings.enableDiffPreviewView) {
+      this.registerDiffPreviewCommands();
+      return;
+    }
+
+    this.removeDiffPreviewCommands();
+    this.app.workspace.detachLeavesOfType(diffPreviewViewType);
+  }
+
   async saveSettings() {
     if (!this.hasLoadedMisspellingFiles) {
       await this.loadAutoCorrectFiles(false);
@@ -149,6 +167,7 @@ export default class LinterPlugin extends Plugin {
 
     this.updatePasteOverrideStatus();
     this.updateHasCustomCommandStatus();
+    this.updateDiffPreviewViewStatus();
   }
 
   addCommands() {
@@ -261,6 +280,39 @@ export default class LinterPlugin extends Plugin {
       },
       icon: iconInfo.ignoreFile.id,
     });
+
+    this.registerDiffPreviewCommands();
+  }
+
+  registerDiffPreviewCommands() {
+    if (this.diffPreviewCommandsRegistered || !this.settings.enableDiffPreviewView) {
+      return;
+    }
+
+    const that = this;
+    this.addCommand({
+      id: previewLintFileCommandId,
+      name: getTextInLanguage('commands.preview-lint-file.name'),
+      editorCheckCallback(checking, editor, ctx) {
+        if (checking) {
+          return that.isMarkdownFile(ctx.file) && editor.cm != null;
+        }
+
+        void that.previewLinterEditor(editor);
+      },
+      icon: iconInfo.file.id,
+    });
+
+    this.diffPreviewCommandsRegistered = true;
+  }
+
+  removeDiffPreviewCommands() {
+    if (!this.diffPreviewCommandsRegistered) {
+      return;
+    }
+
+    this.removeCommand(previewLintFileCommandId);
+    this.diffPreviewCommandsRegistered = false;
   }
 
   registerEventsAndSaveCallback() {
@@ -612,6 +664,51 @@ export default class LinterPlugin extends Plugin {
       return;
     }
 
+    this.applyEditorTextChange(oldText, newText, editor, file);
+
+    setCollectLogs(false);
+  }
+
+  async previewLinterEditor(editor: Editor) {
+    setCollectLogs(this.settings.recordLintOnSaveLogs);
+    clearLogs();
+
+    logInfo(getTextInLanguage('logs.linter-run'));
+
+    const file = this.app.workspace.getActiveFile();
+    const oldText = editor.getValue();
+    let newText: string;
+    try {
+      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
+    } catch (error) {
+      this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      setCollectLogs(false);
+      return;
+    }
+
+    void this.openDiffPreview(getTextInLanguage('notice-text.lint-preview-title'), oldText, newText, editor, file);
+    setCollectLogs(false);
+  }
+
+  private async openDiffPreview(title: string, oldText: string, newText: string, editor: Editor, file: TFile) {
+    if (!this.settings.enableDiffPreviewView) {
+      return;
+    }
+
+    const leaf = await this.getDiffPreviewLeaf();
+    const view = leaf.view as DiffPreviewView;
+    view.setPreview({
+      title,
+      oldText,
+      newText,
+      applyAction: () => {
+        this.applyEditorTextChange(oldText, newText, editor, file);
+      },
+    });
+    await this.app.workspace.revealLeaf(leaf);
+  }
+
+  private applyEditorTextChange(oldText: string, newText: string, editor: Editor, file: TFile) {
     const changes = this.updateEditor(oldText, newText, editor);
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
@@ -625,8 +722,16 @@ export default class LinterPlugin extends Plugin {
       this.updateFileDebouncerText(file, newText);
       this.editorLintFiles.push(file);
     }
+  }
 
-    setCollectLogs(false);
+  private async getDiffPreviewLeaf(): Promise<WorkspaceLeaf> {
+    let leaf = this.app.workspace.getLeavesOfType(diffPreviewViewType)[0];
+    if (!leaf) {
+      leaf = this.app.workspace.getRightLeaf(false) ?? this.app.workspace.getLeaf('split');
+      await leaf.setViewState({type: diffPreviewViewType, active: true});
+    }
+
+    return leaf;
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
