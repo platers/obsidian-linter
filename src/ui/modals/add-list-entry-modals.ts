@@ -177,7 +177,7 @@ export class CustomCommandModal extends FormModal {
 
   constructor(
       app: App,
-      initial: LintCommand | null,
+      private initial: LintCommand | null,
       private existing: LintCommand[],
       private onSubmitEntry: (command: LintCommand) => void | Promise<void>,
   ) {
@@ -185,13 +185,12 @@ export class CustomCommandModal extends FormModal {
     this.value = initial?.name ?? '';
     this.enabled = initial?.enabled ?? true;
 
-    // TODO: add edit tooltip
-    this.setTitle(getTextInLanguage('options.custom-command.add-input-button-text'));
+    this.setTitle(getTextInLanguage(initial ? 'options.custom-command.edit-tooltip' : 'options.custom-command.add-input-button-text'));
 
     this.addField((field) => {
       field.setName(getTextInLanguage('options.custom-command.command-search-placeholder-text'));
       field.addText((cb) => {
-        new CommandSuggester(app, cb.inputEl, existing);
+        new CommandSuggester(app, cb.inputEl, existing, initial);
         cb.setPlaceholder(getTextInLanguage('options.custom-command.command-search-placeholder-text'))
             .onChange((v) => {
               this.value = v;
@@ -203,6 +202,16 @@ export class CustomCommandModal extends FormModal {
           }
         });
         this.inputEl = cb.inputEl;
+      });
+    });
+
+    this.addField((field) => {
+      field.setName(getTextInLanguage('options.custom-command.enabled'));
+      field.addToggle((cb) => {
+        cb.setValue(this.enabled)
+            .onChange((b) => {
+              this.enabled = b;
+            });
       });
     });
   }
@@ -220,13 +229,13 @@ export class CustomCommandModal extends FormModal {
     }
 
     for (const lintCommand of this.existing) {
-      if (lintCommand.id === id) {
+      if (lintCommand.id === id && (!this.initial || this.initial.id != id)) {
         if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('already-in-list'), {classes: ['mod-error']});
         return;
       }
     }
 
-    void this.onSubmitEntry({enabled: true, id: id, name: value});
+    void this.onSubmitEntry({enabled: this.enabled, id: id, name: value});
     this.close();
   }
 }

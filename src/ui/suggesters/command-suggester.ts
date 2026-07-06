@@ -6,8 +6,13 @@ export default class CommandSuggester extends AbstractInputSuggest<Command> {
       app: App,
       public inputEl: HTMLInputElement,
       public valuesToExclude: LintCommand[] = [],
+      initial: LintCommand | null = null,
   ) {
     super(app, inputEl);
+
+    if (initial) {
+      this.selectSuggestion(initial, null);
+    }
   }
 
   protected getSuggestions(inputStr: string): Command[] {
@@ -26,7 +31,7 @@ export default class CommandSuggester extends AbstractInputSuggest<Command> {
     el.setText(command.name);
   }
 
-  selectSuggestion(command: Command, _evt: MouseEvent | KeyboardEvent): void {
+  selectSuggestion(command: Command, _evt: MouseEvent | KeyboardEvent | null): void {
     this.inputEl.setAttribute('commandId', command.id);
     this.setValue(command.name);
     this.inputEl.trigger('input');

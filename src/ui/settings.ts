@@ -506,7 +506,6 @@ export class SettingTab extends PluginSettingTab {
 
   private customCommandsPage(): SettingDefinitionPage<LinterSettingsKeys> {
     const lintCommands = this.plugin.settings.lintCommands;
-    // TODO: needs enable, disable, and edit
     return this.listManagementPage({
       name: getTextInLanguage('options.custom-command.name'),
       desc: richDescription(getTextInLanguage('options.custom-command.description')),
@@ -514,14 +513,20 @@ export class SettingTab extends PluginSettingTab {
       emptyState: getTextInLanguage('options.custom-command.empty-state'),
       values: lintCommands,
       allowReorder: true,
-      openAddForm: () => new CustomCommandModal(this.app, lintCommands, async (command) => {
+      openAddForm: () => new CustomCommandModal(this.app, null, lintCommands, async (command) => {
         lintCommands.push(command);
+        await this.plugin.saveSettings();
+        this.update();
+      }).open(),
+      openEditForm: (entry, index) => new CustomCommandModal(this.app, entry, lintCommands, async (updated) => {
+        lintCommands[index] = updated;
         await this.plugin.saveSettings();
         this.update();
       }).open(),
       onDelete: (index) => lintCommands.splice(index, 1),
       itemName: (entry) => (entry && entry.name) || getTextInLanguage('options.custom-command.command-search-placeholder-text'),
       itemDesc: (entry) => (entry && entry.id) || '',
+      itemIsDisabled: (entry) => !entry.enabled,
     });
   }
 

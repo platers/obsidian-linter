@@ -273,6 +273,8 @@ export default {
       'move-down-tooltip': 'Move down',
       'delete-tooltip': 'Delete',
       'empty-state': 'No custom commands have been added yet.',
+      'edit-tooltip': 'Edit',
+      'enabled': 'Enabled',
     },
     'custom-replace': {
       // custom-replace-option.ts
