@@ -224,5 +224,21 @@ ruleTest({
         style: 'First letter',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1544
+      testName: 'Make sure words following a word with a starting character from startingWordIgnoreCharacters are not incorrectly capitalized on the second character',
+      before: dedent`
+        # Long Way (Known good)
+        # 'twas the night before christmas
+        # (Here's a heading with nested "ignored characters")
+      `,
+      after: dedent`
+        # Long Way (Known Good)
+        # 'Twas the Night before Christmas
+        # (Here's a Heading with Nested "Ignored Characters")
+      `,
+      options: {
+        style: 'Title Case',
+      },
+    },
   ],
 });
