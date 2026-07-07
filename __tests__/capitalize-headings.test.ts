@@ -224,5 +224,17 @@ ruleTest({
         style: 'First letter',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1544
+      testName: 'Make sure that words in parentheses are correctly capitalized',
+      before: dedent`
+        # Long Way (Known good)
+      `,
+      after: dedent`
+        # Long Way (Known Good)
+      `,
+      options: {
+        style: 'Title Case',
+      },
+    },
   ],
 });
