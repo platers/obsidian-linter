@@ -346,7 +346,6 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       const wordRegex = new RegExp(`^${startingCustomRegexGroup}[\\p{L}’'-]{1,}${endingCustomRegexGroup}$`, 'u');
       const keepCasing = options.ignoreWords;
       const ignoreShortWords = options.lowercaseWords;
-      let indexToCapitalize = 0;
       let firstWord = true;
       for (let j = 1; j < headerWords.length; j++) {
         // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
@@ -355,8 +354,9 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
           continue;
         }
 
+        let indexToCapitalize = 0;
         if (options.startingWordIgnoreCharacters?.includes(headerWords[j][0])) {
-          indexToCapitalize =1;
+          indexToCapitalize = 1;
         }
 
         const ignoreCasedWord = options.ignoreCasedWords && headerWords[j] !== headerWords[j].toLowerCase();
@@ -366,9 +366,9 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
           const ignoreWord = ignoreShortWords.includes(headerWords[j]);
           if ((!ignoreWord && !capitalizeJustFirstLetter) || firstWord === true) {
             if (indexToCapitalize === 0) {
-              headerWords[j] = headerWords[j][indexToCapitalize].toUpperCase() + headerWords[j].slice(indexToCapitalize+1);
+              headerWords[j] = headerWords[j][indexToCapitalize].toUpperCase() + headerWords[j].slice(indexToCapitalize + 1);
             } else {
-              headerWords[j] = headerWords[j][0] + headerWords[j][indexToCapitalize].toUpperCase() + headerWords[j].slice(indexToCapitalize+1);
+              headerWords[j] = headerWords[j][0] + headerWords[j][indexToCapitalize].toUpperCase() + headerWords[j].slice(indexToCapitalize + 1);
             }
           }
         }
