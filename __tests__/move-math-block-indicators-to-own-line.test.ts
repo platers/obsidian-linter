@@ -147,18 +147,27 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/1396
-      testName: 'Math indicators in indented blockquotes should not have unnecessarily lines added',
-      // no dedent so that leading indentation is preserved
-      before: ` > [!important]
- >
- > $$
- > f(x)
- > $$`,
-      after: ` > [!important]
- >
- > $$
- > f(x)
- > $$`,
+      testName: 'Math indicators in indented blockquotes should not have unnecessary blank lines added',
+      before: dedent`
+        ${' '}> [!important]
+        ${' '}>
+        ${' '}> $$
+        ${' '}> f(x)
+        ${' '}> $$
+
+        ${'  '}> $$f(x)$$
+      `,
+      after: dedent`
+        ${' '}> [!important]
+        ${' '}>
+        ${' '}> $$
+        ${' '}> f(x)
+        ${' '}> $$
+
+        ${'  '}> $$
+        ${'  '}> f(x)
+        ${'  '}> $$
+      `,
     },
   ],
 });
