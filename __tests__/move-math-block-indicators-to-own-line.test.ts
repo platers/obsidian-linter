@@ -1,6 +1,6 @@
 import MoveMathBlockIndicatorsToOwnLine from '../src/rules/move-math-block-indicators-to-own-line';
 import dedent from 'ts-dedent';
-import { ruleTest } from './common';
+import {ruleTest} from './common';
 
 ruleTest({
   RuleBuilderClass: MoveMathBlockIndicatorsToOwnLine,
