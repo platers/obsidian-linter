@@ -2,6 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {parseYAML, getYAMLText, loadYAML, setYamlSection, astToString, getEmptyDocument} from '../utils/yaml';
+import {escapeDollarSigns} from '../utils/regex';
 import {Document} from 'yaml';
 import {YamlCSTTokens, YamlNode} from '../typings/yaml';
 import {FlowCollection} from 'yaml/dist/parse/cst';
@@ -130,7 +131,10 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
       newYaml = this.updateDateModifiedIfYamlChanged(oldYaml, newYaml, dateModifiedKey, currentTimeFormatted);
     }
 
-    return text.replace(oldYaml, newYaml);
+    // `newYaml` is used as the replacement string, so any `$` in a YAML value
+    // (e.g. `$$$$`) would be interpreted as a replacement pattern and collapsed.
+    // Escape it the same way formatYAML() already does. See #1532.
+    return text.replace(oldYaml, escapeDollarSigns(newYaml));
   }
   sortAlphabeticallyAsc(previousKey: string, currentKey: string): number {
     previousKey = previousKey.toLowerCase();
