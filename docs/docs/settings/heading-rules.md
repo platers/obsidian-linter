@@ -100,7 +100,7 @@ After:
 
 Alias: `file-name-heading`
 
-Inserts the file name as a H1 heading if no H1 heading exists.
+Inserts the file name as a H1 heading if no H1 heading exists. <b>Note: consider using "Heading and filename sync" instead for more features including updating existing headings and regex prefix/suffix stripping.</b>
 
 
 
@@ -259,6 +259,93 @@ After:
 ### H6
 ## H1
 ### H2
+``````
+</details>
+
+## Heading and filename sync
+
+Alias: `heading-filename-sync`
+
+Keeps the first H1 heading synchronized with the filename. Supersedes the "File name heading" rule.
+
+### Options
+
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `Sync direction` | The direction of synchronization between heading and filename. | `heading-to-filename`: Rename the file to match the H1 heading<br/><br/>`filename-to-heading`: Update the H1 heading to match the filename<br/><br/>`bidirectional`: Keep heading and filename in sync (heading wins on conflict) | `heading-to-filename` |
+| `Filename prefix regex` | Regular expression pattern to strip from the start of the filename before syncing (e.g., <code>^\d{12}_</code> for Zettelkasten timestamps). | N/A |  |
+| `Filename suffix regex` | Regular expression pattern to strip from the end of the filename before syncing. | N/A |  |
+
+
+
+### Examples
+
+<details><summary>Updates existing H1 to match filename</summary>
+
+Before:
+
+`````` markdown
+# Old Title
+Some content here.
+``````
+
+After:
+
+`````` markdown
+# My Note
+Some content here.
+``````
+</details>
+<details><summary>Inserts H1 when none exists</summary>
+
+Before:
+
+`````` markdown
+Some content without a heading.
+``````
+
+After:
+
+`````` markdown
+# My Note
+Some content without a heading.
+``````
+</details>
+<details><summary>Strips Zettelkasten prefix from filename</summary>
+
+Before:
+
+`````` markdown
+# Old Title
+Content here.
+``````
+
+After:
+
+`````` markdown
+# Meeting Notes
+Content here.
+``````
+</details>
+<details><summary>Inserts heading after YAML frontmatter</summary>
+
+Before:
+
+`````` markdown
+---
+tags: [note]
+---
+Content here.
+``````
+
+After:
+
+`````` markdown
+---
+tags: [note]
+---
+# My Note
+Content here.
 ``````
 </details>
 
