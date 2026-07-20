@@ -1,5 +1,5 @@
 import {Editor, MarkdownView, Notice, Plugin, TFile, normalizePath} from 'obsidian';
-import LinterPlugin from 'src/main';
+import LinterPlugin from '../src/main';
 import {obsidianModeTestCases} from './obsidian-mode.test';
 import {setWorkspaceItemMode} from './utils.test';
 import {customCommandTestCases} from './custom-commands.test';

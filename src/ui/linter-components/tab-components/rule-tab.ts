@@ -1,7 +1,7 @@
-import LinterPlugin from 'src/main';
+import LinterPlugin from '../../../main';
 import {Tab} from './tab';
-import {Rule} from 'src/rules';
-import {BooleanOption, SearchOptionInfo} from 'src/option';
+import {Rule} from '../../../rules';
+import {BooleanOption, SearchOptionInfo} from '../../../option';
 import {Setting} from 'obsidian';
 
 export class RuleTab extends Tab {

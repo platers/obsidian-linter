@@ -277,6 +277,12 @@ textarea.full-width {
   margin-top: 8px;
 }
 
+/** disabled text **/
+.disabled-list-entry {
+  color: var(--text-faint);
+}
+
+/** Linter diff prview **/
 .linter-diff-preview-view {
   display: flex;
   flex-direction: column;

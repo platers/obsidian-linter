@@ -208,5 +208,37 @@ ruleTest({
         style: 'First letter',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/619
+      testName: `When a word starts with a character in the list of startingWordIgnoreCharacters, then the second character should be capitalized instead of the first in that word`,
+      before: dedent`
+        # 1. "when there is a bug"
+        # 1. 'when there is a bug'
+        # 1. (when there is a bug)
+      `,
+      after: dedent`
+        # 1. "When there is a bug"
+        # 1. 'When there is a bug'
+        # 1. (When there is a bug)
+      `,
+      options: {
+        style: 'First letter',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1544
+      testName: 'Make sure words following a word with a starting character from startingWordIgnoreCharacters are not incorrectly capitalized on the second character',
+      before: dedent`
+        # Long Way (Known good)
+        # 'twas the night before christmas
+        # (Here's a heading with nested "ignored characters")
+      `,
+      after: dedent`
+        # Long Way (Known Good)
+        # 'Twas the Night before Christmas
+        # (Here's a Heading with Nested "Ignored Characters")
+      `,
+      options: {
+        style: 'Title Case',
+      },
+    },
   ],
 });

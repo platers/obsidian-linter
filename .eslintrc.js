@@ -18,7 +18,8 @@ module.exports = {
     '@typescript-eslint',
     'jest',
     'unicorn',
-    "deprecation",
+    'deprecation',
+    'obsidian-linter',
   ],
   'rules': {
     'camelcase': 'off',
@@ -36,8 +37,10 @@ module.exports = {
       'error',
       {
         'argsIgnorePattern': '(^_)|(options)',
+        'varsIgnorePattern': '^_',
       },
     ],
-    "deprecation/deprecation": "warn",
+    'deprecation/deprecation': 'warn',
+    'obsidian-linter/no-duplicate-ignore-types': 'error',
   },
 };

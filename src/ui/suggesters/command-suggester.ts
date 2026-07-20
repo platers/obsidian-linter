@@ -1,51 +1,39 @@
+import {AbstractInputSuggest, App, Command} from 'obsidian';
 import {LintCommand} from '../linter-components/custom-command-option';
-import {TextInputSuggest} from './suggest';
-import type {App, Command} from 'obsidian';
 
-export default class CommandSuggester extends TextInputSuggest<Command> {
+export default class CommandSuggester extends AbstractInputSuggest<Command> {
   constructor(
-    public app: App,
-    public inputEl: HTMLInputElement,
-    public valuesToExclude: LintCommand[] = [],
+      app: App,
+      public inputEl: HTMLInputElement,
+      public valuesToExclude: LintCommand[] = [],
+      initial: LintCommand | null = null,
   ) {
     super(app, inputEl);
+
+    if (initial) {
+      this.selectSuggestion(initial, null);
+    }
   }
 
-  getSuggestions(input_str: string): Command[] {
-    const all_commands = this.app.commands.listCommands();
-    if (!all_commands) {
-      return [];
-    }
+  protected getSuggestions(inputStr: string): Command[] {
+    const allCommands = this.app.commands.listCommands() ?? [];
+    const selectedId = this.inputEl.getAttribute('commandId');
+    const lower = inputStr.toLowerCase();
 
-    const nonSelectedCommands = all_commands.filter((el: Command) => {
-      for (const selectedCommandInfo of this.valuesToExclude) {
-        if (selectedCommandInfo.id == el.id &&
-          !(this.inputEl.hasAttribute('commandId') && this.inputEl.getAttribute('commandId') == el.id)
-        ) {
-          return false;
-        }
-      }
-
-      return true;
+    return allCommands.filter((cmd) => {
+      const alreadySelected = this.valuesToExclude.some((sel) => sel.id === cmd.id);
+      if (alreadySelected && cmd.id !== selectedId) return false;
+      return cmd.id.contains(lower) || cmd.name.toLowerCase().contains(lower);
     });
-
-    const commands:Command[] = [];
-    const lower_input_str = input_str.toLowerCase();
-    nonSelectedCommands.forEach((command:Command) => {
-      if (command.id.contains(lower_input_str) || command.name.toLowerCase().contains(lower_input_str)) {
-        commands.push(command);
-      }
-    });
-    return commands;
   }
 
   renderSuggestion(command: Command, el: HTMLElement): void {
     el.setText(command.name);
   }
 
-  selectSuggestion(command: Command): void {
-    this.inputEl.value = command.name;
+  selectSuggestion(command: Command, _evt: MouseEvent | KeyboardEvent | null): void {
     this.inputEl.setAttribute('commandId', command.id);
+    this.setValue(command.name);
     this.inputEl.trigger('input');
     this.close();
   }

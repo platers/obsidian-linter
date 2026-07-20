@@ -47,6 +47,40 @@ export function getBoolean<ObjectType>(object: Partial<ObjectType>, path: string
   return null;
 }
 
+// Read a value at a dot-notation path (e.g. 'commonStyles.aliasArrayStyle',
+// 'ruleConfigs.yaml-title.titleKey'). Returns undefined when any segment is missing.
+export function getPath<ObjectType>(object: ObjectType, path: string): unknown {
+  let cursor: unknown = object;
+  for (const part of path.split('.')) {
+    if (cursor === null || typeof cursor !== 'object') {
+      return undefined;
+    }
+    cursor = (cursor as Record<string, unknown>)[part];
+  }
+  return cursor;
+}
+
+// Write a value at a dot-notation path, creating intermediate objects as it walks
+// so partial settings JSON (e.g. a lazily-materialized rule config) doesn't throw.
+export function setPath<ObjectType>(object: ObjectType, path: string, value: unknown): void {
+  const parts = path.split('.');
+  const last = parts.pop();
+  if (last === undefined) {
+    return;
+  }
+
+  let cursor: Record<string, unknown> = object as Record<string, unknown>;
+  for (const part of parts) {
+    let next = cursor[part];
+    if (next === null || typeof next !== 'object') {
+      next = {};
+      cursor[part] = next;
+    }
+    cursor = next as Record<string, unknown>;
+  }
+  cursor[last] = value;
+}
+
 function findValueFromPath<ObjectType>(object: Partial<ObjectType>, path: string): unknown {
   path = path.replace('..', '.'); // convert 2 periods in a row to a single period so we can properly account for the blank key value later on
   const keys = path.split('.');

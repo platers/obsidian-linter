@@ -1,5 +1,5 @@
 import {Notice, setIcon} from 'obsidian';
-import {getTextInLanguage} from 'src/lang/helpers';
+import {getTextInLanguage} from '../../lang/helpers';
 import {hideEl, unhideEl} from '../helpers';
 
 export class TextBoxFull {

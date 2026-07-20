@@ -455,7 +455,7 @@ export default class LinterPlugin extends Plugin {
     // load custom-auto-correct replacements if they exist
     for (const replacementFileInfo of this.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
       if (replacementFileInfo.filePath != '') {
-        const file = this.getFileFromPath(replacementFileInfo.filePath);
+        const file = this.app.vault.getFileByPath(normalizePath(replacementFileInfo.filePath));
         if (file) {
           replacementFileInfo.customReplacements = parseCustomReplacements(stripCr(await this.app.vault.cachedRead(file)));
         }
@@ -1320,15 +1320,6 @@ export default class LinterPlugin extends Plugin {
   private endOfDocument(doc: string) {
     const lines = doc.split('\n');
     return {line: lines.length - 1, ch: lines[lines.length - 1].length};
-  }
-
-  private getFileFromPath(filePath: string): TFile {
-    const file = this.app.vault.getAbstractFileByPath(normalizePath(filePath));
-    if (file instanceof TFile) {
-      return file;
-    }
-
-    return null;
   }
 
   private updateFileDebouncerText(file: TFile, newText: string) {
