@@ -214,6 +214,12 @@ export class SettingTab extends PluginSettingTab {
       control: {type: 'toggle', key: 'suppressMessageWhenNoChange'},
     });
 
+    items.push({
+      name: getTextInLanguage('tabs.general.enable-diff-preview-view.name'),
+      desc: richDescription(getTextInLanguage('tabs.general.enable-diff-preview-view.description')),
+      control: {type: 'toggle', key: 'enableDiffPreviewView'},
+    });
+
     const sysLocale = navigator.language?.toLowerCase();
     const localeOptions: Record<string, string> = {
       'system-default': getTextInLanguage('tabs.general.same-as-system-locale').replace('{SYS_LOCALE}', sysLocale),
