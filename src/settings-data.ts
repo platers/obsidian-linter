@@ -30,6 +30,7 @@ export interface LinterSettings {
   lintOnSave: boolean;
   displayChanged: boolean;
   suppressMessageWhenNoChange?: boolean;
+  enableDiffPreviewView: boolean;
   suppressLintAllFilesConfirmationModal?: boolean;
   suppressLintAllFilesInFolderConfirmationModal?: boolean;
   settingsConvertedToConfigKeyValues: boolean;
@@ -54,6 +55,7 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   recordLintOnSaveLogs: false,
   displayChanged: true,
   suppressMessageWhenNoChange: false,
+  enableDiffPreviewView: true,
   suppressLintAllFilesConfirmationModal: false,
   suppressLintAllFilesInFolderConfirmationModal: false,
   lintOnFileChange: false,

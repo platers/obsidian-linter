@@ -9,6 +9,9 @@ export default {
     'lint-file-unless-ignored': {
       'name': 'Lint the current file unless ignored',
     },
+    'preview-lint-file': {
+      'name': 'Preview lint changes for the current file',
+    },
     'lint-all-files': {
       'name': 'Lint all files in the vault',
       'error-message': 'Lint All Files Error in File',
@@ -106,6 +109,13 @@ export default {
     'characters-added': 'characters added',
     'characters-removed': 'characters removed',
     'copy-to-clipboard-failed': 'Failed to copy text to clipboard: ',
+    'apply-lint-preview': 'Apply',
+    'diff-large-file-warning': 'This file is large. Diff rendering is skipped until you ask for it.',
+    'diff-skipped-lines': '{COUNT} unchanged lines hidden',
+    'diff-summary': '+{LINES_ADDED} lines / -{LINES_REMOVED} lines, +{CHARS_ADDED} chars / -{CHARS_REMOVED} chars',
+    'lint-preview-title': 'Lint preview',
+    'no-preview-changes': 'No changes.',
+    'show-diff': 'Show diff',
   },
 
   // rule-alias-suggester.ts
@@ -175,6 +185,10 @@ export default {
       'suppress-message-when-no-change': {
         'name': 'Suppress message when no change',
         'description': 'If enabled, no message will be shown when no actual changes occur.',
+      },
+      'enable-diff-preview-view': {
+        'name': 'Enable workspace diff preview',
+        'description': 'Show lint preview commands in a dockable workspace view. Turn this off to close the preview view and hide preview commands.',
       },
       'lint-on-file-change': {
         'name': 'Lint on focused file change',
