@@ -190,6 +190,11 @@ export default {
         'name': 'Enable workspace diff preview',
         'description': 'Show lint preview commands in a dockable workspace view. Turn this off to close the preview view and hide preview commands.',
       },
+      'maximum-line-number': {
+        'name': 'Maximum number of lines to lint',
+        'description': 'Skip linting files with more than this many lines. Set to 0 to lint files of any length.',
+        'invalid': 'Enter a whole number of 0 or greater.',
+      },
       'lint-on-file-change': {
         'name': 'Lint on focused file change',
         'description': 'When a file is closed or a new file is swapped to, the previous file is linted.',

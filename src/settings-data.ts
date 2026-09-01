@@ -37,6 +37,7 @@ export interface LinterSettings {
   recordLintOnSaveLogs: boolean;
   lintOnFileChange: boolean;
   displayLintOnFileChangeNotice: boolean;
+  maximumLineNumber: number;
   additionalFileExtensions: string[];
   foldersToIgnore: string[];
   filesToIgnore: FileToIgnore[];
@@ -60,6 +61,7 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   suppressLintAllFilesInFolderConfirmationModal: false,
   lintOnFileChange: false,
   displayLintOnFileChangeNotice: false,
+  maximumLineNumber: 0,
   settingsConvertedToConfigKeyValues: false,
   additionalFileExtensions: [],
   foldersToIgnore: [],
