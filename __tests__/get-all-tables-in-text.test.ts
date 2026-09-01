@@ -141,6 +141,16 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
     expectedPositions: [{startIndex: 22, endIndex: 90}],
   },
   {
+    name: 'matches a table in a blockquote with indentation after the indicator',
+    text: dedent`
+      >     | Looks like a table | Column2 |
+      >     | :--- | ----: |
+      >     | One | More |
+    `,
+    expectedTablesInText: 1,
+    expectedPositions: [{startIndex: 6, endIndex: 82}],
+  },
+  {
     name: 'matches recognizes two separate tables in a blockquote/callout when there is a blank line between them',
     text: dedent`
       > Here is some text
