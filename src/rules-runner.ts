@@ -55,7 +55,11 @@ export class RulesRunner {
   skipFile: boolean;
 
   lintText(runOptions: RunLinterRulesOptions): string {
-    this.skipFile = false;
+    this.skipFile = exceedsMaximumLineNumber(runOptions.oldText, runOptions.settings.maximumLineNumber);
+    if (this.skipFile) {
+      return runOptions.oldText;
+    }
+
     const originalText = runOptions.oldText;
     [this.disabledRules, this.skipFile] = getDisabledRules(originalText);
     if (this.skipFile) {
@@ -306,6 +310,15 @@ export class RulesRunner {
 
     return newText;
   }
+}
+
+export function exceedsMaximumLineNumber(text: string, maximumLineNumber: number): boolean {
+  if (!Number.isInteger(maximumLineNumber) || maximumLineNumber <= 0) {
+    return false;
+  }
+
+  const lineCount = text === '' ? 0 : text.split('\n').length - Number(text.endsWith('\n'));
+  return lineCount > maximumLineNumber;
 }
 
 export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings, defaultMisspellings: Map<string, string>): RunLinterRulesOptions {

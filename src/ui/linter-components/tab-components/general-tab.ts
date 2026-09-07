@@ -62,6 +62,9 @@ export class GeneralTab extends Tab {
     tempDiv = this.contentEl.createDiv();
     this.addSettingSearchInfoForGeneralSettings(new ToggleSetting(tempDiv, 'tabs.general.enable-diff-preview-view.name', 'tabs.general.enable-diff-preview-view.description', 'enableDiffPreviewView', this.plugin));
 
+    tempDiv = this.contentEl.createDiv();
+    this.addSettingSearchInfoForGeneralSettings(new NumberInputSetting(tempDiv, 'tabs.general.maximum-line-number.name', 'tabs.general.maximum-line-number.description', 'maximumLineNumber', this.plugin));
+
     const sysLocale = navigator.language?.toLowerCase();
     const localeValues = ['system-default'];
     const localeDescriptions = [getTextInLanguage('tabs.general.same-as-system-locale').replace('{SYS_LOCALE}', sysLocale)];

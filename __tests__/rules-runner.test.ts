@@ -1,5 +1,5 @@
 import {Command} from 'obsidian';
-import {RulesRunner} from '../src/rules-runner';
+import {exceedsMaximumLineNumber, RulesRunner} from '../src/rules-runner';
 import {CustomReplace} from '../src/ui/linter-components/custom-replace-option';
 import dedent from 'ts-dedent';
 import {LintCommand} from 'src/ui/linter-components/custom-command-option';
@@ -288,6 +288,12 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
 ];
 
 describe('Rules Runner', () => {
+  it('skips files with more lines than the configured maximum', () => {
+    expect(exceedsMaximumLineNumber('first\nsecond\nthird', 2)).toBe(true);
+    expect(exceedsMaximumLineNumber('first\nsecond\n', 2)).toBe(false);
+    expect(exceedsMaximumLineNumber('first\nsecond', 0)).toBe(false);
+  });
+
   // custom commands
   for (const testCase of customCommandTestCases) {
     it(testCase.testName, () => {

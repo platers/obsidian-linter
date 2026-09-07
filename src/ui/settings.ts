@@ -220,6 +220,17 @@ export class SettingTab extends PluginSettingTab {
       control: {type: 'toggle', key: 'enableDiffPreviewView'},
     });
 
+    items.push({
+      name: getTextInLanguage('tabs.general.maximum-line-number.name'),
+      desc: richDescription(getTextInLanguage('tabs.general.maximum-line-number.description')),
+      control: {
+        type: 'number',
+        key: 'maximumLineNumber',
+        min: 0,
+        validate: (value) => Number.isInteger(value) && value >= 0 ? undefined : getTextInLanguage('tabs.general.maximum-line-number.invalid'),
+      },
+    });
+
     const sysLocale = navigator.language?.toLowerCase();
     const localeOptions: Record<string, string> = {
       'system-default': getTextInLanguage('tabs.general.same-as-system-locale').replace('{SYS_LOCALE}', sysLocale),
