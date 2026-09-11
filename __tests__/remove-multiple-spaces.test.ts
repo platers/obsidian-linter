@@ -168,6 +168,21 @@ ruleTest({
       `,
     },
     {
+      testName: 'Tables indented after a blockquote indicator are ignored',
+      before: dedent`
+        >     | Field | Length | Value | Description |
+        >     |---|---|---|---|
+        >     | Header | 2 | 0x55 0xAA | |
+        >     | Version | 1 | 0x00 | |
+      `,
+      after: dedent`
+        >     | Field | Length | Value | Description |
+        >     |---|---|---|---|
+        >     | Header | 2 | 0x55 0xAA | |
+        >     | Version | 1 | 0x00 | |
+      `,
+    },
+    {
       testName: 'Multiple spaces after ">" are still removed if not the start of a line',
       before: dedent`
         # Text with > with multiple spaces after it
