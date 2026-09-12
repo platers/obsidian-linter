@@ -1,7 +1,7 @@
 import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex, urlRegex, anchorTagRegex, templaterCommandRegex, footnoteDefinitionIndicatorAtStartOfLine} from './regex';
 import {getAllCustomIgnoreSectionsInText, getAllTablesInText, getPositions, MDAstTypes} from './mdast';
 import type {Position} from 'unist';
-import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
+import {hashString53Bit, replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 export type IgnoreFunction = ((text: string, placeholder: string) => [placeholderInfo[], string]);
 export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string};
@@ -79,6 +79,52 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
  * @return {string} The text with mdast nodes types specified replaced
  * @return {placeholderInfo[]} The mdast nodes values replaced and generated placeholder
  */
+type rangeToMask = {startIndex: number, endIndex: number, placeholder: string}
+
+/**
+ * Swaps each of the provided ranges out for its placeholder.
+ *
+ * Replacing the ranges one at a time rebuilds the entire document on every range, which is
+ * quadratic in the size of the document. When the ranges are in descending order and do not
+ * overlap, the same result can be assembled in a single pass. Overlapping ranges fall back to the
+ * original behaviour, because there the offsets of a later range refer to text that an earlier
+ * replacement has already shifted.
+ * @param {string} text The text to mask the ranges in
+ * @param {rangeToMask[]} ranges The ranges to mask, in the order they should be replaced
+ * @return {string} The text with each range replaced by its placeholder
+ */
+function maskRanges(text: string, ranges: rangeToMask[]): string {
+  let previousStartIndex = text.length;
+  let isDescendingAndDisjoint = true;
+  for (const range of ranges) {
+    if (range.endIndex > previousStartIndex || range.startIndex > range.endIndex) {
+      isDescendingAndDisjoint = false;
+      break;
+    }
+
+    previousStartIndex = range.startIndex;
+  }
+
+  if (!isDescendingAndDisjoint) {
+    for (const range of ranges) {
+      text = replaceTextBetweenStartAndEndWithNewValue(text, range.startIndex, range.endIndex, range.placeholder);
+    }
+
+    return text;
+  }
+
+  const segments: string[] = [];
+  let endOfNextSegment = text.length;
+  for (const range of ranges) {
+    segments.push(text.substring(range.endIndex, endOfNextSegment));
+    segments.push(range.placeholder);
+    endOfNextSegment = range.startIndex;
+  }
+  segments.push(text.substring(0, endOfNextSegment));
+
+  return segments.reverse().join('');
+}
+
 function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): [placeholderInfo[], string] {
   let positions: Position[] = getPositions(type, text);
   const replacedValues: placeholderInfo[] = [];
@@ -87,15 +133,16 @@ function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): 
     positions = removeOverlappingPositions(positions);
   }
 
+  const nextPlaceholder = createPlaceholderGenerator(text, placeholder);
+  const ranges: rangeToMask[] = [];
   for (const position of positions) {
     const valueToReplace = text.substring(position.start.offset, position.end.offset);
-    replacedValues.push({placeholder: getNewPlaceHolder(placeholder), replacedValue: valueToReplace});
+    const newPlaceholder = nextPlaceholder();
+    replacedValues.push({placeholder: newPlaceholder, replacedValue: valueToReplace});
+    ranges.push({startIndex: position.start.offset, endIndex: position.end.offset, placeholder: newPlaceholder});
   }
 
-  let i = 0;
-  for (const position of positions) {
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, replacedValues[i++].placeholder);
-  }
+  text = maskRanges(text, ranges);
 
   // Reverse the replaced values so that they are in the same order as the original text
   replacedValues.reverse();
@@ -113,17 +160,18 @@ function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): 
  */
 function replaceRegex(text: string, placeholder: string, regex: RegExp): [placeholderInfo[], string] {
   const textMatches: placeholderInfo[] = [];
+  const nextPlaceholder = createPlaceholderGenerator(text, placeholder);
 
   if (regex.flags.includes('g')) {
     text = text.replaceAll(regex, (match: string) => {
-      const id = getNewPlaceHolder(placeholder);
+      const id = nextPlaceholder();
       textMatches.push({placeholder: id, replacedValue: match});
 
       return id;
     });
   } else {
     text = text.replace(regex, (match: string) => {
-      const id = getNewPlaceHolder(placeholder);
+      const id = nextPlaceholder();
       textMatches.push({placeholder: id, replacedValue: match});
 
       return id;
@@ -143,6 +191,7 @@ function replaceRegex(text: string, placeholder: string, regex: RegExp): [placeh
 function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): [placeholderInfo[], string] {
   const positions: Position[] = getPositions(MDAstTypes.Link, text);
   const replacedRegularLinks: placeholderInfo[] = [];
+  const nextPlaceholder = createPlaceholderGenerator(text, regularLinkPlaceholder);
 
 
   const positionsToReplace: Position [] = [];
@@ -158,13 +207,15 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): [pl
     }
 
     positionsToReplace.push(position);
-    replacedRegularLinks.push({placeholder: getNewPlaceHolder(regularLinkPlaceholder), replacedValue: regularLink});
+    replacedRegularLinks.push({placeholder: nextPlaceholder(), replacedValue: regularLink});
   }
 
   let i = 0;
-  for (const position of positionsToReplace) {
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, replacedRegularLinks[i++].placeholder);
-  }
+  text = maskRanges(text, positionsToReplace.map((position) => ({
+    startIndex: position.start.offset,
+    endIndex: position.end.offset,
+    placeholder: replacedRegularLinks[i++].placeholder,
+  })));
 
   // Reverse the regular links so that they are in the same order as the original text
   replacedRegularLinks.reverse();
@@ -174,9 +225,10 @@ function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): [pl
 
 function replaceTags(text: string, placeholder: string): [placeholderInfo[], string] {
   const replacedValues: placeholderInfo[] = [];
+  const nextPlaceholder = createPlaceholderGenerator(text, placeholder);
 
   text = text.replace(tagWithLeadingWhitespaceRegex, (_, whitespace, tag: string) => {
-    const id = getNewPlaceHolder(placeholder);
+    const id = nextPlaceholder();
 
     replacedValues.push({placeholder: id, replacedValue: tag});
     return whitespace + id;
@@ -189,16 +241,19 @@ function replaceTables(text: string, tablePlaceholder: string): [placeholderInfo
   const tablePositions = getAllTablesInText(text);
 
   const replacedTables: placeholderInfo[] = new Array<placeholderInfo>(tablePositions.length);
+  const nextPlaceholder = createPlaceholderGenerator(text, tablePlaceholder);
   let index = 0;
   const length = replacedTables.length;
   for (const tablePosition of tablePositions) {
-    replacedTables[length - 1 - index++] = {placeholder: getNewPlaceHolder(tablePlaceholder), replacedValue: text.substring(tablePosition.startIndex, tablePosition.endIndex)};
+    replacedTables[length - 1 - index++] = {placeholder: nextPlaceholder(), replacedValue: text.substring(tablePosition.startIndex, tablePosition.endIndex)};
   }
 
   let i = length -1;
-  for (const tablePosition of tablePositions) {
-    text = replaceTextBetweenStartAndEndWithNewValue(text, tablePosition.startIndex, tablePosition.endIndex, replacedTables[i--].placeholder);
-  }
+  text = maskRanges(text, tablePositions.map((tablePosition) => ({
+    startIndex: tablePosition.startIndex,
+    endIndex: tablePosition.endIndex,
+    placeholder: replacedTables[i--].placeholder,
+  })));
 
   return [replacedTables, text];
 }
@@ -208,16 +263,19 @@ function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): [pl
   const customIgnorePositions = getAllCustomIgnoreSectionsInText(text);
 
   const replacedSections: placeholderInfo[] = new Array<placeholderInfo>(customIgnorePositions.length);
+  const nextPlaceholder = createPlaceholderGenerator(text, customIgnorePlaceholder);
   let index = 0;
   const length = replacedSections.length;
   for (const customIgnorePosition of customIgnorePositions) {
-    replacedSections[length - 1 - index++] = {placeholder: getNewPlaceHolder(customIgnorePlaceholder), replacedValue: text.substring(customIgnorePosition.startIndex, customIgnorePosition.endIndex)};
+    replacedSections[length - 1 - index++] = {placeholder: nextPlaceholder(), replacedValue: text.substring(customIgnorePosition.startIndex, customIgnorePosition.endIndex)};
   }
 
   let i = length - 1;
-  for (const customIgnorePosition of customIgnorePositions) {
-    text = replaceTextBetweenStartAndEndWithNewValue(text, customIgnorePosition.startIndex, customIgnorePosition.endIndex, replacedSections[i--].placeholder);
-  }
+  text = maskRanges(text, customIgnorePositions.map((customIgnorePosition) => ({
+    startIndex: customIgnorePosition.startIndex,
+    endIndex: customIgnorePosition.endIndex,
+    placeholder: replacedSections[i--].placeholder,
+  })));
 
   return [replacedSections, text];
 }
@@ -241,18 +299,42 @@ function removeOverlappingPositions(positions: Position[]): Position[] {
   return result;
 }
 
-function getNewPlaceHolder(placeholder: string): string {
-  if (placeholder.includes('---')) {
-    return placeholder;
+/**
+ * Creates the function that hands out the placeholders for masking a single ignore type.
+ *
+ * The suffix is derived from the text being masked instead of being random so that masking the
+ * same text twice produces the exact same output. Rules are run one after another over a document
+ * and most of them leave it untouched, so reproducible masking lets the parsed markdown cache be
+ * reused instead of reparsing the whole document for every rule.
+ *
+ * The seed is probed against the text first, which guarantees the generated placeholders cannot
+ * collide with content that is already in the document, nor with the placeholders of an enclosing
+ * `ignoreListOfTypes` call, since those are part of the text being masked here.
+ * @param {string} text The text that is about to be masked
+ * @param {string} placeholder The placeholder template for the ignore type being masked
+ * @return {function(): string} A function returning a new unique placeholder on each call
+ */
+function createPlaceholderGenerator(text: string, placeholder: string): () => string {
+  // a 53 bit hash is at most 11 base 36 digits, so seed and counter together keep the suffix the
+  // same length as the random one it replaces, which keeps the masked text the same shape as before
+  let attempt = 0;
+  let seed = hashString53Bit(text, attempt).toString(36).padStart(11, '0');
+  while (text.includes(seed)) {
+    seed = hashString53Bit(text, ++attempt).toString(36).padStart(11, '0');
   }
 
-  // This is not a true uuid, but it gets the job done, so I will use this and avoid trying to figure out
-  // how to use crypto with this logic here
-  // from https://gist.github.com/prashant1k99/e11b01a01dead835a1382a596d50e31d
-  const uuid = Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
-  if (placeholder.endsWith('}')) {
-    return placeholder.replace('}', uuid + '}');
-  }
+  let count = 0;
 
-  return placeholder + uuid;
+  return (): string => {
+    if (placeholder.includes('---')) {
+      return placeholder;
+    }
+
+    const uniqueSuffix = seed + (count++).toString(36).padStart(5, '0');
+    if (placeholder.endsWith('}')) {
+      return placeholder.replace('}', uniqueSuffix + '}');
+    }
+
+    return placeholder + uniqueSuffix;
+  };
 }

@@ -17,7 +17,13 @@ import QuickLRU from 'quick-lru';
 import {countInstances} from './strings';
 import {getTextInLanguage} from '../lang/helpers';
 
-const LRU = new QuickLRU({maxSize: 200});
+type ParsedText = {
+  text: string,
+  ast: Root,
+  positionsByType: Map<string, Position[]>,
+}
+
+const LRU = new QuickLRU<number, ParsedText>({maxSize: 200});
 
 type PositionPlusEmptyIndicator = {
   position: Position,
@@ -75,10 +81,13 @@ export enum LineBreakIndicators {
   Backslash = '\\',
 }
 
-function parseTextToAST(text: string): Root {
+function parseText(text: string): ParsedText {
   const textHash = hashString53Bit(text);
-  if (LRU.has(textHash)) {
-    return LRU.get(textHash) as Root;
+  const cached = LRU.get(textHash);
+  // the hash is only 53 bits, so it is used as a bucket and the exact text still has to be
+  // compared to avoid handing back the AST of a different document on a hash collision
+  if (cached && cached.text === text) {
+    return cached;
   }
 
   // @ts-expect-error for some reason an overload is missing
@@ -93,9 +102,14 @@ function parseTextToAST(text: string): Root {
     ],
   });
 
-  LRU.set(textHash, ast);
+  const parsedText = {text, ast, positionsByType: new Map<string, Position[]>()};
+  LRU.set(textHash, parsedText);
 
-  return ast;
+  return parsedText;
+}
+
+function parseTextToAST(text: string): Root {
+  return parseText(text).ast;
 }
 
 /**
@@ -105,15 +119,22 @@ function parseTextToAST(text: string): Root {
  * @return {Position[]} The positions of the given element type in the given text
  */
 export function getPositions(type: MDAstTypes, text: string): Position[] {
-  const ast = parseTextToAST(text);
-  const positions: Position[] = [];
-  visit(ast, type as string, (node) => {
-    positions.push(node.position);
-  });
+  const parsedText = parseText(text);
 
-  // Sort positions by start position in reverse order
-  positions.sort((a, b) => b.start.offset - a.start.offset);
-  return positions;
+  let positions: Position[] = parsedText.positionsByType.get(type);
+  if (positions === undefined) {
+    positions = [];
+    visit(parsedText.ast, type as string, (node) => {
+      positions.push(node.position);
+    });
+
+    // Sort positions by start position in reverse order
+    positions.sort((a, b) => b.start.offset - a.start.offset);
+    parsedText.positionsByType.set(type, positions);
+  }
+
+  // callers are free to mutate the returned array, so the cached one is never handed out directly
+  return positions.slice();
 }
 
 /**
