@@ -110,11 +110,7 @@ describe('masking round trips', () => {
     });
   }
 
-  // Nested blockquotes are the one node type that reports overlapping positions, which masking has
-  // never handled: the outer quote is replaced first and the inner quote is then replaced using
-  // offsets that belong to the unmasked text. Masking only restores this correctly once
-  // overlapping positions are collapsed the way list positions already are.
-  it.failing('restores the original text for nested blockquotes', () => {
+  it('restores the original text for nested blockquotes', () => {
     const text = dedent`
       > outer quote
       > > inner quote
