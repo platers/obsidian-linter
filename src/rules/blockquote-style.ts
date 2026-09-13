@@ -44,7 +44,14 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
 
     return startOfLine.replace(/>[ \t]+/g, '>');
   }
-  addSpaceToIndicator(this:void, startOfLine: string, isListItemMarkerLine: boolean): string {
+  addSpaceToIndicator(this:void, startOfLine: string, isListItemMarkerLine: boolean, lineHasContent: boolean = true): string {
+    // A blockquote line with nothing on it gets no space after its indicator. Adding one leaves
+    // trailing whitespace that "trailing spaces" then removes, so with both rules on the two would
+    // undo each other forever and the file would never settle.
+    if (!lineHasContent) {
+      return startOfLine.replace(/>([^ >])/g, '> $1').replace(/>>/g, '> >').replace(/[ \t]+$/, '');
+    }
+
     // first we add spaces to blockquote indicators that are not followed by a space and then to catch any that were not handled already
     // we make sure to add a space between any 2 indicators that are side by side
     const newStartOfLine = startOfLine.replace(/>([^ ]|$)/g, '> $1').replace(/>>/g, '> >');
@@ -55,7 +62,7 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
     // since we are not dealing with a list item or checklist line, we can go ahead and remove multiple spaces
     return newStartOfLine.replace(/>(?:[ \t]{2,}|\t+)/g, '> ');
   }
-  updateBlockquoteLines(blockquote: string, startOfLineModification: (startOfLine: string, isListMarker: boolean) => string): string {
+  updateBlockquoteLines(blockquote: string, startOfLineModification: (startOfLine: string, isListMarker: boolean, lineHasContent: boolean) => string): string {
     let currentIndex = 0;
     let nextNewLine: number;
     let startOfLine: string;
@@ -89,7 +96,7 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
       }
 
       const isListItemMarker = startsWithListMarkerRegex.test(restOfLine);
-      updatedStartOfLine = startOfLineModification(startOfLine, isListItemMarker);
+      updatedStartOfLine = startOfLineModification(startOfLine, isListItemMarker, restOfLine.trim() !== '');
 
 
       // since start of index refers to where the new line character is

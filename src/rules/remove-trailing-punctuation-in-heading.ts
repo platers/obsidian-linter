@@ -30,9 +30,16 @@ export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<Remo
           }
 
           const trimmedHeaderText = $4.trimEnd();
-          const lastHeadingChar = trimmedHeaderText.charAt(trimmedHeaderText.length - 1);
-          if (options.punctuationToRemove.includes(lastHeadingChar)) {
-            return $1 + $2 + $3 + $4.substring(0, trimmedHeaderText.length - 1) + $4.substring(trimmedHeaderText.length) + $5;
+          // all of the trailing punctuation goes in one pass. Removing only the last character
+          // meant a heading ending in several of them needed a lint per character, so the file
+          // kept changing every time it was linted and lost a character each time.
+          let endOfHeadingText = trimmedHeaderText.length;
+          while (endOfHeadingText > 0 && options.punctuationToRemove.includes(trimmedHeaderText.charAt(endOfHeadingText - 1))) {
+            endOfHeadingText--;
+          }
+
+          if (endOfHeadingText !== trimmedHeaderText.length) {
+            return $1 + $2 + $3 + $4.substring(0, endOfHeadingText) + $4.substring(trimmedHeaderText.length) + $5;
           }
 
           return heading;
