@@ -17,6 +17,9 @@ import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
 import QuickLRU from 'quick-lru';
 import {countInstances} from './strings';
 import {getTextInLanguage} from '../lang/helpers';
+import {DocumentProjection} from './document-projection';
+import {TextRange} from './ignore-types';
+import {getEditsBetween} from './text-edits';
 
 type ParsedText = {
   text: string,
@@ -799,60 +802,128 @@ export function updateListItemText(text: string, func:(text: string) => string, 
   return replaceTextRanges(text, replacements);
 }
 
-export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
-  const positions: Position[] = getPositions(MDAstTypes.Code, text);
+function getProjectedNodeRanges(type: MDAstTypes, projection: DocumentProjection): TextRange[] {
+  const ranges: TextRange[] = [];
+  for (const position of getPositions(type, projection.source)) {
+    const startIndex = projection.sourceToProjection(position.start.offset);
+    const endIndex = projection.sourceToProjection(position.end.offset);
+    if (startIndex !== undefined && endIndex !== undefined && !projection.isToken(startIndex)) {
+      ranges.push({startIndex, endIndex});
+    }
+  }
+
+  return ranges;
+}
+
+function applyProjectedChanges(projection: DocumentProjection, projectedText: string): string {
+  const replacements: textReplacement[] = [];
+  for (const edit of getEditsBetween(projection.text, projectedText)) {
+    const range = projection.editRangeToSource(edit);
+    if (range) {
+      replacements.push({...range, value: edit.value});
+    }
+  }
+
+  replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+  if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+    throw new Error('Rule replacements must be ordered and non-overlapping');
+  }
+  return replaceTextRanges(projection.source, replacements);
+}
+
+function getProjectedInlineMathRangesAfterBlockChanges(projection: DocumentProjection, projectedText: string): TextRange[] {
+  // The old second pass reparsed after updating block math. Use the original inline nodes and
+  // shift their boundaries past the first pass's edits instead; the decision view is never parsed.
+  const edits = getEditsBetween(projection.text, projectedText);
+  const shiftOffset = (offset: number): number | undefined => {
+    let shift = 0;
+    for (const edit of edits) {
+      if (edit.startIndex > offset) {
+        break;
+      }
+      if (edit.endIndex > offset) {
+        return undefined;
+      }
+      shift += edit.value.length - (edit.endIndex - edit.startIndex);
+    }
+
+    return offset + shift;
+  };
+
+  const ranges: TextRange[] = [];
+  for (const range of getProjectedNodeRanges(MDAstTypes.InlineMath, projection)) {
+    const startIndex = shiftOffset(range.startIndex);
+    const endIndex = shiftOffset(range.endIndex);
+    if (startIndex !== undefined && endIndex !== undefined) {
+      ranges.push({startIndex, endIndex});
+    }
+  }
+
+  return ranges;
+}
+
+export function ensureEmptyLinesAroundFencedCodeBlocks(text: string, protectedRanges: ProtectedRanges): string {
+  const projection = protectedRanges.projection();
+  let projectedText = projection.text;
+  const positions = getProjectedNodeRanges(MDAstTypes.Code, projection);
 
   for (const position of positions) {
-    const codeBlock = text.substring(position.start.offset, position.end.offset);
+    const codeBlock = projectedText.substring(position.startIndex, position.endIndex);
     if (!codeBlock.startsWith('```') && ! codeBlock.startsWith(`~~~`)) {
       continue;
     }
 
-    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+    projectedText = makeSureContentHasEmptyLinesAddedBeforeAndAfter(projectedText, position.startIndex, position.endIndex);
   }
 
-  return text;
+  return applyProjectedChanges(projection, projectedText);
 }
 
-export function ensureEmptyLinesAroundMathBlock(text: string, numberOfDollarSignsForMathBlock: number): string {
-  let positions: Position[] = getPositions(MDAstTypes.Math, text);
+export function ensureEmptyLinesAroundMathBlock(text: string, numberOfDollarSignsForMathBlock: number, protectedRanges: ProtectedRanges): string {
+  const projection = protectedRanges.projection();
+  let projectedText = projection.text;
+  let positions = getProjectedNodeRanges(MDAstTypes.Math, projection);
   for (const position of positions) {
-    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+    projectedText = makeSureContentHasEmptyLinesAddedBeforeAndAfter(projectedText, position.startIndex, position.endIndex);
   }
 
-  positions = getPositions(MDAstTypes.InlineMath, text);
+  positions = getProjectedInlineMathRangesAfterBlockChanges(projection, projectedText);
   for (const position of positions) {
-    if (!text.substring(position.start.offset, position.end.offset).startsWith('$'.repeat(numberOfDollarSignsForMathBlock))) {
+    if (!projectedText.substring(position.startIndex, position.endIndex).startsWith('$'.repeat(numberOfDollarSignsForMathBlock))) {
       continue;
     }
 
-    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+    projectedText = makeSureContentHasEmptyLinesAddedBeforeAndAfter(projectedText, position.startIndex, position.endIndex);
   }
 
-  return text;
+  return applyProjectedChanges(projection, projectedText);
 }
 
-export function ensureEmptyLinesAroundBlockquotes(text: string): string {
-  const positions: Position[] = getPositions(MDAstTypes.Blockquote, text);
+export function ensureEmptyLinesAroundBlockquotes(text: string, protectedRanges: ProtectedRanges): string {
+  const projection = protectedRanges.projection();
+  let projectedText = projection.text;
+  const positions = getProjectedNodeRanges(MDAstTypes.Blockquote, projection);
   for (const position of positions) {
     // make sure to shift end to the next new line character just in case blockquotes are nested which can cause changes to move content out of the original position expected
-    let endIndex = position.end.offset;
-    while (endIndex < text.length - 1 && text.charAt(endIndex) !== '\n') {
+    let endIndex = position.endIndex;
+    while (endIndex < projectedText.length - 1 && projectedText.charAt(endIndex) !== '\n') {
       endIndex++;
     }
 
-    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, endIndex, true);
+    projectedText = makeSureContentHasEmptyLinesAddedBeforeAndAfter(projectedText, position.startIndex, endIndex, true);
   }
 
-  return text;
+  return applyProjectedChanges(projection, projectedText);
 }
 
-export function ensureEmptyLinesAroundHorizontalRule(text: string): string {
-  const positions: Position[] = getPositions(MDAstTypes.HorizontalRule, text);
+export function ensureEmptyLinesAroundHorizontalRule(text: string, protectedRanges: ProtectedRanges): string {
+  const projection = protectedRanges.projection();
+  let projectedText = projection.text;
+  const positions = getProjectedNodeRanges(MDAstTypes.HorizontalRule, projection);
   for (const position of positions) {
-    text = makeSureContentHasEmptyLinesAddedBeforeAndAfter(text, position.start.offset, position.end.offset);
+    projectedText = makeSureContentHasEmptyLinesAddedBeforeAndAfter(projectedText, position.startIndex, position.endIndex);
   }
-  return text;
+  return applyProjectedChanges(projection, projectedText);
 }
 
 export function updateOrderedListItemIndicators(text: string, orderedListStyle: OrderListItemStyles, orderedListEndStyle: OrderListItemEndOfIndicatorStyles, preserveStart: boolean, protectedRanges: ProtectedRanges): string {
@@ -1034,29 +1105,33 @@ export function updateBlockquotes(text: string, prepareUpdate: (text: string, of
 }
 
 
-export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numberOfDollarSignsForMathBlock: number): string {
-  let positions: Position[] = getPositions(MDAstTypes.Math, text);
+export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numberOfDollarSignsForMathBlock: number, protectedRanges: ProtectedRanges): string {
+  const projection = protectedRanges.projection();
+  let projectedText = projection.text;
+  let positions = getProjectedNodeRanges(MDAstTypes.Math, projection);
   const mathOpeningIndicatorRegex = new RegExp('^(\\${' + numberOfDollarSignsForMathBlock + ',})(\\n*)');
   const mathEndingIndicatorRegex = new RegExp('(\\n*)(\\${' + numberOfDollarSignsForMathBlock + ',})([^\\$]*)$');
   for (const position of positions) {
-    const mathBlock = text.substring(position.start.offset, position.end.offset);
-    const mathBlockIndexes = breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock, numberOfDollarSignsForMathBlock, position.start.offset);
+    const mathBlock = projectedText.substring(position.startIndex, position.endIndex);
+    const mathBlockIndexes = breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock, numberOfDollarSignsForMathBlock, position.startIndex);
 
+    // These ranges can overlap (notably with three indicators). Preserve the sequential rewrites
+    // on the decision view; collecting independent replacements here duplicates math delimiters.
     for (const blockIndexes of mathBlockIndexes) {
-      text = addBlankLinesAroundStartAndStopMathIndicators(text, blockIndexes.startIndex, blockIndexes.endIndex, mathOpeningIndicatorRegex, mathEndingIndicatorRegex);
+      projectedText = addBlankLinesAroundStartAndStopMathIndicators(projectedText, blockIndexes.startIndex, blockIndexes.endIndex, mathOpeningIndicatorRegex, mathEndingIndicatorRegex);
     }
   }
 
-  positions = getPositions(MDAstTypes.InlineMath, text);
+  positions = getProjectedInlineMathRangesAfterBlockChanges(projection, projectedText);
   for (const position of positions) {
-    if (!text.substring(position.start.offset, position.end.offset).startsWith('$'.repeat(numberOfDollarSignsForMathBlock))) {
+    if (!projectedText.substring(position.startIndex, position.endIndex).startsWith('$'.repeat(numberOfDollarSignsForMathBlock))) {
       continue;
     }
 
-    text = addBlankLinesAroundStartAndStopMathIndicators(text, position.start.offset, position.end.offset, mathOpeningIndicatorRegex, mathEndingIndicatorRegex);
+    projectedText = addBlankLinesAroundStartAndStopMathIndicators(projectedText, position.startIndex, position.endIndex, mathOpeningIndicatorRegex, mathEndingIndicatorRegex);
   }
 
-  return text;
+  return applyProjectedChanges(projection, projectedText);
 }
 
 function breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock: string, numberOfDollarSignsForMathBlock: number, startIndexOfMathBlock: number): {startIndex: number, endIndex: number}[] {

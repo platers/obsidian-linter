@@ -2,6 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ensureEmptyLinesAroundBlockquotes} from '../utils/mdast';
+import {ProtectedRanges} from '../utils/protected-ranges';
 
 class EmptyLineAroundBlockquotesOptions implements Options {}
 
@@ -12,13 +13,14 @@ export default class EmptyLineAroundBlockquotes extends RuleBuilder<EmptyLineAro
       nameKey: 'rules.empty-line-around-blockquotes.name',
       descriptionKey: 'rules.empty-line-around-blockquotes.description',
       type: RuleType.SPACING,
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => EmptyLineAroundBlockquotesOptions {
     return EmptyLineAroundBlockquotesOptions;
   }
-  apply(text: string, options: EmptyLineAroundBlockquotesOptions): string {
-    return ensureEmptyLinesAroundBlockquotes(text);
+  apply(text: string, options: EmptyLineAroundBlockquotesOptions, protectedRanges: ProtectedRanges): string {
+    return ensureEmptyLinesAroundBlockquotes(text, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundBlockquotesOptions>[] {
     return [

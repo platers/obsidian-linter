@@ -2,6 +2,7 @@ import dedent from 'ts-dedent';
 import {Options, RuleType} from '../rules';
 import {ensureEmptyLinesAroundHorizontalRule} from '../utils/mdast';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import {ProtectedRanges} from '../utils/protected-ranges';
 
 class EmptyLineAroundHorizontalRulesOptions implements Options {}
 
@@ -12,13 +13,14 @@ export default class EmptyLineAroundHorizontalRules extends RuleBuilder<EmptyLin
       nameKey: 'rules.empty-line-around-horizontal-rules.name',
       descriptionKey: 'rules.empty-line-around-horizontal-rules.description',
       type: RuleType.SPACING,
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => EmptyLineAroundHorizontalRulesOptions {
     return EmptyLineAroundHorizontalRulesOptions;
   }
-  apply(text: string, options: EmptyLineAroundHorizontalRulesOptions): string {
-    return ensureEmptyLinesAroundHorizontalRule(text);
+  apply(text: string, options: EmptyLineAroundHorizontalRulesOptions, protectedRanges: ProtectedRanges): string {
+    return ensureEmptyLinesAroundHorizontalRule(text, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundHorizontalRulesOptions>[] {
     return [
