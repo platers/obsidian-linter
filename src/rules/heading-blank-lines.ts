@@ -20,7 +20,6 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
       descriptionKey: 'rules.heading-blank-lines.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => HeadingBlankLinesOptions {

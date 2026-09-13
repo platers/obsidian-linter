@@ -20,7 +20,6 @@ export default class RemoveSpaceBeforeOrAfterCharacters extends RuleBuilder<Remo
       descriptionKey: 'rules.remove-space-before-or-after-characters.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveSpaceBeforeOrAfterCharactersOptions {
@@ -61,7 +60,7 @@ export default class RemoveSpaceBeforeOrAfterCharacters extends RuleBuilder<Remo
 
     for (const {position} of getListItemTextPositions(text)) {
       let startIndex = position.start.offset;
-      // Match updateListItemText: preserve one whitespace character after the marker, including
+      // Preserve one whitespace character after the marker, including
       // the task marker when mdast recognises it, but leave any additional whitespace editable.
       while (startIndex > 0 && text.charAt(startIndex - 1).trim() === '') {
         startIndex--;

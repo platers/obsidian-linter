@@ -13,7 +13,6 @@ export default class EmptyLineAroundBlockquotes extends RuleBuilder<EmptyLineAro
       nameKey: 'rules.empty-line-around-blockquotes.name',
       descriptionKey: 'rules.empty-line-around-blockquotes.description',
       type: RuleType.SPACING,
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => EmptyLineAroundBlockquotesOptions {

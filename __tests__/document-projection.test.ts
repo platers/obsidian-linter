@@ -1,5 +1,5 @@
 import {LintContext} from '../src/utils/protected-ranges';
-import {IgnoreType, IgnoreTypes, ignoreListOfTypes} from '../src/utils/ignore-types';
+import {IgnoreType, IgnoreTypes} from '../src/utils/ignore-types';
 import {projectionTokenFor} from '../src/utils/ignore-type-metadata';
 import {DocumentProjection} from '../src/utils/document-projection';
 import NoBareUrls from '../src/rules/no-bare-urls';
@@ -8,29 +8,13 @@ it('preserves the seven lines of frontmatter followed by a thematic break under 
   const text = '---\ntitle: a title\n---\n\n---\n\nbody\n';
   const ignoreTypes = new NoBareUrls().ignoreTypes;
   const projection = new LintContext(text).projectionFor(ignoreTypes);
-  let masked = text;
-  ignoreListOfTypes(ignoreTypes, text, (value) => {
-    masked = value;
-    return value;
-  });
 
   expect(projection.text.split('\n')).toHaveLength(7);
-  expect(projection.text.split('\n').map((line) => /^\s*$/.test(line)))
-      .toEqual(masked.split('\n').map((line) => /^\s*$/.test(line)));
 });
 
 describe('projection tokens', () => {
-  it.each(Object.entries(IgnoreTypes))('mirrors the generated placeholder shape for %s', (_name, ignoreType) => {
-    const type = {replaceAction: /original/g, placeholder: ignoreType.placeholder};
-    let masked = '';
-    ignoreListOfTypes([type], 'original', (value) => {
-      masked = value;
-      return value;
-    });
-
-    const token = projectionTokenFor(type);
-    expect(token.length).toBe(masked.length);
-    expect(token.split('\n').map((line) => line.length)).toEqual(masked.split('\n').map((line) => line.length));
+  it.each(Object.entries(IgnoreTypes))('has non-whitespace on every token line for %s', (_name, ignoreType) => {
+    const token = projectionTokenFor(ignoreType);
     expect(token.split('\n').every((line) => /\S/.test(line))).toBe(true);
   });
 

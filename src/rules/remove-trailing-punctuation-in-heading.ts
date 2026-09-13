@@ -18,7 +18,6 @@ export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<Remo
       descriptionKey: 'rules.remove-trailing-punctuation-in-heading.description',
       type: RuleType.HEADING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveTrailingPunctuationInHeadingOptions {

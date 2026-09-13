@@ -43,7 +43,6 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       descriptionKey: 'rules.move-tags-to-yaml.description',
       type: RuleType.YAML,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.html, IgnoreTypes.wikiLink, IgnoreTypes.link],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => MoveTagsToYamlOptions {

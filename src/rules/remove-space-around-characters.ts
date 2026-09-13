@@ -22,7 +22,6 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
       descriptionKey: 'rules.remove-space-around-characters.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveSpaceAroundCharactersOptions {
@@ -76,7 +75,7 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
     const replacements = collectReplacements(text, 0, protectedRanges.combinedWith([IgnoreTypes.list, IgnoreTypes.heading]));
     for (const {position} of getListItemTextPositions(text)) {
       let startIndex = position.start.offset;
-      // Keep the same marker whitespace and fallback checklist prefix as updateListItemText.
+      // Preserve marker whitespace and the fallback checklist prefix.
       while (startIndex > 0 && text.charAt(startIndex - 1).trim() === '') {
         startIndex--;
       }

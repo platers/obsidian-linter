@@ -1,8 +1,6 @@
 import TrailingSpaces from '../src/rules/trailing-spaces';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
-import {ignoreListOfTypes, IgnoreTypes} from '../src/utils/ignore-types';
-import {updateListItemText} from '../src/utils/mdast';
 
 ruleTest({
   RuleBuilderClass: TrailingSpaces,
@@ -263,7 +261,7 @@ describe('protected-range compatibility', () => {
     {twoSpaceLineBreak: true, expected: '- a  \n\n  b'},
   ])('does not corrupt paragraph-boundary whitespace with twoSpaceLineBreak = $twoSpaceLineBreak', ({twoSpaceLineBreak, expected}) => {
     // The old code left one trailing space when false and doubled two spaces to four when true:
-    // updateListItemText overlapped its replacement ranges by walking backward across a blank line.
+    // Its list-text helper overlapped replacement ranges by walking backward across a blank line.
     expect(TrailingSpaces.getRule().apply('- a  \n\n  b', {twoSpaceLineBreak})).toBe(expected);
   });
 
@@ -274,52 +272,6 @@ describe('protected-range compatibility', () => {
       const text = `- first${whitespace}\n${whitespace}\n  second${whitespace}`;
       const expected = `- first${trailingWhitespace}\n${emptyLineWhitespace}\n  second${trailingWhitespace}`;
       expect({text, output: TrailingSpaces.getRule().apply(text, {twoSpaceLineBreak})}).toEqual({text, output: expected});
-    }
-  });
-
-  it.each([false, true])('matches legacy output with twoSpaceLineBreak = %j', (twoSpaceLineBreak) => {
-    const builder = new TrailingSpaces();
-    const whitespaceRuns = [' ', '  ', '   ', '\t', ' \t', '\t ', '\t\t', ' \t ', ' \t\t '];
-    for (const whitespace of whitespaceRuns) {
-      const documents = [
-        whitespace,
-        `text${whitespace}`,
-        `[link](url)${whitespace}`,
-        `[[wiki link]]${whitespace}`,
-        `#tag${whitespace}`,
-        `- ${whitespace}`,
-        `- [ ] ${whitespace}`,
-        `- [?] ${whitespace}`,
-        `- text${whitespace}\n  - ${whitespace}`,
-        `> - text${whitespace}\n>   continuation${whitespace}`,
-        `\`\`\`\ncode${whitespace}\n${whitespace}\n\`\`\`\nafter${whitespace}`,
-        `- text${whitespace}\n\`\`\`\ncode${whitespace}\n\`\`\`\nafter${whitespace}`,
-        `- \`\`\`\n  code${whitespace}\n  \`\`\`\n  after${whitespace}`,
-        `$$\nmath${whitespace}\n$$\nafter${whitespace}`,
-        `[[wiki${whitespace}\nlink]]${whitespace}`,
-        `<!-- linter-disable -->\nignored${whitespace}\n${whitespace}\n<!-- linter-enable -->\nafter${whitespace}`,
-      ];
-      for (const text of documents) {
-        const removeTrailingSpaces = (content: string): string => {
-          if (!twoSpaceLineBreak) {
-            return content.replace(/[ \t]+$/gm, '');
-          }
-          return content.replace(/(\S)[ \t]$/gm, '$1')
-              .replace(/(\S)[ \t]{3,}$/gm, '$1')
-              .replace(/(\S)( ?\t\t? ?)$/gm, '$1');
-        };
-        const expected = ignoreListOfTypes(builder.ignoreTypes, text, (value) => {
-          let result = ignoreListOfTypes([IgnoreTypes.list], value, removeTrailingSpaces);
-          result = updateListItemText(result, removeTrailingSpaces, true);
-          if (!twoSpaceLineBreak) {
-            return result.replace(/^[ \t]+$/gm, '');
-          }
-          return result.replace(/^[ \t]$/gm, '')
-              .replace(/^[ \t]{3,}$/gm, '')
-              .replace(/^( ?\t\t? ?)$/gm, '$1');
-        });
-        expect(JSON.stringify({text, output: TrailingSpaces.getRule().apply(text, {twoSpaceLineBreak})})).toBe(JSON.stringify({text, output: expected}));
-      }
     }
   });
 });

@@ -15,7 +15,6 @@ export default class SpaceAfterListMarkers extends RuleBuilder<SpaceAfterListMar
       descriptionKey: 'rules.space-after-list-markers.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => SpaceAfterListMarkersOptions {

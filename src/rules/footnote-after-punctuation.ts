@@ -15,7 +15,6 @@ export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterP
       descriptionKey: 'rules.footnote-after-punctuation.description',
       type: RuleType.FOOTNOTE,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.footnoteAtStartOfLine, IgnoreTypes.footnoteAfterATask],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => FootnoteAfterPunctuationOptions {

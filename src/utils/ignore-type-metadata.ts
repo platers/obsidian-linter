@@ -1,10 +1,8 @@
 import type {IgnoreType} from './ignore-types';
 
 // Keep this module free of runtime imports: mdast depends on protected-ranges, while the ignore
-// registry depends on mdast. Both masking and projection need this metadata without that cycle.
-export const seedLength = 11;
-export const counterLength = 5;
-export const uniqueSuffixLength = seedLength + counterLength;
+// registry depends on mdast. Projection needs this metadata without that cycle.
+const uniqueSuffixLength = 16;
 
 const canonicalRank = new Map<IgnoreType, number>();
 
@@ -18,7 +16,7 @@ export function inCanonicalOrder(ignoreTypes: IgnoreType[]): IgnoreType[] {
 
 /**
  * A structural stand-in for a generated placeholder, not an identifier used for restoration.
- * Keep the template expansion identical to createPlaceholderGenerator, including YAML's exception.
+ * Preserve the historical placeholder length and line structure, including YAML's exception.
  * @param {IgnoreType} ignoreType The type whose placeholder shape to preserve
  * @return {string} A token with the placeholder's length and line structure
  */

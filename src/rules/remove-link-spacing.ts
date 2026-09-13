@@ -14,7 +14,6 @@ export default class RemoveLinkSpacing extends RuleBuilder<RemoveLinkSpacingOpti
       nameKey: 'rules.remove-link-spacing.name',
       descriptionKey: 'rules.remove-link-spacing.description',
       type: RuleType.SPACING,
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveLinkSpacingOptions {

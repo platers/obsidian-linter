@@ -16,7 +16,6 @@ export default class ProperEllipsis extends RuleBuilder<ProperEllipsisOptions> {
       descriptionKey: 'rules.proper-ellipsis.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => ProperEllipsisOptions {

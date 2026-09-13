@@ -17,7 +17,6 @@ export default class RemoveEmptyListMarkers extends RuleBuilder<RemoveEmptyListM
       descriptionKey: 'rules.remove-empty-list-markers.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveEmptyListMarkersOptions {

@@ -22,7 +22,6 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
       descriptionKey: 'rules.header-increment.description',
       type: RuleType.HEADING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => HeaderIncrementOptions {

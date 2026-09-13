@@ -15,7 +15,6 @@ export default class ReIndexFootnotes extends RuleBuilder<ReIndexFootnotesOption
       descriptionKey: 'rules.re-index-footnotes.description',
       type: RuleType.FOOTNOTE,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => ReIndexFootnotesOptions {

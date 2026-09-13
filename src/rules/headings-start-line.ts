@@ -16,7 +16,6 @@ export default class HeadingStartLine extends RuleBuilder<HeadingStartLineOption
       descriptionKey: 'rules.headings-start-line.description',
       type: RuleType.HEADING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => HeadingStartLineOptions {

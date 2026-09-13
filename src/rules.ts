@@ -8,7 +8,7 @@ import {
 } from './option';
 import {LinterError} from './linter-error';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
-import {ignoreListOfTypes, IgnoreType} from './utils/ignore-types';
+import {IgnoreType} from './utils/ignore-types';
 import {LintContext, ProtectedRanges} from './utils/protected-ranges';
 import {LinterSettings} from './settings-data';
 import {App} from 'obsidian';
@@ -57,7 +57,6 @@ export class Rule {
       public options: Array<Option> = [],
       public readonly hasSpecialExecutionOrder: boolean = false,
       public readonly ignoreTypes: IgnoreType[] = [],
-      public readonly usesProtectedRanges: boolean = false,
       disableConflictingOptions: (value: boolean, app: App, plugin: LinterPlugin) => void = null,
   ) {
     this.ruleHeading = this.getName().toLowerCase().replaceAll(' ', '-');
@@ -112,26 +111,18 @@ export class Rule {
   /**
    * Runs the rule, keeping it away from the parts of the document it declared it ignores.
    *
-   * A rule that has been moved onto the protected range contract is given the document itself and
-   * told which regions of it not to change. Every other rule is given a copy of the document with
-   * those regions replaced by placeholders, which is what the linter used to do for all of them.
+   * Every rule is given the document itself and told which regions of it not to change.
    * @param {string} text The document to run the rule over
    * @param {Options} [options] The rule's settings
    * @param {LintContext} [context] The shared view of this document, if one has been built
    * @return {string} The document after the rule
    */
   public apply(text: string, options?: Options, context?: LintContext): string {
-    if (this.usesProtectedRanges) {
-      // a context belongs to the text it was built from, so one for a different document is not
-      // reused rather than trusted
-      const contextForText = context && context.text === text ? context : LintContext.for(text);
+    // a context belongs to the text it was built from, so one for a different document is not
+    // reused rather than trusted
+    const contextForText = context && context.text === text ? context : LintContext.for(text);
 
-      return this.applyAfterIgnore(text, options, contextForText.protectedRangesFor(this.ignoreTypes));
-    }
-
-    return ignoreListOfTypes(this.ignoreTypes, text, (textAfterIgnore: string) => {
-      return this.applyAfterIgnore(textAfterIgnore, options);
-    });
+    return this.applyAfterIgnore(text, options, contextForText.protectedRangesFor(this.ignoreTypes));
   }
 }
 

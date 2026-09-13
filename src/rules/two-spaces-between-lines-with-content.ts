@@ -21,7 +21,6 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
       descriptionKey: 'rules.two-spaces-between-lines-with-content.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table],
-      usesProtectedRanges: true,
       disableConflictingOptions(value: boolean, app: App, plugin: LinterPlugin): void {
         const paragraphBlankLinesEnableOption = rulesDict['paragraph-blank-lines'].options[0] as BooleanOption;
         if (value && paragraphBlankLinesEnableOption.getValue(plugin)) {

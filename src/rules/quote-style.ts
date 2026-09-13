@@ -31,7 +31,6 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
       descriptionKey: 'rules.quote-style.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.inlineMath, IgnoreTypes.html, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.templaterCommand, IgnoreTypes.image],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => QuoteStyleOptions {

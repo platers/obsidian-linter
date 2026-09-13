@@ -13,7 +13,6 @@ export default class EmptyLineAroundHorizontalRules extends RuleBuilder<EmptyLin
       nameKey: 'rules.empty-line-around-horizontal-rules.name',
       descriptionKey: 'rules.empty-line-around-horizontal-rules.description',
       type: RuleType.SPACING,
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => EmptyLineAroundHorizontalRulesOptions {

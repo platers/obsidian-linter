@@ -19,7 +19,6 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
       descriptionKey: 'rules.ordered-list-style.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => OrderedListStyleOptions {

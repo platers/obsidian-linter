@@ -13,7 +13,6 @@ export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineArou
       nameKey: 'rules.empty-line-around-code-fences.name',
       descriptionKey: 'rules.empty-line-around-code-fences.description',
       type: RuleType.SPACING,
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => EmptyLineAroundCodeFencesOptions {

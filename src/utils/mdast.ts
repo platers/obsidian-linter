@@ -3,7 +3,7 @@ import type {Position, Node} from 'unist';
 import type {Root} from 'mdast';
 import {ProtectedRanges} from './protected-ranges';
 import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
-import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex} from './regex';
+import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
 import {frontmatter} from 'micromark-extension-frontmatter';
@@ -763,53 +763,6 @@ export function updateBoldText(text: string, func: (text: string, offset: number
   return replacements;
 }
 
-export function updateListItemText(text: string, func:(text: string) => string, includeEmptyNodes: boolean = false): string {
-  const positions: PositionPlusEmptyIndicator[] = getListItemTextPositions(text, includeEmptyNodes);
-  const replacements: textReplacement[] = [];
-
-  for (const position of positions) {
-    let startIndex = position.position.start.offset;
-    if (position.isEmpty) {
-      // get the actual start of the list item leaving only 1 whitespace between the indicator and the text
-      while (startIndex < position.position.end.offset && text.charAt(startIndex).trim() !== '') {
-        startIndex++;
-      }
-
-      if (startIndex < position.position.end.offset) {
-        startIndex++;
-      }
-    } else {
-      // get the actual start of the list item leaving only 1 whitespace between the indicator and the text
-      while (startIndex > 0 && text.charAt(startIndex - 1).trim() === '') {
-        startIndex--;
-      }
-
-      // keep a single space for the indicator
-      if (startIndex === 0 || text.charAt(startIndex - 1).trim() != '') {
-        startIndex++;
-      }
-    }
-
-    let listText = text.substring(startIndex, position.position.end.offset);
-    // for some reason some checklists are not getting treated as such and this causes the task indicator to be included in the text
-    if (checklistBoxStartsTextRegex.test(listText)) {
-      startIndex += 4;
-      listText = listText.substring(4);
-    }
-
-    listText = func(listText);
-
-    replacements.push({startIndex, endIndex: position.position.end.offset, value: listText});
-  }
-
-  // the positions are the paragraphs inside the list items rather than the items themselves, and a
-  // paragraph cannot contain another paragraph, so none of them overlap and every one of them was
-  // read from the text as it was passed in
-  replacements.reverse();
-
-  return replaceTextRanges(text, replacements);
-}
-
 function getProjectedNodeRanges(type: MDAstTypes, projection: DocumentProjection): TextRange[] {
   const ranges: TextRange[] = [];
   for (const position of getPositions(type, projection.source)) {
@@ -1452,33 +1405,6 @@ export function ensureFencedCodeBlocksHasLanguage(text: string, defaultLanguage:
     }
 
     text = replaceTextBetweenStartAndEndWithNewValue(text, insertionPoint, insertionPoint, defaultLanguage);
-  }
-
-  return text;
-}
-
-export function updateHeaderText(text: string, func:(text: string) => string): string {
-  const positions = getHeaderTextPositions(text);
-
-  // for the best performance, we want to grab all places that need updating and then
-  // at the end we want to update the text in one go because otherwise we get a lot of
-  // instances of the file text in memory
-  const updateLocations: {startIndex: number, endIndex: number, newText: string}[] = [];
-  for (const position of positions) {
-    const updatedText = func(position.text);
-    if (updatedText !== position.text) {
-      const headerText = text.substring(position.position.start.offset, position.position.end.offset);
-      const startIndex = position.position.start.offset+ headerText.indexOf(position.text);
-      updateLocations.push({
-        startIndex: startIndex,
-        endIndex: startIndex + position.text.length,
-        newText: updatedText,
-      });
-    }
-  }
-
-  for (const headerUpdate of updateLocations) {
-    text = replaceTextBetweenStartAndEndWithNewValue(text, headerUpdate.startIndex, headerUpdate.endIndex, headerUpdate.newText);
   }
 
   return text;

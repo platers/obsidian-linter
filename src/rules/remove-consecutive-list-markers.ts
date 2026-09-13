@@ -15,7 +15,6 @@ export default class RemoveConsecutiveListMarkers extends RuleBuilder<RemoveCons
       descriptionKey: 'rules.remove-consecutive-list-markers.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveConsecutiveListMarkersOptions {

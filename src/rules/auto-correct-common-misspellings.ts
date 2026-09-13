@@ -27,7 +27,6 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
       // rule.
       hasSpecialExecutionOrder: true,
       ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.url],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => AutoCorrectCommonMisspellingsOptions {

@@ -1,10 +1,8 @@
 import OrderedListStyle from '../src/rules/ordered-list-style';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
-import {OrderListItemEndOfIndicatorStyles, OrderListItemStyles, UnorderedListItemStyles, updateOrderedListItemIndicators, updateUnorderedListItemIndicators} from '../src/utils/mdast';
+import {OrderListItemEndOfIndicatorStyles, OrderListItemStyles, UnorderedListItemStyles} from '../src/utils/mdast';
 import UnorderedListStyle from '../src/rules/unordered-list-style';
-import {ignoreListOfTypes} from '../src/utils/ignore-types';
-import {ProtectedRanges} from '../src/utils/protected-ranges';
 
 ruleTest({
   RuleBuilderClass: OrderedListStyle,
@@ -225,42 +223,10 @@ ruleTest({
 
 describe('list indicator protected-range compatibility', () => {
   const separatedByCustomIgnore = '1. first\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n1. after';
-  const documents = [
-    '10. first\n10. second\n10. third',
-    '1. outer\n   9. inner\n   9. inner\n8. after',
-    '1. outer\n   ```\n   90. code\n   - code\n   ```\n8. after',
-    '1. outer\n   $$\n   90. math\n   $$\n8. after',
-    '9. outer\n' + Array.from({length: 12}, (_, index) => `   99. nested ${index}`).join('\n') + '\n\n       ```\n       77. hidden\n       ```\n8. after',
-    '> 8. item\n>    ```\n>    90. code\n>    ```\n> 8. next\n> > 3. nested\n> > 3. nested',
-    '<!-- linter-disable -->\n+ ignored\n1. ignored\n<!-- linter-enable -->\n\n* first\n- last',
-    '- first #tag\n  3) ordered\n  3) ordered\n- [ ] task\n+ last',
-    '---\nitems:\n  - yaml\n---\n\n+ first\n- last',
-  ];
   const numberOptions = Object.values(OrderListItemStyles).flatMap((numberStyle) => {
     return Object.values(OrderListItemEndOfIndicatorStyles).flatMap((listEndStyle) => {
       return [false, true].map((preserveStart) => ({numberStyle, listEndStyle, preserveStart}));
     });
-  });
-
-  it.each(numberOptions)('matches ordered masking for $numberStyle/$listEndStyle, preserveStart=$preserveStart', (options) => {
-    const rule = OrderedListStyle.getRule();
-    for (const text of documents) {
-      // Empty guards on masked text retain the old helper's numbering and level-tracking behavior.
-      const expected = ignoreListOfTypes(rule.ignoreTypes, text, (masked) => {
-        return updateOrderedListItemIndicators(masked, options.numberStyle, options.listEndStyle, options.preserveStart, new ProtectedRanges([]));
-      });
-      expect(rule.apply(text, options)).toBe(expected);
-    }
-  });
-
-  it.each(Object.values(UnorderedListItemStyles))('matches unordered masking for %s', (listStyle) => {
-    const rule = UnorderedListStyle.getRule();
-    for (const text of [...documents, separatedByCustomIgnore]) {
-      const expected = ignoreListOfTypes(rule.ignoreTypes, text, (masked) => {
-        return updateUnorderedListItemIndicators(masked, listStyle, new ProtectedRanges([]));
-      });
-      expect(rule.apply(text, {listStyle})).toBe(expected);
-    }
   });
 
   it.each(numberOptions)('preserves separate source lists for $numberStyle/$listEndStyle, preserveStart=$preserveStart', (options) => {

@@ -17,7 +17,6 @@ export default class MoveFootnotesToTheBottom extends RuleBuilder<MoveFootnotesT
       descriptionKey: 'rules.move-footnotes-to-the-bottom.description',
       type: RuleType.FOOTNOTE,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => MoveFootnotesToTheBottomOptions {

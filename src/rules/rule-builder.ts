@@ -22,7 +22,7 @@ export abstract class RuleBuilderBase {
     // and two of them silently became the third.
     const builder = new this();
     if (!RuleBuilderBase.#ruleMap.has(builder.alias)) {
-      const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder, builder.ignoreTypes, builder.usesProtectedRanges, builder.disableConflictingOptions);
+      const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder, builder.ignoreTypes, builder.disableConflictingOptions);
       RuleBuilderBase.#ruleMap.set(builder.alias, rule);
       RuleBuilderBase.#ruleBuilderMap.set(builder.alias, builder);
     }
@@ -81,9 +81,6 @@ type RuleBuilderConstructorArgs = {
   // ignore types to use on the entirety of the rule and not just a part
   // Note: this value should not contain custom ignore as that is added to all rules except Paste rules which do not use this property
   ruleIgnoreTypes?: IgnoreType[],
-  // whether the rule has been moved off masking, so it is given the document itself along with the
-  // regions of it that its ignore types protect, rather than a copy with those regions replaced
-  usesProtectedRanges?: boolean,
   disableConflictingOptions?: (value: boolean, app: App, plugin: LinterPlugin) => void,
 };
 
@@ -95,7 +92,6 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   public type: RuleType;
   public hasSpecialExecutionOrder: boolean;
   public ignoreTypes: IgnoreType[];
-  public usesProtectedRanges: boolean;
   public disableConflictingOptions: (value: boolean, app: App, plugin: LinterPlugin) => void;
   constructor(args: RuleBuilderConstructorArgs) {
     super();
@@ -107,7 +103,6 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     this.descriptionKey = args.descriptionKey;
     this.type = args.type;
     this.hasSpecialExecutionOrder = args.hasSpecialExecutionOrder ?? false;
-    this.usesProtectedRanges = args.usesProtectedRanges ?? false;
     this.disableConflictingOptions = args.disableConflictingOptions ?? null;
 
     if (args.ruleIgnoreTypes) {

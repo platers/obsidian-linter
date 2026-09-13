@@ -20,7 +20,6 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
       type: RuleType.SPACING,
       hasSpecialExecutionOrder: true, // run after all other possible rules to make sure trailing spaces are properly removed
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => TrailingSpacesOptions {
@@ -43,7 +42,7 @@ export default class TrailingSpaces extends RuleBuilder<TrailingSpacesOptions> {
 
     for (const {position, isEmpty} of getListItemTextPositions(text, true)) {
       let startIndex = position.start.offset;
-      // Preserve updateListItemText's empty-item, marker spacing and fallback checklist handling.
+      // Preserve empty-item, marker spacing and fallback checklist handling.
       if (isEmpty) {
         while (startIndex < position.end.offset && text.charAt(startIndex).trim() !== '') {
           startIndex++;

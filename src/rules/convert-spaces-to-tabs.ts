@@ -17,7 +17,6 @@ export default class ConvertSpacesToTabs extends RuleBuilder<ConvertSpacesToTabs
       descriptionKey: 'rules.convert-spaces-to-tabs.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => ConvertSpacesToTabsOptions {

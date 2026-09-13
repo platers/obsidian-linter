@@ -15,7 +15,6 @@ export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphen
       descriptionKey: 'rules.remove-hyphenated-line-breaks.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveHyphenatedLineBreaksOptions {

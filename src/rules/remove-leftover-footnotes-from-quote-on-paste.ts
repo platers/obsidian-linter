@@ -15,7 +15,6 @@ export default class RemoveLeftoverFootnotesFromQuoteOnPaste extends RuleBuilder
       nameKey: 'rules.remove-leftover-footnotes-from-quote-on-paste.name',
       descriptionKey: 'rules.remove-leftover-footnotes-from-quote-on-paste.description',
       ruleIgnoreTypes: [IgnoreTypes.wikiLink, IgnoreTypes.link, IgnoreTypes.image],
-      usesProtectedRanges: true,
       type: RuleType.PASTE,
     });
   }

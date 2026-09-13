@@ -17,7 +17,6 @@ export default class DefaultLanguageForCodeFences extends RuleBuilder<DefaultLan
       descriptionKey: 'rules.default-language-for-code-fences.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.math, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => DefaultLanguageForCodeFencesOptions {

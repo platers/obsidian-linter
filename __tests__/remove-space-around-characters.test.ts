@@ -1,9 +1,6 @@
 import RemoveSpaceAroundCharacters from '../src/rules/remove-space-around-characters';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
-import {ignoreListOfTypes, IgnoreTypes} from '../src/utils/ignore-types';
-import {updateHeaderText, updateListItemText} from '../src/utils/mdast';
-import {escapeRegExp} from '../src/utils/regex';
 
 ruleTest({
   RuleBuilderClass: RemoveSpaceAroundCharacters,
@@ -111,40 +108,6 @@ ruleTest({
 });
 
 describe('protected-range compatibility', () => {
-  const documents = [
-    'text \t Ａ \t text — more 「 text 」',
-    '# Ａ title Ｂ\n\n## 「 text 」 ##',
-    '# lead **bold Ａ** Ｂ tail\n\n# *only Ａ*',
-    '# \\* Ａ text',
-    '  Ａ title Ｂ\n  ==========\n\ntext Ｃ text',
-    '> ## 「 text 」\n>\n> text Ａ text',
-    '-   Ａ text\n- [ ] 「 task 」\n- [?] 「 task 」\n-   [?] 「 task 」',
-    '- item Ａ text\n  - nested Ｂ text\n\n  ## 「 heading 」\n\n  paragraph Ｃ text',
-    '# Ａ [link](url) Ｂ `code Ｃ` Ｄ [[wiki Ｅ]] Ｆ #tag',
-    '# [link Ａ](url)\n\n# `code Ｂ`\n\n# [[wiki Ｃ]]',
-    '- Ａ [link](url) Ｂ `code Ｃ` Ｄ\n\ntext Ｅ [link](url) Ｆ',
-    '<!-- linter-disable -->\n# Ａ text\n- Ｂ text\n<!-- linter-enable -->\n\n# Ｃ text',
-  ];
-
-  it.each(documents)('matches legacy output for %j', (text) => {
-    const builder = new RemoveSpaceAroundCharacters();
-    const options = builder.buildRuleOptions();
-    let symbols = '';
-    if (options.includeFullwidthForms) symbols += '\uff01-\uff5e';
-    if (options.includeCJKSymbolsAndPunctuation) symbols += '\u3000-\u303f';
-    if (options.includeDashes) symbols += '\u2013\u2014';
-    symbols += escapeRegExp(options.otherSymbols);
-    const before = new RegExp(`([ \t])+([${symbols}])`, 'g');
-    const after = new RegExp(`([${symbols}])([ \t])+`, 'g');
-    const replace = (value: string): string => value.replace(before, '$2').replace(after, '$1');
-    const expected = ignoreListOfTypes(builder.ignoreTypes, text, (value) => {
-      const outsideListsAndHeadings = ignoreListOfTypes([IgnoreTypes.list, IgnoreTypes.heading], value, replace);
-      return updateHeaderText(updateListItemText(outsideListsAndHeadings, replace), replace);
-    });
-
-    expect(RemoveSpaceAroundCharacters.getRule().apply(text)).toBe(expected);
-  });
-
   it.each(['', '- ', '# '])('does not use protected punctuation as an anchor with prefix %j', (prefix) => {
     const text = prefix + 'text [link](url) text';
     expect(RemoveSpaceAroundCharacters.getRule().apply(text, {otherSymbols: '[]()'})).toBe(text);

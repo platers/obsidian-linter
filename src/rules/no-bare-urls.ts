@@ -21,7 +21,6 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       descriptionKey: 'rules.no-bare-urls.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode, IgnoreTypes.anchorTag, IgnoreTypes.html],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => NoBareUrlsOptions {

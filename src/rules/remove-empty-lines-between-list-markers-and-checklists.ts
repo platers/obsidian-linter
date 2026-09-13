@@ -17,7 +17,6 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
       descriptionKey: 'rules.remove-empty-lines-between-list-markers-and-checklists.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.thematicBreak],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions {

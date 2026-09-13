@@ -17,7 +17,6 @@ export default class RemoveMultipleSpaces extends RuleBuilder<RemoveMultipleSpac
       descriptionKey: 'rules.remove-multiple-spaces.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.table, IgnoreTypes.image],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveMultipleSpacesOptions {
@@ -36,7 +35,7 @@ export default class RemoveMultipleSpaces extends RuleBuilder<RemoveMultipleSpac
 
     for (const {position} of getListItemTextPositions(text)) {
       let startIndex = position.start.offset;
-      // Preserve updateListItemText's marker spacing and fallback checklist handling.
+      // Preserve marker spacing and fallback checklist handling.
       while (startIndex > 0 && text.charAt(startIndex - 1).trim() === '') {
         startIndex--;
       }

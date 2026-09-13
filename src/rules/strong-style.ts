@@ -19,7 +19,6 @@ export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
       descriptionKey: 'rules.strong-style.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => StrongStyleOptions {

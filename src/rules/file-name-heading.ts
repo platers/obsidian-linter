@@ -22,7 +22,6 @@ export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions>
       descriptionKey: 'rules.file-name-heading.description',
       type: RuleType.HEADING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
       disableConflictingOptions(value: boolean, app: App, plugin: LinterPlugin): void {
         const headerIncrementOptions = rulesDict['header-increment'];
         const headerIncrementEnableOption = headerIncrementOptions.options[0] as BooleanOption;

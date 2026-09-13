@@ -2,10 +2,8 @@ import EmphasisStyle from '../src/rules/emphasis-style';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
 import StrongStyle from '../src/rules/strong-style';
-import {ignoreListOfTypes} from '../src/utils/ignore-types';
-import {getPositions, makeEmphasisOrBoldConsistent, MDAstTypes} from '../src/utils/mdast';
+import {makeEmphasisOrBoldConsistent, MDAstTypes} from '../src/utils/mdast';
 import {ProtectedRanges} from '../src/utils/protected-ranges';
-import {replaceTextBetweenStartAndEndWithNewValue} from '../src/utils/strings';
 
 ruleTest({
   RuleBuilderClass: EmphasisStyle,
@@ -66,24 +64,5 @@ describe.each([
     const startIndex = side === 'opening' ? marker.length - 1 : first.length - 1;
     const protectedRanges = new ProtectedRanges([{startIndex, endIndex: startIndex + 1}]);
     expect(makeEmphasisOrBoldConsistent(text, 'consistent', type, protectedRanges)).toBe(text);
-  });
-
-  it.each(['consistent', 'asterisk', 'underscore'])('preserves descending nested-node rewrites with style %s', (style) => {
-    const documents = ['*)*g**', 'an *outer *inner* emphasis* here', '**a **b** c**', '***both***', '__a **b** c__'];
-    const rule = RuleBuilderClass.getRule();
-    for (const text of documents) {
-      const expected = ignoreListOfTypes(rule.ignoreTypes, text, (value) => {
-        const positions = getPositions(type, value);
-        if (positions.length === 0) return value;
-        let indicator = style === 'underscore' ? '_' : style === 'asterisk' ? '*' : value.charAt(positions[positions.length - 1].start.offset);
-        if (type === MDAstTypes.Bold) indicator += indicator;
-        for (const position of positions) {
-          const newContent = indicator + value.substring(position.start.offset + indicator.length, position.end.offset - indicator.length) + indicator;
-          value = replaceTextBetweenStartAndEndWithNewValue(value, position.start.offset, position.end.offset, newContent);
-        }
-        return value;
-      });
-      expect(rule.apply(text, {style})).toBe(expected);
-    }
   });
 });

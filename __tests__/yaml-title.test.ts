@@ -7,6 +7,34 @@ ruleTest({
   RuleBuilderClass: YamlTitle,
   testCases: [
     {
+      testName: 'Keeps a tag as heading text rather than falling back to the filename',
+      before: '# #a',
+      after: '---\ntitle: "#a"\n---\n# #a',
+      options: {fileName: 'Filename'},
+    },
+    {
+      testName: 'Uses the first visible heading after a fenced code block',
+      before: '```\n# Hidden\n```\n# Visible\n# Later',
+      after: '---\ntitle: Visible\n---\n```\n# Hidden\n```\n# Visible\n# Later',
+    },
+    {
+      testName: 'Uses the first visible heading after a linter-disable section',
+      before: '<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
+      after: '---\ntitle: Visible\n---\n<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
+    },
+    {
+      testName: 'Uses the first normal heading rather than a later heading',
+      before: '# First\n# Later',
+      after: '---\ntitle: First\n---\n# First\n# Later',
+    },
+    {
+      // The old code produced invalid YAML by copying the masked code block into the title.
+      testName: 'Does not use a heading match that crosses into a protected code block',
+      before: '#\n```\n```',
+      after: '---\ntitle: ""\n---\n#\n```\n```',
+      options: {mode: 'first-h1', fileName: 'Filename'},
+    },
+    {
       testName: 'Keeps unescaped title if possible',
       before: dedent`
         # Hello world
@@ -401,4 +429,3 @@ describe('yaml-title', () => {
     expect(emitWarningSpy).not.toHaveBeenCalled();
   });
 });
-

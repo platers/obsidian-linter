@@ -2,8 +2,9 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder, DropdownOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {escapeStringIfNecessaryAndPossible, formatYAML, initYAML, QuoteCharacter} from '../utils/yaml';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {escapeDollarSigns, getFirstHeaderOneText} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
 import {insert} from '../utils/strings';
 
 type YamlTitleModeValues = 'first-h1-or-filename-if-h1-missing' | 'filename' | 'first-h1';
@@ -33,22 +34,22 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
   get OptionsClass(): new () => YamlTitleOptions {
     return YamlTitleOptions;
   }
-  apply(text: string, options: YamlTitleOptions): string {
-    text = initYAML(text);
+  apply(text: string, options: YamlTitleOptions, protectedRanges: ProtectedRanges): string {
     let title = '';
     switch (options.mode) {
       case 'filename':
         title = options.fileName;
         break;
       case 'first-h1':
-        title = this.getFirstH1Header(text);
+        title = this.getFirstH1Header(text, protectedRanges);
         break;
       default:
-        title = this.getFirstH1Header(text);
+        title = this.getFirstH1Header(text, protectedRanges);
         title = title || options.fileName;
     }
 
     title = escapeStringIfNecessaryAndPossible(title, options.defaultEscapeCharacter);
+    text = initYAML(text);
 
     return formatYAML(text, (text) => {
       const title_match_str = `\n${options.titleKey}:.*\n`;
@@ -66,8 +67,8 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
       return text;
     });
   }
-  getFirstH1Header(text: string): string {
-    return ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
+  getFirstH1Header(text: string, protectedRanges: ProtectedRanges): string {
+    return getFirstHeaderOneText(text, protectedRanges.combinedWith([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag]));
   }
   get exampleBuilders(): ExampleBuilder<YamlTitleOptions>[] {
     return [

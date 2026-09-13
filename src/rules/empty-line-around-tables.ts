@@ -17,7 +17,6 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
       descriptionKey: 'rules.empty-line-around-tables.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.wikiLink, IgnoreTypes.link],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => EmptyLineAroundTablesOptions {

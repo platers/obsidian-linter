@@ -325,7 +325,6 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       type: RuleType.HEADING,
       hasSpecialExecutionOrder: true, // this is meant to run at the end after all headers have been updated, added, or removed from the file
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => CapitalizeHeadingsOptions {

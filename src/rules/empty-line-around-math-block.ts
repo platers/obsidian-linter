@@ -18,7 +18,6 @@ export default class EmptyLineAroundMathBlock extends RuleBuilder<EmptyLineAroun
       descriptionKey: 'rules.empty-line-around-math-blocks.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.code],
-      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => EmptyLineAroundMathBlockOptions {
