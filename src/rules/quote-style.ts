@@ -3,7 +3,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {smartDoubleQuoteRegex, smartSingleQuoteRegex, unicodeLetterRegex} from '../utils/regex';
-import {replaceTextBetweenStartAndEndWithNewValue, getSubstringIndex} from '../utils/strings';
+import {replaceTextRanges, getSubstringIndex, textReplacement} from '../utils/strings';
 
 export enum SingleQuoteStyles {
   Straight = '\'\'',
@@ -68,6 +68,9 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
     }
 
     const endOfText = text.length - 1;
+    // every quote is looked at against the text as it was passed in and each one is swapped for a
+    // single character, so the positions stay valid and the replacements can be applied in one go
+    const replacements: textReplacement[] = [];
     let quoteReplacement: string;
     let previousChar: string;
     let nextChar: string;
@@ -103,10 +106,10 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
         previousQuote = quoteReplacement;
       }
 
-      text = replaceTextBetweenStartAndEndWithNewValue(text, index, index + 1, quoteReplacement);
+      replacements.push({startIndex: index, endIndex: index + 1, value: quoteReplacement});
     }
 
-    return text;
+    return replaceTextRanges(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<QuoteStyleOptions>[] {
     return [
