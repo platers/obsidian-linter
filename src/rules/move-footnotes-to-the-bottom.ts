@@ -3,6 +3,7 @@ import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} fr
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {moveFootnotesToEnd} from '../utils/mdast';
+import type {ProtectedRanges} from '../utils/protected-ranges';
 
 class MoveFootnotesToTheBottomOptions implements Options {
   includeBlankLineBetweenFootnotes?: boolean = false;
@@ -16,13 +17,14 @@ export default class MoveFootnotesToTheBottom extends RuleBuilder<MoveFootnotesT
       descriptionKey: 'rules.move-footnotes-to-the-bottom.description',
       type: RuleType.FOOTNOTE,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => MoveFootnotesToTheBottomOptions {
     return MoveFootnotesToTheBottomOptions;
   }
-  apply(text: string, options: MoveFootnotesToTheBottomOptions): string {
-    return moveFootnotesToEnd(text, options.includeBlankLineBetweenFootnotes);
+  apply(text: string, options: MoveFootnotesToTheBottomOptions, protectedRanges: ProtectedRanges): string {
+    return moveFootnotesToEnd(text, options.includeBlankLineBetweenFootnotes, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<MoveFootnotesToTheBottomOptions>[] {
     return [

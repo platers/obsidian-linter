@@ -1,8 +1,8 @@
 import {visit} from 'unist-util-visit';
 import type {Position, Node} from 'unist';
 import type {Root} from 'mdast';
-import type {ProtectedRanges} from './protected-ranges';
-import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, replaceAt, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
+import {ProtectedRanges} from './protected-ranges';
+import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
 import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
@@ -241,10 +241,14 @@ export function getHeaderTextPositions(text: string): PositionPlusText[] {
  * Moves footnote declarations to the end of the document.
  * @param {string} text The text to move footnotes in
  * @param {boolean} includeBlankLinesBetweenFootnotes Whether to have a blank line between footnotes
+ * @param {ProtectedRanges} protectedRanges The regions hidden from definition and reference discovery
  * @return {string} The text with footnote declarations moved to the end
  */
-export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnotes: boolean): string {
-  const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
+export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnotes: boolean, protectedRanges: ProtectedRanges): string {
+  // A definition may contain protected content; only its marker must be visible to discover it.
+  const positions: Position[] = getPositions(MDAstTypes.Footnote, text).filter((position) => {
+    return !protectedRanges.isProtected(position.start.offset, text.indexOf(']', position.start.offset) + 2);
+  });
   let footnotes: string[] = [];
 
   type footnoteKeyInfo = {
@@ -271,12 +275,17 @@ export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnot
     let footnoteReferenceLocation: number;
     const footnoteReferenceLocations: number[] = [];
     do {
+      if (startOfFootnoteReferenceSearch < 0) {
+        break;
+      }
       footnoteReferenceLocation = text.lastIndexOf(footnoteReference, startOfFootnoteReferenceSearch);
       if (footnoteReferenceLocation === -1) {
         continue;
       }
 
-      footnoteReferenceLocations.push(footnoteReferenceLocation);
+      if (!protectedRanges.isProtected(footnoteReferenceLocation, footnoteReferenceLocation + footnoteReference.length)) {
+        footnoteReferenceLocations.push(footnoteReferenceLocation);
+      }
 
       startOfFootnoteReferenceSearch = footnoteReferenceLocation - 1;
     } while (footnoteReferenceLocation > 0);
@@ -290,9 +299,14 @@ export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnot
     footnoteKeyToFootnoteKeyInfo.set(footnoteReference, keyInfo);
   };
 
+  // Finish discovery before removing anything: protected ranges describe the original document.
   for (const position of positions) {
     const footnote = text.substring(position.start.offset, position.end.offset);
     footnotes.push(footnote);
+    getAllReferencePositionsForFootnote(text, footnote, position.start.offset - 1);
+  }
+
+  for (const position of positions) {
     // Remove the newline after the footnote if it exists
     if (position.end.offset < text.length && text[position.end.offset] === '\n') {
       text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
@@ -302,8 +316,6 @@ export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnot
       text = text.substring(0, position.end.offset) + text.substring(position.end.offset + 1);
     }
     text = text.substring(0, position.start.offset) + text.substring(position.end.offset);
-
-    getAllReferencePositionsForFootnote(text, footnote, position.start.offset);
   }
 
   for (const footnoteData of footnoteKeyToFootnoteKeyInfo) {
@@ -347,10 +359,13 @@ export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnot
 /**
  * Re-indexes the footnotes in the document making sure that they increase in number from 1 on up.
  * @param {string} text - The text to re-index the footnotes in.
+ * @param {ProtectedRanges} protectedRanges The regions hidden from definition and reference discovery
  * @return {string} The text with footnotes re-indexed.
  */
-export function reIndexFootnotes(text: string): string {
-  const positions: Position[] = getPositions(MDAstTypes.Footnote, text);
+export function reIndexFootnotes(text: string, protectedRanges: ProtectedRanges): string {
+  const positions: Position[] = getPositions(MDAstTypes.Footnote, text).filter((position) => {
+    return !protectedRanges.isProtected(position.start.offset, text.indexOf(']', position.start.offset) + 2);
+  });
   const footnotes: string[] = [];
 
   type keyInfo = {
@@ -362,7 +377,6 @@ export function reIndexFootnotes(text: string): string {
   const oldKeyToNewKey = new Map<string, string>();
   const footnoteReferenceLocationInfo: keyInfo[] = [];
   const footnoteKeys = new Set<string>();
-  const duplicateFootnotesToReplace: string[] = [];
 
   const getAllFootnoteReferences = function(text: string, footnote: string, startOfFootnoteReferenceSearch: number): void {
     const footnoteReference = footnote.match(/\[\^.*?\]/)[0];
@@ -370,8 +384,6 @@ export function reIndexFootnotes(text: string): string {
 
     const footnoteKeyAlreadyUsed = footnoteKeys.has(footnoteReference);
     if (footnoteKeyAlreadyUsed && footnotes.includes(footnote)) {
-      duplicateFootnotesToReplace.unshift(footnote);
-
       return;
     } else if (footnoteKeyAlreadyUsed) {
       throw new Error(getTextInLanguage('logs.too-many-footnotes-error-message').replace('{FOOTNOTE_KEY}', footnoteReference));
@@ -384,7 +396,8 @@ export function reIndexFootnotes(text: string): string {
         continue;
       }
 
-      if (footnoteReferenceLocation + footnote.length > text.length || text.substring(footnoteReferenceLocation, footnoteReferenceLocation + footnote.length) !== footnote) {
+      if (!protectedRanges.isProtected(footnoteReferenceLocation, footnoteReferenceLocation + footnoteReference.length) &&
+          (footnoteReferenceLocation + footnote.length > text.length || text.substring(footnoteReferenceLocation, footnoteReferenceLocation + footnote.length) !== footnote)) {
         footnoteReferenceLocationInfo.push({key: footnoteReference, position: footnoteReferenceLocation});
       }
 
@@ -418,30 +431,44 @@ export function reIndexFootnotes(text: string): string {
     return pos2.position - pos1.position;
   });
 
-  // replace the values that are tied to existing positions from last to first first since replace works even if positions change
+  // Keep all edits in original coordinates, including definition keys and duplicate removals.
+  const replacements: textReplacement[] = [];
+  const deletions: textReplacement[] = [];
   for (const footnoteReference of footnoteReferenceLocationInfo) {
     const newFootnoteKey = oldKeyToNewKey.get(footnoteReference.key);
 
-    text = replaceAt(text, footnoteReference.key, newFootnoteKey, footnoteReference.position);
+    replacements.push({startIndex: footnoteReference.position, endIndex: footnoteReference.position + footnoteReference.key.length, value: newFootnoteKey});
   }
 
-  for (const footnote of footnotesAdded) {
-    const footnoteKey = footnoteToFootnoteKey.get(footnote);
-    const newFootnoteKey = oldKeyToNewKey.get(footnoteKey);
-
-    text = text.replace(footnote, footnote.replace(footnoteKey, newFootnoteKey));
-  }
-
-  for (const duplicateFootnoteDefinition of duplicateFootnotesToReplace) {
-    let newText = text.replace(`\n${duplicateFootnoteDefinition}\n`, '\n');
-    if (text === newText) {
-      newText = text.replace(duplicateFootnoteDefinition, '');
+  footnotesAdded.clear();
+  for (const position of positions.slice().reverse()) {
+    const footnote = text.substring(position.start.offset, position.end.offset);
+    if (footnotesAdded.has(footnote)) {
+      let start = position.start.offset;
+      if (text[start - 1] === '\n' && text[position.end.offset] === '\n') {
+        start--;
+      }
+      deletions.push({startIndex: start, endIndex: position.end.offset, value: ''});
+      continue;
     }
 
-    text = newText;
+    footnotesAdded.add(footnote);
+    const footnoteKey = footnoteToFootnoteKey.get(footnote);
+    const newFootnoteKey = oldKeyToNewKey.get(footnoteKey);
+    // A differently worded definition with the same key may already be in the reference edits.
+    if (!replacements.some((replacement) => replacement.startIndex === position.start.offset)) {
+      replacements.push({startIndex: position.start.offset, endIndex: position.start.offset + footnoteKey.length, value: newFootnoteKey});
+    }
   }
 
-  return text;
+  // Duplicate definitions can contain references scheduled for renumbering. Deleting the whole
+  // definition takes precedence: union deletions and discard the edits inside them before applying.
+  const deletionRanges = new ProtectedRanges(deletions);
+  const nonOverlappingReplacements = replacements.filter((replacement) => {
+    return !deletionRanges.isProtected(replacement.startIndex, replacement.endIndex);
+  });
+  nonOverlappingReplacements.push(...deletionRanges.ranges.map((range) => ({...range, value: ''})));
+  return replaceTextRanges(text, nonOverlappingReplacements.sort((a, b) => a.startIndex - b.startIndex));
 }
 
 /**

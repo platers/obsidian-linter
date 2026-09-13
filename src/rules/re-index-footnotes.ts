@@ -3,6 +3,7 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {reIndexFootnotes} from '../utils/mdast';
+import type {ProtectedRanges} from '../utils/protected-ranges';
 
 class ReIndexFootnotesOptions implements Options {}
 
@@ -14,13 +15,14 @@ export default class ReIndexFootnotes extends RuleBuilder<ReIndexFootnotesOption
       descriptionKey: 'rules.re-index-footnotes.description',
       type: RuleType.FOOTNOTE,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => ReIndexFootnotesOptions {
     return ReIndexFootnotesOptions;
   }
-  apply(text: string, options: ReIndexFootnotesOptions): string {
-    return reIndexFootnotes(text);
+  apply(text: string, options: ReIndexFootnotesOptions, protectedRanges: ProtectedRanges): string {
+    return reIndexFootnotes(text, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<ReIndexFootnotesOptions>[] {
     return [

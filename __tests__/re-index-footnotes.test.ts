@@ -1,10 +1,36 @@
 import ReIndexFootnotes from '../src/rules/re-index-footnotes';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
+import * as strings from '../src/utils/strings';
 
 ruleTest({
   RuleBuilderClass: ReIndexFootnotes,
   testCases: [
+    {
+      testName: 'A footnote definition inside a fenced code block is not re-indexed',
+      before: '[^hidden]\n\n```\n[^hidden]: code\n```',
+      after: '[^hidden]\n\n```\n[^hidden]: code\n```',
+    },
+    {
+      testName: 'A duplicate footnote key inside a code block does not count as a definition',
+      before: '[^a]\n\n```\n[^a]: hidden\n```\n\n[^a]: visible',
+      after: '[^1]\n\n```\n[^a]: hidden\n```\n\n[^1]: visible',
+    },
+    {
+      testName: 'An identical definition inside a code block is not selected for replacement',
+      before: '[^a]\n\n```\n[^a]: same\n```\n\n[^a]: same',
+      after: '[^1]\n\n```\n[^a]: same\n```\n\n[^1]: same',
+    },
+    {
+      testName: 'Backward reference discovery continues past inline code',
+      before: '[^alpha] `[^alpha]`\n\n[^alpha]: first',
+      after: '[^1] `[^alpha]`\n\n[^1]: first',
+    },
+    {
+      testName: 'Renumbering different length keys leaves interspersed protected references intact',
+      before: '[^alpha]\n\n[^alpha]: first\n\n```\n[^beta]\n```\n\n[^beta] `[^alpha]`\n\n[^beta]: second',
+      after: '[^1]\n\n[^1]: first\n\n```\n[^beta]\n```\n\n[^2] `[^alpha]`\n\n[^2]: second',
+    },
     { // accounts for https://github.com/platers/obsidian-linter/issues/641
       testName: 'Inline code should not be affected by re-indexing footnotes',
       before: dedent`
@@ -125,4 +151,45 @@ ruleTest({
       `,
     },
   ],
+});
+
+describe.each([
+  {
+    name: 'a reference inside a deleted definition',
+    before: '[^a]: [^b]\n[^a]: [^b]\n[^b]: b',
+    after: '[^1]: [^2]\n[^2]: b',
+  },
+  {
+    name: 'adjacent duplicate deletions with multiple references',
+    before: '[^a]: [^b] [^b]\n[^a]: [^b] [^b]\n[^a]: [^b] [^b]\n[^b]: b',
+    after: '[^1]: [^2] [^2]\n[^2]: b',
+  },
+  {
+    name: 'a reference inside a multiline duplicate definition',
+    before: '[^a]: a\n    [^b]\n[^a]: a\n    [^b]\n[^b]: b',
+    after: '[^1]: a\n    [^2]\n[^2]: b',
+  },
+  {
+    name: 'protected references before and after duplicate deletions',
+    before: '`[^b]`\n\n[^a]: [^b]\n[^a]: [^b]\n[^b]: b\n\n```\n[^b]\n```',
+    after: '`[^b]`\n\n[^1]: [^2]\n[^2]: b\n\n```\n[^b]\n```',
+  },
+])('duplicate footnote definition edit ranges: $name', ({before, after}) => {
+  it('does not reinsert a reference from a deleted duplicate definition', () => {
+    expect(ReIndexFootnotes.getRule().apply(before)).toBe(after);
+  });
+
+  it('passes ascending, non-overlapping edits to replaceTextRanges', () => {
+    const replaceTextRanges = jest.spyOn(strings, 'replaceTextRanges');
+    try {
+      ReIndexFootnotes.getRule().apply(before);
+      expect(replaceTextRanges).toHaveBeenCalledTimes(1);
+      const replacements = replaceTextRanges.mock.calls[0][1];
+      for (let index = 1; index < replacements.length; index++) {
+        expect(replacements[index - 1].endIndex).toBeLessThanOrEqual(replacements[index].startIndex);
+      }
+    } finally {
+      replaceTextRanges.mockRestore();
+    }
+  });
 });
