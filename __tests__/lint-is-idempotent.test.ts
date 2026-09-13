@@ -1,7 +1,7 @@
 import {readFileSync} from 'fs';
 import {moment} from 'obsidian';
 import dedent from 'ts-dedent';
-import {rules, Rule} from '../src/rules';
+import {rules} from '../src/rules';
 import {RulesRunner} from '../src/rules-runner';
 import {DEFAULT_SETTINGS, LinterSettings} from '../src/settings-data';
 import {setLanguage} from '../src/lang/helpers';
