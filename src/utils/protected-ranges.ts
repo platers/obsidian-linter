@@ -52,6 +52,28 @@ export class ProtectedRanges {
   }
 
   /**
+   * Returns only the protected regions intersecting a source window, without copying the full index.
+   * @param {number} startIndex The inclusive window start
+   * @param {number} endIndex The exclusive window end
+   * @return {TextRange[]} Intersecting regions in source order
+   */
+  overlappingRanges(startIndex: number, endIndex: number): TextRange[] {
+    const ranges: TextRange[] = [];
+    if (endIndex <= startIndex) {
+      return ranges;
+    }
+
+    let index = Math.max(0, this.lastRangeStartingAtOrBefore(startIndex));
+    while (index < this.startIndexes.length && this.startIndexes[index] < endIndex) {
+      if (this.endIndexes[index] > startIndex) {
+        ranges.push({startIndex: this.startIndexes[index], endIndex: this.endIndexes[index]});
+      }
+      index++;
+    }
+    return ranges;
+  }
+
+  /**
    * Whether changing the given range would change a region that must not be touched.
    *
    * An empty range is an insertion, and inserting against the edge of a protected region is
@@ -123,6 +145,28 @@ export class ProtectedRanges {
 
     return answer;
   }
+}
+
+/**
+ * Reads a source window with protected content hidden, without parsing or rewriting the document.
+ *
+ * The token is non-whitespace but contains no fence, dollar sign, quote marker, or callout syntax.
+ * Its offsets are not source offsets: this result is for decisions, never for locating edits.
+ * @param {string} text The original text
+ * @param {ProtectedRanges} protectedRanges The regions to hide
+ * @param {number} startIndex The inclusive source-window start
+ * @param {number} endIndex The exclusive source-window end
+ * @return {string} The window with each intersecting protected region replaced by a brace token
+ */
+export function redactProtected(text: string, protectedRanges: ProtectedRanges, startIndex: number, endIndex: number): string {
+  const segments: string[] = [];
+  let cursor = startIndex;
+  for (const range of protectedRanges.overlappingRanges(startIndex, endIndex)) {
+    segments.push(text.substring(cursor, Math.max(startIndex, range.startIndex)), '{PROTECTED}');
+    cursor = Math.min(endIndex, range.endIndex);
+  }
+  segments.push(text.substring(cursor, endIndex));
+  return segments.join('');
 }
 
 /**
