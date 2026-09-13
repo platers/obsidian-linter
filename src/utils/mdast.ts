@@ -1,7 +1,7 @@
 import {visit} from 'unist-util-visit';
 import type {Position, Node} from 'unist';
 import type {Root} from 'mdast';
-import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, getStartOfLineIndex, replaceAt, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
+import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, replaceAt, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
 import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
@@ -679,6 +679,7 @@ export function updateBoldText(text: string, func:(text: string) => string): str
 
 export function updateListItemText(text: string, func:(text: string) => string, includeEmptyNodes: boolean = false): string {
   const positions: PositionPlusEmptyIndicator[] = getListItemTextPositions(text, includeEmptyNodes);
+  const replacements: textReplacement[] = [];
 
   for (const position of positions) {
     let startIndex = position.position.start.offset;
@@ -712,10 +713,15 @@ export function updateListItemText(text: string, func:(text: string) => string, 
 
     listText = func(listText);
 
-    text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, position.position.end.offset, listText);
+    replacements.push({startIndex, endIndex: position.position.end.offset, value: listText});
   }
 
-  return text;
+  // the positions are the paragraphs inside the list items rather than the items themselves, and a
+  // paragraph cannot contain another paragraph, so none of them overlap and every one of them was
+  // read from the text as it was passed in
+  replacements.reverse();
+
+  return replaceTextRanges(text, replacements);
 }
 
 export function ensureEmptyLinesAroundFencedCodeBlocks(text: string): string {
