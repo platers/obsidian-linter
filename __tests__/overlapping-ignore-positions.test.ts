@@ -73,6 +73,36 @@ const roundTripCases: {name: string, text: string, ignoreTypes: IgnoreType[]}[] 
   },
 ];
 
+describe('ignore types are masked in a canonical order', () => {
+  // An anchor tag is two separate html nodes, an opening and a closing one, which do not cover the
+  // url between them. The anchor has to be masked before html or the url is left exposed, and this
+  // has to hold however the rule happened to declare the two types.
+  const anchor = '<a href="https://www.google.com" target="_blank">https://www.google.com</a>';
+
+  it('masks anchor tags before html when declared in that order', () => {
+    expect(ignoreListOfTypes([IgnoreTypes.anchorTag, IgnoreTypes.html], anchor, (text) => {
+      expect(text).not.toContain('https://www.google.com');
+      return text;
+    })).toBe(anchor);
+  });
+
+  it('masks anchor tags before html even when declared the other way round', () => {
+    expect(ignoreListOfTypes([IgnoreTypes.html, IgnoreTypes.anchorTag], anchor, (text) => {
+      expect(text).not.toContain('https://www.google.com');
+      return text;
+    })).toBe(anchor);
+  });
+
+  it('masks yaml before thematic breaks so frontmatter is not treated as a horizontal rule', () => {
+    const text = '---\ntitle: a\n---\n\n---\n\nbody\n';
+
+    expect(ignoreListOfTypes([IgnoreTypes.thematicBreak, IgnoreTypes.yaml], text, (masked) => {
+      expect(masked).toContain('---\n---');
+      return masked;
+    })).toBe(text);
+  });
+});
+
 describe('masking restores text containing overlapping positions', () => {
   for (const testCase of roundTripCases) {
     it(testCase.name, () => {

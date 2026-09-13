@@ -41,24 +41,67 @@ function isMdastIgnoreType(ignoreType: IgnoreType): boolean {
   return typeof ignoreType.replaceAction === 'string';
 }
 
+// Rules each declare the ignore types they need, and masking used to follow that declaration
+// order, which meant the same two types could be masked in either order depending on the rule.
+// Masking them in one canonical order instead lets every mdast type be masked from a single parse
+// of the document, which is the bulk of the cost of linting a large file.
+//
+// The order is not arbitrary. Regions that enclose arbitrary markdown are masked first, then the
+// constraints that are known to matter:
+//   - anchorTag before html, because an anchor is an opening and a closing html node that do not
+//     cover the url between them, so masking html first leaves that url exposed
+//   - anchorTag, link and wikiLink before url, because each of them encloses a url
+//   - yaml before thematicBreak, because frontmatter delimiters are also a valid thematic break
+const canonicalIgnoreTypeOrder: IgnoreType[] = [
+  IgnoreTypes.customIgnore,
+  IgnoreTypes.obsidianMultiLineComments,
+  IgnoreTypes.templaterCommand,
+  IgnoreTypes.yaml,
+  IgnoreTypes.anchorTag,
+  IgnoreTypes.table,
+  IgnoreTypes.code,
+  IgnoreTypes.inlineCode,
+  IgnoreTypes.math,
+  IgnoreTypes.inlineMath,
+  IgnoreTypes.html,
+  IgnoreTypes.heading,
+  IgnoreTypes.blockquote,
+  IgnoreTypes.list,
+  IgnoreTypes.thematicBreak,
+  IgnoreTypes.bold,
+  IgnoreTypes.italics,
+  IgnoreTypes.image,
+  IgnoreTypes.link,
+  IgnoreTypes.wikiLink,
+  IgnoreTypes.tag,
+  IgnoreTypes.url,
+  IgnoreTypes.footnoteAtStartOfLine,
+  IgnoreTypes.footnoteAfterATask,
+];
+
+const canonicalRank = new Map<IgnoreType, number>(canonicalIgnoreTypeOrder.map((ignoreType, index) => [ignoreType, index]));
+
+function inCanonicalOrder(ignoreTypes: IgnoreType[]): IgnoreType[] {
+  return [...ignoreTypes].sort((a, b) => (canonicalRank.get(a) ?? Number.MAX_SAFE_INTEGER) - (canonicalRank.get(b) ?? Number.MAX_SAFE_INTEGER));
+}
+
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
   let placeholders: placeholderInfo[] = [];
 
   // replace ignore blocks with their placeholders
   let tempPlaceholders: placeholderInfo[] = [];
 
-  for (let i = 0; i < ignoreTypes.length; i++) {
-    const ignoreType = ignoreTypes[i];
+  const orderedIgnoreTypes = inCanonicalOrder(ignoreTypes);
+  for (let i = 0; i < orderedIgnoreTypes.length; i++) {
+    const ignoreType = orderedIgnoreTypes[i];
 
     if (isMdastIgnoreType(ignoreType)) {
       // Each mdast ignore type needs the document parsed, and parsing dominates the cost of
       // linting. Masking a run of them from a single view of the text lets them share one parse
-      // instead of reparsing the text the previous type just rewrote. The run stops at the next
-      // non mdast type because ignore types are ordered deliberately: `no-bare-urls` masks anchor
-      // tags before html so that the whole tag is hidden rather than just its angle brackets.
+      // instead of reparsing the text the previous type just rewrote.
       const run: IgnoreType[] = [];
-      while (i < ignoreTypes.length && isMdastIgnoreType(ignoreTypes[i])) {
-        run.push(ignoreTypes[i++]);
+      while (i < orderedIgnoreTypes.length && isMdastIgnoreType(orderedIgnoreTypes[i])) {
+        run.push(orderedIgnoreTypes[i++]);
       }
       i--;
 
