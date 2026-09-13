@@ -2,6 +2,8 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
+import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
+import {replaceTextRanges} from '../utils/strings';
 
 class FootnoteAfterPunctuationOptions implements Options {}
 
@@ -13,15 +15,24 @@ export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterP
       descriptionKey: 'rules.footnote-after-punctuation.description',
       type: RuleType.FOOTNOTE,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.footnoteAtStartOfLine, IgnoreTypes.footnoteAfterATask],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => FootnoteAfterPunctuationOptions {
     return FootnoteAfterPunctuationOptions;
   }
-  apply(text: string, options: FootnoteAfterPunctuationOptions): string {
+  apply(text: string, options: FootnoteAfterPunctuationOptions, protectedRanges: ProtectedRanges): string {
     // Matches a footnote reference containing any text except newlines and the
     // terminating ].
-    return text.replace(/(\[\^[^\]]+\]) ?([,.;!:?])/gm, '$2$1');
+    const replacements = collectUnprotectedRegexReplacements(text, /(\[\^[^\]]+\]) ?([,.;!:?])/gm, protectedRanges, {
+      guardRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[0].length}),
+      editRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[0].length, value: match[2] + match[1]}),
+    });
+    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    return replaceTextRanges(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<FootnoteAfterPunctuationOptions>[] {
     return [

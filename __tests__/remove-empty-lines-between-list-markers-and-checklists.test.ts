@@ -6,6 +6,21 @@ ruleTest({
   RuleBuilderClass: RemoveEmptyLinesBetweenListMarkersAndChecklists,
   testCases: [
     {
+      testName: 'Leaves list spacing inside fenced code unchanged',
+      before: '```\n- First\n\n- Second\n```\n\n- Third\n\n- Fourth',
+      after: '```\n- First\n\n- Second\n```\n\n- Third\n- Fourth',
+    },
+    {
+      testName: 'Leaves checklist spacing inside a disabled section unchanged',
+      before: '<!-- linter-disable -->\n- [ ] First\n\n- [ ] Second\n<!-- linter-enable -->\n\n- [ ] Third\n\n- [ ] Fourth',
+      after: '<!-- linter-disable -->\n- [ ] First\n\n- [ ] Second\n<!-- linter-enable -->\n\n- [ ] Third\n- [ ] Fourth',
+    },
+    {
+      testName: 'Collapses list spacing when an item ends with a multiline protected link',
+      before: '- [first\nline](target)\n\n- second\n\n- third',
+      after: '- [first\nline](target)\n- second\n- third',
+    },
+    {
       // accounts for https://github.com/platers/obsidian-linter/issues/283
       testName: 'Horizontal Rules after list should not be affected',
       before: dedent`

@@ -3,6 +3,9 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {checklistBoxIndicator} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {replaceTextRanges, textReplacement} from '../utils/strings';
+import {getEditsBetween} from '../utils/text-edits';
 
 class RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions implements Options {}
 
@@ -14,31 +17,49 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
       descriptionKey: 'rules.remove-empty-lines-between-list-markers-and-checklists.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.thematicBreak],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions {
     return RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions;
   }
-  apply(text: string, options: RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions): string {
+  apply(text: string, options: RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    // Keep the repeated, ordered passes on the decision view, never on the source.
+    let projectedText = projection.text;
     // account for '- [.]' where the period is any character except a line break character
     const checkBoxMarkerRegexText = `(( |\\t)*- ${checklistBoxIndicator}( |\\t)+.+)`;
-    text = this.replaceEmptyLinesBetweenList(text, checkBoxMarkerRegexText);
+    projectedText = this.replaceEmptyLinesBetweenList(projectedText, checkBoxMarkerRegexText);
 
     // account for ordered list marker
     const orderedMarkerRegexText = '(( |\\t)*\\d+\\.( |\\t)+.+)';
-    text = this.replaceEmptyLinesBetweenList(text, orderedMarkerRegexText);
+    projectedText = this.replaceEmptyLinesBetweenList(projectedText, orderedMarkerRegexText);
 
     // account for '+' list marker
     const plusMarkerRegexText = '(( |\\t)*\\+( |\\t)+.+)';
-    text = this.replaceEmptyLinesBetweenList(text, plusMarkerRegexText);
+    projectedText = this.replaceEmptyLinesBetweenList(projectedText, plusMarkerRegexText);
 
     // account for '-' list marker
     const dashMarkerRegexText = `(( |\\t)*-(?! ${checklistBoxIndicator})( |\\t)+.+)`;
-    text = this.replaceEmptyLinesBetweenList(text, dashMarkerRegexText);
+    projectedText = this.replaceEmptyLinesBetweenList(projectedText, dashMarkerRegexText);
 
     // account for '*' list marker
     const splatMarkerRegexText = '(( |\\t)*\\*( |\\t)+.+)';
-    return this.replaceEmptyLinesBetweenList(text, splatMarkerRegexText);
+    projectedText = this.replaceEmptyLinesBetweenList(projectedText, splatMarkerRegexText);
+
+    const replacements: textReplacement[] = [];
+    for (const edit of getEditsBetween(projection.text, projectedText)) {
+      const range = projection.editRangeToSource(edit);
+      if (range) {
+        replacements.push({...range, value: edit.value});
+      }
+    }
+
+    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    return replaceTextRanges(text, replacements);
   }
   replaceEmptyLinesBetweenList = function(text: string, listIndicatorRegexText: string): string {
     const listRegex = new RegExp(`^${listIndicatorRegexText}\n(?:(?:[\t\v\f\r \u00a0\u2000-\u200b\u2028-\u2029\u3000]+)?\n){1,}${listIndicatorRegexText}$`, 'gm');

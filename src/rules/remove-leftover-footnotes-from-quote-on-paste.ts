@@ -3,6 +3,8 @@ import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
+import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
+import {replaceTextRanges} from '../utils/strings';
 
 class RemoveLeftoverFootnotesFromQuoteOnPasteOptions implements Options {}
 
@@ -13,14 +15,25 @@ export default class RemoveLeftoverFootnotesFromQuoteOnPaste extends RuleBuilder
       nameKey: 'rules.remove-leftover-footnotes-from-quote-on-paste.name',
       descriptionKey: 'rules.remove-leftover-footnotes-from-quote-on-paste.description',
       ruleIgnoreTypes: [IgnoreTypes.wikiLink, IgnoreTypes.link, IgnoreTypes.image],
+      usesProtectedRanges: true,
       type: RuleType.PASTE,
     });
   }
   get OptionsClass(): new () => RemoveLeftoverFootnotesFromQuoteOnPasteOptions {
     return RemoveLeftoverFootnotesFromQuoteOnPasteOptions;
   }
-  apply(text: string, options: RemoveLeftoverFootnotesFromQuoteOnPasteOptions): string {
-    return text.replace(/(\D)[.,]\d+/g, '$1');
+  apply(text: string, options: RemoveLeftoverFootnotesFromQuoteOnPasteOptions, protectedRanges: ProtectedRanges): string {
+    // A placeholder's closing brace satisfies the non-digit anchor; only the suffix is removed.
+    const rangeForMatch = (match: RegExpMatchArray, startIndex: number) => ({startIndex: startIndex + match[1].length, endIndex: startIndex + match[0].length, value: ''});
+    const replacements = collectUnprotectedRegexReplacements(text, /(\D)[.,]\d+/g, protectedRanges, {
+      guardRange: rangeForMatch,
+      editRange: rangeForMatch,
+    });
+    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    return replaceTextRanges(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<RemoveLeftoverFootnotesFromQuoteOnPasteOptions>[] {
     return [

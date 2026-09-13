@@ -6,6 +6,21 @@ ruleTest({
   RuleBuilderClass: EmptyLineAroundTables,
   testCases: [
     {
+      testName: 'Leaves tables inside fenced code unchanged',
+      before: '```\nBefore\n| a |\n| - |\n| b |\nAfter\n```',
+      after: '```\nBefore\n| a |\n| - |\n| b |\nAfter\n```',
+    },
+    {
+      testName: 'Leaves tables inside a disabled section unchanged',
+      before: '<!-- linter-disable -->\nBefore\n| a |\n| - |\n| b |\nAfter\n<!-- linter-enable -->',
+      after: '<!-- linter-disable -->\nBefore\n| a |\n| - |\n| b |\nAfter\n<!-- linter-enable -->',
+    },
+    {
+      testName: 'Uses projected lines around a table between protected multiline constructs',
+      before: '```\ncode\n```\n| a |\n| - |\n| b |\n$$\nx\n$$',
+      after: '```\ncode\n```\n\n| a |\n| - |\n| b |\n\n$$\nx\n$$',
+    },
+    {
       testName: 'Make sure multiple blank lines at the start and end are removed',
       before: dedent`
         ${''}
