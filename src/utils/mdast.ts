@@ -821,10 +821,26 @@ export function ensureEmptyLinesAroundHorizontalRule(text: string): string {
   return text;
 }
 
-export function updateOrderedListItemIndicators(text: string, orderedListStyle: OrderListItemStyles, orderedListEndStyle: OrderListItemEndOfIndicatorStyles, preserveStart: boolean): string {
+export function updateOrderedListItemIndicators(text: string, orderedListStyle: OrderListItemStyles, orderedListEndStyle: OrderListItemEndOfIndicatorStyles, preserveStart: boolean, protectedRanges: ProtectedRanges): string {
+  // Keep the real tree's list boundaries; ignored blocks do not join otherwise separate lists.
   const positions: Position[] = getPositions(MDAstTypes.List, text);
   if (!positions) {
     return text;
+  }
+
+  const listItemRegex = /^(( |\t|> )*)((\d+(\.|\)))|[-*+])([^\n]*)$/gm;
+  const protectedIndicatorLines = new Set<number>();
+  let sourceLine = 0;
+  let previousMatchOffset = 0;
+  // Nested lists are rewritten before their parents and can change indicator widths. Record
+  // eligibility against the original text by line, since renumbering never changes newlines.
+  for (const match of text.matchAll(listItemRegex)) {
+    sourceLine += countInstances(text.substring(previousMatchOffset, match.index), '\n');
+    previousMatchOffset = match.index;
+    const indicatorStart = match.index + match[1].length;
+    if (protectedRanges.isProtected(indicatorStart, indicatorStart + match[3].length)) {
+      protectedIndicatorLines.add(sourceLine);
+    }
   }
 
   for (const position of positions) {
@@ -854,7 +870,16 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
     };
 
     let lastItemListIndicatorLevel = -1;
-    listText = listText.replace(/^(( |\t|> )*)((\d+(\.|\)))|[-*+])([^\n]*)$/gm, (listItem: string, $1: string = '', _$2: string, $3: string, _$4: string, _$5: string, $6: string) => {
+    let currentLine = countInstances(text.substring(0, start), '\n');
+    let previousListMatchOffset = 0;
+    listText = listText.replace(listItemRegex, (listItem: string, $1: string = '', _$2: string, $3: string, _$4: string, _$5: string, $6: string, offset: number) => {
+      currentLine += countInstances(listText.substring(previousListMatchOffset, offset), '\n');
+      previousListMatchOffset = offset;
+      // Masked indicators neither changed nor participated in level/counter tracking.
+      if (protectedIndicatorLines.has(currentLine)) {
+        return listItem;
+      }
+
       // _$4 is the indicator with its terminator attached (`1.` or `1)`), so it has to be
       // parsed rather than coerced: Number('1.') is 1, but Number('1)') is NaN.
       let listItemIndicatorNumber = (orderedListStyle === OrderListItemStyles.Preserve || preserveStart) ? parseInt(_$4, 10) : 1;
@@ -894,8 +919,10 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
   return text;
 }
 
-export function updateUnorderedListItemIndicators(text: string, unorderedListStyle: UnorderedListItemStyles): string {
-  const positions: Position[] = getPositions(MDAstTypes.ListItem, text);
+export function updateUnorderedListItemIndicators(text: string, unorderedListStyle: UnorderedListItemStyles, protectedRanges: ProtectedRanges): string {
+  // Only the bullet changes; protected content inside an otherwise editable item is irrelevant.
+  // Filter before consistent-style selection so ignored bullets cannot choose the style.
+  const positions: Position[] = getPositions(MDAstTypes.ListItem, text).filter((position) => !protectedRanges.isProtected(position.start.offset, position.start.offset + 1));
   if (!positions) {
     return text;
   }

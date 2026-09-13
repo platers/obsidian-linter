@@ -3,6 +3,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {UnorderedListItemStyles, updateUnorderedListItemIndicators} from '../utils/mdast';
+import type {ProtectedRanges} from '../utils/protected-ranges';
 
 class UnorderedListStyleOptions implements Options {
   listStyle?: UnorderedListItemStyles = UnorderedListItemStyles.Consistent;
@@ -16,13 +17,14 @@ export default class UnorderedListStyle extends RuleBuilder<UnorderedListStyleOp
       descriptionKey: 'rules.unordered-list-style.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => UnorderedListStyleOptions {
     return UnorderedListStyleOptions;
   }
-  apply(text: string, options: UnorderedListStyleOptions): string {
-    return updateUnorderedListItemIndicators(text, options.listStyle);
+  apply(text: string, options: UnorderedListStyleOptions, protectedRanges: ProtectedRanges): string {
+    return updateUnorderedListItemIndicators(text, options.listStyle, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<UnorderedListStyleOptions>[] {
     return [

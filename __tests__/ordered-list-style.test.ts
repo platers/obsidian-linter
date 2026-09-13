@@ -1,7 +1,10 @@
 import OrderedListStyle from '../src/rules/ordered-list-style';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
-import {OrderListItemStyles} from '../src/utils/mdast';
+import {OrderListItemEndOfIndicatorStyles, OrderListItemStyles, UnorderedListItemStyles, updateOrderedListItemIndicators, updateUnorderedListItemIndicators} from '../src/utils/mdast';
+import UnorderedListStyle from '../src/rules/unordered-list-style';
+import {ignoreListOfTypes} from '../src/utils/ignore-types';
+import {ProtectedRanges} from '../src/utils/protected-ranges';
 
 ruleTest({
   RuleBuilderClass: OrderedListStyle,
@@ -218,4 +221,107 @@ ruleTest({
       `,
     },
   ],
+});
+
+describe('list indicator protected-range compatibility', () => {
+  const separatedByCustomIgnore = '1. first\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n1. after';
+  const documents = [
+    '10. first\n10. second\n10. third',
+    '1. outer\n   9. inner\n   9. inner\n8. after',
+    '1. outer\n   ```\n   90. code\n   - code\n   ```\n8. after',
+    '1. outer\n   $$\n   90. math\n   $$\n8. after',
+    '9. outer\n' + Array.from({length: 12}, (_, index) => `   99. nested ${index}`).join('\n') + '\n\n       ```\n       77. hidden\n       ```\n8. after',
+    '> 8. item\n>    ```\n>    90. code\n>    ```\n> 8. next\n> > 3. nested\n> > 3. nested',
+    '<!-- linter-disable -->\n+ ignored\n1. ignored\n<!-- linter-enable -->\n\n* first\n- last',
+    '- first #tag\n  3) ordered\n  3) ordered\n- [ ] task\n+ last',
+    '---\nitems:\n  - yaml\n---\n\n+ first\n- last',
+  ];
+  const numberOptions = Object.values(OrderListItemStyles).flatMap((numberStyle) => {
+    return Object.values(OrderListItemEndOfIndicatorStyles).flatMap((listEndStyle) => {
+      return [false, true].map((preserveStart) => ({numberStyle, listEndStyle, preserveStart}));
+    });
+  });
+
+  it.each(numberOptions)('matches ordered masking for $numberStyle/$listEndStyle, preserveStart=$preserveStart', (options) => {
+    const rule = OrderedListStyle.getRule();
+    for (const text of documents) {
+      // Empty guards on masked text retain the old helper's numbering and level-tracking behavior.
+      const expected = ignoreListOfTypes(rule.ignoreTypes, text, (masked) => {
+        return updateOrderedListItemIndicators(masked, options.numberStyle, options.listEndStyle, options.preserveStart, new ProtectedRanges([]));
+      });
+      expect(rule.apply(text, options)).toBe(expected);
+    }
+  });
+
+  it.each(Object.values(UnorderedListItemStyles))('matches unordered masking for %s', (listStyle) => {
+    const rule = UnorderedListStyle.getRule();
+    for (const text of [...documents, separatedByCustomIgnore]) {
+      const expected = ignoreListOfTypes(rule.ignoreTypes, text, (masked) => {
+        return updateUnorderedListItemIndicators(masked, listStyle, new ProtectedRanges([]));
+      });
+      expect(rule.apply(text, {listStyle})).toBe(expected);
+    }
+  });
+
+  it.each(numberOptions)('preserves separate source lists for $numberStyle/$listEndStyle, preserveStart=$preserveStart', (options) => {
+    // Masking joined these lists because its placeholder was absorbed as lazy continuation.
+    // The real tree keeps them separate, so numbering now restarts after linter-disable sections.
+    const expected = `1${options.listEndStyle} first\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n1${options.listEndStyle} after`;
+    expect(OrderedListStyle.getRule().apply(separatedByCustomIgnore, options)).toBe(expected);
+  });
+
+  it('renumbers a list enclosing code without counting or changing indicators inside the code', () => {
+    const text = '1. outer\n   ```\n   90. code\n   - code\n   ```\n8. after';
+    expect(OrderedListStyle.getRule().apply(text)).toBe('1. outer\n   ```\n   90. code\n   - code\n   ```\n2. after');
+  });
+
+  it('uses the first unprotected non-checklist bullet for consistent style', () => {
+    const prefix = '<!-- linter-disable -->\n+ ignored\n<!-- linter-enable -->\n\n1. ordered\n\n- [ ] task\n\n';
+    expect(UnorderedListStyle.getRule().apply(prefix + '* first\n- last')).toBe(prefix + '* first\n* last');
+  });
+
+  it('changes an unordered marker while preserving its protected contents', () => {
+    const text = '- outer\n  ```\n  - code\n  ```\n- after';
+    expect(UnorderedListStyle.getRule().apply(text, {listStyle: UnorderedListItemStyles.Plus})).toBe('+ outer\n  ```\n  - code\n  ```\n+ after');
+  });
+
+  it.each([
+    {
+      name: 'a protected gap without blank lines',
+      before: '1. first\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n1. after',
+      after: '1. first\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n1. after',
+    },
+    {
+      name: 'a blank line before the protected section',
+      before: '1. first\n\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n1. after',
+      after: '1. first\n\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n1. after',
+    },
+    {
+      name: 'a blank line after the protected section',
+      before: '1. first\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n\n1. after',
+      after: '1. first\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n\n1. after',
+    },
+    {
+      name: 'two protected sections separated by a blank line',
+      before: '1. first\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n\n<!-- linter-disable -->\n8. hidden\n<!-- linter-enable -->\n1. after',
+      after: '1. first\n<!-- linter-disable -->\n9. hidden\n<!-- linter-enable -->\n\n<!-- linter-disable -->\n8. hidden\n<!-- linter-enable -->\n1. after',
+    },
+    {
+      name: 'an unindented fenced code block between items',
+      before: '1. first\n```\n9. hidden\n```\n1. after',
+      after: '1. first\n```\n9. hidden\n```\n1. after',
+    },
+    {
+      name: 'an indented code block inside a list item',
+      before: '1. first\n\n       9. hidden\n\n1. after',
+      after: '1. first\n\n       9. hidden\n\n2. after',
+    },
+    {
+      name: 'a protected gap between different ordered delimiter styles',
+      before: '1. first\n```\n9. hidden\n```\n1) after',
+      after: '1. first\n```\n9. hidden\n```\n1. after',
+    },
+  ])('keeps natural list grouping for $name', ({before, after}) => {
+    expect(OrderedListStyle.getRule().apply(before)).toBe(after);
+  });
 });
