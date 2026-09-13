@@ -1,7 +1,7 @@
 import QuickLRU from 'quick-lru';
 import {IgnoreType, TextRange} from './ignore-types';
 import {cachePositionsForTypes, getPositions, MDAstTypes} from './mdast';
-import {hashString53Bit} from './strings';
+import {hashString53Bit, textReplacement} from './strings';
 
 /**
  * The regions of a document a rule is not allowed to change.
@@ -123,6 +123,42 @@ export class ProtectedRanges {
 
     return answer;
   }
+}
+
+/**
+ * Collects edits from regex matches using a rule-selected protection guard.
+ *
+ * The edit range is what gets replaced; the guard range is what masking would have had to see.
+ * Specific punctuation anchors must be visible, but placeholders can satisfy non-whitespace anchors.
+ * Match iteration still consumes the whole match, just like String.replace, so adjacent matches
+ * cannot reuse an anchor consumed by an earlier one.
+ * @param {string} text The original document or an original list paragraph slice
+ * @param {RegExp} regex The global expression to match
+ * @param {ProtectedRanges} protectedRanges The regions that must not overlap the guard range
+ * @param {object} rangesForMatch Builds the edit and guard ranges using document-relative offsets
+ * @param {number} offset The slice's starting offset in the original document
+ * @return {textReplacement[]} Edits in ascending order, relative to the original document
+ */
+export function collectUnprotectedRegexReplacements(
+    text: string,
+    regex: RegExp,
+    protectedRanges: ProtectedRanges,
+    rangesForMatch: {
+      editRange: (match: RegExpMatchArray, startIndex: number) => textReplacement,
+      guardRange: (match: RegExpMatchArray, startIndex: number) => TextRange,
+    },
+    offset: number = 0,
+): textReplacement[] {
+  const replacements: textReplacement[] = [];
+  for (const match of text.matchAll(regex)) {
+    const startIndex = offset + match.index;
+    const guardRange = rangesForMatch.guardRange(match, startIndex);
+    if (!protectedRanges.isProtected(guardRange.startIndex, guardRange.endIndex)) {
+      replacements.push(rangesForMatch.editRange(match, startIndex));
+    }
+  }
+
+  return replacements;
 }
 
 /**

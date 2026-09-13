@@ -1,6 +1,8 @@
 import RemoveMultipleSpaces from '../src/rules/remove-multiple-spaces';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
+import {ignoreListOfTypes, IgnoreTypes} from '../src/utils/ignore-types';
+import {updateListItemText} from '../src/utils/mdast';
 
 ruleTest({
   RuleBuilderClass: RemoveMultipleSpaces,
@@ -266,3 +268,44 @@ ruleTest({
   ],
 });
 
+describe('protected-range compatibility', () => {
+  it.each([
+    ['text  [link](url)  more', 'text [link](url) more'],
+    ['text  [two  words](url)  more', 'text [two  words](url) more'],
+    ['[first](a)  [second](b)', '[first](a) [second](b)'],
+    ['- text  `two  words`  more', '- text `two  words` more'],
+  ])('collapses only writable space runs in %j', (text, expected) => {
+    // Placeholders satisfy the non-whitespace anchors; only the spaces themselves need to be visible.
+    expect(RemoveMultipleSpaces.getRule().apply(text)).toBe(expected);
+  });
+
+  const documents = [
+    'a  b  c  d',
+    'a\t  b\n  leading  text  \ntrailing  ',
+    '>  quote  text\n >  indented  quote\ntext >  middle',
+    '> - first  item\n>   continuation  text\n>\n>  following  quote',
+    '> > - first  item\n> >   - nested  item\n> >\n> >  following  quote',
+    '- first  item\n  - nested  item\n\nfollowing  paragraph',
+    '- first  paragraph\n\n  second  paragraph\n\n- last  item',
+    '- [ ] task  text\n- [x] task  text\n- [?] task  text\n-   [?] task  text',
+    '- first  line\n>  continuation  text',
+    '<span class="two  words">some  text</span>',
+    'text  `code`  more',
+    'text  [link](url)  more',
+    '- text  [[wiki link]]  more',
+    'text  #tag  more',
+    '<!-- linter-disable -->\n- ignored  text\n<!-- linter-enable -->\n\neditable  text',
+  ];
+
+  it.each(documents)('matches legacy output for %j', (text) => {
+    const builder = new RemoveMultipleSpaces();
+    const expected = ignoreListOfTypes(builder.ignoreTypes, text, (value) => {
+      const outsideLists = ignoreListOfTypes([IgnoreTypes.list], value, (content) => {
+        return content.replace(/(?!^>)([^\s])( ){2,}([^\s])/gm, '$1 $3');
+      });
+      return updateListItemText(outsideLists, (content) => content.replace(/([^\s])( ){2,}([^\s])/gm, '$1 $3'));
+    });
+
+    expect(RemoveMultipleSpaces.getRule().apply(text)).toBe(expected);
+  });
+});

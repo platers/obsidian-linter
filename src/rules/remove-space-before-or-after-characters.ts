@@ -3,7 +3,7 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from 
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {getListItemTextPositions} from '../utils/mdast';
-import {ProtectedRanges} from '../utils/protected-ranges';
+import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
 import {checklistBoxStartsTextRegex, escapeRegExp} from '../utils/regex';
 import {replaceTextRanges, textReplacement} from '../utils/strings';
 
@@ -39,22 +39,22 @@ export default class RemoveSpaceBeforeOrAfterCharacters extends RuleBuilder<Remo
     const removeWhitespaceAfterCharacters = new RegExp(`([${symbolsAfter}])([ \t])+`, 'g');
     const replacements: textReplacement[] = [];
     const collectReplacements = function(value: string, offset: number, ignored: ProtectedRanges): void {
-      for (const match of value.matchAll(removeWhitespaceBeforeCharacters)) {
-        const startIndex = offset + match.index;
-        const endIndex = startIndex + match[0].length - match[2].length;
-        // The anchor must also be visible, even though only the whitespace is deleted.
-        if (!ignored.isProtected(startIndex, offset + match.index + match[0].length)) {
-          replacements.push({startIndex, endIndex, value: ''});
-        }
-      }
-
-      for (const match of value.matchAll(removeWhitespaceAfterCharacters)) {
-        const startIndex = offset + match.index + match[1].length;
-        const endIndex = offset + match.index + match[0].length;
-        if (!ignored.isProtected(offset + match.index, endIndex)) {
-          replacements.push({startIndex, endIndex, value: ''});
-        }
-      }
+      replacements.push(...collectUnprotectedRegexReplacements(value, removeWhitespaceBeforeCharacters, ignored, {
+        editRange: (match, startIndex) => ({
+          startIndex,
+          endIndex: startIndex + match[0].length - match[2].length,
+          value: '',
+        }),
+        guardRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[0].length}),
+      }, offset));
+      replacements.push(...collectUnprotectedRegexReplacements(value, removeWhitespaceAfterCharacters, ignored, {
+        editRange: (match, startIndex) => ({
+          startIndex: startIndex + match[1].length,
+          endIndex: startIndex + match[0].length,
+          value: '',
+        }),
+        guardRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[0].length}),
+      }, offset));
     };
 
     collectReplacements(text, 0, protectedRanges.combinedWith([IgnoreTypes.list, IgnoreTypes.html]));

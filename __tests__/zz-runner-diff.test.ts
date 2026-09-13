@@ -139,6 +139,32 @@ const adversarialDocuments: corpusDocument[] = [
     name: 'wiki links and tags next to urls',
     text: 'A [[wiki link]] and #a-tag and https://example.com/b and [a link](https://example.com/c).\n',
   },
+  // Whether a rule may change the whitespace touching an ignored region depends on whether the
+  // placeholder that used to stand in for that region would itself have satisfied whatever the
+  // rule matches on. Two rules that look alike disagree about it, so the boundary needs documents
+  // of its own rather than being left to turn up inside some larger case.
+  {
+    name: 'runs of spaces on both sides of ignored constructs',
+    text: 'text  [a link](https://example.com)  more  `inline code`  and  [[a wiki link]]  and  #a-tag  end\n',
+  },
+  {
+    name: 'punctuation separated from ignored constructs by a space',
+    text: 'see [a link](https://example.com) , and `code` ; and [[a wiki]] ! and ( spaced )\n',
+  },
+  {
+    name: 'ignored constructs sitting directly against each other',
+    text: '`one``two` and [[a]][[b]] and $x$$y$ end\n',
+  },
+  {
+    name: 'a list item whose text runs up against ignored constructs',
+    text: '-  an item  with  `code`  in it\n-  [a link](https://example.com)  after  two  spaces\n',
+  },
+  {
+    // masking a list collapsed it to a single line, which moves where a line starts, and the rule
+    // that collapses runs of spaces declines to touch a line beginning with a blockquote marker
+    name: 'blockquote markers and lists sharing a run of spaces',
+    text: '>  quoted  text\n\n-  a list  item\n   -  nested  item\n\n>  after  the  list\n>  more  quoted  text\n',
+  },
   {
     name: 'a mix of the constructs the rules tend to fight over',
     text: dedent`
