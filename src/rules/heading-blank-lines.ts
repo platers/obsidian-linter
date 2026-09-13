@@ -3,6 +3,9 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {yamlRegex} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {replaceTextRanges, textReplacement} from '../utils/strings';
+import {getEditsBetween} from '../utils/text-edits';
 
 class HeadingBlankLinesOptions implements Options {
   bottom: boolean = true;
@@ -17,28 +20,45 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
       descriptionKey: 'rules.heading-blank-lines.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => HeadingBlankLinesOptions {
     return HeadingBlankLinesOptions;
   }
-  apply(text: string, options: HeadingBlankLinesOptions): string {
+  apply(text: string, options: HeadingBlankLinesOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    // Keep the ordered passes on the decision view: later expressions consume the blank lines
+    // inserted by earlier ones. Only their net edits are mapped back to the untouched source.
+    let projectedText = projection.text;
     if (!options.bottom) {
-      text = text.replace(/^([^#\n][^\n]+)\n+(#+\s.*)/gm, '$1\n\n$2');
+      projectedText = projectedText.replace(/^([^#\n][^\n]+)\n+(#+\s.*)/gm, '$1\n\n$2');
     } else {
-      text = text.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings
-      text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
-      text = text.replace(/(^#+\s.*)\n+/gm, '$1\n\n'); // trim blank lines after headings
+      projectedText = projectedText.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings
+      projectedText = projectedText.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
+      projectedText = projectedText.replace(/(^#+\s.*)\n+/gm, '$1\n\n'); // trim blank lines after headings
     }
 
-    text = text.replace(/^\n+(#+\s.*)/, '$1'); // remove blank lines before first heading
-    text = text.replace(/(#+\s.*)\n+$/, '$1'); // remove blank lines after last heading
+    projectedText = projectedText.replace(/^\n+(#+\s.*)/, '$1'); // remove blank lines before first heading
+    projectedText = projectedText.replace(/(#+\s.*)\n+$/, '$1'); // remove blank lines after last heading
 
     if (!options.emptyLineAfterYaml) {
-      text = text.replace(new RegExp('(' + yamlRegex.source + ')\\n+(#+\\s.*)'), '$1\n$5');
+      projectedText = projectedText.replace(new RegExp('(' + yamlRegex.source + ')\\n+(#+\\s.*)'), '$1\n$5');
     }
 
-    return text;
+    const replacements: textReplacement[] = [];
+    for (const edit of getEditsBetween(projection.text, projectedText)) {
+      const range = projection.editRangeToSource(edit);
+      if (range) {
+        replacements.push({...range, value: edit.value});
+      }
+    }
+
+    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    return replaceTextRanges(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<HeadingBlankLinesOptions>[] {
     return [

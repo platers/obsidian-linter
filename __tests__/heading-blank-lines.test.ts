@@ -16,11 +16,21 @@ ruleTest({
       after: '<!-- linter-disable -->\n# inside\ntext\n<!-- linter-enable -->',
     },
     {
-      // This rule remains on masking: collapsing a multiline ignored region changes heading adjacency.
       testName: 'Preserves heading adjacency across a multiline disabled section',
       before: '# <!-- linter-disable -->\n<!-- linter-enable -->\n# h',
       after: '# <!-- linter-disable -->\n<!-- linter-enable -->\n# h',
       options: {bottom: false, emptyLineAfterYaml: true},
+    },
+    {
+      testName: 'Maps blank lines around a heading containing a multiline disabled section',
+      before: 'text\n# <!-- linter-disable -->\n<!-- linter-enable -->\n# h\ntext',
+      after: 'text\n\n# <!-- linter-disable -->\n<!-- linter-enable -->\n\n# h\n\ntext',
+    },
+    {
+      testName: 'Maps YAML spacing and adjacent heading edits without overlapping',
+      before: '---\nkey: value\n---\n\n\n# first\n# second\n```\n# inside\n```\n# last\n\n',
+      after: '---\nkey: value\n---\n# first\n\n# second\n\n```\n# inside\n```\n\n# last',
+      options: {bottom: true, emptyLineAfterYaml: false},
     },
     {
       testName: 'Ignores codeblocks',

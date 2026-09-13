@@ -45,6 +45,18 @@ export class ProtectedRanges {
     return this.context.protectedRangesFor([...this.ignoreTypes, ...ignoreTypes]);
   }
 
+  /**
+   * The cached decision view for these ignore types, owned by the same context as the ranges.
+   * @return {DocumentProjection} The projection with maps back to source offsets
+   */
+  projection(): DocumentProjection {
+    if (!this.context || !this.ignoreTypes) {
+      throw new Error('protected ranges that did not come from a lint context cannot provide a projection');
+    }
+
+    return this.context.projectionFor(this.ignoreTypes);
+  }
+
   get isEmpty(): boolean {
     return this.startIndexes.length === 0;
   }

@@ -17,10 +17,14 @@ ruleTest({
       after: '<!-- linter-disable -->\n# inside!\n<!-- linter-enable -->\n# outside',
     },
     {
-      // This rule remains on masking: collapsing a multiline ignored region changes the heading end.
       testName: 'Preserves masking behavior across a multiline disabled section in a heading',
       before: '# <!-- linter-disable -->\n<!-- linter-enable -->!',
       after: '# <!-- linter-disable -->\n<!-- linter-enable -->',
+    },
+    {
+      testName: 'Maps punctuation edits around protected blocks in source order',
+      before: '# first!!\n```\n# inside!\n```\n# <!-- linter-disable -->\n<!-- linter-enable -->!!  ##\n# last!',
+      after: '# first\n```\n# inside!\n```\n# <!-- linter-disable -->\n<!-- linter-enable -->  ##\n# last',
     },
     {
       testName: 'A single trailing punctuation character is removed',
