@@ -7,6 +7,22 @@ ruleTest({
   RuleBuilderClass: RemoveTrailingPunctuationInHeading,
   testCases: [
     {
+      testName: 'Leaves trailing heading punctuation inside fenced code alone',
+      before: '```\n# inside!\n```\n# outside!',
+      after: '```\n# inside!\n```\n# outside',
+    },
+    {
+      testName: 'Leaves trailing heading punctuation inside disabled sections alone',
+      before: '<!-- linter-disable -->\n# inside!\n<!-- linter-enable -->\n# outside!',
+      after: '<!-- linter-disable -->\n# inside!\n<!-- linter-enable -->\n# outside',
+    },
+    {
+      // This rule remains on masking: collapsing a multiline ignored region changes the heading end.
+      testName: 'Preserves masking behavior across a multiline disabled section in a heading',
+      before: '# <!-- linter-disable -->\n<!-- linter-enable -->!',
+      after: '# <!-- linter-disable -->\n<!-- linter-enable -->',
+    },
+    {
       testName: 'A single trailing punctuation character is removed',
       before: '# Heading.',
       after: '# Heading',

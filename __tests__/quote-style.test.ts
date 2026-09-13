@@ -5,6 +5,46 @@ import {ruleTest} from './common';
 ruleTest({
   RuleBuilderClass: QuoteStyle,
   testCases: [
+    {
+      // Edits come from more than one pass and have to be ordered together before applying.
+      testName: 'Orders double and single quote edits together with default settings',
+      before: '‘“',
+      after: '\'"',
+    },
+    {
+      testName: 'Leaves smart quotes inside fenced code alone',
+      before: '```\n“inside” ‘inside’\n```\n“outside” ‘outside’',
+      after: '```\n“inside” ‘inside’\n```\n"outside" \'outside\'',
+    },
+    {
+      testName: 'Leaves smart quotes inside disabled sections alone',
+      before: '<!-- linter-disable -->\n“inside” ‘inside’\n<!-- linter-enable -->\n“outside” ‘outside’',
+      after: '<!-- linter-disable -->\n“inside” ‘inside’\n<!-- linter-enable -->\n"outside" \'outside\'',
+    },
+    {
+      testName: 'Protected straight quotes do not advance smart quote pairing',
+      before: '```\n"\'\n```\n<!-- linter-disable -->\n"\'\n<!-- linter-enable -->\n"outside" \'outside\'',
+      after: '```\n"\'\n```\n<!-- linter-disable -->\n"\'\n<!-- linter-enable -->\n“outside” ‘outside’',
+      options: {singleQuoteStyle: SingleQuoteStyles.SmartQuote, doubleQuoteStyle: DoubleQuoteStyles.SmartQuote},
+    },
+    {
+      testName: 'Ignores templater and HTML quotes while converting surrounding quotes',
+      before: '"<% "\' %>" \'<span title="\'">text</span>\'',
+      after: '“<% "\' %>” ‘<span title="\'">text</span>’',
+      options: {singleQuoteStyle: SingleQuoteStyles.SmartQuote, doubleQuoteStyle: DoubleQuoteStyles.SmartQuote},
+    },
+    {
+      testName: 'Classifies quotes beside protected content without reading its letters',
+      before: '\'`a`\'b "[x](url)"',
+      after: '‘`a`’b “[x](url)”',
+      options: {singleQuoteStyle: SingleQuoteStyles.SmartQuote, doubleQuoteStyle: DoubleQuoteStyles.SmartQuote},
+    },
+    {
+      testName: 'Combines double quote straightening and single quote smartening against original text',
+      before: '“\'text\'”',
+      after: '"‘text’"',
+      options: {singleQuoteStyle: SingleQuoteStyles.SmartQuote, doubleQuoteStyle: DoubleQuoteStyles.Straight},
+    },
     { // accounts for https://github.com/platers/obsidian-linter/issues/826
       testName: 'Make sure inline code is unaffected',
       before: dedent`

@@ -6,6 +6,23 @@ ruleTest({
   RuleBuilderClass: HeadingBlankLines,
   testCases: [
     {
+      testName: 'Leaves heading spacing inside fenced code alone',
+      before: '```\n# inside\ntext\n```',
+      after: '```\n# inside\ntext\n```',
+    },
+    {
+      testName: 'Leaves heading spacing inside disabled sections alone',
+      before: '<!-- linter-disable -->\n# inside\ntext\n<!-- linter-enable -->',
+      after: '<!-- linter-disable -->\n# inside\ntext\n<!-- linter-enable -->',
+    },
+    {
+      // This rule remains on masking: collapsing a multiline ignored region changes heading adjacency.
+      testName: 'Preserves heading adjacency across a multiline disabled section',
+      before: '# <!-- linter-disable -->\n<!-- linter-enable -->\n# h',
+      after: '# <!-- linter-disable -->\n<!-- linter-enable -->\n# h',
+      options: {bottom: false, emptyLineAfterYaml: true},
+    },
+    {
       testName: 'Ignores codeblocks',
       before: dedent`
         ---

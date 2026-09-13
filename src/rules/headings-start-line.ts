@@ -3,6 +3,8 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex} from '../utils/regex';
+import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
+import {replaceTextRanges} from '../utils/strings';
 
 class HeadingStartLineOptions implements Options {}
 
@@ -14,15 +16,25 @@ export default class HeadingStartLine extends RuleBuilder<HeadingStartLineOption
       descriptionKey: 'rules.headings-start-line.description',
       type: RuleType.HEADING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => HeadingStartLineOptions {
     return HeadingStartLineOptions;
   }
-  apply(text: string, options: HeadingStartLineOptions): string {
-    return text.replaceAll(allHeadersRegex, (heading: string) => {
-      return heading.trimStart();
-    });
+  apply(text: string, options: HeadingStartLineOptions, protectedRanges: ProtectedRanges): string {
+    const replacements = collectUnprotectedRegexReplacements(
+        text, allHeadersRegex, protectedRanges, {
+          editRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[1].length, value: ''}),
+          // The heading marker must be visible, but its text can contain a placeholder.
+          guardRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[1].length + match[2].length + match[3].length}),
+        },
+    );
+    replacements.sort((a, b) => a.startIndex - b.startIndex);
+    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    return replaceTextRanges(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<HeadingStartLineOptions>[] {
     return [
