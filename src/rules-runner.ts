@@ -25,6 +25,7 @@ import YamlTitle from './rules/yaml-title';
 import YamlTitleAlias from './rules/yaml-title-alias';
 import BlockquoteStyle from './rules/blockquote-style';
 import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
+import {LintContext} from './utils/protected-ranges';
 import {addEditsIfTheyDoNotClash, getEditsBetween} from './utils/text-edits';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
 import {LinterSettings} from './settings-data';
@@ -148,6 +149,11 @@ export class RulesRunner {
     let index = 0;
     while (index < rulesToRun.length) {
       const snapshot = text;
+      // Every rule in a batch is given this exact text, so the parse of it and the regions of it
+      // each rule has to leave alone are worked out once and shared by all of them. The context
+      // describes this snapshot and nothing else, so it is dropped as soon as the batch's changes
+      // are applied and the text moves on.
+      const context = new LintContext(snapshot);
       const batchedEdits: textReplacement[] = [];
 
       while (index < rulesToRun.length) {
@@ -163,7 +169,7 @@ export class RulesRunner {
           break;
         }
 
-        const [ruleOutput] = RuleBuilderBase.applyIfEnabledBase(rule, snapshot, settings, extraOptions);
+        const [ruleOutput] = RuleBuilderBase.applyIfEnabledBase(rule, snapshot, settings, extraOptions, context);
         if (ruleOutput === snapshot) {
           index++;
           continue;
