@@ -668,11 +668,18 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
  * @param {string} text The text to make that there are no spaces around the link text of
  * @return {string} The text with spaces around link text removed
  */
-export function removeSpacesInLinkText(text: string): string {
+export function removeSpacesInLinkText(text: string, protectedRanges: ProtectedRanges): string {
   const positions: Position[] = getPositions(MDAstTypes.Link, text);
 
   for (const position of positions) {
     if (position == null) {
+      continue;
+    }
+
+    // the whole link is guarded rather than just the whitespace being trimmed, because masking had
+    // to leave the link itself alone for there to be a link to trim: a region it replaced is one
+    // string, not a link with text inside it
+    if (protectedRanges.isProtected(position.start.offset, position.end.offset)) {
       continue;
     }
 
@@ -1299,7 +1306,7 @@ export function getAllCustomIgnoreSectionsInText(text: string): {startIndex: num
   return positions.reverse();
 }
 
-export function ensureFencedCodeBlocksHasLanguage(text: string, defaultLanguage: string): string {
+export function ensureFencedCodeBlocksHasLanguage(text: string, defaultLanguage: string, protectedRanges: ProtectedRanges): string {
   const positions: Position[] = getPositions(MDAstTypes.Code, text);
 
   for (const position of positions) {
@@ -1312,7 +1319,15 @@ export function ensureFencedCodeBlocksHasLanguage(text: string, defaultLanguage:
     if (language !== '') {
       continue;
     }
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset + 3, position.start.offset + 3, defaultLanguage);
+
+    // nothing is replaced, the language is put in after the fence, so the only place that has to
+    // be writable is the point it goes in at
+    const insertionPoint = position.start.offset + 3;
+    if (protectedRanges.isProtected(insertionPoint, insertionPoint)) {
+      continue;
+    }
+
+    text = replaceTextBetweenStartAndEndWithNewValue(text, insertionPoint, insertionPoint, defaultLanguage);
   }
 
   return text;
