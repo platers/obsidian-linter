@@ -40,6 +40,11 @@ yarn.lock
 
 .DS_Store
 
+# local performance fixtures and planning notes
+.sisyphus/
+Introduction.to.a.Self.Managed.Life.md
+data-test.json
+
 !__mocks__/*.js
 !eslint.config.mjs
 !babel.config.js
