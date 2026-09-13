@@ -146,6 +146,11 @@ export class RulesRunner {
   }
 
   private runRulesInBatches(rulesToRun: Rule[], text: string, settings: LinterSettings, extraOptions: Options): string {
+    return this.runBatches(rulesToRun, text, settings, extraOptions,
+        (rule) => rule.type === RuleType.YAML || rulesThatMustSeeEarlierWork.includes(rule.alias));
+  }
+
+  private runBatches(rulesToRun: Rule[], text: string, settings: LinterSettings, extraOptions: Options, mustRunOnItsOwn: (rule: Rule) => boolean): string {
     let index = 0;
     while (index < rulesToRun.length) {
       const snapshot = text;
@@ -171,7 +176,7 @@ export class RulesRunner {
         // The rules that move content about, or that look at the document as a whole, decide what
         // to do from where everything already is, so whether they need to do anything depends on
         // what ran before them. Those are given the result of the rule before them.
-        const runsOnItsOwn = rule.type === RuleType.YAML || rulesThatMustSeeEarlierWork.includes(rule.alias);
+        const runsOnItsOwn = mustRunOnItsOwn(rule);
         if (runsOnItsOwn && batchedEdits.length > 0) {
           break;
         }
@@ -240,15 +245,19 @@ export class RulesRunner {
       removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
     });
 
-    [newText] = BlockquoteStyle.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+    const cleanupRules = [BlockquoteStyle.getRule(), ForceYamlEscape.getRule(), TrailingSpaces.getRule(), ConsecutiveBlankLines.getRule()].filter((rule) => {
+      if (this.disabledRules.includes(rule.alias)) {
+        logDebug(rule.alias + ' ' + getTextInLanguage('logs.disabled-text'));
+        return false;
+      }
 
-    [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
-      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+      return true;
     });
-
-    [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
-
-    [newText] = ConsecutiveBlankLines.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+    // These adjacent cleanup rules can share a snapshot, including the frontmatter-only escape
+    // rule. Clashes still start a fresh batch; the title and timestamp barriers stay sequential.
+    newText = this.runBatches(cleanupRules, newText, runOptions.settings, {
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+    }, () => false);
 
     const yaml = newText.match(yamlRegex);
     if (yaml != null) {
