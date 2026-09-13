@@ -1,5 +1,7 @@
+import QuickLRU from 'quick-lru';
 import {IgnoreType, TextRange} from './ignore-types';
 import {cachePositionsForTypes, getPositions, MDAstTypes} from './mdast';
+import {hashString53Bit} from './strings';
 
 /**
  * The regions of a document a rule is not allowed to change.
@@ -12,12 +14,33 @@ import {cachePositionsForTypes, getPositions, MDAstTypes} from './mdast';
 export class ProtectedRanges {
   private readonly startIndexes: number[];
   private readonly endIndexes: number[];
+  private readonly context?: LintContext;
+  private readonly ignoreTypes?: IgnoreType[];
 
-  constructor(ranges: TextRange[]) {
+  constructor(ranges: TextRange[], context?: LintContext, ignoreTypes?: IgnoreType[]) {
     const merged = mergeRanges(ranges);
 
     this.startIndexes = merged.map((range) => range.startIndex);
     this.endIndexes = merged.map((range) => range.endIndex);
+    this.context = context;
+    this.ignoreTypes = ignoreTypes;
+  }
+
+  /**
+   * These regions together with those of some further ignore types.
+   *
+   * Several rules mask a second set of types inside their own body, on top of the ones they
+   * declare. Going back through the context keeps that combination cached with all the others,
+   * rather than working the ranges out again every time the rule runs.
+   * @param {IgnoreType[]} ignoreTypes The further types to protect
+   * @return {ProtectedRanges} The regions of both sets of types
+   */
+  combinedWith(ignoreTypes: IgnoreType[]): ProtectedRanges {
+    if (!this.context || !this.ignoreTypes) {
+      throw new Error('protected ranges that did not come from a lint context cannot be combined with more ignore types');
+    }
+
+    return this.context.protectedRangesFor([...this.ignoreTypes, ...ignoreTypes]);
   }
 
   get isEmpty(): boolean {
@@ -193,6 +216,31 @@ export class LintContext {
   constructor(public readonly text: string) {}
 
   /**
+   * The context for this text, reusing the one built for it before where there is one.
+   *
+   * A rule is run again when its changes clashed with another rule's and it has to lead the next
+   * run, and the runs either side of a rule that changed nothing are over the same text. Working
+   * out the ranges again each time costs about as much as parsing the document, so the answers are
+   * kept for the last few documents seen, exactly as the parsed markdown is.
+   * @param {string} text The document to describe
+   * @return {LintContext} The context for that document
+   */
+  static for(text: string): LintContext {
+    const textHash = hashString53Bit(text);
+    const cached = contextCache.get(textHash);
+    // the hash is only 53 bits, so it is used as a bucket and the exact text still has to be
+    // compared to avoid handing back the ranges of a different document on a hash collision
+    if (cached && cached.text === text) {
+      return cached;
+    }
+
+    const context = new LintContext(text);
+    contextCache.set(textHash, context);
+
+    return context;
+  }
+
+  /**
    * The regions protected by the given ignore types, taken together.
    * @param {IgnoreType[]} ignoreTypes The types whose regions must not be changed
    * @return {ProtectedRanges} The union of their regions, ready to be asked about a change
@@ -222,9 +270,11 @@ export class LintContext {
       ranges.push(...rangesForType);
     }
 
-    const protectedRanges = new ProtectedRanges(ranges);
+    const protectedRanges = new ProtectedRanges(ranges, this, ignoreTypes);
     this.protectedRangesByKey.set(key, protectedRanges);
 
     return protectedRanges;
   }
 }
+
+const contextCache = new QuickLRU<number, LintContext>({maxSize: 20});

@@ -153,7 +153,7 @@ export class RulesRunner {
       // each rule has to leave alone are worked out once and shared by all of them. The context
       // describes this snapshot and nothing else, so it is dropped as soon as the batch's changes
       // are applied and the text moves on.
-      const context = new LintContext(snapshot);
+      const context = LintContext.for(snapshot);
       const batchedEdits: textReplacement[] = [];
 
       while (index < rulesToRun.length) {

@@ -124,7 +124,7 @@ export class Rule {
     if (this.usesProtectedRanges) {
       // a context belongs to the text it was built from, so one for a different document is not
       // reused rather than trusted
-      const contextForText = context && context.text === text ? context : new LintContext(text);
+      const contextForText = context && context.text === text ? context : LintContext.for(text);
 
       return this.applyAfterIgnore(text, options, contextForText.protectedRangesFor(this.ignoreTypes));
     }

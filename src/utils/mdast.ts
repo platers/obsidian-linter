@@ -177,7 +177,7 @@ export function cachePositionsForTypes(types: MDAstTypes[], text: string): void 
  * @return {PositionPlusEmptyIndicator[]} The positions of the list item text in the given text
  * with a status as to whether or not they are empty
  */
-function getListItemTextPositions(text: string, includeEmptyNodes: boolean = false): PositionPlusEmptyIndicator[] {
+export function getListItemTextPositions(text: string, includeEmptyNodes: boolean = false): PositionPlusEmptyIndicator[] {
   const ast = parseTextToAST(text);
   const positions: PositionPlusEmptyIndicator[] = [];
   visit(ast, MDAstTypes.ListItem as string, (node) => {
