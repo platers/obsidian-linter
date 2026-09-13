@@ -138,6 +138,36 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
  * @return {RegExp} An expression matching all of them, or null if they do not share a shape
  */
 function buildStagePlaceholderRegex(placeholders: string[]): RegExp {
+  // A stage masks several ignore types at once, and each type has its own template, so the
+  // placeholders do not all share one shape. They are grouped by the template they came from and
+  // an alternative is built for each, which keeps every alternative anchored on a long literal.
+  const groups = new Map<string, string[]>();
+  for (const placeholder of placeholders) {
+    const template = `${placeholder.length}\u0000${placeholder.substring(0, placeholder.length - uniqueSuffixLength)}`;
+    const group = groups.get(template);
+    if (group) {
+      group.push(placeholder);
+    } else {
+      groups.set(template, [placeholder]);
+    }
+  }
+
+  const alternatives: string[] = [];
+  for (const group of groups.values()) {
+    const alternative = buildGroupPlaceholderPattern(group);
+    if (alternative === null) {
+      return null;
+    }
+
+    alternatives.push(alternative);
+  }
+
+  // the placeholder case is matched loosely because a rule can change it, see
+  // https://github.com/platers/obsidian-linter/issues/201
+  return new RegExp(alternatives.length === 1 ? alternatives[0] : alternatives.map((alternative) => `(?:${alternative})`).join('|'), 'gi');
+}
+
+function buildGroupPlaceholderPattern(placeholders: string[]): string {
   const length = placeholders[0].length;
   if (!placeholders.every((placeholder) => placeholder.length === length)) {
     return null;
@@ -157,9 +187,7 @@ function buildStagePlaceholderRegex(placeholders: string[]): RegExp {
   const prefix = escapeRegExp(placeholders[0].substring(0, prefixLength));
   const suffix = escapeRegExp(placeholders[0].substring(length - suffixLength));
 
-  // the placeholder case is matched loosely because a rule can change it, see
-  // https://github.com/platers/obsidian-linter/issues/201
-  return new RegExp(prefix + (middleLength > 0 ? `[\\s\\S]{${middleLength}}` : '') + suffix, 'gi');
+  return prefix + (middleLength > 0 ? `[\\s\\S]{${middleLength}}` : '') + suffix;
 }
 
 function restoreStage(text: string, stage: placeholderInfo[]): string {
@@ -387,6 +415,10 @@ function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): [pl
   return [replacedSections, text];
 }
 
+const seedLength = 11;
+const counterLength = 5;
+const uniqueSuffixLength = seedLength + counterLength;
+
 let lastSeededText = '';
 let lastSeed = '';
 
@@ -408,10 +440,10 @@ function getSeedForText(text: string): string {
     return lastSeed;
   }
 
-  let candidate = text.length.toString(36).padStart(11, '0');
+  let candidate = text.length.toString(36).padStart(seedLength, '0');
   let attempt = 0;
   while (text.includes(candidate)) {
-    candidate = (text.length + ++attempt * 0x100000).toString(36).padStart(11, '0').slice(-11);
+    candidate = (text.length + ++attempt * 0x100000).toString(36).padStart(seedLength, '0').slice(-seedLength);
   }
 
   lastSeededText = text;
@@ -444,7 +476,7 @@ function createPlaceholderGenerator(text: string, placeholder: string): () => st
       return placeholder;
     }
 
-    const uniqueSuffix = seed + (count++).toString(36).padStart(5, '0');
+    const uniqueSuffix = seed + (count++).toString(36).padStart(counterLength, '0');
     if (placeholder.endsWith('}')) {
       return placeholder.replace('}', uniqueSuffix + '}');
     }
