@@ -14,7 +14,7 @@ import {mathFromMarkdown} from 'mdast-util-math';
 import {fromMarkdown} from 'mdast-util-from-markdown';
 import {gfmFootnoteFromMarkdown} from 'mdast-util-gfm-footnote';
 import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
-import QuickLRU from 'quick-lru';
+import {LRUCache} from 'lru-cache';
 import {countInstances} from './strings';
 import {getTextInLanguage} from '../lang/helpers';
 import {DocumentProjection} from './document-projection';
@@ -25,10 +25,26 @@ type ParsedText = {
   text: string,
   ast: Root,
   positionsByType: Map<string, Position[]>,
-  everyTypeCollected: boolean,
+  // Zero means positions have not been collected; even an empty tree has a root node.
+  treeBytes: number,
 }
 
-const LRU = new QuickLRU<string, ParsedText>({maxSize: 200});
+// Node 24 --expose-gc, five GCs per sample: 1KiB/50KiB/859,811-character fixture
+// retained 20.9KB/564KB/11.03MB per parse, including the lazily collected positions.
+// Releasing all 15 fixture parses freed 188.56MB (12.57MB/entry, including source
+// strings). Round that ~14.6 bytes/character up to 16, with 8KiB of fixed overhead.
+// Source length alone misses dense markdown: 50KiB of '*a* ' retained 11.05MB for
+// 38,402 nodes (~288 bytes/node). Reserve 384 bytes/node plus UTF-16 string storage
+// when that is larger. Accumulate it during the existing position-collection walk,
+// not during set(): AST-only callers keep the provisional source-length estimate.
+// These are conservative heap estimates, not engine-independent object sizes.
+const LRU = new LRUCache<string, ParsedText>({
+  maxSize: 64 * 1024 * 1024,
+  maxEntrySize: 16 * 1024 * 1024,
+  sizeCalculation: (parsedText) => 8192 + Math.max(16 * parsedText.text.length, parsedText.treeBytes),
+});
+
+const nodeStringFields = ['value', 'lang', 'meta', 'url', 'title', 'alt', 'identifier', 'label'] as const;
 
 type PositionPlusEmptyIndicator = {
   position: Position,
@@ -108,7 +124,9 @@ function parseText(text: string): ParsedText {
     ],
   });
 
-  const parsedText = {text, ast, positionsByType: new Map<string, Position[]>(), everyTypeCollected: false};
+  const parsedText = {text, ast, positionsByType: new Map<string, Position[]>(), treeBytes: 0};
+  // Oversized entries are not stored; the caller still gets this parse, and the next
+  // lookup simply parses again. No AST or Position objects are changed by eviction.
   LRU.set(text, parsedText);
 
   return parsedText;
@@ -155,7 +173,7 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
  * @param {ParsedText} parsedText The parsed document to collect the positions of
  */
 function collectEveryTypesPositions(parsedText: ParsedText): void {
-  if (parsedText.everyTypeCollected) {
+  if (parsedText.treeBytes !== 0) {
     return;
   }
 
@@ -167,8 +185,17 @@ function collectEveryTypesPositions(parsedText: ParsedText): void {
     positionsByType.set(type, []);
   }
 
-  visit(parsedText.ast, everyType as string[], (node) => {
-    positionsByType.get(node.type).push(node.position);
+  let treeBytes = 2 * parsedText.text.length;
+  // Account for every node, including text, without collecting additional position types.
+  visit(parsedText.ast, (node: Node & Partial<Record<(typeof nodeStringFields)[number], unknown>>) => {
+    treeBytes += 384;
+    for (const field of nodeStringFields) {
+      const value = node[field];
+      if (typeof value === 'string') {
+        treeBytes += 2 * value.length;
+      }
+    }
+    positionsByType.get(node.type)?.push(node.position);
   });
 
   for (const [type, positions] of positionsByType) {
@@ -177,7 +204,14 @@ function collectEveryTypesPositions(parsedText: ParsedText): void {
     parsedText.positionsByType.set(type, positions);
   }
 
-  parsedText.everyTypeCollected = true;
+  parsedText.treeBytes = treeBytes;
+  if (LRU.peek(parsedText.text) === parsedText) {
+    // set() with the same object does not refresh its recorded size. Reinsert only
+    // our own live entry; evicted or initially oversized parses must not be resurrected.
+    // If the density-aware charge exceeds maxEntrySize, the caller still gets its positions.
+    LRU.delete(parsedText.text);
+    LRU.set(parsedText.text, parsedText);
+  }
 }
 
 

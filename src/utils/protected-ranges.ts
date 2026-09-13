@@ -1,4 +1,4 @@
-import QuickLRU from 'quick-lru';
+import {LRUCache} from 'lru-cache';
 import {IgnoreType, TextRange} from './ignore-types';
 import {inCanonicalOrder, projectionTokenFor} from './ignore-type-metadata';
 import {DocumentProjection, ProjectionReplacement} from './document-projection';
@@ -340,8 +340,27 @@ export class LintContext {
   private readonly rangesByIgnoreType = new Map<IgnoreType, TextRange[]>();
   private readonly protectedRangesByKey = new Map<string, ProtectedRanges>();
   private readonly projectionsByKey = new Map<string, DocumentProjection>();
+  private cacheSize: number;
 
-  constructor(public readonly text: string) {}
+  constructor(public readonly text: string) {
+    this.cacheSize = 4096 + 2 * text.length;
+  }
+
+  /** Estimated retained bytes, including source, lazy ranges and full projection strings. */
+  get estimatedRetainedBytes(): number {
+    return this.cacheSize;
+  }
+
+  private updateCacheSize(): void {
+    // Do not reinsert an evicted context, or cache one constructed directly by a caller.
+    if (contextCache.peek(this.text) === this) {
+      // lru-cache does not update an entry's size when set() receives the same object.
+      // Delete before setting it again so lazy growth is charged and maxEntrySize is
+      // enforced. A rejected context remains usable by the batch holding it explicitly.
+      contextCache.delete(this.text);
+      contextCache.set(this.text, this);
+    }
+  }
 
   /**
    * The context for this text, reusing the one built for it before where there is one.
@@ -383,6 +402,7 @@ export class LintContext {
       if (rangesForType === undefined) {
         rangesForType = findRangesForIgnoreType(this.text, ignoreType);
         this.rangesByIgnoreType.set(ignoreType, rangesForType);
+        this.cacheSize += 256 + 64 * rangesForType.length;
       }
 
       ranges.push(...rangesForType);
@@ -390,6 +410,9 @@ export class LintContext {
 
     const protectedRanges = new ProtectedRanges(ranges, this, ignoreTypes);
     this.protectedRangesByKey.set(key, protectedRanges);
+    // The unmerged count is a conservative bound for the two merged index arrays.
+    this.cacheSize += 256 + 2 * key.length + 16 * ignoreTypes.length + 32 * ranges.length;
+    this.updateCacheSize();
 
     return protectedRanges;
   }
@@ -433,8 +456,25 @@ export class LintContext {
 
     const projection = new DocumentProjection(this.text, replacements);
     this.projectionsByKey.set(key, projection);
+    this.cacheSize += 512 + 2 * key.length + 2 * projection.text.length + 64 * replacements.length;
+    this.updateCacheSize();
     return projection;
   }
 }
 
-const contextCache = new QuickLRU<string, LintContext>({maxSize: 20});
+// Measured independently with parsed inputs pinned, Node 24 --expose-gc (five GCs):
+// 1KiB/50KiB/859,811-character inputs retained 6.2KB/37.7KB/659.5KB for all ignore
+// types and one range union. With four projection keys those grew to 12.6KB/442.8KB/
+// 7.05MB. Large projections added 1.46-1.85MB each: charge their actual UTF-16 length,
+// not a single source multiplier. Range objects cost about 64 bytes in the dense
+// sample (847KB/12,800 ranges, including the union); reserve 64 per range plus 32
+// per union member and 64 per projection member for overallocated number arrays.
+// Map/key/object overhead is charged separately, and every lazy insertion reweighs
+// the context. The source is charged even when also retained by the parse cache.
+// 16MiB keeps several active large contexts, rather than all historical snapshots;
+// the separate 64MiB parse budget keeps the full fixture at 15 parses.
+const contextCache = new LRUCache<string, LintContext>({
+  maxSize: 16 * 1024 * 1024,
+  maxEntrySize: 8 * 1024 * 1024,
+  sizeCalculation: (context) => context.estimatedRetainedBytes,
+});

@@ -67,6 +67,7 @@
     "async-lock": "^1.4.1",
     "diff-match-patch": "^1.0.5",
     "loglevel": "^1.9.2",
+    "lru-cache": "^11.5.2",
     "mdast-util-from-markdown": "^2.0.3",
     "mdast-util-frontmatter": "^2.0.1",
     "mdast-util-gfm-footnote": "^2.1.0",
@@ -78,7 +79,6 @@
     "micromark-extension-math": "^3.1.0",
     "micromark-util-combine-extensions": "^2.0.1",
     "moment-parseformat": "^4.0.0",
-    "quick-lru": "^7.3.0",
     "ts-dedent": "^2.3.0",
     "unist-util-visit": "^5.1.0",
     "yaml": "^2.9.1"
