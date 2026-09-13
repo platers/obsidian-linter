@@ -3,7 +3,12 @@ import {getAllCustomIgnoreSectionsInText, getAllTablesInText, getPositions, MDAs
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 export type IgnoreFunction = ((text: string, placeholder: string) => [placeholderInfo[], string]);
-export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string, onlyIfMatches?: RegExp};
+export type TextRange = {startIndex: number, endIndex: number};
+// An ignore type whose replaceAction is a function hides regions that cannot be described by an
+// mdast type or a regex, so it has to say separately where those regions are for anything that
+// wants to know without rewriting the document.
+export type RangeFinder = ((text: string) => TextRange[]);
+export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string, onlyIfMatches?: RegExp, findRanges?: RangeFinder};
 
 export const IgnoreTypes: Record<string, IgnoreType> = {
   // mdast node types
@@ -30,10 +35,29 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   templaterCommand: {replaceAction: templaterCommandRegex, placeholder: '{TEMPLATER_PLACEHOLDER}'},
   // custom functions
   link: {replaceAction: MDAstTypes.Link, placeholder: '{REGULAR_LINK_PLACEHOLDER}', onlyIfMatches: genericLinkRegex},
-  tag: {replaceAction: replaceTags, placeholder: '#tag-placeholder'},
-  table: {replaceAction: replaceTables, placeholder: '{TABLE_PLACEHOLDER}'},
-  customIgnore: {replaceAction: replaceCustomIgnore, placeholder: '{CUSTOM_IGNORE_PLACEHOLDER}'},
+  tag: {replaceAction: replaceTags, placeholder: '#tag-placeholder', findRanges: findTagRanges},
+  table: {replaceAction: replaceTables, placeholder: '{TABLE_PLACEHOLDER}', findRanges: getAllTablesInText},
+  customIgnore: {replaceAction: replaceCustomIgnore, placeholder: '{CUSTOM_IGNORE_PLACEHOLDER}', findRanges: getAllCustomIgnoreSectionsInText},
 } as const;
+
+/**
+ * Finds the tags in the text, without the whitespace that has to be in front of one.
+ *
+ * `replaceTags` matches the whitespace before a tag so that a tag is only recognised at the start
+ * of a word, but puts that whitespace back rather than masking it. A range covering the whitespace
+ * would protect a character the masking left writable, which changes what the spacing rules do.
+ * @param {string} text The text to find the tags in
+ * @return {TextRange[]} The range of each tag, not including the whitespace before it
+ */
+function findTagRanges(text: string): TextRange[] {
+  const ranges: TextRange[] = [];
+  for (const match of text.matchAll(tagWithLeadingWhitespaceRegex)) {
+    const startIndex = match.index + match[1].length;
+    ranges.push({startIndex, endIndex: startIndex + match[2].length});
+  }
+
+  return ranges;
+}
 
 type placeholderInfo = {placeholder: string, replacedValue: string}
 

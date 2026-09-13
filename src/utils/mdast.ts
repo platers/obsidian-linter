@@ -138,6 +138,38 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
 }
 
 /**
+ * Fills the position cache for several element types from a single walk of the tree.
+ *
+ * `getPositions` walks the whole tree for one type, so asking it for ten types walks the tree ten
+ * times. `unist-util-visit` takes a list of types, which collects all of them in one walk.
+ * @param {MDAstTypes[]} types - The element types to get positions for
+ * @param {string} text - The markdown text
+ */
+export function cachePositionsForTypes(types: MDAstTypes[], text: string): void {
+  const parsedText = parseText(text);
+
+  const uncachedTypes = types.filter((type) => parsedText.positionsByType.get(type) === undefined);
+  if (uncachedTypes.length === 0) {
+    return;
+  }
+
+  const positionsByType = new Map<string, Position[]>();
+  for (const type of uncachedTypes) {
+    positionsByType.set(type, []);
+  }
+
+  visit(parsedText.ast, uncachedTypes as string[], (node) => {
+    positionsByType.get(node.type).push(node.position);
+  });
+
+  for (const [type, positions] of positionsByType) {
+    // the same descending order getPositions caches, since callers of both rely on it
+    positions.sort((a, b) => b.start.offset - a.start.offset);
+    parsedText.positionsByType.set(type, positions);
+  }
+}
+
+/**
  * Gets the positions of the list item text in the given text.
  * @param {string} text - The markdown text
  * @param {boolean} includeEmptyNodes - Whether or not empty list items should be
