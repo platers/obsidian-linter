@@ -635,6 +635,23 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
     return projection.source;
   }
 
+  const replacements: textReplacement[] = [];
+  const boundaryReplacements = new Map<string, textReplacement>();
+  const addBoundaryReplacement = (startIndex: number, endIndex: number, value: string): void => {
+    const key = `${startIndex}:${endIndex}`;
+    const existing = boundaryReplacements.get(key);
+    if (existing) {
+      if (existing.value != value) {
+        throw new Error('Paragraphs sharing a gap must agree on its replacement');
+      }
+      return;
+    }
+
+    const replacement = {startIndex, endIndex, value};
+    boundaryReplacements.set(key, replacement);
+    replacements.push(replacement);
+  };
+
   for (const position of positions) {
     // get index of previous new line character to get actual paragraph contents rather than just a snippet
     let startIndex = position.start.offset;
@@ -655,58 +672,43 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
       continue;
     }
 
-    const lineCount = paragraphLines.length;
-    const newParagraphLines: string[] = [];
-    let nextLineIsSameParagraph = false;
-    for (let i = 0; i < lineCount; i++) {
+    let newlineIndex = startIndex;
+    for (let i = 0; i < paragraphLines.length - 1; i++) {
       const paragraphLine = paragraphLines[i];
-
-      if (nextLineIsSameParagraph) {
-        const lastParagraphLineAdded = newParagraphLines.length-1;
-        newParagraphLines[lastParagraphLineAdded] += '\n' + paragraphLine;
-      } else {
-        newParagraphLines.push(paragraphLine);
-      }
+      newlineIndex += paragraphLine.length;
 
       // make sure that lines that end in \, <br>, <br/>, or two or more spaces are in the same paragraph
-      nextLineIsSameParagraph = paragraphLine.endsWith(LineBreakIndicators.LineBreakHtmlNotXml) || paragraphLine.endsWith(LineBreakIndicators.LineBreakHtml) || paragraphLine.endsWith(LineBreakIndicators.TwoSpaces) || (!paragraphLine.endsWith('\\\\') && paragraphLine.endsWith(LineBreakIndicators.Backslash));
+      const nextLineIsSameParagraph = paragraphLine.endsWith(LineBreakIndicators.LineBreakHtmlNotXml) || paragraphLine.endsWith(LineBreakIndicators.LineBreakHtml) || paragraphLine.endsWith(LineBreakIndicators.TwoSpaces) || (!paragraphLine.endsWith('\\\\') && paragraphLine.endsWith(LineBreakIndicators.Backslash));
+      replacements.push({startIndex: newlineIndex, endIndex: newlineIndex + 1, value: nextLineIsSameParagraph ? '\n' : '\n\n'});
+      newlineIndex++;
     }
 
-    // remove new lines prior to paragraph
+    // Adjacent paragraphs claim the same newline run. Deduplicate the gap itself,
+    // rather than expanding paragraph replacements into overlapping ranges.
+    const lineStartIndex = startIndex;
     while (startIndex > 0 && text.charAt(startIndex-1) == '\n') {
       startIndex--;
     }
+    addBoundaryReplacement(startIndex, lineStartIndex, startIndex == 0 ? '' : '\n\n');
 
-    // remove new lines after paragraph
     const textLength = text.length;
     let endIndex = position.end.offset;
+    // Preserve the legacy expansion: consume one character (including CR), then LFs.
     if (endIndex < textLength) {
       endIndex++;
     }
-
     while (endIndex < textLength && text.charAt(endIndex) == '\n') {
       endIndex++;
     }
 
-    // make sure two new lines are only added between the paragraph and other content
-    let startNewLines = '\n\n';
-    if (startIndex == 0) {
-      startNewLines = '';
-    }
-
     let endNewLines = '\n\n';
     if (endIndex == textLength) {
-      endNewLines = '';
+      endNewLines = hasTrailingLineBreak ? '\n' : '';
     }
-
-    text = replaceTextBetweenStartAndEndWithNewValue(text, startIndex, endIndex, startNewLines + newParagraphLines.join('\n\n') + endNewLines);
+    addBoundaryReplacement(position.end.offset, endIndex, endNewLines);
   }
 
-  if (hasTrailingLineBreak && !text.endsWith('\n')) {
-    text += '\n';
-  }
-
-  return applyProjectedChanges(projection, text);
+  return applyProjectedChanges(projection, applyNonOverlappingReplacements(text, replacements));
 }
 
 
