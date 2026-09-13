@@ -1,9 +1,11 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {updateBoldText, updateItalicsText} from '../utils/mdast';
+import {collectUnprotectedRegexReplacements, LintContext, ProtectedRanges} from '../utils/protected-ranges';
 import {escapeRegExp} from '../utils/regex';
+import {replaceTextRanges, textReplacement} from '../utils/strings';
 
 class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions implements Options {
   englishNonLetterCharactersAfterCJKCharacters?: string = `-+'"([¥$`;
@@ -18,6 +20,7 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
       descriptionKey: 'rules.space-between-chinese-japanese-or-korean-and-english-or-numbers.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.yaml, IgnoreTypes.image, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions {
@@ -26,26 +29,61 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
   apply(
       text: string,
       options: SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions,
+      protectedRanges: ProtectedRanges,
   ): string {
     const head = this.buildHeadRegex(options.englishNonLetterCharactersAfterCJKCharacters);
     const tail = this.buildTailRegex(options.englishNonLetterCharactersBeforeCJKCharacters);
     // inline math, inline code, markdown links, and wiki links are an exception in that even though they are to be ignored we want to keep a space around these types when surrounded by CJK characters
-    const regexEscapedIgnoreExceptionPlaceHolders = `${IgnoreTypes.link.placeholder}|${IgnoreTypes.inlineMath.placeholder}|${IgnoreTypes.inlineCode.placeholder}|${IgnoreTypes.wikiLink.placeholder}`.replaceAll('{', '\\{').replaceAll('}', '.+\\}');
-    const ignoreExceptionsHead = new RegExp(`(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})( *)(${regexEscapedIgnoreExceptionPlaceHolders})`, 'gmu');
-    const ignoreExceptionsTail = new RegExp(`(${regexEscapedIgnoreExceptionPlaceHolders})( *)(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})`, 'gmu');
-    const addSpaceAroundChineseJapaneseKoreanAndEnglish = function(text: string): string {
-      return text.replace(head, '$1 $3').replace(tail, '$1 $3');
+    // Reuse the document's cached context for this narrower set, rather than rebuilding its ranges.
+    const ignoreExceptions = LintContext.for(text).protectedRangesFor([IgnoreTypes.link, IgnoreTypes.inlineMath, IgnoreTypes.inlineCode, IgnoreTypes.wikiLink]);
+    const addSpaceAroundChineseJapaneseKoreanAndEnglish = (content: string, offset: number, ranges: ProtectedRanges): textReplacement[] => {
+      const replacements: textReplacement[] = [];
+      for (const regex of [head, tail]) {
+        replacements.push(...collectUnprotectedRegexReplacements(content, regex, ranges, {
+          editRange: (match, startIndex) => ({
+            startIndex: startIndex + match[1].length,
+            endIndex: startIndex + match[0].length - match[3].length,
+            value: ' ',
+          }),
+          guardRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[0].length}),
+        }, offset));
+      }
+      return replacements;
     };
 
-    let newText = ignoreListOfTypes([IgnoreTypes.italics, IgnoreTypes.bold], text, addSpaceAroundChineseJapaneseKoreanAndEnglish);
+    const replacements = addSpaceAroundChineseJapaneseKoreanAndEnglish(text, 0, protectedRanges.combinedWith([IgnoreTypes.italics, IgnoreTypes.bold]));
+    const cjkBefore = /[\p{sc=Han}\p{sc=Katakana}\p{sc=Hiragana}\p{sc=Hangul}]( *)$/u;
+    const cjkAfter = /^( *)[\p{sc=Han}\p{sc=Katakana}\p{sc=Hiragana}\p{sc=Hangul}]/u;
+    for (const range of ignoreExceptions.ranges) {
+      let startIndex = range.startIndex;
+      while (startIndex > 0 && text.charAt(startIndex - 1) === ' ') {
+        startIndex--;
+      }
+      const before = text.substring(Math.max(0, startIndex - 2), range.startIndex).match(cjkBefore);
+      if (before && !protectedRanges.isProtected(range.startIndex - before[0].length, range.startIndex)) {
+        replacements.push({startIndex, endIndex: range.startIndex, value: ' '});
+      }
 
-    newText = newText.replace(ignoreExceptionsHead, '$1 $3').replace(ignoreExceptionsTail, '$1 $3');
+      let endIndex = range.endIndex;
+      while (endIndex < text.length && text.charAt(endIndex) === ' ') {
+        endIndex++;
+      }
+      const after = text.substring(range.endIndex, endIndex + 2).match(cjkAfter);
+      if (after && !protectedRanges.isProtected(range.endIndex, range.endIndex + after[0].length)) {
+        replacements.push({startIndex: range.endIndex, endIndex, value: ' '});
+      }
+    }
 
-    newText = updateItalicsText(newText, addSpaceAroundChineseJapaneseKoreanAndEnglish);
+    replacements.push(...updateItalicsText(text, addSpaceAroundChineseJapaneseKoreanAndEnglish, protectedRanges));
+    replacements.push(...updateBoldText(text, addSpaceAroundChineseJapaneseKoreanAndEnglish, protectedRanges));
 
-    newText = updateBoldText(newText, addSpaceAroundChineseJapaneseKoreanAndEnglish);
-
-    return newText;
+    // Nested emphasis and bold may discover the same whitespace edit. Apply that edit only once.
+    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    const uniqueReplacements = replacements.filter((replacement, index) => {
+      const previous = replacements[index - 1];
+      return !previous || replacement.startIndex !== previous.startIndex || replacement.endIndex !== previous.endIndex;
+    });
+    return replaceTextRanges(text, uniqueReplacements);
   }
   buildHeadRegex(englishPunctuationAndSymbols: string): RegExp {
     if (englishPunctuationAndSymbols && englishPunctuationAndSymbols !== '') {

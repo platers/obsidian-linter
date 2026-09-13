@@ -724,32 +724,32 @@ export function removeSpacesInLinkText(text: string, protectedRanges: ProtectedR
   return text;
 }
 
-export function updateItalicsText(text: string, func:(text: string) => string): string {
+export function updateItalicsText(text: string, func: (text: string, offset: number, protectedRanges: ProtectedRanges) => textReplacement[], protectedRanges: ProtectedRanges): textReplacement[] {
   const positions: Position[] = getPositions(MDAstTypes.Italics, text);
+  const replacements: textReplacement[] = [];
 
   for (const position of positions) {
-    let italicText = text.substring(position.start.offset+1, position.end.offset-1);
-
-    italicText = func(italicText);
-
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+1, position.end.offset-1, italicText);
+    if (protectedRanges.isProtected(position.start.offset, position.start.offset + 1) || protectedRanges.isProtected(position.end.offset - 1, position.end.offset)) {
+      continue;
+    }
+    replacements.push(...func(text.substring(position.start.offset + 1, position.end.offset - 1), position.start.offset + 1, protectedRanges));
   }
 
-  return text;
+  return replacements;
 }
 
-export function updateBoldText(text: string, func:(text: string) => string): string {
+export function updateBoldText(text: string, func: (text: string, offset: number, protectedRanges: ProtectedRanges) => textReplacement[], protectedRanges: ProtectedRanges): textReplacement[] {
   const positions: Position[] = getPositions(MDAstTypes.Bold, text);
+  const replacements: textReplacement[] = [];
 
   for (const position of positions) {
-    let boldText = text.substring(position.start.offset+2, position.end.offset-2);
-
-    boldText = func(boldText);
-
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset+2, position.end.offset-2, boldText);
+    if (protectedRanges.isProtected(position.start.offset, position.start.offset + 2) || protectedRanges.isProtected(position.end.offset - 2, position.end.offset)) {
+      continue;
+    }
+    replacements.push(...func(text.substring(position.start.offset + 2, position.end.offset - 2), position.start.offset + 2, protectedRanges));
   }
 
-  return text;
+  return replacements;
 }
 
 export function updateListItemText(text: string, func:(text: string) => string, includeEmptyNodes: boolean = false): string {
@@ -1000,12 +1000,24 @@ export function updateUnorderedListItemIndicators(text: string, unorderedListSty
 /**
 * Updates all blockquotes in the provided text based on the function provided.
 * @param {string} text - The text to update the blockquotes in.
-* @param {function(text: string): string} func - The operation to run on each blockquote to update them.
+* @param {function} prepareUpdate - Prepares each blockquote's line decisions before any text is rewritten.
 * @return {string} The text with the blockquotes updated based on the provided function.
 */
-export function updateBlockquotes(text: string, func: (text: string) => string): string {
+export function updateBlockquotes(text: string, prepareUpdate: (text: string, offset: number) => (text: string) => string): string {
   const positions: Position[] = getPositions(MDAstTypes.Blockquote, text);
+  const updates = new Map<Position, (text: string) => string>();
   for (const position of positions) {
+    let endIndex = position.end.offset;
+    while (endIndex < text.length - 1 && text.charAt(endIndex) !== '\n') {
+      endIndex++;
+    }
+    updates.set(position, prepareUpdate(text.substring(position.start.offset, endIndex), position.start.offset));
+  }
+
+  // Keep the descending, per-level rewrites: nested blockquotes must see the inner level's result.
+  // Only marker spacing changes, so prepared decisions follow line order rather than stale offsets.
+  for (const position of positions) {
+    const func = updates.get(position);
     // make sure to shift end to the next new line character just in case blockquotes are nested which can cause changes to move content out of the original position expected
     let endIndex = position.end.offset;
     while (endIndex < text.length - 1 && text.charAt(endIndex) !== '\n') {

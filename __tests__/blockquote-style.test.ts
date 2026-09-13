@@ -5,6 +5,24 @@ import {ruleTest} from './common';
 ruleTest({
   RuleBuilderClass: BlockquoteStyle,
   testCases: [
+    { // Nested blockquotes are rewritten once per level; a single pass loses the inner marker spacing.
+      testName: 'Nested blockquotes retain the spacing introduced by rewriting each level',
+      before: '>>ab',
+      after: '> > ab',
+      options: {style: 'space'},
+    },
+    {
+      testName: 'Fenced code and math block lines keep their markers while surrounding quote lines gain spaces',
+      before: '>before\n>```\n>  code\n>```\n>$$\n>  x\n>$$\n>after',
+      after: '> before\n>```\n>  code\n>```\n>$$\n>  x\n>$$\n> after',
+      options: {style: 'space'},
+    },
+    {
+      testName: 'Fenced code and math block lines keep their markers while surrounding quote lines lose spaces',
+      before: '> before\n> ```\n>   code\n> ```\n> $$\n>   x\n> $$\n> after',
+      after: '>before\n> ```\n>   code\n> ```\n> $$\n>   x\n> $$\n>after',
+      options: {style: 'no space'},
+    },
     { // accounts for https://github.com/platers/obsidian-linter/issues/935
       testName: 'Make sure we properly handle adding spaces to blockquote indicators instead of adding them to values that are not at the start of the line',
       before: dedent`
