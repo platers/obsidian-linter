@@ -24,8 +24,8 @@ import CapitalizeHeadings from './rules/capitalize-headings';
 import YamlTitle from './rules/yaml-title';
 import YamlTitleAlias from './rules/yaml-title-alias';
 import BlockquoteStyle from './rules/blockquote-style';
-import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
-import {LintContext} from './utils/protected-ranges';
+import {IgnoreTypes} from './utils/ignore-types';
+import {LintContext, replaceUnprotectedRegexMatches} from './utils/protected-ranges';
 import {addEditsIfTheyDoNotClash, getEditsBetween} from './utils/text-edits';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
 import {LinterSettings} from './settings-data';
@@ -305,38 +305,37 @@ export class RulesRunner {
   }
 
   runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
-    return ignoreListOfTypes([IgnoreTypes.customIgnore], oldText, (text: string) => {
-      logDebug(getTextInLanguage('logs.running-custom-regex'));
+    logDebug(getTextInLanguage('logs.running-custom-regex'));
 
-      let newText = text;
-      let initialText = text;
-      for (const eachRegex of customRegexes) {
-        const findIsEmpty = eachRegex.find === undefined || eachRegex.find == '' || eachRegex.find === null;
-        const replaceIsEmpty = eachRegex.replace === undefined || eachRegex.replace === null;
-        if (findIsEmpty || replaceIsEmpty || !eachRegex.enabled) {
-          continue;
-        }
-
-        let debugMsg = eachRegex.label;
-        if (debugMsg && debugMsg.trim() != '') {
-          debugMsg += ':\n';
-        }
-        debugMsg +=`/${eachRegex.find}/${eachRegex.flags}/${eachRegex.replace}/`;
-
-        logDebug(debugMsg);
-        const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
-        // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
-        newText = newText.replace(regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace));
-
-        if (initialText != newText) {
-          logDebug(newText);
-        }
-
-        initialText = newText;
+    let newText = oldText;
+    let initialText = oldText;
+    for (const eachRegex of customRegexes) {
+      const findIsEmpty = eachRegex.find === undefined || eachRegex.find == '' || eachRegex.find === null;
+      const replaceIsEmpty = eachRegex.replace === undefined || eachRegex.replace === null;
+      if (findIsEmpty || replaceIsEmpty || !eachRegex.enabled) {
+        continue;
       }
 
-      return newText;
-    });
+      let debugMsg = eachRegex.label;
+      if (debugMsg && debugMsg.trim() != '') {
+        debugMsg += ':\n';
+      }
+      debugMsg +=`/${eachRegex.find}/${eachRegex.flags}/${eachRegex.replace}/`;
+
+      logDebug(debugMsg);
+      const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
+      const protectedRanges = LintContext.for(newText).protectedRangesFor([IgnoreTypes.customIgnore]);
+      // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
+      newText = replaceUnprotectedRegexMatches(newText, regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace), protectedRanges);
+
+      if (initialText != newText) {
+        logDebug(newText);
+      }
+
+      initialText = newText;
+    }
+
+    return newText;
   }
 
   runPasteLint(currentLine: string, selectedText: string, runOptions: RunLinterRulesOptions): string {

@@ -218,6 +218,41 @@ export function collectUnprotectedRegexReplacements(
 }
 
 /**
+ * Replaces whole, unprotected matches while retaining native replacement-string expansion.
+ * @param {string} text The original document
+ * @param {RegExp} regex The user's expression, including its replacement-count and sticky flags
+ * @param {string} replacement The replacement string, including any capture references
+ * @param {ProtectedRanges} protectedRanges The regions matches must not overlap
+ * @return {string} The document with only accepted matches replaced
+ */
+export function replaceUnprotectedRegexMatches(text: string, regex: RegExp, replacement: string, protectedRanges: ProtectedRanges): string {
+  if (protectedRanges.isEmpty) {
+    return text.replace(regex, replacement);
+  }
+
+  const guardedRegex = new RegExp(regex.source, regex.flags);
+  const searchRegex = new RegExp(regex.source, regex.global ? regex.flags : regex.flags + 'g');
+  // String.replace still owns capture expansion and the single/global replacement count.
+  // Filtering exec results lets a rejected match leave the non-global replacement available.
+  guardedRegex.exec = (source: string): RegExpExecArray | null => {
+    searchRegex.lastIndex = guardedRegex.lastIndex;
+    let match = searchRegex.exec(source);
+    while (match && protectedRanges.isProtected(match.index, match.index + match[0].length)) {
+      if (match[0].length === 0) {
+        // Rejected empty matches must advance just as native replace does, including Unicode pairs.
+        const unicode = searchRegex.unicode || searchRegex.flags.includes('v');
+        searchRegex.lastIndex += unicode && source.codePointAt(searchRegex.lastIndex) > 0xFFFF ? 2 : 1;
+      }
+      match = searchRegex.exec(source);
+    }
+    guardedRegex.lastIndex = searchRegex.lastIndex;
+    return match;
+  };
+
+  return text.replace(guardedRegex, replacement);
+}
+
+/**
  * Collapses a set of ranges into the smallest set of ranges covering the same characters.
  *
  * Nodes nest, both within a type and across types, so the ranges that come out of the detectors

@@ -295,6 +295,65 @@ const customReplaceTestCases: CustomReplaceTestCase[] = [
 ];
 
 describe('Rules Runner', () => {
+  describe.each([
+    ['HTML', '<!-- linter-disable -->', '<!-- linter-enable -->'],
+    ['Obsidian', '%% linter-disable %%', '%% linter-enable %%'],
+  ])('custom regex protection with %s comments', (_format, start, end) => {
+    const ignored = `${start}x${end}`;
+    const replace = (text: string, find: string, replacement: string, flags: string) => rulesRunner.runCustomRegexReplacement([
+      {label: '', find, replace: replacement, flags, enabled: true},
+    ], text);
+
+    it('continues to the first unprotected non-global match', () => {
+      // A protected match must not consume the single replacement a non-global expression makes.
+      expect(replace(`${ignored}xx`, 'x', 'y', '')).toBe(`${ignored}yx`);
+    });
+
+    it('discards global matches inside protection', () => {
+      expect(replace(`x${ignored}x`, 'x', 'y', 'g')).toBe(`y${ignored}y`);
+    });
+
+    it('discards a match spanning a disabled section', () => {
+      expect(replace(`before${ignored}after`, 'before[\\s\\S]*after', 'removed', 'g')).toBe(`before${ignored}after`);
+    });
+
+    it('continues after a rejected spanning non-global match', () => {
+      expect(replace(`a${ignored}b ab ab`, 'a[\\s\\S]*?b', 'y', '')).toBe(`a${ignored}b y ab`);
+    });
+
+    it('preserves native replacement expansion and lookahead', () => {
+      const suffix = ' (x) (x)';
+      const replacement = '$$:$&:$1:$2:$<letter>:$<missing>:$12:$01:$0';
+      expect(replace(ignored + suffix, '(?<letter>x)(z)?(?=\\))', replacement, 'g'))
+          .toBe(ignored + suffix.replace(new RegExp('(?<letter>x)(z)?(?=\\))', 'g'), replacement));
+    });
+
+    it('preserves native prefix and suffix replacement references', () => {
+      const text = `${ignored} x!`;
+      expect(replace(text, 'x(?=!)', "$`|$&|$'", '')).toBe(text.replace(/x(?=!)/, "$`|$&|$'"));
+    });
+
+    it('advances past protected empty Unicode matches', () => {
+      const text = `${start}😀${end}😀`;
+      expect(replace(text, '(?=😀)', 'y', 'gu')).toBe(`${start}😀${end}y😀`);
+    });
+
+    it('permits empty matches at protection boundaries', () => {
+      expect(replace(ignored, '(?:)', '|', 'gu')).toBe(`|${ignored}|`);
+    });
+
+    it('preserves sticky matching without searching past a gap', () => {
+      expect(replace(`x ${ignored}x`, 'x', 'y', 'gy')).toBe(`y ${ignored}x`);
+    });
+
+    it('refreshes protection offsets between expressions', () => {
+      expect(rulesRunner.runCustomRegexReplacement([
+        {label: '', find: '^a', replace: 'longer', flags: '', enabled: true},
+        {label: '', find: 'x', replace: 'y', flags: 'g', enabled: true},
+      ], `a${ignored}x`)).toBe(`longer${ignored}y`);
+    });
+  });
+
   // custom commands
   for (const testCase of customCommandTestCases) {
     it(testCase.testName, () => {
