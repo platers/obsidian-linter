@@ -2,7 +2,7 @@ import {visit} from 'unist-util-visit';
 import type {Position, Node} from 'unist';
 import type {Root} from 'mdast';
 import {ProtectedRanges} from './protected-ranges';
-import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
+import {hashDocument, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
 import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
@@ -87,7 +87,7 @@ export enum LineBreakIndicators {
 }
 
 function parseText(text: string): ParsedText {
-  const textHash = hashString53Bit(text);
+  const textHash = hashDocument(text);
   const cached = LRU.get(textHash);
   // the hash is only 53 bits, so it is used as a bucket and the exact text still has to be
   // compared to avoid handing back the AST of a different document on a hash collision

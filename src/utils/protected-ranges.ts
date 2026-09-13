@@ -3,7 +3,7 @@ import {IgnoreType, TextRange} from './ignore-types';
 import {inCanonicalOrder, projectionTokenFor} from './ignore-type-metadata';
 import {DocumentProjection, ProjectionReplacement} from './document-projection';
 import {getPositions, MDAstTypes} from './mdast';
-import {hashString53Bit, textReplacement} from './strings';
+import {hashDocument, textReplacement} from './strings';
 
 /**
  * The regions of a document a rule is not allowed to change.
@@ -354,7 +354,7 @@ export class LintContext {
    * @return {LintContext} The context for that document
    */
   static for(text: string): LintContext {
-    const textHash = hashString53Bit(text);
+    const textHash = hashDocument(text);
     const cached = contextCache.get(textHash);
     // the hash is only 53 bits, so it is used as a bucket and the exact text still has to be
     // compared to avoid handing back the ranges of a different document on a hash collision
