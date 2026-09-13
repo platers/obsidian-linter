@@ -9,6 +9,18 @@ ruleTest({
   RuleBuilderClass: EmphasisStyle,
   testCases: [
     {
+      testName: 'nested emphasis keeps disjoint delimiters under asterisk style',
+      before: '*)*g**',
+      after: '*)*g**',
+      options: {style: 'asterisk'},
+    },
+    {
+      testName: 'nested emphasis converts both delimiter pairs under underscore style',
+      before: '*)*g**',
+      after: '_)_g__',
+      options: {style: 'underscore'},
+    },
+    {
       // accounts for https://github.com/platers/obsidian-linter/issues/380
       testName: 'Make sure inline math is unaffected',
       before: dedent`

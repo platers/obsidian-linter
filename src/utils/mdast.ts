@@ -517,13 +517,14 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
     indicator += indicator;
   }
 
-  // Retain the descending rewrite order: an outer node must see prior edits to its nested nodes.
+  // Nested nodes overlap, but their delimiter runs are disjoint. Leave their interiors untouched.
+  const replacements: textReplacement[] = [];
   for (const position of positions) {
-    const newContent = indicator + text.substring(position.start.offset + indicator.length, position.end.offset - indicator.length) + indicator;
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, newContent);
+    replacements.push({startIndex: position.start.offset, endIndex: position.start.offset + indicator.length, value: indicator});
+    replacements.push({startIndex: position.end.offset - indicator.length, endIndex: position.end.offset, value: indicator});
   }
 
-  return text;
+  return applyNonOverlappingReplacements(text, replacements);
 }
 
 /**
