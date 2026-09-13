@@ -209,7 +209,7 @@ export function getListItemTextPositions(text: string, includeEmptyNodes: boolea
   return positions;
 }
 
-function getHeaderTextPositions(text: string): PositionPlusText[] {
+export function getHeaderTextPositions(text: string): PositionPlusText[] {
   const ast = parseTextToAST(text);
   const positions: PositionPlusText[] = [];
   visit(ast, MDAstTypes.Heading as string, (node) => {

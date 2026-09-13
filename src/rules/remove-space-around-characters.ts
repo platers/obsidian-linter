@@ -1,9 +1,11 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {updateHeaderText, updateListItemText} from '../utils/mdast';
-import {escapeRegExp} from '../utils/regex';
+import {IgnoreTypes} from '../utils/ignore-types';
+import {getHeaderTextPositions, getListItemTextPositions} from '../utils/mdast';
+import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
+import {checklistBoxStartsTextRegex, escapeRegExp} from '../utils/regex';
+import {replaceTextRanges, textReplacement} from '../utils/strings';
 
 class RemoveSpaceAroundCharactersOptions implements Options {
   includeFullwidthForms?: boolean = true;
@@ -20,12 +22,13 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
       descriptionKey: 'rules.remove-space-around-characters.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => RemoveSpaceAroundCharactersOptions {
     return RemoveSpaceAroundCharactersOptions;
   }
-  apply(text: string, options: RemoveSpaceAroundCharactersOptions): string {
+  apply(text: string, options: RemoveSpaceAroundCharactersOptions, protectedRanges: ProtectedRanges): string {
     let symbolsRegExpBuilder = '';
 
     if (options.includeFullwidthForms) {
@@ -49,16 +52,58 @@ export default class RemoveSpaceAroundCharacters extends RuleBuilder<RemoveSpace
     const fullwidthCharacterWithTextAtStart = new RegExp(`([ \t])+([${symbolsRegExpBuilder}])`, 'g');
     const fullwidthCharacterWithTextAtEnd = new RegExp(`([${symbolsRegExpBuilder}])([ \t])+`, 'g');
 
-    const replaceWhitespaceAroundFullwidthCharacters = function(text: string): string {
-      return text.replace(fullwidthCharacterWithTextAtStart, '$2').replace(fullwidthCharacterWithTextAtEnd, '$1');
+    const collectReplacements = function(value: string, offset: number, ignored: ProtectedRanges): textReplacement[] {
+      return [
+        ...collectUnprotectedRegexReplacements(value, fullwidthCharacterWithTextAtStart, ignored, {
+          editRange: (match, startIndex) => ({
+            startIndex,
+            endIndex: startIndex + match[0].length - match[2].length,
+            value: '',
+          }),
+          guardRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[0].length}),
+        }, offset),
+        ...collectUnprotectedRegexReplacements(value, fullwidthCharacterWithTextAtEnd, ignored, {
+          editRange: (match, startIndex) => ({
+            startIndex: startIndex + match[1].length,
+            endIndex: startIndex + match[0].length,
+            value: '',
+          }),
+          guardRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[0].length}),
+        }, offset),
+      ];
     };
 
-    let newText = ignoreListOfTypes([IgnoreTypes.list, IgnoreTypes.heading], text, replaceWhitespaceAroundFullwidthCharacters);
+    const replacements = collectReplacements(text, 0, protectedRanges.combinedWith([IgnoreTypes.list, IgnoreTypes.heading]));
+    for (const {position} of getListItemTextPositions(text)) {
+      let startIndex = position.start.offset;
+      // Keep the same marker whitespace and fallback checklist prefix as updateListItemText.
+      while (startIndex > 0 && text.charAt(startIndex - 1).trim() === '') {
+        startIndex--;
+      }
+      if (startIndex === 0 || text.charAt(startIndex - 1).trim() !== '') {
+        startIndex++;
+      }
+      if (checklistBoxStartsTextRegex.test(text.substring(startIndex, position.end.offset))) {
+        startIndex += 4;
+      }
+      replacements.push(...collectReplacements(text.substring(startIndex, position.end.offset), startIndex, protectedRanges));
+    }
 
-    newText = updateListItemText(newText, replaceWhitespaceAroundFullwidthCharacters);
-    newText = updateHeaderText(newText, replaceWhitespaceAroundFullwidthCharacters);
+    for (const {position, text: value} of getHeaderTextPositions(text)) {
+      const headerText = text.substring(position.start.offset, position.end.offset);
+      const valueOffset = headerText.indexOf(value);
+      // Decoded entities/escapes may not occur verbatim in the source. The old helper used -1
+      // as an offset and corrupted the document; leave this text alone instead.
+      if (valueOffset === -1) {
+        continue;
+      }
 
-    return newText;
+      replacements.push(...collectReplacements(value, position.start.offset + valueOffset, protectedRanges));
+    }
+
+    // A space between two symbols can be matched by both expressions; delete it only once.
+    const edits: textReplacement[] = new ProtectedRanges(replacements).ranges.map((range) => ({...range, value: ''}));
+    return replaceTextRanges(text, edits);
   }
   get exampleBuilders(): ExampleBuilder<RemoveSpaceAroundCharactersOptions>[] {
     return [
