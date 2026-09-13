@@ -1,44 +1,40 @@
 diff --git a/node_modules/mdast-util-from-markdown/lib/index.js b/node_modules/mdast-util-from-markdown/lib/index.js
-index 90e17be..58f6081 100644
+index 90e17be..4470d95 100644
 --- a/node_modules/mdast-util-from-markdown/lib/index.js
 +++ b/node_modules/mdast-util-from-markdown/lib/index.js
-@@ -287,7 +287,14 @@ function compiler(options) {
+@@ -287,6 +287,17 @@ function compiler(options) {
      let firstBlankLineIndex;
      /** @type {boolean | undefined} */
      let atMarker;
--    while (++index <= length) {
-+    // PATCH(obsidian-linter): collect the listItem events instead of splicing each one into the
-+    // shared event array, which is O(items x events). See syntax-tree/mdast-util-from-markdown#49.
++    // PATCH(obsidian-linter): upstream's fix from 53875a7 for
++    // syntax-tree/mdast-util-from-markdown#49 (PR #51), unreleased as of 2.0.3.
++    // Delete this patch when a release contains the fix.
++    /**
++     * Insertions accumulated in walk order: each {at, event} maps to an
++     * `events.splice(at, 0, event)` in the original implementation. Applied
++     * once at the end so a wide list's per-item O(n) splice cost collapses
++     * to a single batched rebuild.
++     * @type {Array<{at: number, event: Event}>}
++     */
 +    const insertions = [];
-+    const originalLength = length;
-+    // an already inserted exit stops the backward scan below, so the position of the last one has
-+    // to be remembered now that it is not physically present in the array yet
-+    let lastExitInsertionIndex = -1;
-+    while (++index <= originalLength) {
+     while (++index <= length) {
        const event = events[index];
        switch (event[1].type) {
-         case "listUnordered":
-@@ -332,6 +339,7 @@ function compiler(options) {
-           let tailIndex = index;
-           lineIndex = undefined;
-           while (tailIndex--) {
-+            if (tailIndex < lastExitInsertionIndex) break;
-             const tailEvent = events[tailIndex];
-             if (tailEvent[1].type === "lineEnding" || tailEvent[1].type === "lineEndingBlank") {
-               if (tailEvent[0] === 'exit') continue;
-@@ -353,9 +361,8 @@ function compiler(options) {
+@@ -353,9 +364,10 @@ function compiler(options) {
  
            // Fix position.
            listItem.end = Object.assign({}, lineIndex ? events[lineIndex][1].start : event[1].end);
 -          events.splice(lineIndex || index, 0, ['exit', listItem, event[2]]);
 -          index++;
 -          length++;
-+          lastExitInsertionIndex = lineIndex || index;
-+          insertions.push({at: lastExitInsertionIndex, event: ['exit', listItem, event[2]]});
++          insertions.push({
++            at: lineIndex || index,
++            event: ['exit', listItem, event[2]]
++          });
          }
  
          // Create a new list item.
-@@ -369,16 +376,34 @@ function compiler(options) {
+@@ -369,16 +381,79 @@ function compiler(options) {
              end: undefined
            };
            listItem = item;
@@ -51,29 +47,74 @@ index 90e17be..58f6081 100644
          }
        }
      }
++    // Apply queued insertions outside the loop so a wide list's O(n*k)
++    // shift cost collapses into one batched pass. Small lists take the
++    // splice fast path; wider lists rebuild the replacement once, then
++    // either spread it back in one splice or shift the suffix in place
++    // when the replacement is too large to spread safely.
 +    if (insertions.length > 0) {
-+      // the recorded positions never go backwards, so the events after the list can be shifted
-+      // right once and the region then filled in from the end backwards, without copying the rest
-+      // of the array or allocating anything the size of the document
-+      const inserted = insertions.length;
-+      const oldLength = events.length;
-+      events.length = oldLength + inserted;
-+      for (let i = oldLength - 1; i > originalLength; i--) {
-+        events[i + inserted] = events[i];
-+      }
-+      let writeIndex = originalLength + inserted;
-+      let readIndex = originalLength;
-+      for (let i = inserted - 1; i >= 0; i--) {
-+        const insertion = insertions[i];
-+        while (readIndex >= insertion.at) {
-+          events[writeIndex--] = events[readIndex--];
++      // Fast path: one splice per insertion, shifting the suffix each
++      // time. Cheap when there are few insertions, expensive when many.
++      // Rebuild path: one allocation plus one splice. Cheap once K grows,
++      // but pays allocation overhead even on tiny ranges. The crossover
++      // depends on document shape; 8 was picked by sweeping representative
++      // inputs.
++      const SMALL_LIST_LIMIT = 8;
++      if (insertions.length <= SMALL_LIST_LIMIT) {
++        // Splice last-to-first so unspliced positions stay valid. Within
++        // a same-`at` group this reverses the walk order, which still
++        // produces the original loop's final ordering (exit before enter).
++        let insertion = insertions.length;
++        while (insertion-- > 0) {
++          events.splice(insertions[insertion].at, 0, insertions[insertion].event);
 +        }
-+        events[writeIndex--] = insertion.event;
++      } else {
++        // Pass-1 visits events left-to-right and records exit-then-enter at
++        // non-decreasing `at` values, so no sort is needed.
++        const rangeLength = length - start + 1;
++        /** @type {Array<Event>} */
++        const replacement = new Array(rangeLength + insertions.length);
++        let writeIndex = 0;
++        let insertionIndex = 0;
++        let sourceIndex = start;
++        while (sourceIndex <= length) {
++          while (insertionIndex < insertions.length && insertions[insertionIndex].at === sourceIndex) {
++            replacement[writeIndex++] = insertions[insertionIndex].event;
++            insertionIndex++;
++          }
++          replacement[writeIndex++] = events[sourceIndex++];
++        }
++
++        // Splice with a single spread when the replacement fits under
++        // V8's stack-arg limit. Above that, looping smaller splices would
++        // re-shift the suffix each time, so instead resize the array
++        // once, shift the suffix to its target position, and overwrite
++        // the vacated range. Both paths are O(suffix + replacement.length).
++        // The threshold matches micromark-util-chunked's own splice helper.
++        const SAFE_SPREAD = 10_000;
++        if (replacement.length <= SAFE_SPREAD) {
++          events.splice(start, rangeLength, ...replacement);
++        } else {
++          const oldEnd = start + rangeLength;
++          const newEnd = start + replacement.length;
++          const delta = newEnd - oldEnd;
++          const oldEventsLength = events.length;
++          events.length = oldEventsLength + delta;
++          let shiftIndex = events.length;
++          while (shiftIndex-- > newEnd) {
++            events[shiftIndex] = events[shiftIndex - delta];
++          }
++          let writeIndex = 0;
++          while (writeIndex < replacement.length) {
++            events[start + writeIndex] = replacement[writeIndex];
++            writeIndex++;
++          }
++        }
 +      }
 +    }
      events[start][1]._spread = listSpread;
 -    return length;
-+    return originalLength + insertions.length;
++    return length + insertions.length;
    }
  
    /**
