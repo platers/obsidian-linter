@@ -4,8 +4,59 @@ import { CustomReplace } from "../src/settings-data";
 import dedent from 'ts-dedent';
 import { LintCommand } from "../src/settings-data";
 import { ObsidianCommandInterface } from '../src/typings/obsidian-ex';
+import {DEFAULT_SETTINGS, LinterSettings} from '../src/settings-data';
+import FileNameHeading from '../src/rules/file-name-heading';
+import ReIndexFootnotes from '../src/rules/re-index-footnotes';
+import RemoveYamlKeys from '../src/rules/remove-yaml-keys';
+import ProperEllipsis from '../src/rules/proper-ellipsis';
+import RemoveMultipleSpaces from '../src/rules/remove-multiple-spaces';
+import StrongStyle from '../src/rules/strong-style';
 
 const rulesRunner = new RulesRunner();
+describe('settings enablement before batch barriers', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  describe.each([
+    {rule: RemoveYamlKeys.getRule(), isBarrier: true},
+    {rule: FileNameHeading.getRule(), isBarrier: true},
+    {rule: ReIndexFootnotes.getRule(), isBarrier: true},
+    {rule: StrongStyle.getRule(), isBarrier: false},
+  ])('$rule.alias', ({rule, isBarrier}) => {
+    it.each([false, undefined, true])('preserves output and shares snapshots only when safe with enabled=%s', (enabled) => {
+      const firstRule = ProperEllipsis.getRule();
+      const lastRule = RemoveMultipleSpaces.getRule();
+      const settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as LinterSettings;
+      settings.ruleConfigs[firstRule.settingsKey] = {enabled: true};
+      settings.ruleConfigs[rule.settingsKey] = enabled === undefined ? {} : {enabled};
+      settings.ruleConfigs[lastRule.settingsKey] = {enabled: true};
+
+      // Keep the edits far enough apart that only the middle rule can split this batch.
+      const text = 'first\n\nunchanged\n\nunchanged\n\nlast';
+      const firstApply = jest.spyOn(firstRule, 'apply').mockImplementation((snapshot) => snapshot.replace('first', 'FIRST'));
+      const middleApply = jest.spyOn(rule, 'apply').mockImplementation((snapshot) => snapshot);
+      const lastApply = jest.spyOn(lastRule, 'apply').mockImplementation((snapshot) => snapshot.replace('last', 'LAST'));
+
+      const output = rulesRunner['runRulesInBatches']([firstRule, rule, lastRule], text, settings, {});
+
+      expect(output).toBe('FIRST\n\nunchanged\n\nunchanged\n\nLAST');
+      expect(firstApply).toHaveBeenCalledTimes(1);
+      expect(middleApply).toHaveBeenCalledTimes(enabled ? 1 : 0);
+      expect(lastApply).toHaveBeenCalledTimes(1);
+      const startsNewBatch = enabled && isBarrier;
+      expect(lastApply.mock.calls[0][0]).toBe(startsNewBatch ? text.replace('first', 'FIRST') : text);
+      if (startsNewBatch) {
+        // Even an enabled barrier that returns unchanged text must see earlier work first.
+        expect(middleApply.mock.calls[0][0]).toBe(text.replace('first', 'FIRST'));
+        expect(lastApply.mock.calls[0][2]).not.toBe(firstApply.mock.calls[0][2]);
+      } else {
+        expect(lastApply.mock.calls[0][2]).toBe(firstApply.mock.calls[0][2]);
+      }
+    });
+  });
+});
+
 interface AppCommandsMock extends ObsidianCommandInterface {
   numberOfCommands: number;
   numberOfHitsPerId: Map<string, number>;

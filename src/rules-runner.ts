@@ -159,6 +159,13 @@ export class RulesRunner {
       while (index < rulesToRun.length) {
         const rule = rulesToRun[index];
 
+        // A disabled rule will not read the snapshot, so it does not need a batch boundary.
+        const optionsFromSettings = rule.getOptions(settings) as Record<string, unknown>;
+        if (!optionsFromSettings[rule.enabledOptionName()]) {
+          index++;
+          continue;
+        }
+
         // Some rules cannot be told apart by looking only at what they changed. The yaml rules
         // build on each other, one inserting a key and another deciding how its value is written.
         // The rules that move content about, or that look at the document as a whole, decide what
