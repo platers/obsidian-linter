@@ -1,6 +1,7 @@
 import {visit} from 'unist-util-visit';
 import type {Position, Node} from 'unist';
 import type {Root} from 'mdast';
+import type {ProtectedRanges} from './protected-ranges';
 import {hashString53Bit, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, replaceAt, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
 import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, checklistBoxStartsTextRegex, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
@@ -448,10 +449,17 @@ export function reIndexFootnotes(text: string): string {
  * @param {string} text The text to style either the strong or emphasis in a consistent manner
  * @param {string} style The style to use for the emphasis indicator (i.e. underscore, asterisk, or consistent)
  * @param {MDAstTypes} type The type of element to make consistent and the value should be either strong or emphasis
+ * @param {ProtectedRanges} protectedRanges The regions whose overlapping delimiters must be skipped
  * @return {string} The text with either strong or emphasis styles made consistent
  */
-export function makeEmphasisOrBoldConsistent(text: string, style: string, type: MDAstTypes): string {
-  const positions: Position[] = getPositions(type, text);
+export function makeEmphasisOrBoldConsistent(text: string, style: string, type: MDAstTypes, protectedRanges: ProtectedRanges): string {
+  const delimiterLength = type === MDAstTypes.Bold ? 2 : 1;
+  // Only delimiters change: enclosing a protected link is allowed, being enclosed by one is not.
+  // Filter before choosing the first indicator so protected delimiters cannot determine the style.
+  const positions: Position[] = getPositions(type, text).filter((position) => {
+    return !protectedRanges.isProtected(position.start.offset, position.start.offset + delimiterLength) &&
+      !protectedRanges.isProtected(position.end.offset - delimiterLength, position.end.offset);
+  });
   if (positions.length === 0) {
     return text;
   }
@@ -471,6 +479,7 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
     indicator += indicator;
   }
 
+  // Retain the descending rewrite order: an outer node must see prior edits to its nested nodes.
   for (const position of positions) {
     const newContent = indicator + text.substring(position.start.offset + indicator.length, position.end.offset - indicator.length) + indicator;
     text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, newContent);
