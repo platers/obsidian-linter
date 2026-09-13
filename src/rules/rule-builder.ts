@@ -302,7 +302,7 @@ export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuild
 
 
   protected buildOption(): Option {
-    return new TextAreaOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue.join(this.separator), this.separator, this.splitter);
+    return new TextAreaOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue.join(this.separator));
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
