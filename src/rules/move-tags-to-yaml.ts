@@ -1,8 +1,11 @@
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
-import {matchTagRegex, tagWithLeadingWhitespaceRegex} from '../utils/regex';
+import {IgnoreTypes} from '../utils/ignore-types';
+import {tagWithLeadingWhitespaceRegex} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {replaceTextRanges, textReplacement} from '../utils/strings';
+import {getEditsBetween} from '../utils/text-edits';
 import {
   convertTagValueToStringOrStringArray,
   getYamlSectionValue,
@@ -40,27 +43,27 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       descriptionKey: 'rules.move-tags-to-yaml.description',
       type: RuleType.YAML,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.html, IgnoreTypes.wikiLink, IgnoreTypes.link],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => MoveTagsToYamlOptions {
     return MoveTagsToYamlOptions;
   }
-  apply(text: string, options: MoveTagsToYamlOptions): string {
-    let tags: string[];
-
+  apply(text: string, options: MoveTagsToYamlOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    const bodyProjection = protectedRanges.combinedWith([IgnoreTypes.yaml]).projection();
     // need to ignore YAML when getting regex matches to avoid improper matches with YAML contents
     // https://github.com/platers/obsidian-linter/issues/661
-    ignoreListOfTypes([IgnoreTypes.yaml], text, (text) => {
-      tags = matchTagRegex(text);
-
-      return text;
+    const tagMatches = [...bodyProjection.text.matchAll(tagWithLeadingWhitespaceRegex)].filter((match) => {
+      return bodyProjection.editRangeToSource({startIndex: match.index, endIndex: match.index + match[0].length}) !== undefined;
     });
+    const tags = tagMatches.map((match) => match[2]);
 
     if (tags.length === 0) {
       return text;
     }
 
-    text = initYAML(text);
+    text = initYAML(projection.text);
     text = formatYAML(text, (text: string) => {
       text = text.replace('---\n', '').replace('---', '');
 
@@ -102,32 +105,50 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       return `---\n${newYaml}---`;
     });
 
-    text = ignoreListOfTypes([IgnoreTypes.yaml], text, (text) => {
-      if (options.howToHandleExistingTags !== 'Nothing') {
-        text = text.replace(tagWithLeadingWhitespaceRegex, (tag: string) => {
-          const hashtagIndex = tag.indexOf('#');
-
-          const tagContents = tag.substring(hashtagIndex+1);
-          if (options.tagsToIgnore.includes(tagContents)) {
-            return tag;
+    const removals: textReplacement[] = [];
+    const yamlLengthChange = text.length - projection.text.length;
+    if (options.howToHandleExistingTags !== 'Nothing') {
+      for (const match of tagMatches) {
+        if (options.tagsToIgnore.includes(match[2].substring(1))) {
+          continue;
+        }
+        const sourceRange = bodyProjection.editRangeToSource({startIndex: match.index, endIndex: match.index + match[0].length});
+        let startIndex = projection.sourceToProjection(sourceRange.startIndex) + yamlLengthChange;
+        const endIndex = projection.sourceToProjection(sourceRange.endIndex) + yamlLengthChange;
+        if (options.howToHandleExistingTags === 'Remove hashtag') {
+          startIndex += match[1].length;
+          removals.push({startIndex, endIndex: startIndex + 1, value: ''});
+        } else {
+          // A newly inserted frontmatter supplies the leading newline for a tag at offset zero.
+          if (match.index === 0 && match[1] === '' && yamlLengthChange > 0) {
+            startIndex--;
           }
-
-          if (options.howToHandleExistingTags === 'Remove hashtag') {
-            return tag.substring(0, hashtagIndex) + tagContents;
-          }
-
-          return '';
-        });
+          removals.push({startIndex, endIndex, value: ''});
+        }
       }
-
-      return text;
-    });
+    }
+    removals.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    if (removals.some((replacement, index) => index > 0 && replacement.startIndex < removals[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    text = replaceTextRanges(text, removals);
 
     // Make sure that the YAML frontmatter does not have whitespace added after the end of the YAML frontmatter.
     // This accounts for https://github.com/platers/obsidian-linter/issues/573
     text = text.replace(/(\n---)( |\t)+/, '$1');
 
-    return text;
+    const replacements: textReplacement[] = [];
+    for (const edit of getEditsBetween(projection.text, text)) {
+      const range = projection.editRangeToSource(edit);
+      if (range) {
+        replacements.push({...range, value: edit.value});
+      }
+    }
+    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    return replaceTextRanges(projection.source, replacements);
   }
   get exampleBuilders(): ExampleBuilder<MoveTagsToYamlOptions>[] {
     return [

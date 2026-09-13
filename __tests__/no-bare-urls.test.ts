@@ -5,6 +5,27 @@ import {ruleTest} from './common';
 ruleTest({
   RuleBuilderClass: NoBareUrls,
   testCases: [
+    {
+      testName: 'Combines many interleaved URLs and URIs without wrapping overlapping matches twice',
+      before: Array.from({length: 256}, (_, index) => `https://example.com/${index} obsidian://note-${index} custom://example.org/${index}`).join('\n'),
+      after: Array.from({length: 256}, (_, index) => `<https://example.com/${index}> <obsidian://note-${index}> <custom://example.org/${index}>`).join('\n'),
+      options: {noBareURIs: true},
+    },
+    {
+      testName: 'Leaves URLs inside fenced code alone',
+      before: '```\nhttps://example.com\n```\nhttps://example.org',
+      after: '```\nhttps://example.com\n```\n<https://example.org>',
+    },
+    {
+      testName: 'Leaves URLs inside disabled sections alone',
+      before: '<!-- linter-disable -->\nhttps://example.com\n<!-- linter-enable -->\n\nhttps://example.org',
+      after: '<!-- linter-disable -->\nhttps://example.com\n<!-- linter-enable -->\n\n<https://example.org>',
+    },
+    {
+      testName: 'Protects the URL between opening and closing anchor HTML nodes',
+      before: '<a href="https://example.com">https://example.org</a> https://example.net',
+      after: '<a href="https://example.com">https://example.org</a> <https://example.net>',
+    },
     {// accounts for https://github.com/platers/obsidian-linter/issues/275
       testName: 'Leaves markdown links and images alone',
       before: dedent`
@@ -246,4 +267,3 @@ ruleTest({
     },
   ],
 });
-

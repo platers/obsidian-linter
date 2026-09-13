@@ -4,6 +4,8 @@ import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MdFilePickerOptionBui
 import dedent from 'ts-dedent';
 import {wordRegex, wordSplitterRegex} from '../utils/regex';
 import { CustomAutoCorrectContent } from '../settings-data';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {replaceTextRanges, textReplacement} from '../utils/strings';
 
 class AutoCorrectCommonMisspellingsOptions implements Options {
   ignoreWords?: string[] = [];
@@ -25,13 +27,30 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
       // rule.
       hasSpecialExecutionOrder: true,
       ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.url],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => AutoCorrectCommonMisspellingsOptions {
     return AutoCorrectCommonMisspellingsOptions;
   }
-  apply(text: string, options: AutoCorrectCommonMisspellingsOptions): string {
-    return text.replaceAll(wordRegex, (word: string) => this.replaceWordWithCorrectCasing(word, options));
+  apply(text: string, options: AutoCorrectCommonMisspellingsOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    const replacements: textReplacement[] = [];
+    // Backticks belong to wordRegex, so hide inline code before finding adjacent visible words.
+    for (const match of projection.text.matchAll(wordRegex)) {
+      const range = projection.editRangeToSource({startIndex: match.index, endIndex: match.index + match[0].length});
+      if (range) {
+        const value = this.replaceWordWithCorrectCasing(match[0], options);
+        if (value !== match[0]) {
+          replacements.push({...range, value});
+        }
+      }
+    }
+    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    return replaceTextRanges(text, replacements);
   }
   replaceWordWithCorrectCasing(word: string, options: AutoCorrectCommonMisspellingsOptions): string {
     const lowercasedWord = word.toLowerCase();

@@ -7,6 +7,7 @@ import {BooleanOption} from '../option';
 import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 import {App} from 'obsidian';
 import LinterPlugin from '../main';
+import {ProtectedRanges} from '../utils/protected-ranges';
 
 class TwoSpacesBetweenLinesWithContentOptions implements Options {
   lineBreakIndicator?: LineBreakIndicators = LineBreakIndicators.TwoSpaces;
@@ -20,6 +21,7 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
       descriptionKey: 'rules.two-spaces-between-lines-with-content.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table],
+      usesProtectedRanges: true,
       disableConflictingOptions(value: boolean, app: App, plugin: LinterPlugin): void {
         const paragraphBlankLinesEnableOption = rulesDict['paragraph-blank-lines'].options[0] as BooleanOption;
         if (value && paragraphBlankLinesEnableOption.getValue(plugin)) {
@@ -38,8 +40,8 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
   get OptionsClass(): new () => TwoSpacesBetweenLinesWithContentOptions {
     return TwoSpacesBetweenLinesWithContentOptions;
   }
-  apply(text: string, options: TwoSpacesBetweenLinesWithContentOptions): string {
-    return addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text, options.lineBreakIndicator);
+  apply(text: string, options: TwoSpacesBetweenLinesWithContentOptions, protectedRanges: ProtectedRanges): string {
+    return addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text, options.lineBreakIndicator, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<TwoSpacesBetweenLinesWithContentOptions>[] {
     return [

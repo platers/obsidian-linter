@@ -4,6 +4,7 @@ import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {countInstances, replaceTextRanges, textReplacement} from '../utils/strings';
 import {simpleURIRegex, urlRegex} from '../utils/regex';
+import {ProtectedRanges, redactProtected} from '../utils/protected-ranges';
 
 class NoBareUrlsOptions implements Options {
   noBareURIs?: boolean = false;
@@ -20,27 +21,40 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       descriptionKey: 'rules.no-bare-urls.description',
       type: RuleType.CONTENT,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.image, IgnoreTypes.inlineCode, IgnoreTypes.anchorTag, IgnoreTypes.html],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => NoBareUrlsOptions {
     return NoBareUrlsOptions;
   }
-  apply(text: string, options: NoBareUrlsOptions): string {
+  apply(text: string, options: NoBareUrlsOptions, protectedRanges: ProtectedRanges): string {
+    const replacements: textReplacement[] = [];
     const URLMatches = text.match(urlRegex);
     if (URLMatches) {
-      text = this.handleMatches(text, URLMatches, false);
+      replacements.push(...this.handleMatches(text, URLMatches, false, protectedRanges));
     }
 
     if (options.noBareURIs) {
       const URIMatches = text.match(simpleURIRegex);
       if (URIMatches) {
-        text = this.handleMatches(text, URIMatches, true);
+        const urlReplacements = new ProtectedRanges(replacements);
+        for (const replacement of this.handleMatches(text, URIMatches, true, protectedRanges)) {
+          // The URL pass already wraps these characters before the URI pass would see them.
+          // URI edits are disjoint within handleMatches; only the URL edits need indexing.
+          if (!urlReplacements.isProtected(replacement.startIndex, replacement.endIndex)) {
+            replacements.push(replacement);
+          }
+        }
       }
     }
 
-    return text;
+    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    return replaceTextRanges(text, replacements);
   }
-  handleMatches(text: string, matches: RegExpMatchArray, isURISearch: boolean): string {
+  handleMatches(text: string, matches: RegExpMatchArray, isURISearch: boolean, protectedRanges: ProtectedRanges): textReplacement[] {
     // make sure you do not match on the same thing more than once by keeping track of the last position you checked up to
     let startSearch = 0;
     // Every match is located and inspected against the text as it was passed in rather than against
@@ -52,6 +66,11 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       let urlMatch = matches[i];
       let urlStart = text.indexOf(urlMatch, startSearch);
       let urlEnd = urlStart + urlMatch.length;
+      startSearch = urlEnd;
+      // anchorTag protects the URL between the two HTML nodes as well as the tags themselves.
+      if (protectedRanges.isProtected(urlStart, urlEnd)) {
+        continue;
+      }
       if (urlMatch.charAt(0) === '<') {
         urlMatch = urlMatch.substring(1);
         urlStart++;
@@ -62,14 +81,14 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
         urlEnd--;
       }
 
-      const previousChar = urlStart === 0 ? undefined : text.charAt(urlStart - 1);
-      let nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
+      const previousChar = urlStart === 0 ? undefined : redactProtected(text, protectedRanges, urlStart - 1, urlStart).slice(-1);
+      let nextChar = urlEnd >= text.length ? undefined : redactProtected(text, protectedRanges, urlEnd, urlEnd + 1).charAt(0);
       // check for an unmatched opening paren
       const openingParentheses = countInstances(urlMatch, '(');
       if (openingParentheses != 0 && openingParentheses != countInstances(urlMatch, ')') && nextChar == ')') {
         urlMatch += nextChar;
         urlEnd++;
-        nextChar = urlEnd >= text.length ? undefined : text.charAt(urlEnd);
+        nextChar = urlEnd >= text.length ? undefined : redactProtected(text, protectedRanges, urlEnd, urlEnd + 1).charAt(0);
       } else if (openingParentheses == 0 && urlMatch.endsWith(')')) {
         nextChar = ')';
         urlEnd--;
@@ -93,17 +112,21 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
           endOfClosingChevrons++;
         }
 
-        this.addReplacement(replacements, {startIndex: startOfOpeningChevrons, endIndex: endOfClosingChevrons+1, value: '<' + urlMatch + '>'});
+        if (!protectedRanges.isProtected(startOfOpeningChevrons, endOfClosingChevrons + 1)) {
+          this.addReplacement(replacements, {startIndex: startOfOpeningChevrons, endIndex: endOfClosingChevrons+1, value: '<' + urlMatch + '>'});
+        }
 
         startSearch = urlStart + urlMatch.length;
         continue;
       }
 
-      this.addReplacement(replacements, {startIndex: urlStart, endIndex: urlStart + urlMatch.length, value: '<' + urlMatch + '>'});
+      if (!protectedRanges.isProtected(urlStart, urlStart + urlMatch.length)) {
+        this.addReplacement(replacements, {startIndex: urlStart, endIndex: urlStart + urlMatch.length, value: '<' + urlMatch + '>'});
+      }
       startSearch = urlStart + urlMatch.length;
     }
 
-    return replaceTextRanges(text, replacements);
+    return replacements;
   }
   addReplacement(replacements: textReplacement[], replacement: textReplacement) {
     // a url wrapped in chevrons reaches back over the characters before it, which can run into the

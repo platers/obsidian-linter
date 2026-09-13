@@ -7,6 +7,18 @@ ruleTest({
   RuleBuilderClass: MoveTagsToYaml,
   testCases: [
     {
+      testName: 'Does not collect or remove tags inside fenced code',
+      before: '```\n#inside\n```\n\nText #outside',
+      after: '---\ntags: [outside]\n---\n```\n#inside\n```\n\nText',
+      options: {howToHandleExistingTags: 'Remove whole tag'},
+    },
+    {
+      testName: 'Does not collect or remove tags inside disabled sections',
+      before: '<!-- linter-disable -->\n#inside\n<!-- linter-enable -->\n\nText #outside',
+      after: '---\ntags: [outside]\n---\n<!-- linter-disable -->\n#inside\n<!-- linter-enable -->\n\nText',
+      options: {howToHandleExistingTags: 'Remove whole tag'},
+    },
+    {
       testName: 'Nothing happens when there is no tag in the content of the text',
       before: dedent`
         # Title

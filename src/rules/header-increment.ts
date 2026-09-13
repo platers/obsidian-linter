@@ -7,6 +7,8 @@ import {BooleanOption} from '../option';
 import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 import {App} from 'obsidian';
 import LinterPlugin from '../main';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {replaceTextRanges, textReplacement} from '../utils/strings';
 
 class HeaderIncrementOptions implements Options {
   startAtH2?: boolean = false;
@@ -20,12 +22,15 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
       descriptionKey: 'rules.header-increment.description',
       type: RuleType.HEADING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      usesProtectedRanges: true,
     });
   }
   get OptionsClass(): new () => HeaderIncrementOptions {
     return HeaderIncrementOptions;
   }
-  apply(text: string, options: HeaderIncrementOptions): string {
+  apply(text: string, options: HeaderIncrementOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    const replacements: textReplacement[] = [];
     let lastLevel = 0; // level of last header processed
     const minimumLevel = options.startAtH2 ? 2: 1;
     const headingLevelStartNumbers: Array<number> = [];
@@ -34,8 +39,13 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
     const headingLevels = [0, 0, 0, 0, 0, 0];
     const highestHeadingLevel = headingLevels.length;
 
-    return text.replace(allHeadersRegex, (_: string, $1: string = '', $2: string = '', $3: string = '', $4: string = '', $5: string = '') => {
-      let level = $2.length;
+    for (const match of projection.text.matchAll(allHeadersRegex)) {
+      const startIndex = match.index + match[1].length;
+      const range = projection.editRangeToSource({startIndex, endIndex: startIndex + match[2].length});
+      if (!range) {
+        continue;
+      }
+      let level = match[2].length;
       level = level <= highestHeadingLevel ? level : highestHeadingLevel;
 
       if (headingLevels[level - 1] >= 0 && level < lastLevel) {
@@ -71,8 +81,13 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
 
       lastLevel = level;
 
-      return $1 + '#'.repeat(headingLevels[level - 1]) + $3 + $4 + $5;
-    });
+      replacements.push({...range, value: '#'.repeat(headingLevels[level - 1])});
+    }
+    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    return replaceTextRanges(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<HeaderIncrementOptions>[] {
     return [

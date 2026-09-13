@@ -7,6 +7,16 @@ ruleTest({
   RuleBuilderClass: TwoSpacesBetweenLinesWithContent,
   testCases: [
     {
+      testName: 'Leaves line endings inside fenced code alone',
+      before: '```\nInside one\nInside two\n```\n\nOutside one\nOutside two',
+      after: '```\nInside one\nInside two\n```\n\nOutside one  \nOutside two',
+    },
+    {
+      testName: 'Leaves line endings inside disabled sections alone',
+      before: '<!-- linter-disable -->\nInside one\nInside two\n<!-- linter-enable -->\n\nOutside one\nOutside two',
+      after: '<!-- linter-disable -->\nInside one\nInside two\n<!-- linter-enable -->\n\nOutside one  \nOutside two',
+    },
+    {
       testName: 'Make sure obsidian multiline comments are not affected',
       before: dedent`
         Here is some inline comments: %%You can't see this text%% (Can't see it)

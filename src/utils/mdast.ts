@@ -522,16 +522,19 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
    * Makes sure that blockquotes, paragraphs, and list items have two spaces at the end of them if the following line continues its content.
    * @param {string} text The text to make sure that the two spaces are added to if there are consecutive lines of content
    * @param {LineBreakIndicators} indicator The indicator to use for the lines that do not already use a blank line indicator
+   * @param {ProtectedRanges} protectedRanges The regions to hide from line-ending decisions
    * @return {string} The text with two spaces at the end of lines of paragraphs, list items, and blockquotes where there were consecutive lines of content.
    */
-export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text: string, indicator: LineBreakIndicators): string {
-  const positions: Position[] = getPositions(MDAstTypes.Paragraph, text);
+export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text: string, indicator: LineBreakIndicators, protectedRanges: ProtectedRanges): string {
+  const projection = protectedRanges.projection();
+  const positions = getProjectedNodeRanges(MDAstTypes.Paragraph, projection);
   if (positions.length === 0) {
     return text;
   }
 
+  text = projection.text;
   for (const position of positions) {
-    const paragraphLines = text.substring(position.start.offset, position.end.offset).split('\n');
+    const paragraphLines = text.substring(position.startIndex, position.endIndex).split('\n');
     const lastLineIndex = paragraphLines.length - 1;
     // only update paragraph if there is more than 1 line present
     if (lastLineIndex < 1) {
@@ -558,10 +561,10 @@ export function addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text:
       paragraphLines[i] = addOrReplaceLineEnding(paragraphLine, indicator);
     }
 
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, paragraphLines.join('\n'));
+    text = replaceTextBetweenStartAndEndWithNewValue(text, position.startIndex, position.endIndex, paragraphLines.join('\n'));
   }
 
-  return text;
+  return applyProjectedChanges(projection, text);
 }
 
 function lineEndsInLineBreak(paragraphLine: string, indicator: LineBreakIndicators): boolean {
@@ -807,6 +810,8 @@ function getProjectedNodeRanges(type: MDAstTypes, projection: DocumentProjection
   for (const position of getPositions(type, projection.source)) {
     const startIndex = projection.sourceToProjection(position.start.offset);
     const endIndex = projection.sourceToProjection(position.end.offset);
+    // A node starting inside a token is skipped whole, losing edits to its visible part if it
+    // extends past the token. paragraph-blank-lines is the known case and stays on masking.
     if (startIndex !== undefined && endIndex !== undefined && !projection.isToken(startIndex)) {
       ranges.push({startIndex, endIndex});
     }

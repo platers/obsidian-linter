@@ -2,7 +2,8 @@ import {Options, rulesDict, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
-import {escapeMarkdownSpecialCharacters, insert} from '../utils/strings';
+import {escapeMarkdownSpecialCharacters, replaceTextRanges, textReplacement} from '../utils/strings';
+import {ProtectedRanges} from '../utils/protected-ranges';
 import {App} from 'obsidian';
 import {BooleanOption} from '../option';
 import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
@@ -21,6 +22,7 @@ export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions>
       descriptionKey: 'rules.file-name-heading.description',
       type: RuleType.HEADING,
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      usesProtectedRanges: true,
       disableConflictingOptions(value: boolean, app: App, plugin: LinterPlugin): void {
         const headerIncrementOptions = rulesDict['header-increment'];
         const headerIncrementEnableOption = headerIncrementOptions.options[0] as BooleanOption;
@@ -41,25 +43,34 @@ export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions>
   get OptionsClass(): new () => FileNameHeadingOptions {
     return FileNameHeadingOptions;
   }
-  apply(text: string, options: FileNameHeadingOptions): string {
+  apply(text: string, options: FileNameHeadingOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    const projectedText = projection.text;
     // check if there is a H1 heading
-    const hasH1 = text.match(/^#\s.*/m);
+    const hasH1 = projectedText.match(/^#\s.*/m);
     if (hasH1) {
       return text;
     }
 
     const fileName = options.fileName;
     // insert H1 heading after front matter
-    let yaml_end = text.indexOf('\n---');
+    let yaml_end = projectedText.indexOf('\n---');
     yaml_end =
-        yaml_end == -1 || !text.startsWith('---\n') ? 0 : yaml_end + 5;
+        yaml_end == -1 || !projectedText.startsWith('---\n') ? 0 : yaml_end + 5;
 
     let header = `# ${escapeMarkdownSpecialCharacters(fileName)}\n`;
-    if (text.length < yaml_end) {
+    if (projectedText.length < yaml_end) {
       header = '\n' + header;
     }
 
-    return insert(text, yaml_end, header);
+    const index = Math.min(yaml_end, projectedText.length);
+    const range = projection.editRangeToSource({startIndex: index, endIndex: index});
+    const replacements: textReplacement[] = range ? [{...range, value: header}] : [];
+    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+      throw new Error('Rule replacements must be ordered and non-overlapping');
+    }
+    return replaceTextRanges(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<FileNameHeadingOptions>[] {
     return [
