@@ -1,4 +1,4 @@
-import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex, urlRegex, anchorTagRegex, templaterCommandRegex, footnoteDefinitionIndicatorAtStartOfLine} from './regex';
+import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, escapeRegExp, genericLinkRegex, urlRegex, anchorTagRegex, templaterCommandRegex, footnoteDefinitionIndicatorAtStartOfLine} from './regex';
 import {getAllCustomIgnoreSectionsInText, getAllTablesInText, getPositions, MDAstTypes} from './mdast';
 import {hashString53Bit, replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
@@ -86,7 +86,7 @@ function inCanonicalOrder(ignoreTypes: IgnoreType[]): IgnoreType[] {
 }
 
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
-  let placeholders: placeholderInfo[] = [];
+  const maskedStages: placeholderInfo[][] = [];
 
   // replace ignore blocks with their placeholders
   let tempPlaceholders: placeholderInfo[] = [];
@@ -113,19 +113,84 @@ export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func:
       [tempPlaceholders, text] = ignoreFunc(text, ignoreType.placeholder);
     }
 
-    placeholders.push(...tempPlaceholders);
+    maskedStages.push(tempPlaceholders);
   }
 
   text = func(text);
 
-  placeholders = placeholders.reverse();
-  // add back values that were replaced with their placeholders
-  if (placeholders != null && placeholders.length > 0) {
-    placeholders.forEach((replacedInfo: placeholderInfo) => {
-      // Regex was added to fix capitalization issue  where another rule made the text not match the original place holder's case
-      // see https://github.com/platers/obsidian-linter/issues/201
-      text = text.replace(new RegExp(replacedInfo.placeholder, 'i'), escapeDollarSigns(replacedInfo.replacedValue));
+  // add back values that were replaced with their placeholders. A value masked by a later stage can
+  // contain the placeholders of an earlier one, since that stage masked text that was already
+  // masked, so the stages have to be unwound in the order they were applied.
+  for (let i = maskedStages.length - 1; i >= 0; i--) {
+    text = restoreStage(text, maskedStages[i]);
+  }
+
+  return text;
+}
+
+/**
+ * Builds a single expression matching every placeholder a stage produced.
+ *
+ * The placeholders of one stage share a template and a seed and differ only in a fixed width
+ * counter, so they are all the same length and differ only in the middle. That makes a single
+ * fixed width expression enough to find all of them, with no ambiguity about where a match ends.
+ * @param {string[]} placeholders The placeholders produced by one masking stage
+ * @return {RegExp} An expression matching all of them, or null if they do not share a shape
+ */
+function buildStagePlaceholderRegex(placeholders: string[]): RegExp {
+  const length = placeholders[0].length;
+  if (!placeholders.every((placeholder) => placeholder.length === length)) {
+    return null;
+  }
+
+  let prefixLength = 0;
+  while (prefixLength < length && placeholders.every((placeholder) => placeholder[prefixLength] === placeholders[0][prefixLength])) {
+    prefixLength++;
+  }
+
+  let suffixLength = 0;
+  while (prefixLength + suffixLength < length && placeholders.every((placeholder) => placeholder[length - 1 - suffixLength] === placeholders[0][length - 1 - suffixLength])) {
+    suffixLength++;
+  }
+
+  const middleLength = length - prefixLength - suffixLength;
+  const prefix = escapeRegExp(placeholders[0].substring(0, prefixLength));
+  const suffix = escapeRegExp(placeholders[0].substring(length - suffixLength));
+
+  // the placeholder case is matched loosely because a rule can change it, see
+  // https://github.com/platers/obsidian-linter/issues/201
+  return new RegExp(prefix + (middleLength > 0 ? `[\\s\\S]{${middleLength}}` : '') + suffix, 'gi');
+}
+
+function restoreStage(text: string, stage: placeholderInfo[]): string {
+  if (stage.length === 0) {
+    return text;
+  }
+
+  const valueByPlaceholder = new Map<string, string>(stage.map((replacedInfo) => [replacedInfo.placeholder.toLowerCase(), replacedInfo.replacedValue]));
+  const stageRegex = valueByPlaceholder.size === stage.length ? buildStagePlaceholderRegex(stage.map((replacedInfo) => replacedInfo.placeholder)) : null;
+
+  // Nothing a stage masked can contain that same stage's placeholders, because the seed they are
+  // built from is checked against the text before it is used. Within a stage the replacements are
+  // therefore independent of each other and can all be made in one pass over the text.
+  if (stageRegex) {
+    const alreadyRestored = new Set<string>();
+    return text.replace(stageRegex, (match: string) => {
+      const key = match.toLowerCase();
+      const replacedValue = valueByPlaceholder.get(key);
+      // a placeholder belonging to an earlier stage, or a repeat of one this stage already put
+      // back, is left alone so that it is restored by the stage that owns it
+      if (replacedValue === undefined || alreadyRestored.has(key)) {
+        return match;
+      }
+
+      alreadyRestored.add(key);
+      return replacedValue;
     });
+  }
+
+  for (let i = stage.length - 1; i >= 0; i--) {
+    text = text.replace(new RegExp(stage[i].placeholder, 'i'), escapeDollarSigns(stage[i].replacedValue));
   }
 
   return text;
