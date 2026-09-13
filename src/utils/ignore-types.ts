@@ -1,6 +1,6 @@
 import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, escapeRegExp, genericLinkRegex, urlRegex, anchorTagRegex, templaterCommandRegex, footnoteDefinitionIndicatorAtStartOfLine} from './regex';
 import {getAllCustomIgnoreSectionsInText, getAllTablesInText, getPositions, MDAstTypes} from './mdast';
-import {hashString53Bit, replaceTextBetweenStartAndEndWithNewValue} from './strings';
+import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 export type IgnoreFunction = ((text: string, placeholder: string) => [placeholderInfo[], string]);
 export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string, onlyIfMatches?: RegExp};
@@ -268,7 +268,18 @@ function replaceMdastTypes(text: string, ignoreTypes: IgnoreType[]): [placeholde
   const priority = new Map<IgnoreType, number>(ignoreTypes.map((ignoreType, index) => [ignoreType, index]));
   candidates.sort((a, b) => a.startIndex - b.startIndex || b.endIndex - a.endIndex || priority.get(a.ignoreType) - priority.get(b.ignoreType));
 
-  const generators = new Map<IgnoreType, () => string>(ignoreTypes.map((ignoreType) => [ignoreType, createPlaceholderGenerator(text, ignoreType.placeholder)]));
+  // most rules declare ignore types the document does not contain, so the generator for a type is
+  // only built once that type turns out to have something to mask
+  const generators = new Map<IgnoreType, () => string>();
+  const generatorFor = (ignoreType: IgnoreType): (() => string) => {
+    let generator = generators.get(ignoreType);
+    if (!generator) {
+      generator = createPlaceholderGenerator(text, ignoreType.placeholder);
+      generators.set(ignoreType, generator);
+    }
+
+    return generator;
+  };
   const replacedValues: placeholderInfo[] = [];
   const ranges: rangeToMask[] = [];
   let endOfLastMaskedRange = -1;
@@ -277,7 +288,7 @@ function replaceMdastTypes(text: string, ignoreTypes: IgnoreType[]): [placeholde
       continue;
     }
 
-    const newPlaceholder = generators.get(candidate.ignoreType)();
+    const newPlaceholder = generatorFor(candidate.ignoreType)();
     replacedValues.push({placeholder: newPlaceholder, replacedValue: text.substring(candidate.startIndex, candidate.endIndex)});
     ranges.push({startIndex: candidate.startIndex, endIndex: candidate.endIndex, placeholder: newPlaceholder});
     endOfLastMaskedRange = candidate.endIndex;
@@ -376,6 +387,39 @@ function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): [pl
   return [replacedSections, text];
 }
 
+let lastSeededText = '';
+let lastSeed = '';
+
+/**
+ * Finds a short string that does not occur in the text, to build that text's placeholders from.
+ *
+ * The length of the text is used rather than a hash of it so that this stays cheap. Every ignore
+ * type masked from the same text wants the same seed, and hashing a large document once per ignore
+ * type per rule was costing more than parsing it. Two different documents of the same length share
+ * a seed, which is harmless, since a seed only has to be absent from the text it is used on.
+ *
+ * Eleven characters of seed plus five of counter keep the suffix the same length as the random one
+ * this replaced, so masked text has the same shape as before.
+ * @param {string} text The text that is about to be masked
+ * @return {string} A string that does not occur anywhere in the text
+ */
+function getSeedForText(text: string): string {
+  if (text === lastSeededText) {
+    return lastSeed;
+  }
+
+  let candidate = text.length.toString(36).padStart(11, '0');
+  let attempt = 0;
+  while (text.includes(candidate)) {
+    candidate = (text.length + ++attempt * 0x100000).toString(36).padStart(11, '0').slice(-11);
+  }
+
+  lastSeededText = text;
+  lastSeed = candidate;
+
+  return candidate;
+}
+
 /**
  * Creates the function that hands out the placeholders for masking a single ignore type.
  *
@@ -392,14 +436,7 @@ function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): [pl
  * @return {function(): string} A function returning a new unique placeholder on each call
  */
 function createPlaceholderGenerator(text: string, placeholder: string): () => string {
-  // a 53 bit hash is at most 11 base 36 digits, so seed and counter together keep the suffix the
-  // same length as the random one it replaces, which keeps the masked text the same shape as before
-  let attempt = 0;
-  let seed = hashString53Bit(text, attempt).toString(36).padStart(11, '0');
-  while (text.includes(seed)) {
-    seed = hashString53Bit(text, ++attempt).toString(36).padStart(11, '0');
-  }
-
+  const seed = getSeedForText(text);
   let count = 0;
 
   return (): string => {
