@@ -42,7 +42,7 @@ function settingsForRulesUnderTest(): LinterSettings {
 
   // every rule needs an entry, since the runner reads the enabled flag off it before doing anything
   settings.ruleConfigs = {};
-  for (const rule of rules as Rule[]) {
+  for (const rule of rules) {
     const config = Object.assign(rule.getDefaultOptions(), DEFAULT_SETTINGS.ruleConfigs[rule.settingsKey] ?? {}) as {enabled: boolean};
     config.enabled = rulesUnderTest.includes(rule.alias);
     settings.ruleConfigs[rule.settingsKey] = config;
@@ -54,7 +54,7 @@ function settingsForRulesUnderTest(): LinterSettings {
   Object.assign(settings.ruleConfigs['trailing-spaces'], {'two-space-line-break': true});
   Object.assign(settings.ruleConfigs['remove-trailing-punctuation-in-heading'], {'punctuation-to-remove': '.,;:!。，；：！'});
 
-  settings.logLevel = 'ERROR' as never;
+  settings.logLevel = 'ERROR';
   return settings;
 }
 
