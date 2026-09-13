@@ -2,7 +2,7 @@ import {visit} from 'unist-util-visit';
 import type {Position, Node} from 'unist';
 import type {Root} from 'mdast';
 import {ProtectedRanges} from './protected-ranges';
-import {hashDocument, makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
+import {makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
 import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex} from './regex';
 import {gfmFootnote} from 'micromark-extension-gfm-footnote';
 import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
@@ -28,7 +28,7 @@ type ParsedText = {
   everyTypeCollected: boolean,
 }
 
-const LRU = new QuickLRU<number, ParsedText>({maxSize: 200});
+const LRU = new QuickLRU<string, ParsedText>({maxSize: 200});
 
 type PositionPlusEmptyIndicator = {
   position: Position,
@@ -87,11 +87,12 @@ export enum LineBreakIndicators {
 }
 
 function parseText(text: string): ParsedText {
-  const textHash = hashDocument(text);
-  const cached = LRU.get(textHash);
-  // the hash is only 53 bits, so it is used as a bucket and the exact text still has to be
-  // compared to avoid handing back the AST of a different document on a hash collision
-  if (cached && cached.text === text) {
+  // Keyed on the document itself rather than a hash of it. Hashing read all 866KB of a large
+  // document every time it was looked up, and the engine already keeps a string's hash on the
+  // string once it has been used as a key. It also removes the exact comparison a hash needed to
+  // guard against a collision handing back another document's tree.
+  const cached = LRU.get(text);
+  if (cached) {
     return cached;
   }
 
@@ -108,7 +109,7 @@ function parseText(text: string): ParsedText {
   });
 
   const parsedText = {text, ast, positionsByType: new Map<string, Position[]>(), everyTypeCollected: false};
-  LRU.set(textHash, parsedText);
+  LRU.set(text, parsedText);
 
   return parsedText;
 }

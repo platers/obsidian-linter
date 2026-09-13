@@ -3,7 +3,7 @@ import {IgnoreType, TextRange} from './ignore-types';
 import {inCanonicalOrder, projectionTokenFor} from './ignore-type-metadata';
 import {DocumentProjection, ProjectionReplacement} from './document-projection';
 import {getPositions, MDAstTypes} from './mdast';
-import {hashDocument, textReplacement} from './strings';
+import {textReplacement} from './strings';
 
 /**
  * The regions of a document a rule is not allowed to change.
@@ -354,16 +354,13 @@ export class LintContext {
    * @return {LintContext} The context for that document
    */
   static for(text: string): LintContext {
-    const textHash = hashDocument(text);
-    const cached = contextCache.get(textHash);
-    // the hash is only 53 bits, so it is used as a bucket and the exact text still has to be
-    // compared to avoid handing back the ranges of a different document on a hash collision
-    if (cached && cached.text === text) {
+    const cached = contextCache.get(text);
+    if (cached) {
       return cached;
     }
 
     const context = new LintContext(text);
-    contextCache.set(textHash, context);
+    contextCache.set(text, context);
 
     return context;
   }
@@ -440,4 +437,4 @@ export class LintContext {
   }
 }
 
-const contextCache = new QuickLRU<number, LintContext>({maxSize: 20});
+const contextCache = new QuickLRU<string, LintContext>({maxSize: 20});

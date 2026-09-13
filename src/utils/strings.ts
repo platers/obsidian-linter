@@ -371,30 +371,6 @@ export function makeSureContentHasEmptyLinesAddedBeforeAndAfter(text: string, st
   return makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFile(newText, startOfLineIndex);
 }
 
-let lastHashedText: string = null;
-let lastTextHash: number = 0;
-
-/**
- * The hash of a document, reusing the last answer when asked about the same document again.
- *
- * Hashing reads every character, which is 288ms on an 866KB document, and the caches keyed on it
- * are asked about the same document many times while the rules of one run look at it. Comparing
- * the string first costs nothing when it is the same string, since that is a reference comparison,
- * and the whole cost is avoided.
- * @param {string} text The document to hash
- * @return {number} Its hash
- */
-export function hashDocument(text: string): number {
-  if (text === lastHashedText) {
-    return lastTextHash;
-  }
-
-  lastTextHash = hashString53Bit(text);
-  lastHashedText = text;
-
-  return lastTextHash;
-}
-
 // from https://stackoverflow.com/a/52171480/8353749
 export function hashString53Bit(str: string, seed: number = 0): number {
   let h1 = 0xdeadbeef ^ seed;
