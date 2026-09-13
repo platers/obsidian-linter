@@ -1,5 +1,7 @@
 import QuickLRU from 'quick-lru';
 import {IgnoreType, TextRange} from './ignore-types';
+import {inCanonicalOrder, projectionTokenFor} from './ignore-type-metadata';
+import {DocumentProjection, ProjectionReplacement} from './document-projection';
 import {cachePositionsForTypes, getPositions, MDAstTypes} from './mdast';
 import {hashString53Bit, textReplacement} from './strings';
 
@@ -159,14 +161,12 @@ export class ProtectedRanges {
  * @return {string} The window with each intersecting protected region replaced by a brace token
  */
 export function redactProtected(text: string, protectedRanges: ProtectedRanges, startIndex: number, endIndex: number): string {
-  const segments: string[] = [];
-  let cursor = startIndex;
-  for (const range of protectedRanges.overlappingRanges(startIndex, endIndex)) {
-    segments.push(text.substring(cursor, Math.max(startIndex, range.startIndex)), '{PROTECTED}');
-    cursor = Math.min(endIndex, range.endIndex);
-  }
-  segments.push(text.substring(cursor, endIndex));
-  return segments.join('');
+  const replacements = protectedRanges.overlappingRanges(startIndex, endIndex).map((range) => ({
+    startIndex: Math.max(startIndex, range.startIndex) - startIndex,
+    endIndex: Math.min(endIndex, range.endIndex) - startIndex,
+    token: '{PROTECTED}',
+  }));
+  return new DocumentProjection(text.substring(startIndex, endIndex), replacements).text;
 }
 
 /**
@@ -292,6 +292,7 @@ function findRangesForIgnoreType(text: string, ignoreType: IgnoreType): TextRang
 export class LintContext {
   private readonly rangesByIgnoreType = new Map<IgnoreType, TextRange[]>();
   private readonly protectedRangesByKey = new Map<string, ProtectedRanges>();
+  private readonly projectionsByKey = new Map<string, DocumentProjection>();
 
   constructor(public readonly text: string) {}
 
@@ -354,6 +355,48 @@ export class LintContext {
     this.protectedRangesByKey.set(key, protectedRanges);
 
     return protectedRanges;
+  }
+
+  /**
+   * The document with typed placeholders for decisions, sharing the original parse and per-type
+   * ranges. The union is still used for protection; it cannot supply tokens because it lost types.
+   * @param {IgnoreType[]} ignoreTypes The types to hide in the decision view
+   * @return {DocumentProjection} The cached projection and its source-offset maps
+   */
+  projectionFor(ignoreTypes: IgnoreType[]): DocumentProjection {
+    const types = inCanonicalOrder([...new Set(ignoreTypes)]);
+    const key = types.map((ignoreType) => ignoreType.placeholder).sort().join('\u0000');
+    const cached = this.projectionsByKey.get(key);
+    if (cached) {
+      return cached;
+    }
+
+    // Populate the per-type cache in one pass before consulting it below.
+    this.protectedRangesFor(types);
+    const candidates: ProjectionReplacement[] = [];
+    for (const ignoreType of types) {
+      const token = projectionTokenFor(ignoreType);
+      for (const range of this.rangesByIgnoreType.get(ignoreType)) {
+        candidates.push({...range, token});
+      }
+    }
+
+    // Keep the enclosing type's token. Stable sorting breaks equal-range ties in masking order.
+    // Adjacent ranges stay separate: each has its own placeholder length.
+    candidates.sort((a, b) => a.startIndex - b.startIndex || b.endIndex - a.endIndex);
+    const replacements: ProjectionReplacement[] = [];
+    for (const candidate of candidates) {
+      const previous = replacements[replacements.length - 1];
+      if (previous && candidate.startIndex < previous.endIndex) {
+        previous.endIndex = Math.max(previous.endIndex, candidate.endIndex);
+      } else {
+        replacements.push({...candidate});
+      }
+    }
+
+    const projection = new DocumentProjection(this.text, replacements);
+    this.projectionsByKey.set(key, projection);
+    return projection;
   }
 }
 

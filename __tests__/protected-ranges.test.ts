@@ -166,6 +166,38 @@ describe('the protected range index hides what masking hid', () => {
     }
   }
 
+  it('preserves masking line counts and blank lines for the corpus and every rule example under every declared ignore set', () => {
+    const differences: string[] = [];
+    const allDocuments = [...documents];
+    for (const rule of rules) {
+      rule.examples.forEach((example, index) => {
+        allDocuments.push({name: `${rule.alias} example ${index}`, text: example.before});
+      });
+    }
+
+    const allIgnoreTypeSets = new Map(rules.map((rule) => [rule.alias, rule.ignoreTypes]));
+    for (const document of allDocuments) {
+      const context = new LintContext(document.text);
+      for (const [alias, ignoreTypes] of allIgnoreTypeSets) {
+        let masked = document.text;
+        ignoreListOfTypes(ignoreTypes, document.text, (text) => {
+          masked = text;
+          return text;
+        });
+        const projected = context.projectionFor(ignoreTypes).text;
+        const maskedLines = masked.split('\n');
+        const projectedLines = projected.split('\n');
+        const blankLinesDisagree = maskedLines.some((line, index) =>
+          index < projectedLines.length && /^\s*$/.test(line) !== /^\s*$/.test(projectedLines[index]));
+        if (maskedLines.length !== projectedLines.length || blankLinesDisagree) {
+          differences.push(`${document.name} under ${alias}\n  masking (${maskedLines.length} lines): ${JSON.stringify(masked)}\n  projection (${projectedLines.length} lines): ${JSON.stringify(projected)}`);
+        }
+      }
+    }
+
+    expect(differences).toEqual([]);
+  });
+
   it('for every document every rule has examples of', () => {
     const differences: string[] = [];
 

@@ -1,6 +1,7 @@
 import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, escapeRegExp, genericLinkRegex, urlRegex, anchorTagRegex, templaterCommandRegex, footnoteDefinitionIndicatorAtStartOfLine} from './regex';
 import {getAllCustomIgnoreSectionsInText, getAllTablesInText, getPositions, MDAstTypes} from './mdast';
 import {replaceTextBetweenStartAndEndWithNewValue} from './strings';
+import {counterLength, inCanonicalOrder, registerCanonicalIgnoreTypeOrder, seedLength, uniqueSuffixLength} from './ignore-type-metadata';
 
 export type IgnoreFunction = ((text: string, placeholder: string) => [placeholderInfo[], string]);
 export type TextRange = {startIndex: number, endIndex: number};
@@ -103,11 +104,7 @@ const canonicalIgnoreTypeOrder: IgnoreType[] = [
   IgnoreTypes.footnoteAfterATask,
 ];
 
-const canonicalRank = new Map<IgnoreType, number>(canonicalIgnoreTypeOrder.map((ignoreType, index) => [ignoreType, index]));
-
-function inCanonicalOrder(ignoreTypes: IgnoreType[]): IgnoreType[] {
-  return [...ignoreTypes].sort((a, b) => (canonicalRank.get(a) ?? Number.MAX_SAFE_INTEGER) - (canonicalRank.get(b) ?? Number.MAX_SAFE_INTEGER));
-}
+registerCanonicalIgnoreTypeOrder(canonicalIgnoreTypeOrder);
 
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
   const maskedStages: placeholderInfo[][] = [];
@@ -438,10 +435,6 @@ function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): [pl
 
   return [replacedSections, text];
 }
-
-const seedLength = 11;
-const counterLength = 5;
-const uniqueSuffixLength = seedLength + counterLength;
 
 let lastSeededText = '';
 let lastSeed = '';
