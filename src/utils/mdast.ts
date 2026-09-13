@@ -25,6 +25,7 @@ type ParsedText = {
   text: string,
   ast: Root,
   positionsByType: Map<string, Position[]>,
+  everyTypeCollected: boolean,
 }
 
 const LRU = new QuickLRU<number, ParsedText>({maxSize: 200});
@@ -106,7 +107,7 @@ function parseText(text: string): ParsedText {
     ],
   });
 
-  const parsedText = {text, ast, positionsByType: new Map<string, Position[]>()};
+  const parsedText = {text, ast, positionsByType: new Map<string, Position[]>(), everyTypeCollected: false};
   LRU.set(textHash, parsedText);
 
   return parsedText;
@@ -124,15 +125,16 @@ function parseTextToAST(text: string): Root {
  */
 export function getPositions(type: MDAstTypes, text: string): Position[] {
   const parsedText = parseText(text);
+  collectEveryTypesPositions(parsedText);
 
-  let positions: Position[] = parsedText.positionsByType.get(type);
+  let positions = parsedText.positionsByType.get(type);
   if (positions === undefined) {
+    // a type left out of the walk above, which is only worth doing for one nothing asks for
     positions = [];
     visit(parsedText.ast, type as string, (node) => {
       positions.push(node.position);
     });
 
-    // Sort positions by start position in reverse order
     positions.sort((a, b) => b.start.offset - a.start.offset);
     parsedText.positionsByType.set(type, positions);
   }
@@ -142,36 +144,41 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
 }
 
 /**
- * Fills the position cache for several element types from a single walk of the tree.
+ * Walks the tree once, collecting the positions of every element type the rules can ask for.
  *
- * `getPositions` walks the whole tree for one type, so asking it for ten types walks the tree ten
- * times. `unist-util-visit` takes a list of types, which collects all of them in one walk.
- * @param {MDAstTypes[]} types - The element types to get positions for
- * @param {string} text - The markdown text
+ * Walking it for one type at a time was the single largest cost of linting a large document: the
+ * ignore types a rule declares were collected together, but the types the helpers ask for
+ * directly, paragraphs, list items and footnote definitions among them, were not, so each of those
+ * walked the whole tree again. A walk costs about as much whatever is collected during it, so
+ * everything is collected on the first one and every later request is a lookup.
+ * @param {ParsedText} parsedText The parsed document to collect the positions of
  */
-export function cachePositionsForTypes(types: MDAstTypes[], text: string): void {
-  const parsedText = parseText(text);
-
-  const uncachedTypes = types.filter((type) => parsedText.positionsByType.get(type) === undefined);
-  if (uncachedTypes.length === 0) {
+function collectEveryTypesPositions(parsedText: ParsedText): void {
+  if (parsedText.everyTypeCollected) {
     return;
   }
 
+  // Text is left out deliberately. Nothing asks getPositions for it, and a document has a text node
+  // for every run of words in it, so collecting and sorting them costs more than the walk it saves.
+  const everyType = Object.values(MDAstTypes).filter((type) => type !== MDAstTypes.Text);
   const positionsByType = new Map<string, Position[]>();
-  for (const type of uncachedTypes) {
+  for (const type of everyType) {
     positionsByType.set(type, []);
   }
 
-  visit(parsedText.ast, uncachedTypes as string[], (node) => {
+  visit(parsedText.ast, everyType as string[], (node) => {
     positionsByType.get(node.type).push(node.position);
   });
 
   for (const [type, positions] of positionsByType) {
-    // the same descending order getPositions caches, since callers of both rely on it
+    // descending by start, which is the order every caller of getPositions relies on
     positions.sort((a, b) => b.start.offset - a.start.offset);
     parsedText.positionsByType.set(type, positions);
   }
+
+  parsedText.everyTypeCollected = true;
 }
+
 
 /**
  * Gets the positions of the list item text in the given text.

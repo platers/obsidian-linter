@@ -2,7 +2,7 @@ import QuickLRU from 'quick-lru';
 import {IgnoreType, TextRange} from './ignore-types';
 import {inCanonicalOrder, projectionTokenFor} from './ignore-type-metadata';
 import {DocumentProjection, ProjectionReplacement} from './document-projection';
-import {cachePositionsForTypes, getPositions, MDAstTypes} from './mdast';
+import {getPositions, MDAstTypes} from './mdast';
 import {hashString53Bit, textReplacement} from './strings';
 
 /**
@@ -378,13 +378,6 @@ export class LintContext {
     const cached = this.protectedRangesByKey.get(key);
     if (cached) {
       return cached;
-    }
-
-    const uncachedMdastTypes = ignoreTypes
-        .filter((ignoreType) => isMdastIgnoreType(ignoreType) && !ignoreType.findRanges && !this.rangesByIgnoreType.has(ignoreType))
-        .map((ignoreType) => ignoreType.replaceAction as MDAstTypes);
-    if (uncachedMdastTypes.length > 0) {
-      cachePositionsForTypes(uncachedMdastTypes, this.text);
     }
 
     const ranges: TextRange[] = [];
