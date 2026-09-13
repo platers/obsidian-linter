@@ -1,6 +1,6 @@
 import {TFile, moment} from 'obsidian';
 import {logDebug, logWarn, timingBegin, timingEnd} from './utils/logger';
-import {getDisabledRules, rules, wrapLintError, RuleType} from './rules';
+import {getDisabledRules, rules, wrapLintError, Rule, RuleType, Options} from './rules';
 import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import ForceYamlEscape from './rules/force-yaml-escape';
@@ -18,13 +18,14 @@ import YamlTimestamp from './rules/yaml-timestamp';
 import {ObsidianCommandInterface} from './typings/obsidian-ex';
 import { CustomReplace } from "./settings-data";
 import { LintCommand } from "./settings-data";
-import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from './utils/strings';
+import {convertStringVersionOfEscapeCharactersToEscapeCharacters, replaceTextRanges, textReplacement} from './utils/strings';
 import {getTextInLanguage} from './lang/helpers';
 import CapitalizeHeadings from './rules/capitalize-headings';
 import YamlTitle from './rules/yaml-title';
 import YamlTitleAlias from './rules/yaml-title-alias';
 import BlockquoteStyle from './rules/blockquote-style';
 import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
+import {addEditsIfTheyDoNotClash, getEditsBetween} from './utils/text-edits';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
 import {LinterSettings} from './settings-data';
 import TrailingSpaces from './rules/trailing-spaces';
@@ -49,6 +50,14 @@ type FileInfo = {
   modifiedAtFormatted: string,
   path: string,
 }
+
+const rulesThatMustSeeEarlierWork = [
+  'move-footnotes-to-the-bottom',
+  're-index-footnotes',
+  'line-break-at-document-end',
+  'file-name-heading',
+  'header-increment',
+];
 
 export class RulesRunner {
   private disabledRules: string[] = [];
@@ -78,6 +87,24 @@ export class RulesRunner {
     }
 
     const disabledRuleText = getTextInLanguage('logs.disabled-text');
+    const extraOptions = {
+      fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
+      fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
+      fileName: runOptions.fileInfo.name,
+      locale: runOptions.momentLocale,
+      minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
+      aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
+      tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+      removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
+    };
+
+    // Rules used to be handed the text the rule before them produced. A run of rules is now given
+    // the same text, what each of them changed is worked out by comparing their answer with what
+    // they were given, and the changes are applied together, so they share one parse of it. A rule
+    // whose changes land near another's, or one that has to see earlier work, ends the run and
+    // starts the next one.
+    const rulesToRun: Rule[] = [];
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
       if (this.disabledRules.includes(rule.alias)) {
@@ -102,18 +129,10 @@ export class RulesRunner {
         }
       }
 
-      [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, runOptions.settings, {
-        fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
-        fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
-        fileName: runOptions.fileInfo.name,
-        locale: runOptions.momentLocale,
-        minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
-        aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
-        tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
-        defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
-        removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
-      });
+      rulesToRun.push(rule);
     }
+
+    newText = this.runRulesInBatches(rulesToRun, newText, runOptions.settings, extraOptions);
 
     const customRegexLogText = getTextInLanguage('logs.custom-regex');
     timingBegin(customRegexLogText);
@@ -123,6 +142,50 @@ export class RulesRunner {
     runOptions.oldText = newText;
 
     return this.runAfterRegularRules(originalText, runOptions);
+  }
+
+  private runRulesInBatches(rulesToRun: Rule[], text: string, settings: LinterSettings, extraOptions: Options): string {
+    let index = 0;
+    while (index < rulesToRun.length) {
+      const snapshot = text;
+      const batchedEdits: textReplacement[] = [];
+
+      while (index < rulesToRun.length) {
+        const rule = rulesToRun[index];
+
+        // Some rules cannot be told apart by looking only at what they changed. The yaml rules
+        // build on each other, one inserting a key and another deciding how its value is written.
+        // The rules that move content about, or that look at the document as a whole, decide what
+        // to do from where everything already is, so whether they need to do anything depends on
+        // what ran before them. Those are given the result of the rule before them.
+        const runsOnItsOwn = rule.type === RuleType.YAML || rulesThatMustSeeEarlierWork.includes(rule.alias);
+        if (runsOnItsOwn && batchedEdits.length > 0) {
+          break;
+        }
+
+        const [ruleOutput] = RuleBuilderBase.applyIfEnabledBase(rule, snapshot, settings, extraOptions);
+        if (ruleOutput === snapshot) {
+          index++;
+          continue;
+        }
+
+        if (!addEditsIfTheyDoNotClash(batchedEdits, getEditsBetween(snapshot, ruleOutput), snapshot)) {
+          break;
+        }
+
+        index++;
+
+        if (runsOnItsOwn) {
+          break;
+        }
+      }
+
+      // a rule that clashed has not been counted as run, so it leads the next batch and gets to
+      // see what the rules before it settled on
+      text = replaceTextRanges(snapshot, batchedEdits);
+    }
+
+    return text;
   }
 
   private runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
