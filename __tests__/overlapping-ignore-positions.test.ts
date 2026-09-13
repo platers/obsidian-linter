@@ -46,6 +46,26 @@ const roundTripCases: {name: string, text: string, ignoreTypes: IgnoreType[]}[] 
     `,
     ignoreTypes: [IgnoreTypes.list],
   },
+  { // mdast types are masked together, so a node of one type nested in another must still restore
+    name: 'inline code nested inside emphasis',
+    text: 'an *emphasis with `code` inside* it',
+    ignoreTypes: [IgnoreTypes.italics, IgnoreTypes.inlineCode],
+  },
+  {
+    name: 'the same types declared in the opposite order',
+    text: 'an *emphasis with `code` inside* it',
+    ignoreTypes: [IgnoreTypes.inlineCode, IgnoreTypes.italics],
+  },
+  {
+    name: 'a link nested inside emphasis alongside a heading',
+    text: '# A heading\n\n*emphasis with [a link](https://example.com) inside*\n',
+    ignoreTypes: [IgnoreTypes.heading, IgnoreTypes.italics, IgnoreTypes.link],
+  },
+  {
+    name: 'a code block inside a list inside a blockquote',
+    text: '> - an item\n>   ```js\n>   const a = 1;\n>   ```\n',
+    ignoreTypes: [IgnoreTypes.blockquote, IgnoreTypes.list, IgnoreTypes.code],
+  },
   {
     name: 'the emphasis that was corrupted in a real document',
     text: 'maps hardware devices from your host system*(the physical computer you are installing this program onto)* into the container',

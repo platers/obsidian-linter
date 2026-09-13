@@ -1,10 +1,9 @@
 import {obsidianMultilineCommentRegex, tagWithLeadingWhitespaceRegex, wikiLinkRegex, yamlRegex, escapeDollarSigns, genericLinkRegex, urlRegex, anchorTagRegex, templaterCommandRegex, footnoteDefinitionIndicatorAtStartOfLine} from './regex';
 import {getAllCustomIgnoreSectionsInText, getAllTablesInText, getPositions, MDAstTypes} from './mdast';
-import type {Position} from 'unist';
 import {hashString53Bit, replaceTextBetweenStartAndEndWithNewValue} from './strings';
 
 export type IgnoreFunction = ((text: string, placeholder: string) => [placeholderInfo[], string]);
-export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string};
+export type IgnoreType = {replaceAction: MDAstTypes | RegExp | IgnoreFunction, placeholder: string, onlyIfMatches?: RegExp};
 
 export const IgnoreTypes: Record<string, IgnoreType> = {
   // mdast node types
@@ -30,7 +29,7 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
   anchorTag: {replaceAction: anchorTagRegex, placeholder: '{ANCHOR_PLACEHOLDER}'},
   templaterCommand: {replaceAction: templaterCommandRegex, placeholder: '{TEMPLATER_PLACEHOLDER}'},
   // custom functions
-  link: {replaceAction: replaceMarkdownLinks, placeholder: '{REGULAR_LINK_PLACEHOLDER}'},
+  link: {replaceAction: MDAstTypes.Link, placeholder: '{REGULAR_LINK_PLACEHOLDER}', onlyIfMatches: genericLinkRegex},
   tag: {replaceAction: replaceTags, placeholder: '#tag-placeholder'},
   table: {replaceAction: replaceTables, placeholder: '{TABLE_PLACEHOLDER}'},
   customIgnore: {replaceAction: replaceCustomIgnore, placeholder: '{CUSTOM_IGNORE_PLACEHOLDER}'},
@@ -38,14 +37,32 @@ export const IgnoreTypes: Record<string, IgnoreType> = {
 
 type placeholderInfo = {placeholder: string, replacedValue: string}
 
+function isMdastIgnoreType(ignoreType: IgnoreType): boolean {
+  return typeof ignoreType.replaceAction === 'string';
+}
+
 export function ignoreListOfTypes(ignoreTypes: IgnoreType[], text: string, func: ((text: string) => string)): string {
   let placeholders: placeholderInfo[] = [];
 
   // replace ignore blocks with their placeholders
   let tempPlaceholders: placeholderInfo[] = [];
-  for (const ignoreType of ignoreTypes) {
-    if (typeof ignoreType.replaceAction === 'string') { // mdast
-      [tempPlaceholders, text] = replaceMdastType(text, ignoreType.placeholder, ignoreType.replaceAction);
+
+  for (let i = 0; i < ignoreTypes.length; i++) {
+    const ignoreType = ignoreTypes[i];
+
+    if (isMdastIgnoreType(ignoreType)) {
+      // Each mdast ignore type needs the document parsed, and parsing dominates the cost of
+      // linting. Masking a run of them from a single view of the text lets them share one parse
+      // instead of reparsing the text the previous type just rewrote. The run stops at the next
+      // non mdast type because ignore types are ordered deliberately: `no-bare-urls` masks anchor
+      // tags before html so that the whole tag is hidden rather than just its angle brackets.
+      const run: IgnoreType[] = [];
+      while (i < ignoreTypes.length && isMdastIgnoreType(ignoreTypes[i])) {
+        run.push(ignoreTypes[i++]);
+      }
+      i--;
+
+      [tempPlaceholders, text] = replaceMdastTypes(text, run);
     } else if (ignoreType.replaceAction instanceof RegExp) {
       [tempPlaceholders, text] = replaceRegex(text, ignoreType.placeholder, ignoreType.replaceAction);
     } else if (typeof ignoreType.replaceAction === 'function') {
@@ -125,26 +142,40 @@ function maskRanges(text: string, ranges: rangeToMask[]): string {
   return segments.reverse().join('');
 }
 
-function replaceMdastType(text: string, placeholder: string, type: MDAstTypes): [placeholderInfo[], string] {
-  // Nested nodes of the same type report overlapping positions, and replacing one of them shifts
-  // the offsets of the others. Masking the outermost node protects everything inside it anyway, so
-  // the nested ones are dropped rather than replaced with offsets that no longer line up.
-  const positions: Position[] = removeOverlappingPositions(getPositions(type, text));
-  const replacedValues: placeholderInfo[] = [];
+function replaceMdastTypes(text: string, ignoreTypes: IgnoreType[]): [placeholderInfo[], string] {
+  const candidates: {startIndex: number, endIndex: number, ignoreType: IgnoreType}[] = [];
+  for (const ignoreType of ignoreTypes) {
+    for (const position of getPositions(ignoreType.replaceAction as MDAstTypes, text)) {
+      if (ignoreType.onlyIfMatches && !text.substring(position.start.offset, position.end.offset).match(ignoreType.onlyIfMatches)) {
+        continue;
+      }
 
-  const nextPlaceholder = createPlaceholderGenerator(text, placeholder);
-  const ranges: rangeToMask[] = [];
-  for (const position of positions) {
-    const valueToReplace = text.substring(position.start.offset, position.end.offset);
-    const newPlaceholder = nextPlaceholder();
-    replacedValues.push({placeholder: newPlaceholder, replacedValue: valueToReplace});
-    ranges.push({startIndex: position.start.offset, endIndex: position.end.offset, placeholder: newPlaceholder});
+      candidates.push({startIndex: position.start.offset, endIndex: position.end.offset, ignoreType});
+    }
   }
 
-  text = maskRanges(text, ranges);
+  // Nodes nest, both within a type and across types, and every range is expressed against the text
+  // as it is now. Replacing a nested range would shift the offsets of the range around it, so only
+  // the outermost range of any overlapping group is masked. That still hides everything inside it.
+  const priority = new Map<IgnoreType, number>(ignoreTypes.map((ignoreType, index) => [ignoreType, index]));
+  candidates.sort((a, b) => a.startIndex - b.startIndex || b.endIndex - a.endIndex || priority.get(a.ignoreType) - priority.get(b.ignoreType));
 
-  // Reverse the replaced values so that they are in the same order as the original text
-  replacedValues.reverse();
+  const generators = new Map<IgnoreType, () => string>(ignoreTypes.map((ignoreType) => [ignoreType, createPlaceholderGenerator(text, ignoreType.placeholder)]));
+  const replacedValues: placeholderInfo[] = [];
+  const ranges: rangeToMask[] = [];
+  let endOfLastMaskedRange = -1;
+  for (const candidate of candidates) {
+    if (candidate.startIndex < endOfLastMaskedRange) {
+      continue;
+    }
+
+    const newPlaceholder = generators.get(candidate.ignoreType)();
+    replacedValues.push({placeholder: newPlaceholder, replacedValue: text.substring(candidate.startIndex, candidate.endIndex)});
+    ranges.push({startIndex: candidate.startIndex, endIndex: candidate.endIndex, placeholder: newPlaceholder});
+    endOfLastMaskedRange = candidate.endIndex;
+  }
+
+  text = maskRanges(text, ranges.reverse());
 
   return [replacedValues, text];
 }
@@ -178,48 +209,6 @@ function replaceRegex(text: string, placeholder: string, regex: RegExp): [placeh
   }
 
   return [textMatches, text];
-}
-
-/**
- * Replaces all markdown links in the given text with a placeholder.
- * @param {string} text The text to replace links in
- * @param {string} regularLinkPlaceholder The placeholder to use for regular markdown links
- * @return {string} The text with links replaced
- * @return {placeholderInfo[]} The regular markdown links replaced and generated placeholder
- */
-function replaceMarkdownLinks(text: string, regularLinkPlaceholder: string): [placeholderInfo[], string] {
-  const positions: Position[] = getPositions(MDAstTypes.Link, text);
-  const replacedRegularLinks: placeholderInfo[] = [];
-  const nextPlaceholder = createPlaceholderGenerator(text, regularLinkPlaceholder);
-
-
-  const positionsToReplace: Position [] = [];
-  for (const position of positions) {
-    if (position == undefined) {
-      continue;
-    }
-
-    const regularLink = text.substring(position.start.offset, position.end.offset);
-    // skip links that are not in markdown format
-    if (!regularLink.match(genericLinkRegex)) {
-      continue;
-    }
-
-    positionsToReplace.push(position);
-    replacedRegularLinks.push({placeholder: nextPlaceholder(), replacedValue: regularLink});
-  }
-
-  let i = 0;
-  text = maskRanges(text, positionsToReplace.map((position) => ({
-    startIndex: position.start.offset,
-    endIndex: position.end.offset,
-    placeholder: replacedRegularLinks[i++].placeholder,
-  })));
-
-  // Reverse the regular links so that they are in the same order as the original text
-  replacedRegularLinks.reverse();
-
-  return [replacedRegularLinks, text];
 }
 
 function replaceTags(text: string, placeholder: string): [placeholderInfo[], string] {
@@ -277,25 +266,6 @@ function replaceCustomIgnore(text: string, customIgnorePlaceholder: string): [pl
   })));
 
   return [replacedSections, text];
-}
-
-function removeOverlappingPositions(positions: Position[]): Position[] {
-  if (positions.length < 2) {
-    return positions;
-  }
-
-  let lastPosition: Position = positions.pop();
-  let currentPosition: Position;
-  const result: Position[] = [lastPosition];
-  while (positions.length > 0) {
-    currentPosition = positions.pop();
-    if (lastPosition.start.offset >= currentPosition.end.offset || currentPosition.start.offset >= lastPosition.end.offset) {
-      result.unshift(currentPosition);
-      lastPosition = currentPosition;
-    }
-  }
-
-  return result;
 }
 
 /**
