@@ -1,0 +1,79 @@
+diff --git a/node_modules/mdast-util-from-markdown/lib/index.js b/node_modules/mdast-util-from-markdown/lib/index.js
+index 90e17be..58f6081 100644
+--- a/node_modules/mdast-util-from-markdown/lib/index.js
++++ b/node_modules/mdast-util-from-markdown/lib/index.js
+@@ -287,7 +287,14 @@ function compiler(options) {
+     let firstBlankLineIndex;
+     /** @type {boolean | undefined} */
+     let atMarker;
+-    while (++index <= length) {
++    // PATCH(obsidian-linter): collect the listItem events instead of splicing each one into the
++    // shared event array, which is O(items x events). See syntax-tree/mdast-util-from-markdown#49.
++    const insertions = [];
++    const originalLength = length;
++    // an already inserted exit stops the backward scan below, so the position of the last one has
++    // to be remembered now that it is not physically present in the array yet
++    let lastExitInsertionIndex = -1;
++    while (++index <= originalLength) {
+       const event = events[index];
+       switch (event[1].type) {
+         case "listUnordered":
+@@ -332,6 +339,7 @@ function compiler(options) {
+           let tailIndex = index;
+           lineIndex = undefined;
+           while (tailIndex--) {
++            if (tailIndex < lastExitInsertionIndex) break;
+             const tailEvent = events[tailIndex];
+             if (tailEvent[1].type === "lineEnding" || tailEvent[1].type === "lineEndingBlank") {
+               if (tailEvent[0] === 'exit') continue;
+@@ -353,9 +361,8 @@ function compiler(options) {
+ 
+           // Fix position.
+           listItem.end = Object.assign({}, lineIndex ? events[lineIndex][1].start : event[1].end);
+-          events.splice(lineIndex || index, 0, ['exit', listItem, event[2]]);
+-          index++;
+-          length++;
++          lastExitInsertionIndex = lineIndex || index;
++          insertions.push({at: lastExitInsertionIndex, event: ['exit', listItem, event[2]]});
+         }
+ 
+         // Create a new list item.
+@@ -369,16 +376,34 @@ function compiler(options) {
+             end: undefined
+           };
+           listItem = item;
+-          events.splice(index, 0, ['enter', item, event[2]]);
+-          index++;
+-          length++;
++          insertions.push({at: index, event: ['enter', item, event[2]]});
+           firstBlankLineIndex = undefined;
+           atMarker = true;
+         }
+       }
+     }
++    if (insertions.length > 0) {
++      // the recorded positions never go backwards, so the events after the list can be shifted
++      // right once and the region then filled in from the end backwards, without copying the rest
++      // of the array or allocating anything the size of the document
++      const inserted = insertions.length;
++      const oldLength = events.length;
++      events.length = oldLength + inserted;
++      for (let i = oldLength - 1; i > originalLength; i--) {
++        events[i + inserted] = events[i];
++      }
++      let writeIndex = originalLength + inserted;
++      let readIndex = originalLength;
++      for (let i = inserted - 1; i >= 0; i--) {
++        const insertion = insertions[i];
++        while (readIndex >= insertion.at) {
++          events[writeIndex--] = events[readIndex--];
++        }
++        events[writeIndex--] = insertion.event;
++      }
++    }
+     events[start][1]._spread = listSpread;
+-    return length;
++    return originalLength + insertions.length;
+   }
+ 
+   /**
