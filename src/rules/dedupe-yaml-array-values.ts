@@ -32,7 +32,7 @@ class DedupeYamlArrayValuesOptions implements Options {
 }
 
 @RuleBuilder.register
-export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptions> {
+export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayValuesOptions> {
   constructor() {
     super({
       nameKey: 'rules.dedupe-yaml-array-values.name',

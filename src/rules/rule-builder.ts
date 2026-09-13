@@ -16,14 +16,17 @@ export abstract class RuleBuilderBase {
   static #noSettingsControlMap = new Map<string, string[]>();
 
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
-    if (!RuleBuilderBase.#ruleMap.has(this.name)) {
-      const builder = new this();
+    // Keyed on the rule's alias rather than the name of the class it was built from. Three rules
+    // were left named `RuleTemplate` after being copied from the template, so they shared an entry
+    // and two of them silently became the third.
+    const builder = new this();
+    if (!RuleBuilderBase.#ruleMap.has(builder.alias)) {
       const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder, builder.ignoreTypes, builder.disableConflictingOptions);
-      RuleBuilderBase.#ruleMap.set(this.name, rule);
+      RuleBuilderBase.#ruleMap.set(builder.alias, rule);
       RuleBuilderBase.#ruleBuilderMap.set(builder.alias, builder);
     }
 
-    return RuleBuilderBase.#ruleMap.get(this.name);
+    return RuleBuilderBase.#ruleMap.get(builder.alias);
   }
 
   static applyIfEnabledBase(rule: Rule, text: string, settings: LinterSettings, extraOptions: Options): [result: string, isEnabled: boolean] {
