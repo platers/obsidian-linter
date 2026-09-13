@@ -7,6 +7,7 @@ import {BooleanOption} from '../option';
 import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 import {App} from 'obsidian';
 import LinterPlugin from '../main';
+import {ProtectedRanges} from '../utils/protected-ranges';
 
 class ParagraphBlankLinesOptions implements Options {}
 
@@ -18,6 +19,7 @@ export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLines
       descriptionKey: 'rules.paragraph-blank-lines.description',
       type: RuleType.SPACING,
       ruleIgnoreTypes: [IgnoreTypes.obsidianMultiLineComments, IgnoreTypes.yaml, IgnoreTypes.table],
+      usesProtectedRanges: true,
       disableConflictingOptions(value: boolean, app: App, plugin: LinterPlugin ): void {
         const twoSpacesEnableOption = rulesDict['two-spaces-between-lines-with-content'].options[0] as BooleanOption;
         if (value && twoSpacesEnableOption.getValue(plugin)) {
@@ -36,8 +38,8 @@ export default class ParagraphBlankLines extends RuleBuilder<ParagraphBlankLines
   get OptionsClass(): new () => ParagraphBlankLinesOptions {
     return ParagraphBlankLinesOptions;
   }
-  apply(text: string, options: ParagraphBlankLinesOptions): string {
-    return makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text);
+  apply(text: string, options: ParagraphBlankLinesOptions, protectedRanges: ProtectedRanges): string {
+    return makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<ParagraphBlankLinesOptions>[] {
     return [

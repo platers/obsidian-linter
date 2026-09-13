@@ -612,13 +612,18 @@ function addOrReplaceLineEnding(paragraphLine: string, indicator: LineBreakIndic
 /**
  * Makes sure that paragraphs have a single new line before and after them.
  * @param {string} text The text to make sure that paragraphs have only 1 new line before and after them
+ * @param {ProtectedRanges} protectedRanges The regions to hide when determining paragraph boundaries
  * @return {string} The text with paragraphs with a single new line before and after them.
  */
-export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: string): string {
+export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: string, protectedRanges: ProtectedRanges): string {
+  const projection = protectedRanges.projection();
+  text = projection.text;
   const hasTrailingLineBreak = text.endsWith('\n');
+  // Regex-protected comments and tables change paragraph boundaries, not just their offsets.
+  // Read those boundaries from the projection through the shared parse and position cache.
   const positions: Position[] = getPositions(MDAstTypes.Paragraph, text);
   if (positions.length === 0) {
-    return text;
+    return projection.source;
   }
 
   for (const position of positions) {
@@ -692,7 +697,7 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
     text += '\n';
   }
 
-  return text;
+  return applyProjectedChanges(projection, text);
 }
 
 
@@ -811,7 +816,7 @@ function getProjectedNodeRanges(type: MDAstTypes, projection: DocumentProjection
     const startIndex = projection.sourceToProjection(position.start.offset);
     const endIndex = projection.sourceToProjection(position.end.offset);
     // A node starting inside a token is skipped whole, losing edits to its visible part if it
-    // extends past the token. paragraph-blank-lines is the known case and stays on masking.
+    // extends past the token. paragraph-blank-lines instead parses the projection itself.
     if (startIndex !== undefined && endIndex !== undefined && !projection.isToken(startIndex)) {
       ranges.push({startIndex, endIndex});
     }
