@@ -716,6 +716,7 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
  */
 export function removeSpacesInLinkText(text: string, protectedRanges: ProtectedRanges): string {
   const positions: Position[] = getPositions(MDAstTypes.Link, text);
+  const replacements: textReplacement[] = [];
 
   for (const position of positions) {
     if (position == null) {
@@ -737,10 +738,24 @@ export function removeSpacesInLinkText(text: string, protectedRanges: ProtectedR
 
     const endLinkTextPosition = regularLink.indexOf(']');
     const newLink = regularLink.substring(0, 1) + regularLink.substring(1, endLinkTextPosition).trim() + regularLink.substring(endLinkTextPosition);
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, newLink);
+    replacements.push({startIndex: position.start.offset, endIndex: position.end.offset, value: newLink});
   }
 
-  return text;
+  return applyNonOverlappingReplacements(text, replacements);
+}
+
+function applyNonOverlappingReplacements(text: string, replacements: textReplacement[]): string {
+  replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+  for (let index = 1; index < replacements.length; index++) {
+    if (replacements[index].startIndex < replacements[index - 1].startIndex) {
+      throw new Error('Rule replacements must be ordered');
+    }
+    if (replacements[index].startIndex < replacements[index - 1].endIndex) {
+      throw new Error('Rule replacements must be non-overlapping');
+    }
+  }
+
+  return replaceTextRanges(text, replacements);
 }
 
 export function updateItalicsText(text: string, func: (text: string, offset: number, protectedRanges: ProtectedRanges) => textReplacement[], protectedRanges: ProtectedRanges): textReplacement[] {
@@ -1024,19 +1039,20 @@ export function updateUnorderedListItemIndicators(text: string, unorderedListSty
     }
   }
 
+  const replacements: textReplacement[] = [];
   for (const position of positions) {
-    let listText = text.substring(position.start.offset, position.end.offset);
+    const listText = text.substring(position.start.offset, position.end.offset);
 
     if (listText.match(orderedListAndCheckboxIndicatorRegex)) {
       continue;
     }
 
-    listText = unorderedStyle + listText.substring(1);
-
-    text = replaceTextBetweenStartAndEndWithNewValue(text, position.start.offset, position.end.offset, listText);
+    // List item spans nest, but their bullets do not. Replacing only the bullet preserves inner
+    // edits; nested bullets are not at the start of a line and cannot change the regex above.
+    replacements.push({startIndex: position.start.offset, endIndex: position.start.offset + 1, value: unorderedStyle});
   }
 
-  return text;
+  return applyNonOverlappingReplacements(text, replacements);
 }
 
 /**
