@@ -3,6 +3,7 @@ import {Options, RuleType, ruleTypeToRules, rules, sortRules} from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import {parseCustomReplacements, stripCr} from './utils/strings';
+import {diffToEditorChanges} from './utils/editor-changes';
 import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel} from './utils/logger';
 import {moment} from 'obsidian';
 import './rules-registry';
@@ -976,41 +977,19 @@ export default class LinterPlugin extends Plugin {
   }
 
   private updateEditor(oldText: string, newText: string, editor: Editor): DiffMatchPatch.Diff[] {
-    const dmp = new DiffMatchPatch.diff_match_patch();  
+    const dmp = new DiffMatchPatch.diff_match_patch();
     const changes = dmp.diff_main(oldText, newText);
-    let curText = '';
-    changes.forEach((change) => {
-      const [type, value] = change;
-
-      if (type == DiffMatchPatch.DIFF_INSERT) {
-        // use codemirror dispatch in order to bypass the filter on transactions that causes editor.replaceRange not to not work in Live Preview
-        editor.cm.dispatch({
-          changes: [{
-            from: editor.posToOffset(this.endOfDocument(curText)),
-            insert: value,
-          }],
-          filter: false,
-        });
-        curText += value;
-      } else if (type == DiffMatchPatch.DIFF_DELETE) {
-        const start = this.endOfDocument(curText);
-        let tempText = curText;
-        tempText += value;
-        const end = this.endOfDocument(tempText);
-
-        // use codemirror dispatch in order to bypass the filter on transactions that causes editor.replaceRange not to not work in Live Preview
-        editor.cm.dispatch({
-          changes: [{
-            from: editor.posToOffset(start),
-            to: editor.posToOffset(end),
-            insert: '',
-          }],
-          filter: false,
-        });
-      } else {
-        curText += value;
+    // Batched offsets refer to the pre-transaction document; serialized line endings can invalidate that basis.
+    const docLength = editor.cm.state.doc.length;
+    if (oldText.length !== docLength) {
+      editor.cm.dispatch({changes: {from: 0, to: docLength, insert: newText}, filter: false});
+    } else {
+      const editorChanges = diffToEditorChanges(changes);
+      if (editorChanges.length > 0) {
+        // Bypass the transaction filter that prevents editor.replaceRange from working in Live Preview.
+        editor.cm.dispatch({changes: editorChanges, filter: false});
       }
-    });
+    }
 
     return changes;
   }
@@ -1311,11 +1290,6 @@ export default class LinterPlugin extends Plugin {
     }
 
     this.hasCustomCommands = false;
-  }
-
-  private endOfDocument(doc: string) {
-    const lines = doc.split('\n');
-    return {line: lines.length - 1, ch: lines[lines.length - 1].length};
   }
 
   private updateFileDebouncerText(file: TFile, newText: string) {
