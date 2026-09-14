@@ -7,6 +7,8 @@ import {setLanguage} from '../src/lang/helpers';
 import {parseCustomReplacements} from '../src/utils/strings';
 import '../src/rules-registry';
 
+// Set LINTER_PERF_FIXTURE to a large Markdown note and LINTER_PERF_SETTINGS to its
+// Linter settings JSON to run this optional performance harness.
 // Parsing the document is the bulk of the cost of linting a large one, and the number of parses is
 // stable from run to run in a way that the elapsed time is not, so it is the number that gets
 // asserted on. jest insists the variable a mock factory closes over is named `mock` something.
@@ -28,12 +30,12 @@ jest.mock('mdast-util-from-markdown', () => {
   };
 });
 
-const largeFixturePath = 'Introduction.to.a.Self.Managed.Life.md';
-const settingsFixturePath = 'data-test.json';
+const largeFixturePath = process.env.LINTER_PERF_FIXTURE ?? '';
+const settingsFixturePath = process.env.LINTER_PERF_SETTINGS ?? '';
 const excerptLineCount = 600;
 
-// Both fixtures are untracked, so anyone without them gets a run that reports nothing rather than
-// a failure. Set LINT_FULL_FIXTURE=1 to measure the whole document instead of an excerpt of it.
+// Anyone without both fixtures gets a skipped test rather than a failure. Set
+// LINT_FULL_FIXTURE=1 to measure the whole document instead of an excerpt of it.
 const runsWholeFixture = process.env.LINT_FULL_FIXTURE === '1';
 const excerptParseBudget = 36;
 const wholeFixtureParseBudget = 36;

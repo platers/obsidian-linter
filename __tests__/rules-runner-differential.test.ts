@@ -1,4 +1,6 @@
 import {existsSync, readFileSync, writeFileSync} from 'fs';
+import {createHash} from 'crypto';
+import {join} from 'path';
 import {moment} from 'obsidian';
 import dedent from 'ts-dedent';
 import {rules} from '../src/rules';
@@ -8,23 +10,25 @@ import {setLanguage} from '../src/lang/helpers';
 import {parseCustomReplacements} from '../src/utils/strings';
 import '../src/rules-registry';
 
+// Set LINTER_PERF_FIXTURE to a large Markdown note to include its first 600 lines in the optional
+// full-text dump. The committed hash snapshot only covers documents available in a clean checkout.
 // A change to how rules see the document is only safe if the document they produce does not
-// change. This lints a corpus and writes the result of each document to a file, so that the same
-// corpus can be linted with and without the change and the two files compared. Set DUMP_PATH to
-// write the dump; without it this still runs every document and only checks that none of them
-// blow up in a way that is not recorded.
+// change. This lints a corpus and checks each output against the committed SHA-256 snapshot. Set
+// DUMP_PATH to write every full result when an expected change needs to be inspected or compared
+// against another implementation.
 //
-//   DUMP_PATH=/tmp/new.txt npx jest __tests__/zz-runner-diff.test.ts
+//   DUMP_PATH=/tmp/new.txt npx jest __tests__/rules-runner-differential.test.ts
 //   git stash push -- src/
-//   DUMP_PATH=/tmp/old.txt npx jest __tests__/zz-runner-diff.test.ts
+//   DUMP_PATH=/tmp/old.txt npx jest __tests__/rules-runner-differential.test.ts
 //   git stash pop
 //   diff /tmp/old.txt /tmp/new.txt
 //
 // Check the stash actually reverted something. Comparing code against itself passes and means
 // nothing.
 
-const largeFixturePath = 'Introduction.to.a.Self.Managed.Life.md';
+const largeFixturePath = process.env.LINTER_PERF_FIXTURE;
 const largeFixtureLineCount = 600;
+const snapshotPath = join(__dirname, 'rules-runner-differential.snapshot.txt');
 
 let misspellings: Map<string, string>;
 
@@ -191,7 +195,7 @@ const adversarialDocuments: corpusDocument[] = [
   },
 ];
 
-function buildCorpus(): corpusDocument[] {
+function buildCorpus(): {documents: corpusDocument[], snapshotDocumentCount: number} {
   const corpus: corpusDocument[] = [];
 
   for (const rule of rules) {
@@ -202,14 +206,15 @@ function buildCorpus(): corpusDocument[] {
   }
 
   corpus.push(...adversarialDocuments);
+  const snapshotDocumentCount = corpus.length;
 
-  // untracked, so the dump is smaller when it is missing rather than the run failing
-  if (existsSync(largeFixturePath)) {
+  // optional, so the dump is smaller when it is unset or missing rather than the run failing
+  if (largeFixturePath && existsSync(largeFixturePath)) {
     const text = readFileSync(largeFixturePath, 'utf8').split('\n').slice(0, largeFixtureLineCount).join('\n');
     corpus.push({name: `the first ${largeFixtureLineCount} lines of ${largeFixturePath}`, text});
   }
 
-  return corpus;
+  return {documents: corpus, snapshotDocumentCount};
 }
 
 describe('the linter produces the same documents it did before', () => {
@@ -220,11 +225,12 @@ describe('the linter produces the same documents it did before', () => {
 
   it('lints the corpus', () => {
     const settings = settingsWithEveryRuleEnabled();
-    const corpus = buildCorpus();
+    const {documents, snapshotDocumentCount} = buildCorpus();
     const lines: string[] = [];
+    const hashes: {name: string, hash: string}[] = [];
 
     let index = 0;
-    for (const document of corpus) {
+    for (const document of documents) {
       let output: string;
       try {
         output = lint(document.text, settings);
@@ -235,12 +241,29 @@ describe('the linter produces the same documents it did before', () => {
       }
 
       lines.push(`${index++}\u0001${document.name}\u0001${JSON.stringify(output)}`);
+      if (hashes.length < snapshotDocumentCount) {
+        hashes.push({name: document.name, hash: createHash('sha256').update(output).digest('hex')});
+      }
     }
 
     if (process.env.DUMP_PATH) {
       writeFileSync(process.env.DUMP_PATH, lines.join('\n') + '\n');
     }
 
-    expect(lines.length).toBe(corpus.length);
+    const expectedHashes = new Map(readFileSync(snapshotPath, 'utf8').trimEnd().split('\n').map((line) => {
+      const separatorIndex = line.lastIndexOf('\t');
+      return [line.slice(0, separatorIndex), line.slice(separatorIndex + 1)];
+    }));
+
+    if (expectedHashes.size !== hashes.length) {
+      throw new Error(`Differential snapshot has ${expectedHashes.size} entries, but the checkout corpus has ${hashes.length}. Regenerate and review the snapshot.`);
+    }
+
+    for (const {name, hash} of hashes) {
+      const expectedHash = expectedHashes.get(name);
+      if (hash !== expectedHash) {
+        throw new Error(`Linted output changed for "${name}". Inspect the full output with DUMP_PATH=/tmp/linter-differential.txt npx jest __tests__/rules-runner-differential.test.ts.`);
+      }
+    }
   });
 });
