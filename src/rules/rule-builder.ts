@@ -3,6 +3,7 @@ import {BooleanOption, DropdownOption, DropdownRecord, MdFilePickerOption, Momen
 import {logDebug, timingBegin, timingEnd} from '../utils/logger';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
+import {LintContext, ProtectedRanges} from '../utils/protected-ranges';
 import {LinterSettings} from '../settings-data';
 import {App} from 'obsidian';
 import LinterPlugin from '../main';
@@ -16,17 +17,20 @@ export abstract class RuleBuilderBase {
   static #noSettingsControlMap = new Map<string, string[]>();
 
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
-    if (!RuleBuilderBase.#ruleMap.has(this.name)) {
-      const builder = new this();
+    // Keyed on the rule's alias rather than the name of the class it was built from. Three rules
+    // were left named `RuleTemplate` after being copied from the template, so they shared an entry
+    // and two of them silently became the third.
+    const builder = new this();
+    if (!RuleBuilderBase.#ruleMap.has(builder.alias)) {
       const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder, builder.ignoreTypes, builder.disableConflictingOptions);
-      RuleBuilderBase.#ruleMap.set(this.name, rule);
+      RuleBuilderBase.#ruleMap.set(builder.alias, rule);
       RuleBuilderBase.#ruleBuilderMap.set(builder.alias, builder);
     }
 
-    return RuleBuilderBase.#ruleMap.get(this.name);
+    return RuleBuilderBase.#ruleMap.get(builder.alias);
   }
 
-  static applyIfEnabledBase(rule: Rule, text: string, settings: LinterSettings, extraOptions: Options): [result: string, isEnabled: boolean] {
+  static applyIfEnabledBase(rule: Rule, text: string, settings: LinterSettings, extraOptions: Options, context?: LintContext): [result: string, isEnabled: boolean] {
     const optionsFromSettings = rule.getOptions(settings);
     if (optionsFromSettings[rule.enabledOptionName()]) {
       timingBegin(rule.alias);
@@ -34,7 +38,7 @@ export abstract class RuleBuilderBase {
       logDebug(`${getTextInLanguage('logs.run-rule-text')} ${rule.getName()}`);
 
       try {
-        const newText = rule.apply(text, options);
+        const newText = rule.apply(text, options, context);
         timingEnd(rule.alias);
 
         if (newText.length > maxFileSizeLength) {
@@ -115,8 +119,8 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   registerRule(rule);
 }
 
-  safeApply(text: string, options?: Options): string {
-    return this.apply(text, this.buildRuleOptions(options));
+  safeApply(text: string, options?: Options, protectedRanges?: ProtectedRanges): string {
+    return this.apply(text, this.buildRuleOptions(options), protectedRanges);
   }
 
   buildRuleOptions(options?: Options): TOptions {
@@ -131,18 +135,18 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     return ruleOptions;
   }
 
-  abstract apply(text: string, options: TOptions): string;
+  abstract apply(text: string, options: TOptions, protectedRanges?: ProtectedRanges): string;
   abstract get exampleBuilders(): ExampleBuilder<TOptions>[];
   abstract get optionBuilders(): OptionBuilderBase<TOptions>[];
 
-  static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions): [result: string, isEnabled: boolean] {
+  static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions, context?: LintContext): [result: string, isEnabled: boolean] {
     const rule = this.getRule();
     if (disabledRules.includes(rule.alias)) {
       logDebug(rule.alias + ' ' + getTextInLanguage('logs.disabled-text'));
       return [text, false];
     }
 
-    return RuleBuilderBase.applyIfEnabledBase(rule, text, settings, extraOptions);
+    return RuleBuilderBase.applyIfEnabledBase(rule, text, settings, extraOptions, context);
   }
 
   static getRuleOptions<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>), settings: LinterSettings): TOptions {
@@ -298,7 +302,7 @@ export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuild
 
 
   protected buildOption(): Option {
-    return new TextAreaOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue.join(this.separator), this.separator, this.splitter);
+    return new TextAreaOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue.join(this.separator));
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {

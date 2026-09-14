@@ -6,6 +6,26 @@ ruleTest({
   RuleBuilderClass: TrailingSpaces,
   testCases: [
     {
+      testName: 'Trailing whitespace inside a fenced code block is preserved',
+      before: '```\ncode \t \n   \n```',
+      after: '```\ncode \t \n   \n```',
+    },
+    {
+      testName: 'Trailing whitespace immediately after a fenced code block is removed',
+      before: '```\ncode\n```\nafter \t ',
+      after: '```\ncode\n```\nafter',
+    },
+    {
+      testName: 'An empty list item preserves one marker space',
+      before: '-   ',
+      after: '- ',
+    },
+    {
+      testName: 'Trailing whitespace inside a disabled section is preserved',
+      before: '<!-- linter-disable -->\nignored \t \n   \n<!-- linter-enable -->\nafter \t ',
+      after: '<!-- linter-disable -->\nignored \t \n   \n<!-- linter-enable -->\nafter',
+    },
+    {
       testName: 'One trailing space removed',
       before: dedent`
         # H1 ${''}
@@ -233,4 +253,25 @@ ruleTest({
       },
     },
   ],
+});
+
+describe('protected-range compatibility', () => {
+  it.each([
+    {twoSpaceLineBreak: false, expected: '- a\n\n  b'},
+    {twoSpaceLineBreak: true, expected: '- a  \n\n  b'},
+  ])('does not corrupt paragraph-boundary whitespace with twoSpaceLineBreak = $twoSpaceLineBreak', ({twoSpaceLineBreak, expected}) => {
+    // The old code left one trailing space when false and doubled two spaces to four when true:
+    // Its list-text helper overlapped replacement ranges by walking backward across a blank line.
+    expect(TrailingSpaces.getRule().apply('- a  \n\n  b', {twoSpaceLineBreak})).toBe(expected);
+  });
+
+  it.each([false, true])('handles whitespace runs across a list paragraph boundary with twoSpaceLineBreak = %j', (twoSpaceLineBreak) => {
+    for (const whitespace of [' ', '  ', '   ', '\t', ' \t', '\t ', '\t\t', ' \t ', ' \t\t ']) {
+      const trailingWhitespace = twoSpaceLineBreak && whitespace === '  ' ? whitespace : '';
+      const emptyLineWhitespace = twoSpaceLineBreak && whitespace.length === 2 ? whitespace : '';
+      const text = `- first${whitespace}\n${whitespace}\n  second${whitespace}`;
+      const expected = `- first${trailingWhitespace}\n${emptyLineWhitespace}\n  second${trailingWhitespace}`;
+      expect({text, output: TrailingSpaces.getRule().apply(text, {twoSpaceLineBreak})}).toEqual({text, output: expected});
+    }
+  });
 });

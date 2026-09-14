@@ -746,24 +746,48 @@ At times you may find a function or variable that is needed in multiple rules. T
 stored in  `src/utils/`. Feel free to reuse as much logic as possible from within these existing files to help reduce
 the amount of code we need to maintain.
 
-##### Ignoring Types for Part of a Rule's Logic
+##### Leaving Parts of a File Alone
 
-At times, there is a need to ignore a specific type of element in a file for just a portion of the logic of the rule.
-This can be done using `ignoreListOfTypes` from
-[ignore-types.ts](src/utils/ignore-types.ts)
-which takes a list of `IgnoreTypes` and a function that takes the resulting string and returns another string.
-
-We have an example of this in [Remove Space Around Characters](src/rules/remove-space-around-characters.ts) where we needed to make sure we did not remove whitespace between a list marker and the fullwidth or other characters in question so we had to ignore lists for the first regex replacement and then do the same regex replacement on just the list item text:
+A rule is given the file as it is, never a rewritten copy of it, along with a `ProtectedRanges` describing the regions
+it must not change. Those regions come from the `ruleIgnoreTypes` the rule declared in its `super({...})` call, so
+`apply` takes a third parameter:
 
 ``` TypeScript
-const replaceWhitespaceAroundFullwidthCharacters = function(text: string): string {
-  return text.replace(fullwidthCharacterWithTextAtStart, '$2').replace(fullwidthCharacterWithTextAtEnd, '$1');
-};
-
-let newText = ignoreListOfTypes([IgnoreTypes.list], text, replaceWhitespaceAroundFullwidthCharacters);
-
-newText = updateListItemText(newText, replaceWhitespaceAroundFullwidthCharacters);
+apply(text: string, options: MyRuleOptions, protectedRanges: ProtectedRanges): string
 ```
+
+To leave a further set of types alone for just part of a rule's logic, ask for them together with the rule's own:
+
+``` TypeScript
+const ranges = protectedRanges.combinedWith([IgnoreTypes.list]);
+```
+
+Never build a `LintContext` inside a rule. Every rule in a run shares one, along with the parse and the ranges worked
+out from it, and making a private one throws that away.
+
+The thing to get right is that a change has two ranges, and they are usually not the same:
+
+- the **edit range**, the characters the rule rewrites;
+- the **guard range**, the characters that had to be visible for the rule to make that change at all. If the guard
+  range is protected, the change is skipped.
+
+For example, [Remove Space Before or After Characters](src/rules/remove-space-before-or-after-characters.ts)
+deletes whitespace next to a punctuation character the user configured, so **both** the whitespace and that character
+have to be unprotected: the character is what says the whitespace should go. Whereas
+[Remove Multiple Spaces](src/rules/remove-multiple-spaces.ts)
+collapses a run of spaces between any two non whitespace characters, and only the whitespace itself has to be
+unprotected, because anything at all can sit either side of it.
+
+`collectUnprotectedRegexReplacements` in
+[protected-ranges.ts](src/utils/protected-ranges.ts)
+takes those two ranges separately and is the helper for this shape.
+
+A rule that decides something from **where a line begins or ends**, such as counting blank lines, needs
+`LintContext.projectionFor`, which gives a view of the file with each protected region collapsed to a single token so
+that line counts and blank lines read the way they would have. That view is for decisions only; its offsets are not
+offsets into the file, and edits worked out against it have to be mapped back with `editRangeToSource`.
+[Consecutive Blank Lines](src/rules/consecutive-blank-lines.ts)
+is an example.
 
 #### Rule Examples
 

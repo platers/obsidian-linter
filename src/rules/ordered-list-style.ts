@@ -3,6 +3,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {OrderListItemEndOfIndicatorStyles, OrderListItemStyles, updateOrderedListItemIndicators} from '../utils/mdast';
+import type {ProtectedRanges} from '../utils/protected-ranges';
 
 class OrderedListStyleOptions implements Options {
   numberStyle?: OrderListItemStyles = OrderListItemStyles.Ascending;
@@ -23,8 +24,8 @@ export default class OrderedListStyle extends RuleBuilder<OrderedListStyleOption
   get OptionsClass(): new () => OrderedListStyleOptions {
     return OrderedListStyleOptions;
   }
-  apply(text: string, options: OrderedListStyleOptions): string {
-    return updateOrderedListItemIndicators(text, options.numberStyle, options.listEndStyle, options.preserveStart);
+  apply(text: string, options: OrderedListStyleOptions, protectedRanges: ProtectedRanges): string {
+    return updateOrderedListItemIndicators(text, options.numberStyle, options.listEndStyle, options.preserveStart, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<OrderedListStyleOptions>[] {
     return [

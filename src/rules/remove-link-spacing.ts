@@ -3,6 +3,7 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {removeSpacesInLinkText} from '../utils/mdast';
 import {removeSpacesInWikiLinkText} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
 
 class RemoveLinkSpacingOptions implements Options {}
 
@@ -18,8 +19,8 @@ export default class RemoveLinkSpacing extends RuleBuilder<RemoveLinkSpacingOpti
   get OptionsClass(): new () => RemoveLinkSpacingOptions {
     return RemoveLinkSpacingOptions;
   }
-  apply(text: string, options: RemoveLinkSpacingOptions): string {
-    text = removeSpacesInLinkText(text);
+  apply(text: string, options: RemoveLinkSpacingOptions, protectedRanges: ProtectedRanges): string {
+    text = removeSpacesInLinkText(text, protectedRanges);
     return removeSpacesInWikiLinkText(text);
   }
   get exampleBuilders(): ExampleBuilder<RemoveLinkSpacingOptions>[] {

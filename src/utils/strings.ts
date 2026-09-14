@@ -25,6 +25,35 @@ export function replaceTextBetweenStartAndEndWithNewValue(str: string, start: nu
   return str.substring(0, start) + value + str.substring(end);
 }
 
+export type textReplacement = {startIndex: number, endIndex: number, value: string}
+
+/**
+ * Applies every replacement to the string in one pass.
+ *
+ * Replacing ranges one at a time copies the whole string for each replacement, which gets
+ * expensive quickly on a large file with a lot of matches. The replacements must be in ascending
+ * order and must not overlap, and their positions are all relative to the string as passed in.
+ * @param {string} str The string to replace values in
+ * @param {textReplacement[]} replacements The replacements to apply, ascending and non overlapping
+ * @return {string} The string with every replacement applied
+ */
+export function replaceTextRanges(str: string, replacements: textReplacement[]): string {
+  if (replacements.length === 0) {
+    return str;
+  }
+
+  const segments: string[] = [];
+  let startOfNextSegment = 0;
+  for (const replacement of replacements) {
+    segments.push(str.substring(startOfNextSegment, replacement.startIndex), replacement.value);
+    startOfNextSegment = replacement.endIndex;
+  }
+
+  segments.push(str.substring(startOfNextSegment));
+
+  return segments.join('');
+}
+
 /**
  * Replaces \r with nothing.
  * @param {string} text - Text to strip

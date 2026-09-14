@@ -2,8 +2,9 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, DEFAULT_LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray, isValueEscapedAlready} from '../utils/yaml';
-import {ignoreListOfTypes, IgnoreTypes} from '../utils/ignore-types';
+import {IgnoreTypes} from '../utils/ignore-types';
 import {getFirstHeaderOneText, yamlRegex} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
 import {isNumeric} from '../utils/strings';
 
 class YamlTitleAliasOptions implements Options {
@@ -38,9 +39,9 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   get OptionsClass(): new () => YamlTitleAliasOptions {
     return YamlTitleAliasOptions;
   }
-  apply(text: string, options: YamlTitleAliasOptions): string {
+  apply(text: string, options: YamlTitleAliasOptions, protectedRanges: ProtectedRanges): string {
+    const [unescapedTitle, title] = this.getTitleInfo(text, options.fileName, options.aliasArrayStyle, options.defaultEscapeCharacter, protectedRanges);
     text = initYAML(text);
-    const [unescapedTitle, title] = this.getTitleInfo(text, options.fileName, options.aliasArrayStyle, options.defaultEscapeCharacter);
 
     let previousTitle: string;
     const yaml = text.match(yamlRegex)[1];
@@ -126,8 +127,8 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     return text;
   }
-  getTitleInfo(text: string, fileName: string, aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats, defaultEscapeCharacter: QuoteCharacter): [string, string] {
-    let unescapedTitle = ignoreListOfTypes([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag], text, getFirstHeaderOneText);
+  getTitleInfo(text: string, fileName: string, aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats, defaultEscapeCharacter: QuoteCharacter, protectedRanges: ProtectedRanges): [string, string] {
+    let unescapedTitle = getFirstHeaderOneText(text, protectedRanges.combinedWith([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag]));
     unescapedTitle = unescapedTitle || fileName;
 
     const escapedTitle = escapeStringIfNecessaryAndPossible(unescapedTitle, defaultEscapeCharacter, this.forceEscape(unescapedTitle, aliasArrayStyle));

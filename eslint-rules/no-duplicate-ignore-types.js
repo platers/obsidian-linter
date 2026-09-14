@@ -7,7 +7,7 @@ module.exports = {
     type: "problem",
     docs: {
       description:
-        "Disallow duplicate values in ignoreListOfTypes and ruleIgnoreTypes",
+        "Disallow duplicate values in ruleIgnoreTypes and combinedWith",
       recommended: "error",
     },
     fixable: "code",
@@ -100,13 +100,14 @@ module.exports = {
 
     return {
       /**
-       * ignoreListOfTypes([...])
+       * protectedRanges.combinedWith([...])
        * @param {TSESTree.CallExpression} node
        */
       CallExpression(node) {
         if (
-          node.callee.type === "Identifier" &&
-          node.callee.name === "ignoreListOfTypes"
+          node.callee.type === "MemberExpression" &&
+          node.callee.property.type === "Identifier" &&
+          node.callee.property.name === "combinedWith"
         ) {
           const arg = node.arguments[0];
 
