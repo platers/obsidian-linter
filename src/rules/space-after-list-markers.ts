@@ -3,7 +3,8 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
-import {replaceTextRanges, textReplacement} from '../utils/strings';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 class SpaceAfterListMarkersOptions implements Options {}
 
@@ -38,11 +39,7 @@ export default class SpaceAfterListMarkers extends RuleBuilder<SpaceAfterListMar
     replacements.push(...collectUnprotectedRegexReplacements(
         text, /^(\s*[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm, protectedRanges, rangesForMatch,
     ));
-    replacements.sort((a, b) => a.startIndex - b.startIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(text, replacements);
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<SpaceAfterListMarkersOptions>[] {
     return [

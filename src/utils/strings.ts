@@ -34,7 +34,7 @@ export type textReplacement = {startIndex: number, endIndex: number, value: stri
  * expensive quickly on a large file with a lot of matches. The replacements must be in ascending
  * order and must not overlap, and their positions are all relative to the string as passed in.
  * @param {string} str The string to replace values in
- * @param {textReplacement[]} replacements The replacements to apply, ascending and non overlapping
+ * @param {textReplacement[]} replacements The replacements to apply, ascending and non-overlapping
  * @return {string} The string with every replacement applied
  */
 export function replaceTextRanges(str: string, replacements: textReplacement[]): string {

@@ -1,4 +1,5 @@
 import {TextRange} from './ignore-types';
+import {getTextInLanguage} from '../lang/helpers';
 
 export type ProjectionReplacement = TextRange & {token: string};
 
@@ -21,7 +22,7 @@ export class DocumentProjection {
     for (const {startIndex, endIndex, token} of replacements) {
       if (!Number.isInteger(startIndex) || !Number.isInteger(endIndex) ||
           startIndex < sourceCursor || endIndex <= startIndex || endIndex > source.length || token.length === 0) {
-        throw new RangeError('projection replacements must be sorted, nonempty and disjoint source ranges with nonempty tokens');
+        throw new RangeError(getTextInLanguage('logs.invalid-projection-replacements-error'));
       }
 
       segments.push(source.substring(sourceCursor, startIndex), token);

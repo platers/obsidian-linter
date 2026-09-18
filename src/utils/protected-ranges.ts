@@ -4,6 +4,7 @@ import {inCanonicalOrder, projectionTokenFor} from './ignore-type-metadata';
 import {DocumentProjection, ProjectionReplacement} from './document-projection';
 import {getPositions, MDAstTypes} from './mdast';
 import {textReplacement} from './strings';
+import {getTextInLanguage} from '../lang/helpers';
 
 /**
  * The regions of a document a rule is not allowed to change.
@@ -39,7 +40,7 @@ export class ProtectedRanges {
    */
   combinedWith(ignoreTypes: IgnoreType[]): ProtectedRanges {
     if (!this.context || !this.ignoreTypes) {
-      throw new Error('protected ranges that did not come from a lint context cannot be combined with more ignore types');
+      throw new Error(getTextInLanguage('logs.protected-ranges-combine-error'));
     }
 
     return this.context.protectedRangesFor([...this.ignoreTypes, ...ignoreTypes]);
@@ -51,7 +52,7 @@ export class ProtectedRanges {
    */
   projection(): DocumentProjection {
     if (!this.context || !this.ignoreTypes) {
-      throw new Error('protected ranges that did not come from a lint context cannot provide a projection');
+      throw new Error(getTextInLanguage('logs.protected-ranges-projection-error'));
     }
 
     return this.context.projectionFor(this.ignoreTypes);

@@ -2,7 +2,8 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
-import {countInstances, replaceTextRanges, textReplacement} from '../utils/strings';
+import {countInstances, textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 import {simpleURIRegex, urlRegex} from '../utils/regex';
 import {ProtectedRanges, redactProtected} from '../utils/protected-ranges';
 
@@ -47,11 +48,7 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       }
     }
 
-    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(text, replacements);
+    return applyNonOverlappingReplacements(text, replacements);
   }
   handleMatches(text: string, matches: RegExpMatchArray, isURISearch: boolean, protectedRanges: ProtectedRanges): textReplacement[] {
     // make sure you do not match on the same thing more than once by keeping track of the last position you checked up to

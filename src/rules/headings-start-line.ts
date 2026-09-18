@@ -4,7 +4,7 @@ import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex} from '../utils/regex';
 import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
-import {replaceTextRanges} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 class HeadingStartLineOptions implements Options {}
 
@@ -29,11 +29,7 @@ export default class HeadingStartLine extends RuleBuilder<HeadingStartLineOption
           guardRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[1].length + match[2].length + match[3].length}),
         },
     );
-    replacements.sort((a, b) => a.startIndex - b.startIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(text, replacements);
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<HeadingStartLineOptions>[] {
     return [

@@ -4,7 +4,8 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {checklistBoxIndicator} from '../utils/regex';
 import {ProtectedRanges} from '../utils/protected-ranges';
-import {replaceTextRanges, textReplacement} from '../utils/strings';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 import {getEditsBetween} from '../utils/text-edits';
 
 class RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions implements Options {}
@@ -54,11 +55,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
       }
     }
 
-    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(text, replacements);
+    return applyNonOverlappingReplacements(text, replacements);
   }
   replaceEmptyLinesBetweenList = function(text: string, listIndicatorRegexText: string): string {
     const listRegex = new RegExp(`^${listIndicatorRegexText}\n(?:(?:[\t\v\f\r \u00a0\u2000-\u200b\u2028-\u2029\u3000]+)?\n){1,}${listIndicatorRegexText}$`, 'gm');

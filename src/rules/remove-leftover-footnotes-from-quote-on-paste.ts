@@ -4,7 +4,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
-import {replaceTextRanges} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 class RemoveLeftoverFootnotesFromQuoteOnPasteOptions implements Options {}
 
@@ -28,11 +28,7 @@ export default class RemoveLeftoverFootnotesFromQuoteOnPaste extends RuleBuilder
       guardRange: rangeForMatch,
       editRange: rangeForMatch,
     });
-    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(text, replacements);
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<RemoveLeftoverFootnotesFromQuoteOnPasteOptions>[] {
     return [

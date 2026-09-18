@@ -99,7 +99,6 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
 
       [startOfLine, startOfIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(newBlockquote, nextNewLine-1);
 
-      // we need to ignore code and math blocks to prevent changing values in the display
       const currentLine = lineIndex++;
       if (protectedLines[currentLine]) {
         currentIndex = nextNewLine + 1;

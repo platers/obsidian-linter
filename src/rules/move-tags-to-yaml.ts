@@ -4,8 +4,8 @@ import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {tagWithLeadingWhitespaceRegex} from '../utils/regex';
 import {ProtectedRanges} from '../utils/protected-ranges';
-import {replaceTextRanges, textReplacement} from '../utils/strings';
-import {getEditsBetween} from '../utils/text-edits';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements, getEditsBetween} from '../utils/text-edits';
 import {
   convertTagValueToStringOrStringArray,
   getYamlSectionValue,
@@ -126,11 +126,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         }
       }
     }
-    removals.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-    if (removals.some((replacement, index) => index > 0 && replacement.startIndex < removals[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    text = replaceTextRanges(text, removals);
+    text = applyNonOverlappingReplacements(text, removals);
 
     // Make sure that the YAML frontmatter does not have whitespace added after the end of the YAML frontmatter.
     // This accounts for https://github.com/platers/obsidian-linter/issues/573
@@ -143,11 +139,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         replacements.push({...range, value: edit.value});
       }
     }
-    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(projection.source, replacements);
+    return applyNonOverlappingReplacements(projection.source, replacements);
   }
   get exampleBuilders(): ExampleBuilder<MoveTagsToYamlOptions>[] {
     return [

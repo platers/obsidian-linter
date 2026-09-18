@@ -3,7 +3,8 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {smartDoubleQuoteRegex, smartSingleQuoteRegex, unicodeLetterRegex} from '../utils/regex';
-import {replaceTextRanges, textReplacement} from '../utils/strings';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 import {collectUnprotectedRegexReplacements, ProtectedRanges, redactProtected} from '../utils/protected-ranges';
 
 export enum SingleQuoteStyles {
@@ -56,11 +57,7 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
 
     // The two quote families are disjoint, and converting either one does not change the
     // letter/whitespace classification used by the other, so both read the original text.
-    replacements.sort((a, b) => a.startIndex - b.startIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(text, replacements);
+    return applyNonOverlappingReplacements(text, replacements);
   }
   collectSmartQuotesToStraightQuotes(text: string, regex: RegExp, straightQuote: string, protectedRanges: ProtectedRanges): textReplacement[] {
     const replacement = (match: RegExpMatchArray, startIndex: number): textReplacement => ({startIndex, endIndex: startIndex + match[0].length, value: straightQuote});

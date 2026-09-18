@@ -19,7 +19,7 @@ import {countInstances} from './strings';
 import {getTextInLanguage} from '../lang/helpers';
 import {DocumentProjection} from './document-projection';
 import {TextRange} from './ignore-types';
-import {getEditsBetween} from './text-edits';
+import {applyNonOverlappingReplacements, getEditsBetween} from './text-edits';
 
 type ParsedText = {
   text: string,
@@ -168,7 +168,7 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
  * Walking it for one type at a time was the single largest cost of linting a large document: the
  * ignore types a rule declares were collected together, but the types the helpers ask for
  * directly, paragraphs, list items and footnote definitions among them, were not, so each of those
- * walked the whole tree again. A walk costs about as much whatever is collected during it, so
+ * walked the whole tree again. A walk costs about the same regardless of what is collected during it, so
  * everything is collected on the first one and every later request is a lookup.
  * @param {ParsedText} parsedText The parsed document to collect the positions of
  */
@@ -676,7 +676,7 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
     const existing = boundaryReplacements.get(key);
     if (existing) {
       if (existing.value != value) {
-        throw new Error('Paragraphs sharing a gap must agree on its replacement');
+        throw new Error(getTextInLanguage('logs.paragraph-gap-conflict-error'));
       }
       return;
     }
@@ -781,20 +781,6 @@ export function removeSpacesInLinkText(text: string, protectedRanges: ProtectedR
   return applyNonOverlappingReplacements(text, replacements);
 }
 
-function applyNonOverlappingReplacements(text: string, replacements: textReplacement[]): string {
-  replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-  for (let index = 1; index < replacements.length; index++) {
-    if (replacements[index].startIndex < replacements[index - 1].startIndex) {
-      throw new Error('Rule replacements must be ordered');
-    }
-    if (replacements[index].startIndex < replacements[index - 1].endIndex) {
-      throw new Error('Rule replacements must be non-overlapping');
-    }
-  }
-
-  return replaceTextRanges(text, replacements);
-}
-
 export function updateItalicsText(text: string, func: (text: string, offset: number, protectedRanges: ProtectedRanges) => textReplacement[], protectedRanges: ProtectedRanges): textReplacement[] {
   const positions: Position[] = getPositions(MDAstTypes.Italics, text);
   const replacements: textReplacement[] = [];
@@ -847,11 +833,7 @@ function applyProjectedChanges(projection: DocumentProjection, projectedText: st
     }
   }
 
-  replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-  if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-    throw new Error('Rule replacements must be ordered and non-overlapping');
-  }
-  return replaceTextRanges(projection.source, replacements);
+  return applyNonOverlappingReplacements(projection.source, replacements);
 }
 
 function getProjectedInlineMathRangesAfterBlockChanges(projection: DocumentProjection, projectedText: string): TextRange[] {

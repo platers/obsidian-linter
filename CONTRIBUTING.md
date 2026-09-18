@@ -776,7 +776,7 @@ deletes whitespace next to a punctuation character the user configured, so **bot
 have to be unprotected: the character is what says the whitespace should go. Whereas
 [Remove Multiple Spaces](src/rules/remove-multiple-spaces.ts)
 collapses a run of spaces between any two non whitespace characters, and only the whitespace itself has to be
-unprotected, because anything at all can sit either side of it.
+unprotected, because anything at all can sit on either side of it.
 
 `collectUnprotectedRegexReplacements` in
 [protected-ranges.ts](src/utils/protected-ranges.ts)

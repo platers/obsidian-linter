@@ -2,7 +2,8 @@ import {Options, rulesDict, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
-import {escapeMarkdownSpecialCharacters, replaceTextRanges, textReplacement} from '../utils/strings';
+import {escapeMarkdownSpecialCharacters, textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 import {ProtectedRanges} from '../utils/protected-ranges';
 import {App} from 'obsidian';
 import {BooleanOption} from '../option';
@@ -65,11 +66,7 @@ export default class FileNameHeading extends RuleBuilder<FileNameHeadingOptions>
     const index = Math.min(yaml_end, projectedText.length);
     const range = projection.editRangeToSource({startIndex: index, endIndex: index});
     const replacements: textReplacement[] = range ? [{...range, value: header}] : [];
-    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(text, replacements);
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<FileNameHeadingOptions>[] {
     return [

@@ -1,10 +1,25 @@
 import DiffMatchPatch from 'diff-match-patch';
-import {textReplacement} from './strings';
+import {replaceTextRanges, textReplacement} from './strings';
+import {getTextInLanguage} from '../lang/helpers';
 
 const differ = new DiffMatchPatch();
 // the diff is between a document and the same document after one rule, so it is worth letting it
 // run to completion rather than falling back to a rougher answer part way through
 differ.Diff_Timeout = 0;
+
+/**
+ * Sorts replacements in place, rejects overlaps, and applies them to the original text.
+ * @param {string} text The text the replacement offsets refer to
+ * @param {textReplacement[]} replacements The replacements to sort and apply
+ * @return {string} The text with every replacement applied
+ */
+export function applyNonOverlappingReplacements(text: string, replacements: textReplacement[]): string {
+  replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+  if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
+    throw new Error(getTextInLanguage('logs.overlapping-replacements-error'));
+  }
+  return replaceTextRanges(text, replacements);
+}
 
 /**
  * Works out what a rule changed by comparing the text it was given with the text it returned.

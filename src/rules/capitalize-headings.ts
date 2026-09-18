@@ -4,7 +4,8 @@ import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex, escapeRegExp, whitespaceSplitterRegex, wordSplitterRegex} from '../utils/regex';
 import {ProtectedRanges} from '../utils/protected-ranges';
-import {replaceTextRanges, textReplacement} from '../utils/strings';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 type Style = 'Title Case' | 'ALL CAPS' | 'First letter';
 
@@ -362,11 +363,7 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       }
       addReplacement(cursor, match[0].length, '');
     }
-    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(text, replacements);
+    return applyNonOverlappingReplacements(text, replacements);
   }
   capitalizeHeading(text: string, options: CapitalizeHeadingsOptions): string {
     return text.replace(allHeadersRegex, (headerText: string) => {

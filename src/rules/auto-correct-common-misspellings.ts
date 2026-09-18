@@ -5,7 +5,8 @@ import dedent from 'ts-dedent';
 import {wordRegex, wordSplitterRegex} from '../utils/regex';
 import { CustomAutoCorrectContent } from '../settings-data';
 import {ProtectedRanges} from '../utils/protected-ranges';
-import {replaceTextRanges, textReplacement} from '../utils/strings';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 class AutoCorrectCommonMisspellingsOptions implements Options {
   ignoreWords?: string[] = [];
@@ -45,11 +46,7 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
         }
       }
     }
-    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(text, replacements);
+    return applyNonOverlappingReplacements(text, replacements);
   }
   replaceWordWithCorrectCasing(word: string, options: AutoCorrectCommonMisspellingsOptions): string {
     const lowercasedWord = word.toLowerCase();

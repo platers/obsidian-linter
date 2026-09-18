@@ -8,7 +8,8 @@ import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 import {App} from 'obsidian';
 import LinterPlugin from '../main';
 import {ProtectedRanges} from '../utils/protected-ranges';
-import {replaceTextRanges, textReplacement} from '../utils/strings';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 class HeaderIncrementOptions implements Options {
   startAtH2?: boolean = false;
@@ -82,11 +83,7 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
 
       replacements.push({...range, value: '#'.repeat(headingLevels[level - 1])});
     }
-    replacements.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
-    if (replacements.some((replacement, index) => index > 0 && replacement.startIndex < replacements[index - 1].endIndex)) {
-      throw new Error('Rule replacements must be ordered and non-overlapping');
-    }
-    return replaceTextRanges(text, replacements);
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<HeaderIncrementOptions>[] {
     return [
