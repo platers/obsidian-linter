@@ -3,6 +3,7 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {ensureEmptyLinesAroundMathBlock} from '../utils/mdast';
+import {ProtectedRanges} from '../utils/protected-ranges';
 
 class EmptyLineAroundMathBlockOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -22,8 +23,8 @@ export default class EmptyLineAroundMathBlock extends RuleBuilder<EmptyLineAroun
   get OptionsClass(): new () => EmptyLineAroundMathBlockOptions {
     return EmptyLineAroundMathBlockOptions;
   }
-  apply(text: string, options: EmptyLineAroundMathBlockOptions): string {
-    return ensureEmptyLinesAroundMathBlock(text, options.minimumNumberOfDollarSignsToBeAMathBlock);
+  apply(text: string, options: EmptyLineAroundMathBlockOptions, protectedRanges: ProtectedRanges): string {
+    return ensureEmptyLinesAroundMathBlock(text, options.minimumNumberOfDollarSignsToBeAMathBlock, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundMathBlockOptions>[] {
     return [

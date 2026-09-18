@@ -5,6 +5,18 @@ import {ruleTest} from './common';
 ruleTest({
   RuleBuilderClass: SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers,
   testCases: [
+    ...['[x](u)', '[[x]]', '`x`', '$x$'].flatMap((construct) => [
+      {
+        testName: `Add spaces around ${construct} directly against CJK text`,
+        before: `中${construct}文`,
+        after: `中 ${construct} 文`,
+      },
+      {
+        testName: `Keep spaces around ${construct} between CJK text`,
+        before: `中 ${construct} 文`,
+        after: `中 ${construct} 文`,
+      },
+    ]),
     {
       // accounts for https://github.com/platers/obsidian-linter/issues/303
       testName:

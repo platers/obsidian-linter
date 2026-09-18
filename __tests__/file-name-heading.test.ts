@@ -6,6 +6,18 @@ ruleTest({
   RuleBuilderClass: FileNameHeading,
   testCases: [
     {
+      testName: 'Does not count an H1 inside fenced code',
+      before: '```\n# inside heading\n```',
+      after: '# File Name\n```\n# inside heading\n```',
+      options: {fileName: 'File Name'},
+    },
+    {
+      testName: 'Does not count an H1 inside a disabled section',
+      before: '<!-- linter-disable -->\n# inside heading\n<!-- linter-enable -->',
+      after: '# File Name\n<!-- linter-disable -->\n# inside heading\n<!-- linter-enable -->',
+      options: {fileName: 'File Name'},
+    },
+    {
       testName: 'Handles stray dashes',
       before: dedent`
         Text 1

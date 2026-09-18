@@ -6,6 +6,11 @@ ruleTest({
   RuleBuilderClass: ConsecutiveBlankLines,
   testCases: [
     {
+      testName: 'Leaves consecutive blank lines inside a disabled section unchanged',
+      before: '<!-- linter-disable -->\nFirst\n\n\nSecond\n<!-- linter-enable -->\n\n\nLast',
+      after: '<!-- linter-disable -->\nFirst\n\n\nSecond\n<!-- linter-enable -->\n\nLast',
+    },
+    {
       testName: 'Handles ignores code blocks',
       before: dedent`
         Line 1

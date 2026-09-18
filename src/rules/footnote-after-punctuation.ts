@@ -2,6 +2,8 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
+import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 class FootnoteAfterPunctuationOptions implements Options {}
 
@@ -18,10 +20,14 @@ export default class FootnoteAfterPunctuation extends RuleBuilder<FootnoteAfterP
   get OptionsClass(): new () => FootnoteAfterPunctuationOptions {
     return FootnoteAfterPunctuationOptions;
   }
-  apply(text: string, options: FootnoteAfterPunctuationOptions): string {
+  apply(text: string, options: FootnoteAfterPunctuationOptions, protectedRanges: ProtectedRanges): string {
     // Matches a footnote reference containing any text except newlines and the
     // terminating ].
-    return text.replace(/(\[\^[^\]]+\]) ?([,.;!:?])/gm, '$2$1');
+    const replacements = collectUnprotectedRegexReplacements(text, /(\[\^[^\]]+\]) ?([,.;!:?])/gm, protectedRanges, {
+      guardRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[0].length}),
+      editRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[0].length, value: match[2] + match[1]}),
+    });
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<FootnoteAfterPunctuationOptions>[] {
     return [

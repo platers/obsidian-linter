@@ -106,3 +106,32 @@ ruleTest({
     },
   ],
 });
+
+describe('protected-range compatibility', () => {
+  it.each(['', '- ', '# '])('does not use protected punctuation as an anchor with prefix %j', (prefix) => {
+    const text = prefix + 'text [link](url) text';
+    expect(RemoveSpaceAroundCharacters.getRule().apply(text, {otherSymbols: '[]()'})).toBe(text);
+  });
+
+  it('removes spaces beside heading links without editing their contents', () => {
+    expect(RemoveSpaceAroundCharacters.getRule().apply('# Ａ [link Ｂ](url) Ｃ')).toBe('# Ａ[link Ｂ](url)Ｃ');
+  });
+});
+
+describe('headings with decoded values absent from the source', () => {
+  it.each([
+    '# A &amp; Ｂ text',
+    '# A &amp; Ｂ [link](url)',
+    '# A &amp; Ｂ `code`',
+    '# &#65; Ｂ text',
+    '# A \\* Ｂ text',
+  ])('leaves %j unchanged instead of corrupting the document', (text) => {
+    // The old helper used indexOf === -1 as an offset and wrote a corrupted document.
+    expect(RemoveSpaceAroundCharacters.getRule().apply(text)).toBe(text);
+  });
+
+  it('still processes other headings and body text', () => {
+    const text = '# A &amp; Ｂ [link](url)\n\ntext Ｃ text\n\n## Ｄ heading';
+    expect(RemoveSpaceAroundCharacters.getRule().apply(text)).toBe('# A &amp; Ｂ [link](url)\n\ntextＣtext\n\n## Ｄheading');
+  });
+});

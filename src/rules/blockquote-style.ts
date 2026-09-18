@@ -5,6 +5,7 @@ import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {getStartOfLineWhitespaceOrBlockquoteLevel, replaceTextBetweenStartAndEndWithNewValue} from '../utils/strings';
 import {startsWithListMarkerRegex} from '../utils/regex';
+import {LintContext, ProtectedRanges, redactProtected} from '../utils/protected-ranges';
 
 type BlockquoteStyleValues = 'no space' | 'space';
 
@@ -26,15 +27,32 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
   get OptionsClass(): new () => BlockquoteStyleOptions {
     return BlockquoteStyleOptions;
   }
-  apply(text: string, options: BlockquoteStyleOptions): string {
-    if (options.style === 'space') {
-      return updateBlockquotes(text, (blockquote: string) => {
-        return this.updateBlockquoteLines(blockquote, this.addSpaceToIndicator);
-      });
-    }
+  apply(text: string, options: BlockquoteStyleOptions, protectedRanges: ProtectedRanges): string {
+    const codeAndMath = LintContext.for(text).protectedRangesFor([IgnoreTypes.code, IgnoreTypes.math]);
+    return updateBlockquotes(text, (blockquote: string, offset: number) => {
+      const protectedLines: boolean[] = [];
+      const listItemMarkerLines: boolean[] = [];
+      const linesWithContent: boolean[] = [];
+      let currentIndex = 0;
+      let done = false;
+      do {
+        let nextNewLine = blockquote.indexOf('\n', currentIndex);
+        if (nextNewLine === -1) {
+          nextNewLine = blockquote.length - 1;
+          done = true;
+        }
+        const [startOfLine, startOfIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(blockquote, nextNewLine - 1);
+        const lineStart = offset + startOfIndex + 1;
+        const contentStart = lineStart + startOfLine.length;
+        const lineEnd = offset + nextNewLine + (done ? 1 : 0);
+        protectedLines.push(codeAndMath.isProtected(lineStart, lineEnd) || protectedRanges.isProtected(lineStart, contentStart));
+        const restOfLine = redactProtected(text, protectedRanges, contentStart, lineEnd);
+        listItemMarkerLines.push(startsWithListMarkerRegex.test(restOfLine));
+        linesWithContent.push(restOfLine.trim() !== '');
+        currentIndex = nextNewLine + 1;
+      } while (!done);
 
-    return updateBlockquotes(text, (blockquote: string) => {
-      return this.updateBlockquoteLines(blockquote, this.removeSpaceFromIndicator);
+      return (currentBlockquote: string) => this.updateBlockquoteLines(currentBlockquote, options.style === 'space' ? this.addSpaceToIndicator : this.removeSpaceFromIndicator, protectedLines, listItemMarkerLines, linesWithContent);
     });
   }
   removeSpaceFromIndicator(this:void, startOfLine: string, isListItemMarkerLine: boolean): string {
@@ -44,7 +62,14 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
 
     return startOfLine.replace(/>[ \t]+/g, '>');
   }
-  addSpaceToIndicator(this:void, startOfLine: string, isListItemMarkerLine: boolean): string {
+  addSpaceToIndicator(this:void, startOfLine: string, isListItemMarkerLine: boolean, lineHasContent: boolean = true): string {
+    // A blockquote line with nothing on it gets no space after its indicator. Adding one leaves
+    // trailing whitespace that "trailing spaces" then removes, so with both rules on the two would
+    // undo each other forever and the file would never settle.
+    if (!lineHasContent) {
+      return startOfLine.replace(/>([^ >])/g, '> $1').replace(/>>/g, '> >').replace(/[ \t]+$/, '');
+    }
+
     // first we add spaces to blockquote indicators that are not followed by a space and then to catch any that were not handled already
     // we make sure to add a space between any 2 indicators that are side by side
     const newStartOfLine = startOfLine.replace(/>([^ ]|$)/g, '> $1').replace(/>>/g, '> >');
@@ -55,7 +80,7 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
     // since we are not dealing with a list item or checklist line, we can go ahead and remove multiple spaces
     return newStartOfLine.replace(/>(?:[ \t]{2,}|\t+)/g, '> ');
   }
-  updateBlockquoteLines(blockquote: string, startOfLineModification: (startOfLine: string, isListMarker: boolean) => string): string {
+  updateBlockquoteLines(blockquote: string, startOfLineModification: (startOfLine: string, isListMarker: boolean, lineHasContent: boolean) => string, protectedLines: boolean[], listItemMarkerLines: boolean[], linesWithContent: boolean[]): string {
     let currentIndex = 0;
     let nextNewLine: number;
     let startOfLine: string;
@@ -63,8 +88,7 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
     let startOfIndex: number;
     let newBlockquote = blockquote;
     let breakOutOfLoop = false;
-    const mathPlaceHolderRegex = new RegExp(IgnoreTypes.math.placeholder.replace('}', '.+}'), '');
-    const codePlaceHolderRegex = new RegExp(IgnoreTypes.code.placeholder.replace('}', '.+}'), '');
+    let lineIndex = 0;
 
     do {
       nextNewLine = newBlockquote.indexOf('\n', currentIndex);
@@ -74,22 +98,14 @@ export default class BlockquoteStyle extends RuleBuilder<BlockquoteStyleOptions>
       }
 
       [startOfLine, startOfIndex] = getStartOfLineWhitespaceOrBlockquoteLevel(newBlockquote, nextNewLine-1);
-      const startOfRestOfLine = startOfIndex + startOfLine.length+1;
 
-      let endOfRestOfLine = nextNewLine;
-      if (breakOutOfLoop) {
-        endOfRestOfLine++;
-      }
-
-      const restOfLine = newBlockquote.substring(startOfRestOfLine, endOfRestOfLine);
-      // we need to ignore code and math blocks to prevent changing values in the display
-      if (restOfLine.match(mathPlaceHolderRegex) || restOfLine.match(codePlaceHolderRegex)) {
-        currentIndex++;
+      const currentLine = lineIndex++;
+      if (protectedLines[currentLine]) {
+        currentIndex = nextNewLine + 1;
         continue;
       }
 
-      const isListItemMarker = startsWithListMarkerRegex.test(restOfLine);
-      updatedStartOfLine = startOfLineModification(startOfLine, isListItemMarker);
+      updatedStartOfLine = startOfLineModification(startOfLine, listItemMarkerLines[currentLine], linesWithContent[currentLine]);
 
 
       // since start of index refers to where the new line character is

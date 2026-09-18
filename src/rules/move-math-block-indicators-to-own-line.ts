@@ -3,6 +3,7 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {makeSureMathBlockIndicatorsAreOnTheirOwnLines} from '../utils/mdast';
+import {ProtectedRanges} from '../utils/protected-ranges';
 
 class MoveMathBlockIndicatorsToOwnLineOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -23,8 +24,8 @@ export default class MoveMathBlockIndicatorsToOwnLine extends RuleBuilder<MoveMa
   get OptionsClass(): new () => MoveMathBlockIndicatorsToOwnLineOptions {
     return MoveMathBlockIndicatorsToOwnLineOptions;
   }
-  apply(text: string, options: MoveMathBlockIndicatorsToOwnLineOptions): string {
-    return makeSureMathBlockIndicatorsAreOnTheirOwnLines(text, options.minimumNumberOfDollarSignsToBeAMathBlock);
+  apply(text: string, options: MoveMathBlockIndicatorsToOwnLineOptions, protectedRanges: ProtectedRanges): string {
+    return makeSureMathBlockIndicatorsAreOnTheirOwnLines(text, options.minimumNumberOfDollarSignsToBeAMathBlock, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<MoveMathBlockIndicatorsToOwnLineOptions>[] {
     return [

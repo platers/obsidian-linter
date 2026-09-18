@@ -34,7 +34,7 @@ class FormatYamlArrayOptions implements Options {
 }
 
 @RuleBuilder.register
-export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
+export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions> {
   constructor() {
     super({
       nameKey: 'rules.format-yaml-array.name',

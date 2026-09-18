@@ -7,6 +7,34 @@ ruleTest({
   RuleBuilderClass: YamlTitleAlias,
   testCases: [
     {
+      testName: 'Keeps a tag as heading text rather than falling back to the filename',
+      before: '# #a',
+      after: '---\naliases:\n  - "#a"\nlinter-yaml-title-alias: "#a"\n---\n# #a',
+      options: {fileName: 'Filename'},
+    },
+    {
+      testName: 'Uses the first visible heading after a fenced code block',
+      before: '```\n# Hidden\n```\n# Visible\n# Later',
+      after: '---\naliases:\n  - Visible\nlinter-yaml-title-alias: Visible\n---\n```\n# Hidden\n```\n# Visible\n# Later',
+    },
+    {
+      testName: 'Uses the first visible heading after a linter-disable section',
+      before: '<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
+      after: '---\naliases:\n  - Visible\nlinter-yaml-title-alias: Visible\n---\n<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
+    },
+    {
+      testName: 'Uses the first normal heading rather than a later heading',
+      before: '# First\n# Later',
+      after: '---\naliases:\n  - First\nlinter-yaml-title-alias: First\n---\n# First\n# Later',
+    },
+    {
+      // The old code produced invalid YAML by copying the masked code block into the title.
+      testName: 'Does not use a heading match that crosses into a protected code block',
+      before: '#\n```\n```',
+      after: '---\naliases:\n  - Filename\nlinter-yaml-title-alias: Filename\n---\n#\n```\n```',
+      options: {fileName: 'Filename', keepAliasThatMatchesTheFilename: true},
+    },
+    {
       testName: 'Creates multi-line array aliases when missing',
       before: dedent`
         # Title

@@ -6,6 +6,16 @@ ruleTest({
   RuleBuilderClass: ParagraphBlankLines,
   testCases: [
     {
+      testName: 'Separates a paragraph from an adjacent multiline comment',
+      before: 'A\n%%\nB\n%%',
+      after: 'A\n\n%%\nB\n%%',
+    },
+    {
+      testName: 'Separates a protected table from a heading and following paragraphs',
+      before: '# H\n| a |\n| - |\n| b |\nParagraph\nNext',
+      after: '# H\n\n| a |\n| - |\n| b |\n\nParagraph\n\nNext',
+    },
+    {
       testName: 'Ignores codeblocks',
       before: dedent`
         ---

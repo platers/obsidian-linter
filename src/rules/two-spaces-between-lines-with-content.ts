@@ -7,6 +7,7 @@ import {BooleanOption} from '../option';
 import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 import {App} from 'obsidian';
 import LinterPlugin from '../main';
+import {ProtectedRanges} from '../utils/protected-ranges';
 
 class TwoSpacesBetweenLinesWithContentOptions implements Options {
   lineBreakIndicator?: LineBreakIndicators = LineBreakIndicators.TwoSpaces;
@@ -38,8 +39,8 @@ export default class TwoSpacesBetweenLinesWithContent extends RuleBuilder<TwoSpa
   get OptionsClass(): new () => TwoSpacesBetweenLinesWithContentOptions {
     return TwoSpacesBetweenLinesWithContentOptions;
   }
-  apply(text: string, options: TwoSpacesBetweenLinesWithContentOptions): string {
-    return addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text, options.lineBreakIndicator);
+  apply(text: string, options: TwoSpacesBetweenLinesWithContentOptions, protectedRanges: ProtectedRanges): string {
+    return addTwoSpacesAtEndOfLinesFollowedByAnotherLineOfTextContent(text, options.lineBreakIndicator, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<TwoSpacesBetweenLinesWithContentOptions>[] {
     return [

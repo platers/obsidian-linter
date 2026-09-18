@@ -3,6 +3,9 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from 
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex, htmlEntitiesRegex} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 class RemoveTrailingPunctuationInHeadingOptions implements Options {
   punctuationToRemove?: string = '.,;:!。，；：！';
@@ -21,22 +24,39 @@ export default class RemoveTrailingPunctuationInHeading extends RuleBuilder<Remo
   get OptionsClass(): new () => RemoveTrailingPunctuationInHeadingOptions {
     return RemoveTrailingPunctuationInHeadingOptions;
   }
-  apply(text: string, options: RemoveTrailingPunctuationInHeadingOptions): string {
-    return text.replaceAll(allHeadersRegex,
-        (heading: string, $1: string = '', $2: string = '', $3: string = '', $4: string = '', $5: string = '') => {
-          // ignore the html entities and entries without any heading text
-          if ($4 == '' || $4.match(htmlEntitiesRegex)) {
-            return heading;
-          }
+  apply(text: string, options: RemoveTrailingPunctuationInHeadingOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    const replacements: textReplacement[] = [];
+    for (const match of projection.text.matchAll(allHeadersRegex)) {
+      const headingText = match[4];
+      // ignore the html entities and entries without any heading text
+      if (headingText == '' || headingText.match(htmlEntitiesRegex)) {
+        continue;
+      }
 
-          const trimmedHeaderText = $4.trimEnd();
-          const lastHeadingChar = trimmedHeaderText.charAt(trimmedHeaderText.length - 1);
-          if (options.punctuationToRemove.includes(lastHeadingChar)) {
-            return $1 + $2 + $3 + $4.substring(0, trimmedHeaderText.length - 1) + $4.substring(trimmedHeaderText.length) + $5;
-          }
+      const trimmedHeaderText = headingText.trimEnd();
+      // all of the trailing punctuation goes in one pass. Removing only the last character
+      // meant a heading ending in several of them needed a lint per character, so the file
+      // kept changing every time it was linted and lost a character each time.
+      let endOfHeadingText = trimmedHeaderText.length;
+      while (endOfHeadingText > 0 && options.punctuationToRemove.includes(trimmedHeaderText.charAt(endOfHeadingText - 1))) {
+        endOfHeadingText--;
+      }
 
-          return heading;
+      if (endOfHeadingText !== trimmedHeaderText.length) {
+        // Only the punctuation is edited: a heading can span a projected multiline token.
+        const startOfHeadingText = match.index + match[1].length + match[2].length + match[3].length;
+        const range = projection.editRangeToSource({
+          startIndex: startOfHeadingText + endOfHeadingText,
+          endIndex: startOfHeadingText + trimmedHeaderText.length,
         });
+        if (range) {
+          replacements.push({...range, value: ''});
+        }
+      }
+    }
+
+    return applyNonOverlappingReplacements(text, replacements);
   }
 
   get exampleBuilders(): ExampleBuilder<RemoveTrailingPunctuationInHeadingOptions>[] {

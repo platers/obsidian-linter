@@ -8,7 +8,8 @@ import {
 } from './option';
 import {LinterError} from './linter-error';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
-import {ignoreListOfTypes, IgnoreType} from './utils/ignore-types';
+import {IgnoreType} from './utils/ignore-types';
+import {LintContext, ProtectedRanges} from './utils/protected-ranges';
 import {LinterSettings} from './settings-data';
 import {App} from 'obsidian';
 import {YAMLParseError} from 'yaml';
@@ -16,7 +17,7 @@ import LinterPlugin from './main';
 
 export type Options = object;
 
-type ApplyFunction = (text: string, options?: Options) => string;
+type ApplyFunction = (text: string, options?: Options, protectedRanges?: ProtectedRanges) => string;
 
 export enum RuleType {
   YAML = 'YAML',
@@ -107,10 +108,21 @@ export class Rule {
     enabled.onChange?.(value, app, plugin);
   }
 
-  public apply(text: string, options?: Options): string {
-    return ignoreListOfTypes(this.ignoreTypes, text, (textAfterIgnore: string) => {
-      return this.applyAfterIgnore(textAfterIgnore, options);
-    });
+  /**
+   * Runs the rule, keeping it away from the parts of the document it declared it ignores.
+   *
+   * Every rule is given the document itself and told which regions of it not to change.
+   * @param {string} text The document to run the rule over
+   * @param {Options} [options] The rule's settings
+   * @param {LintContext} [context] The shared view of this document, if one has been built
+   * @return {string} The document after the rule
+   */
+  public apply(text: string, options?: Options, context?: LintContext): string {
+    // a context belongs to the text it was built from, so one for a different document is not
+    // reused rather than trusted
+    const contextForText = context && context.text === text ? context : LintContext.for(text);
+
+    return this.applyAfterIgnore(text, options, contextForText.protectedRangesFor(this.ignoreTypes));
   }
 }
 
