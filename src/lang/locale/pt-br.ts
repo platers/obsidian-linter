@@ -383,7 +383,7 @@ export default {
         'description': 'Ativa a remoção de valores duplicados para arrays regulares no YAML',
       },
       'ignore-keys': {
-        'name': 'Chaves do YAML a ignorar',
+        'name': 'Chaves do YAML a ignorar para Desduplicar valores de array no YAML',
         'description': 'Uma lista de chaves do YAML, sem os dois pontos finais e em linhas separadas, cujos valores duplicados não devem ser removidos.',
       },
     },
@@ -756,7 +756,7 @@ export default {
         'description': 'Ativa a ordenação de valores para arrays regulares no YAML',
       },
       'ignore-keys': {
-        'name': 'Chaves do YAML a ignorar',
+        'name': 'Chaves do YAML a ignorar para Ordenar valores de array no YAML',
         'description': 'Uma lista de chaves do YAML sem os dois pontos finais em linhas próprias que não devem ter seus valores ordenados.',
       },
       'sort-order': {

@@ -374,7 +374,7 @@ export default {
         'description': '通常のYAML配列の重複する値の削除を有効にします。',
       },
       'ignore-keys': {
-        'name': '無視するYAMLキー',
+        'name': 'YAML配列値の重複排除時に無視するYAMLキー',
         'description': '重複する値を削除しないYAMLキーのリスト（末尾のコロンなし）です。',
       },
     },
@@ -747,7 +747,7 @@ export default {
         'description': '通常のYAML配列の値のソートを有効にします。',
       },
       'ignore-keys': {
-        'name': '無視するYAMLキー',
+        'name': 'YAML Keys to ignore for Sort YAML array values',
         'description': '値のソートを行わないYAMLキーのリスト。各キーはコロンなしで独立した行に記述します。',
       },
       'sort-order': {

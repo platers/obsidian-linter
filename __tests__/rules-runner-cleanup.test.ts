@@ -46,7 +46,7 @@ function cleanupSettings(mask: number, style: string = 'space', twoSpaceLineBrea
   }
   settings.ruleConfigs['blockquote-style'] = {...settings.ruleConfigs['blockquote-style'], style};
   settings.ruleConfigs['trailing-spaces'] = {...settings.ruleConfigs['trailing-spaces'], 'two-space-line-break': twoSpaceLineBreak};
-  settings.ruleConfigs['force-yaml-escape'] = {...settings.ruleConfigs['force-yaml-escape'], 'force-yaml-escape-keys': 'key'};
+  settings.ruleConfigs['force-yaml-escape'] = {...settings.ruleConfigs['force-yaml-escape'], 'force-yaml-escape-keys': ['key']};
   return settings;
 }
 

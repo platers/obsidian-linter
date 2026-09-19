@@ -522,13 +522,13 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
   }
   get optionBuilders(): OptionBuilderBase<YamlKeySortOptions>[] {
     return [
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: YamlKeySortOptions,
         nameKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.name',
         descriptionKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.description',
         optionsKey: 'yamlKeyPrioritySortOrder',
       }),
-      new BooleanOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: YamlKeySortOptions,
         nameKey: 'rules.yaml-key-sort.priority-keys-at-start-of-yaml.name',
         descriptionKey: 'rules.yaml-key-sort.priority-keys-at-start-of-yaml.description',
@@ -626,7 +626,7 @@ In the example above we see the following settings:
 ``` TypeScript
 get optionBuilders(): OptionBuilderBase<YamlKeySortOptions>[] {
   return [
-    new TextAreaOptionBuilder({
+    new ListItemOptionBuilder({
       OptionsClass: YamlKeySortOptions,
       nameKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.name',
       descriptionKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.description',

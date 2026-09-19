@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
@@ -15,6 +15,7 @@ import {convertAliasValueToStringOrStringArray,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
   TagSpecificArrayFormats} from '../utils/yaml';
+import { isValidYamlKeyOnly } from '../utils/validation';
 
 class DedupeYamlArrayValuesOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -267,11 +268,15 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
         descriptionKey: 'rules.dedupe-yaml-array-values.dedupe-array-keys.description',
         optionsKey: 'dedupeArrayKeys',
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: DedupeYamlArrayValuesOptions,
         nameKey: 'rules.dedupe-yaml-array-values.ignore-keys.name',
         descriptionKey: 'rules.dedupe-yaml-array-values.ignore-keys.description',
+        emptyStateKey: 'rules.dedupe-yaml-array-values.ignore-keys.empty-state',
+        fieldNamePlaceholderKey: 'rules.dedupe-yaml-array-values.ignore-keys.placeholder-text',
         optionsKey: 'ignoreDedupeArrayKeys',
+        trimItemWhitespace: true,
+        validator: isValidYamlKeyOnly,
       }),
     ];
   }

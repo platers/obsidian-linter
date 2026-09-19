@@ -362,7 +362,7 @@ export default {
         'description': '打开以对普通 YAML 数组中的值去重',
       },
       'ignore-keys': {
-        'name': '要忽略的 YAML 键',
+        'name': '在对 YAML 数组值进行去重时需忽略的 YAML 键',
         'description': '要忽略的 YAML 键列表，每行一个键',
       },
     },
@@ -731,7 +731,7 @@ export default {
         'description': '打开以对普通 YAML 数组中的值排序',
       },
       'ignore-keys': {
-        'name': '要忽略的 YAML 键',
+        'name': '在对 YAML 数组值进行排序时需忽略的 YAML 键',
         'description': '要忽略的 YAML 键列表，每行一个键',
       },
       'sort-order': {

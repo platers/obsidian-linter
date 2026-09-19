@@ -36,6 +36,7 @@ export interface LinterSettings {
   suppressLintAllFilesConfirmationModal?: boolean;
   suppressLintAllFilesInFolderConfirmationModal?: boolean;
   settingsConvertedToConfigKeyValues: boolean;
+  textAreaSettingsConvertedToListItemSettings: boolean;
   recordLintOnSaveLogs: boolean;
   lintOnFileChange: boolean;
   displayLintOnFileChangeNotice: boolean;
@@ -63,6 +64,7 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   lintOnFileChange: false,
   displayLintOnFileChangeNotice: false,
   settingsConvertedToConfigKeyValues: false,
+  textAreaSettingsConvertedToListItemSettings: false,
   additionalFileExtensions: [],
   foldersToIgnore: [],
   filesToIgnore: [],

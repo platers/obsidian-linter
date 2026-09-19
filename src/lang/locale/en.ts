@@ -107,6 +107,19 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'error in the YAML: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'unknown error: {ERROR_MESSAGE}',
+    'error-message-format': '"{RULE_NAME}" ecountered an {ERROR_MESSAGE}'
+  },
+
+  'validation': {
+    // utils/validation.ts
+    'yaml-key-no-whitespace': '"{KEY}" should not include any leading or trailing whitespace',
+    'yaml-key-no-colon': '"{KEY}" should only be the YAML key with no colon',
+    'yaml-key-only': '"{KEY}" should only be the YAML key with an optional colon',
+    'invalid-yaml-key': '"{KEY}" is not a valid YAML key: {ERROR_MESSAGE}`',
+    'invalid-yaml': '"{YAML}" is invalid YAML',
+    'no-whitespace': '"{TEXT}" cannot have any whitespace',
+    'no-hashtag-in-tag': '"{TAG}" must not start with #',
+    'invalid-tag': '"{TAG}" is not a valid Obsidian tag',
   },
 
   'notice-text': {
@@ -153,6 +166,8 @@ export default {
   // add-list-entry-modals.ts
   'required': 'Required',
   'already-in-list': 'Already in the list',
+  'edit-tooltip': 'Edit',
+  'add-tooltip': 'Add',
 
   'tabs': {
     'names': {
@@ -315,7 +330,9 @@ export default {
       'description': 'Uses a dictionary of common misspellings to automatically convert them to their proper spellings. See <a href="https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md">auto-correct map</a> for the full list of auto-corrected words. <b>Note: this list can work on text from multiple languages, but this list is the same no matter what language is currently in use.</b>',
       'ignore-words': {
         'name': 'Ignore words',
-        'description': 'A comma separated list of lowercased words to ignore when auto-correcting',
+        'description': 'A list of lowercased words to ignore when auto-correcting',
+        'empty-state': 'No words to ignore yet.',
+        'placeholder-text': 'Word to ignore',
       },
       'extra-auto-correct-files': {
         'name': 'Extra auto-correct source files',
@@ -362,11 +379,15 @@ export default {
       },
       'ignore-words': {
         'name': 'Ignore words',
-        'description': 'A comma separated list of words to ignore when capitalizing',
+        'description': 'A list of words to ignore when capitalizing',
+        'empty-state': 'No words to ignore yet.',
+        'placeholder-text': 'Word to ignore',
       },
       'lowercase-words': {
         'name': 'Lowercase words',
-        'description': 'A comma separated list of words to keep lowercase',
+        'description': 'A list of words to keep lowercase',
+        'empty-state': 'No words to lowercase yet.',
+        'placeholder-text': 'Word to lowercase',
       },
       'starting-word-ignore-characters': {
         'name': 'Characters to ignore at the start of potential words',
@@ -422,8 +443,10 @@ export default {
         'description': 'Turns on removing duplicate values for regular YAML arrays',
       },
       'ignore-keys': {
-        'name': 'YAML keys to ignore',
+        'name': 'YAML keys to ignore for Dedupe YAML array values',
         'description': 'A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them.',
+        'empty-state': 'No YAML keys to dedupe yet.',
+        'placeholder-text': 'YAML key to dedupe',
       },
     },
     // default-language-for-code-fences.ts
@@ -489,7 +512,9 @@ export default {
       'description': 'Escapes the values for the specified YAML keys.',
       'force-yaml-escape-keys': {
         'name': 'Force YAML escape on keys',
-        'description': 'Uses the YAML escape character on the specified YAML keys separated by a new line character if it is not already escaped. Do not use on YAML arrays.',
+        'description': 'Uses the YAML escape character on the specified YAML keys if it is not already escaped. Do not use on YAML arrays.',
+        'empty-state': 'No YAML keys to escape values for yet.',
+        'placeholder-text': 'YAML key to escape the value of',
       },
     },
     // format-tags-in-yaml.ts
@@ -519,11 +544,15 @@ export default {
       },
       'force-single-line-array-style': {
         'name': 'Force key values to be single-line arrays',
-        'description': 'Forces the YAML array for the new line separated keys to be in single-line format (leave empty to disable this option)',
+        'description': 'Forces the YAML array keys to be in single-line format (leave empty to disable this option)',
+        'empty-state': 'No YAML array key to force to be in single-line format yet.',
+        'placeholder-text': 'YAML array key to force to be in single-line format',
       },
       'force-multi-line-array-style': {
         'name': 'Force key values to be multi-line arrays',
-        'description': 'Forces the YAML array for the new line separated keys to be in multi-line format (leave empty to disable this option)',
+        'description': 'Forces the YAML array keys to be in multi-line format (leave empty to disable this option)',
+        'empty-state': 'No YAML array key to force to be in multi-line format yet.',
+        'placeholder-text': 'YAML array key to force to be in multi-line format',
       },
     },
     // header-increment.ts
@@ -560,6 +589,8 @@ export default {
       'text-to-insert': {
         'name': 'Text to insert',
         'description': 'Text to insert into the YAML frontmatter',
+        'empty-state': 'No text to insert yet.',
+        'placeholder-text': 'YAML to insert',
       },
     },
     // line-break-at-document-end.ts
@@ -591,7 +622,9 @@ export default {
       },
       'tags-to-ignore': {
         'name': 'Tags to ignore',
-        'description': 'The tags that will not be moved to the tags array or removed from the body content if <code>Remove the hashtag from tags in content body</code> is enabled. Each tag should be on a new line and without the <code>#</code>. <b>Make sure not to include the hashtag in the tag name.</b>',
+        'description': 'The tags that will not be moved to the tags array or removed from the body content if <code>Remove the hashtag from tags in content body</code> is enabled. Tags should not include <code>#</code>. <b>Make sure not to include the hashtag in the tag name.</b>',
+        'empty-state': 'No tags to ignore yet.',
+        'placeholder-text': 'Tag to ignore',
       },
     },
     // no-bare-urls.ts
@@ -776,6 +809,8 @@ export default {
       'yaml-keys-to-remove': {
         'name': 'YAML keys to remove',
         'description': 'The YAML keys to remove from the YAML frontmatter with or without colons',
+        'empty-state': 'No YAML keys to remove yet.',
+        'placeholder-text': 'YAML key to remove',
       },
     },
     // sort-yaml-array-values.ts
@@ -795,8 +830,10 @@ export default {
         'description': 'Turns on sorting values for regular YAML arrays',
       },
       'ignore-keys': {
-        'name': 'YAML Keys to ignore',
-        'description': 'A list of YAML keys without the ending colon on their own lines that are not meant to have their values sorted.',
+        'name': 'YAML Keys to ignore for Sort YAML array values',
+        'description': 'A list of YAML keys without the ending colon that are not meant to have their values sorted.',
+        'empty-state': 'No YAML keys to ignore yet.',
+        'placeholder-text': 'YAML key to ignore',
       },
       'sort-order': {
         'name': 'Sort order',
@@ -868,6 +905,8 @@ export default {
       'priority-keys-at-start-of-yaml': {
         'name': 'Priority keys at start of YAML',
         'description': 'YAML Key Priority Sort Order is placed at the start of the YAML frontmatter',
+        'empty-state': 'No priority key sort order provided yet..',
+        'placeholder-text': 'YAML key to give sort priority',
       },
       'yaml-sort-order-for-other-keys': {
         'name': 'YAML sort order for other keys',

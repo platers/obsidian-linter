@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {tagWithLeadingWhitespaceRegex} from '../utils/regex';
@@ -21,6 +21,7 @@ import {
   OBSIDIAN_TAG_KEY_PLURAL,
   QuoteCharacter,
 } from '../utils/yaml';
+import { isValidTag } from '../utils/validation';
 
 type tagOperations = 'Nothing' | 'Remove hashtag' | 'Remove whole tag';
 
@@ -258,11 +259,14 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
           },
         ],
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: MoveTagsToYamlOptions,
         nameKey: 'rules.move-tags-to-yaml.tags-to-ignore.name',
         descriptionKey: 'rules.move-tags-to-yaml.tags-to-ignore.description',
+         emptyStateKey: 'rules.move-tags-to-yaml.tags-to-ignore.empty-state',
+        fieldNamePlaceholderKey: 'rules.move-tags-to-yaml.tags-to-ignore.placeholder-text',
         optionsKey: 'tagsToIgnore',
+        validator: isValidTag,
       }),
     ];
   }
