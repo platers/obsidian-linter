@@ -1,7 +1,8 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {escapeStringIfNecessaryAndPossible, formatYAML, getYamlSectionValue, isValueEscapedAlready, QuoteCharacter, setYamlSection} from '../utils/yaml';
+import { isValidYamlKey } from '../utils/validation';
 
 class ForceYamlEscapeOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -89,11 +90,12 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
   }
   get optionBuilders(): OptionBuilderBase<ForceYamlEscapeOptions>[] {
     return [
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: ForceYamlEscapeOptions,
         nameKey: 'rules.force-yaml-escape.force-yaml-escape-keys.name',
         descriptionKey: 'rules.force-yaml-escape.force-yaml-escape-keys.description',
         optionsKey: 'forceYamlEscape',
+        validator: isValidYamlKey,
       }),
     ];
   }

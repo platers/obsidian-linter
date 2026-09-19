@@ -422,7 +422,7 @@ export default {
         'description': 'Turns on removing duplicate values for regular YAML arrays',
       },
       'ignore-keys': {
-        'name': 'YAML keys to ignore',
+        'name': 'YAML keys to ignore for Dedupe YAML array values',
         'description': 'A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them.',
       },
     },
@@ -795,7 +795,7 @@ export default {
         'description': 'Turns on sorting values for regular YAML arrays',
       },
       'ignore-keys': {
-        'name': 'YAML Keys to ignore',
+        'name': 'YAML Keys to ignore for Sort YAML array values',
         'description': 'A list of YAML keys without the ending colon on their own lines that are not meant to have their values sorted.',
       },
       'sort-order': {

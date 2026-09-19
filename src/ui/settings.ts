@@ -351,6 +351,7 @@ export class SettingTab extends PluginSettingTab {
 
   private rulePageFor(ruleType: RuleType): SettingDefinitionPage<LinterSettingsKeys> {
     const rules = ruleTypeToRules.get(ruleType) ?? [];
+
     return {
       type: 'page',
       name: getTextInLanguage(tabNameKeys[ruleType]),

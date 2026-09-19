@@ -328,7 +328,7 @@ export class CustomRegexModal extends FormModal {
   }
 
   onSubmit() {
-    const find = this.find.trim();
+    const find = this.find; // find can be whitespace, so triming the value is not valid (see https://github.com/platers/obsidian-linter/issues/1591)
     if (!find) {
       if (this.findInputEl) displayTooltip(this.findInputEl, getTextInLanguage('required'), {classes: ['mod-error']});
       return;
@@ -348,6 +348,72 @@ export class CustomRegexModal extends FormModal {
       replace: this.replace,
       enabled: this.enabled,
     });
+    this.close();
+  }
+}
+
+export type ListItemValidation = (entry: string) => [boolean, string];
+
+export class ListItemsModal extends FormModal {
+  private value: string;
+  private inputEl: HTMLInputElement | undefined;
+
+  // TODO: add edit tootltip and add button
+  // TODO: add entry item name...
+  constructor(
+      app: App,
+      initial: string | null,
+      // edit tooltip
+      // add input button text
+      // placeholder
+      // field name text
+      private onSubmitEntry: (entry: string) => void | Promise<void>,
+      // private isEmpty: (entry string) =>
+      private isValidInput?: ListItemValidation = undefined,
+  ) {
+    super(app);
+    this.value = initial ?? '';
+
+    // TODO: swap to values coming from constructor
+    this.setTitle(getTextInLanguage(initial ? 'options.custom-replace.edit-tooltip' : 'options.custom-replace.add-input-button-text'));
+
+    this.addField((field) => {
+      // TODO: swap to get text in language
+      field.setName('YAML Key (and value) to insert');
+      // TODO: optional description of field
+      field.addText((cb) => {
+        this.inputEl = cb.inputEl;
+        cb.setPlaceholder('Value')
+            .setValue(this.value)
+            .onChange((v) => {
+              this.value = v;
+            });
+      });
+    });
+  }
+
+  onOpen() {
+    this.inputEl?.focus();
+  }
+
+  onSubmit() {
+    // TODO: decide what happens to this trim (should it be configurable, always run, have a function passed in to mutate it, or something else)
+    // const value = this.value.trim();
+    const value = this.value;
+    if (!value) {
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});
+      return;
+    }
+
+    if (this.isValidInput) {
+      const [isValid, validationMsg] = this.isValidInput(value);
+      if (!isValid) {
+        displayTooltip(this.inputEl, validationMsg, {classes: ['mod-error']});
+        return;
+      }
+    }
+
+    void this.onSubmitEntry(value);
     this.close();
   }
 }

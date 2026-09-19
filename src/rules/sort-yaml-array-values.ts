@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
@@ -15,6 +15,7 @@ import {convertAliasValueToStringOrStringArray,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
   TagSpecificArrayFormats} from '../utils/yaml';
+import { isValidYamlKey } from '../utils/validation';
 
 type YamlArraySortOrder = 'Ascending Alphabetical' | 'Descending Alphabetical'
 
@@ -245,11 +246,12 @@ export default class SortYamlArrayValues extends RuleBuilder<SortYamlArrayValues
         descriptionKey: 'rules.sort-yaml-array-values.sort-array-keys.description',
         optionsKey: 'sortArrayKeys',
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: SortYamlArrayValuesOptions,
         nameKey: 'rules.sort-yaml-array-values.ignore-keys.name',
         descriptionKey: 'rules.sort-yaml-array-values.ignore-keys.description',
         optionsKey: 'ignoreSortArrayKeys',
+        validator: isValidYamlKey,
       }),
       new DropdownOptionBuilder<SortYamlArrayValuesOptions, YamlArraySortOrder>({
         OptionsClass: SortYamlArrayValuesOptions,

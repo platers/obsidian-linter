@@ -1,11 +1,12 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder, TextOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex, escapeRegExp, whitespaceSplitterRegex, wordSplitterRegex} from '../utils/regex';
 import {ProtectedRanges} from '../utils/protected-ranges';
 import {textReplacement} from '../utils/strings';
 import {applyNonOverlappingReplacements} from '../utils/text-edits';
+import { noWhitespace } from '../utils/validation';
 
 type Style = 'Title Case' | 'ALL CAPS' | 'First letter';
 
@@ -515,21 +516,19 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
         descriptionKey: 'rules.capitalize-headings.ignore-case-words.description',
         optionsKey: 'ignoreCasedWords',
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
         nameKey: 'rules.capitalize-headings.ignore-words.name',
         descriptionKey: 'rules.capitalize-headings.ignore-words.description',
         optionsKey: 'ignoreWords',
-        splitter: wordSplitterRegex,
-        separator: ', ',
+        validator: noWhitespace,
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,
         nameKey: 'rules.capitalize-headings.lowercase-words.name',
         descriptionKey: 'rules.capitalize-headings.lowercase-words.description',
         optionsKey: 'lowercaseWords',
-        splitter: wordSplitterRegex,
-        separator: ', ',
+        validator: noWhitespace,
       }),
       new TextOptionBuilder({
         OptionsClass: CapitalizeHeadingsOptions,

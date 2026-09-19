@@ -1,5 +1,5 @@
 import {Example, Options, Rule, RuleType, registerRule, wrapLintError} from '../rules';
-import {BooleanOption, DropdownOption, DropdownRecord, MdFilePickerOption, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
+import {BooleanOption, DropdownOption, DropdownRecord, MdFilePickerOption, MomentFormatOption, Option, ListItemOption, TextOption} from '../option';
 import {logDebug, timingBegin, timingEnd} from '../utils/logger';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
@@ -7,6 +7,7 @@ import {LintContext, ProtectedRanges} from '../utils/protected-ranges';
 import {LinterSettings} from '../settings-data';
 import {App} from 'obsidian';
 import LinterPlugin from '../main';
+import type {ListItemValidation} from '../ui/modals/add-list-entry-modals';
 
 // limit the amount of text that can be written to the logs to try to prevent memory issues
 const maxFileSizeLength = 10000;
@@ -288,35 +289,31 @@ export class DropdownOptionBuilder<TOptions extends Options, TValue extends stri
   }
 }
 
-export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string[]> {
-  separator: string;
-  splitter: RegExp;
-  constructor(args: OptionBuilderConstructorArgs<TOptions, string[]> & {
-    separator?: string,
-    splitter?: RegExp
-  }) {
+
+
+export class ListItemOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string[]> {
+  private validator?: ListItemValidation = undefined;
+  constructor(args: OptionBuilderConstructorArgs<TOptions, string[]> & { validator?: ListItemValidation}) {
     super(args);
-    this.separator = args.separator ?? '\n';
-    this.splitter = args.splitter ?? /\n/;
+
+    this.validator = args.validator;
   }
 
 
   protected buildOption(): Option {
-    return new TextAreaOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue.join(this.separator));
+    return new ListItemOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue ?? [], this.validator);
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
     if (options[this.configKey] !== undefined) {
       // `as string[]` is not enough because of the https://github.com/microsoft/TypeScript/issues/48992
       // make sure to remove any empty strings as well as they are not valid values
-      const optionValue = (options[this.configKey] as string)
-        .split(this.splitter)
+      const optionValue = (options[this.configKey] as string[])
         .filter((el: string) => el !== '');
 
       ruleOptions[this.optionsKey] = optionValue as TOptions[
         KeysOfObjectMatchingPropertyValueType<TOptions, string[]>
       ];
-
     }
   }
 }

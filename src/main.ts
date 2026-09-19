@@ -12,7 +12,7 @@ import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
 import {LinterError} from './linter-error';
 import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
 import {SettingTab} from './ui/settings';
-import {escapeRegExp, urlRegex} from './utils/regex';
+import {escapeRegExp, urlRegex, wordSplitterRegex} from './utils/regex';
 import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
 import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
 import {AfterFileChangeLintTimes, DEFAULT_SETTINGS, LinterSettings} from './settings-data';
@@ -762,20 +762,8 @@ export default class LinterPlugin extends Plugin {
       updateMade = await this.moveConfigValuesToKeyBasedFormat();
     }
 
-    // move a recently moved setting to its new location
-    if ('lintOnFileContentChangeDelay' in this.settings) {
-      this.settings.ruleConfigs['yaml-timestamp']['update-on-file-contents-updated'] = this.settings['lintOnFileContentChangeDelay'];
-
-      delete this.settings['lintOnFileContentChangeDelay'];
-      updateMade = true;
-    }
-
-    // move the setting of typo rule name to its new name
-    if (this.settings.ruleConfigs['trailing-spaces'] && 'twp-space-line-break' in this.settings.ruleConfigs['trailing-spaces']) {
-      this.settings.ruleConfigs['trailing-spaces']['two-space-line-break'] = this.settings.ruleConfigs['trailing-spaces']['twp-space-line-break'];
-
-      delete this.settings.ruleConfigs['trailing-spaces']['twp-space-line-break'];
-      updateMade = true;
+    if (!this.settings.textAreaSettingsConvertedToListItemSettings) {
+      updateMade = await this.moveTextAreaSettingsToListItemSettings();
     }
 
     // check for and fix invalid settings
@@ -816,38 +804,6 @@ export default class LinterPlugin extends Plugin {
         this.settings.ruleConfigs[rule.alias] = ruleDefaults;
         updateMade = true;
         continue;
-      }
-
-      // remove this after a reasonable amount of time
-      if (rule.alias == 'space-between-chinese-japanese-or-korean-and-english-or-numbers') {
-        if (!('english-symbols-punctuation-before' in this.settings.ruleConfigs[rule.alias])) {
-          this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-before'] = ruleDefaults['english-symbols-punctuation-before'];
-          updateMade = true;
-        }
-
-        if (!('english-symbols-punctuation-after' in this.settings.ruleConfigs[rule.alias])) {
-          this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = ruleDefaults['english-symbols-punctuation-after'];
-          updateMade = true;
-        }
-      } else if (rule.alias == 'yaml-timestamp') {
-        const defaults = rule.getDefaultOptions();
-        if ('force-retention-of-create-value' in this.settings.ruleConfigs[rule.alias]) {
-          if (!('date-created-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
-            if (this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value']) {
-              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = 'frontmatter';
-            } else {
-              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = defaults['date-created-source-of-truth'];
-            }
-          }
-
-          delete this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value'];
-          updateMade = true;
-        }
-
-        if (!('date-modified-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
-          this.settings.ruleConfigs[rule.alias]['date-modified-source-of-truth'] = defaults['date-modified-source-of-truth'];
-          updateMade = true;
-        }
       }
 
       // make sure new/empty settings on a rule that exists get filled in with their default value as well
@@ -1250,6 +1206,95 @@ export default class LinterPlugin extends Plugin {
     await this.saveSettings();
 
     setLanguage(getLanguage());
+
+    return updateMade;
+  }
+
+  private async moveTextAreaSettingsToListItemSettings(): Promise<boolean> {
+    const defaultSplitter = /\n/;
+    const textAreaToListItemMigrations: {ruleName: string, key: string, splitter: RegExp}[] = [
+      {
+        ruleName: 'auto-correct-common-misspellings',
+        key: 'ignore-words',
+        splitter: wordSplitterRegex,
+      },
+      {
+        ruleName: 'capitalize-headings',
+        key: 'ignore-words',
+        splitter: wordSplitterRegex,
+      },
+      {
+        ruleName: 'capitalize-headings',
+        key: 'lowercase-words',
+        splitter: wordSplitterRegex,
+      },
+      {
+        ruleName: 'dedupe-yaml-array-values',
+        key: 'ignore-keys',
+        splitter: wordSplitterRegex,
+      },
+      {
+        ruleName: 'force-yaml-escape',
+        key: 'force-yaml-escape-keys',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'format-yaml-array',
+        key: 'force-multi-line-array-style',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'format-yaml-array',
+        key: 'force-single-line-array-style',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'insert-yaml-attributes',
+        key: 'text-to-insert',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'move-tags-to-yaml',
+        key: 'tags-to-ignore',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'remove-yaml-keys',
+        key: 'yaml-keys-to-remove',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'sort-yaml-array-values',
+        key: 'ignore-keys',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'sort-yaml-array-values',
+        key: 'ignore-keys',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'yaml-key-sort',
+        key: 'yaml-key-priority-sort-order',
+        splitter: defaultSplitter,
+      },
+    ];
+
+    let updateMade = false;
+    for (const migration of textAreaToListItemMigrations) {
+      const ruleSettings = this.settings.ruleConfigs[migration.ruleName];
+      const value = (ruleSettings as {[k: string]: string})[migration.key];
+      if (ruleSettings != undefined && typeof value === 'string') {
+        const replacementValue = value.split(migration.splitter);
+
+        this.settings.ruleConfigs[migration.ruleName][migration.key] = replacementValue.length === 1 && replacementValue[0].trim() === '' ? [] : replacementValue;
+
+        updateMade = true;
+      }
+    }
+
+    this.settings.textAreaSettingsConvertedToListItemSettings = true;
+    await this.saveSettings();
 
     return updateMade;
   }
