@@ -162,5 +162,23 @@ ruleTest({
         englishNonLetterCharactersBeforeCJKCharacters: ` \t`,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1554
+      testName: 'Make sure spaces are added around multiple inline math expressions on the same line',
+      before: dedent`
+        测试$math$测试$math$测试
+      `,
+      after: dedent`
+        测试 $math$ 测试 $math$ 测试
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1554
+      testName: 'Make sure spaces are added around multiple inline code blocks on the same line',
+      before: dedent`
+        直接修改数据库\`library\`表对应行的\`exclusionPatterns\`字段
+      `,
+      after: dedent`
+        直接修改数据库 \`library\` 表对应行的 \`exclusionPatterns\` 字段
+      `,
+    },
   ],
 });
