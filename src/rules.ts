@@ -205,6 +205,5 @@ export function wrapLintError(error: Error, ruleName: string) {
     errorMessage = getTextInLanguage('logs.wrapper-unknown-error').replace('{ERROR_MESSAGE}', error.message);
   }
 
-  // TODO: clean this up, and see about replacing encountered an with the appropriate getTextInLanguage
-  throw new LinterError(`"${ruleName}" encountered an ${errorMessage}`, error);
+  throw new LinterError(getTextInLanguage('logs.error-message-format').replace('{RULE_NAME}', ruleName).replace('{ERROR_MESSAGE}', errorMessage), error);
 }

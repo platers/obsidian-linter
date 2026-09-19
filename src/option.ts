@@ -1,5 +1,5 @@
 import {App, ExtraButtonComponent, normalizePath, TFile, ToggleComponent} from 'obsidian';
-import type {SettingDefinition, SettingDefinitionItem, SettingDefinitionList} from 'obsidian';
+import type {SettingDefinition, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage} from 'obsidian';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
 import LinterPlugin from './main';
 import {richDescription} from './ui/helpers';
@@ -7,7 +7,9 @@ import {LinterSettings} from './settings-data';
 import { CustomAutoCorrectContent } from './settings-data';
 import MdFileSuggester from './ui/suggesters/md-file-suggester';
 import {ParseResultsModal} from './ui/modals/parse-results-modal';
+import {ListItemsModal, ListItemValidation} from './ui/modals/add-list-entry-modals'
 import {parseCustomReplacements, stripCr} from './utils/strings';
+import {LinterSettingsKeys} from './settings-data';
 
 function getFileFromPath(app: App, filePath: string): TFile | null {
   const file = app.vault.getAbstractFileByPath(normalizePath(filePath));
@@ -132,15 +134,48 @@ export class TextOption extends Option {
   }
 }
 
-export class TextAreaOption extends Option {
-  public defaultValue: string;
+export class ListItemOption extends Option {
+  public defaultValue: string[];
 
-  public getSettingDefinition(_plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
-    return {
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: unknown, ruleAlias?: string | null, private validator: ListItemValidation | undefined, private emptyStateKey: LanguageStringKey, private fieldPlaceholderKey: LanguageStringKey, private allowReorder: boolean, private trimItemWhitespace: boolean) {
+    super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
+  }
+
+  protected async writeValue(value: unknown, plugin: LinterPlugin): void {
+    plugin.settings.ruleConfigs[this.ruleAlias] ??= {};
+    plugin.settings.ruleConfigs[this.ruleAlias][this.configKey] = value;
+  }
+
+  public getSettingDefinition(plugin: LinterPlugin, update: () => void): SettingDefinitionItem {
+    const values = this.getCurrentValue(plugin) as string[] | undefined ?? [];
+
+    return createListManagementPage({
       name: this.getName(),
-      desc: richDescription(this.getDescription()),
-      control: {type: 'textarea', key: this.controlKey(), defaultValue: this.defaultValue ?? ''},
-    };
+        desc: richDescription(this.getDescription()),
+        addButtonText: getTextInLanguage('add-tooltip'),
+        emptyState: getTextInLanguage(this.emptyStateKey),
+        values: values,
+        allowReorder: this.allowReorder,
+        openAddForm: () => new ListItemsModal(plugin.app, null, this.fieldPlaceholderKey, this.trimItemWhitespace, async (entry) => {
+          values.push(entry);
+          await this.writeAndSave(values, plugin);
+          update();
+        },
+        this.validator).open(),
+        openEditForm: (entry, index) => new ListItemsModal(plugin.app, entry, this.fieldPlaceholderKey, this.trimItemWhitespace, async (updated) => {
+          values[index] = updated;
+          await this.writeAndSave(values, plugin);
+          update();
+        },
+        this.validator).open(),
+        editTooltip: getTextInLanguage('edit-tooltip'),
+        onDelete: (index) => {
+          values.splice(index, 1);
+          this.writeValue(values, plugin);
+        },
+        itemName: (entry) => entry, // we may want to add a default place holder here if we start allowing empty entries
+        plugin: plugin,
+      });
   }
 }
 
@@ -302,3 +337,73 @@ export class MdFilePickerOption extends Option {
     };
   }
 }
+
+export function createListManagementPage<T>(opts: {
+    name: string;
+    desc: string | DocumentFragment;
+    addButtonText: string;
+    emptyState: string;
+    values: T[];
+    openAddForm: () => void;
+    onDelete: (index: number) => void;
+    itemName: (entry: T) => string;
+    itemDesc?: (entry: T) => string | undefined;
+    itemIsDisabled?: (entry: T) => boolean;
+    allowReorder?: boolean | undefined;
+    openEditForm?: (entry: T, index: number) => void;
+    editTooltip?: string;
+    plugin: LinterPlugin;
+  }): SettingDefinitionPage<LinterSettingsKeys> {
+    const list: SettingDefinitionList<LinterSettingsKeys> = {
+      type: 'list',
+      emptyState: opts.emptyState,
+      addItem: {
+        name: opts.addButtonText,
+        action: opts.openAddForm,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises -- I don't have control over this, so we may as well ignore the promise mismatch
+      onDelete: async (index: number) => {
+        opts.onDelete(index);
+        await opts.plugin.saveSettings();
+        opts.plugin.settingsTab.update();
+      },
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises -- I don't have control over this, so we may as well ignore the promise mismatch
+      onReorder: !opts.allowReorder ? undefined : async (oldIndex: number, newIndex: number) => {
+        const [moved] = opts.values.splice(oldIndex, 1);
+        opts.values.splice(newIndex, 0, moved);
+        await  opts.plugin.saveSettings();
+      },
+      items: opts.values.map((entry): SettingDefinition<LinterSettingsKeys> => {
+        const base = {
+          name: opts.itemName(entry),
+          desc: opts.itemDesc?.(entry),
+          searchable: false,
+        } as const;
+        if (!opts.openEditForm) return base;
+        return {
+          ...base,
+          render: (setting) => {
+            setting.setName(base.name);
+            if (base.desc !== undefined) setting.setDesc(base.desc);
+            if (opts.itemIsDisabled && opts.itemIsDisabled(entry)) {
+              setting.nameEl.addClass('disabled-list-entry');
+              setting.descEl.addClass('disabled-list-entry');
+            }
+            setting.addExtraButton((cb) => cb
+                .setIcon('lucide-pencil')
+                .setTooltip(opts.editTooltip ?? 'Edit')
+                // Resolve the live index at click time — a captured map index
+                // goes stale after a reorder or delete.
+                .onClick(() => opts.openEditForm(entry, opts.values.indexOf(entry))));
+          },
+        };
+      }),
+    };
+
+    return {
+      type: 'page',
+      name: opts.name,
+      desc: opts.desc,
+      items: [list],
+    };
+  }

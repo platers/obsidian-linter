@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
@@ -15,6 +15,7 @@ import {convertAliasValueToStringOrStringArray,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
   TagSpecificArrayFormats} from '../utils/yaml';
+import { isValidYamlKeyOnly } from '../utils/validation';
 
 class FormatYamlArrayOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -266,17 +267,23 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
         descriptionKey: 'rules.format-yaml-array.default-array-keys.description',
         optionsKey: 'formatArrayKeys',
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
         nameKey: 'rules.format-yaml-array.force-single-line-array-style.name',
         descriptionKey: 'rules.format-yaml-array.force-single-line-array-style.description',
+        emptyStateKey: 'rules.format-yaml-array.force-single-line-array-style.empty-state',
+        fieldNamePlaceholderKey: 'rules.format-yaml-array.force-single-line-array-style.placeholder-text',
         optionsKey: 'forceSingleLineArrayStyle',
+        validator: isValidYamlKeyOnly,
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
         nameKey: 'rules.format-yaml-array.force-multi-line-array-style.name',
         descriptionKey: 'rules.format-yaml-array.force-multi-line-array-style.description',
+        emptyStateKey: 'rules.format-yaml-array.force-multi-line-array-style.empty-state',
+        fieldNamePlaceholderKey: 'rules.format-yaml-array.force-multi-line-array-style.placeholder-text',
         optionsKey: 'forceMultiLineArrayStyle',
+        validator: isValidYamlKeyOnly,
       }),
     ];
   }

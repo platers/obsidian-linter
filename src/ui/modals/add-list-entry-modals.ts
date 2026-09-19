@@ -1,5 +1,5 @@
 import {App, displayTooltip} from 'obsidian';
-import {getTextInLanguage} from '../../lang/helpers';
+import {getTextInLanguage, LanguageStringKey} from '../../lang/helpers';
 import { FileToIgnore } from "../../settings-data";
 import FolderSuggester from '../suggesters/folder-suggester';
 import {FormModal} from './form-modal';
@@ -328,7 +328,7 @@ export class CustomRegexModal extends FormModal {
   }
 
   onSubmit() {
-    const find = this.find.trim();
+    const find = this.find; // find can be whitespace, so triming the value is not valid (see https://github.com/platers/obsidian-linter/issues/1591)
     if (!find) {
       if (this.findInputEl) displayTooltip(this.findInputEl, getTextInLanguage('required'), {classes: ['mod-error']});
       return;
@@ -348,6 +348,64 @@ export class CustomRegexModal extends FormModal {
       replace: this.replace,
       enabled: this.enabled,
     });
+    this.close();
+  }
+}
+
+export type ListItemValidation = (entry: string) => [boolean, string];
+
+export class ListItemsModal extends FormModal {
+  private value: string;
+  private inputEl: HTMLInputElement | undefined;
+
+  constructor(
+      app: App,
+      initial: string | null,
+      fieldNameKey: LanguageStringKey,
+      private trimItemWhitespace: boolean,
+      private onSubmitEntry: (entry: string) => void | Promise<void>,
+      private isValidInput?: ListItemValidation = undefined,
+  ) {
+    super(app);
+    this.value = initial ?? '';
+
+    this.setTitle(getTextInLanguage(initial ? 'edit-tooltip' : 'add-tooltip'));
+
+    this.addField((field) => {
+      field.setName(getTextInLanguage(fieldNameKey));
+      field.addText((cb) => {
+        cb.setPlaceholder(getTextInLanguage(fieldNameKey))
+            .setValue(this.value)
+            .onChange((v) => {
+              this.value = v;
+            });
+
+        this.inputEl = cb.inputEl;
+      });
+    });
+  }
+
+  onOpen() {
+    this.inputEl?.focus();
+  }
+
+  onSubmit() {
+    const value = this.trimItemWhitespace ? this.value.trim() : this.value;
+    const trimmedValue = this.value.trim();
+    if (!trimmedValue) {
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});
+      return;
+    }
+
+    if (this.isValidInput) {
+      const [isValid, validationMsg] = this.isValidInput(value);
+      if (!isValid) {
+        if (this.inputEl) displayTooltip(this.inputEl, validationMsg, {classes: ['mod-error']});
+        return;
+      }
+    }
+
+    void this.onSubmitEntry(value);
     this.close();
   }
 }

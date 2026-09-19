@@ -17,6 +17,7 @@ export const genericLinkRegex = /(!?)\[([^[]*)\](\(.*\))/g;
 // based on https://help.obsidian.md/Editing+and+formatting/Tags#Tag+format
 // the lookahead enforces "tags must contain at least one non-numerical character", so `#1984` is not a tag while `#y1984` is
 export const tagWithLeadingWhitespaceRegex = /(\s|^)(#(?=\d*[\p{L}\-_/\p{Emoji_Presentation}])[\p{L}\-_\d/\p{Emoji_Presentation}]+)/gu;
+export const tagContentRegex = /^(?=\d*[\p{L}\-_/\p{Emoji_Presentation}])[\p{L}\-_\d/\p{Emoji_Presentation}]+$/u;
 export const obsidianMultilineCommentRegex = /^%%\n[^%]*\n%%/gm;
 export const wordSplitterRegex = /[,\s]+/;
 export const whitespaceSplitterRegex = /\S+/g;

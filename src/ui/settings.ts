@@ -1,5 +1,5 @@
 import {App, PluginSettingTab, moment} from 'obsidian';
-import type {SettingDefinition, SettingDefinitionGroup, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage, SettingGroupItem} from 'obsidian';
+import type {SettingDefinition, SettingDefinitionGroup, SettingDefinitionItem, SettingDefinitionPage, SettingGroupItem} from 'obsidian';
 import log from 'loglevel';
 import LinterPlugin from '../main';
 import {Rule, RuleType, ruleTypeToRules} from '../rules';
@@ -10,6 +10,7 @@ import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '
 import {logsFromLastRun, setLogLevel} from '../utils/logger';
 import {getPath, setPath} from '../utils/nested-keyof';
 import {CustomCommandModal, AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal, CustomRegexModal} from './modals/add-list-entry-modals';
+import { createListManagementPage } from '../option';
 
 const tabNameKeys: Record<RuleType | 'Custom' | 'Debug', LanguageStringKey> = {
   [RuleType.YAML]: 'tabs.names.yaml',
@@ -221,78 +222,9 @@ export class SettingTab extends PluginSettingTab {
     };
   }
 
-  private listManagementPage<T>(opts: {
-    name: string;
-    desc: string | DocumentFragment;
-    addButtonText: string;
-    emptyState: string;
-    values: T[];
-    openAddForm: () => void;
-    onDelete: (index: number) => void;
-    itemName: (entry: T) => string;
-    itemDesc?: (entry: T) => string | undefined;
-    itemIsDisabled?: (entry: T) => boolean;
-    allowReorder?: boolean | undefined;
-    openEditForm?: (entry: T, index: number) => void;
-    editTooltip?: string;
-  }): SettingDefinitionPage<LinterSettingsKeys> {
-    const list: SettingDefinitionList<LinterSettingsKeys> = {
-      type: 'list',
-      emptyState: opts.emptyState,
-      addItem: {
-        name: opts.addButtonText,
-        action: opts.openAddForm,
-      },
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises -- I don't have control over this, so we may as well ignore the promise mismatch
-      onDelete: async (index: number) => {
-        opts.onDelete(index);
-        await this.plugin.saveSettings();
-        this.update();
-      },
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises -- I don't have control over this, so we may as well ignore the promise mismatch
-      onReorder: !opts.allowReorder ? undefined : async (oldIndex: number, newIndex: number) => {
-        const [moved] = opts.values.splice(oldIndex, 1);
-        opts.values.splice(newIndex, 0, moved);
-        await this.plugin.saveSettings();
-      },
-      items: opts.values.map((entry): SettingDefinition<LinterSettingsKeys> => {
-        const base = {
-          name: opts.itemName(entry),
-          desc: opts.itemDesc?.(entry),
-          searchable: false,
-        } as const;
-        if (!opts.openEditForm) return base;
-        return {
-          ...base,
-          render: (setting) => {
-            setting.setName(base.name);
-            if (base.desc !== undefined) setting.setDesc(base.desc);
-            if (opts.itemIsDisabled && opts.itemIsDisabled(entry)) {
-              setting.nameEl.addClass('disabled-list-entry');
-              setting.descEl.addClass('disabled-list-entry');
-            }
-            setting.addExtraButton((cb) => cb
-                .setIcon('lucide-pencil')
-                .setTooltip(opts.editTooltip ?? 'Edit')
-                // Resolve the live index at click time — a captured map index
-                // goes stale after a reorder or delete.
-                .onClick(() => opts.openEditForm(entry, opts.values.indexOf(entry))));
-          },
-        };
-      }),
-    };
-
-    return {
-      type: 'page',
-      name: opts.name,
-      desc: opts.desc,
-      items: [list],
-    };
-  }
-
   private foldersToIgnorePage(): SettingDefinitionPage<LinterSettingsKeys> {
     const folders = this.plugin.settings.foldersToIgnore;
-    return this.listManagementPage({
+    return createListManagementPage({
       name: getTextInLanguage('tabs.general.folders-to-ignore.name'),
       desc: richDescription(getTextInLanguage('tabs.general.folders-to-ignore.description')),
       addButtonText: getTextInLanguage('tabs.general.folders-to-ignore.add-input-button-text'),
@@ -305,12 +237,13 @@ export class SettingTab extends PluginSettingTab {
       }).open(),
       onDelete: (index) => folders.splice(index, 1),
       itemName: (folder) => folder || getTextInLanguage('tabs.general.folders-to-ignore.folder-search-placeholder-text'),
+      plugin: this.plugin,
     });
   }
 
   private filesToIgnorePage(): SettingDefinitionPage<LinterSettingsKeys> {
     const filesToIgnore = this.plugin.settings.filesToIgnore;
-    return this.listManagementPage({
+    return createListManagementPage({
       name: getTextInLanguage('tabs.general.files-to-ignore.name'),
       desc: richDescription(getTextInLanguage('tabs.general.files-to-ignore.description')),
       addButtonText: getTextInLanguage('tabs.general.files-to-ignore.add-input-button-text'),
@@ -324,6 +257,7 @@ export class SettingTab extends PluginSettingTab {
       onDelete: (index) => filesToIgnore.splice(index, 1),
       itemName: (entry) => entry.label || entry.match || getTextInLanguage('tabs.general.files-to-ignore.label-placeholder-text'),
       itemDesc: (entry) => entry.label && entry.match ? this.buildRegexDisplay(entry.match, entry.flags) : undefined,
+      plugin: this.plugin,
     });
   }
 
@@ -333,7 +267,7 @@ export class SettingTab extends PluginSettingTab {
 
   private additionalFileExtensionsPage(): SettingDefinitionPage<LinterSettingsKeys> {
     const extensions = this.plugin.settings.additionalFileExtensions;
-    return this.listManagementPage({
+    return createListManagementPage({
       name: getTextInLanguage('tabs.general.additional-file-extensions.name'),
       desc: richDescription(getTextInLanguage('tabs.general.additional-file-extensions.description')),
       addButtonText: getTextInLanguage('tabs.general.additional-file-extensions.add-input-button-text'),
@@ -351,6 +285,7 @@ export class SettingTab extends PluginSettingTab {
 
   private rulePageFor(ruleType: RuleType): SettingDefinitionPage<LinterSettingsKeys> {
     const rules = ruleTypeToRules.get(ruleType) ?? [];
+
     return {
       type: 'page',
       name: getTextInLanguage(tabNameKeys[ruleType]),
@@ -413,7 +348,7 @@ export class SettingTab extends PluginSettingTab {
 
   private customCommandsPage(): SettingDefinitionPage<LinterSettingsKeys> {
     const lintCommands = this.plugin.settings.lintCommands;
-    return this.listManagementPage({
+    return createListManagementPage({
       name: getTextInLanguage('options.custom-command.name'),
       desc: richDescription(getTextInLanguage('options.custom-command.description')),
       addButtonText: getTextInLanguage('options.custom-command.add-input-button-text'),
@@ -434,12 +369,13 @@ export class SettingTab extends PluginSettingTab {
       itemName: (entry) => (entry && entry.name) || getTextInLanguage('options.custom-command.command-search-placeholder-text'),
       itemDesc: (entry) => (entry && entry.id) || '',
       itemIsDisabled: (entry) => !entry.enabled,
+      plugin: this.plugin,
     });
   }
 
   private customRegexesPage(): SettingDefinitionPage<LinterSettingsKeys> {
     const regexes = this.plugin.settings.customRegexes;
-    return this.listManagementPage({
+    return createListManagementPage({
       name: getTextInLanguage('options.custom-replace.name'),
       desc: richDescription(getTextInLanguage('options.custom-replace.description')),
       addButtonText: getTextInLanguage('options.custom-replace.add-input-button-text'),
@@ -461,6 +397,7 @@ export class SettingTab extends PluginSettingTab {
       itemName: (entry) => entry.label || entry.find || getTextInLanguage('options.custom-replace.label-placeholder-text'),
       itemDesc: (entry) => entry.find && entry.label ? entry.find : undefined,
       itemIsDisabled: (entry) => !entry.enabled,
+      plugin: this.plugin,
     });
   }
 

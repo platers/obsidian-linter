@@ -369,7 +369,7 @@ export default {
         'description': '開啟移除一般 YAML 陣列重複值的功能',
       },
       'ignore-keys': {
-        'name': '要忽略的 YAML 鍵',
+        'name': '若要忽略的 YAML 鍵，以便對 YAML 陣列值進行去重',
         'description': '一個 YAML 鍵的清單，每行一個，不含結尾的冒號，這些鍵不應移除重複值。',
       },
     },
@@ -738,7 +738,7 @@ export default {
         'description': '開啟對一般 YAML 陣列的值進行排序的功能',
       },
       'ignore-keys': {
-        'name': '要忽略的 YAML 鍵',
+        'name': '若要忽略的 YAML 鍵，以便對 YAML 陣列值進行排序',
         'description': '一個 YAML 鍵的清單，每行一個，不含結尾的冒號，這些鍵的值不應進行排序。',
       },
       'sort-order': {
