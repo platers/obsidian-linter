@@ -6,6 +6,26 @@ ruleTest({
   RuleBuilderClass: MoveFootnotesToTheBottom,
   testCases: [
     {
+      testName: 'A footnote definition inside a fenced code block is not moved',
+      before: '[^hidden]\n\n```\n[^hidden]: code\n```\n\nAfter',
+      after: '[^hidden]\n\n```\n[^hidden]: code\n```\n\nAfter',
+    },
+    {
+      testName: 'A duplicate footnote key inside a code block does not count as a definition',
+      before: '[^a]\n\n```\n[^a]: hidden\n```\n\n[^a]: visible\n\nAfter',
+      after: '[^a]\n\n```\n[^a]: hidden\n```\n\nAfter\n\n[^a]: visible',
+    },
+    {
+      testName: 'Backward reference discovery continues past inline code',
+      before: '[^a] [^b] `[^a]`\n\n[^b]: second\n[^a]: first',
+      after: '[^a] [^b] `[^a]`\n\n[^a]: first\n[^b]: second',
+    },
+    {
+      testName: 'Interspersed definitions do not shift protected reference discovery',
+      before: '[^a]\n\n[^a]: first\n\n```\n[^b]\n```\n\n[^b]\n\n[^b]: second\n\nAfter',
+      after: '[^a]\n\n```\n[^b]\n```\n\n[^b]\n\nAfter\n\n[^a]: first\n[^b]: second',
+    },
+    {
       testName: 'Simple case',
       before: dedent`
         This has a footnote reference at the end [^alpha]

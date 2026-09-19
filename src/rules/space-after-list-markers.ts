@@ -2,6 +2,9 @@ import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
+import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 class SpaceAfterListMarkersOptions implements Options {}
 
@@ -18,14 +21,25 @@ export default class SpaceAfterListMarkers extends RuleBuilder<SpaceAfterListMar
   get OptionsClass(): new () => SpaceAfterListMarkersOptions {
     return SpaceAfterListMarkersOptions;
   }
-  apply(text: string, options: SpaceAfterListMarkersOptions): string {
-    // Space after marker
-    text = text.replace(/^(\s*\d+\.|\s*[-+*])[^\S\r\n]+/gm, '$1 ');
-    // Space after checkbox
-    return text.replace(
-        /^(\s*\d+\.|\s*[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm,
-        '$1 ',
+  apply(text: string, options: SpaceAfterListMarkersOptions, protectedRanges: ProtectedRanges): string {
+    const rangesForMatch = {
+      editRange: (match: RegExpMatchArray, startIndex: number): textReplacement => ({
+        startIndex: startIndex + match[1].length,
+        endIndex: startIndex + match[0].length,
+        value: ' ',
+      }),
+      // Placeholders cannot supply a list marker or a checkbox.
+      guardRange: (match: RegExpMatchArray, startIndex: number) => ({startIndex, endIndex: startIndex + match[0].length}),
+    };
+    const replacements = collectUnprotectedRegexReplacements(
+        text, /^(\s*\d+\.|\s*[-+*])[^\S\r\n]+/gm, protectedRanges, rangesForMatch,
     );
+    // Ordered markers were already handled above. Omitting that redundant alternative keeps
+    // the edits disjoint; normalizing marker whitespace cannot enable a new checkbox match.
+    replacements.push(...collectUnprotectedRegexReplacements(
+        text, /^(\s*[-+*]\s+\[[ xX]\])[^\S\r\n]+/gm, protectedRanges, rangesForMatch,
+    ));
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<SpaceAfterListMarkersOptions>[] {
     return [

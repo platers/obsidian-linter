@@ -3,6 +3,9 @@ import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {allHeadersRegex, escapeRegExp, whitespaceSplitterRegex, wordSplitterRegex} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 type Style = 'Title Case' | 'ALL CAPS' | 'First letter';
 
@@ -328,7 +331,41 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
   get OptionsClass(): new () => CapitalizeHeadingsOptions {
     return CapitalizeHeadingsOptions;
   }
-  apply(text: string, options: CapitalizeHeadingsOptions): string {
+  apply(text: string, options: CapitalizeHeadingsOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    const replacements: textReplacement[] = [];
+    for (const match of projection.text.matchAll(allHeadersRegex)) {
+      const addReplacement = (startIndex: number, endIndex: number, value: string) => {
+        const range = projection.editRangeToSource({startIndex: match.index + startIndex, endIndex: match.index + endIndex});
+        if (range && text.substring(range.startIndex, range.endIndex) !== value) {
+          replacements.push({...range, value});
+        }
+      };
+      if (options.style === 'ALL CAPS') {
+        // Case conversion can expand a character (ß -> SS). Never uppercase protected text,
+        // including tokens that the old case-insensitive restore would have restored unchanged.
+        let offset = 0;
+        for (const character of match[0]) {
+          addReplacement(offset, offset + character.length, character.toUpperCase());
+          offset += character.length;
+        }
+        continue;
+      }
+
+      const words = [...match[0].matchAll(whitespaceSplitterRegex)];
+      const capitalizedWords = this.capitalizeHeading(match[0], options).split(' ');
+      let cursor = 0;
+      for (let index = 0; index < words.length; index++) {
+        const word = words[index];
+        addReplacement(cursor, word.index, index === 0 ? '' : ' ');
+        addReplacement(word.index, word.index + word[0].length, capitalizedWords[index]);
+        cursor = word.index + word[0].length;
+      }
+      addReplacement(cursor, match[0].length, '');
+    }
+    return applyNonOverlappingReplacements(text, replacements);
+  }
+  capitalizeHeading(text: string, options: CapitalizeHeadingsOptions): string {
     return text.replace(allHeadersRegex, (headerText: string) => {
       if (options.style === 'ALL CAPS') {
         return headerText.toUpperCase(); // convert full heading to uppercase

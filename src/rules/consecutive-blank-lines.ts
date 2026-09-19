@@ -3,6 +3,9 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {multipleBlankLinesRegex} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 class ConsecutiveBlankLinesOptions implements Options {}
 
@@ -20,8 +23,17 @@ export default class ConsecutiveBlankLines extends RuleBuilder<ConsecutiveBlankL
   get OptionsClass(): new () => ConsecutiveBlankLinesOptions {
     return ConsecutiveBlankLinesOptions;
   }
-  apply(text: string, options: ConsecutiveBlankLinesOptions): string {
-    return text.replace(multipleBlankLinesRegex, '\n\n');
+  apply(text: string, options: ConsecutiveBlankLinesOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    const replacements: textReplacement[] = [];
+    for (const match of projection.text.matchAll(multipleBlankLinesRegex)) {
+      const range = projection.editRangeToSource({startIndex: match.index, endIndex: match.index + match[0].length});
+      if (range) {
+        replacements.push({...range, value: '\n\n'});
+      }
+    }
+
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<ConsecutiveBlankLinesOptions>[] {
     return [

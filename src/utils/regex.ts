@@ -1,4 +1,5 @@
 import {getAllTablesInText} from './mdast';
+import {ProtectedRanges} from './protected-ranges';
 import {makeSureContentHasEmptyLinesAddedBeforeAndAfter, unescapeMarkdownSpecialCharacters} from './strings';
 
 // Useful regexes
@@ -115,10 +116,14 @@ export function ensureEmptyLinesAroundTables(text: string): string {
 /**
  * Gets the first header one's text from the string provided making sure to convert any links to their display text.
  * @param {string} text - The text to have get the first header one's text from.
+ * @param {ProtectedRanges} protectedRanges The regions whose headings must not be used.
  * @return {string} The text for the first header one if present or an empty string.
  */
-export function getFirstHeaderOneText(text: string): string {
-  const result = text.match(/^#\s+(.*)/m);
+export function getFirstHeaderOneText(text: string, protectedRanges: ProtectedRanges): string {
+  const result = [...text.matchAll(/^#[^\S\r\n\u2028\u2029]+(.*)/gm)].find((match) => {
+    // Protect the marker, not its text: a heading may contain tags or other ignored constructs.
+    return !protectedRanges.isProtected(match.index, match.index + match[0].length - match[1].length);
+  });
   if (result && result[1]) {
     let headerText = result[1];
     headerText = headerText.replaceAll(wikiLinkRegex, (_, _2, $2: string, $3: string) => {

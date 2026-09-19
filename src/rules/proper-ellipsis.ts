@@ -3,6 +3,8 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {ellipsisRegex} from '../utils/regex';
+import {collectUnprotectedRegexReplacements, ProtectedRanges} from '../utils/protected-ranges';
+import {replaceTextRanges, textReplacement} from '../utils/strings';
 
 class ProperEllipsisOptions implements Options {}
 
@@ -19,8 +21,16 @@ export default class ProperEllipsis extends RuleBuilder<ProperEllipsisOptions> {
   get OptionsClass(): new () => ProperEllipsisOptions {
     return ProperEllipsisOptions;
   }
-  apply(text: string, options: ProperEllipsisOptions): string {
-    return text.replaceAll(ellipsisRegex, '…');
+  apply(text: string, options: ProperEllipsisOptions, protectedRanges: ProtectedRanges): string {
+    // Each match consumes three dots and the optional spaces between them, not the whole dot run.
+    const replaceEllipsis = (match: RegExpMatchArray, startIndex: number): textReplacement => ({
+      startIndex,
+      endIndex: startIndex + match[0].length,
+      value: '…',
+    });
+    return replaceTextRanges(text, collectUnprotectedRegexReplacements(
+        text, ellipsisRegex, protectedRanges, {editRange: replaceEllipsis, guardRange: replaceEllipsis},
+    ));
   }
   get exampleBuilders(): ExampleBuilder<ProperEllipsisOptions>[] {
     return [

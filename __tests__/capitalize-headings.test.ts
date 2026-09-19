@@ -6,6 +6,27 @@ ruleTest({
   RuleBuilderClass: CapitalizeHeadings,
   testCases: [
     {
+      testName: 'Leaves headings inside fenced code alone',
+      before: '```\n# inside heading\n```\n# outside heading',
+      after: '```\n# inside heading\n```\n# Outside Heading',
+    },
+    {
+      testName: 'Leaves headings inside disabled sections alone',
+      before: '<!-- linter-disable -->\n# inside heading\n<!-- linter-enable -->\n\n# outside heading',
+      after: '<!-- linter-disable -->\n# inside heading\n<!-- linter-enable -->\n\n# Outside Heading',
+    },
+    {
+      testName: 'Uppercases heading text without changing ignored constructs or expanding their casing',
+      before: '# straße `mixed ß` [[mixed]] [mixed](url) #mixed',
+      after: '# STRASSE `mixed ß` [[mixed]] [mixed](url) #mixed',
+      options: {style: 'ALL CAPS'},
+    },
+    {
+      testName: 'Leaves backticks spanning a heading and the following line unchanged',
+      before: '# `mixed\ncase`  the heading',
+      after: '# `mixed\ncase`  the heading',
+    },
+    {
       testName: 'Ignores not words',
       before: dedent`
         # h1

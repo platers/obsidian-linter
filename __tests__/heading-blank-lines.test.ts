@@ -6,6 +6,33 @@ ruleTest({
   RuleBuilderClass: HeadingBlankLines,
   testCases: [
     {
+      testName: 'Leaves heading spacing inside fenced code alone',
+      before: '```\n# inside\ntext\n```',
+      after: '```\n# inside\ntext\n```',
+    },
+    {
+      testName: 'Leaves heading spacing inside disabled sections alone',
+      before: '<!-- linter-disable -->\n# inside\ntext\n<!-- linter-enable -->',
+      after: '<!-- linter-disable -->\n# inside\ntext\n<!-- linter-enable -->',
+    },
+    {
+      testName: 'Preserves heading adjacency across a multiline disabled section',
+      before: '# <!-- linter-disable -->\n<!-- linter-enable -->\n# h',
+      after: '# <!-- linter-disable -->\n<!-- linter-enable -->\n# h',
+      options: {bottom: false, emptyLineAfterYaml: true},
+    },
+    {
+      testName: 'Maps blank lines around a heading containing a multiline disabled section',
+      before: 'text\n# <!-- linter-disable -->\n<!-- linter-enable -->\n# h\ntext',
+      after: 'text\n\n# <!-- linter-disable -->\n<!-- linter-enable -->\n\n# h\n\ntext',
+    },
+    {
+      testName: 'Maps YAML spacing and adjacent heading edits without overlapping',
+      before: '---\nkey: value\n---\n\n\n# first\n# second\n```\n# inside\n```\n# last\n\n',
+      after: '---\nkey: value\n---\n# first\n\n# second\n\n```\n# inside\n```\n\n# last',
+      options: {bottom: true, emptyLineAfterYaml: false},
+    },
+    {
       testName: 'Ignores codeblocks',
       before: dedent`
         ---

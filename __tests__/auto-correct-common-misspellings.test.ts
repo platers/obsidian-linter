@@ -6,6 +6,25 @@ ruleTest({
   RuleBuilderClass: AutoCorrectCommonMisspellings,
   testCases: [
     {
+      // The word expression includes the backtick, so inline code must be a token before words can be found.
+      testName: 'Corrects a visible word immediately before inline code',
+      before: 'a`b`',
+      after: 'c`b`',
+      options: {misspellingToCorrection: new Map([['a', 'c']])},
+    },
+    {
+      testName: 'Leaves misspellings inside fenced code alone',
+      before: '```\nabsoltely\n```\nabsoltely',
+      after: '```\nabsoltely\n```\nabsolutely',
+      options: {misspellingToCorrection: defaultMisspellings()},
+    },
+    {
+      testName: 'Leaves misspellings inside disabled sections alone',
+      before: '<!-- linter-disable -->\nabsoltely\n<!-- linter-enable -->\n\nabsoltely',
+      after: '<!-- linter-disable -->\nabsoltely\n<!-- linter-enable -->\n\nabsolutely',
+      options: {misspellingToCorrection: defaultMisspellings()},
+    },
+    {
       testName: 'Doesn\'t auto-correct markdown and wiki links',
       before: dedent`
         [[absoltely not a changed]]

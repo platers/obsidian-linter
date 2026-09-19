@@ -6,6 +6,16 @@ ruleTest({
   RuleBuilderClass: ConvertSpacesToTabs,
   testCases: [
     {
+      testName: 'Leaves indentation inside fenced code alone after earlier replacements shift its offsets',
+      before: '- item\n        - outside\n```\n        code\n>     code\n```\n>     outside',
+      after: '- item\n\t\t- outside\n```\n        code\n>     code\n```\n>     outside',
+    },
+    {
+      testName: 'Leaves indentation inside disabled sections alone',
+      before: '<!-- linter-disable -->\n        - item\n>     item\n<!-- linter-enable -->\n>     outside',
+      after: '<!-- linter-disable -->\n        - item\n>     item\n<!-- linter-enable -->\n>     outside',
+    },
+    {
       testName: 'Basic case',
       before: dedent`
         - Lorem ipsum dolor sit amet, consectetur adipiscing elit.

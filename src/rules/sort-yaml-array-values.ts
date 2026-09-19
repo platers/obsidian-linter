@@ -35,7 +35,7 @@ class SortYamlArrayValuesOptions implements Options {
 }
 
 @RuleBuilder.register
-export default class RuleTemplate extends RuleBuilder<SortYamlArrayValuesOptions> {
+export default class SortYamlArrayValues extends RuleBuilder<SortYamlArrayValuesOptions> {
   constructor() {
     super({
       nameKey: 'rules.sort-yaml-array-values.name',
@@ -187,6 +187,7 @@ export default class RuleTemplate extends RuleBuilder<SortYamlArrayValuesOptions
         `,
         options: {
           aliasArrayStyle: NormalArrayFormats.MultiLine,
+          sortOrder: 'Descending Alphabetical',
         },
       }),
       new ExampleBuilder({
