@@ -67,6 +67,10 @@ export function isValidYaml(text: string): [boolean, string] {
 }
 
 export function isValidTag(tag: string) : [boolean, string] {
+  if (tag.startsWith('#')) {
+    return [false, getTextInLanguage('validation.no-hashtag-in-tag').replace('{TAG}', tag)]
+  }
+
   if (tag.match(tagContentRegex)) {
     return [true, ''];
   }

@@ -118,6 +118,7 @@ export default {
     'invalid-yaml-key': '"{KEY}" is not a valid YAML key: {ERROR_MESSAGE}`',
     'invalid-yaml': '"{YAML}" is invalid YAML',
     'no-whitespace': '"{TEXT}" cannot have any whitespace',
+    'no-hashtag-in-tag': '"{TAG}" must not start with #',
     'invalid-tag': '"{TAG}" is not a valid Obsidian tag',
   },
 
