@@ -27,7 +27,7 @@ const mockedPlugins = [replace({
     'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
     // remove the use of obsidian in the options to allow for docs.js to run
     'import {App, ExtraButtonComponent, normalizePath, TFile, ToggleComponent} from \'obsidian\';': '',
-    'import type {SettingDefinition, SettingDefinitionItem, SettingDefinitionList} from \'obsidian\';': '',
+    'import type {SettingDefinition, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage} from \'obsidian\';': '',
     // remove the use of obsidian in the auto-correct files picker to allow for docs.js to run
     'import {Setting, App, TFile, normalizePath, ExtraButtonComponent} from \'obsidian\';': '',
     // remove the use of obsidian in add custom row to allow for docs.js to run
