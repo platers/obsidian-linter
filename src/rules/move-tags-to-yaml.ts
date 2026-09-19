@@ -263,6 +263,8 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         OptionsClass: MoveTagsToYamlOptions,
         nameKey: 'rules.move-tags-to-yaml.tags-to-ignore.name',
         descriptionKey: 'rules.move-tags-to-yaml.tags-to-ignore.description',
+         emptyStateKey: 'rules.move-tags-to-yaml.tags-to-ignore.empty-state',
+        fieldNamePlaceholderKey: 'rules.move-tags-to-yaml.tags-to-ignore.placeholder-text',
         optionsKey: 'tagsToIgnore',
         validator: noWhitespace,
       }),

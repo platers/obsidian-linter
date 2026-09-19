@@ -136,12 +136,9 @@ export class TextOption extends Option {
 
 export class ListItemOption extends Option {
   public defaultValue: string[];
-   private validator?: ListItemValidation = undefined;
 
-  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: unknown, ruleAlias?: string | null, validator: ListItemValidation | undefined) {
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: unknown, ruleAlias?: string | null, private validator: ListItemValidation | undefined, private emptyStateKey: LanguageStringKey, private fieldPlaceholderKey: LanguageStringKey, private allowReorder: boolean) {
     super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
-
-    this.validator = validator;
   }
 
   protected async writeValue(value: unknown, plugin: LinterPlugin): void {
@@ -155,28 +152,29 @@ export class ListItemOption extends Option {
     return createListManagementPage({
       name: this.getName(),
         desc: richDescription(this.getDescription()),
-        addButtonText: getTextInLanguage('options.custom-replace.add-input-button-text'), // TODO: swap to list item option text...
-        emptyState: getTextInLanguage('options.custom-replace.empty-state'),// TODO: swap to list item option text...
+        addButtonText: getTextInLanguage('add-tooltip'),
+        emptyState: getTextInLanguage(this.emptyStateKey),
         values: values,
         allowReorder: false,
-        openAddForm: () => new ListItemsModal(plugin.app, null, async (entry) => {
+        openAddForm: () => new ListItemsModal(plugin.app, null, this.fieldPlaceholderKey, async (entry) => {
           values.push(entry);
           await this.writeAndSave(values, plugin);
           update();
         },
         this.validator).open(),
-        openEditForm: (entry, index) => new ListItemsModal(plugin.app, entry, async (updated) => {
+        openEditForm: (entry, index) => new ListItemsModal(plugin.app, entry, this.fieldPlaceholderKey, async (updated) => {
           values[index] = updated;
           await this.writeAndSave(values, plugin);
           update();
         },
         this.validator).open(),
-        editTooltip: getTextInLanguage('options.custom-replace.edit-tooltip'), // TODO: swap for generic edit tooltip
+        editTooltip: getTextInLanguage('edit-tooltip'),
         onDelete: (index) => {
           values.splice(index, 1);
           this.writeValue(values, plugin);
         },
-        itemName: (entry) => entry || getTextInLanguage('options.custom-replace.label-placeholder-text'), // TODO: swap for placeholder
+        allowReorder: this.allowReorder,
+        itemName: (entry) => entry, // we may want to add a default place holder here if we start allowing empty entries
         plugin: plugin,
       });
   }

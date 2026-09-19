@@ -289,7 +289,10 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
         OptionsClass: YamlKeySortOptions,
         nameKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.name',
         descriptionKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.description',
+         emptyStateKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.empty-state',
+        fieldNamePlaceholderKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.placeholder-text',
         optionsKey: 'yamlKeyPrioritySortOrder',
+        allowReorder: true,
         validator: isValidYamlKey,
       }),
       new BooleanOptionBuilder({

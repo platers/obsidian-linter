@@ -2,7 +2,7 @@ import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MdFilePickerOptionBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {wordRegex, wordSplitterRegex} from '../utils/regex';
+import {wordRegex} from '../utils/regex';
 import { CustomAutoCorrectContent } from '../settings-data';
 import {ProtectedRanges} from '../utils/protected-ranges';
 import {textReplacement} from '../utils/strings';
@@ -165,6 +165,8 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
         OptionsClass: AutoCorrectCommonMisspellingsOptions,
         nameKey: 'rules.auto-correct-common-misspellings.ignore-words.name',
         descriptionKey: 'rules.auto-correct-common-misspellings.ignore-words.description',
+        emptyStateKey: 'rules.auto-correct-common-misspellings.ignore-words.empty-state',
+        fieldNamePlaceholderKey: 'rules.auto-correct-common-misspellings.ignore-words.placeholder-text',
         optionsKey: 'ignoreWords',
         validator: noWhitespace,
       }),
@@ -178,7 +180,6 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
         OptionsClass: AutoCorrectCommonMisspellingsOptions,
         nameKey: 'rules.auto-correct-common-misspellings.extra-auto-correct-files.name',
         descriptionKey: 'rules.auto-correct-common-misspellings.extra-auto-correct-files.description',
-        // @ts-expect-error since it looks like there is an issue with the types here
         optionsKey: 'extraAutoCorrectFiles',
       }),
     ];

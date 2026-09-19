@@ -272,6 +272,8 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
         OptionsClass: DedupeYamlArrayValuesOptions,
         nameKey: 'rules.dedupe-yaml-array-values.ignore-keys.name',
         descriptionKey: 'rules.dedupe-yaml-array-values.ignore-keys.description',
+        emptyStateKey: 'rules.dedupe-yaml-array-values.ignore-keys.empty-state',
+        fieldNamePlaceholderKey: 'rules.dedupe-yaml-array-values.ignore-keys.placeholder-text',
         optionsKey: 'ignoreDedupeArrayKeys',
         validator: isValidYamlKey,
       }),

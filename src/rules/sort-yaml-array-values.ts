@@ -250,6 +250,8 @@ export default class SortYamlArrayValues extends RuleBuilder<SortYamlArrayValues
         OptionsClass: SortYamlArrayValuesOptions,
         nameKey: 'rules.sort-yaml-array-values.ignore-keys.name',
         descriptionKey: 'rules.sort-yaml-array-values.ignore-keys.description',
+         emptyStateKey: 'rules.sort-yaml-array-values.ignore-keys.empty-state',
+        fieldNamePlaceholderKey: 'rules.sort-yaml-array-values.ignore-keys.placeholder-text',
         optionsKey: 'ignoreSortArrayKeys',
         validator: isValidYamlKey,
       }),

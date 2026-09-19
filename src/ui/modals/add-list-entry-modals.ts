@@ -1,5 +1,5 @@
 import {App, displayTooltip} from 'obsidian';
-import {getTextInLanguage} from '../../lang/helpers';
+import {getTextInLanguage, LanguageStringKey} from '../../lang/helpers';
 import { FileToIgnore } from "../../settings-data";
 import FolderSuggester from '../suggesters/folder-suggester';
 import {FormModal} from './form-modal';
@@ -358,36 +358,28 @@ export class ListItemsModal extends FormModal {
   private value: string;
   private inputEl: HTMLInputElement | undefined;
 
-  // TODO: add edit tootltip and add button
-  // TODO: add entry item name...
   constructor(
       app: App,
       initial: string | null,
-      // edit tooltip
-      // add input button text
-      // placeholder
-      // field name text
+      fieldNameKey: LanguageStringKey,
       private onSubmitEntry: (entry: string) => void | Promise<void>,
-      // private isEmpty: (entry string) =>
       private isValidInput?: ListItemValidation = undefined,
   ) {
     super(app);
     this.value = initial ?? '';
 
-    // TODO: swap to values coming from constructor
-    this.setTitle(getTextInLanguage(initial ? 'options.custom-replace.edit-tooltip' : 'options.custom-replace.add-input-button-text'));
+    this.setTitle(getTextInLanguage(initial ? 'edit-tooltip' : 'add-tooltip'));
 
     this.addField((field) => {
-      // TODO: swap to get text in language
-      field.setName('YAML Key (and value) to insert');
-      // TODO: optional description of field
+      field.setName(getTextInLanguage(fieldNameKey));
       field.addText((cb) => {
-        this.inputEl = cb.inputEl;
-        cb.setPlaceholder('Value')
+        cb.setPlaceholder(getTextInLanguage(fieldNameKey))
             .setValue(this.value)
             .onChange((v) => {
               this.value = v;
             });
+
+        this.inputEl = cb.inputEl;
       });
     });
   }
@@ -397,10 +389,9 @@ export class ListItemsModal extends FormModal {
   }
 
   onSubmit() {
-    // TODO: decide what happens to this trim (should it be configurable, always run, have a function passed in to mutate it, or something else)
-    // const value = this.value.trim();
     const value = this.value;
-    if (!value) {
+    const trimmedValue = this.value.trim();
+    if (!trimmedValue) {
       if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});
       return;
     }
@@ -408,7 +399,7 @@ export class ListItemsModal extends FormModal {
     if (this.isValidInput) {
       const [isValid, validationMsg] = this.isValidInput(value);
       if (!isValid) {
-        displayTooltip(this.inputEl, validationMsg, {classes: ['mod-error']});
+        if (this.inputEl) displayTooltip(this.inputEl, validationMsg, {classes: ['mod-error']});
         return;
       }
     }

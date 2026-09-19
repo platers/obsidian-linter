@@ -293,15 +293,21 @@ export class DropdownOptionBuilder<TOptions extends Options, TValue extends stri
 
 export class ListItemOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string[]> {
   private validator?: ListItemValidation = undefined;
-  constructor(args: OptionBuilderConstructorArgs<TOptions, string[]> & { validator?: ListItemValidation}) {
+  private emptyStateKey: LanguageStringKey;
+  private fieldNamePlaceholderKey: LanguageStringKey;
+  private allowReorder: boolean;  
+  constructor(args: OptionBuilderConstructorArgs<TOptions, string[]> & { validator?: ListItemValidation, emptyStateKey: LanguageStringKey, fieldNamePlaceholderKey: LanguageStringKey, allowReorder?: boolean }) {
     super(args);
 
     this.validator = args.validator;
+    this.emptyStateKey = args.emptyStateKey;
+    this.fieldNamePlaceholderKey = args.fieldNamePlaceholderKey;
+    this.allowReorder = args.allowReorder ?? false;
   }
 
 
   protected buildOption(): Option {
-    return new ListItemOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue ?? [], this.validator);
+    return new ListItemOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue ?? [], this.validator, this.emptyStateKey, this.fieldNamePlaceholderKey, this.allowReorder);
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {

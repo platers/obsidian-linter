@@ -77,6 +77,8 @@ export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttribut
         OptionsClass: InsertYamlAttributesOptions,
         nameKey: 'rules.insert-yaml-attributes.text-to-insert.name',
         descriptionKey: 'rules.insert-yaml-attributes.text-to-insert.description',
+        emptyStateKey: 'rules.insert-yaml-attributes.text-to-insert.empty-state',
+        fieldNamePlaceholderKey: 'rules.insert-yaml-attributes.text-to-insert.placeholder-text',
         optionsKey: 'textToInsert',
         validator: isValidYaml,
       }),

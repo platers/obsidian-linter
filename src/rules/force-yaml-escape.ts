@@ -94,6 +94,8 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
         OptionsClass: ForceYamlEscapeOptions,
         nameKey: 'rules.force-yaml-escape.force-yaml-escape-keys.name',
         descriptionKey: 'rules.force-yaml-escape.force-yaml-escape-keys.description',
+        emptyStateKey: 'rules.force-yaml-escape.force-yaml-escape-keys.empty-state',
+        fieldNamePlaceholderKey: 'rules.force-yaml-escape.force-yaml-escape-keys.placeholder-text',
         optionsKey: 'forceYamlEscape',
         validator: isValidYamlKey,
       }),

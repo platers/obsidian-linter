@@ -89,6 +89,8 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
         OptionsClass: RemoveYamlKeysOptions,
         nameKey: 'rules.remove-yaml-keys.yaml-keys-to-remove.name',
         descriptionKey: 'rules.remove-yaml-keys.yaml-keys-to-remove.description',
+         emptyStateKey: 'rules.remove-yaml-keys.yaml-keys-to-remove.empty-state',
+        fieldNamePlaceholderKey: 'rules.remove-yaml-keys.yaml-keys-to-remove.placeholder-text',
         optionsKey: 'yamlKeysToRemove',
         validator: isValidYamlKey,
       }),
