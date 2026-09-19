@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {escapeStringIfNecessaryAndPossible, formatYAML, getYamlSectionValue, isValueEscapedAlready, QuoteCharacter, setYamlSection} from '../utils/yaml';
-import { isValidYamlKey } from '../utils/validation';
+import { isValidYamlKeyOnly } from '../utils/validation';
 
 class ForceYamlEscapeOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -97,7 +97,7 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
         emptyStateKey: 'rules.force-yaml-escape.force-yaml-escape-keys.empty-state',
         fieldNamePlaceholderKey: 'rules.force-yaml-escape.force-yaml-escape-keys.placeholder-text',
         optionsKey: 'forceYamlEscape',
-        validator: isValidYamlKey,
+        validator: isValidYamlKeyOnly,
       }),
     ];
   }

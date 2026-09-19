@@ -137,7 +137,7 @@ export class TextOption extends Option {
 export class ListItemOption extends Option {
   public defaultValue: string[];
 
-  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: unknown, ruleAlias?: string | null, private validator: ListItemValidation | undefined, private emptyStateKey: LanguageStringKey, private fieldPlaceholderKey: LanguageStringKey, private allowReorder: boolean) {
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: unknown, ruleAlias?: string | null, private validator: ListItemValidation | undefined, private emptyStateKey: LanguageStringKey, private fieldPlaceholderKey: LanguageStringKey, private allowReorder: boolean, private trimItemWhitespace: boolean) {
     super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
   }
 
@@ -155,14 +155,14 @@ export class ListItemOption extends Option {
         addButtonText: getTextInLanguage('add-tooltip'),
         emptyState: getTextInLanguage(this.emptyStateKey),
         values: values,
-        allowReorder: false,
-        openAddForm: () => new ListItemsModal(plugin.app, null, this.fieldPlaceholderKey, async (entry) => {
+        allowReorder: this.allowReorder,
+        openAddForm: () => new ListItemsModal(plugin.app, null, this.fieldPlaceholderKey, this.trimItemWhitespace, async (entry) => {
           values.push(entry);
           await this.writeAndSave(values, plugin);
           update();
         },
         this.validator).open(),
-        openEditForm: (entry, index) => new ListItemsModal(plugin.app, entry, this.fieldPlaceholderKey, async (updated) => {
+        openEditForm: (entry, index) => new ListItemsModal(plugin.app, entry, this.fieldPlaceholderKey, this.trimItemWhitespace, async (updated) => {
           values[index] = updated;
           await this.writeAndSave(values, plugin);
           update();
@@ -173,7 +173,6 @@ export class ListItemOption extends Option {
           values.splice(index, 1);
           this.writeValue(values, plugin);
         },
-        allowReorder: this.allowReorder,
         itemName: (entry) => entry, // we may want to add a default place holder here if we start allowing empty entries
         plugin: plugin,
       });

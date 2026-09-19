@@ -15,7 +15,7 @@ import {convertAliasValueToStringOrStringArray,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
   TagSpecificArrayFormats} from '../utils/yaml';
-import { isValidYamlKey } from '../utils/validation';
+import { isValidYamlKeyOnly } from '../utils/validation';
 
 class DedupeYamlArrayValuesOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -275,7 +275,8 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
         emptyStateKey: 'rules.dedupe-yaml-array-values.ignore-keys.empty-state',
         fieldNamePlaceholderKey: 'rules.dedupe-yaml-array-values.ignore-keys.placeholder-text',
         optionsKey: 'ignoreDedupeArrayKeys',
-        validator: isValidYamlKey,
+        trimItemWhitespace: true,
+        validator: isValidYamlKeyOnly,
       }),
     ];
   }

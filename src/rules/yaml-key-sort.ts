@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {parseYAML, getYAMLText, loadYAML, setYamlSection, astToString, getEmptyDocument} from '../utils/yaml';
-import { isValidYamlKey } from '../utils/validation';
+import { isValidYamlKeyOnly } from '../utils/validation';
 import {escapeDollarSigns} from '../utils/regex';
 import {Document, CST} from 'yaml';
 import {YamlCSTTokens, YamlNode} from '../typings/yaml';
@@ -293,7 +293,7 @@ export default class YamlKeySort extends RuleBuilder<YamlKeySortOptions> {
         fieldNamePlaceholderKey: 'rules.yaml-key-sort.yaml-key-priority-sort-order.placeholder-text',
         optionsKey: 'yamlKeyPrioritySortOrder',
         allowReorder: true,
-        validator: isValidYamlKey,
+        validator: isValidYamlKeyOnly,
       }),
       new BooleanOptionBuilder({
         OptionsClass: YamlKeySortOptions,

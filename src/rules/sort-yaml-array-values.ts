@@ -15,7 +15,7 @@ import {convertAliasValueToStringOrStringArray,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
   TagSpecificArrayFormats} from '../utils/yaml';
-import { isValidYamlKey } from '../utils/validation';
+import { isValidYamlKeyOnly } from '../utils/validation';
 
 type YamlArraySortOrder = 'Ascending Alphabetical' | 'Descending Alphabetical'
 
@@ -250,10 +250,10 @@ export default class SortYamlArrayValues extends RuleBuilder<SortYamlArrayValues
         OptionsClass: SortYamlArrayValuesOptions,
         nameKey: 'rules.sort-yaml-array-values.ignore-keys.name',
         descriptionKey: 'rules.sort-yaml-array-values.ignore-keys.description',
-         emptyStateKey: 'rules.sort-yaml-array-values.ignore-keys.empty-state',
+        emptyStateKey: 'rules.sort-yaml-array-values.ignore-keys.empty-state',
         fieldNamePlaceholderKey: 'rules.sort-yaml-array-values.ignore-keys.placeholder-text',
         optionsKey: 'ignoreSortArrayKeys',
-        validator: isValidYamlKey,
+        validator: isValidYamlKeyOnly,
       }),
       new DropdownOptionBuilder<SortYamlArrayValuesOptions, YamlArraySortOrder>({
         OptionsClass: SortYamlArrayValuesOptions,

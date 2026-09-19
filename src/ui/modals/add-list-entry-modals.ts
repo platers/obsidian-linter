@@ -362,6 +362,7 @@ export class ListItemsModal extends FormModal {
       app: App,
       initial: string | null,
       fieldNameKey: LanguageStringKey,
+      private trimItemWhitespace: boolean,
       private onSubmitEntry: (entry: string) => void | Promise<void>,
       private isValidInput?: ListItemValidation = undefined,
   ) {
@@ -389,7 +390,7 @@ export class ListItemsModal extends FormModal {
   }
 
   onSubmit() {
-    const value = this.value;
+    const value = this.trimItemWhitespace ? this.value.trim() : this.value;
     const trimmedValue = this.value.trim();
     if (!trimmedValue) {
       if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});

@@ -112,10 +112,13 @@ export default {
 
   'validation': {
     // utils/validation.ts
+    'yaml-key-no-whitespace': '"{KEY}" should not include any leading or trailing whitespace',
+    'yaml-key-no-colon': '"{KEY}" should only be the YAML key with no colon',
     'yaml-key-only': '"{KEY}" should only be the YAML key with an optional colon',
     'invalid-yaml-key': '"{KEY}" is not a valid YAML key: {ERROR_MESSAGE}`',
     'invalid-yaml': '"{YAML}" is invalid YAML',
-    'no-whitespace': '"{TEXT}" cannot have any whitespace'
+    'no-whitespace': '"{TEXT}" cannot have any whitespace',
+    'invalid-tag': '"{TAG}" is not a valid Obsidian tag',
   },
 
   'notice-text': {

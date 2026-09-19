@@ -295,19 +295,21 @@ export class ListItemOptionBuilder<TOptions extends Options> extends OptionBuild
   private validator?: ListItemValidation = undefined;
   private emptyStateKey: LanguageStringKey;
   private fieldNamePlaceholderKey: LanguageStringKey;
-  private allowReorder: boolean;  
-  constructor(args: OptionBuilderConstructorArgs<TOptions, string[]> & { validator?: ListItemValidation, emptyStateKey: LanguageStringKey, fieldNamePlaceholderKey: LanguageStringKey, allowReorder?: boolean }) {
+  private allowReorder: boolean;
+  private trimItemWhitespace: boolean;
+  constructor(args: OptionBuilderConstructorArgs<TOptions, string[]> & { validator?: ListItemValidation, emptyStateKey: LanguageStringKey, fieldNamePlaceholderKey: LanguageStringKey, allowReorder?: boolean, trimItemWhitespace?: boolean }) {
     super(args);
 
     this.validator = args.validator;
     this.emptyStateKey = args.emptyStateKey;
     this.fieldNamePlaceholderKey = args.fieldNamePlaceholderKey;
     this.allowReorder = args.allowReorder ?? false;
+    this.trimItemWhitespace = args.trimItemWhitespace ?? false;
   }
 
 
   protected buildOption(): Option {
-    return new ListItemOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue ?? [], this.validator, this.emptyStateKey, this.fieldNamePlaceholderKey, this.allowReorder);
+    return new ListItemOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue ?? [], this.validator, this.emptyStateKey, this.fieldNamePlaceholderKey, this.allowReorder, this.trimItemWhitespace);
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {

@@ -1,6 +1,19 @@
 import { parse, YAMLParseError } from 'yaml';
 import { loadYAML } from './yaml';
 import { getTextInLanguage } from '../lang/helpers';
+import { tagContentRegex } from './regex';
+
+export function isValidYamlKeyOnly(key: string): [boolean, string]{
+  if (key !== key.trim()) {
+    return [false, getTextInLanguage('validation.yaml-key-no-whitespace').replace('{KEY}', key)];
+  }
+
+  if (key.includes(':')) {
+    return [false, getTextInLanguage('validation.yaml-key-no-colon').replace('{KEY}', key)];
+  }
+
+  return validateKey(key, key);
+}
 
 export function isValidYamlKey(key: string): [boolean, string] {
   let trimmedKey = key.trim();
@@ -12,8 +25,13 @@ export function isValidYamlKey(key: string): [boolean, string] {
     return [false, getTextInLanguage('validation.yaml-key-only').replace('{KEY}', key)];
   }
 
+  return validateKey(trimmedKey, key)
+}
+  
+
+function validateKey(key: string, originalKey: string) {
   try {
-    parse(trimmedKey);
+    parse(key);
   }
   catch (error: Error) {
     let errorMessage: string;
@@ -24,7 +42,7 @@ export function isValidYamlKey(key: string): [boolean, string] {
       errorMessage = (error as Error).message;
     }
 
-    return [false, getTextInLanguage('validation.yaml-key-only').replace('{KEY}', key).replace('{ERROR_MESSAGE}', errorMessage)];
+    return [false, getTextInLanguage('validation.yaml-key-only').replace('{KEY}', originalKey).replace('{ERROR_MESSAGE}', errorMessage)];
   }
 
   return [true, ""];
@@ -46,6 +64,14 @@ export function isValidYaml(text: string): [boolean, string] {
   }
 
   return [true, ""];
+}
+
+export function isValidTag(tag: string) : [boolean, string] {
+  if (tag.match(tagContentRegex)) {
+    return [true, ''];
+  }
+
+  return [false, getTextInLanguage('validation.invalid-tag').replace('{TAG}', tag)]
 }
 
 export function noWhitespace(text: string): [boolean, string] {

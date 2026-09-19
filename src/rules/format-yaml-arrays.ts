@@ -15,7 +15,7 @@ import {convertAliasValueToStringOrStringArray,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
   TagSpecificArrayFormats} from '../utils/yaml';
-import { isValidYamlKey } from '../utils/validation';
+import { isValidYamlKeyOnly } from '../utils/validation';
 
 class FormatYamlArrayOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -274,7 +274,7 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
         emptyStateKey: 'rules.format-yaml-array.force-single-line-array-style.empty-state',
         fieldNamePlaceholderKey: 'rules.format-yaml-array.force-single-line-array-style.placeholder-text',
         optionsKey: 'forceSingleLineArrayStyle',
-        validator: isValidYamlKey,
+        validator: isValidYamlKeyOnly,
       }),
       new ListItemOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
@@ -283,7 +283,7 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
         emptyStateKey: 'rules.format-yaml-array.force-multi-line-array-style.empty-state',
         fieldNamePlaceholderKey: 'rules.format-yaml-array.force-multi-line-array-style.placeholder-text',
         optionsKey: 'forceMultiLineArrayStyle',
-        validator: isValidYamlKey,
+        validator: isValidYamlKeyOnly,
       }),
     ];
   }

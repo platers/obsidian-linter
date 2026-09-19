@@ -21,7 +21,7 @@ import {
   OBSIDIAN_TAG_KEY_PLURAL,
   QuoteCharacter,
 } from '../utils/yaml';
-import { noWhitespace } from '../utils/validation';
+import { isValidTag } from '../utils/validation';
 
 type tagOperations = 'Nothing' | 'Remove hashtag' | 'Remove whole tag';
 
@@ -266,7 +266,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
          emptyStateKey: 'rules.move-tags-to-yaml.tags-to-ignore.empty-state',
         fieldNamePlaceholderKey: 'rules.move-tags-to-yaml.tags-to-ignore.placeholder-text',
         optionsKey: 'tagsToIgnore',
-        validator: noWhitespace,
+        validator: isValidTag,
       }),
     ];
   }
