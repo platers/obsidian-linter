@@ -2,7 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder, TextOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
-import {allHeadersRegex, escapeRegExp, whitespaceSplitterRegex, wordSplitterRegex} from '../utils/regex';
+import {allHeadersRegex, escapeRegExp, whitespaceSplitterRegex} from '../utils/regex';
 import {ProtectedRanges} from '../utils/protected-ranges';
 import {textReplacement} from '../utils/strings';
 import {applyNonOverlappingReplacements} from '../utils/text-edits';
