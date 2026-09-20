@@ -62,5 +62,24 @@ ruleTest({
         ---
       `,
     },
+    {
+      testName: 'Make sure that block scalars get skipped for escape yaml-special-characters',
+      before: dedent`
+        ---
+        overview: |-
+          This is the System area. It holds the system's own infrastructure and governance.
+
+          This vault holds only the System area at present.
+        ---
+      `,
+      after: dedent`
+        ---
+        overview: |-
+          This is the System area. It holds the system's own infrastructure and governance.
+
+          This vault holds only the System area at present.
+        ---
+      `,
+    },
   ],
 });
