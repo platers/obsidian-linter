@@ -62,7 +62,7 @@ ruleTest({
         ---
       `,
     },
-    {
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1385
       testName: 'Make sure that block scalars get skipped for escape yaml-special-characters',
       before: dedent`
         ---

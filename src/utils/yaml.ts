@@ -63,9 +63,8 @@ type YamlPair = {
 
 function parseYamlForSectionLookup(yaml: string): Document {
   /*
-   * Do not normalize the input before parsing. CST offsets refer to the
-   * exact string passed to parseDocument(), so changing the string first
-   * would make the offsets unusable for slicing the original YAML.
+   * CST offsets are relative to the exact string passed to parseDocument().
+   * Do not normalize tabs or otherwise modify the string here.
    */
   return parseDocument(yaml, {
     keepSourceTokens: true,
@@ -101,9 +100,7 @@ function getYamlNodeEnd(node: unknown): number | null {
   const yamlNode = node as YamlSourceNode;
 
   /*
-   * YAML node ranges are [start, end, valueEnd]. The second element is the
-   * end of the complete node, which is what is needed for block sequences and
-   * block mappings.
+   * A YAML node range is [start, end, valueEnd].
    */
   if (yamlNode.range && typeof yamlNode.range[1] === 'number') {
     return yamlNode.range[1];
@@ -119,18 +116,55 @@ function getYamlNodeEnd(node: unknown): number | null {
   return null;
 }
 
+function getComparableYamlKey(
+  rawKey: unknown,
+): string | null {
+  if (typeof rawKey !== 'string') {
+    return null;
+  }
+
+  const key = rawKey.trim();
+
+  if (
+    key.length >= 2 &&
+    (
+      (
+        key.startsWith('"') &&
+        key.endsWith('"')
+      ) ||
+      (
+        key.startsWith('\'') &&
+        key.endsWith('\'')
+      )
+    )
+  ) {
+    return key.substring(1, key.length - 1);
+  }
+
+  return key;
+}
+
 function findYamlPair(
   map: YAMLMap,
-  rawKey: string,
+  rawKey: unknown,
   allowNestedKey: boolean,
 ): YamlPair | null {
+  const comparableKey = getComparableYamlKey(rawKey);
+
+  if (comparableKey == null) {
+    return null;
+  }
+
   for (const item of map.items) {
     const pair = item as YamlPair;
 
-    if (
+    const parsedKey =
       pair.key &&
-      pair.key.value === rawKey
-    ) {
+      typeof pair.key.value === 'string'
+        ? pair.key.value
+        : null;
+
+    if (parsedKey === comparableKey) {
       return pair;
     }
 
@@ -156,9 +190,13 @@ function findYamlPair(
 
 function getYamlPair(
   yaml: string,
-  rawKey: string,
+  rawKey: unknown,
   allowNestedKey: boolean,
 ): YamlPair | null {
+  if (typeof rawKey !== 'string') {
+    return null;
+  }
+
   const document = parseYamlForSectionLookup(yaml);
 
   if (
@@ -181,11 +219,9 @@ function getLineStart(
 ): number {
   const newline = text.lastIndexOf('\n', offset - 1);
 
-  if (newline === -1) {
-    return 0;
-  }
-
-  return newline + 1;
+  return newline === -1
+    ? 0
+    : newline + 1;
 }
 
 function getLineEnd(
@@ -194,45 +230,118 @@ function getLineEnd(
 ): number {
   const newline = text.indexOf('\n', offset);
 
-  if (newline === -1) {
-    return text.length;
-  }
-
-  return newline;
+  return newline === -1
+    ? text.length
+    : newline;
 }
 
-function getYamlValueStart(
+/**
+ * Finds the colon separating a YAML key from its value.
+ *
+ * The colon inside a quoted key is ignored:
+ *
+ *   "key:with:colons": value
+ *   'key:with:colons': value
+ */
+function findKeyColon(
+  line: string,
+  keyStartInLine: number,
+): number {
+  let quote: '"' | '\'' | null = null;
+
+  for (
+    let index = keyStartInLine;
+    index < line.length;
+    index++
+  ) {
+    const character = line[index];
+
+    if (quote !== null) {
+      if (character === quote) {
+        /*
+         * YAML escapes double quotes with a backslash. Single-quoted YAML
+         * strings escape a quote by doubling it.
+         */
+        if (
+          quote === '"' &&
+          line[index - 1] !== '\\'
+        ) {
+          quote = null;
+        } else if (
+          quote === '\'' &&
+          line[index + 1] === '\''
+        ) {
+          index++;
+        } else if (quote === '\'') {
+          quote = null;
+        }
+      }
+
+      continue;
+    }
+
+    if (character === '"' || character === '\'') {
+      quote = character;
+      continue;
+    }
+
+    if (character === ':') {
+      return index;
+    }
+  }
+
+  return -1;
+}
+
+function getYamlKeySourceRange(
   yaml: string,
   pair: YamlPair,
-): number | null {
+): {start: number; end: number; colon: number} | null {
   const keyStart = getYamlNodeStart(pair.key);
-  const keyEnd = getYamlNodeEnd(pair.key);
 
-  if (keyStart == null || keyEnd == null) {
+  if (keyStart == null) {
     return null;
   }
 
-  const keyLineEnd = getLineEnd(yaml, keyStart);
-  const colonIndex = yaml.indexOf(':', keyEnd);
+  const lineStart = getLineStart(yaml, keyStart);
+  const lineEnd = getLineEnd(yaml, keyStart);
+  const line = yaml.substring(lineStart, lineEnd);
+  const keyStartInLine = keyStart - lineStart;
+  const colonInLine = findKeyColon(
+    line,
+    keyStartInLine,
+  );
 
-  if (
-    colonIndex === -1 ||
-    colonIndex > keyLineEnd
-  ) {
+  if (colonInLine === -1) {
     return null;
   }
 
-  let valueStart = colonIndex + 1;
+  const colon = lineStart + colonInLine;
+
+  return {
+    start: keyStart,
+    end: colon,
+    colon,
+  };
+}
+
+function getYamlValueRange(
+  yaml: string,
+  pair: YamlPair,
+): {start: number; end: number} | null {
+  const keyRange = getYamlKeySourceRange(yaml, pair);
+
+  if (!keyRange) {
+    return null;
+  }
 
   /*
-   * Preserve newlines, because a newline after the colon is part of a
-   * multiline value:
-   *
-   * aliases:
-   *   - first
-   *
-   * The old regex returned "\n  - first..." rather than starting at "-".
+   * Start immediately after the colon, omitting spaces and tabs on the same
+   * line. For a block value, the newline is intentionally preserved.
    */
+  let valueStart = keyRange.colon + 1;
+  const keyLineEnd = getLineEnd(yaml, keyRange.colon);
+
   while (
     valueStart < keyLineEnd &&
     (
@@ -243,25 +352,11 @@ function getYamlValueStart(
     valueStart++;
   }
 
-  return valueStart;
-}
-
-function getYamlValueRange(
-  yaml: string,
-  pair: YamlPair,
-): {start: number; end: number} | null {
-  const valueStart = getYamlValueStart(yaml, pair);
-
-  if (valueStart == null) {
-    return null;
-  }
-
   const valueNodeStart = getYamlNodeStart(pair.value);
   const valueNodeEnd = getYamlNodeEnd(pair.value);
 
   /*
-   * Empty values such as `aliases:` do not have a value node. In that case,
-   * the value ends at the end of the key's line.
+   * Empty values such as `key:` have no value node.
    */
   if (
     valueNodeStart == null ||
@@ -269,15 +364,15 @@ function getYamlValueRange(
   ) {
     return {
       start: valueStart,
-      end: getLineEnd(yaml, valueStart),
+      end: keyLineEnd,
     };
   }
 
   let valueEnd = valueNodeEnd;
 
   /*
-   * CST node ranges do not include an inline comment. Keep an inline comment
-   * attached to the returned value and to the replaced section.
+   * A CST node does not include an inline comment. Keep an inline comment
+   * attached to the returned value and to the section being replaced.
    */
   const valueLineEnd = getLineEnd(yaml, valueNodeEnd);
   const textAfterValue = yaml.substring(
@@ -290,9 +385,12 @@ function getYamlValueRange(
   }
 
   /*
-   * The start deliberately comes from the colon rather than the value node.
-   * A block sequence's CST node starts at its first `-`, which would lose the
-   * newline and indentation before the first array item.
+   * The start comes from the colon rather than the value node. This retains
+   * the newline and indentation before the first item of a block sequence:
+   *
+   *   key:
+   *     - first
+   *     - second
    */
   return {
     start: valueStart,
@@ -318,9 +416,8 @@ function getYamlSectionRange(
   let end = valueRange.end;
 
   /*
-   * The previous regex included the newline terminating the section.
-   * Including it here prevents blank lines from being left behind when a
-   * section is removed or replaced.
+   * Match the previous regex behavior by consuming the newline terminating
+   * the key's value.
    */
   if (yaml[end] === '\n') {
     end++;
@@ -359,6 +456,37 @@ export function getYamlSectionValue(
   );
 }
 
+export function getYamlSectionKey(
+  yaml: string,
+  rawKey: string,
+  allowNestedKey: boolean = true,
+): string | null {
+  const pair = getYamlPair(
+    yaml,
+    rawKey,
+    allowNestedKey,
+  );
+
+  if (!pair) {
+    return null;
+  }
+
+  const keyRange = getYamlKeySourceRange(yaml, pair);
+
+  if (!keyRange) {
+    return null;
+  }
+
+  /*
+   * Return the original key text, including its original quotes. Only
+   * whitespace between the key and colon is excluded.
+   */
+  return yaml.substring(
+    keyRange.start,
+    keyRange.end,
+  ).trimEnd();
+}
+
 export function setYamlSection(
   yaml: string,
   rawKey: string,
@@ -378,23 +506,40 @@ export function setYamlSection(
     yaml,
     pair,
   );
-  const keyStart = getYamlNodeStart(pair.key);
+  const keyRange = getYamlKeySourceRange(
+    yaml,
+    pair,
+  );
 
   if (
     !sectionRange ||
-    keyStart == null
+    !keyRange
   ) {
     return yaml;
   }
 
-  const lineStart = getLineStart(yaml, keyStart);
+  const lineStart = getLineStart(
+    yaml,
+    keyRange.start,
+  );
   const indentation = yaml.substring(
     lineStart,
-    keyStart,
+    keyRange.start,
   );
 
+  /*
+   * Use the original key source, not rawKey. This preserves:
+   *
+   *   "key1":
+   *   'key2':
+   */
+  const originalKey = yaml.substring(
+    keyRange.start,
+    keyRange.end,
+  ).trimEnd();
+
   const replacement =
-    `${indentation}${rawKey}:${rawValue}\n`;
+    `${indentation}${originalKey}:${rawValue}\n`;
 
   return yaml.substring(0, sectionRange.start) +
     replacement +
@@ -428,46 +573,6 @@ export function removeYamlSection(
   return yaml.substring(0, sectionRange.start) +
     yaml.substring(sectionRange.end);
 }
-
-// function getYamlSectionRegExp(rawKey: string, allowNestedKey: boolean = true): RegExp {
-//   if (allowNestedKey) {
-//     return new RegExp(`^([\\t ]*)${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm');
-//   }
-
-//   return new RegExp(`^${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm');
-// }
-
-// export function setYamlSection(yaml: string, rawKey: string, rawValue: string): string {
-//   const yamlSectionEscaped = `${rawKey}:${rawValue}\n`;
-//   let isReplaced = false;
-//   let result = yaml.replace(getYamlSectionRegExp(rawKey), (_, $1: string) => {
-//     isReplaced = true;
-//     return $1 + yamlSectionEscaped;
-//   });
-//   if (!isReplaced) {
-//     result = `${yaml}${yamlSectionEscaped}`;
-//   }
-//   return result;
-// }
-
-// export function getYamlSectionValue(yaml: string, rawKey: string, allowNestedKey: boolean = true): string | null {
-//   const match = yaml.match(getYamlSectionRegExp(rawKey, allowNestedKey));
-//   if (match == null) {
-//     return null;
-//   }
-
-//   let result = match[2];
-//   if (!allowNestedKey) {
-//     result = match[1];
-//   }
-
-//   return result;
-// }
-
-// export function removeYamlSection(yaml: string, rawKey: string, allowNestedKey: boolean = true): string {
-//   const result = yaml.replace(getYamlSectionRegExp(rawKey, allowNestedKey), '');
-//   return result;
-// }
 
 export function loadYAML(yaml_text: string): null | object {
   if (yaml_text == null) {
