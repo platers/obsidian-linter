@@ -5,7 +5,6 @@ import {convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
   formatYAML,
   formatYamlArrayValue,
-  getYamlSectionKey,
   getYamlSectionValue,
   loadYAML,
   NormalArrayFormats,
@@ -103,7 +102,7 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
           const newVal = this.getUniqueArray(splitValueIfSingleOrMultilineArray(currentYamlText));
 
           text = setYamlSection(text,
-              getYamlSectionKey(text) ?? key,
+              key,
               formatYamlArrayValue(
                   newVal,
                   arrayType,

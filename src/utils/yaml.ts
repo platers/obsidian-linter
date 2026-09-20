@@ -456,37 +456,6 @@ export function getYamlSectionValue(
   );
 }
 
-export function getYamlSectionKey(
-  yaml: string,
-  rawKey: string,
-  allowNestedKey: boolean = true,
-): string | null {
-  const pair = getYamlPair(
-    yaml,
-    rawKey,
-    allowNestedKey,
-  );
-
-  if (!pair) {
-    return null;
-  }
-
-  const keyRange = getYamlKeySourceRange(yaml, pair);
-
-  if (!keyRange) {
-    return null;
-  }
-
-  /*
-   * Return the original key text, including its original quotes. Only
-   * whitespace between the key and colon is excluded.
-   */
-  return yaml.substring(
-    keyRange.start,
-    keyRange.end,
-  ).trimEnd();
-}
-
 export function setYamlSection(
   yaml: string,
   rawKey: string,
