@@ -24,5 +24,20 @@ ruleTest({
         ---
       `,
     },
+     { // accounts for https://github.com/platers/obsidian-linter/issues/1217
+      testName: 'Deduping YAML arrays should properly handle escaped values being the same and reescaping values based on the provided default escape character',
+      before: dedent`
+        ---
+        key: [a, "a", 'a']
+        key2: ["blob,bob, sally", 'blob,bob, sally']
+        ---
+      `,
+      after: dedent`
+        ---
+        key: [a]
+        key2: ["blob,bob, sally"]
+        ---
+      `,
+    },
   ],
 });

@@ -116,12 +116,38 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
       return text;
     });
   }
+  getYamlValue(value: string): string {
+    if (typeof value !== "string" || value.length < 2) {
+      return value;
+    }
+
+    if (value.startsWith("'") && value.endsWith("'")) {
+      return value.slice(1, -1);
+    }
+
+    if (value.startsWith('"') && value.endsWith('"')) {
+        return value.slice(1, -1);
+    }
+
+    return value;
+  }
   getUniqueArray(arr: string | string[]): string | string[] {
-    if (arr == null || typeof arr === 'string' || arr.length <= 1) {
+    if (arr == null || typeof arr === "string" || arr.length <= 1) {
       return arr;
     }
 
-    return [...new Set(arr)];
+    const uniqueValues = new Set();
+
+    for (const value of arr) {
+      const normalizedValue = this.getYamlValue(value);
+      if (uniqueValues.has(normalizedValue)) {
+        continue;
+      }
+
+      uniqueValues.add(normalizedValue);
+    }
+
+    return [...uniqueValues.values()];
   }
 
   get exampleBuilders(): ExampleBuilder<DedupeYamlArrayValuesOptions>[] {
