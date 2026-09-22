@@ -1108,5 +1108,41 @@ ruleTest({
         aliasArrayStyle: NormalArrayFormats.SingleLine,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1384
+      testName: 'A double quoted YAML key needing no change should not have its value duplicated at the end of the YAML content ',
+      before: dedent`
+        ---
+        "key1":${' '}
+          - value
+        ---
+      `,
+      after: dedent`
+        ---
+        "key1":
+          - value
+        ---
+      `,
+      options: {
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1384
+      testName: 'A single quoted YAML key needing no change should not have its value duplicated at the end of the YAML content ',
+      before: dedent`
+        ---
+        'key1':${' '}
+          - value
+        ---
+      `,
+      after: dedent`
+        ---
+        'key1':
+          - value
+        ---
+      `,
+      options: {
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
   ],
 });
