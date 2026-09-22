@@ -131,12 +131,13 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
 
     return value;
   }
-  getUniqueArray(arr: string | string[]): string | string[] {
+  getUniqueArray(arr: string | string[], defaultEscapeCharacter: QuoteCharacter): string | string[] {
     if (arr == null || typeof arr === "string" || arr.length <= 1) {
       return arr;
     }
 
     const uniqueValues = new Set();
+    const result: string[] = [];
 
     for (const value of arr) {
       const normalizedValue = this.getYamlValue(value);
@@ -145,9 +146,10 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
       }
 
       uniqueValues.add(normalizedValue);
+      result.push(value);
     }
 
-    return [...uniqueValues.values()];
+    return result;
   }
 
   get exampleBuilders(): ExampleBuilder<DedupeYamlArrayValuesOptions>[] {

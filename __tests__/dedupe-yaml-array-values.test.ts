@@ -25,7 +25,7 @@ ruleTest({
       `,
     },
      { // accounts for https://github.com/platers/obsidian-linter/issues/1217
-      testName: 'Deduping YAML arrays should properly handle escaped values being the same and reescaping values based on the provided default escape character',
+      testName: 'Deduping YAML arrays should properly handle escaped values being the same and prefer the first of all values that are found to be the same',
       before: dedent`
         ---
         key: [a, "a", 'a']
