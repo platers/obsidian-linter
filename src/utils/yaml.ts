@@ -1,8 +1,8 @@
-import {getTextInLanguage} from '../lang/helpers';
-import {escapeDollarSigns, yamlRegex} from './regex';
-import {isNumeric} from './strings';
-import {parse, parseDocument, Document, stringify, CST, YAMLMap, isMap} from 'yaml';
-import {YamlNode} from '../typings/yaml';
+import { getTextInLanguage } from '../lang/helpers';
+import { escapeDollarSigns, yamlRegex } from './regex';
+import { isNumeric } from './strings';
+import { parse, parseDocument, Document, stringify, CST, YAMLMap, isMap } from 'yaml';
+import { YamlNode } from '../typings/yaml';
 
 export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
 export const OBSIDIAN_TAG_KEY_PLURAL = 'tags';
@@ -41,7 +41,7 @@ export function formatYAML(text: string, func: (text: string) => string): string
   }
 
   const oldYaml = oldYamlMatch[0];
-  const newYaml = func(oldYaml );
+  const newYaml = func(oldYaml);
   text = text.replace(oldYaml, escapeDollarSigns(newYaml));
 
   return text;
@@ -160,7 +160,7 @@ function findYamlPair(
 
     const parsedKey =
       pair.key &&
-      typeof pair.key.value === 'string'
+        typeof pair.key.value === 'string'
         ? pair.key.value
         : null;
 
@@ -296,7 +296,7 @@ function findKeyColon(
 function getYamlKeySourceRange(
   yaml: string,
   pair: YamlPair,
-): {start: number; end: number; colon: number} | null {
+): { start: number; end: number; colon: number } | null {
   const keyStart = getYamlNodeStart(pair.key);
 
   if (keyStart == null) {
@@ -328,7 +328,7 @@ function getYamlKeySourceRange(
 function getYamlValueRange(
   yaml: string,
   pair: YamlPair,
-): {start: number; end: number} | null {
+): { start: number; end: number } | null {
   const keyRange = getYamlKeySourceRange(yaml, pair);
 
   if (!keyRange) {
@@ -401,7 +401,7 @@ function getYamlValueRange(
 function getYamlSectionRange(
   yaml: string,
   pair: YamlPair,
-): {start: number; end: number} | null {
+): { start: number; end: number } | null {
   const keyStart = getYamlNodeStart(pair.key);
   const valueRange = getYamlValueRange(yaml, pair);
 
@@ -565,7 +565,7 @@ export function parseYAML(yaml_text: string): null | Document {
 
   // replacing tabs at the beginning of new lines with 2 spaces fixes loading YAML that has tabs at the start of a line
   // https://github.com/platers/obsidian-linter/issues/157
-  const parsed_yaml = parseDocument(yaml_text.replace(/\n(\t)+/g, '\n  '), {keepSourceTokens: true});
+  const parsed_yaml = parseDocument(yaml_text.replace(/\n(\t)+/g, '\n  '), { keepSourceTokens: true });
   if (parsed_yaml == null) {
     return null;
   }
@@ -711,7 +711,7 @@ export function formatYamlArrayValue(value: string | string[], format: NormalArr
 }
 
 function getDefaultYAMLArrayValue(format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats): string {
-   
+
   switch (format) {
     case NormalArrayFormats.SingleLine:
     case TagSpecificArrayFormats.SingleLineSpaceDelimited:
@@ -723,7 +723,7 @@ function getDefaultYAMLArrayValue(format: NormalArrayFormats | SpecialArrayForma
     case SpecialArrayFormats.SingleStringCommaDelimited:
       return ' ';
   }
-   
+
 }
 
 function convertStringArrayToSingleLineArray(arrayItems: string[]): string {
@@ -780,7 +780,7 @@ export function splitValueIfSingleOrMultilineArray(value: string): null | string
       return el != '';
     });
 
-    if (arrayItems == null || arrayItems.length === 0 ) {
+    if (arrayItems == null || arrayItems.length === 0) {
       return null;
     }
 
@@ -830,7 +830,7 @@ export function convertAliasValueToStringOrStringArray(value: string | string[])
   return value;
 }
 
-export function convertYAMLStringToArray(value: string, delimiter: string = ','): null|string[] {
+export function convertYAMLStringToArray(value: string, delimiter: string = ','): null | string[] {
   if (value == '' || value == null) {
     return null;
   }
@@ -851,7 +851,7 @@ export function convertYAMLStringToArray(value: string, delimiter: string = ',')
       currentItem = '';
     } else if (currentChar === '"' || currentChar === '\'') {
       // if there is an escape character check to see if there is a closing escape character and if so, skip to it as the next part of the value
-      const endOfEscapedValue = value.indexOf(currentChar, index+1);
+      const endOfEscapedValue = value.indexOf(currentChar, index + 1);
       if (endOfEscapedValue != -1) {
         currentItem += value.substring(index, endOfEscapedValue + 1);
         index = endOfEscapedValue;
@@ -898,7 +898,7 @@ export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeC
   }
 
   try {
-    const unescaped = parse(basicEscape, {logLevel: 'error'}) as string;
+    const unescaped = parse(basicEscape, { logLevel: 'error' }) as string;
     if (unescaped === value) {
       return basicEscape;
     }
@@ -964,7 +964,7 @@ export function getExactDisabledRuleValue(yaml_text: string): string[] {
 
   const parsed_yaml = loadYAML(disabledRulesKeyAndValue);
   let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string })[
-      'disabled rules'
+    'disabled rules'
   ];
   if (!disabled_rules) {
     return [];

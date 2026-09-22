@@ -1,6 +1,6 @@
 import DedupeYamlArrayValues from '../src/rules/dedupe-yaml-array-values';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
+import { ruleTest } from './common';
 
 ruleTest({
   RuleBuilderClass: DedupeYamlArrayValues,
@@ -24,7 +24,7 @@ ruleTest({
         ---
       `,
     },
-     { // accounts for https://github.com/platers/obsidian-linter/issues/1217
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1217
       testName: 'Deduping YAML arrays should properly handle escaped values being the same and prefer the first of all values that are found to be the same',
       before: dedent`
         ---
