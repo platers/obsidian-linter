@@ -25,7 +25,6 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
       text = text.replace(/\n+---/, '\n---');
       if (options.innerNewLines) {
         text = removeBlankLinesOutsideBlockScalars(text);
-        // text = text.replaceAll(/\n{2,}/g, '\n');
       }
 
       return text;
