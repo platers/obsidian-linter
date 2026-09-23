@@ -22,7 +22,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
   get OptionsClass(): new () => EscapeYamlSpecialCharactersOptions {
     return EscapeYamlSpecialCharactersOptions;
   }
-  apply(text: string, options: EscapeYamlSpecialCharactersOptions,): string {
+  apply(text: string, options: EscapeYamlSpecialCharactersOptions): string {
     return formatYAML(text, (text) => {
       const yamlLines = text.split('\n');
 
