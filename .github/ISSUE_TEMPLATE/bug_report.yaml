@@ -1,9 +1,7 @@
----
 name: Bug report
-about: Create a report to help us improve
+description: Create a report to help us improve
 title: 'Bug: '
 labels: [bug, needs-triage]
-assignees: ''
 body:
   - type: checkboxes
     id: no-invalid-issues
@@ -11,7 +9,7 @@ body:
       label: "Check issue is an issue in latest version."
       description: "There can be confusion around whether an issue still exists. Testing on the latest version of the plugin can help eliminate that confusion."
       options:
-        - label: "I have tested the bug with the [latest version](https://github.com/platers/obsidian-linter/obsidian-tasks/releases) of Linter plugin."
+        - label: "I have tested the bug with the [latest version](https://github.com/platers/obsidian-linter/releases) of Linter plugin."
           required: true
 
   - type: checkboxes
@@ -30,6 +28,27 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: affected-area
+    attributes:
+      label: Affected Area
+      description: Where does this issue affect?
+      options:
+        - I don't know
+        - YAML
+        - Headings
+        - Spacing
+        - General Content
+        - Footnotes
+        - Paste
+        - Custom commands
+        - Regex replace
+        - Settings
+        - Documentation
+      default: 0
+    validations:
+      required: true
+
   - type: textarea
     id: reproduce
     attributes:
@@ -37,14 +56,14 @@ body:
       description: |
         Which exact steps can a developer take to reproduce the issue?
         The more detail you provide, the easier it will be to narrow down and fix the bug.
-        Please paste in markdown content **as text, not screenshots**. While screenshots can help when displaying a visaul issue, it makes 
+        Please paste in markdown content **as text, not screenshots**. While screenshots can help when displaying a visual issue, it makes 
         things harder when trying to reproduce an issue related to what is going on with rules.
       placeholder: |
         Example of the level of detail needed to reproduce any bugs efficiently and reliably.
         1. Enable setting x
         2. Enable setting y
         3. Navigate to file z with content:
-        `````` makrdown
+        `````` markdown
         Content here
         ``````
         4. Run command x
@@ -53,6 +72,24 @@ body:
         New content here
         ``````
         6. etc
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: Tell us what **should** happen, when **exactly** following the steps above.
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Current behaviour
+      description: |
+        Tell us what happens instead of the expected behavior.
+        The addition of screenshots can be helpful for UI related issues.
     validations:
       required: true
 
@@ -90,24 +127,6 @@ body:
     validations:
       required: false
 
-  - type: textarea
-    id: expected
-    attributes:
-      label: Expected Behavior
-      description: Tell us what **should** happen, when **exactly** following the steps above.
-    validations:
-      required: true
-
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: Current behaviour
-      description: |
-        Tell us what happens instead of the expected behavior.
-        The addition of screenshots can be helpful for UI related issues.
-    validations:
-      required: true
-
   - type: checkboxes
     id: operating-systems
     attributes:
@@ -119,14 +138,6 @@ body:
         - label: Linux
         - label: macOS
         - label: Windows
-    validations:
-      required: true
-
-  - type: input
-    id: os-versions
-    attributes:
-      label: Operating System Version(s)
-      description: Which operating system version(s) are you using?
     validations:
       required: true
 
@@ -147,27 +158,6 @@ body:
       options:
         - label: I have tried it with all other plugins disabled and the error still occurs
           required: false
-
-  - type: dropdown
-    id: affected-area
-    attributes:
-      label: Affected Area
-      description: Where does this issue affect?
-      options:
-        - I don't know
-        - YAML
-        - Headings
-        - Spacing
-        - General Content
-        - Footnotes
-        - Paste
-        - Custom commands
-        - Regex replace
-        - Settings
-        - Documentation
-      default: 0
-    validations:
-      required: true
 
   - type: textarea
     id: possible-solution
