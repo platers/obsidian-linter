@@ -1,13 +1,13 @@
-import {existsSync, readFileSync, writeFileSync} from 'fs';
-import {createHash} from 'crypto';
-import {join} from 'path';
-import {moment} from 'obsidian';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { createHash } from 'crypto';
+import { join } from 'path';
+import { moment } from 'obsidian';
 import dedent from 'ts-dedent';
-import {rules} from '../src/rules';
-import {RulesRunner} from '../src/rules-runner';
-import {DEFAULT_SETTINGS, LinterSettings} from '../src/settings-data';
-import {setLanguage} from '../src/lang/helpers';
-import {parseCustomReplacements} from '../src/utils/strings';
+import { rules } from '../src/rules';
+import { RulesRunner } from '../src/rules-runner';
+import { DEFAULT_SETTINGS, LinterSettings } from '../src/settings-data';
+import { setLanguage } from '../src/lang/helpers';
+import { parseCustomReplacements } from '../src/utils/strings';
 import '../src/rules-registry';
 
 // Set LINTER_PERF_FIXTURE to a large Markdown note to include its first 600 lines in the optional
@@ -66,7 +66,7 @@ function settingsWithEveryRuleEnabled(): LinterSettings {
 function lint(text: string, settings: LinterSettings): string {
   return new RulesRunner().lintText({
     oldText: text,
-    fileInfo: {name: 'note', createdAtFormatted: '2025-05-11T19:34:17-04:00', modifiedAtFormatted: '2025-05-31T12:38:50-04:00', path: 'note.md'},
+    fileInfo: { name: 'note', createdAtFormatted: '2025-05-11T19:34:17-04:00', modifiedAtFormatted: '2025-05-31T12:38:50-04:00', path: 'note.md' },
     settings,
     momentLocale: 'en',
     getCurrentTime: () => moment('2025-05-31T12:38:50-04:00'),
@@ -74,7 +74,7 @@ function lint(text: string, settings: LinterSettings): string {
   });
 }
 
-type corpusDocument = {name: string, text: string};
+type corpusDocument = { name: string, text: string };
 
 // Each of these targets something that broke while the masking was being worked on, so that a
 // change that reintroduces one of those failures shows up in the diff rather than in a bug report.
@@ -195,13 +195,13 @@ const adversarialDocuments: corpusDocument[] = [
   },
 ];
 
-function buildCorpus(): {documents: corpusDocument[], snapshotDocumentCount: number} {
+function buildCorpus(): { documents: corpusDocument[], snapshotDocumentCount: number } {
   const corpus: corpusDocument[] = [];
 
   for (const rule of rules) {
     let index = 0;
     for (const example of rule.examples) {
-      corpus.push({name: `${rule.alias} example ${index++}`, text: example.before});
+      corpus.push({ name: `${rule.alias} example ${index++}`, text: example.before });
     }
   }
 
@@ -211,10 +211,10 @@ function buildCorpus(): {documents: corpusDocument[], snapshotDocumentCount: num
   // optional, so the dump is smaller when it is unset or missing rather than the run failing
   if (largeFixturePath && existsSync(largeFixturePath)) {
     const text = readFileSync(largeFixturePath, 'utf8').split('\n').slice(0, largeFixtureLineCount).join('\n');
-    corpus.push({name: `the first ${largeFixtureLineCount} lines of ${largeFixturePath}`, text});
+    corpus.push({ name: `the first ${largeFixtureLineCount} lines of ${largeFixturePath}`, text });
   }
 
-  return {documents: corpus, snapshotDocumentCount};
+  return { documents: corpus, snapshotDocumentCount };
 }
 
 describe('the linter produces the same documents it did before', () => {
@@ -225,9 +225,9 @@ describe('the linter produces the same documents it did before', () => {
 
   it('lints the corpus', () => {
     const settings = settingsWithEveryRuleEnabled();
-    const {documents, snapshotDocumentCount} = buildCorpus();
+    const { documents, snapshotDocumentCount } = buildCorpus();
     const lines: string[] = [];
-    const hashes: {name: string, hash: string}[] = [];
+    const hashes: { name: string, hash: string }[] = [];
 
     let index = 0;
     for (const document of documents) {
@@ -242,7 +242,7 @@ describe('the linter produces the same documents it did before', () => {
 
       lines.push(`${index++}\u0001${document.name}\u0001${JSON.stringify(output)}`);
       if (hashes.length < snapshotDocumentCount) {
-        hashes.push({name: document.name, hash: createHash('sha256').update(output).digest('hex')});
+        hashes.push({ name: document.name, hash: createHash('sha256').update(output).digest('hex') });
       }
     }
 
@@ -259,7 +259,7 @@ describe('the linter produces the same documents it did before', () => {
       throw new Error(`Differential snapshot has ${expectedHashes.size} entries, but the checkout corpus has ${hashes.length}. Regenerate and review the snapshot.`);
     }
 
-    for (const {name, hash} of hashes) {
+    for (const { name, hash } of hashes) {
       const expectedHash = expectedHashes.get(name);
       if (hash !== expectedHash) {
         throw new Error(`Linted output changed for "${name}". Inspect the full output with DUMP_PATH=/tmp/linter-differential.txt npx jest __tests__/rules-runner-differential.test.ts.`);

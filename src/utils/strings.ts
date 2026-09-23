@@ -1,7 +1,7 @@
-import {calloutRegex, codeBlockBlockquoteRegex} from './regex';
-import {getTextInLanguage} from '../lang/helpers';
-import {logWarn} from './logger';
-import {getAllTablesInText} from './mdast';
+import { calloutRegex, codeBlockBlockquoteRegex } from './regex';
+import { getTextInLanguage } from '../lang/helpers';
+import { logWarn } from './logger';
+import { getAllTablesInText } from './mdast';
 /**
  * Inserts a string at the given position in a string.
  * @param {string} str - The string to insert into
@@ -25,7 +25,7 @@ export function replaceTextBetweenStartAndEndWithNewValue(str: string, start: nu
   return str.substring(0, start) + value + str.substring(end);
 }
 
-export type textReplacement = {startIndex: number, endIndex: number, value: string}
+export type textReplacement = { startIndex: number, endIndex: number, value: string }
 
 /**
  * Applies every replacement to the string in one pass.
@@ -192,7 +192,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
   }
 
   let firstLineOfBlockquote: string;
-  const indexOfEndOfFirstLine = text.indexOf('\n', startOfContent+1);
+  const indexOfEndOfFirstLine = text.indexOf('\n', startOfContent + 1);
   if (indexOfEndOfFirstLine === -1) {
     firstLineOfBlockquote = text.substring(startOfContent);
   } else {
@@ -318,11 +318,11 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
   }
 
   let lastLineOfBlockquote: string;
-  const indexOfEndOfLastLine = text.lastIndexOf('\n', endOfContent-1);
+  const indexOfEndOfLastLine = text.lastIndexOf('\n', endOfContent - 1);
   if (indexOfEndOfLastLine === -1) {
     lastLineOfBlockquote = text.substring(0, endOfNewContent);
   } else {
-    lastLineOfBlockquote = text.substring(indexOfEndOfLastLine+1, endOfContent);
+    lastLineOfBlockquote = text.substring(indexOfEndOfLastLine + 1, endOfContent);
   }
 
   let emptyLine: string;
@@ -437,7 +437,7 @@ export function replaceAt(text: string, search: string, replace: string, start: 
   }
 
   return text.slice(0, start) +
-      text.slice(start, text.length).replace(search, replace);
+    text.slice(start, text.length).replace(search, replace);
 }
 
 // based on https://stackoverflow.com/a/21730166/8353749
@@ -461,7 +461,7 @@ export function isNumeric(str: string) {
   const type = typeof str;
   if (type != 'string') return type === 'number'; // we only process strings so if the value is not already a number the result is false
   return !isNaN(str as unknown as number) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-         !isNaN(parseFloat(str)); // ...and ensure strings of whitespace fail
+    !isNaN(parseFloat(str)); // ...and ensure strings of whitespace fail
 }
 
 export function getSubstringIndex(substring: string, text: string): number[] {
@@ -476,7 +476,7 @@ export function getSubstringIndex(substring: string, text: string): number[] {
 
 function getIndexOfStartOfFirstNonEmptyLine(text: string, currentStartOfBlockquote: number, blockquoteLevel: number): number {
   let actualStartOfBlockquote = currentStartOfBlockquote;
-  let blockquoteIndex = currentStartOfBlockquote+1;
+  let blockquoteIndex = currentStartOfBlockquote + 1;
   let currentChar: string;
   let foundNewStart = false;
   let level = 0;
@@ -508,7 +508,7 @@ function getIndexOfStartOfFirstNonEmptyLine(text: string, currentStartOfBlockquo
 
 function getIndexOfEndOfLastNonEmptyLine(text: string, currentEndOfBlockquote: number, blockquoteLevel: number): number {
   let actualEndOfBlockquote = currentEndOfBlockquote;
-  let blockquoteIndex = currentEndOfBlockquote-1;
+  let blockquoteIndex = currentEndOfBlockquote - 1;
   let currentChar: string;
   let foundNewEnd = false;
   let level = 0;
@@ -543,7 +543,7 @@ export function parseCustomReplacements(text: string): Map<string, string> {
   const customReplacements = new Map<string, string>();
 
   let tableContent: string;
-  let tableRows:string[];
+  let tableRows: string[];
   let rowParts: string[];
   for (const table of tableInfo) {
     tableContent = text.substring(table.startIndex, table.endIndex);

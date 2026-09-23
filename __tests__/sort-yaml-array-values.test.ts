@@ -30,5 +30,33 @@ ruleTest({
         tagArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1385
+      testName: 'Sort YAML Arrays sorts values in a case-insensitive manner and retains the original key escaping',
+      before: dedent`
+        ---
+        'tags':
+          - tag/a
+          - tag/B
+          - tag/c
+          - tag/D
+        "key":
+          - value
+        ---
+      `,
+      after: dedent`
+        ---
+        'tags':
+          - tag/a
+          - tag/B
+          - tag/c
+          - tag/D
+        "key":
+          - value
+        ---
+      `,
+      options: {
+        tagArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
   ],
 });
