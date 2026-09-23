@@ -14,7 +14,7 @@ Uses a dictionary of common misspellings to automatically convert them to their 
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Ignore words` | A comma separated list of lowercased words to ignore when auto-correcting | N/A |  |
+| `Ignore words` | A list of lowercased words to ignore when auto-correcting | N/A | `null` |
 | `Skip words with multiple capitals` | Will skip any files that have a capital letter in them other than as the first letter of the word. Acronyms and some other words can benefit from this. It may cause issues with proper nouns being properly fixed. | N/A | false |
 | `Extra auto-correct source files` | These are files that have a markdown table in them that have the initial word and the word to correct it to (these are case insensitive corrections). <b>Note: the tables used should have the starting and ending <code>\|</code> indicators present for each line.</b> | N/A |  |
 
