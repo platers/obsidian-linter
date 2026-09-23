@@ -9,7 +9,7 @@ body:
       label: "Check issue is an issue in latest version."
       description: "There can be confusion around whether an issue still exists. Testing on the latest version of the plugin can help eliminate that confusion."
       options:
-        - label: "I have tested the bug with the [latest version](https://github.com/platers/obsidian-linter/obsidian-tasks/releases) of Linter plugin."
+        - label: "I have tested the bug with the [latest version](https://github.com/platers/obsidian-linter//releases) of Linter plugin."
           required: true
 
   - type: checkboxes
@@ -35,14 +35,14 @@ body:
       description: |
         Which exact steps can a developer take to reproduce the issue?
         The more detail you provide, the easier it will be to narrow down and fix the bug.
-        Please paste in markdown content **as text, not screenshots**. While screenshots can help when displaying a visaul issue, it makes 
+        Please paste in markdown content **as text, not screenshots**. While screenshots can help when displaying a visual issue, it makes 
         things harder when trying to reproduce an issue related to what is going on with rules.
       placeholder: |
         Example of the level of detail needed to reproduce any bugs efficiently and reliably.
         1. Enable setting x
         2. Enable setting y
         3. Navigate to file z with content:
-        `````` makrdown
+        `````` markdown
         Content here
         ``````
         4. Run command x
