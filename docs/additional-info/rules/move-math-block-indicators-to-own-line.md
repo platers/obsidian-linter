@@ -15,6 +15,29 @@ $$
 The Linter will try to break inline math blocks into math blocks when the inline math block has the minimum number of `$` at the start of
 the inline math.
 
+So if you have something like the following the Linter will not consider it a math block and it will be affected by Linter rules that would otherwise
+ignore math blocks:
+```markdown
+adafsd$$
+\begin{align}
+\text{asfsss}_{}{d_{a}}
+\end{align}
+$$
+```
+
+The problem in this example is that the math syntax here is multiline, however it is not setup to where the the dollar signs are alone on their lines.
+The expected syntax for this would be:
+```markdown
+adafsd
+$$
+\begin{align}
+\text{asfsss}_{}{d_{a}}
+\end{align}
+$$
+```
+
+This allows the underlying parser to handle the math block in question.
+
 ##### Exceptions
 
 The Linter tries to correct a couple of exceptions that seem to be weird results from the parser when the desired format is not followed for inline and math blocks.
