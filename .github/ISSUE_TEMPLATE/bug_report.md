@@ -2,57 +2,176 @@
 name: Bug report
 about: Create a report to help us improve
 title: 'Bug: '
-labels: bug
+labels: [bug, needs-triage]
 assignees: ''
+body:
+  - type: checkboxes
+    id: no-invalid-issues
+    attributes:
+      label: "Check issue is an issue in latest version."
+      description: "There can be confusion around whether an issue still exists. Testing on the latest version of the plugin can help eliminate that confusion."
+      options:
+        - label: "I have tested the bug with the [latest version](https://github.com/platers/obsidian-linter/obsidian-tasks/releases) of Linter plugin."
+          required: true
 
----
+  - type: checkboxes
+    id: no-duplicate-issues
+    attributes:
+      label: "Check that this issue hasn't been reported before."
+      description: "Please search for pre-existing issues before submitting a new one to help make things go quicker for you and for us."
+      options:
+        - label: "I searched previous [Linter plugin Bug Reports](https://github.com/platers/obsidian-linter/issues?q=is%3Aissue%20state%3Aopen%20label%3Abug) didn't find any similar reports."
+          required: true
 
-- [ ] I have verified that I am on the latest version of the Linter
+  - type: input
+    id: linter-version
+    attributes:
+      label: "What Linter Plugin version do you have installed?"
+    validations:
+      required: true
 
-## Describe the Bug
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Which exact steps can a developer take to reproduce the issue?
+        The more detail you provide, the easier it will be to narrow down and fix the bug.
+        Please paste in markdown content **as text, not screenshots**. While screenshots can help when displaying a visaul issue, it makes 
+        things harder when trying to reproduce an issue related to what is going on with rules.
+      placeholder: |
+        Example of the level of detail needed to reproduce any bugs efficiently and reliably.
+        1. Enable setting x
+        2. Enable setting y
+        3. Navigate to file z with content:
+        `````` makrdown
+        Content here
+        ``````
+        4. Run command x
+        5. See that text is now:
+        ``````markdown
+        New content here
+        ``````
+        6. etc
+    validations:
+      required: true
 
-A clear and concise description of what the bug is.
+  - type: textarea
+    id: settings
+    attributes:
+      label: Settings Enabled
+      description: |
+        What settings do you have enabled?
+        You can find your enabled settings in your `data.json` file under `.obsidian/plugins/obsidian-linter` in your vault or
+        you can get them from the debug tab for the Linter under the setting called `Linter config`.
+        Please paste it inside of a json code block or attach it as a file to the issue.
+        _Note: you may want to remove the settings about the custom auto correct files, and files and folders to ignore for privacy reasons. But if they relate to the issue they or an equivalent value will be needed for reproducing the issue._
+      placeholder: |
+        ```json
+        // Settings here
+        ```
+    validations:
+      required: false
 
-## How to Reproduce
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs from Linter around Issue
+      description: |
+        What logs does the Linter provide around the issue if applicable?
+        You can include logs by going to the debug tab of the Linter and setting the log level to debug. 
+        Then enable the capturing of logs and either lint on save or lint the current file. 
+        Then go back to the debug tab and you can grab Linter logs from the last run.
+        They may be too large and need to be attached as a file.
+      placeholder: |
+        ``````
+        // Logs here
+        ``````
+    validations:
+      required: false
 
-Steps to reproduce the behavior:
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: Tell us what **should** happen, when **exactly** following the steps above.
+    validations:
+      required: true
 
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Current behaviour
+      description: |
+        Tell us what happens instead of the expected behavior.
+        The addition of screenshots can be helpful for UI related issues.
+    validations:
+      required: true
 
-Or
+  - type: checkboxes
+    id: operating-systems
+    attributes:
+      label: Which Operating Systems are you using?
+      description: You may select more than one.
+      options:
+        - label: Android
+        - label: iPhone/iPad
+        - label: Linux
+        - label: macOS
+        - label: Windows
+    validations:
+      required: true
 
-Example to reproduce issue with
+  - type: input
+    id: os-versions
+    attributes:
+      label: Operating System Version(s)
+      description: Which operating system version(s) are you using?
+    validations:
+      required: true
 
-``` markdown
-example here
-```
+  - type: input
+    id: obsidian-version
+    attributes:
+      label: Obsidian Version
+      description: Which Obsidian version are you using?
+      placeholder: 1.6.7
+    validations:
+      required: true
 
-Please make sure to include logs and the rule(s) that cause the issue if applicable. You can include logs by going to the debug tab of the Linter and setting the log level to debug. Then enable the capturing of logs and either lint on save or lint the current file. Then go back to the debug tab and you can grab Linter logs from the last run.
+  - type: checkboxes
+    id: other-plugins-disabled
+    attributes:
+      label: Checks
+      description: Please confirm (only necessary for non-custom command issues)
+      options:
+        - label: I have tried it with all other plugins disabled and the error still occurs
+          required: false
 
-If you are not sure which rule(s) may cause the issue, please attach the `data.json` file located at `<vault>/.obsidian/plugins/obsidian-linter/` or copy the config from the debug tab.
+  - type: dropdown
+    id: affected-area
+    attributes:
+      label: Affected Area
+      description: Where does this issue affect?
+      options:
+        - I don't know
+        - YAML
+        - Headings
+        - Spacing
+        - General Content
+        - Footnotes
+        - Paste
+        - Custom commands
+        - Regex replace
+        - Settings
+        - Documentation
+      default: 0
+    validations:
+      required: true
 
-## Expected Behavior
-
-A clear and concise description of what you expected to happen.
-
-Expected output if applicable:
-
-``` markdown
-expected output here
-```
-
-## Screenshots
-
-If applicable, add screenshots to help explain your problem.
-
-## Device
-
-- [ ] Desktop
-- [ ] Mobile
-
-## Additional Context
-
-Add any other context about the problem here.
+  - type: textarea
+    id: possible-solution
+    attributes:
+      label: Possible solution
+      description: |
+        Not obligatory, but please suggest a fix or reason for the bug, if you have an idea.
