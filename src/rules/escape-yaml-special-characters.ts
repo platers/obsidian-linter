@@ -1,11 +1,11 @@
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase } from './rule-builder';
 import dedent from 'ts-dedent';
-import {escapeStringIfNecessaryAndPossible, formatYAML, QuoteCharacter} from '../utils/yaml';
+import { escapeStringIfNecessaryAndPossible, formatYAML, QuoteCharacter } from '../utils/yaml';
 
 class EscapeYamlSpecialCharactersOptions implements Options {
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: QuoteCharacter = '"';
+  defaultEscapeCharacter?: QuoteCharacter = '"';
   tryToEscapeSingleLineArrays?: boolean = false;
 }
 
@@ -277,7 +277,7 @@ export default class EscapeYamlSpecialCharacters extends RuleBuilder<EscapeYamlS
 
 function getIndentation(line: string): number {
   let indentation = 0;
-  while (indentation < line.length &&(line[indentation] === ' ' || line[indentation] === '\t')) {
+  while (indentation < line.length && (line[indentation] === ' ' || line[indentation] === '\t')) {
     indentation++;
   }
 

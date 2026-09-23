@@ -1,6 +1,6 @@
-import {formatYAML} from '../utils/yaml';
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import { formatYAML, removeBlankLinesOutsideBlockScalars } from '../utils/yaml';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase } from './rule-builder';
 import dedent from 'ts-dedent';
 
 class CompactYamlOptions implements Options {
@@ -24,12 +24,14 @@ export default class CompactYaml extends RuleBuilder<CompactYamlOptions> {
       text = text.replace(/^---\n+/, '---\n');
       text = text.replace(/\n+---/, '\n---');
       if (options.innerNewLines) {
-        text = text.replaceAll(/\n{2,}/g, '\n');
+        text = removeBlankLinesOutsideBlockScalars(text);
+        // text = text.replaceAll(/\n{2,}/g, '\n');
       }
 
       return text;
     });
   }
+
   get exampleBuilders(): ExampleBuilder<CompactYamlOptions>[] {
     return [
       new ExampleBuilder({
