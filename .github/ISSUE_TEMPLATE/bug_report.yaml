@@ -9,7 +9,7 @@ body:
       label: "Check issue is an issue in latest version."
       description: "There can be confusion around whether an issue still exists. Testing on the latest version of the plugin can help eliminate that confusion."
       options:
-        - label: "I have tested the bug with the [latest version](https://github.com/platers/obsidian-linter//releases) of Linter plugin."
+        - label: "I have tested the bug with the [latest version](https://github.com/platers/obsidian-linter/releases) of Linter plugin."
           required: true
 
   - type: checkboxes
@@ -25,6 +25,27 @@ body:
     id: linter-version
     attributes:
       label: "What Linter Plugin version do you have installed?"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-area
+    attributes:
+      label: Affected Area
+      description: Where does this issue affect?
+      options:
+        - I don't know
+        - YAML
+        - Headings
+        - Spacing
+        - General Content
+        - Footnotes
+        - Paste
+        - Custom commands
+        - Regex replace
+        - Settings
+        - Documentation
+      default: 0
     validations:
       required: true
 
@@ -51,6 +72,24 @@ body:
         New content here
         ``````
         6. etc
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: Tell us what **should** happen, when **exactly** following the steps above.
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Current behaviour
+      description: |
+        Tell us what happens instead of the expected behavior.
+        The addition of screenshots can be helpful for UI related issues.
     validations:
       required: true
 
@@ -88,24 +127,6 @@ body:
     validations:
       required: false
 
-  - type: textarea
-    id: expected
-    attributes:
-      label: Expected Behavior
-      description: Tell us what **should** happen, when **exactly** following the steps above.
-    validations:
-      required: true
-
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: Current behaviour
-      description: |
-        Tell us what happens instead of the expected behavior.
-        The addition of screenshots can be helpful for UI related issues.
-    validations:
-      required: true
-
   - type: checkboxes
     id: operating-systems
     attributes:
@@ -117,14 +138,6 @@ body:
         - label: Linux
         - label: macOS
         - label: Windows
-    validations:
-      required: true
-
-  - type: input
-    id: os-versions
-    attributes:
-      label: Operating System Version(s)
-      description: Which operating system version(s) are you using?
     validations:
       required: true
 
@@ -145,27 +158,6 @@ body:
       options:
         - label: I have tried it with all other plugins disabled and the error still occurs
           required: false
-
-  - type: dropdown
-    id: affected-area
-    attributes:
-      label: Affected Area
-      description: Where does this issue affect?
-      options:
-        - I don't know
-        - YAML
-        - Headings
-        - Spacing
-        - General Content
-        - Footnotes
-        - Paste
-        - Custom commands
-        - Regex replace
-        - Settings
-        - Documentation
-      default: 0
-    validations:
-      required: true
 
   - type: textarea
     id: possible-solution
