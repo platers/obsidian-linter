@@ -98,7 +98,7 @@ Removes duplicate array values in a case sensitive manner.
 | `Dedupe YAML aliases section` | Turns on removing duplicate aliases. | N/A | `true` |
 | `Dedupe YAML tags section` | Turns on removing duplicate tags. | N/A | `true` |
 | `Dedupe YAML array sections` | Turns on removing duplicate values for regular YAML arrays | N/A | `true` |
-| `YAML keys to ignore` | A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them. | N/A |  |
+| `YAML keys to ignore for Dedupe YAML array values` | A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them. | N/A | `null` |
 
 
 
@@ -365,7 +365,7 @@ Escapes the values for the specified YAML keys.
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Force YAML escape on keys` | Uses the YAML escape character on the specified YAML keys separated by a new line character if it is not already escaped. Do not use on YAML arrays. | N/A |  |
+| `Force YAML escape on keys` | Uses the YAML escape character on the specified YAML keys if it is not already escaped. Do not use on YAML arrays. | N/A | `null` |
 
 
 
@@ -523,8 +523,8 @@ Allows for the formatting of regular YAML arrays as either multi-line or single-
 | `Format YAML tags section` | Turns on formatting for the YAML tags section. | N/A | `true` |
 | `Default YAML array section style` | The style of other YAML arrays that are not <code>tags</code>, <code>aliases</code> or  in <code>Force key values to be single-line arrays</code> and <code>Force key values to be multi-line arrays</code> | `multi-line`: ```key:\n  - value```<br/><br/>`single-line`: ```key: [value]``` | `single-line` |
 | `Format YAML array sections` | Turns on formatting for regular YAML arrays | N/A | `true` |
-| `Force key values to be single-line arrays` | Forces the YAML array for the new line separated keys to be in single-line format (leave empty to disable this option) | N/A |  |
-| `Force key values to be multi-line arrays` | Forces the YAML array for the new line separated keys to be in multi-line format (leave empty to disable this option) | N/A |  |
+| `Force key values to be single-line arrays` | Forces the YAML array keys to be in single-line format (leave empty to disable this option) | N/A | `null` |
+| `Force key values to be multi-line arrays` | Forces the YAML array keys to be in multi-line format (leave empty to disable this option) | N/A | `null` |
 
 
 
@@ -629,8 +629,7 @@ Inserts the given YAML attributes into the YAML frontmatter. Put each attribute 
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Text to insert` | Text to insert into the YAML frontmatter | N/A | `aliases: 
-tags: ` |
+| `Text to insert` | Text to insert into the YAML frontmatter | N/A | `null` |
 
 
 
@@ -670,7 +669,7 @@ Move all tags to YAML frontmatter of the document.
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Body tag operation` | What to do with non-ignored tags in the body of the file once they have been moved to the frontmatter | `Nothing`: Leaves tags in the body of the file alone<br/><br/>`Remove hashtag`: Removes `#` from tags in content body after moving them to the YAML frontmatter<br/><br/>`Remove whole tag`: Removes the whole tag in content body after moving them to the YAML frontmatter. _Note that this removes the first space prior to the tag as well_ | `Nothing` |
-| `Tags to ignore` | The tags that will not be moved to the tags array or removed from the body content if <code>Remove the hashtag from tags in content body</code> is enabled. Each tag should be on a new line and without the <code>#</code>. <b>Make sure not to include the hashtag in the tag name.</b> | N/A |  |
+| `Tags to ignore` | The tags that will not be moved to the tags array or removed from the body content if <code>Remove the hashtag from tags in content body</code> is enabled. Tags should not include <code>#</code>. <b>Make sure not to include the hashtag in the tag name.</b> | N/A | `null` |
 
 
 
@@ -788,7 +787,7 @@ Removes the YAML keys specified
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `YAML keys to remove` | The YAML keys to remove from the YAML frontmatter with or without colons | N/A |  |
+| `YAML keys to remove` | The YAML keys to remove from the YAML frontmatter with or without colons | N/A | `null` |
 
 
 
@@ -845,7 +844,7 @@ Sorts YAML array values based on the specified sort order.
 | `Sort YAML aliases section` | Turns on sorting aliases. | N/A | `true` |
 | `Sort YAML tags section` | Turns on sorting tags. | N/A | `true` |
 | `Sort YAML array sections` | Turns on sorting values for regular YAML arrays | N/A | `true` |
-| `YAML Keys to ignore` | A list of YAML keys without the ending colon on their own lines that are not meant to have their values sorted. | N/A |  |
+| `YAML Keys to ignore for Sort YAML array values` | A list of YAML keys without the ending colon that are not meant to have their values sorted. | N/A | `null` |
 | `Sort order` | The way to sort the YAML array values. | `Ascending Alphabetical`: Sorts the array values from a to z<br/><br/>`Descending Alphabetical`: Sorts the array values from z to a | `Ascending Alphabetical` |
 
 
@@ -945,7 +944,7 @@ Sorts the YAML keys based on the order and priority specified. <b>Note: may remo
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `YAML key priority sort order` | The order in which to sort keys with one on each line where it sorts in the order found in the list | N/A |  |
+| `YAML key priority sort order` | The order in which to sort keys with one on each line where it sorts in the order found in the list | N/A | `null` |
 | `Priority keys at start of YAML` | YAML Key Priority Sort Order is placed at the start of the YAML frontmatter | N/A | `true` |
 | `YAML sort order for other keys` | The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area | `None`: No sorting other than what is in the YAML Key Priority Sort Order text area<br/><br/>`Ascending Alphabetical`: Sorts the keys based on key value from a to z<br/><br/>`Descending Alphabetical`: Sorts the keys based on key value from z to a | `None` |
 

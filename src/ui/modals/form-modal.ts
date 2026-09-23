@@ -1,5 +1,5 @@
-import {App, ButtonComponent, DropdownComponent, Modal, Platform, setIcon, TextComponent, ToggleComponent} from 'obsidian';
-import {getTextInLanguage} from '../../lang/helpers';
+import { App, ButtonComponent, DropdownComponent, Modal, Platform, setIcon, TextComponent, ToggleComponent } from 'obsidian';
+import { getTextInLanguage } from '../../lang/helpers';
 
 export class FormField {
   containerEl: HTMLElement;
@@ -7,7 +7,7 @@ export class FormField {
   helpEl: HTMLElement | null = null;
 
   constructor(parentEl: HTMLElement) {
-    this.containerEl = parentEl.createEl('p', {cls: 'form-field'});
+    this.containerEl = parentEl.createEl('p', { cls: 'form-field' });
     this.labelEl = this.containerEl.createEl('label');
   }
 
@@ -18,7 +18,7 @@ export class FormField {
 
   setHelp(help: string | DocumentFragment): this {
     if (!this.helpEl) {
-      this.helpEl = this.containerEl.createDiv({cls: 'form-field-help'});
+      this.helpEl = this.containerEl.createDiv({ cls: 'form-field-help' });
     }
     this.helpEl.empty();
     if (typeof help === 'string') {
@@ -66,27 +66,27 @@ export class FormModal extends Modal {
     if (Platform.isPhone) {
       const headerEl = this.headerEl;
       headerEl.createDiv(
-          {cls: 'modal-header-button mod-raised clickable-icon mod-start'},
-          (el) => {
-            setIcon(el, 'x');
-            el.addEventListener('click', () => this.close());
-          },
+        { cls: 'modal-header-button mod-raised clickable-icon mod-start' },
+        (el) => {
+          setIcon(el, 'x');
+          el.addEventListener('click', () => this.close());
+        },
       );
       this.ctaEl = headerEl.createDiv(
-          {cls: 'modal-header-button mod-raised clickable-icon mod-cta'},
-          (el) => setIcon(el, 'lucide-check'),
+        { cls: 'modal-header-button mod-raised clickable-icon mod-cta' },
+        (el) => setIcon(el, 'lucide-check'),
       );
       this.ctaEl.addEventListener('click', () => this.formSubmit());
     } else {
-      this.buttonContainerEl = this.modalEl.createDiv({cls: 'modal-button-container'});
+      this.buttonContainerEl = this.modalEl.createDiv({ cls: 'modal-button-container' });
       this.ctaButton = new ButtonComponent(this.buttonContainerEl)
-          .setCta()
-          .setButtonText('Save')
-          .onClick(() => this.formSubmit());
+        .setCta()
+        .setButtonText('Save')
+        .onClick(() => this.formSubmit());
       this.ctaEl = this.ctaButton.buttonEl;
       new ButtonComponent(this.buttonContainerEl)
-          .setButtonText(getTextInLanguage('cancel-button-text'))
-          .onClick(() => this.close());
+        .setButtonText(getTextInLanguage('cancel-button-text'))
+        .onClick(() => this.close());
     }
   }
 
@@ -123,5 +123,5 @@ export class FormModal extends Modal {
     this.onSubmit();
   }
 
-  onSubmit(): void {}
+  onSubmit(): void { }
 }
