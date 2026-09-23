@@ -1,8 +1,7 @@
 name: Bug report
-about: Create a report to help us improve
+description: Create a report to help us improve
 title: 'Bug: '
 labels: [bug, needs-triage]
-assignees: ''
 body:
   - type: checkboxes
     id: no-invalid-issues
