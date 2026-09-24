@@ -881,26 +881,14 @@ export default class LinterPlugin extends Plugin {
               return;
             }
 
-            let markdownInfo: MarkdownView;
-            let modeNeedsResetting = false;
-            let originalState;
             if (activeFileChangeInfo.markdownInfo instanceof MarkdownView) {
-              markdownInfo = activeFileChangeInfo.markdownInfo;
-              originalState = markdownInfo.getState();
-              modeNeedsResetting = originalState.mode !== 'source';
-              // if we are in reading mode, we need to change to source mode in order to make changes
-              if (modeNeedsResetting) {
-                const newState = markdownInfo.getState();
-                newState.mode = 'source';
-                await markdownInfo.setState(newState, { history: false });
+              const markdownInfo = activeFileChangeInfo.markdownInfo;
+              const state = markdownInfo.getState();
+              if (state.mode === "source") {
+                this.updateEditor(oldText, newText, editor);
+              } else {
+                await this.app.vault.process(file, () => newText);
               }
-            }
-
-            this.updateEditor(oldText, newText, editor);
-
-            if (modeNeedsResetting) {
-              await markdownInfo.setState(originalState, { history: false });
-              await markdownInfo.leaf.rebuildView();
             }
           } else {
             logInfo(getTextInLanguage('logs.file-change-yaml-lint-skipped'));
