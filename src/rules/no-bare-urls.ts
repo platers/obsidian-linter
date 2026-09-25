@@ -1,11 +1,12 @@
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase } from './rule-builder';
 import dedent from 'ts-dedent';
-import {IgnoreTypes} from '../utils/ignore-types';
-import {countInstances, textReplacement} from '../utils/strings';
-import {applyNonOverlappingReplacements} from '../utils/text-edits';
-import {simpleURIRegex, urlRegex} from '../utils/regex';
-import {ProtectedRanges, redactProtected} from '../utils/protected-ranges';
+import { IgnoreTypes } from '../utils/ignore-types';
+import { countInstances, textReplacement } from '../utils/strings';
+import { applyNonOverlappingReplacements } from '../utils/text-edits';
+import { simpleURIRegex } from '../utils/regex';
+import { ProtectedRanges, redactProtected } from '../utils/protected-ranges';
+import { getUrlPositions } from '../utils/mdast';
 
 class NoBareUrlsOptions implements Options {
   noBareURIs?: boolean = false;
@@ -13,6 +14,12 @@ class NoBareUrlsOptions implements Options {
 
 const specialCharsToNotEscapeContentsWithin = `'"‘’“”\`[]`;
 const uriSchemesToIgnore = ['http', 'ftp', 'https', 'smtp'];
+
+type MatchInfo = {
+  urlStart: number,
+  urlEnd: number,
+  match: string,
+}
 
 @RuleBuilder.register
 export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
@@ -29,14 +36,39 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
   }
   apply(text: string, options: NoBareUrlsOptions, protectedRanges: ProtectedRanges): string {
     const replacements: textReplacement[] = [];
-    const URLMatches = text.match(urlRegex);
-    if (URLMatches) {
+    const URLPostions = getUrlPositions(text).toReversed();
+    if (URLPostions) {
+      const URLMatches: MatchInfo[] = [];
+      for (const position of URLPostions) {
+        URLMatches.push({
+          match: text.substring(position.start.offset, position.end.offset),
+          urlStart: position.start.offset,
+          urlEnd: position.end.offset,
+        });
+      }
+
       replacements.push(...this.handleMatches(text, URLMatches, false, protectedRanges));
     }
 
     if (options.noBareURIs) {
-      const URIMatches = text.match(simpleURIRegex);
-      if (URIMatches) {
+      const URIRegexMatches = text.match(simpleURIRegex);
+      if (URIRegexMatches) {
+        // make sure you do not match on the same thing more than once by keeping track of the last position you checked up to
+        let startSearch = 0;
+        const URIMatches: MatchInfo[] = [];
+        for (const uri of URIRegexMatches) {
+          let urlMatch = uri;
+          let urlStart = text.indexOf(urlMatch, startSearch);
+          let urlEnd = urlStart + urlMatch.length;
+          startSearch = urlEnd;
+
+          URIMatches.push({
+            match: urlMatch,
+            urlStart: urlStart,
+            urlEnd: urlEnd,
+          });
+        }
+
         const urlReplacements = new ProtectedRanges(replacements);
         for (const replacement of this.handleMatches(text, URIMatches, true, protectedRanges)) {
           // The URL pass already wraps these characters before the URI pass would see them.
@@ -50,19 +82,15 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
 
     return applyNonOverlappingReplacements(text, replacements);
   }
-  handleMatches(text: string, matches: RegExpMatchArray, isURISearch: boolean, protectedRanges: ProtectedRanges): textReplacement[] {
-    // make sure you do not match on the same thing more than once by keeping track of the last position you checked up to
-    let startSearch = 0;
+  handleMatches(text: string, matches: MatchInfo[], isURISearch: boolean, protectedRanges: ProtectedRanges): textReplacement[] {
     // Every match is located and inspected against the text as it was passed in rather than against
     // a copy that grows as angle brackets are added, so that the whole text is only rebuilt once at
     // the end instead of once per url.
     const replacements: textReplacement[] = [];
-    const numMatches = matches.length;
-    for (let i = 0; i < numMatches; i++) {
-      let urlMatch = matches[i];
-      let urlStart = text.indexOf(urlMatch, startSearch);
-      let urlEnd = urlStart + urlMatch.length;
-      startSearch = urlEnd;
+    for (const match of matches) {
+      let urlMatch = match.match;
+      let urlStart = match.urlStart;
+      let urlEnd = match.urlEnd;
       // anchorTag protects the URL between the two HTML nodes as well as the tags themselves.
       if (protectedRanges.isProtected(urlStart, urlEnd)) {
         continue;
@@ -88,38 +116,34 @@ export default class NoBareUrls extends RuleBuilder<NoBareUrlsOptions> {
       } else if (openingParentheses == 0 && urlMatch.endsWith(')')) {
         nextChar = ')';
         urlEnd--;
-        urlMatch = urlMatch.substring(0, urlMatch.length -1);
+        urlMatch = urlMatch.substring(0, urlMatch.length - 1);
       }
 
       if (this.skipMatch(previousChar, nextChar, urlMatch, isURISearch)) {
-        startSearch = urlStart + urlMatch.length;
         continue;
       }
 
-
       if (previousChar != undefined && previousChar === '<' && nextChar != undefined && nextChar === '>') {
         let startOfOpeningChevrons = urlStart - 1;
-        while (startOfOpeningChevrons > 0 && text.charAt(startOfOpeningChevrons-1) === '<') {
+        while (startOfOpeningChevrons > 0 && text.charAt(startOfOpeningChevrons - 1) === '<') {
           startOfOpeningChevrons--;
         }
 
         let endOfClosingChevrons = urlEnd;
-        while (endOfClosingChevrons < text.length -1 && text.charAt(endOfClosingChevrons+1) === '>') {
+        while (endOfClosingChevrons < text.length - 1 && text.charAt(endOfClosingChevrons + 1) === '>') {
           endOfClosingChevrons++;
         }
 
         if (!protectedRanges.isProtected(startOfOpeningChevrons, endOfClosingChevrons + 1)) {
-          this.addReplacement(replacements, {startIndex: startOfOpeningChevrons, endIndex: endOfClosingChevrons+1, value: '<' + urlMatch + '>'});
+          this.addReplacement(replacements, { startIndex: startOfOpeningChevrons, endIndex: endOfClosingChevrons + 1, value: '<' + urlMatch + '>' });
         }
 
-        startSearch = urlStart + urlMatch.length;
         continue;
       }
 
       if (!protectedRanges.isProtected(urlStart, urlStart + urlMatch.length)) {
-        this.addReplacement(replacements, {startIndex: urlStart, endIndex: urlStart + urlMatch.length, value: '<' + urlMatch + '>'});
+        this.addReplacement(replacements, { startIndex: urlStart, endIndex: urlStart + urlMatch.length, value: '<' + urlMatch + '>' });
       }
-      startSearch = urlStart + urlMatch.length;
     }
 
     return replacements;

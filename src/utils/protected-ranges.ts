@@ -1,10 +1,10 @@
-import {LRUCache} from 'lru-cache';
-import {IgnoreType, TextRange} from './ignore-types';
-import {inCanonicalOrder, projectionTokenFor} from './ignore-type-metadata';
-import {DocumentProjection, ProjectionReplacement} from './document-projection';
-import {getPositions, MDAstTypes} from './mdast';
-import {textReplacement} from './strings';
-import {getTextInLanguage} from '../lang/helpers';
+import { LRUCache } from 'lru-cache';
+import { IgnoreType, TextRange } from './ignore-types';
+import { inCanonicalOrder, projectionTokenFor } from './ignore-type-metadata';
+import { DocumentProjection, ProjectionReplacement } from './document-projection';
+import { getPositions, MDAstTypes } from './mdast';
+import { textReplacement } from './strings';
+import { getTextInLanguage } from '../lang/helpers';
 
 /**
  * The regions of a document a rule is not allowed to change.
@@ -63,7 +63,7 @@ export class ProtectedRanges {
   }
 
   get ranges(): TextRange[] {
-    return this.startIndexes.map((startIndex, index) => ({startIndex, endIndex: this.endIndexes[index]}));
+    return this.startIndexes.map((startIndex, index) => ({ startIndex, endIndex: this.endIndexes[index] }));
   }
 
   /**
@@ -81,7 +81,7 @@ export class ProtectedRanges {
     let index = Math.max(0, this.lastRangeStartingAtOrBefore(startIndex));
     while (index < this.startIndexes.length && this.startIndexes[index] < endIndex) {
       if (this.endIndexes[index] > startIndex) {
-        ranges.push({startIndex: this.startIndexes[index], endIndex: this.endIndexes[index]});
+        ranges.push({ startIndex: this.startIndexes[index], endIndex: this.endIndexes[index] });
       }
       index++;
     }
@@ -197,14 +197,14 @@ export function redactProtected(text: string, protectedRanges: ProtectedRanges, 
  * @return {textReplacement[]} Edits in ascending order, relative to the original document
  */
 export function collectUnprotectedRegexReplacements(
-    text: string,
-    regex: RegExp,
-    protectedRanges: ProtectedRanges,
-    rangesForMatch: {
-      editRange: (match: RegExpMatchArray, startIndex: number) => textReplacement,
-      guardRange: (match: RegExpMatchArray, startIndex: number) => TextRange,
-    },
-    offset: number = 0,
+  text: string,
+  regex: RegExp,
+  protectedRanges: ProtectedRanges,
+  rangesForMatch: {
+    editRange: (match: RegExpMatchArray, startIndex: number) => textReplacement,
+    guardRange: (match: RegExpMatchArray, startIndex: number) => TextRange,
+  },
+  offset: number = 0,
 ): textReplacement[] {
   const replacements: textReplacement[] = [];
   for (const match of text.matchAll(regex)) {
@@ -270,7 +270,7 @@ function mergeRanges(ranges: TextRange[]): TextRange[] {
 
   const sorted = [...ranges].sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
   const merged: TextRange[] = [];
-  let current = {startIndex: sorted[0].startIndex, endIndex: sorted[0].endIndex};
+  let current = { startIndex: sorted[0].startIndex, endIndex: sorted[0].endIndex };
 
   for (let index = 1; index < sorted.length; index++) {
     const range = sorted[index];
@@ -283,7 +283,7 @@ function mergeRanges(ranges: TextRange[]): TextRange[] {
     }
 
     merged.push(current);
-    current = {startIndex: range.startIndex, endIndex: range.endIndex};
+    current = { startIndex: range.startIndex, endIndex: range.endIndex };
   }
 
   merged.push(current);
@@ -307,7 +307,7 @@ function findRangesForIgnoreType(text: string, ignoreType: IgnoreType): TextRang
         continue;
       }
 
-      ranges.push({startIndex: position.start.offset, endIndex: position.end.offset});
+      ranges.push({ startIndex: position.start.offset, endIndex: position.end.offset });
     }
 
     return ranges;
@@ -319,12 +319,12 @@ function findRangesForIgnoreType(text: string, ignoreType: IgnoreType): TextRang
     // first match is protected
     const match = regex.exec(text);
 
-    return match === null ? [] : [{startIndex: match.index, endIndex: match.index + match[0].length}];
+    return match === null ? [] : [{ startIndex: match.index, endIndex: match.index + match[0].length }];
   }
 
   const ranges: TextRange[] = [];
   for (const match of text.matchAll(regex)) {
-    ranges.push({startIndex: match.index, endIndex: match.index + match[0].length});
+    ranges.push({ startIndex: match.index, endIndex: match.index + match[0].length });
   }
 
   return ranges;
@@ -438,7 +438,7 @@ export class LintContext {
     for (const ignoreType of types) {
       const token = projectionTokenFor(ignoreType);
       for (const range of this.rangesByIgnoreType.get(ignoreType)) {
-        candidates.push({...range, token});
+        candidates.push({ ...range, token });
       }
     }
 
@@ -451,7 +451,7 @@ export class LintContext {
       if (previous && candidate.startIndex < previous.endIndex) {
         previous.endIndex = Math.max(previous.endIndex, candidate.endIndex);
       } else {
-        replacements.push({...candidate});
+        replacements.push({ ...candidate });
       }
     }
 

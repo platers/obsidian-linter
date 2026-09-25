@@ -1,15 +1,15 @@
 import NoBareUrls from '../src/rules/no-bare-urls';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
+import { ruleTest } from './common';
 
 ruleTest({
   RuleBuilderClass: NoBareUrls,
   testCases: [
     {
       testName: 'Combines many interleaved URLs and URIs without wrapping overlapping matches twice',
-      before: Array.from({length: 256}, (_, index) => `https://example.com/${index} obsidian://note-${index} custom://example.org/${index}`).join('\n'),
-      after: Array.from({length: 256}, (_, index) => `<https://example.com/${index}> <obsidian://note-${index}> <custom://example.org/${index}>`).join('\n'),
-      options: {noBareURIs: true},
+      before: Array.from({ length: 256 }, (_, index) => `https://example.com/${index} obsidian://note-${index} custom://example.org/${index}`).join('\n'),
+      after: Array.from({ length: 256 }, (_, index) => `<https://example.com/${index}> <obsidian://note-${index}> <custom://example.org/${index}>`).join('\n'),
+      options: { noBareURIs: true },
     },
     {
       testName: 'Leaves URLs inside fenced code alone',
@@ -252,7 +252,7 @@ ruleTest({
       },
     },
     {// accounts for https://github.com/platers/obsidian-linter/issues/1084
-      testName: 'Make sure that URls containing `~` are properly matched',
+      testName: 'Make sure that URLs containing `~` are properly matched',
       before: dedent`
         https://some.website/~username/
         <https://some.website/~username/>
@@ -260,6 +260,54 @@ ruleTest({
       after: dedent`
         <https://some.website/~username/>
         <https://some.website/~username/>
+      `,
+      options: {
+        noBareURIs: false,
+      },
+    },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/1064
+      testName: 'Make sure that various odd URL formats are indeed correctly matcted as URLs',
+      before: dedent`
+        https://web.archive.org/web/20240402173118/https://www.apple.com/
+        https://en.wikipedia.org/wiki/Möbius_strip
+        https://zh.wikipedia.org/wiki/Wikipedia:关于中文维基百科/en
+        https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top
+        http://127.0.0.1/index.html
+        mailto:John.Doe@example.com
+        https://medium.com/@robertwiblin
+        https://company.sharepoint.com/:x:/r/sites/246073/
+        https://cs.wikipedia.org/wiki/P%C5%99%C3%ADli%C5%A1_%C5%BElu%C5%A5ou%C4%8Dk%C3%BD_k%C5%AF%C5%88_%C3%BAp%C4%9Bl_%C4%8F%C3%A1belsk%C3%A9_%C3%B3dy
+        https://cs.wikipedia.org/wiki/Příliš_žluťoučký_kůň_úpěl_ďábelské_ódy
+        https://shop.aeg.no/search?q=:relevance:pnc:91028883600
+        https://www.clasohlson.com/no/Electrolux-st&oslash;vsugerslange,-Gr&aring;/p/51-2445
+        https://web.archive.org/web/20090425045316/http://www.kernelthread.com/publications/appleoshistory/1.html
+      `,
+      after: dedent`
+        <https://web.archive.org/web/20240402173118/https://www.apple.com/>
+        <https://en.wikipedia.org/wiki/Möbius_strip>
+        <https://zh.wikipedia.org/wiki/Wikipedia:关于中文维基百科/en>
+        <https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top>
+        <http://127.0.0.1/index.html>
+        <mailto:John.Doe@example.com>
+        <https://medium.com/@robertwiblin>
+        <https://company.sharepoint.com/:x:/r/sites/246073/>
+        <https://cs.wikipedia.org/wiki/P%C5%99%C3%ADli%C5%A1_%C5%BElu%C5%A5ou%C4%8Dk%C3%BD_k%C5%AF%C5%88_%C3%BAp%C4%9Bl_%C4%8F%C3%A1belsk%C3%A9_%C3%B3dy>
+        <https://cs.wikipedia.org/wiki/Příliš_žluťoučký_kůň_úpěl_ďábelské_ódy>
+        <https://shop.aeg.no/search?q=:relevance:pnc:91028883600>
+        <https://www.clasohlson.com/no/Electrolux-st&oslash;vsugerslange,-Gr&aring;/p/51-2445>
+        <https://web.archive.org/web/20090425045316/http://www.kernelthread.com/publications/appleoshistory/1.html>
+      `,
+      options: {
+        noBareURIs: false,
+      },
+    },
+    {// accounts for https://github.com/platers/obsidian-linter/issues/1064
+      testName: 'Make sure that a URL looking part to a URI gets ignored for the URL logic',
+      before: dedent`
+        news:comp.infosystems.www.servers.unix
+      `,
+      after: dedent`
+        news:comp.infosystems.www.servers.unix
       `,
       options: {
         noBareURIs: false,

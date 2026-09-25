@@ -1,6 +1,6 @@
-import {getAllTablesInText} from './mdast';
-import {ProtectedRanges} from './protected-ranges';
-import {makeSureContentHasEmptyLinesAddedBeforeAndAfter, unescapeMarkdownSpecialCharacters} from './strings';
+import { getAllTablesInText } from './mdast';
+import { ProtectedRanges } from './protected-ranges';
+import { makeSureContentHasEmptyLinesAddedBeforeAndAfter, unescapeMarkdownSpecialCharacters } from './strings';
 
 // Useful regexes
 export const allHeadersRegex = /^([ \t]*)(#+)([ \t]+)([^\n\r]*?)([ \t]+#+)?$/gm;
@@ -63,6 +63,8 @@ export const unicodeLetterRegex = RegExp(/\p{L}/, 'u');
 // make sure that the match ends in a newline
 export const multipleBlankLinesRegex = /(\n([\t\v\f\r \u00a0\u2000-\u200b\u2028-\u2029\u3000]+)?){2,}\n/g;
 
+export const hanCharacterOrCommonChinesePunctuationRegex = /\p{Script=Han}|[，。！？；：、（）［］【】「」『』“”‘’《》〈〉〔〕〖〗〘〙〚〛…—～￥﹁﹂﹃﹄﹏]/u;
+
 // https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
 // Important to use this for any regex replacements where the replacement string
 // could have user constructed dollar signs in it
@@ -87,7 +89,7 @@ export function removeSpacesInWikiLinkText(text: string): string {
       // wiki link with link text
       if (link.includes('|')) {
         const startLinkTextPosition = link.indexOf('|');
-        const newLink = link.substring(0, startLinkTextPosition+1) + link.substring(startLinkTextPosition+1, link.length - 2).trim() + ']]';
+        const newLink = link.substring(0, startLinkTextPosition + 1) + link.substring(startLinkTextPosition + 1, link.length - 2).trim() + ']]';
         text = text.replace(link, newLink);
       }
     }

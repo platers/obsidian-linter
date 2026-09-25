@@ -1,25 +1,27 @@
-import {visit} from 'unist-util-visit';
-import type {Position, Node} from 'unist';
-import type {Root} from 'mdast';
-import {ProtectedRanges} from './protected-ranges';
-import {makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, getStartOfLineWhitespaceOrBlockquoteLevel} from './strings';
-import {genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex} from './regex';
-import {gfmFootnote} from 'micromark-extension-gfm-footnote';
-import {gfmTaskListItem} from 'micromark-extension-gfm-task-list-item';
-import {frontmatter} from 'micromark-extension-frontmatter';
-import {frontmatterFromMarkdown} from 'mdast-util-frontmatter';
-import {combineExtensions} from 'micromark-util-combine-extensions';
-import {math} from 'micromark-extension-math';
-import {mathFromMarkdown} from 'mdast-util-math';
-import {fromMarkdown} from 'mdast-util-from-markdown';
-import {gfmFootnoteFromMarkdown} from 'mdast-util-gfm-footnote';
-import {gfmTaskListItemFromMarkdown} from 'mdast-util-gfm-task-list-item';
-import {LRUCache} from 'lru-cache';
-import {countInstances} from './strings';
-import {getTextInLanguage} from '../lang/helpers';
-import {DocumentProjection} from './document-projection';
-import {TextRange} from './ignore-types';
-import {applyNonOverlappingReplacements, getEditsBetween} from './text-edits';
+import { visit } from 'unist-util-visit';
+import type { Position, Node, Point } from 'unist';
+import type { Parent, Root } from 'mdast';
+import { ProtectedRanges } from './protected-ranges';
+import { makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, getStartOfLineWhitespaceOrBlockquoteLevel } from './strings';
+import { genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex, hanCharacterOrCommonChinesePunctuationRegex } from './regex';
+import { gfmFootnote } from 'micromark-extension-gfm-footnote';
+import { gfmTaskListItem } from 'micromark-extension-gfm-task-list-item';
+import { frontmatter } from 'micromark-extension-frontmatter';
+import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
+import { combineExtensions } from 'micromark-util-combine-extensions';
+import { math } from 'micromark-extension-math';
+import { mathFromMarkdown } from 'mdast-util-math';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { gfmFootnoteFromMarkdown } from 'mdast-util-gfm-footnote';
+import { gfmTaskListItemFromMarkdown } from 'mdast-util-gfm-task-list-item';
+import { LRUCache } from 'lru-cache';
+import { countInstances } from './strings';
+import { getTextInLanguage } from '../lang/helpers';
+import { DocumentProjection } from './document-projection';
+import { TextRange } from './ignore-types';
+import { applyNonOverlappingReplacements, getEditsBetween } from './text-edits';
+import { gfmAutolinkLiteral } from 'micromark-extension-gfm-autolink-literal';
+import { gfmAutolinkLiteralFromMarkdown } from 'mdast-util-gfm-autolink-literal';
 
 type ParsedText = {
   text: string,
@@ -114,17 +116,18 @@ function parseText(text: string): ParsedText {
 
   // @ts-expect-error for some reason an overload is missing
   const ast = fromMarkdown(text, {
-    extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem(), frontmatter(['yaml'])]), math()],
+    extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem(), gfmAutolinkLiteral(), frontmatter(['yaml'])]), math()],
     mdastExtensions: [[
       gfmFootnoteFromMarkdown(),
       gfmTaskListItemFromMarkdown,
+      gfmAutolinkLiteralFromMarkdown(),
       frontmatterFromMarkdown(['yaml']),
     ],
     mathFromMarkdown(),
     ],
   });
 
-  const parsedText = {text, ast, positionsByType: new Map<string, Position[]>(), treeBytes: 0};
+  const parsedText = { text, ast, positionsByType: new Map<string, Position[]>(), treeBytes: 0 };
   // Oversized entries are not stored; the caller still gets this parse, and the next
   // lookup simply parses again. No AST or Position objects are changed by eviction.
   LRU.set(text, parsedText);
@@ -162,6 +165,46 @@ export function getPositions(type: MDAstTypes, text: string): Position[] {
   return positions.slice();
 }
 
+function getDefinitionUrlPositions(text: string): Position[] {
+  const parsedText = parseText(text);
+  collectEveryTypesPositions(parsedText);
+
+  const type = 'definition';
+
+  let positions = parsedText.positionsByType.get(type);
+  if (positions === undefined) {
+    // a type left out of the walk above, which is only worth doing for one nothing asks for
+    positions = [];
+    visit(parsedText.ast, type as string, (node) => {
+      if (node.position && node.url && !(node.url as string).match(genericLinkRegex)) {
+        // build the new url index here
+        const url = node.url as string;
+        const startIndex = text.substring(node.position.start.offset, node.position.end.offset).indexOf(url);
+        // the line and column may not be exactly right if definitions can be multiline, but I am not really worried about that, since all that needs to be right for my purposes here are the offests
+        const startPoint = {
+          line: node.position.start.line,
+          column: node.position.start.column + startIndex,
+          offset: node.position.start.offset + startIndex,
+        };
+        positions.push({
+          start: startPoint,
+          end: {
+            line: startPoint.line,
+            column: startPoint.column + url.length,
+            offset: startPoint.offset + url.length,
+          }
+        });
+      }
+    });
+
+    positions.sort((a, b) => b.start.offset - a.start.offset);
+    parsedText.positionsByType.set(type, positions);
+  }
+
+  // callers are free to mutate the returned array, so the cached one is never handed out directly
+  return positions.slice();
+}
+
 /**
  * Walks the tree once, collecting the positions of every element type the rules can ask for.
  *
@@ -187,7 +230,7 @@ function collectEveryTypesPositions(parsedText: ParsedText): void {
 
   let treeBytes = 2 * parsedText.text.length;
   // Account for every node, including text, without collecting additional position types.
-  visit(parsedText.ast, (node: Node & Partial<Record<(typeof nodeStringFields)[number], unknown>>) => {
+  visit(parsedText.ast, (node: Node & Partial<Record<(typeof nodeStringFields)[number], unknown>>, index: number, parent: Node & Partial<Record<(typeof nodeStringFields)[number], unknown>>) => {
     treeBytes += 384;
     for (const field of nodeStringFields) {
       const value = node[field];
@@ -195,6 +238,10 @@ function collectEveryTypesPositions(parsedText: ParsedText): void {
         treeBytes += 2 * value.length;
       }
     }
+
+    // there seems to be a bug in the fromMarkdown logic somewhere where it is making some links and paragraphs lack position info, so we will try to reconstruct that info for links because otherwise we fail to handle links properly
+    node.position = node.position ?? reconstructNodePosition(node, parent, index, parsedText.text)
+
     positionsByType.get(node.type)?.push(node.position);
   });
 
@@ -214,6 +261,87 @@ function collectEveryTypesPositions(parsedText: ParsedText): void {
   }
 }
 
+function getNodeText(node: Node): string | undefined {
+  if (node.type === 'text') {
+    return node.value as string;
+  }
+
+  if (node.type === 'link') {
+    return (node.children as Node[])
+      .map(getNodeText)
+      .filter((value): value is string => value !== undefined)
+      .join('');
+  }
+
+  return undefined;
+}
+
+function reconstructNodePosition(node: Node, parent: Parent | undefined, index: number | undefined, text: string): Position | undefined {
+  if (!parent?.position || index === undefined) {
+    return undefined;
+  }
+
+  const nodeText = getNodeText(node);
+
+  if (!nodeText) {
+    return undefined;
+  }
+
+  // Everything between the parent's boundaries is the search space.
+  const parentStart = parent.position.start.offset;
+  const parentEnd = parent.position.end.offset;
+  const source = text.slice(parentStart, parentEnd);
+
+  // Find the source corresponding to this node by accounting for all
+  // preceding siblings, whether or not they have positions.
+  let cursor = 0;
+
+  for (let i = 0; i < index; i++) {
+    const siblingText = getNodeText(parent.children[i]);
+
+    if (!siblingText) {
+      continue;
+    }
+
+    const siblingOffset = source.indexOf(siblingText, cursor);
+
+    if (siblingOffset === -1) {
+      return undefined;
+    }
+
+    cursor = siblingOffset + siblingText.length;
+  }
+
+  const nodeOffset = source.indexOf(nodeText, cursor);
+
+  if (nodeOffset === -1) {
+    return undefined;
+  }
+
+  const startOffset = parentStart + nodeOffset;
+  const endOffset = startOffset + nodeText.length;
+
+  return {
+    start: offsetToPoint(text, startOffset),
+    end: offsetToPoint(text, endOffset),
+  };
+}
+
+function offsetToPoint(text: string, offset: number): Point {
+  let line = 1;
+  let column = 1;
+
+  for (let i = 0; i < offset; i++) {
+    if (text[i] === '\n') {
+      line++;
+      column = 1;
+    } else {
+      column++;
+    }
+  }
+
+  return { line, column, offset };
+}
 
 /**
  * Gets the positions of the list item text in the given text.
@@ -305,7 +433,7 @@ export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnot
   const footnoteKeyToFootnoteKeyInfo = new Map<string, footnoteKeyInfo>();
   const mapOfFootnoteToFootnoteReferenceIndex = new Map<string, number>();
 
-  const getAllReferencePositionsForFootnote = function(text: string, footnote: string, startOfFootnoteReferenceSearch: number): void {
+  const getAllReferencePositionsForFootnote = function (text: string, footnote: string, startOfFootnoteReferenceSearch: number): void {
     const footnoteReference = footnote.match(/\[\^.*?\]/)[0];
 
     if (footnoteKeyToFootnoteKeyInfo.has(footnoteReference)) {
@@ -367,7 +495,7 @@ export function moveFootnotesToEnd(text: string, includeBlankLinesBetweenFootnot
     const keyInfo = footnoteData[1];
     // we need to offset the index to pull from for the footnote based on the difference in the amount of keys present, but make sure it is >= 0
     let offset = keyInfo.referencePositions.length - keyInfo.footnotesReferencingKey.length;
-    offset = offset >= 0 ? offset: 0; // this allows us to properly hit not found error messages
+    offset = offset >= 0 ? offset : 0; // this allows us to properly hit not found error messages
     let index = 0;
     for (const footnote of keyInfo.footnotesReferencingKey) {
       if (index + offset >= keyInfo.referencePositions.length) {
@@ -423,7 +551,7 @@ export function reIndexFootnotes(text: string, protectedRanges: ProtectedRanges)
   const footnoteReferenceLocationInfo: keyInfo[] = [];
   const footnoteKeys = new Set<string>();
 
-  const getAllFootnoteReferences = function(text: string, footnote: string, startOfFootnoteReferenceSearch: number): void {
+  const getAllFootnoteReferences = function (text: string, footnote: string, startOfFootnoteReferenceSearch: number): void {
     const footnoteReference = footnote.match(/\[\^.*?\]/)[0];
     footnoteToFootnoteKey.set(footnote, footnoteReference);
 
@@ -442,8 +570,8 @@ export function reIndexFootnotes(text: string, protectedRanges: ProtectedRanges)
       }
 
       if (!protectedRanges.isProtected(footnoteReferenceLocation, footnoteReferenceLocation + footnoteReference.length) &&
-          (footnoteReferenceLocation + footnote.length > text.length || text.substring(footnoteReferenceLocation, footnoteReferenceLocation + footnote.length) !== footnote)) {
-        footnoteReferenceLocationInfo.push({key: footnoteReference, position: footnoteReferenceLocation});
+        (footnoteReferenceLocation + footnote.length > text.length || text.substring(footnoteReferenceLocation, footnoteReferenceLocation + footnote.length) !== footnote)) {
+        footnoteReferenceLocationInfo.push({ key: footnoteReference, position: footnoteReferenceLocation });
       }
 
       startOfFootnoteReferenceSearch = footnoteReferenceLocation - 1;
@@ -482,7 +610,7 @@ export function reIndexFootnotes(text: string, protectedRanges: ProtectedRanges)
   for (const footnoteReference of footnoteReferenceLocationInfo) {
     const newFootnoteKey = oldKeyToNewKey.get(footnoteReference.key);
 
-    replacements.push({startIndex: footnoteReference.position, endIndex: footnoteReference.position + footnoteReference.key.length, value: newFootnoteKey});
+    replacements.push({ startIndex: footnoteReference.position, endIndex: footnoteReference.position + footnoteReference.key.length, value: newFootnoteKey });
   }
 
   footnotesAdded.clear();
@@ -493,7 +621,7 @@ export function reIndexFootnotes(text: string, protectedRanges: ProtectedRanges)
       if (text[start - 1] === '\n' && text[position.end.offset] === '\n') {
         start--;
       }
-      deletions.push({startIndex: start, endIndex: position.end.offset, value: ''});
+      deletions.push({ startIndex: start, endIndex: position.end.offset, value: '' });
       continue;
     }
 
@@ -502,7 +630,7 @@ export function reIndexFootnotes(text: string, protectedRanges: ProtectedRanges)
     const newFootnoteKey = oldKeyToNewKey.get(footnoteKey);
     // A differently worded definition with the same key may already be in the reference edits.
     if (!replacements.some((replacement) => replacement.startIndex === position.start.offset)) {
-      replacements.push({startIndex: position.start.offset, endIndex: position.start.offset + footnoteKey.length, value: newFootnoteKey});
+      replacements.push({ startIndex: position.start.offset, endIndex: position.start.offset + footnoteKey.length, value: newFootnoteKey });
     }
   }
 
@@ -512,7 +640,7 @@ export function reIndexFootnotes(text: string, protectedRanges: ProtectedRanges)
   const nonOverlappingReplacements = replacements.filter((replacement) => {
     return !deletionRanges.isProtected(replacement.startIndex, replacement.endIndex);
   });
-  nonOverlappingReplacements.push(...deletionRanges.ranges.map((range) => ({...range, value: ''})));
+  nonOverlappingReplacements.push(...deletionRanges.ranges.map((range) => ({ ...range, value: '' })));
   return replaceTextRanges(text, nonOverlappingReplacements.sort((a, b) => a.startIndex - b.startIndex));
 }
 
@@ -542,8 +670,8 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
   } else if (style === 'asterisk') {
     indicator = '*';
   } else {
-    const firstPosition = positions[positions.length-1];
-    indicator = text.substring(firstPosition.start.offset, firstPosition.start.offset+1);
+    const firstPosition = positions[positions.length - 1];
+    indicator = text.substring(firstPosition.start.offset, firstPosition.start.offset + 1);
   }
 
   // make the size two for the indicator when the type is strong
@@ -554,8 +682,8 @@ export function makeEmphasisOrBoldConsistent(text: string, style: string, type: 
   // Nested nodes overlap, but their delimiter runs are disjoint. Leave their interiors untouched.
   const replacements: textReplacement[] = [];
   for (const position of positions) {
-    replacements.push({startIndex: position.start.offset, endIndex: position.start.offset + indicator.length, value: indicator});
-    replacements.push({startIndex: position.end.offset - indicator.length, endIndex: position.end.offset, value: indicator});
+    replacements.push({ startIndex: position.start.offset, endIndex: position.start.offset + indicator.length, value: indicator });
+    replacements.push({ startIndex: position.end.offset - indicator.length, endIndex: position.end.offset, value: indicator });
   }
 
   return applyNonOverlappingReplacements(text, replacements);
@@ -681,7 +809,7 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
       return;
     }
 
-    const replacement = {startIndex, endIndex, value};
+    const replacement = { startIndex, endIndex, value };
     boundaryReplacements.set(key, replacement);
     replacements.push(replacement);
   };
@@ -713,14 +841,14 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
 
       // make sure that lines that end in \, <br>, <br/>, or two or more spaces are in the same paragraph
       const nextLineIsSameParagraph = paragraphLine.endsWith(LineBreakIndicators.LineBreakHtmlNotXml) || paragraphLine.endsWith(LineBreakIndicators.LineBreakHtml) || paragraphLine.endsWith(LineBreakIndicators.TwoSpaces) || (!paragraphLine.endsWith('\\\\') && paragraphLine.endsWith(LineBreakIndicators.Backslash));
-      replacements.push({startIndex: newlineIndex, endIndex: newlineIndex + 1, value: nextLineIsSameParagraph ? '\n' : '\n\n'});
+      replacements.push({ startIndex: newlineIndex, endIndex: newlineIndex + 1, value: nextLineIsSameParagraph ? '\n' : '\n\n' });
       newlineIndex++;
     }
 
     // Adjacent paragraphs claim the same newline run. Deduplicate the gap itself,
     // rather than expanding paragraph replacements into overlapping ranges.
     const lineStartIndex = startIndex;
-    while (startIndex > 0 && text.charAt(startIndex-1) == '\n') {
+    while (startIndex > 0 && text.charAt(startIndex - 1) == '\n') {
       startIndex--;
     }
     addBoundaryReplacement(startIndex, lineStartIndex, startIndex == 0 ? '' : '\n\n');
@@ -744,7 +872,6 @@ export function makeSureThereIsOnlyOneBlankLineBeforeAndAfterParagraphs(text: st
 
   return applyProjectedChanges(projection, applyNonOverlappingReplacements(text, replacements));
 }
-
 
 /**
  * Removes spaces before and after markdown link text
@@ -775,7 +902,7 @@ export function removeSpacesInLinkText(text: string, protectedRanges: ProtectedR
 
     const endLinkTextPosition = regularLink.indexOf(']');
     const newLink = regularLink.substring(0, 1) + regularLink.substring(1, endLinkTextPosition).trim() + regularLink.substring(endLinkTextPosition);
-    replacements.push({startIndex: position.start.offset, endIndex: position.end.offset, value: newLink});
+    replacements.push({ startIndex: position.start.offset, endIndex: position.end.offset, value: newLink });
   }
 
   return applyNonOverlappingReplacements(text, replacements);
@@ -817,7 +944,7 @@ function getProjectedNodeRanges(type: MDAstTypes, projection: DocumentProjection
     // A node starting inside a token is skipped whole, losing edits to its visible part if it
     // extends past the token. paragraph-blank-lines instead parses the projection itself.
     if (startIndex !== undefined && endIndex !== undefined && !projection.isToken(startIndex)) {
-      ranges.push({startIndex, endIndex});
+      ranges.push({ startIndex, endIndex });
     }
   }
 
@@ -829,7 +956,7 @@ function applyProjectedChanges(projection: DocumentProjection, projectedText: st
   for (const edit of getEditsBetween(projection.text, projectedText)) {
     const range = projection.editRangeToSource(edit);
     if (range) {
-      replacements.push({...range, value: edit.value});
+      replacements.push({ ...range, value: edit.value });
     }
   }
 
@@ -860,7 +987,7 @@ function getProjectedInlineMathRangesAfterBlockChanges(projection: DocumentProje
     const startIndex = shiftOffset(range.startIndex);
     const endIndex = shiftOffset(range.endIndex);
     if (startIndex !== undefined && endIndex !== undefined) {
-      ranges.push({startIndex, endIndex});
+      ranges.push({ startIndex, endIndex });
     }
   }
 
@@ -874,7 +1001,7 @@ export function ensureEmptyLinesAroundFencedCodeBlocks(text: string, protectedRa
 
   for (const position of positions) {
     const codeBlock = projectedText.substring(position.startIndex, position.endIndex);
-    if (!codeBlock.startsWith('```') && ! codeBlock.startsWith(`~~~`)) {
+    if (!codeBlock.startsWith('```') && !codeBlock.startsWith(`~~~`)) {
       continue;
     }
 
@@ -960,7 +1087,7 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
     }
     let listText = text.substring(start, position.end.offset);
 
-    const getListItemLevel = function(preListItemIndicatorContent: string): number {
+    const getListItemLevel = function (preListItemIndicatorContent: string): number {
       const lastBlockQuoteIndicator = preListItemIndicatorContent.lastIndexOf('> ');
       if (lastBlockQuoteIndicator !== -1) {
         preListItemIndicatorContent = preListItemIndicatorContent.substring(lastBlockQuoteIndicator + 2);
@@ -972,7 +1099,7 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
     };
 
     const preListIndicatorLevelsToIndicatorNumber = new Map<number, number>();
-    const removeListItemsItemIndicatorInfo = function(start: number, end: number) {
+    const removeListItemsItemIndicatorInfo = function (start: number, end: number) {
       let i = end;
       while (i > start) {
         preListIndicatorLevelsToIndicatorNumber.delete(i--);
@@ -996,7 +1123,7 @@ export function updateOrderedListItemIndicators(text: string, orderedListStyle: 
       const listItemIndicatorLevel = getListItemLevel($1);
       // when dealing with a value that is not an int reset all values greater than or equal to the current list level
       if (!/^\d/.test($3)) {
-        const highestCurrentValue = listItemIndicatorLevel > lastItemListIndicatorLevel ? listItemIndicatorLevel: lastItemListIndicatorLevel;
+        const highestCurrentValue = listItemIndicatorLevel > lastItemListIndicatorLevel ? listItemIndicatorLevel : lastItemListIndicatorLevel;
         removeListItemsItemIndicatorInfo(listItemIndicatorLevel, highestCurrentValue);
 
         return listItem; // skip to the next item if the current item is not an ordered list item
@@ -1068,7 +1195,7 @@ export function updateUnorderedListItemIndicators(text: string, unorderedListSty
 
     // List item spans nest, but their bullets do not. Replacing only the bullet preserves inner
     // edits; nested bullets are not at the start of a line and cannot change the regex above.
-    replacements.push({startIndex: position.start.offset, endIndex: position.start.offset + 1, value: unorderedStyle});
+    replacements.push({ startIndex: position.start.offset, endIndex: position.start.offset + 1, value: unorderedStyle });
   }
 
   return applyNonOverlappingReplacements(text, replacements);
@@ -1140,7 +1267,7 @@ export function makeSureMathBlockIndicatorsAreOnTheirOwnLines(text: string, numb
   return applyProjectedChanges(projection, projectedText);
 }
 
-function breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock: string, numberOfDollarSignsForMathBlock: number, startIndexOfMathBlock: number): {startIndex: number, endIndex: number}[] {
+function breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock: string, numberOfDollarSignsForMathBlock: number, startIndexOfMathBlock: number): { startIndex: number, endIndex: number }[] {
   let mathBlockIndicator = '$'.repeat(numberOfDollarSignsForMathBlock);
   let endOfOpeningIndicator = numberOfDollarSignsForMathBlock;
   while (mathBlock.charAt(endOfOpeningIndicator) === '$') {
@@ -1148,7 +1275,7 @@ function breakMathBlockIntoMultipleBlocksIfNeedBe(mathBlock: string, numberOfDol
     endOfOpeningIndicator++;
   }
 
-  const mathBlockIndexes = [] as {startIndex: number, endIndex: number}[];
+  const mathBlockIndexes = [] as { startIndex: number, endIndex: number }[];
 
   let matchCount = countInstances(mathBlock, mathBlockIndicator);
   if (matchCount <= 1) {
@@ -1239,7 +1366,7 @@ function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockSt
   // math block indicators to its own line
   // eslint-disable-next-line no-unmodified-loop-condition -- the logic here does break, so there is no need to be stringent about no loop condition changing
   while (startingNewLineAdded && mathBlockStartIndex > 0) {
-    const previousChar = text[mathBlockStartIndex-1];
+    const previousChar = text[mathBlockStartIndex - 1];
     if (previousChar !== ' ' && previousChar !== '\t') {
       break;
     }
@@ -1256,9 +1383,9 @@ function addBlankLinesAroundStartAndStopMathIndicators(text: string, mathBlockSt
  * @param {string} text - The text to get the list of table locations from.
  * @return {{startIndex: number, endIndex: number}[]} An array of start and end indexes of each table found from last to earliest.
  */
-export function getAllTablesInText(text: string): {startIndex: number, endIndex: number}[] {
+export function getAllTablesInText(text: string): { startIndex: number, endIndex: number }[] {
   const regexMatches = [...text.matchAll(tableSeparator)];
-  const positions: {startIndex: number, endIndex: number}[] = [];
+  const positions: { startIndex: number, endIndex: number }[] = [];
   for (const match of regexMatches) {
     const startOfCurrentLine = getStartOfLineIndex(text, match.index);
     if (startOfCurrentLine === 0) {
@@ -1280,7 +1407,7 @@ export function getAllTablesInText(text: string): {startIndex: number, endIndex:
       continue;
     }
 
-    firstLine = firstLine.replace(tableStartingPipe, (match: string)=> {
+    firstLine = firstLine.replace(tableStartingPipe, (match: string) => {
       // do nothing if the table only has whitespace or a pipe before it
       const trimmedMatch = match.trim();
       if (trimmedMatch === '' || trimmedMatch === '|') {
@@ -1385,10 +1512,10 @@ function countTableDelimiters(line: string): number {
   return numDelimiters;
 }
 
-export function getAllCustomIgnoreSectionsInText(text: string): {startIndex: number, endIndex: number}[] {
+export function getAllCustomIgnoreSectionsInText(text: string): { startIndex: number, endIndex: number }[] {
   let iteratorIndex = 0;
 
-  const positions: {startIndex: number, endIndex: number}[] = [];
+  const positions: { startIndex: number, endIndex: number }[] = [];
   const startMatches = [...text.matchAll(customIgnoreAllStartIndicator)];
   if (!startMatches || startMatches.length === 0) {
     return positions;
@@ -1451,4 +1578,98 @@ export function ensureFencedCodeBlocksHasLanguage(text: string, defaultLanguage:
   }
 
   return text;
+}
+
+export function getUrlPositions(text: string): Position[] {
+  const allLinks = getPositions(MDAstTypes.Link, text);
+
+  const urls: Position[] = [];
+  for (let position of allLinks) {
+    if (text.substring(position.start.offset, position.end.offset).match(genericLinkRegex)) {
+      continue;
+    }
+
+    // mailto: seems to get left off when dealing with links even though the url text includes it. So to properly escape it we need to walk back the start of the position
+    // mailto: is also special in that it is a URI, but gfm gives it first class citizenship in its autolink setup
+    position = includeMailtoPrefix(text, position);
+
+    // we can hit false positives, so check whether or not we come after a URI
+    if (isPrecededByUri(text, position)) {
+      continue;
+    }
+
+    // there seems to be an incongruency between what the markdown parser counts as a link and what the Linter has which is Chinese characters
+    // if a link has Chinese characters then we need to cut it short at that point and update the url info accordingly
+    urls.push(trimTrailingHanCharacters(text, position));
+  }
+
+  urls.push(...getDefinitionUrlPositions(text))
+  urls.sort((a, b) => b.start.offset - a.start.offset);
+
+  return urls;
+}
+
+function trimTrailingHanCharacters(text: string, position: Position): Position {
+  let end = position.end.offset;
+
+  while (end > position.start.offset) {
+    const char = text[end - 1];
+
+    if (!hanCharacterOrCommonChinesePunctuationRegex.test(char)) {
+      break;
+    }
+
+    end--;
+  }
+
+  if (end === position.end.offset) {
+    return position;
+  }
+
+  return {
+    ...position,
+    end: {
+      ...position.end,
+      offset: end,
+    },
+  };
+}
+
+function includeMailtoPrefix(text: string, position: Position): Position {
+  const prefix = 'mailto:';
+  const start = position.start.offset;
+
+  if (start < prefix.length || text.substring(start - prefix.length, start) !== prefix) {
+    return position;
+  }
+
+  const newStartOffset = start - prefix.length;
+
+  return {
+    start: {
+      ...position.start,
+      offset: newStartOffset,
+      column: position.start.column - prefix.length,
+    },
+    end: position.end,
+  };
+}
+
+// this function may not be entirely accurate, but it is my best approximation of what this looks like at this time. We can refine this as needed.
+function isPrecededByUri(text: string, position: Position): boolean {
+  for (let index = position.start.offset - 1; index >= 0; index--) {
+    const character = text[index];
+
+    if (character === undefined || character.charCodeAt(0) > 127 || /\s/.test(character)) {
+      return false;
+    }
+
+    if (character === ':' && index > 0) {
+      const previousCharacter = text[index - 1];
+
+      return previousCharacter !== ':';
+    }
+  }
+
+  return false;
 }
