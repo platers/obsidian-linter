@@ -108,6 +108,12 @@ export default class LinterPlugin extends Plugin {
 
     this.registerEditorSuggest(new RuleAliasSuggest(this));
 
+    if (!this.settings.textAreaSettingsConvertedToListItemSettings) {
+      if (await this.moveTextAreaSettingsToListItemSettings()) {
+        await this.saveSettings();
+      }
+    }
+
     this.settingsTab = new SettingTab(this.app, this);
     this.addSettingTab(this.settingsTab);
   }
