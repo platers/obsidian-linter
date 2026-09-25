@@ -333,9 +333,13 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     // we can change this to the necessary implementation when this scenario is encountered
     emptyLine = text.substring(endOfContent, endOfNewContent).trimEnd();
   } else {
-    emptyLine = getEmptyLine(nextLine);
+    // we need to make sure that the next line is not a callout. If it is, then we need to use the current line instead of the next line (see https://github.com/platers/obsidian-linter/issues/1596)
+    if (nextLine.match(calloutRegex)) {
+      emptyLine = getEmptyLine(startOfLine);
+    } else {
+      emptyLine = getEmptyLine(nextLine);
+    }
   }
-
 
   return text.substring(0, endOfContent) + emptyLine + text.substring(endOfNewContent);
 }
