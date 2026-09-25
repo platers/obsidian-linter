@@ -44,6 +44,13 @@ jobs:
           cp main.js manifest.json styles.css src/utils/default-misspellings.md ${{ env.PLUGIN_NAME }}
           zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
 
+      - name: Run Obsidain scanner checks
+        uses: obsidianmd/obsidian-workflows@v1
+        with:
+          mode: pr
+          scanner-lint: true
+          node-version: "20.19.x"
+
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
