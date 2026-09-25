@@ -1,0 +1,76 @@
+name: Feature request
+about: Suggest an idea for this project
+title: 'FR: '
+labels: [rule suggestion, needs-triage]
+body:
+  - type: textarea
+    id: problem-to-solve
+    attributes:
+      label: What problem are you trying to solve?
+      description: |
+        A clear and concise description of what the problem is. Ex. I'm always frustrated when [...].
+        Please do not use screenshots unless the issue is related to a UI element or is otherwise necessary to 
+        understand the problem. Any text that is expected to be helpful for working on the feature should be typed out or pasted in.
+      placeholder: |
+        When I work with YAML I find myself frequently...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type-of-change
+    attributes:
+      label: Type of change being requested
+      description: What type of change does this fall under?
+      options:
+        - New rule
+        - Update existing rule
+        - New tooling
+        - Other
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-solution
+    attributes:
+      label: How do you think this problem should be solved
+      description: |
+        The better thought out the solution the more likely it is for it to be picked up and added. Very vague requests
+        will require more thought about what needs to be done which takes away from development time. Please include any
+        edge cases you are aware of that would need handling.
+        Make sure to include examples of the before and after of the markdown if the requested change relates to a rule.
+      placeholder: |
+        A clear and concise description of what you want to happen.
+
+        **Please include an example where applicable:**
+
+        ``` markdown
+        original text
+        ```
+
+        ``` markdown
+        expected outcome
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What alternatives have you considered?
+      description: |
+        This is typically what other solutions you have tried, if they currently work, 
+        and why this would be better than those alternatives.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: |
+        Add any other context or screenshots about the feature request here.
+        If another plugin already encapsulates this functionality, please add it here for reference.
+    validations:
+      required: false
+
