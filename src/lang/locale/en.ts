@@ -683,7 +683,7 @@ export default {
       'name': 'Quote style',
       'description': 'Updates the quotes in the body content to be updated to the specified single and double quote styles.',
       'single-quote-enabled': {
-        'name': 'Enable <code>Single quote style</code>',
+        'name': 'Enable Single quote style',
         'description': 'Specifies that the selected single quote style should be used.',
       },
       'single-quote-style': {
@@ -691,7 +691,7 @@ export default {
         'description': 'The style of single quotes to use.',
       },
       'double-quote-enabled': {
-        'name': 'Enable <code>Double quote style</code>',
+        'name': 'Enable Double quote style',
         'description': 'Specifies that the selected double quote style should be used.',
       },
       'double-quote-style': {
@@ -967,7 +967,7 @@ export default {
         'description': 'Such aliases are usually redundant',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': 'Use the YAML key specified by <code>Alias helper key</code> to help with filename and heading changes',
+        'name': 'Use the YAML key specified by Alias helper key to help with filename and heading changes',
         'description': 'If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array',
       },
       'alias-helper-key': {

@@ -864,7 +864,7 @@ export default {
         'description': '这样的别名通常是冗余的',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': '使用 YAML 键 <code>linter-yaml-title-alias</code> 来保留标题修改记录',
+        'name': '使用 YAML 键 linter-yaml-title-alias 来保留标题修改记录',
         'description': '如果设置，当第一个 H1 标题更改或文档名更改时，此键中存储的旧 aliases 将替换为新值，而不仅仅是在 aliases 中插入新条目',
       },
       'alias-helper-key': {
