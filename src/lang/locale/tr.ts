@@ -175,7 +175,7 @@ export default {
       },
     },
     'debug': {
-    // debug-tab.ts
+      // debug-tab.ts
       'log-level': {
         'name': 'Log Düzeyi',
         'description': 'Hizmetin loglamaya izin verdiği log türleri. Varsayılan ERROR\'dur.',
@@ -494,7 +494,7 @@ export default {
       'name': 'üç nokta karakteriyle',
       'description': 'Gövde içeriğindeki alıntıları belirtilen tek ve çift alıntı stillerine günceller.',
       'single-quote-enabled': {
-        'name': '<code>Tek Alıntı Stili</code> Kullanımı',
+        'name': 'Tek Alıntı Stili Kullanımı',
         'description': 'Seçilen tek alıntı stilinin kullanılacağını belirtir.',
       },
       'single-quote-style': {
@@ -502,7 +502,7 @@ export default {
         'description': 'Kullanılacak tek alıntı stilidir.',
       },
       'double-quote-enabled': {
-        'name': '<code>Çift Alıntı Stili</code> Kullanımı',
+        'name': 'Çift Alıntı Stili Kullanımı',
         'description': 'Seçilen çift alıntı stilinin kullanılacağını belirtir.',
       },
       'double-quote-style': {
@@ -714,7 +714,7 @@ export default {
         'description': 'Bu tür takma adlar genellikle gereksizdir',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': '<code>linter-yaml-title-alias</code> YAML anahtarını kullanarak eski dosya adı ve başlık değişikliklerini takip et',
+        'name': 'linter-yaml-title-alias YAML anahtarını kullanarak eski dosya adı ve başlık değişikliklerini takip et',
         'description': 'Ayarlanırsa, ilk H1 başlığı değiştiğinde veya ilk H1 yoksa dosya adı değiştiğinde, bu anahtarda saklanan eski takma ad, takma adlar dizisine yeni bir giriş eklemek yerine yeni değerle değiştirilir',
       },
     },

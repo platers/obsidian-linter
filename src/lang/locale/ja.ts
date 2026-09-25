@@ -880,7 +880,7 @@ export default {
         'description': 'そのようなエイリアスは通常冗長です',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': '<code>Alias Helper Key</code>で指定されたYAMLキーを使用して、ファイル名と見出しの変更を支援します',
+        'name': 'Alias Helper Keyで指定されたYAMLキーを使用して、ファイル名と見出しの変更を支援します',
         'description': '設定されている場合、最初のH1見出しが変更された場合、または最初のH1が存在しない場合はファイル名が変更された場合に、このキーに保存されている古いエイリアスは、新しい値に置き換えられます。エイリアス配列に新しいエントリを挿入するだけではありません。',
       },
       'alias-helper-key': {

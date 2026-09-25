@@ -177,7 +177,7 @@ export default {
       },
     },
     'debug': {
-    // debug-tab.ts
+      // debug-tab.ts
       'log-level': {
         'name': 'Log-Ebene',
         'description': 'Die Arten von Logmeldungen, die vom Dienst protokolliert werden dürfen. Der Standardwert ist Fehler.',
@@ -187,7 +187,7 @@ export default {
         'description': 'Der Inhalt der data.json für den Linter zum Zeitpunkt des Ladens der Einstellungsseite',
       },
       'log-collection': {
-        'name': 'Sammeln Sie Protokolle bei aktiviertem <code>Linten beim Speichern</code> und dem Linten der aktuellen Datei',
+        'name': 'Sammeln Sie Protokolle bei aktiviertem Linten beim Speichern und dem Linten der aktuellen Datei',
         'description': 'Sammelt die Log-Meldungen, wenn Sie <code>Linten beim Speichern</code> aktiviert haben und die aktuelle Datei linten. Diese Protokolle können beim Debuggen und Erstellen von Fehlerberichten hilfreich sein.',
       },
       'linter-logs': {
@@ -495,7 +495,7 @@ export default {
       'name': 'Zitatstil',
       'description': 'Aktualisiert die Anführungszeichen im Textkörperinhalt, sodass sie auf die angegebenen einfachen und doppelten Anführungszeichenstile aktualisiert werden.',
       'single-quote-enabled': {
-        'name': 'Aktivieren Sie <code>Stil für einfache Anführungszeichen</code>',
+        'name': 'Aktivieren Sie Stil für einfache Anführungszeichen',
         'description': 'Gibt an, dass der ausgewählte einfache Anführungszeichenstil verwendet werden soll.',
       },
       'single-quote-style': {
@@ -503,7 +503,7 @@ export default {
         'description': 'Der Stil der zu verwendenden einfachen Anführungszeichen.',
       },
       'double-quote-enabled': {
-        'name': 'Aktivieren Sie <code>Stil für doppelte Anführungszeichen</code>',
+        'name': 'Aktivieren Sie Stil für doppelte Anführungszeichen',
         'description': 'Gibt an, dass der ausgewählte doppelte Anführungszeichenstil verwendet werden soll.',
       },
       'double-quote-style': {
@@ -715,7 +715,7 @@ export default {
         'description': 'Solche Aliase sind in der Regel redundant',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': 'Verwenden Sie den YAML-Schlüssel <code>linter-yaml-title-alias</code>, um bei Änderungen von Dateinamen und Überschriften zu helfen',
+        'name': 'Verwenden Sie den YAML-Schlüssel linter-yaml-title-alias, um bei Änderungen von Dateinamen und Überschriften zu helfen',
         'description': 'Wenn sich die erste H1-Überschrift ändert oder der Dateiname geändert wird, wenn der erste H1 nicht vorhanden ist, wird der alte Alias, der in diesem Schlüssel gespeichert ist, durch den neuen Wert ersetzt, anstatt nur einen neuen Eintrag in das Alias-Array einzufügen',
       },
     },

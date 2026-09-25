@@ -593,7 +593,7 @@ export default {
       'name': '引號樣式',
       'description': '將內文內容中的引號更新為指定的單引號和雙引號樣式。',
       'single-quote-enabled': {
-        'name': '啟用 <code>單引號樣式</code>',
+        'name': '啟用 單引號樣式',
         'description': '指定應使用選定的單引號樣式。',
       },
       'single-quote-style': {
@@ -601,7 +601,7 @@ export default {
         'description': '要使用的單引號樣式。',
       },
       'double-quote-enabled': {
-        'name': '啟用 <code>雙引號樣式</code>',
+        'name': '啟用 雙引號樣式',
         'description': '指定應使用選定的雙引號樣式。',
       },
       'double-quote-style': {
@@ -871,7 +871,7 @@ export default {
         'description': '此類別名通常是多餘的',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': '使用由 <code>別名輔助鍵</code> 指定的 YAML 鍵來協助處理檔名和標題變更',
+        'name': '使用由 別名輔助鍵 指定的 YAML 鍵來協助處理檔名和標題變更',
         'description': '如果設定，當第一個 H1 標題變更或如果第一個 H1 不存在時檔名變更，則儲存在此鍵中的舊別名將被新值取代，而不是僅在別名陣列中插入新項目',
       },
       'alias-helper-key': {

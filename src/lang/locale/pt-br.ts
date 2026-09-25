@@ -611,7 +611,7 @@ export default {
       'name': 'Estilo de aspas',
       'description': 'Atualiza as aspas no conteúdo do corpo para os estilos especificados de aspas simples e duplas.',
       'single-quote-enabled': {
-        'name': 'Ativar <code>Estilo de aspas simples</code>',
+        'name': 'Ativar Estilo de aspas simples',
         'description': 'Especifica que o estilo selecionado para aspas simples deve ser utilizado.',
       },
       'single-quote-style': {
@@ -619,7 +619,7 @@ export default {
         'description': 'O estilo de aspas simples a ser utilizado.',
       },
       'double-quote-enabled': {
-        'name': 'Ativar <code>Estilo de aspas duplas</code>',
+        'name': 'Ativar Estilo de aspas duplas',
         'description': 'Especifica que o estilo selecionado para aspas duplas deve ser utilizado.',
       },
       'double-quote-style': {
@@ -889,7 +889,7 @@ export default {
         'description': 'Tais aliases geralmente são redundantes',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': 'Usar a chave do YAML especificada por <code>Chave auxiliar de alias</code> para ajudar com alterações no nome do arquivo e cabeçalho',
+        'name': 'Usar a chave do YAML especificada por Chave auxiliar de alias para ajudar com alterações no nome do arquivo e cabeçalho',
         'description': 'Se ativado, ao alterar o primeiro cabeçalho H1 (ou o nome do arquivo, caso não haja H1), o alias antigo guardado nessa chave será substituído pelo novo valor em vez de apenas inserir uma nova entrada no array de aliases',
       },
       'alias-helper-key': {
