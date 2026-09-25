@@ -1,5 +1,4 @@
 name: Documentation request
-about: Create a request to have documentation added, updated, or removed for a feature or process
 title: 'Doc: '
 labels: [documentation]
 body:
