@@ -351,6 +351,11 @@ export default {
       'name': 'Add blank line after YAML',
       'description': 'Adds a blank line after the YAML block if it does not end the current file or it is not already followed by at least 1 blank line',
     },
+    // align-table-columns.ts
+    'align-table-columns': {
+      'name': 'Align Table Columns',
+      'description': 'Aligns the table so that all columns have the same length.',
+    },
     // blockquotify-on-paste.ts
     'add-blockquote-indentation-on-paste': {
       'name': 'Add blockquote indentation on paste',

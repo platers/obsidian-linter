@@ -25,6 +25,9 @@ import '../src/rules-registry';
 //
 // Check the stash actually reverted something. Comparing code against itself passes and means
 // nothing.
+//
+// Set UPDATE_SNAPSHOT=1 when the differential snapshot will be run to regenerate the differential
+// since its value differs from the actual differential hash setup of the dumped file.
 
 const largeFixturePath = process.env.LINTER_PERF_FIXTURE;
 const largeFixtureLineCount = 600;
@@ -246,6 +249,11 @@ describe('the linter produces the same documents it did before', () => {
       }
     }
 
+    if (process.env.UPDATE_SNAPSHOT) {
+      writeFileSync(snapshotPath, hashes.map(({ name, hash }) => `${name}\t${hash}`).join('\n') + '\n');
+      return;
+    }
+
     if (process.env.DUMP_PATH) {
       writeFileSync(process.env.DUMP_PATH, lines.join('\n') + '\n');
     }
@@ -256,7 +264,7 @@ describe('the linter produces the same documents it did before', () => {
     }));
 
     if (expectedHashes.size !== hashes.length) {
-      throw new Error(`Differential snapshot has ${expectedHashes.size} entries, but the checkout corpus has ${hashes.length}. Regenerate and review the snapshot.`);
+      throw new Error(`Differential snapshot has ${expectedHashes.size} entries, but the checkout corpus has ${hashes.length}. Regenerate and review the snapshot. Regenerate the snapshot with UPDATE_SNAPSHOT=1 npx jest __tests__/rules-runner-differential.test.ts`);
     }
 
     for (const { name, hash } of hashes) {

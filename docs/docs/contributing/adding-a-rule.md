@@ -509,6 +509,12 @@ they can suggest a change to the wording.
 
 Once a rule has been created, see about adding tests for edge cases as described in [Adding Test](testing.md#adding-tests).
 
-## 5. Open a Pull Request
+## 5. Regenerate the Differential Snapshot
+
+There is a test file called `rules-runner-differential.test.ts` that compares current rules to their previous outputs. This helps catch
+potential rule issues when they interact with one another. However it is a static file. So when you create a new rule, you will need to
+go ahead run `npm run generate-differential` to make sure that it creates an updated snapshot.
+
+## 6. Open a Pull Request
 
 Once the tests are in place, the new rule should be ready for review. So go on ahead and [open a pull request](open-a-pr.md).
