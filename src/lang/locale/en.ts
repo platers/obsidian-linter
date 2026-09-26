@@ -974,6 +974,10 @@ export default {
         'name': 'Alias helper key',
         'description': 'The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule.',
       },
+      'remove-alias-if-empty': {
+        'name': 'Remove alias if empty',
+        'description': 'Removes the alias key if the alias key for the file ends up being empty.',
+      },
     },
     // yaml-title.ts
     'yaml-title': {

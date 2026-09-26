@@ -1,7 +1,7 @@
 import YamlTitleAlias from '../src/rules/yaml-title-alias';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
-import {NormalArrayFormats, SpecialArrayFormats} from '../src/utils/yaml';
+import { ruleTest } from './common';
+import { NormalArrayFormats, SpecialArrayFormats } from '../src/utils/yaml';
 
 ruleTest({
   RuleBuilderClass: YamlTitleAlias,
@@ -10,7 +10,7 @@ ruleTest({
       testName: 'Keeps a tag as heading text rather than falling back to the filename',
       before: '# #a',
       after: '---\naliases:\n  - "#a"\nlinter-yaml-title-alias: "#a"\n---\n# #a',
-      options: {fileName: 'Filename'},
+      options: { fileName: 'Filename' },
     },
     {
       testName: 'Uses the first visible heading after a fenced code block',
@@ -32,7 +32,7 @@ ruleTest({
       testName: 'Does not use a heading match that crosses into a protected code block',
       before: '#\n```\n```',
       after: '---\naliases:\n  - Filename\nlinter-yaml-title-alias: Filename\n---\n#\n```\n```',
-      options: {fileName: 'Filename', keepAliasThatMatchesTheFilename: true},
+      options: { fileName: 'Filename', keepAliasThatMatchesTheFilename: true },
     },
     {
       testName: 'Creates multi-line array aliases when missing',
@@ -1092,6 +1092,26 @@ ruleTest({
       `,
       options: {
         fileName: 'Filename',
+        removeAliasKeyWhenEmpty: true,
+      },
+    },
+    {
+      testName: 'Doesn\'t remove empty alias section if title matches the filename and removeAliasKeyWhenEmpty false',
+      before: dedent`
+        ---
+        aliases:
+        ---
+        # Filename
+      `,
+      after: dedent`
+        ---
+        aliases:
+        ---
+        # Filename
+      `,
+      options: {
+        fileName: 'Filename',
+        removeAliasKeyWhenEmpty: false,
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/449
