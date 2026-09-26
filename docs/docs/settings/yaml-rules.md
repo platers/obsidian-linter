@@ -658,6 +658,200 @@ animal: cat
 ``````
 </details>
 
+## Move inline fields to YAML
+
+Alias: `move-inline-fields-to-yaml`
+
+Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Full-line fields are removed from the body once moved. Fields on list items and tasks are left alone since Dataview scopes them to the list item.
+
+### Options
+
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `Bracketed inline fields` | What to do with inline fields wrapped in square brackets or parentheses like <code>[key:: value]</code> and <code>(key:: value)</code> | `Leave in place`: Does not move bracketed fields like `[key:: value]` and `(key:: value)`<br/><br/>`Move and keep value in text`: Moves bracketed fields to the YAML frontmatter and replaces them with their value<br/><br/>`Move and remove`: Moves bracketed fields to the YAML frontmatter and removes them from the body, removing the line if only whitespace is left | `Leave in place` |
+| `When the key already exists` | What to do when an inline field has the same key as a key already in the YAML frontmatter. Keys have to match exactly, including their case. | `Skip`: Leaves the fields in the body and the YAML frontmatter value as is<br/><br/>`Merge into list`: Adds the field values to the YAML frontmatter value, turning it into a list<br/><br/>`Overwrite`: Replaces the YAML frontmatter value with the field values | `Skip` |
+| `Keys to ignore` | The inline field keys that will not be moved to the YAML frontmatter | N/A | `null` |
+
+
+
+### Examples
+
+<details><summary>Moves full-line fields to the YAML frontmatter and removes their lines while leaving list items, bracketed fields, and code alone</summary>
+
+Before:
+
+`````` markdown
+# Book notes
+Author:: Terry Pratchett
+Series:: [[Discworld]]
+Rating:: 5
+
+- Fields on list items like this:: one are left alone
+- [ ] So are fields on tasks [due:: 2024-01-01]
+
+I read it in a day [mood:: happy].
+```
+code:: is ignored
+```
+``````
+
+After:
+
+`````` markdown
+---
+Author: Terry Pratchett
+Series: "[[Discworld]]"
+Rating: 5
+---
+# Book notes
+
+- Fields on list items like this:: one are left alone
+- [ ] So are fields on tasks [due:: 2024-01-01]
+
+I read it in a day [mood:: happy].
+```
+code:: is ignored
+```
+``````
+</details>
+<details><summary>Keys that are not plain YAML keys are escaped and Markdown around a full-line key is removed</summary>
+
+Before:
+
+`````` markdown
+**Date Read**:: 2024-01-01
+Project Status:: in progress
+``````
+
+After:
+
+`````` markdown
+---
+"Date Read": 2024-01-01
+"Project Status": in progress
+---
+``````
+</details>
+<details><summary>Moves bracketed fields and keeps their values in the text when `Bracketed inline fields = 'Move and keep value in text'`</summary>
+
+Before:
+
+`````` markdown
+I want to eat [taste:: pie] after (meal:: dinner).
+``````
+
+After:
+
+`````` markdown
+---
+taste: pie
+meal: dinner
+---
+I want to eat pie after dinner.
+``````
+</details>
+<details><summary>Moves bracketed fields and removes them when `Bracketed inline fields = 'Move and remove'`, removing lines that are left with only whitespace</summary>
+
+Before:
+
+`````` markdown
+# Recipe
+[servings:: 4] [time:: 30 minutes]
+Serve warm [course:: dessert] with ice cream.
+``````
+
+After:
+
+`````` markdown
+---
+servings: 4
+time: 30 minutes
+course: dessert
+---
+# Recipe
+Serve warm with ice cream.
+``````
+</details>
+<details><summary>Leaves fields whose key is already in the YAML frontmatter alone when `When the key already exists = 'Skip'`</summary>
+
+Before:
+
+`````` markdown
+---
+context: work
+---
+context:: home
+Context:: garden
+``````
+
+After:
+
+`````` markdown
+---
+context: work
+Context: garden
+---
+context:: home
+``````
+</details>
+<details><summary>Adds values to the existing key when `When the key already exists = 'Merge into list'`</summary>
+
+Before:
+
+`````` markdown
+---
+context: work
+---
+context:: home
+context:: garden
+``````
+
+After:
+
+`````` markdown
+---
+context: [work, home, garden]
+---
+``````
+</details>
+<details><summary>Replaces the value of the existing key when `When the key already exists = 'Overwrite'`</summary>
+
+Before:
+
+`````` markdown
+---
+status: draft
+---
+status:: published
+``````
+
+After:
+
+`````` markdown
+---
+status: published
+---
+``````
+</details>
+<details><summary>Leaves fields alone when their key is in `Keys to ignore = 'related'`</summary>
+
+Before:
+
+`````` markdown
+related:: [[Another note]]
+topic:: linting
+``````
+
+After:
+
+`````` markdown
+---
+topic: linting
+---
+related:: [[Another note]]
+``````
+</details>
+
 ## Move tags to YAML
 
 Alias: `move-tags-to-yaml`
