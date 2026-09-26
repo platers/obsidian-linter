@@ -88,7 +88,7 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
         `,
       }),
       new ExampleBuilder({
-        description: 'Missing separators get added in as well',
+        description: 'Missing separators get added to the table if they are missing',
         before: dedent`
           | Column 1 | Column 2 |
           |-------|-------
