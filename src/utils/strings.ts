@@ -247,6 +247,29 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     return text;
   }
 
+  // the ending character being > for anything other than a blockquote means that we are actually getting extra content as a part of the element
+  // so we need to walk back the end of the content that we are actually working on (see https://github.com/platers/obsidian-linter/issues/1367)
+  if (text.charAt(endOfContent) === '>' && !addingEmptyLinesAroundBlockquotes) {
+    const endOfPreviousLine = endOfContent - 1;
+
+    if (text.charAt(endOfPreviousLine) === '\n') {
+      const startOfPreviousLine = text.lastIndexOf('\n', endOfPreviousLine - 1) + 1;
+      const previousLine = text.substring(startOfPreviousLine, endOfPreviousLine);
+
+      if (isEmptyBlockquoteLine(previousLine)) {
+        // The scanner below treats the first newline it encounters specially.
+        // Start one character before the empty blockquote line so that the
+        // newline terminating the preceding content is consumed as the first
+        // newline and the newline terminating the empty blockquote line becomes
+        // endOfNewContent.
+        endOfContent = startOfPreviousLine - 1;
+        if (endOfContent < 0) {
+          endOfContent = 0;
+        }
+      }
+    }
+  }
+
   const nestingLevel = startOfLine.split('>').length - 1;
   let index = endOfContent;
   let endOfNewContent = endOfContent;
@@ -342,6 +365,22 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
   }
 
   return text.substring(0, endOfContent) + emptyLine + text.substring(endOfNewContent);
+}
+
+function isEmptyBlockquoteLine(line: string): boolean {
+  const trimmedLine = line.trim();
+
+  if (trimmedLine === '') {
+    return false;
+  }
+
+  for (const char of trimmedLine) {
+    if (char !== '>') {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**
