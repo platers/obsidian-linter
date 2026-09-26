@@ -74,6 +74,7 @@
     "mdast-util-gfm-footnote": "^2.1.0",
     "mdast-util-gfm-task-list-item": "^2.0.0",
     "mdast-util-math": "^3.0.0",
+    "meaw": "^11.0.0",
     "micromark-extension-frontmatter": "^2.0.0",
     "micromark-extension-gfm-autolink-literal": "^2.1.0",
     "micromark-extension-gfm-footnote": "^2.1.0",
