@@ -354,7 +354,7 @@ export default {
     // align-table-columns.ts
     'align-table-columns': {
       'name': 'Align Table Columns',
-      'description': 'Aligns the table so that all columns are have same length.',
+      'description': 'Aligns the table so that all columns have the same length.',
     },
     // blockquotify-on-paste.ts
     'add-blockquote-indentation-on-paste': {
