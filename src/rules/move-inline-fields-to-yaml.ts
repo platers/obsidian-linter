@@ -58,6 +58,8 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
       nameKey: 'rules.move-inline-fields-to-yaml.name',
       descriptionKey: 'rules.move-inline-fields-to-yaml.description',
       type: RuleType.YAML,
+      // runs at the end of the rules that run before the regular rules so that the keys it adds are formatted by the other YAML rules
+      hasSpecialExecutionOrder: true,
       // Dataview scopes fields on list items and tasks to the list item, so those are always left alone.
       // Tables and comments are left alone as removing a line from them would change their contents.
       ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html, IgnoreTypes.list, IgnoreTypes.table, IgnoreTypes.obsidianMultiLineComments],
