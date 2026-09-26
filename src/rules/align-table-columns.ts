@@ -41,7 +41,7 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
   get exampleBuilders(): ExampleBuilder<AlignTableOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Make columns are aligned properly',
+        description: 'Make sure columns are aligned properly',
         before: dedent`
           | Column 1 | Column 2 |
           |-------|-------|
@@ -58,7 +58,7 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
         `,
       }),
       new ExampleBuilder({
-        description: 'Columns align with CJK characters',
+        description: 'Make sure column alignment works with CJK characters',
         before: dedent`
           | Column 1 | Column 2 |
           |-------|-------|
@@ -75,7 +75,7 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
         `,
       }),
       new ExampleBuilder({
-        description: 'fill lossing separators',
+        description: 'Missing separators get added in as well',
         before: dedent`
           | Column 1 | Column 2 |
           |-------|-------
