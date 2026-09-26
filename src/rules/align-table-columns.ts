@@ -5,7 +5,7 @@ import RuleBuilder, { ExampleBuilder, OptionBuilderBase } from './rule-builder';
 import dedent from 'ts-dedent';
 import { IgnoreTypes } from '../utils/ignore-types';
 import { ProtectedRanges } from '../utils/protected-ranges';
-import { textReplacement } from '../utils/strings';
+import { getStartOfLineIndex, textReplacement } from '../utils/strings';
 import { applyNonOverlappingReplacements, getEditsBetween } from '../utils/text-edits';
 class AlignTableOptions implements Options {
 }
@@ -36,8 +36,26 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
     let projectedText = projection.text;
     for (const tablePosition of tablePositions) {
       const tableText = projectedText.substring(tablePosition.startIndex, tablePosition.endIndex);
+      const startIndex = getStartOfLineIndex(projectedText, tablePosition.startIndex);
+
+      let startOfLine: string;
+      if (startIndex === tablePosition.startIndex) { // make sure we didn't accidentally already include the whitespace at the start of the table
+        let endOfStartOfLine = startIndex;
+        while (endOfStartOfLine < tablePosition.endIndex) {
+          const char = projectedText.charAt(endOfStartOfLine);
+          if (char.trim() !== '') {
+            break;
+          }
+
+          endOfStartOfLine++;
+        }
+        startOfLine = projectedText.substring(startIndex, endOfStartOfLine);
+      } else {
+        startOfLine = projectedText.substring(startIndex, tablePosition.startIndex);
+      }
+
       fmt = new MarkdownTableFormatter();
-      formatedTable = fmt.formatTable(tableText);
+      formatedTable = fmt.formatTable(tableText, startOfLine);
       projectedText = projectedText.replace(tableText, formatedTable);
     }
 
