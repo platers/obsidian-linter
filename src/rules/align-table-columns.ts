@@ -1,9 +1,12 @@
-import {getAllTablesInText} from '../utils/mdast';
-import {MarkdownTableFormatter} from '../utils/tables';
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import { getAllTablesInText } from '../utils/mdast';
+import { MarkdownTableFormatter } from '../utils/tables';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { ExampleBuilder, OptionBuilderBase } from './rule-builder';
 import dedent from 'ts-dedent';
-import {IgnoreTypes} from '../utils/ignore-types';
+import { IgnoreTypes } from '../utils/ignore-types';
+import { ProtectedRanges } from '../utils/protected-ranges';
+import { textReplacement } from '../utils/strings';
+import { applyNonOverlappingReplacements, getEditsBetween } from '../utils/text-edits';
 class AlignTableOptions implements Options {
 }
 
@@ -20,23 +23,33 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
   get OptionsClass(): new () => AlignTableOptions {
     return AlignTableOptions;
   }
-  apply(text: string, options: AlignTableOptions): string {
-    const tablePositions = getAllTablesInText(text);
-    let formatedTable = '';
+  apply(text: string, options: AlignTableOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    const tablePositions = getAllTablesInText(projection.text);
+    let formatedTable: string;
     let fmt: MarkdownTableFormatter;
 
     if (tablePositions.length === 0) {
       return text;
     }
 
+    let projectedText = projection.text;
     for (const tablePosition of tablePositions) {
-      const tableText = text.substring(tablePosition.startIndex, tablePosition.endIndex);
+      const tableText = projectedText.substring(tablePosition.startIndex, tablePosition.endIndex);
       fmt = new MarkdownTableFormatter();
       formatedTable = fmt.formatTable(tableText);
-      text = text.replace(tableText, formatedTable);
+      projectedText = projectedText.replace(tableText, formatedTable);
     }
 
-    return text;
+    const replacements: textReplacement[] = [];
+    for (const edit of getEditsBetween(projection.text, projectedText)) {
+      const range = projection.editRangeToSource(edit);
+      if (range) {
+        replacements.push({ ...range, value: edit.value });
+      }
+    }
+
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<AlignTableOptions>[] {
     return [
