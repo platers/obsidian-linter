@@ -507,34 +507,6 @@ ruleTest({
       options: {howToHandleExistingKeys: 'Overwrite'},
     },
     {
-      testName: 'Merge into list skips keys whose existing value is a map, a block scalar, or has a comment',
-      before: dedent`
-        ---
-        map:
-          a: b
-        block: |
-          text
-        commented: value # comment
-        ---
-        map:: value
-        block:: value
-        commented:: value
-      `,
-      after: dedent`
-        ---
-        map:
-          a: b
-        block: |
-          text
-        commented: value # comment
-        ---
-        map:: value
-        block:: value
-        commented:: value
-      `,
-      options: {howToHandleExistingKeys: 'Merge into list'},
-    },
-    {
       testName: 'Overwrite replaces an existing multi-line array with every value of the key and keeps it multi-line',
       before: dedent`
         ---

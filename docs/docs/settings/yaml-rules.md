@@ -715,6 +715,40 @@ code:: is ignored
 ```
 ``````
 </details>
+<details><summary>Leaves fields in tables and comments alone since removing a line from them would change their contents</summary>
+
+Before:
+
+`````` markdown
+status:: done
+
+| Field | Value |
+| ----- | ----- |
+| owner:: me | [due:: tomorrow] |
+
+%%
+reviewer:: someone
+%%
+<!-- note:: in an HTML comment -->
+``````
+
+After:
+
+`````` markdown
+---
+status: done
+---
+
+| Field | Value |
+| ----- | ----- |
+| owner:: me | [due:: tomorrow] |
+
+%%
+reviewer:: someone
+%%
+<!-- note:: in an HTML comment -->
+``````
+</details>
 <details><summary>Keys that are not plain YAML keys are escaped and Markdown around a full-line key is removed</summary>
 
 Before:
@@ -851,6 +885,48 @@ After:
 ---
 context: [work, home, garden]
 ---
+``````
+</details>
+<details><summary>Leaves fields in the body when `When the key already exists = 'Merge into list'` and the existing value is a block scalar, a map, or has a YAML comment, since those cannot be turned into a list without losing part of them</summary>
+
+Before:
+
+`````` markdown
+---
+summary: |
+  A long
+  summary
+details:
+  pages: 300
+rating: 4 # out of 5
+context:
+  # where I read it
+  - home
+---
+summary:: Short summary
+details:: hardcover
+rating:: 5
+context:: garden
+``````
+
+After:
+
+`````` markdown
+---
+summary: |
+  A long
+  summary
+details:
+  pages: 300
+rating: 4 # out of 5
+context:
+  # where I read it
+  - home
+---
+summary:: Short summary
+details:: hardcover
+rating:: 5
+context:: garden
 ``````
 </details>
 <details><summary>Replaces the value of the existing key when `When the key already exists = 'Overwrite'`</summary>

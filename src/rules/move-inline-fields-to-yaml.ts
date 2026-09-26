@@ -389,7 +389,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
     const trimmedValue = value.trim();
     if (trimmedValue === '') {
       return [];
-    } else if (/^[|>]/.test(trimmedValue) || /\s#/.test(trimmedValue)) {
+    } else if (/^[|>]/.test(trimmedValue) || /(^|\s)#/.test(trimmedValue)) {
       // block scalars and comments would not survive being split up
       return null;
     }
@@ -448,6 +448,38 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
           code:: is ignored
           \`\`\`
         `,
+      }),
+      new ExampleBuilder({
+        description: 'Leaves fields in tables and comments alone since removing a line from them would change their contents',
+        before: dedent`
+          status:: done
+          ${''}
+          | Field | Value |
+          | ----- | ----- |
+          | owner:: me | [due:: tomorrow] |
+          ${''}
+          %%
+          reviewer:: someone
+          %%
+          <!-- note:: in an HTML comment -->
+        `,
+        after: dedent`
+          ---
+          status: done
+          ---
+          ${''}
+          | Field | Value |
+          | ----- | ----- |
+          | owner:: me | [due:: tomorrow] |
+          ${''}
+          %%
+          reviewer:: someone
+          %%
+          <!-- note:: in an HTML comment -->
+        `,
+        options: {
+          howToHandleBracketedFields: 'Move and remove',
+        },
       }),
       new ExampleBuilder({
         description: 'Keys that are not plain YAML keys are escaped and Markdown around a full-line key is removed',
@@ -559,6 +591,46 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
           ---
           context: [work, home, garden]
           ---
+        `,
+        options: {
+          howToHandleExistingKeys: 'Merge into list',
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Leaves fields in the body when `When the key already exists = \'Merge into list\'` and the existing value is a block scalar, a map, or has a YAML comment, since those cannot be turned into a list without losing part of them',
+        before: dedent`
+          ---
+          summary: |
+            A long
+            summary
+          details:
+            pages: 300
+          rating: 4 # out of 5
+          context:
+            # where I read it
+            - home
+          ---
+          summary:: Short summary
+          details:: hardcover
+          rating:: 5
+          context:: garden
+        `,
+        after: dedent`
+          ---
+          summary: |
+            A long
+            summary
+          details:
+            pages: 300
+          rating: 4 # out of 5
+          context:
+            # where I read it
+            - home
+          ---
+          summary:: Short summary
+          details:: hardcover
+          rating:: 5
+          context:: garden
         `,
         options: {
           howToHandleExistingKeys: 'Merge into list',
