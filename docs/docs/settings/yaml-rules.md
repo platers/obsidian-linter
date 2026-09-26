@@ -658,6 +658,315 @@ animal: cat
 ``````
 </details>
 
+## Move inline fields to YAML
+
+Alias: `move-inline-fields-to-yaml`
+
+Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item. Tag and alias fields use the tag and alias array styles from the general settings.
+
+### Options
+
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `Full-line inline fields` | What to do with inline fields that take up a whole line like <code>key:: value</code> | `Leave in place`: Does not move full-line fields like `key:: value`<br/><br/>`Move and keep in text`: Adds full-line fields to the YAML frontmatter and leaves their lines as they are<br/><br/>`Move and remove`: Moves full-line fields to the YAML frontmatter and removes their lines | `Move and remove` |
+| `Bracketed inline fields` | What to do with inline fields wrapped in square brackets or parentheses like <code>[key:: value]</code> and <code>(key:: value)</code> | `Leave in place`: Does not move bracketed fields like `[key:: value]` and `(key:: value)`<br/><br/>`Move and keep in text`: Adds bracketed fields to the YAML frontmatter and leaves them in the text as they are<br/><br/>`Move and keep value in text`: Moves bracketed fields to the YAML frontmatter and replaces them with their value<br/><br/>`Move and remove`: Moves bracketed fields to the YAML frontmatter and removes them from the body, removing the line if only whitespace is left | `Leave in place` |
+| `When the key already exists` | What to do when an inline field has the same key as a key already in the YAML frontmatter. Keys have to match exactly, including their case. | `Skip`: Leaves the fields in the body and the YAML frontmatter value as is<br/><br/>`Merge into list`: Adds the field values to the YAML frontmatter value, turning it into a list<br/><br/>`Overwrite`: Replaces the YAML frontmatter value with the field values | `Skip` |
+| `Inline keys to ignore` | The inline field keys that will not be moved to the YAML frontmatter | N/A | `null` |
+
+
+
+### Examples
+
+<details><summary>Moves full-line fields to the YAML frontmatter and removes their lines while leaving list items, bracketed fields, and code alone</summary>
+
+Before:
+
+`````` markdown
+# Book notes
+Author:: Terry Pratchett
+Series:: [[Discworld]]
+Rating:: 5
+
+- Fields on list items like this:: one are left alone
+- [ ] So are fields on tasks [due:: 2024-01-01]
+
+I read it in a day [mood:: happy].
+```
+code:: is ignored
+```
+``````
+
+After:
+
+`````` markdown
+---
+Author: Terry Pratchett
+Series: "[[Discworld]]"
+Rating: 5
+---
+# Book notes
+
+- Fields on list items like this:: one are left alone
+- [ ] So are fields on tasks [due:: 2024-01-01]
+
+I read it in a day [mood:: happy].
+```
+code:: is ignored
+```
+``````
+</details>
+<details><summary>Leaves fields in tables and comments alone since removing a line from them would change their contents</summary>
+
+Before:
+
+`````` markdown
+status:: done
+
+| Field | Value |
+| ----- | ----- |
+| owner:: me | [due:: tomorrow] |
+
+%%
+reviewer:: someone
+%%
+<!-- note:: in an HTML comment -->
+``````
+
+After:
+
+`````` markdown
+---
+status: done
+---
+
+| Field | Value |
+| ----- | ----- |
+| owner:: me | [due:: tomorrow] |
+
+%%
+reviewer:: someone
+%%
+<!-- note:: in an HTML comment -->
+``````
+</details>
+<details><summary>Keys that are not plain YAML keys are escaped and Markdown around a full-line key is removed</summary>
+
+Before:
+
+`````` markdown
+**Date Read**:: 2024-01-01
+Project Status:: in progress
+``````
+
+After:
+
+`````` markdown
+---
+"Date Read": 2024-01-01
+"Project Status": in progress
+---
+``````
+</details>
+<details><summary>Tags have their hashtags removed and tags and aliases are split up and use the tag and alias array styles from the general settings</summary>
+
+Before:
+
+`````` markdown
+tags:: #book #fiction
+aliases:: Pratchett, Sir Terry
+``````
+
+After:
+
+`````` markdown
+---
+tags: [book, fiction]
+aliases: [Pratchett, Sir Terry]
+---
+``````
+</details>
+<details><summary>Adds full-line fields to the YAML frontmatter and leaves their lines, including any Markdown or emoji around the key, as they are when `Full-line inline fields = 'Move and keep in text'`</summary>
+
+Before:
+
+`````` markdown
+# 🎉 Party:: yes
+> **Status**:: done
+``````
+
+After:
+
+`````` markdown
+---
+Party: yes
+Status: done
+---
+# 🎉 Party:: yes
+> **Status**:: done
+``````
+</details>
+<details><summary>Moves bracketed fields and keeps their values in the text when `Bracketed inline fields = 'Move and keep value in text'`</summary>
+
+Before:
+
+`````` markdown
+I want to eat [taste:: pie] after (meal:: dinner).
+``````
+
+After:
+
+`````` markdown
+---
+taste: pie
+meal: dinner
+---
+I want to eat pie after dinner.
+``````
+</details>
+<details><summary>Moves bracketed fields and removes them when `Bracketed inline fields = 'Move and remove'`, removing lines that are left with only whitespace</summary>
+
+Before:
+
+`````` markdown
+# Recipe
+[servings:: 4] [time:: 30 minutes]
+Serve warm [course:: dessert] with ice cream.
+``````
+
+After:
+
+`````` markdown
+---
+servings: 4
+time: 30 minutes
+course: dessert
+---
+# Recipe
+Serve warm with ice cream.
+``````
+</details>
+<details><summary>Leaves fields whose key is already in the YAML frontmatter alone when `When the key already exists = 'Skip'`</summary>
+
+Before:
+
+`````` markdown
+---
+context: work
+---
+context:: home
+Context:: garden
+``````
+
+After:
+
+`````` markdown
+---
+context: work
+Context: garden
+---
+context:: home
+``````
+</details>
+<details><summary>Adds values to the existing key when `When the key already exists = 'Merge into list'`</summary>
+
+Before:
+
+`````` markdown
+---
+context: work
+---
+context:: home
+context:: garden
+``````
+
+After:
+
+`````` markdown
+---
+context: [work, home, garden]
+---
+``````
+</details>
+<details><summary>Leaves fields in the body when `When the key already exists = 'Merge into list'` and the existing value is a block scalar, a map, or has a YAML comment, since those cannot be turned into a list without losing part of them</summary>
+
+Before:
+
+`````` markdown
+---
+summary: |
+  A long
+  summary
+details:
+  pages: 300
+rating: 4 # out of 5
+context:
+  # where I read it
+  - home
+---
+summary:: Short summary
+details:: hardcover
+rating:: 5
+context:: garden
+``````
+
+After:
+
+`````` markdown
+---
+summary: |
+  A long
+  summary
+details:
+  pages: 300
+rating: 4 # out of 5
+context:
+  # where I read it
+  - home
+---
+summary:: Short summary
+details:: hardcover
+rating:: 5
+context:: garden
+``````
+</details>
+<details><summary>Replaces the value of the existing key when `When the key already exists = 'Overwrite'`</summary>
+
+Before:
+
+`````` markdown
+---
+status: draft
+---
+status:: published
+``````
+
+After:
+
+`````` markdown
+---
+status: published
+---
+``````
+</details>
+<details><summary>Leaves fields alone when their key is in `Inline keys to ignore = 'related'`</summary>
+
+Before:
+
+`````` markdown
+related:: [[Another note]]
+topic:: linting
+``````
+
+After:
+
+`````` markdown
+---
+topic: linting
+---
+related:: [[Another note]]
+``````
+</details>
+
 ## Move tags to YAML
 
 Alias: `move-tags-to-yaml`
@@ -1360,8 +1669,9 @@ Inserts or updates the title of the file into the YAML frontmatter's aliases sec
 | ---- | ----------- | ---------- | ------------- |
 | `Preserve existing aliases section style` | If set, the <code>YAML aliases section style</code> setting applies only to the newly created sections | N/A | `true` |
 | `Keep alias that matches the filename` | Such aliases are usually redundant | N/A | false |
-| `Use the YAML key specified by <code>Alias helper key</code> to help with filename and heading changes` | If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array | N/A | `true` |
+| `Use the YAML key specified by Alias helper key to help with filename and heading changes` | If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array | N/A | `true` |
 | `Alias helper key` | The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule. | N/A | `linter-yaml-title-alias` |
+| `Remove alias if empty` | Removes the alias key if the alias key for the file ends up being empty. | N/A | `true` |
 
 ### Additional Info
 
