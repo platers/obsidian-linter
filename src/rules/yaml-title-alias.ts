@@ -1,29 +1,30 @@
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextOptionBuilder } from './rule-builder';
 import dedent from 'ts-dedent';
-import {convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, DEFAULT_LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray, isValueEscapedAlready} from '../utils/yaml';
-import {IgnoreTypes} from '../utils/ignore-types';
-import {getFirstHeaderOneText, yamlRegex} from '../utils/regex';
-import {ProtectedRanges} from '../utils/protected-ranges';
-import {isNumeric} from '../utils/strings';
+import { convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, DEFAULT_LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray, isValueEscapedAlready } from '../utils/yaml';
+import { IgnoreTypes } from '../utils/ignore-types';
+import { getFirstHeaderOneText, yamlRegex } from '../utils/regex';
+import { ProtectedRanges } from '../utils/protected-ranges';
+import { isNumeric } from '../utils/strings';
 
 class YamlTitleAliasOptions implements Options {
   preserveExistingAliasesSectionStyle?: boolean = true;
   keepAliasThatMatchesTheFilename?: boolean = false;
+  removeAliasKeyWhenEmpty?: boolean = true
   useYamlKeyToKeepTrackOfOldFilenameOrHeading?: boolean = true;
   aliasHelperKey?: string = DEFAULT_LINTER_ALIASES_HELPER_KEY;
 
   @RuleBuilder.noSettingControl()
-    aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
+  aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
 
   @RuleBuilder.noSettingControl()
-    fileName?: string;
+  fileName?: string;
 
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: QuoteCharacter = '"';
+  defaultEscapeCharacter?: QuoteCharacter = '"';
 
   @RuleBuilder.noSettingControl()
-    removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
+  removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
 
 @RuleBuilder.register
@@ -55,7 +56,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       aliasHelperKey = aliasHelperKey.substring(0, aliasHelperKey.length - 1);
     }
 
-    previousTitle = ((parsedYaml as {[k: string]: string})[aliasHelperKey]) ?? null;
+    previousTitle = ((parsedYaml as { [k: string]: string })[aliasHelperKey]) ?? null;
     if (previousTitle != null) {
       // force previousTitle to be a string by concatenating with an empty string to make non-strings like numbers get handled correctly
       previousTitle = previousTitle + '';
@@ -93,7 +94,9 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       const newAliasValue = this.getNewAliasValue(currentAliasValue, shouldRemoveTitleAlias, title, previousTitle);
 
       if (newAliasValue === '') {
-        newYaml = removeYamlSection(newYaml, aliasKeyForFile);
+        if (options.removeAliasKeyWhenEmpty) {
+          newYaml = removeYamlSection(newYaml, aliasKeyForFile);
+        }
       } else if (options.preserveExistingAliasesSectionStyle) {
         if (!isEmpty && ((isSingleString && title == newAliasValue) || !isSingleString || currentAliasValue == newAliasValue)) {
           newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, currentAliasStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true/* escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747*/));
@@ -138,7 +141,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
   forceEscape(title: string, aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats): boolean {
     return isNumeric(title) || (title.includes(',') && (aliasArrayStyle === NormalArrayFormats.SingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited));
   }
-  getNewAliasValue(originalValue: string |string[], shouldRemoveTitle: boolean, title: string, previousTitle: string): string |string[] {
+  getNewAliasValue(originalValue: string | string[], shouldRemoveTitle: boolean, title: string, previousTitle: string): string | string[] {
     if (originalValue == null) {
       return shouldRemoveTitle ? '' : title;
     }
@@ -342,6 +345,12 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         nameKey: 'rules.yaml-title-alias.alias-helper-key.name',
         descriptionKey: 'rules.yaml-title-alias.alias-helper-key.description',
         optionsKey: 'aliasHelperKey',
+      }),
+      new BooleanOptionBuilder({
+        OptionsClass: YamlTitleAliasOptions,
+        nameKey: 'rules.yaml-title-alias.remove-alias-if-empty.name',
+        descriptionKey: 'rules.yaml-title-alias.remove-alias-if-empty.description',
+        optionsKey: 'removeAliasKeyWhenEmpty',
       }),
     ];
   }
