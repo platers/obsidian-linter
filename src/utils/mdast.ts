@@ -1405,12 +1405,6 @@ export function getAllTablesInText(text: string): { startIndex: number, endIndex
     }
 
     firstLine = firstLine.replace(tableStartingPipe, (match: string) => {
-      // do nothing if the table only has whitespace or a pipe before it
-      const trimmedMatch = match.trim();
-      if (trimmedMatch === '' || trimmedMatch === '|') {
-        return '';
-      }
-
       start += match.length - 1;
 
       return '';
