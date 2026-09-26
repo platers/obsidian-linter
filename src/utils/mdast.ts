@@ -5,7 +5,6 @@ import { ProtectedRanges } from './protected-ranges';
 import { makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, getStartOfLineWhitespaceOrBlockquoteLevel } from './strings';
 import { genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex, hanCharacterOrCommonChinesePunctuationRegex } from './regex';
 import { gfmFootnote } from 'micromark-extension-gfm-footnote';
-import { gfmTaskListItem } from 'micromark-extension-gfm-task-list-item';
 import { frontmatter } from 'micromark-extension-frontmatter';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
 import { combineExtensions } from 'micromark-util-combine-extensions';
@@ -13,7 +12,6 @@ import { math } from 'micromark-extension-math';
 import { mathFromMarkdown } from 'mdast-util-math';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { gfmFootnoteFromMarkdown } from 'mdast-util-gfm-footnote';
-import { gfmTaskListItemFromMarkdown } from 'mdast-util-gfm-task-list-item';
 import { LRUCache } from 'lru-cache';
 import { countInstances } from './strings';
 import { getTextInLanguage } from '../lang/helpers';
@@ -116,10 +114,9 @@ function parseText(text: string): ParsedText {
 
   // @ts-expect-error for some reason an overload is missing
   const ast = fromMarkdown(text, {
-    extensions: [combineExtensions([gfmFootnote(), gfmTaskListItem(), gfmAutolinkLiteral(), frontmatter(['yaml'])]), math()],
+    extensions: [combineExtensions([gfmFootnote(), gfmAutolinkLiteral(), frontmatter(['yaml'])]), math()],
     mdastExtensions: [[
       gfmFootnoteFromMarkdown(),
-      gfmTaskListItemFromMarkdown,
       gfmAutolinkLiteralFromMarkdown(),
       frontmatterFromMarkdown(['yaml']),
     ],
