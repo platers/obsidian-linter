@@ -7,6 +7,16 @@ ruleTest({
   RuleBuilderClass: TwoSpacesBetweenLinesWithContent,
   testCases: [
     {
+      testName: 'Leaves line endings inside fenced code alone',
+      before: '```\nInside one\nInside two\n```\n\nOutside one\nOutside two',
+      after: '```\nInside one\nInside two\n```\n\nOutside one  \nOutside two',
+    },
+    {
+      testName: 'Leaves line endings inside disabled sections alone',
+      before: '<!-- linter-disable -->\nInside one\nInside two\n<!-- linter-enable -->\n\nOutside one\nOutside two',
+      after: '<!-- linter-disable -->\nInside one\nInside two\n<!-- linter-enable -->\n\nOutside one  \nOutside two',
+    },
+    {
       testName: 'Make sure obsidian multiline comments are not affected',
       before: dedent`
         Here is some inline comments: %%You can't see this text%% (Can't see it)
@@ -165,6 +175,40 @@ ruleTest({
       `,
       options: {
         lineBreakIndicator: LineBreakIndicators.TwoSpaces,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1243
+      testName: 'Make sure that a callout does not erroneously get its callout indicator line updated.',
+      before: dedent`
+        > [!NOTE]
+        > Callout!
+        > Callout2!
+      `,
+      after: dedent`
+        > [!NOTE]
+        > Callout!\\
+        > Callout2!
+      `,
+      options: {
+        lineBreakIndicator: LineBreakIndicators.Backslash,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1243
+      testName: 'Make sure that a nested callout does not erroneously get its callout indicator line updated.',
+      before: dedent`
+        > Something
+        > > [!NOTE]
+        > > Callout!
+        > > Callout2!
+      `,
+      after: dedent`
+        > Something
+        > > [!NOTE]
+        > > Callout!\\
+        > > Callout2!
+      `,
+      options: {
+        lineBreakIndicator: LineBreakIndicators.Backslash,
       },
     },
   ],

@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [20.19.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -27,7 +27,9 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Verify building docs works
+        run: npm run docs
       - name: Run unit tests
         run: npm test
       - name: Run ESLint
-        run: npx eslint . --ext .ts
+        run: npx eslint

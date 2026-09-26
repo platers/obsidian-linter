@@ -1,0 +1,14 @@
+name: Ask a question
+description: Ask a question about how something works
+title: 'Question: '
+labels: [question]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: What would you like to ask?
+      placeholder: |
+        What you would like to know more about...
+    validations:
+      required: true
+

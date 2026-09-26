@@ -11,7 +11,7 @@
 - When doing a multicursor multiline paste, the cursors will stay where they were after pasting the values instead of moving to the end of the pasted value
 
 
-## Add Blockquote Indentation on Paste
+## Add blockquote indentation on paste
 
 Alias: `add-blockquote-indentation-on-paste`
 
@@ -58,11 +58,11 @@ This content is being added to a blockquote
 ``````
 </details>
 
-## Prevent Double Checklist Indicator on Paste
+## Prevent double checklist marker on Paste
 
 Alias: `prevent-double-checklist-indicator-on-paste`
 
-Removes starting checklist indicator from the text to paste if the line the cursor is on in the file has a checklist indicator
+Removes starting checklist marker from the text to paste if the line the cursor is on in the file has a checklist marker
 
 
 
@@ -70,7 +70,7 @@ Removes starting checklist indicator from the text to paste if the line the curs
 
 ### Examples
 
-<details><summary>Line being pasted is left alone when current line has no checklist indicator in it: `Regular text here`</summary>
+<details><summary>Line being pasted is left alone when current line has no checklist marker in it: `Regular text here`</summary>
 
 Before:
 
@@ -84,7 +84,7 @@ After:
 - [ ] Checklist item being pasted
 ``````
 </details>
-<details><summary>Line being pasted into a blockquote without a checklist indicator is left alone when it lacks a checklist indicator: `> > `</summary>
+<details><summary>Line being pasted into a blockquote without a checklist marker is left alone when it lacks a checklist marker: `> > `</summary>
 
 Before:
 
@@ -100,7 +100,7 @@ After:
 More content here
 ``````
 </details>
-<details><summary>Line being pasted into a blockquote with a checklist indicator has its checklist indicator removed when current line is: `> - [x] `</summary>
+<details><summary>Line being pasted into a blockquote with a checklist marker has its checklist marker removed when current line is: `> - [x] `</summary>
 
 Before:
 
@@ -116,7 +116,7 @@ Checklist item contents here
 More content here
 ``````
 </details>
-<details><summary>Line being pasted with a checklist indicator has its checklist indicator removed when current line is: `- [ ] `</summary>
+<details><summary>Line being pasted with a checklist marker has its checklist marker removed when current line is: `- [ ] `</summary>
 
 Before:
 
@@ -132,7 +132,7 @@ Checklist item 1
 - [ ] Checklist item 2
 ``````
 </details>
-<details><summary>Line being pasted as a checklist indicator has its checklist indicator removed when current line is: `- [!] `</summary>
+<details><summary>Line being pasted as a checklist marker has its checklist marker removed when current line is: `- [!] `</summary>
 
 Before:
 
@@ -165,11 +165,11 @@ After:
 ``````
 </details>
 
-## Prevent Double List Item Indicator on Paste
+## Prevent double list item marker on paste
 
 Alias: `prevent-double-list-item-indicator-on-paste`
 
-Removes starting list indicator from the text to paste if the line the cursor is on in the file has a list indicator
+Removes starting list marker from the text to paste if the line the cursor is on in the file has a list marker
 
 
 
@@ -177,7 +177,7 @@ Removes starting list indicator from the text to paste if the line the cursor is
 
 ### Examples
 
-<details><summary>Line being pasted is left alone when current line has no list indicator in it: `Regular text here`</summary>
+<details><summary>Line being pasted is left alone when current line has no list marker in it: `Regular text here`</summary>
 
 Before:
 
@@ -191,7 +191,7 @@ After:
 - List item being pasted
 ``````
 </details>
-<details><summary>Line being pasted into a blockquote without a list indicator is left alone when it lacks a list indicator: `> > `</summary>
+<details><summary>Line being pasted into a blockquote without a list marker is left alone when it lacks a list marker: `> > `</summary>
 
 Before:
 
@@ -207,7 +207,7 @@ After:
 More content here
 ``````
 </details>
-<details><summary>Line being pasted into a blockquote with a list indicator is has its list indicator removed when current line is: `> * `</summary>
+<details><summary>Line being pasted into a blockquote with a list marker is has its list marker removed when current line is: `> * `</summary>
 
 Before:
 
@@ -223,7 +223,7 @@ List item contents here
 More content here
 ``````
 </details>
-<details><summary>Line being pasted with a list indicator is has its list indicator removed when current line is: `+ `</summary>
+<details><summary>Line being pasted with a list marker is has its list marker removed when current line is: `+ `</summary>
 
 Before:
 
@@ -256,7 +256,7 @@ After:
 ``````
 </details>
 
-## Proper Ellipsis on Paste
+## Proper ellipsis on paste
 
 Alias: `proper-ellipsis-on-paste`
 
@@ -287,7 +287,7 @@ Lorem (…) Impsum.
 ``````
 </details>
 
-## Remove Hyphens on Paste
+## Remove hyphens on paste
 
 Alias: `remove-hyphens-on-paste`
 
@@ -315,7 +315,7 @@ Text that was cool but hypertension made it uncool.
 ``````
 </details>
 
-## Remove Leading or Trailing Whitespace on Paste
+## Remove leading or trailing whitespace on paste
 
 Alias: `remove-leading-or-trailing-whitespace-on-paste`
 
@@ -362,7 +362,7 @@ After:
 ``````
 </details>
 
-## Remove Leftover Footnotes from Quote on Paste
+## Remove leftover footnotes from quote on paste
 
 Alias: `remove-leftover-footnotes-from-quote-on-paste`
 
@@ -413,7 +413,7 @@ After:
 ``````
 </details>
 
-## Remove Multiple Blank Lines on Paste
+## Remove multiple blank lines on paste
 
 Alias: `remove-multiple-blank-lines-on-paste`
 
@@ -453,6 +453,27 @@ Before:
 `````` markdown
 First line.
 
+Last line.
+``````
+
+After:
+
+`````` markdown
+First line.
+
+Last line.
+``````
+</details>
+<details><summary>Text with blank lines present that also have tabs or other whitespace will also be considered blank lines</summary>
+
+Before:
+
+`````` markdown
+First line.
+	
+ 
+ 	
+	 
 Last line.
 ``````
 

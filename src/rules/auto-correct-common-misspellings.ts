@@ -1,9 +1,13 @@
 import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MdFilePickerOptionBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, MdFilePickerOptionBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
-import {wordRegex, wordSplitterRegex} from '../utils/regex';
-import {CustomAutoCorrectContent} from '../ui/linter-components/auto-correct-files-picker-option';
+import {wordRegex} from '../utils/regex';
+import { CustomAutoCorrectContent } from '../settings-data';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
+import { noWhitespace } from '../utils/validation';
 
 class AutoCorrectCommonMisspellingsOptions implements Options {
   ignoreWords?: string[] = [];
@@ -30,8 +34,20 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
   get OptionsClass(): new () => AutoCorrectCommonMisspellingsOptions {
     return AutoCorrectCommonMisspellingsOptions;
   }
-  apply(text: string, options: AutoCorrectCommonMisspellingsOptions): string {
-    return text.replaceAll(wordRegex, (word: string) => this.replaceWordWithCorrectCasing(word, options));
+  apply(text: string, options: AutoCorrectCommonMisspellingsOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    const replacements: textReplacement[] = [];
+    // Backticks belong to wordRegex, so hide inline code before finding adjacent visible words.
+    for (const match of projection.text.matchAll(wordRegex)) {
+      const range = projection.editRangeToSource({startIndex: match.index, endIndex: match.index + match[0].length});
+      if (range) {
+        const value = this.replaceWordWithCorrectCasing(match[0], options);
+        if (value !== match[0]) {
+          replacements.push({...range, value});
+        }
+      }
+    }
+    return applyNonOverlappingReplacements(text, replacements);
   }
   replaceWordWithCorrectCasing(word: string, options: AutoCorrectCommonMisspellingsOptions): string {
     const lowercasedWord = word.toLowerCase();
@@ -145,13 +161,14 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
   }
   get optionBuilders(): OptionBuilderBase<AutoCorrectCommonMisspellingsOptions>[] {
     return [
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: AutoCorrectCommonMisspellingsOptions,
         nameKey: 'rules.auto-correct-common-misspellings.ignore-words.name',
         descriptionKey: 'rules.auto-correct-common-misspellings.ignore-words.description',
+        emptyStateKey: 'rules.auto-correct-common-misspellings.ignore-words.empty-state',
+        fieldNamePlaceholderKey: 'rules.auto-correct-common-misspellings.ignore-words.placeholder-text',
         optionsKey: 'ignoreWords',
-        splitter: wordSplitterRegex,
-        separator: ', ',
+        validator: noWhitespace,
       }),
       new BooleanOptionBuilder({
         OptionsClass: AutoCorrectCommonMisspellingsOptions,
@@ -163,7 +180,6 @@ export default class AutoCorrectCommonMisspellings extends RuleBuilder<AutoCorre
         OptionsClass: AutoCorrectCommonMisspellingsOptions,
         nameKey: 'rules.auto-correct-common-misspellings.extra-auto-correct-files.name',
         descriptionKey: 'rules.auto-correct-common-misspellings.extra-auto-correct-files.description',
-        // @ts-expect-error since it looks like there is an issue with the types here
         optionsKey: 'extraAutoCorrectFiles',
       }),
     ];

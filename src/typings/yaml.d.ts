@@ -23,8 +23,8 @@ interface YamlCSTTokens {
 interface YamlNode {
   constructor: { name: string };
   key?: Key;
-  value?: any;
-  items?: [string, any][];
+  value?: unknown;
+  items?: [string, unknown][];
   moved?: boolean;
   srcTokens?: YamlCSTTokens;
 }

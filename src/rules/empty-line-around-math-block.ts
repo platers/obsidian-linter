@@ -3,6 +3,7 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {ensureEmptyLinesAroundMathBlock} from '../utils/mdast';
+import {ProtectedRanges} from '../utils/protected-ranges';
 
 class EmptyLineAroundMathBlockOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -22,8 +23,8 @@ export default class EmptyLineAroundMathBlock extends RuleBuilder<EmptyLineAroun
   get OptionsClass(): new () => EmptyLineAroundMathBlockOptions {
     return EmptyLineAroundMathBlockOptions;
   }
-  apply(text: string, options: EmptyLineAroundMathBlockOptions): string {
-    return ensureEmptyLinesAroundMathBlock(text, options.minimumNumberOfDollarSignsToBeAMathBlock);
+  apply(text: string, options: EmptyLineAroundMathBlockOptions, protectedRanges: ProtectedRanges): string {
+    return ensureEmptyLinesAroundMathBlock(text, options.minimumNumberOfDollarSignsToBeAMathBlock, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundMathBlockOptions>[] {
     return [
@@ -44,7 +45,7 @@ export default class EmptyLineAroundMathBlock extends RuleBuilder<EmptyLineAroun
         `,
       }),
       new ExampleBuilder({
-        description: 'Math blocks that are singe-line are updated based on the value of `Number of Dollar Signs to Indicate a Math Block` (in this case its value is 2)',
+        description: 'Math blocks that are singe-line are updated based on the value of `Number of dollar signs to indicate a math block` (in this case its value is 2)',
         before: dedent`
           $$\\boldsymbol{a}=\\begin{bmatrix}a_x \\\\ a_y\\end{bmatrix}$$
           some more text

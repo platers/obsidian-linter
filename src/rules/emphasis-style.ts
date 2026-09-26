@@ -3,6 +3,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {makeEmphasisOrBoldConsistent, MDAstTypes} from '../utils/mdast';
+import type {ProtectedRanges} from '../utils/protected-ranges';
 
 type EmphasisStyleValues = 'consistent' | 'asterisk' | 'underscore';
 
@@ -17,14 +18,14 @@ export default class EmphasisStyle extends RuleBuilder<EmphasisStyleOptions> {
       nameKey: 'rules.emphasis-style.name',
       descriptionKey: 'rules.emphasis-style.description',
       type: RuleType.CONTENT,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.math, IgnoreTypes.inlineMath],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.inlineMath],
     });
   }
   get OptionsClass(): new () => EmphasisStyleOptions {
     return EmphasisStyleOptions;
   }
-  apply(text: string, options: EmphasisStyleOptions): string {
-    return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Italics);
+  apply(text: string, options: EmphasisStyleOptions, protectedRanges: ProtectedRanges): string {
+    return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Italics, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<EmphasisStyleOptions>[] {
     return [

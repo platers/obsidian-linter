@@ -254,6 +254,26 @@ ruleTest({
         test test
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1346
+      testName: 'Make sure that spaces within an embed are preserved',
+      before: dedent`
+        ![](<./a  b.md>)
+      `,
+      after: dedent`
+        ![](<./a  b.md>)
+      `,
+    },
   ],
 });
 
+describe('protected-range compatibility', () => {
+  it.each([
+    ['text  [link](url)  more', 'text [link](url) more'],
+    ['text  [two  words](url)  more', 'text [two  words](url) more'],
+    ['[first](a)  [second](b)', '[first](a) [second](b)'],
+    ['- text  `two  words`  more', '- text `two  words` more'],
+  ])('collapses only writable space runs in %j', (text, expected) => {
+    // Placeholders satisfy the non-whitespace anchors; only the spaces themselves need to be visible.
+    expect(RemoveMultipleSpaces.getRule().apply(text)).toBe(expected);
+  });
+});

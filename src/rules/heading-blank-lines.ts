@@ -3,6 +3,10 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {yamlRegex} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
+import {getEditsBetween} from '../utils/text-edits';
 
 class HeadingBlankLinesOptions implements Options {
   bottom: boolean = true;
@@ -22,23 +26,35 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
   get OptionsClass(): new () => HeadingBlankLinesOptions {
     return HeadingBlankLinesOptions;
   }
-  apply(text: string, options: HeadingBlankLinesOptions): string {
+  apply(text: string, options: HeadingBlankLinesOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    // Keep the ordered passes on the decision view: later expressions consume the blank lines
+    // inserted by earlier ones. Only their net edits are mapped back to the untouched source.
+    let projectedText = projection.text;
     if (!options.bottom) {
-      text = text.replace(/^([^#\n][^\n]+)\n+(#+\s.*)/gm, '$1\n\n$2');
+      projectedText = projectedText.replace(/^([^#\n][^\n]+)\n+(#+\s.*)/gm, '$1\n\n$2');
     } else {
-      text = text.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings
-      text = text.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
-      text = text.replace(/(^#+\s.*)\n+/gm, '$1\n\n'); // trim blank lines after headings
+      projectedText = projectedText.replace(/^(#+\s.*)/gm, '\n\n$1\n\n'); // add blank line before and after headings
+      projectedText = projectedText.replace(/\n+(#+\s.*)/g, '\n\n$1'); // trim blank lines before headings
+      projectedText = projectedText.replace(/(^#+\s.*)\n+/gm, '$1\n\n'); // trim blank lines after headings
     }
 
-    text = text.replace(/^\n+(#+\s.*)/, '$1'); // remove blank lines before first heading
-    text = text.replace(/(#+\s.*)\n+$/, '$1'); // remove blank lines after last heading
+    projectedText = projectedText.replace(/^\n+(#+\s.*)/, '$1'); // remove blank lines before first heading
+    projectedText = projectedText.replace(/(#+\s.*)\n+$/, '$1'); // remove blank lines after last heading
 
     if (!options.emptyLineAfterYaml) {
-      text = text.replace(new RegExp('(' + yamlRegex.source + ')\\n+(#+\\s.*)'), '$1\n$5');
+      projectedText = projectedText.replace(new RegExp('(' + yamlRegex.source + ')\\n+(#+\\s.*)'), '$1\n$5');
     }
 
-    return text;
+    const replacements: textReplacement[] = [];
+    for (const edit of getEditsBetween(projection.text, projectedText)) {
+      const range = projection.editRangeToSource(edit);
+      if (range) {
+        replacements.push({...range, value: edit.value});
+      }
+    }
+
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<HeadingBlankLinesOptions>[] {
     return [
@@ -90,7 +106,7 @@ export default class HeadingBlankLines extends RuleBuilder<HeadingBlankLinesOpti
       }),
       new ExampleBuilder({
         // accounts for https://github.com/platers/obsidian-linter/issues/219
-        description: 'Empty line before header and after YAML is removed with `Empty Line Between YAML and Header=false`',
+        description: 'Empty line before header and after YAML is removed with `Empty line between YAML and header=false`',
         before: dedent`
           ---
           key: value

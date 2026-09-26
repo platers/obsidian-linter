@@ -1,25 +1,26 @@
-import {App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer} from 'obsidian';
-import {Options, RuleType, ruleTypeToRules, rules, sortRules} from './rules';
+import { App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, WorkspaceLeaf, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer, getLanguage } from 'obsidian';
+import { Options, RuleType, ruleTypeToRules, rules, sortRules } from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
-import {parseCustomReplacements, stripCr} from './utils/strings';
-import {logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel} from './utils/logger';
-import {moment} from 'obsidian';
+import { parseCustomReplacements, stripCr } from './utils/strings';
+import { diffToEditorChanges } from './utils/editor-changes';
+import { logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel } from './utils/logger';
+import { moment } from 'obsidian';
 import './rules-registry';
-import {iconInfo} from './ui/icons';
-import {createRunLinterRulesOptions, RulesRunner} from './rules-runner';
-import {LinterError} from './linter-error';
-import {LintConfirmationModal} from './ui/modals/lint-confirmation-modal';
-import {SettingTab} from './ui/settings';
-import {escapeRegExp, urlRegex} from './utils/regex';
-import {getTextInLanguage, LanguageStringKey, setLanguage} from './lang/helpers';
-import {RuleAliasSuggest} from './cm6/rule-alias-suggester';
-import {AfterFileChangeLintTimes, DEFAULT_SETTINGS, LinterSettings} from './settings-data';
+import { iconInfo } from './ui/icons';
+import { createRunLinterRulesOptions, RulesRunner } from './rules-runner';
+import { LinterError } from './linter-error';
+import { LintConfirmationModal } from './ui/modals/lint-confirmation-modal';
+import { SettingTab } from './ui/settings';
+import { escapeRegExp, urlRegex, wordSplitterRegex } from './utils/regex';
+import { getTextInLanguage, LanguageStringKey, setLanguage } from './lang/helpers';
+import { RuleAliasSuggest } from './cm6/rule-alias-suggester';
+import { AfterFileChangeLintTimes, DEFAULT_SETTINGS, LinterSettings } from './settings-data';
 import AsyncLock from 'async-lock';
-import {warn} from 'loglevel';
-import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
-import {ChangeSpec} from '@codemirror/state';
-import {downloadMisspellings, readInMisspellingsFile} from './utils/auto-correct-misspellings';
+import { warn } from 'loglevel';
+import { CustomAutoCorrectContent } from './settings-data';
+import { downloadMisspellings, readInMisspellingsFile } from './utils/auto-correct-misspellings';
+import { DiffPreviewView, diffPreviewViewType } from './ui/views/diff-preview-view';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -48,11 +49,13 @@ const langToMomentLocale = {
 };
 
 const userClickTimeout = 0;
+const previewLintFileCommandId = 'preview-lint-file';
 
 type FileChangeUpdateInfo = {
   debounceFn: Debouncer<[TFile, Editor], Promise<void>>,
   isRunning: boolean
   originalText: string
+  markdownInfo: MarkdownView | MarkdownFileInfo
 }
 
 export default class LinterPlugin extends Plugin {
@@ -77,15 +80,19 @@ export default class LinterPlugin extends Plugin {
   private activeFileChangeDebouncer: Map<string, FileChangeUpdateInfo> = new Map();
   private defaultAutoCorrectMisspellings: Map<string, string> = new Map();
   private hasLoadedMisspellingFiles = false;
+  private diffPreviewCommandsRegistered = false;
+  private saveSettingsDebounce = debounce(async (settings: LinterSettings) => {
+    await this.saveData(settings);
+  }, 5000);
 
   async onload() {
     sortRules();
 
-    setLanguage(window.localStorage.getItem('language'));
+    setLanguage(getLanguage());
     logInfo(getTextInLanguage('logs.plugin-load'));
 
     this.isEnabled = true;
-    // eslint-disable-next-line guard-for-in
+
     for (const key in iconInfo) {
       const svg = iconInfo[key];
       addIcon(svg.id, svg.source);
@@ -94,16 +101,24 @@ export default class LinterPlugin extends Plugin {
     await this.loadSettings();
 
     this.addCommands();
+    this.registerView(diffPreviewViewType, (leaf) => new DiffPreviewView(leaf));
+    this.updateDiffPreviewViewStatus();
 
     this.registerEventsAndSaveCallback();
 
     this.registerEditorSuggest(new RuleAliasSuggest(this));
 
+    if (!this.settings.textAreaSettingsConvertedToListItemSettings) {
+      if (await this.moveTextAreaSettingsToListItemSettings()) {
+        await this.saveSettings();
+      }
+    }
+
     this.settingsTab = new SettingTab(this.app, this);
     this.addSettingTab(this.settingsTab);
   }
 
-  async onunload() {
+  async onunload(): void {
     logInfo(getTextInLanguage('logs.plugin-unload'));
     this.isEnabled = false;
 
@@ -120,8 +135,14 @@ export default class LinterPlugin extends Plugin {
   }
 
   async loadSettings() {
-    const data = await this.loadData();
+    const data = await this.loadData() as object;
     this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+    if (typeof this.settings.suppressMessageWhenNoChange !== 'boolean') {
+      this.settings.suppressMessageWhenNoChange = false;
+    }
+    if (typeof this.settings.enableDiffPreviewView !== 'boolean') {
+      this.settings.enableDiffPreviewView = true;
+    }
     if (typeof this.settings.logLevel === 'number') {
       this.settings.logLevel = convertNumberToLogLevel(this.settings.logLevel);
     }
@@ -133,27 +154,38 @@ export default class LinterPlugin extends Plugin {
     this.updateHasCustomCommandStatus();
   }
 
+  updateDiffPreviewViewStatus() {
+    if (this.settings.enableDiffPreviewView) {
+      this.registerDiffPreviewCommands();
+      return;
+    }
+
+    this.removeDiffPreviewCommands();
+    this.app.workspace.detachLeavesOfType(diffPreviewViewType);
+  }
+
   async saveSettings() {
     if (!this.hasLoadedMisspellingFiles) {
       await this.loadAutoCorrectFiles(false);
     }
 
-    await this.saveData(this.settings);
+    void this.saveSettingsDebounce(this.settings);
+
     this.updatePasteOverrideStatus();
     this.updateHasCustomCommandStatus();
+    this.updateDiffPreviewViewStatus();
   }
 
   addCommands() {
-    const that = this;
     this.addCommand({
       id: 'lint-file',
       name: getTextInLanguage('commands.lint-file.name'),
-      editorCheckCallback(checking, editor, ctx) {
+      editorCheckCallback: (checking, editor, ctx) => {
         if (checking) {
-          return that.isMarkdownFile(ctx.file) && editor.cm != null;
+          return this.isMarkdownFile(ctx.file) && editor.cm != null;
         }
 
-        void that.runLinterEditor(editor);
+        void this.runLinterEditor(editor);
       },
       icon: iconInfo.file.id,
     });
@@ -161,13 +193,13 @@ export default class LinterPlugin extends Plugin {
     this.addCommand({
       id: 'lint-file-unless-ignored',
       name: getTextInLanguage('commands.lint-file-unless-ignored.name'),
-      editorCheckCallback(checking, editor, ctx) {
+      editorCheckCallback: (checking, editor, ctx) => {
         if (checking) {
-          return that.isMarkdownFile(ctx.file);
+          return this.isMarkdownFile(ctx.file);
         }
 
-        if (!that.shouldIgnoreFile(ctx.file) && editor.cm) {
-          void that.runLinterEditor(editor);
+        if (!this.shouldIgnoreFile(ctx.file) && editor.cm) {
+          void this.runLinterEditor(editor);
         }
       },
       icon: iconInfo.file.id,
@@ -178,12 +210,20 @@ export default class LinterPlugin extends Plugin {
       name: getTextInLanguage('commands.lint-all-files.name'),
       icon: iconInfo.vault.id,
       callback: () => {
+        if (this.settings.suppressLintAllFilesConfirmationModal) {
+          void this.runLinterAllFiles(this.app);
+          return;
+        }
+
         const startMessage = getTextInLanguage('commands.lint-all-files.start-message');
         const submitBtnText = getTextInLanguage('commands.lint-all-files.submit-button-text');
         const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files.submit-button-notice-text');
         new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => {
           return this.runLinterAllFiles(this.app);
-        }, this.settings.lintCommands && this.settings.lintCommands.length > 0).open();
+        }, this.settings.lintCommands && this.settings.lintCommands.length > 0, async () => {
+          this.settings.suppressLintAllFilesConfirmationModal = true;
+          await this.saveSettings();
+        }).open();
       },
     });
 
@@ -191,7 +231,7 @@ export default class LinterPlugin extends Plugin {
       id: 'lint-all-files-in-folder',
       name: getTextInLanguage('commands.lint-all-files-in-folder.name'),
       icon: iconInfo.folder.id,
-      editorCheckCallback: (checking: Boolean, _, ctx) => {
+      editorCheckCallback: (checking: boolean, _, ctx) => {
         if (checking) {
           if (ctx && ctx.file && ctx.file instanceof TFile && ctx.file.parent) {
             return !ctx.file.parent.isRoot();
@@ -236,19 +276,51 @@ export default class LinterPlugin extends Plugin {
     this.addCommand({
       id: 'ignore-file',
       name: getTextInLanguage('commands.ignore-file.name'),
-      editorCheckCallback(checking, _, ctx) {
+      editorCheckCallback: (checking, _, ctx) => {
         if (checking && ctx.file) {
-          return that.isMarkdownFile(ctx.file) && !that.shouldIgnoreFile(ctx.file);
+          return this.isMarkdownFile(ctx.file) && !this.shouldIgnoreFile(ctx.file);
         }
 
         void this.addFileToIgnoreList(ctx.file);
       },
       icon: iconInfo.ignoreFile.id,
     });
+
+    this.registerDiffPreviewCommands();
+  }
+
+  registerDiffPreviewCommands() {
+    if (this.diffPreviewCommandsRegistered || !this.settings.enableDiffPreviewView) {
+      return;
+    }
+
+    this.addCommand({
+      id: previewLintFileCommandId,
+      name: getTextInLanguage('commands.preview-lint-file.name'),
+      editorCheckCallback: (checking, editor, ctx) => {
+        if (checking) {
+          return this.isMarkdownFile(ctx.file) && editor.cm != null;
+        }
+
+        void this.previewLinterEditor(editor);
+      },
+      icon: iconInfo.file.id,
+    });
+
+    this.diffPreviewCommandsRegistered = true;
+  }
+
+  removeDiffPreviewCommands() {
+    if (!this.diffPreviewCommandsRegistered) {
+      return;
+    }
+
+    this.removeCommand(previewLintFileCommandId);
+    this.diffPreviewCommandsRegistered = false;
   }
 
   registerEventsAndSaveCallback() {
-    let eventRef = this.app.workspace.on('editor-paste', (clipboardEv: ClipboardEvent, editor: Editor) => {
+    let eventRef = this.app.workspace.on('editor-paste', async (clipboardEv: ClipboardEvent, editor: Editor) => {
       // do not paste if another handler has already handled pasting text as that would likely cause a
       // double pasting of the clipboard contents
       // also skip if no paste rules are enabled
@@ -256,7 +328,7 @@ export default class LinterPlugin extends Plugin {
         return;
       }
 
-      void this.modifyPasteEvent(clipboardEv, editor);
+      await this.modifyPasteEvent(clipboardEv, editor);
     });
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
@@ -297,6 +369,7 @@ export default class LinterPlugin extends Plugin {
           // to check if the same file we already intend to add is in the map before we set
           // the value in the map
           originalText: '',
+          markdownInfo: info,
         };
         this.activeFileChangeDebouncer.set(info.file.path, activeFileDebounceInfo);
         // do not use editor because it already has the change, so if the user removes all changes
@@ -319,7 +392,7 @@ export default class LinterPlugin extends Plugin {
       'editor:save-file'
     ];
 
-    this.originalSaveCallback = saveCommandDefinition?.checkCallback;
+    this.originalSaveCallback = saveCommandDefinition?.checkCallback?.bind(saveCommandDefinition);
 
     if (typeof this.originalSaveCallback === 'function') {
       saveCommandDefinition.checkCallback = (checking: boolean) => {
@@ -342,9 +415,8 @@ export default class LinterPlugin extends Plugin {
 
     // defines the vim command for saving a file and lets the linter run on save for it
     // accounts for https://github.com/platers/obsidian-linter/issues/19
-    const that = this;
     window.CodeMirrorAdapter.commands.save = () => {
-      that.app.commands.executeCommandById('editor:save-file');
+      this.app.commands.executeCommandById('editor:save-file');
     };
   }
 
@@ -384,9 +456,9 @@ export default class LinterPlugin extends Plugin {
     this.defaultAutoCorrectMisspellings = parseCustomReplacements(stripCr(await readInMisspellingsFile(this)));
 
     // load custom-auto-correct replacements if they exist
-    for (const replacementFileInfo of this.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
+    for (const replacementFileInfo of (this.settings.ruleConfigs['auto-correct-common-misspellings'] as { [k: string]: CustomAutoCorrectContent[] })['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
       if (replacementFileInfo.filePath != '') {
-        const file = this.getFileFromPath(replacementFileInfo.filePath);
+        const file = this.app.vault.getFileByPath(normalizePath(replacementFileInfo.filePath));
         if (file) {
           replacementFileInfo.customReplacements = parseCustomReplacements(stripCr(await this.app.vault.cachedRead(file)));
         }
@@ -401,38 +473,38 @@ export default class LinterPlugin extends Plugin {
       if (!this.shouldIgnoreFile(file)) {
         menu.addItem((item) => {
           item.setIcon(iconInfo.file.id)
-              .setTitle(getTextInLanguage('commands.lint-file-pop-up-menu-text.name'))
-              .onClick(() => {
-                const activeFile = this.app.workspace.getActiveFile();
-                const editor = this.getEditor();
-                if (activeFile === file && editor && editor.cm) {
-                  void this.runLinterEditor(editor);
-                } else {
-                  void this.runLinterFile(file);
-                }
-              });
+            .setTitle(getTextInLanguage('commands.lint-file-pop-up-menu-text.name'))
+            .onClick(() => {
+              const activeFile = this.app.workspace.getActiveFile();
+              const editor = this.getEditor();
+              if (activeFile === file && editor && editor.cm) {
+                void this.runLinterEditor(editor);
+              } else {
+                void this.runLinterFile(file);
+              }
+            });
         });
 
         menu.addItem((item) => {
           item.setIcon(iconInfo.ignoreFile.id)
-              .setTitle(getTextInLanguage('commands.ignore-file-pop-up-menu-text.name'))
-              .onClick(() => {
-                void this.addFileToIgnoreList(file);
-              });
+            .setTitle(getTextInLanguage('commands.ignore-file-pop-up-menu-text.name'))
+            .onClick(() => {
+              void this.addFileToIgnoreList(file);
+            });
         });
       }
     } else if (file instanceof TFolder) {
       if (!this.settings.foldersToIgnore.includes(file.path)) {
         menu.addItem((item) => {
           item.setTitle(getTextInLanguage('commands.lint-folder-pop-up-menu-text.name'))
-              .setIcon(iconInfo.folder.id)
-              .onClick(() => this.createFolderLintModal(file));
+            .setIcon(iconInfo.folder.id)
+            .onClick(() => this.createFolderLintModal(file));
         });
 
         menu.addItem((item) => {
           item.setTitle(getTextInLanguage('commands.ignore-folder-pop-up-menu-text.name'))
-              .setIcon(iconInfo.ignoreFolder.id)
-              .onClick(() => void this.addFolderToIgnoreList(file));
+            .setIcon(iconInfo.ignoreFolder.id)
+            .onClick(() => void this.addFolderToIgnoreList(file));
         });
       }
     }
@@ -453,7 +525,7 @@ export default class LinterPlugin extends Plugin {
     try {
       await this.runLinterFile(this.lastActiveFile, true);
     } catch (error) {
-      this.handleLintError(this.lastActiveFile, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      this.handleLintError(this.lastActiveFile, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
     } finally {
       this.lastActiveFile = currentActiveFile;
     }
@@ -463,7 +535,7 @@ export default class LinterPlugin extends Plugin {
     for (const folder of this.settings.foldersToIgnore) {
       // make sure that we check that the folder name is exactly at the start of the path
       // which prevent incorrect matches see https://github.com/platers/obsidian-linter/issues/1208
-      if (folder.length > 0 && file.path.startsWith(normalizePath(folder)+ '/')) {
+      if (folder.length > 0 && file.path.startsWith(normalizePath(folder) + '/')) {
         return true;
       }
     }
@@ -483,7 +555,7 @@ export default class LinterPlugin extends Plugin {
   }
 
   isMarkdownFile(file: TFile): boolean {
-    return file && file.extension === 'md';
+    return file && (file.extension === 'md' || this.settings.additionalFileExtensions.includes(file.extension));
   }
 
   async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
@@ -519,7 +591,7 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          this.handleLintError(file, error, getTextInLanguage('commands.lint-all-files.error-message') + ' \'{FILE_PATH}\'');
+          this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-all-files.error-message') + ' \'{FILE_PATH}\'');
 
           numberOfErrors += 1;
         }
@@ -545,7 +617,7 @@ export default class LinterPlugin extends Plugin {
         try {
           await this.runLinterFile(file);
         } catch (error) {
-          this.handleLintError(file, error, getTextInLanguage('commands.lint-all-files-in-folder.error-message') + ' \'{FILE_PATH}\'');
+          this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-all-files-in-folder.error-message') + ' \'{FILE_PATH}\'');
 
           numberOfErrors += 1;
         }
@@ -557,18 +629,26 @@ export default class LinterPlugin extends Plugin {
     if (numberOfErrors === 0) {
       new Notice(getTextInLanguage('commands.lint-all-files-in-folder.success-message').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name), userClickTimeout);
     } else {
-      const errorMessageText = numberOfErrors === 1 ? getTextInLanguage('commands.lint-all-files-in-folder.message-singular').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name):
-      getTextInLanguage('commands.lint-all-files-in-folder.message-plural').replace('{FILE_COUNT}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name).replace('{ERROR_COUNT}', numberOfErrors.toString());
+      const errorMessageText = numberOfErrors === 1 ? getTextInLanguage('commands.lint-all-files-in-folder.message-singular').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name) :
+        getTextInLanguage('commands.lint-all-files-in-folder.message-plural').replace('{FILE_COUNT}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name).replace('{ERROR_COUNT}', numberOfErrors.toString());
       new Notice(errorMessageText, userClickTimeout);
     }
   }
 
   // handles the creation of the folder linting modal since this happens in multiple places and it should be consistent
   createFolderLintModal(folder: TFolder) {
+    if (this.settings.suppressLintAllFilesInFolderConfirmationModal) {
+      void this.runLinterAllFilesInFolder(folder);
+      return;
+    }
+
     const startMessage = getTextInLanguage('commands.lint-all-files-in-folder.start-message').replace('{FOLDER_NAME}', folder.name);
     const submitBtnText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-text').replace('{FOLDER_NAME}', folder.name);
     const submitBtnNoticeText = getTextInLanguage('commands.lint-all-files-in-folder.submit-button-notice-text').replace('{FOLDER_NAME}', folder.name);
-    new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder), this.settings.lintCommands && this.settings.lintCommands.length > 0).open();
+    new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => this.runLinterAllFilesInFolder(folder), this.settings.lintCommands && this.settings.lintCommands.length > 0, async () => {
+      this.settings.suppressLintAllFilesInFolderConfirmationModal = true;
+      await this.saveSettings();
+    }).open();
   }
 
   async runLinterEditor(editor: Editor) {
@@ -578,15 +658,60 @@ export default class LinterPlugin extends Plugin {
     logInfo(getTextInLanguage('logs.linter-run'));
 
     const file = this.app.workspace.getActiveFile();
-    const oldText = editor.getValue();
+    const oldText = stripCr(editor.getValue());
     let newText: string;
     try {
       newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
     } catch (error) {
-      this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       return;
     }
 
+    this.applyEditorTextChange(oldText, newText, editor, file);
+
+    setCollectLogs(false);
+  }
+
+  async previewLinterEditor(editor: Editor) {
+    setCollectLogs(this.settings.recordLintOnSaveLogs);
+    clearLogs();
+
+    logInfo(getTextInLanguage('logs.linter-run'));
+
+    const file = this.app.workspace.getActiveFile();
+    const oldText = stripCr(editor.getValue());
+    let newText: string;
+    try {
+      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
+    } catch (error) {
+      this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      setCollectLogs(false);
+      return;
+    }
+
+    void this.openDiffPreview(getTextInLanguage('notice-text.lint-preview-title'), oldText, newText, editor, file);
+    setCollectLogs(false);
+  }
+
+  private async openDiffPreview(title: string, oldText: string, newText: string, editor: Editor, file: TFile) {
+    if (!this.settings.enableDiffPreviewView) {
+      return;
+    }
+
+    const leaf = await this.getDiffPreviewLeaf();
+    const view = leaf.view as DiffPreviewView;
+    view.setPreview({
+      title,
+      oldText,
+      newText,
+      applyAction: () => {
+        this.applyEditorTextChange(oldText, newText, editor, file);
+      },
+    });
+    await this.app.workspace.revealLeaf(leaf);
+  }
+
+  private applyEditorTextChange(oldText: string, newText: string, editor: Editor, file: TFile) {
     const changes = this.updateEditor(oldText, newText, editor);
     const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
     const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
@@ -600,13 +725,21 @@ export default class LinterPlugin extends Plugin {
       this.updateFileDebouncerText(file, newText);
       this.editorLintFiles.push(file);
     }
+  }
 
-    setCollectLogs(false);
+  private async getDiffPreviewLeaf(): Promise<WorkspaceLeaf> {
+    let leaf = this.app.workspace.getLeavesOfType(diffPreviewViewType)[0];
+    if (!leaf) {
+      leaf = this.app.workspace.getRightLeaf(false) ?? this.app.workspace.getLeaf('split');
+      await leaf.setViewState({ type: diffPreviewViewType, active: true });
+    }
+
+    return leaf;
   }
 
   // based on https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L85-L109
   async setOrUpdateMomentInstance() {
-    const obsidianLang: string = localStorage.getItem('language') || 'en';
+    const obsidianLang: string = getLanguage() || 'en';
     const systemLang = navigator.language?.toLowerCase();
 
     let momentLocale = langToMomentLocale[obsidianLang as keyof typeof langToMomentLocale];
@@ -635,20 +768,8 @@ export default class LinterPlugin extends Plugin {
       updateMade = await this.moveConfigValuesToKeyBasedFormat();
     }
 
-    // move a recently moved setting to its new location
-    if ('lintOnFileContentChangeDelay' in this.settings) {
-      this.settings.ruleConfigs['yaml-timestamp']['update-on-file-contents-updated'] = this.settings['lintOnFileContentChangeDelay'];
-
-      delete this.settings['lintOnFileContentChangeDelay'];
-      updateMade = true;
-    }
-
-    // move the setting of typo rule name to its new name
-    if (this.settings.ruleConfigs['trailing-spaces'] && 'twp-space-line-break' in this.settings.ruleConfigs['trailing-spaces']) {
-      this.settings.ruleConfigs['trailing-spaces']['two-space-line-break'] = this.settings.ruleConfigs['trailing-spaces']['twp-space-line-break'];
-
-      delete this.settings.ruleConfigs['trailing-spaces']['twp-space-line-break'];
-      updateMade = true;
+    if (!this.settings.textAreaSettingsConvertedToListItemSettings) {
+      updateMade = await this.moveTextAreaSettingsToListItemSettings();
     }
 
     // check for and fix invalid settings
@@ -689,38 +810,6 @@ export default class LinterPlugin extends Plugin {
         this.settings.ruleConfigs[rule.alias] = ruleDefaults;
         updateMade = true;
         continue;
-      }
-
-      // remove this after a reasonable amount of time
-      if (rule.alias == 'space-between-chinese-japanese-or-korean-and-english-or-numbers') {
-        if (!('english-symbols-punctuation-before' in this.settings.ruleConfigs[rule.alias])) {
-          this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-before'] = ruleDefaults['english-symbols-punctuation-before'];
-          updateMade = true;
-        }
-
-        if (!('english-symbols-punctuation-after' in this.settings.ruleConfigs[rule.alias])) {
-          this.settings.ruleConfigs[rule.alias]['english-symbols-punctuation-after'] = ruleDefaults['english-symbols-punctuation-after'];
-          updateMade = true;
-        }
-      } else if (rule.alias == 'yaml-timestamp') {
-        const defaults = rule.getDefaultOptions();
-        if ('force-retention-of-create-value' in this.settings.ruleConfigs[rule.alias]) {
-          if (!('date-created-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
-            if (this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value']) {
-              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = 'frontmatter';
-            } else {
-              this.settings.ruleConfigs[rule.alias]['date-created-source-of-truth'] = defaults['date-created-source-of-truth'];
-            }
-          }
-
-          delete this.settings.ruleConfigs[rule.alias]['force-retention-of-create-value'];
-          updateMade = true;
-        }
-
-        if (!('date-modified-source-of-truth' in this.settings.ruleConfigs[rule.alias])) {
-          this.settings.ruleConfigs[rule.alias]['date-modified-source-of-truth'] = defaults['date-modified-source-of-truth'];
-          updateMade = true;
-        }
       }
 
       // make sure new/empty settings on a rule that exists get filled in with their default value as well
@@ -771,106 +860,96 @@ export default class LinterPlugin extends Plugin {
     }
 
     return debounce(
-        async (file: TFile, editor: Editor) => {
-          if (!this.activeFileChangeDebouncer.has(file.path)) {
-            logWarn(getTextInLanguage('logs.file-change-yaml-lint-warning'));
-            return;
-          }
+      async (file: TFile, editor: Editor) => {
+        if (!this.activeFileChangeDebouncer.has(file.path)) {
+          logWarn(getTextInLanguage('logs.file-change-yaml-lint-warning'));
+          return;
+        }
 
-          const activeFileChangeInfo = this.activeFileChangeDebouncer.get(file.path);
-          activeFileChangeInfo.isRunning = true;
+        const activeFileChangeInfo = this.activeFileChangeDebouncer.get(file.path);
+        activeFileChangeInfo.isRunning = true;
 
-          const editorValue = editor.getValue();
-          const cachedValue = await this.app.vault.cachedRead(file);
-          const editorIsWholeFile = editorValue === cachedValue;
+        const editorValue = stripCr(editor.getValue());
+        const cachedValue = stripCr(await this.app.vault.cachedRead(file));
+        const editorIsWholeFile = editorValue === cachedValue;
 
-          let oldText = '';
-          if (editorIsWholeFile) {
-            oldText = editorValue;
+        let oldText = '';
+        if (editorIsWholeFile) {
+          oldText = editorValue;
 
-            let newText = oldText;
-            if (oldText != activeFileChangeInfo.originalText ) {
-              logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
-              try {
-                newText = this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
-              } catch (error) {
-                this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
-                return;
+          let newText: string;
+          if (oldText != activeFileChangeInfo.originalText) {
+            logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
+            try {
+              newText = this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
+            } catch (error) {
+              this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+              return;
+            }
+
+            if (activeFileChangeInfo.markdownInfo instanceof MarkdownView) {
+              const markdownInfo = activeFileChangeInfo.markdownInfo;
+              const state = markdownInfo.getState();
+              if (state.mode === "source") {
+                this.updateEditor(oldText, newText, editor);
+              } else {
+                await this.app.vault.process(file, () => newText);
               }
-
-              this.updateEditor(oldText, newText, editor);
-            } else {
-              logInfo(getTextInLanguage('logs.file-change-yaml-lint-skipped'));
             }
           } else {
-            oldText = cachedValue;
-            if (oldText != activeFileChangeInfo.originalText) {
-              logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
-
-              await this.app.vault.process(file, (data: string) => {
-                logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
-                try {
-                  return this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
-                } catch (error) {
-                  this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
-                  return data;
-                }
-              });
-            } else {
-              logInfo(getTextInLanguage('logs.file-change-yaml-lint-skipped'));
-            }
+            logInfo(getTextInLanguage('logs.file-change-yaml-lint-skipped'));
           }
+        } else {
+          oldText = cachedValue;
+          if (oldText != activeFileChangeInfo.originalText) {
+            logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
 
-          this.activeFileChangeDebouncer.delete(file.path);
-          activeFileChangeInfo.isRunning = false;
-        },
-        delay,
-        true,
+            await this.app.vault.process(file, (data: string) => {
+              logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
+              try {
+                return this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
+              } catch (error) {
+                this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+                return data;
+              }
+            });
+          } else {
+            logInfo(getTextInLanguage('logs.file-change-yaml-lint-skipped'));
+          }
+        }
+
+        this.activeFileChangeDebouncer.delete(file.path);
+        activeFileChangeInfo.isRunning = false;
+      },
+      delay,
+      true,
     );
   }
 
   private updateEditor(oldText: string, newText: string, editor: Editor): DiffMatchPatch.Diff[] {
-    const dmp = new DiffMatchPatch.diff_match_patch(); // eslint-disable-line new-cap
+    const dmp = new DiffMatchPatch.diff_match_patch();
     const changes = dmp.diff_main(oldText, newText);
-    let curText = '';
-    changes.forEach((change) => {
-      const [type, value] = change;
-
-      if (type == DiffMatchPatch.DIFF_INSERT) {
-        // use codemirror dispatch in order to bypass the filter on transactions that causes editor.replaceRange not to not work in Live Preview
-        editor.cm.dispatch({
-          changes: [{
-            from: editor.posToOffset(this.endOfDocument(curText)),
-            insert: value,
-          } as ChangeSpec],
-          filter: false,
-        });
-        curText += value;
-      } else if (type == DiffMatchPatch.DIFF_DELETE) {
-        const start = this.endOfDocument(curText);
-        let tempText = curText;
-        tempText += value;
-        const end = this.endOfDocument(tempText);
-
-        // use codemirror dispatch in order to bypass the filter on transactions that causes editor.replaceRange not to not work in Live Preview
-        editor.cm.dispatch({
-          changes: [{
-            from: editor.posToOffset(start),
-            to: editor.posToOffset(end),
-            insert: '',
-          } as ChangeSpec],
-          filter: false,
-        });
-      } else {
-        curText += value;
+    // Batched offsets refer to the pre-transaction document; serialized line endings can invalidate that basis.
+    const docLength = editor.cm.state.doc.length;
+    if (oldText.length !== docLength) {
+      editor.cm.dispatch({ changes: { from: 0, to: docLength, insert: newText }, filter: false });
+    } else {
+      const editorChanges = diffToEditorChanges(changes);
+      if (editorChanges.length > 0) {
+        // Bypass the transaction filter that prevents editor.replaceRange from working in Live Preview.
+        editor.cm.dispatch({ changes: editorChanges, filter: false });
       }
-    });
+    }
 
     return changes;
   }
 
   private displayChangedMessage(charsAdded: number, charsRemoved: number) {
+    const suppressMessageWhenNoChange = this.settings.suppressMessageWhenNoChange ?? false;
     if (this.settings.displayChanged) {
+      if (suppressMessageWhenNoChange && charsAdded + charsRemoved === 0) {
+        return;
+      }
       const message = dedent`
         ${charsAdded} ${getTextInLanguage('notice-text.characters-added')}
         ${charsRemoved} ${getTextInLanguage('notice-text.characters-removed')}
@@ -912,6 +991,12 @@ export default class LinterPlugin extends Plugin {
     // Note: it looks like those two plugins look for an exact match for a URL,
     // so we will too.
     const text = plainClipboard.trim();
+    // fixes https://github.com/platers/obsidian-linter/issues/1446
+    // for some reason when you run a global regex on a string it keeps track
+    // of how far it got in that string the last time it ran on it. Hence
+    // pasting the same string 2 times results in 1 match and 1 non-match.
+    // Resetting last index handles this issue.
+    urlRegex.lastIndex = 0;
     if (urlRegex.test(text)) {
       logWarn(getTextInLanguage('logs.paste-link-warning'));
       return;
@@ -925,15 +1010,18 @@ export default class LinterPlugin extends Plugin {
     // use Turndown via Obsidian API to emulate "Auto Convert HTML" setting
     const convertHtmlEnabled = this.app.vault.getConfig('autoConvertHtml');
     const htmlClipText = clipboardEv.clipboardData.getData('text/html');
-    let clipboardText = htmlClipText && convertHtmlEnabled ? htmlToMarkdown(htmlClipText) : plainClipboard;
+    // make sure that we skip handling Obsidian editor based html copied text as the plaintext is the way it will be pasted as as opposed
+    // to what is created by converting the provided HTML to markdown
+    // see https://github.com/platers/obsidian-linter/issues/1471
+    let clipboardText = htmlClipText && convertHtmlEnabled && htmlClipText.indexOf('<!-- obsidian -->') === -1 ? htmlToMarkdown(htmlClipText) : plainClipboard;
 
     // if everything went well, run clipboard modifications (passing in current line and text to paste)
     const cursorSelections = editor.listSelections();
     if (cursorSelections.length === 1) {
       const cursorSelection = cursorSelections[0];
       clipboardText = this.rulesRunner.runPasteLint(this.getLineContent(editor, cursorSelection),
-          editor.getSelection() ?? '',
-          createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings, null),
+        editor.getSelection() ?? '',
+        createRunLinterRulesOptions(clipboardText, null, this.momentLocale, this.settings, null),
       );
 
       editor.replaceSelection(clipboardText);
@@ -1024,7 +1112,7 @@ export default class LinterPlugin extends Plugin {
     await this.customCommandsLock.acquire('command', async () => {
       this.currentlyOpeningSidebar = true;
 
-      await sidebarTab.openFile(file, {active: true});
+      await sidebarTab.openFile(file, { active: true });
       this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
       if (this.customCommandsCallback) {
         await this.customCommandsCallback(file);
@@ -1047,7 +1135,7 @@ export default class LinterPlugin extends Plugin {
       try {
         this.rulesRunner.runCustomCommands(this.settings.lintCommands, this.app.commands);
       } catch (error) {
-        this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+        this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       }
 
       if (this.customCommandsCallback) {
@@ -1072,7 +1160,7 @@ export default class LinterPlugin extends Plugin {
    * @param {EditorSelection} selection - The codemirror editor selection where a cursor is at.
    * @return {string} The current line contents in the editor (i.e. the line where the cursor is)
    */
-  private getLineContent(editor:Editor, selection: EditorSelection): string {
+  private getLineContent(editor: Editor, selection: EditorSelection): string {
     return editor.getLine(selection.anchor.line);
   }
 
@@ -1087,7 +1175,7 @@ export default class LinterPlugin extends Plugin {
         const ruleDescription = getTextInLanguage('rules.' + rule.alias + '.description' as LanguageStringKey);
         // move description config value to new setting location
         const newSettingValues: Options = {
-          enabled: ruleSettings[ruleDescription] ?? false,
+          enabled: ruleSettings[ruleDescription] as boolean | undefined ?? false,
         };
 
         // move option config values to new setting location
@@ -1098,7 +1186,7 @@ export default class LinterPlugin extends Plugin {
           }
 
           const configKeyName = getTextInLanguage('rules.' + rule.alias + '.' + option.configKey + '.name' as LanguageStringKey);
-          newSettingValues[option.configKey] = ruleSettings[configKeyName] ?? option.defaultValue;
+          newSettingValues[option.configKey] = (ruleSettings[configKeyName] as unknown) ?? option.defaultValue;
         }
 
         this.settings.ruleConfigs[rule.alias] = newSettingValues;
@@ -1111,7 +1199,96 @@ export default class LinterPlugin extends Plugin {
     this.settings.settingsConvertedToConfigKeyValues = true;
     await this.saveSettings();
 
-    setLanguage(window.localStorage.getItem('language'));
+    setLanguage(getLanguage());
+
+    return updateMade;
+  }
+
+  private async moveTextAreaSettingsToListItemSettings(): Promise<boolean> {
+    const defaultSplitter = /\n/;
+    const textAreaToListItemMigrations: { ruleName: string, key: string, splitter: RegExp }[] = [
+      {
+        ruleName: 'auto-correct-common-misspellings',
+        key: 'ignore-words',
+        splitter: wordSplitterRegex,
+      },
+      {
+        ruleName: 'capitalize-headings',
+        key: 'ignore-words',
+        splitter: wordSplitterRegex,
+      },
+      {
+        ruleName: 'capitalize-headings',
+        key: 'lowercase-words',
+        splitter: wordSplitterRegex,
+      },
+      {
+        ruleName: 'dedupe-yaml-array-values',
+        key: 'ignore-keys',
+        splitter: wordSplitterRegex,
+      },
+      {
+        ruleName: 'force-yaml-escape',
+        key: 'force-yaml-escape-keys',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'format-yaml-array',
+        key: 'force-multi-line-array-style',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'format-yaml-array',
+        key: 'force-single-line-array-style',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'insert-yaml-attributes',
+        key: 'text-to-insert',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'move-tags-to-yaml',
+        key: 'tags-to-ignore',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'remove-yaml-keys',
+        key: 'yaml-keys-to-remove',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'sort-yaml-array-values',
+        key: 'ignore-keys',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'sort-yaml-array-values',
+        key: 'ignore-keys',
+        splitter: defaultSplitter,
+      },
+      {
+        ruleName: 'yaml-key-sort',
+        key: 'yaml-key-priority-sort-order',
+        splitter: defaultSplitter,
+      },
+    ];
+
+    let updateMade = false;
+    for (const migration of textAreaToListItemMigrations) {
+      const ruleSettings = this.settings.ruleConfigs[migration.ruleName];
+      const value = (ruleSettings as { [k: string]: string })[migration.key];
+      if (ruleSettings != undefined && typeof value === 'string') {
+        const replacementValue = value.split(migration.splitter);
+
+        this.settings.ruleConfigs[migration.ruleName][migration.key] = replacementValue.length === 1 && replacementValue[0].trim() === '' ? [] : replacementValue;
+
+        updateMade = true;
+      }
+    }
+
+    this.settings.textAreaSettingsConvertedToListItemSettings = true;
+    await this.saveSettings();
 
     return updateMade;
   }
@@ -1152,20 +1329,6 @@ export default class LinterPlugin extends Plugin {
     }
 
     this.hasCustomCommands = false;
-  }
-
-  private endOfDocument(doc: string) {
-    const lines = doc.split('\n');
-    return {line: lines.length - 1, ch: lines[lines.length - 1].length};
-  }
-
-  private getFileFromPath(filePath: string): TFile {
-    const file = this.app.vault.getAbstractFileByPath(normalizePath(filePath));
-    if (file instanceof TFile) {
-      return file;
-    }
-
-    return null;
   }
 
   private updateFileDebouncerText(file: TFile, newText: string) {

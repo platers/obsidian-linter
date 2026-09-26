@@ -1,6 +1,6 @@
 import RemoveSpaceBeforeOrAfterCharacters from '../src/rules/remove-space-before-or-after-characters';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
+import { ruleTest } from './common';
 
 ruleTest({
   RuleBuilderClass: RemoveSpaceBeforeOrAfterCharacters,
@@ -47,5 +47,37 @@ ruleTest({
         ${''}
       `,
     },
+    {
+      testName: 'Headings should have a space preserved in them rather than having the text converted into a value that is not valid',
+      before: dedent`
+        # ?
+        # Some text ?
+      `,
+      after: dedent`
+        # ?
+        # Some text?
+      `,
+    },
   ],
+});
+
+describe('protected ranges preserve the masking contract', () => {
+  it.each(['', '- '])('does not use protected symbols as anchors with prefix %j', (prefix) => {
+    const text = prefix + 'text [link](url) text';
+    const options = { 'characters-to-remove-space-before': '[', 'characters-to-remove-space-after': ')' };
+    // An ignored link's brackets cannot license deletion of whitespace outside that link.
+    expect(RemoveSpaceBeforeOrAfterCharacters.getRule().apply(text, options)).toBe(text);
+  });
+
+  it.each(['', '- '])('allows unprotected anchors next to protected regions with prefix %j', (prefix) => {
+    const text = prefix + '[link](url) . ( [link](url)';
+    expect(RemoveSpaceBeforeOrAfterCharacters.getRule().apply(text)).toBe(prefix + '[link](url). ([link](url)');
+  });
+
+  it('uses literal braces, not legacy placeholder braces, as anchors', () => {
+    const text = 'text [link](url) text {literal} text';
+    const options = { 'characters-to-remove-space-before': '{', 'characters-to-remove-space-after': '}' };
+    // Intentionally unlike masking: synthetic placeholder braces must not trigger edits.
+    expect(RemoveSpaceBeforeOrAfterCharacters.getRule().apply(text, options)).toBe('text [link](url) text{literal}text');
+  });
 });

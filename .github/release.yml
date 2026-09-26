@@ -13,6 +13,7 @@ changelog:
       labels:
         - 'github'
         - 'dependencies'
+        - 'maintenance'
     - title: Other Changes
       labels:
         - "*"

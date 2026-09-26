@@ -1918,11 +1918,11 @@ Alias: `ordered-list-style`
 Makes sure that ordered lists follow the style specified. Note that 2 spaces or 1 tab is considered to be an indentation level.
 
 Options:
-- Number Style: The number style used in ordered list indicators
+- Number Style: The number style used in ordered list markers
 	- Default: `ascending`
 	- `ascending`: Makes sure ordered list items are ascending (i.e. 1, 2, 3, etc.)
 	- `lazy`: Makes sure ordered list item indicators all are the number 1
-- Ordered List Indicator End Style: The ending character of an ordered list indicator
+- Ordered List Indicator End Style: The ending character of an ordered list marker
 	- Default: `.`
 	- `.`: Makes sure ordered list items indicators end in '.' (i.e `1.`)
 	- `)`: Makes sure ordered list item indicators end in ')' (i.e. `1)`)
@@ -2625,7 +2625,7 @@ Options:
 	- `*`: Makes sure unordered list items use `*` as their indicator
 	- `+`: Makes sure unordered list items use `+` as their indicator
 
-Example: Unordered lists have their indicator updated to `*` when `List item style = 'consistent'` and `*` is the first unordered list indicator
+Example: Unordered lists have their indicator updated to `*` when `List item style = 'consistent'` and `*` is the first unordered list marker
 
 Before:
 
@@ -3643,7 +3643,7 @@ After:
 1. Item 1
 2. Item 2
 ``````
-Example: Blank lines are removed between list items when the list indicator is '-'
+Example: Blank lines are removed between list items when the list marker is '-'
 
 Before:
 
@@ -3681,7 +3681,7 @@ After:
 	- [!] Subitem 1
 - [ ] Item 2
 ``````
-Example: Blank lines are removed between list items when the list indicator is '+'
+Example: Blank lines are removed between list items when the list marker is '+'
 
 Before:
 
@@ -3700,7 +3700,7 @@ After:
 	+ Subitem 1
 + Item 2
 ``````
-Example: Blank lines are removed between list items when the list indicator is '*'
+Example: Blank lines are removed between list items when the list marker is '*'
 
 Before:
 
@@ -4217,11 +4217,11 @@ This content is being added to a blockquote
 
 Alias: `prevent-double-checklist-indicator-on-paste`
 
-Removes starting checklist indicator from the text to paste if the line the cursor is on in the file has a checklist indicator
+Removes starting checklist marker from the text to paste if the line the cursor is on in the file has a checklist marker
 
 
 
-Example: Line being pasted is left alone when current line has no checklist indicator in it: `Regular text here`
+Example: Line being pasted is left alone when current line has no checklist marker in it: `Regular text here`
 
 Before:
 
@@ -4234,7 +4234,7 @@ After:
 ``````markdown
 - [ ] Checklist item being pasted
 ``````
-Example: Line being pasted into a blockquote without a checklist indicator is left alone when it lacks a checklist indicator: `> > `
+Example: Line being pasted into a blockquote without a checklist marker is left alone when it lacks a checklist marker: `> > `
 
 Before:
 
@@ -4249,7 +4249,7 @@ After:
 - [ ] Checklist item contents here
 More content here
 ``````
-Example: Line being pasted into a blockquote with a checklist indicator has its checklist indicator removed when current line is: `> - [x] `
+Example: Line being pasted into a blockquote with a checklist marker has its checklist marker removed when current line is: `> - [x] `
 
 Before:
 
@@ -4264,7 +4264,7 @@ After:
 Checklist item contents here
 More content here
 ``````
-Example: Line being pasted with a checklist indicator has its checklist indicator removed when current line is: `- [ ] `
+Example: Line being pasted with a checklist marker has its checklist marker removed when current line is: `- [ ] `
 
 Before:
 
@@ -4279,7 +4279,7 @@ After:
 Checklist item 1
 - [ ] Checklist item 2
 ``````
-Example: Line being pasted as a checklist indicator has its checklist indicator removed when current line is: `- [!] `
+Example: Line being pasted as a checklist marker has its checklist marker removed when current line is: `- [!] `
 
 Before:
 
@@ -4299,11 +4299,11 @@ Checklist item 1
 
 Alias: `prevent-double-list-item-indicator-on-paste`
 
-Removes starting list indicator from the text to paste if the line the cursor is on in the file has a list indicator
+Removes starting list marker from the text to paste if the line the cursor is on in the file has a list marker
 
 
 
-Example: Line being pasted is left alone when current line has no list indicator in it: `Regular text here`
+Example: Line being pasted is left alone when current line has no list marker in it: `Regular text here`
 
 Before:
 
@@ -4316,7 +4316,7 @@ After:
 ``````markdown
 - List item being pasted
 ``````
-Example: Line being pasted into a blockquote without a list indicator is left alone when it lacks a list indicator: `> > `
+Example: Line being pasted into a blockquote without a list marker is left alone when it lacks a list marker: `> > `
 
 Before:
 
@@ -4331,7 +4331,7 @@ After:
 * List item contents here
 More content here
 ``````
-Example: Line being pasted into a blockquote with a list indicator is has its list indicator removed when current line is: `> * `
+Example: Line being pasted into a blockquote with a list marker is has its list marker removed when current line is: `> * `
 
 Before:
 
@@ -4346,7 +4346,7 @@ After:
 List item contents here
 More content here
 ``````
-Example: Line being pasted with a list indicator is has its list indicator removed when current line is: `+ `
+Example: Line being pasted with a list marker is has its list marker removed when current line is: `+ `
 
 Before:
 

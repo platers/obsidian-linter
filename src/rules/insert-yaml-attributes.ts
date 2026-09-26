@@ -1,7 +1,8 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {formatYAML, initYAML, loadYAML} from '../utils/yaml';
+import { isValidYaml } from '../utils/validation';
 import {escapeDollarSigns, yamlRegex} from '../utils/regex';
 
 class InsertYamlAttributesOptions implements Options {
@@ -29,8 +30,13 @@ export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttribut
       const insert_lines = options.textToInsert.reverse();
       const parsed_yaml = loadYAML(text.match(yamlRegex)[1]);
 
-      for (const line of insert_lines) {
-        const key = line.split(':')[0];
+      for (let line of insert_lines) {
+        const parts =  line.split(':');
+        const key = parts[0];
+        if (parts.length === 1) {
+          line  += ":"
+        }
+
         if (!Object.prototype.hasOwnProperty.call(parsed_yaml, key)) {
           text = text.replace(/^---\n/, escapeDollarSigns(`---\n${line}\n`));
         }
@@ -67,11 +73,14 @@ export default class InsertYamlAttributes extends RuleBuilder<InsertYamlAttribut
   }
   get optionBuilders(): OptionBuilderBase<InsertYamlAttributesOptions>[] {
     return [
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: InsertYamlAttributesOptions,
         nameKey: 'rules.insert-yaml-attributes.text-to-insert.name',
         descriptionKey: 'rules.insert-yaml-attributes.text-to-insert.description',
+        emptyStateKey: 'rules.insert-yaml-attributes.text-to-insert.empty-state',
+        fieldNamePlaceholderKey: 'rules.insert-yaml-attributes.text-to-insert.placeholder-text',
         optionsKey: 'textToInsert',
+        validator: isValidYaml,
       }),
     ];
   }

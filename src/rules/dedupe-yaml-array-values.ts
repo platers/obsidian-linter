@@ -1,7 +1,8 @@
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder } from './rule-builder';
 import dedent from 'ts-dedent';
-import {convertAliasValueToStringOrStringArray,
+import {
+  convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
   formatYAML,
   formatYamlArrayValue,
@@ -14,25 +15,27 @@ import {convertAliasValueToStringOrStringArray,
   setYamlSection,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
-  TagSpecificArrayFormats} from '../utils/yaml';
+  TagSpecificArrayFormats
+} from '../utils/yaml';
+import { isValidYamlKeyOnly } from '../utils/validation';
 
 class DedupeYamlArrayValuesOptions implements Options {
   @RuleBuilder.noSettingControl()
-    aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   dedupeAliasKey?: boolean = true;
   @RuleBuilder.noSettingControl()
-    tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   dedupeTagKey?: boolean = true;
   dedupeArrayKeys?: boolean = true;
   ignoreDedupeArrayKeys?: string[] = [];
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: QuoteCharacter = '"';
+  defaultEscapeCharacter?: QuoteCharacter = '"';
   @RuleBuilder.noSettingControl()
-    removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
+  removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
 
 @RuleBuilder.register
-export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptions> {
+export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayValuesOptions> {
   constructor() {
     super({
       nameKey: 'rules.dedupe-yaml-array-values.name',
@@ -53,14 +56,14 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
       for (const aliasKey of OBSIDIAN_ALIASES_KEYS) {
         if (options.dedupeAliasKey && Object.keys(yaml).includes(aliasKey)) {
           text = setYamlSection(text,
-              aliasKey,
-              formatYamlArrayValue(
-                  convertAliasValueToStringOrStringArray(this.getUniqueArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, aliasKey)))),
-                  options.aliasArrayStyle,
-                  options.defaultEscapeCharacter,
-                  options.removeUnnecessaryEscapeCharsForMultiLineArrays,
-                  true, // escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747
-              ),
+            aliasKey,
+            formatYamlArrayValue(
+              convertAliasValueToStringOrStringArray(this.getUniqueArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, aliasKey)))),
+              options.aliasArrayStyle,
+              options.defaultEscapeCharacter,
+              options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+              true, // escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747
+            ),
           );
 
           break;
@@ -70,13 +73,13 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
       for (const tagKey of OBSIDIAN_TAG_KEYS) {
         if (options.dedupeTagKey && Object.keys(yaml).includes(tagKey)) {
           text = setYamlSection(text,
-              tagKey,
-              formatYamlArrayValue(
-                  convertTagValueToStringOrStringArray(this.getUniqueArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, tagKey)))),
-                  options.tagArrayStyle,
-                  options.defaultEscapeCharacter,
-                  options.removeUnnecessaryEscapeCharsForMultiLineArrays,
-              ),
+            tagKey,
+            formatYamlArrayValue(
+              convertTagValueToStringOrStringArray(this.getUniqueArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, tagKey)))),
+              options.tagArrayStyle,
+              options.defaultEscapeCharacter,
+              options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+            ),
           );
 
           break;
@@ -88,7 +91,7 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays, arrays of objects, ignored keys, and already accounted for keys
-          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || (yaml[key].length !== 0 && typeof yaml[key][0] === 'object' && yaml[key][0] !== null)) {
+          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || ((yaml as { [k: string]: object[] })[key].length !== 0 && typeof (yaml as { [k: string]: object[] })[key][0] === 'object' && (yaml as { [k: string]: object[] })[key][0] !== null)) {
             continue;
           }
 
@@ -101,13 +104,13 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
           const newVal = this.getUniqueArray(splitValueIfSingleOrMultilineArray(currentYamlText));
 
           text = setYamlSection(text,
-              key,
-              formatYamlArrayValue(
-                  newVal,
-                  arrayType,
-                  options.defaultEscapeCharacter,
-                  options.removeUnnecessaryEscapeCharsForMultiLineArrays,
-              ),
+            key,
+            formatYamlArrayValue(
+              newVal,
+              arrayType,
+              options.defaultEscapeCharacter,
+              options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+            ),
           );
         }
       }
@@ -115,12 +118,40 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
       return text;
     });
   }
+  getYamlValue(value: string): string {
+    if (typeof value !== "string" || value.length < 2) {
+      return value;
+    }
+
+    if (value.startsWith("'") && value.endsWith("'")) {
+      return value.slice(1, -1);
+    }
+
+    if (value.startsWith('"') && value.endsWith('"')) {
+      return value.slice(1, -1);
+    }
+
+    return value;
+  }
   getUniqueArray(arr: string | string[]): string | string[] {
-    if (arr == null || typeof arr === 'string' || arr.length <= 1) {
+    if (arr == null || typeof arr === "string" || arr.length <= 1) {
       return arr;
     }
 
-    return [...new Set(arr)];
+    const uniqueValues = new Set();
+    const result: string[] = [];
+
+    for (const value of arr) {
+      const normalizedValue = this.getYamlValue(value);
+      if (uniqueValues.has(normalizedValue)) {
+        continue;
+      }
+
+      uniqueValues.add(normalizedValue);
+      result.push(value);
+    }
+
+    return result;
   }
 
   get exampleBuilders(): ExampleBuilder<DedupeYamlArrayValuesOptions>[] {
@@ -267,11 +298,15 @@ export default class RuleTemplate extends RuleBuilder<DedupeYamlArrayValuesOptio
         descriptionKey: 'rules.dedupe-yaml-array-values.dedupe-array-keys.description',
         optionsKey: 'dedupeArrayKeys',
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: DedupeYamlArrayValuesOptions,
         nameKey: 'rules.dedupe-yaml-array-values.ignore-keys.name',
         descriptionKey: 'rules.dedupe-yaml-array-values.ignore-keys.description',
+        emptyStateKey: 'rules.dedupe-yaml-array-values.ignore-keys.empty-state',
+        fieldNamePlaceholderKey: 'rules.dedupe-yaml-array-values.ignore-keys.placeholder-text',
         optionsKey: 'ignoreDedupeArrayKeys',
+        trimItemWhitespace: true,
+        validator: isValidYamlKeyOnly,
       }),
     ];
   }

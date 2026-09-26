@@ -6,16 +6,18 @@ import {
   Option,
   BooleanOption,
 } from './option';
-import {YAMLException} from 'js-yaml';
 import {LinterError} from './linter-error';
 import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
-import {ignoreListOfTypes, IgnoreType} from './utils/ignore-types';
+import {IgnoreType} from './utils/ignore-types';
+import {LintContext, ProtectedRanges} from './utils/protected-ranges';
 import {LinterSettings} from './settings-data';
 import {App} from 'obsidian';
+import {YAMLParseError} from 'yaml';
+import LinterPlugin from './main';
 
-export type Options = { [optionName: string]: any};
+export type Options = object;
 
-type ApplyFunction = (text: string, options?: Options) => string;
+type ApplyFunction = (text: string, options?: Options, protectedRanges?: ProtectedRanges) => string;
 
 export enum RuleType {
   YAML = 'YAML',
@@ -55,32 +57,24 @@ export class Rule {
       public options: Array<Option> = [],
       public readonly hasSpecialExecutionOrder: boolean = false,
       public readonly ignoreTypes: IgnoreType[] = [],
-      disableConflictingOptions: (value: boolean, app: App) => void = null,
+      disableConflictingOptions: (value: boolean, app: App, plugin: LinterPlugin) => void = null,
   ) {
     this.ruleHeading = this.getName().toLowerCase().replaceAll(' ', '-');
 
-    options.unshift(new BooleanOption('enabled', this.descriptionKey, '' as LanguageStringKey, false, alias, (value: boolean, app: App) => {
-      if (value && disableConflictingOptions) {
-        disableConflictingOptions(value, app);
+    const onChange = disableConflictingOptions ? (value: boolean, app: App, plugin: LinterPlugin) => {
+      if (value) {
+        disableConflictingOptions(value, app, plugin);
       }
+    }: undefined;
 
-      if (options.length > 1) {
-        for (let i = 1; i < options.length; i++) {
-          if (value) {
-            options[i].unhide();
-          } else {
-            options[i].hide();
-          }
-        }
-      }
-    }));
+    options.unshift(new BooleanOption('enabled', this.descriptionKey, '' as LanguageStringKey, false, alias, onChange));
     for (const option of options) {
       option.ruleAlias = alias;
     }
   }
 
   public getDefaultOptions() {
-    const options: { [optionName: string]: any } = {};
+    const options: { [optionName: string]: unknown } = {};
 
     for (const option of this.options) {
       options[option.configKey] = option.defaultValue;
@@ -109,10 +103,26 @@ export class Rule {
     return this.options[0].configKey;
   }
 
-  public apply(text: string, options?: Options): string {
-    return ignoreListOfTypes(this.ignoreTypes, text, (textAfterIgnore: string) => {
-      return this.applyAfterIgnore(textAfterIgnore, options);
-    });
+  public runEnabledSideEffect(value: boolean, app: App, plugin: LinterPlugin): void {
+    const enabled = this.options[0] as BooleanOption;
+    enabled.onChange?.(value, app, plugin);
+  }
+
+  /**
+   * Runs the rule, keeping it away from the parts of the document it declared it ignores.
+   *
+   * Every rule is given the document itself and told which regions of it not to change.
+   * @param {string} text The document to run the rule over
+   * @param {Options} [options] The rule's settings
+   * @param {LintContext} [context] The shared view of this document, if one has been built
+   * @return {string} The document after the rule
+   */
+  public apply(text: string, options?: Options, context?: LintContext): string {
+    // a context belongs to the text it was built from, so one for a different document is not
+    // reused rather than trusted
+    const contextForText = context && context.text === text ? context : LintContext.for(text);
+
+    return this.applyAfterIgnore(text, options, contextForText.protectedRangesFor(this.ignoreTypes));
   }
 }
 
@@ -188,12 +198,12 @@ export function sortRules(): void {
 
 export function wrapLintError(error: Error, ruleName: string) {
   let errorMessage: string;
-  if (error instanceof YAMLException) {
+  if (error instanceof YAMLParseError) {
     errorMessage = error.toString();
     errorMessage = getTextInLanguage('logs.wrapper-yaml-error').replace('{ERROR_MESSAGE}', errorMessage.substring(errorMessage.indexOf(':') + 1));
   } else {
     errorMessage = getTextInLanguage('logs.wrapper-unknown-error').replace('{ERROR_MESSAGE}', error.message);
   }
 
-  throw new LinterError(`"${ruleName}" encountered an ${errorMessage}`, error);
+  throw new LinterError(getTextInLanguage('logs.error-message-format').replace('{RULE_NAME}', ruleName).replace('{ERROR_MESSAGE}', errorMessage), error);
 }

@@ -89,7 +89,6 @@ export default {
     'empty-clipboard': 'Es gibt keinen Inhalt in der Zwischenablage.',
     'characters-added': 'Zeichen hinzugefügt',
     'characters-removed': 'Zeichen entfernt',
-    'copy-to-clipboard-failed': 'Kopieren des Textes in die Zwischenablage fehlgeschlagen: ',
   },
 
   // rule-alias-suggester.ts
@@ -102,6 +101,7 @@ export default {
   // lint-confirmation-modal.ts
   'warning-text': 'Warnung',
   'file-backup-text': 'Stellen Sie sicher, dass Sie Ihre Dateien gesichert haben.',
+  'do-not-show-again': 'Diese Bestätigung nicht mehr anzeigen',
 
   'tabs': {
     'names': {
@@ -116,8 +116,6 @@ export default {
       'paste': 'Einfügen',
       'debug': 'Debuggen',
     },
-    // tab-searcher.ts
-    'default-search-bar-text': 'Alle Einstellungen durchsuchen',
     'general': {
       // general-tab.ts
       'lint-on-save': {
@@ -127,6 +125,10 @@ export default {
       'display-message': {
         'name': 'Meldung beim Linten anzeigen',
         'description': 'Zeigen Sie die Anzahl der Zeichen an, die sich nach dem Linten geändert haben',
+      },
+      'suppress-message-when-no-change': {
+        'name': 'Meldung bei keiner Änderung unterdrücken',
+        'description': 'Wenn aktiviert, wird keine Meldung angezeigt, wenn keine tatsächlichen Änderungen auftreten.',
       },
       'lint-on-file-change': {
         'name': 'Linten bei Dateiänderungen',
@@ -141,7 +143,12 @@ export default {
         'description': 'Ordner, die ignoriert werden sollen, wenn alle Dateien gelinted oder beim Speichern gelinted werden. Geben Sie Ordnerpfade ein, die durch Zeilenumbrüche getrennt sind',
         'folder-search-placeholder-text': 'Ordner-Name',
         'add-input-button-text': 'Einen anderen zu ignorierenden Ordner hinzufügen',
-        'delete-tooltip': 'Löschen',
+      },
+      'additional-file-extensions': {
+        'name': 'Zusätzliche Dateierweiterungen',
+        'description': 'Dateierweiterungen, die zusätzlich zu md gelinted werden sollen. Zum Beispiel mdx oder svx. Führenden Punkt nicht angeben. <b>Hinweis: Es werden nur Dateien gelinted, die Obsidian als Markdown ansieht (nativ oder über andere Plugins), unabhängig von hinzugefügten Erweiterungen.</b>',
+        'extension-placeholder': 'z.B. mdx',
+        'add-input-button-text': 'Weitere Erweiterung hinzufügen',
       },
       'override-locale': {
         'name': 'Gebietsschema überschreiben',
@@ -170,7 +177,7 @@ export default {
       },
     },
     'debug': {
-    // debug-tab.ts
+      // debug-tab.ts
       'log-level': {
         'name': 'Log-Ebene',
         'description': 'Die Arten von Logmeldungen, die vom Dienst protokolliert werden dürfen. Der Standardwert ist Fehler.',
@@ -180,7 +187,7 @@ export default {
         'description': 'Der Inhalt der data.json für den Linter zum Zeitpunkt des Ladens der Einstellungsseite',
       },
       'log-collection': {
-        'name': 'Sammeln Sie Protokolle bei aktiviertem <code>Linten beim Speichern</code> und dem Linten der aktuellen Datei',
+        'name': 'Sammeln Sie Protokolle bei aktiviertem Linten beim Speichern und dem Linten der aktuellen Datei',
         'description': 'Sammelt die Log-Meldungen, wenn Sie <code>Linten beim Speichern</code> aktiviert haben und die aktuelle Datei linten. Diese Protokolle können beim Debuggen und Erstellen von Fehlerberichten hilfreich sein.',
       },
       'linter-logs': {
@@ -195,27 +202,19 @@ export default {
       // custom-command-option.ts
       'name': 'Benutzerdefinierte Befehle',
       'description': 'Benutzerdefinierte Befehle sind Obsidian-Befehle, die ausgeführt werden, nachdem der Linter seine regulären Regeln ausgeführt hat. Dies bedeutet, dass sie nicht ausgeführt werden, bevor die YAML-Zeitstempellogik ausgeführt wird, sodass sie dazu führen können, dass der YAML-Zeitstempel bei der nächsten Ausführung des Linters ausgelöst wird. Sie können einen Obsidian-Befehl nur einmal auswählen.',
-      'warning': 'Wenn Sie eine Option auswählen, stellen Sie sicher, dass Sie die Option entweder mit der Maus oder durch Drücken der Eingabetaste auswählen. Andere Auswahlmethoden funktionieren möglicherweise nicht und es werden nur Auswahlen eines tatsächlichen Obsidian-Befehls oder einer leeren Zeichenfolge gespeichert.',
 
       'add-input-button-text': 'Neuen Befehl hinzufügen',
       'command-search-placeholder-text': 'Obsidian-Befehl',
-      'move-up-tooltip': 'Aufrücken',
-      'move-down-tooltip': 'Bewegen Sie sich nach unten',
-      'delete-tooltip': 'Löschen',
     },
     'custom-replace': {
       // custom-replace-option.ts
       'name': 'Benutzerdefinierter Regex-Ersatz',
       'description': 'Der benutzerdefinierte Regex-Ersatz kann verwendet werden, um alles zu ersetzen, was mit dem Such-Regex mit dem Ersatzwert übereinstimmt. Bei den Werten replace und find muss es sich um gültige Regex-Werte handeln.',
-      'warning': 'Verwenden Sie dies mit Vorsicht, wenn Sie Regex nicht kennen. Stellen Sie außerdem sicher, dass Sie keine Lookbehinds in Ihrem regulären Ausdruck auf iOS-Mobilgeräten verwenden, da dies dazu führt, dass Lints fehlschlagen, da dies auf dieser Plattform nicht unterstützt wird.',
       'add-input-button-text': 'Neuen Regex-Ersatz hinzufügen',
       'regex-to-find-placeholder-text': 'Regex zu finden',
       'flags-placeholder-text': 'Flaggen',
       'regex-to-replace-placeholder-text': 'Regex zu ersetzen',
       'label-placeholder-text': 'Etikett',
-      'move-up-tooltip': 'Aufrücken',
-      'move-down-tooltip': 'Bewegen Sie sich nach unten',
-      'delete-tooltip': 'Löschen',
     },
   },
 
@@ -399,7 +398,7 @@ export default {
       'description': 'Alle Überschriften haben sowohl davor als auch danach eine Leerzeile (außer wenn sich die Überschrift am Anfang oder Ende des Dokuments befindet).',
       'bottom': {
         'name': 'Darunter',
-        'description': 'Einfügen einer Leerzeile unter Überschriften',
+        'description': 'Einfügen einer Leerzeile unter Überschriften (Wenn diese Funktion deaktiviert ist, werden die Leerzeilen nach Überschriften nicht entfernt.)',
       },
       'empty-line-after-yaml': {
         'name': 'Leere Zeile zwischen YAML und Header',
@@ -496,7 +495,7 @@ export default {
       'name': 'Zitatstil',
       'description': 'Aktualisiert die Anführungszeichen im Textkörperinhalt, sodass sie auf die angegebenen einfachen und doppelten Anführungszeichenstile aktualisiert werden.',
       'single-quote-enabled': {
-        'name': 'Aktivieren Sie <code>Stil für einfache Anführungszeichen</code>',
+        'name': 'Aktivieren Sie Stil für einfache Anführungszeichen',
         'description': 'Gibt an, dass der ausgewählte einfache Anführungszeichenstil verwendet werden soll.',
       },
       'single-quote-style': {
@@ -504,7 +503,7 @@ export default {
         'description': 'Der Stil der zu verwendenden einfachen Anführungszeichen.',
       },
       'double-quote-enabled': {
-        'name': 'Aktivieren Sie <code>Stil für doppelte Anführungszeichen</code>',
+        'name': 'Aktivieren Sie Stil für doppelte Anführungszeichen',
         'description': 'Gibt an, dass der ausgewählte doppelte Anführungszeichenstil verwendet werden soll.',
       },
       'double-quote-style': {
@@ -515,7 +514,7 @@ export default {
     // re-index-footnotes.ts
     're-index-footnotes': {
       'name': 'Fußnoten neu indizieren',
-      'description': 'Indiziert Fußnotenschlüssel und Fußnoten basierend auf der Reihenfolge des Auftretens neu (HINWEIS: Diese Regel funktioniert *nicht*, wenn es mehr als eine Fußnote für einen Schlüssel gibt.)',
+      'description': 'Indiziert Fußnotenschlüssel und Fußnoten neu, basierend auf der Reihenfolge der Fußnotenverweise in der Datei. <b>HINWEIS: Diese Regel funktioniert <i>nicht</i>, wenn es mehr als eine Fußnote für einen Schlüssel gibt.</b>',
     },
     // remove-consecutive-list-markers.ts
     'remove-consecutive-list-markers': {
@@ -664,7 +663,7 @@ export default {
     // yaml-key-sort.ts
     'yaml-key-sort': {
       'name': 'Sortierung von YAML-Schlüsseln',
-      'description': 'Sortiert die YAML-Schlüssel basierend auf der angegebenen Reihenfolge und Priorität. Hinweis: Kann auch Leerzeilen entfernen.',
+      'description': 'Sortiert die YAML-Schlüssel basierend auf der angegebenen Reihenfolge und Priorität. <b>Hinweis: Kann auch Leerzeilen entfernen.</b>',
       'yaml-key-priority-sort-order': {
         'name': 'Prioritätssortierreihenfolge der YAML-Schlüssel',
         'description': 'Die Reihenfolge, in der die Schlüssel sortiert werden sollen, wobei in jeder Zeile ein Schlüssel in der Reihenfolge der Liste sortiert wird',
@@ -716,7 +715,7 @@ export default {
         'description': 'Solche Aliase sind in der Regel redundant',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': 'Verwenden Sie den YAML-Schlüssel <code>linter-yaml-title-alias</code>, um bei Änderungen von Dateinamen und Überschriften zu helfen',
+        'name': 'Verwenden Sie den YAML-Schlüssel linter-yaml-title-alias, um bei Änderungen von Dateinamen und Überschriften zu helfen',
         'description': 'Wenn sich die erste H1-Überschrift ändert oder der Dateiname geändert wird, wenn der erste H1 nicht vorhanden ist, wird der alte Alias, der in diesem Schlüssel gespeichert ist, durch den neuen Wert ersetzt, anstatt nur einen neuen Eintrag in das Alias-Array einzufügen',
       },
     },

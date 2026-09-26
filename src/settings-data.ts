@@ -1,7 +1,4 @@
 import {Options} from './rules';
-import {LintCommand} from './ui/linter-components/custom-command-option';
-import {CustomReplace} from './ui/linter-components/custom-replace-option';
-import {FileToIgnore} from './ui/linter-components/files-to-ignore-option';
 import {NestedKeyOf} from './utils/nested-keyof';
 import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from './utils/yaml';
 
@@ -23,16 +20,27 @@ export enum AfterFileChangeLintTimes {
   After1Minute = 'after 1 minute',
 }
 
+export type CustomAutoCorrectContent = { filePath: string; customReplacements: Map<string, string>; };
+export type LintCommand = { id: string; name: string; enabled: boolean; };
+export type CustomReplace = { label: string; find: string; replace: string; flags: string; enabled: boolean; };
+export type FileToIgnore = { label: string; match: string; flags: string; };
+
 export interface LinterSettings {
   ruleConfigs: {
     [ruleName: string]: Options;
   };
   lintOnSave: boolean;
   displayChanged: boolean;
+  suppressMessageWhenNoChange?: boolean;
+  enableDiffPreviewView: boolean;
+  suppressLintAllFilesConfirmationModal?: boolean;
+  suppressLintAllFilesInFolderConfirmationModal?: boolean;
   settingsConvertedToConfigKeyValues: boolean;
+  textAreaSettingsConvertedToListItemSettings: boolean;
   recordLintOnSaveLogs: boolean;
   lintOnFileChange: boolean;
   displayLintOnFileChangeNotice: boolean;
+  additionalFileExtensions: string[];
   foldersToIgnore: string[];
   filesToIgnore: FileToIgnore[];
   linterLocale: string;
@@ -49,9 +57,15 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   lintOnSave: false,
   recordLintOnSaveLogs: false,
   displayChanged: true,
+  suppressMessageWhenNoChange: false,
+  enableDiffPreviewView: true,
+  suppressLintAllFilesConfirmationModal: false,
+  suppressLintAllFilesInFolderConfirmationModal: false,
   lintOnFileChange: false,
   displayLintOnFileChangeNotice: false,
   settingsConvertedToConfigKeyValues: false,
+  textAreaSettingsConvertedToListItemSettings: false,
+  additionalFileExtensions: [],
   foldersToIgnore: [],
   filesToIgnore: [],
   linterLocale: 'system-default',

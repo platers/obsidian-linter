@@ -1,26 +1,26 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "inlineSourceMap": true,
     "inlineSources": true,
-    "module": "esnext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "target": "es6",
     "allowJs": true,
     "noImplicitAny": true,
-    "moduleResolution": "node",
+    "noImplicitThis": true,
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
-    "experimentalDecorators": true,
     "strictBindCallApply": true,
     "lib": [
       "dom",
       "es5",
       "scripthost",
       "ESNext"
-    ]
+    ],
+    "types": ["jest", "node"]
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
   ],
   "exclude": [
     "node_modules/**/*",

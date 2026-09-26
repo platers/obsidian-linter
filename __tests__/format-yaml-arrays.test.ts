@@ -1074,5 +1074,75 @@ ruleTest({
         aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
       },
     },
+    { // relates to https://github.com/platers/obsidian-linter/issues/1434
+      testName: 'Converting from a multi-line array to a single comma delimited string should result in strings with commas in them being escaped',
+      before: dedent`
+        ---
+        aliases:
+          - Denver, Co
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: "Denver, Co"
+        ---
+      `,
+      options: {
+        aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
+      },
+    },
+    { // fixes https://github.com/platers/obsidian-linter/issues/1434
+      testName: 'Converting from a multi-line array to a single line array should result in strings with commas in them being escaped',
+      before: dedent`
+        ---
+        aliases:
+          - Denver, Co
+        ---
+      `,
+      after: dedent`
+        ---
+        aliases: ["Denver, Co"]
+        ---
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.SingleLine,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1384
+      testName: 'A double quoted YAML key needing no change should not have its value duplicated at the end of the YAML content ',
+      before: dedent`
+        ---
+        "key1":${' '}
+          - value
+        ---
+      `,
+      after: dedent`
+        ---
+        "key1":
+          - value
+        ---
+      `,
+      options: {
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1384
+      testName: 'A single quoted YAML key needing no change should not have its value duplicated at the end of the YAML content ',
+      before: dedent`
+        ---
+        'key1':${' '}
+          - value
+        ---
+      `,
+      after: dedent`
+        ---
+        'key1':
+          - value
+        ---
+      `,
+      options: {
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
   ],
 });

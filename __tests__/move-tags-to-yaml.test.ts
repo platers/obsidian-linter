@@ -7,6 +7,18 @@ ruleTest({
   RuleBuilderClass: MoveTagsToYaml,
   testCases: [
     {
+      testName: 'Does not collect or remove tags inside fenced code',
+      before: '```\n#inside\n```\n\nText #outside',
+      after: '---\ntags: [outside]\n---\n```\n#inside\n```\n\nText',
+      options: {howToHandleExistingTags: 'Remove whole tag'},
+    },
+    {
+      testName: 'Does not collect or remove tags inside disabled sections',
+      before: '<!-- linter-disable -->\n#inside\n<!-- linter-enable -->\n\nText #outside',
+      after: '---\ntags: [outside]\n---\n<!-- linter-disable -->\n#inside\n<!-- linter-enable -->\n\nText',
+      options: {howToHandleExistingTags: 'Remove whole tag'},
+    },
+    {
       testName: 'Nothing happens when there is no tag in the content of the text',
       before: dedent`
         # Title
@@ -383,6 +395,24 @@ ruleTest({
         tagArrayStyle: NormalArrayFormats.SingleLine,
         howToHandleExistingTags: 'Remove whole tag',
       },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1535
+      testName: 'Purely numeric hashes are not treated as tags since Obsidian requires at least one non-numerical character',
+      before: dedent`
+        Numeric only: #123
+        Year like: #1984
+        Valid tag with digits: #y1984
+        Valid tag ending in digits: #1984book
+      `,
+      after: dedent`
+        ---
+        tags: [y1984, 1984book]
+        ---
+        Numeric only: #123
+        Year like: #1984
+        Valid tag with digits: #y1984
+        Valid tag ending in digits: #1984book
+      `,
     },
   ],
 });

@@ -1,6 +1,6 @@
 import {TFile, moment} from 'obsidian';
 import {logDebug, logWarn, timingBegin, timingEnd} from './utils/logger';
-import {getDisabledRules, rules, wrapLintError, RuleType} from './rules';
+import {getDisabledRules, rules, wrapLintError, Rule, RuleType, Options} from './rules';
 import BlockquotifyOnPaste from './rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from './rules/escape-yaml-special-characters';
 import ForceYamlEscape from './rules/force-yaml-escape';
@@ -16,19 +16,21 @@ import {RuleBuilderBase} from './rules/rule-builder';
 import YamlKeySort from './rules/yaml-key-sort';
 import YamlTimestamp from './rules/yaml-timestamp';
 import {ObsidianCommandInterface} from './typings/obsidian-ex';
-import {CustomReplace} from './ui/linter-components/custom-replace-option';
-import {LintCommand} from './ui/linter-components/custom-command-option';
-import {convertStringVersionOfEscapeCharactersToEscapeCharacters} from './utils/strings';
+import { CustomReplace } from "./settings-data";
+import { LintCommand } from "./settings-data";
+import {convertStringVersionOfEscapeCharactersToEscapeCharacters, replaceTextRanges, textReplacement} from './utils/strings';
 import {getTextInLanguage} from './lang/helpers';
 import CapitalizeHeadings from './rules/capitalize-headings';
 import YamlTitle from './rules/yaml-title';
 import YamlTitleAlias from './rules/yaml-title-alias';
 import BlockquoteStyle from './rules/blockquote-style';
-import {IgnoreTypes, ignoreListOfTypes} from './utils/ignore-types';
+import {IgnoreTypes} from './utils/ignore-types';
+import {LintContext, replaceUnprotectedRegexMatches} from './utils/protected-ranges';
+import {addEditsIfTheyDoNotClash, getEditsBetween} from './utils/text-edits';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
 import {LinterSettings} from './settings-data';
 import TrailingSpaces from './rules/trailing-spaces';
-import {CustomAutoCorrectContent} from './ui/linter-components/auto-correct-files-picker-option';
+import { CustomAutoCorrectContent } from './settings-data';
 import AutoCorrectCommonMisspellings from './rules/auto-correct-common-misspellings';
 import {yamlRegex} from './utils/regex';
 import AddBlankLineAfterYAML from './rules/add-blank-line-after-yaml';
@@ -50,6 +52,14 @@ type FileInfo = {
   path: string,
 }
 
+const rulesThatMustSeeEarlierWork = [
+  'move-footnotes-to-the-bottom',
+  're-index-footnotes',
+  'line-break-at-document-end',
+  'file-name-heading',
+  'header-increment',
+];
+
 export class RulesRunner {
   private disabledRules: string[] = [];
   skipFile: boolean;
@@ -70,7 +80,7 @@ export class RulesRunner {
     timingEnd(preRuleText);
 
     let hasCustomCorrections = false;
-    for (const replacementFileInfo of runOptions.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
+    for (const replacementFileInfo of (runOptions.settings.ruleConfigs['auto-correct-common-misspellings'] as {[k: string]: CustomAutoCorrectContent[] | null})['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
       if (replacementFileInfo.filePath != '') {
         hasCustomCorrections = true;
         break;
@@ -78,6 +88,24 @@ export class RulesRunner {
     }
 
     const disabledRuleText = getTextInLanguage('logs.disabled-text');
+    const extraOptions = {
+      fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
+      fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
+      fileName: runOptions.fileInfo.name,
+      locale: runOptions.momentLocale,
+      minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
+      aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
+      tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+      removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
+    };
+
+    // Rules used to be handed the text the rule before them produced. A run of rules is now given
+    // the same text, what each of them changed is worked out by comparing their answer with what
+    // they were given, and the changes are applied together, so they share one parse of it. A rule
+    // whose changes land near another's, or one that has to see earlier work, ends the run and
+    // starts the next one.
+    const rulesToRun: Rule[] = [];
     for (const rule of rules) {
       // if you are run prior to or after the regular rules or are a disabled rule, skip running the rule
       if (this.disabledRules.includes(rule.alias)) {
@@ -89,7 +117,7 @@ export class RulesRunner {
 
       if (rule.alias === 'auto-correct-common-misspellings' && hasCustomCorrections) {
         let skipRule = false;
-        for (const replacementFileInfo of runOptions.settings.ruleConfigs['auto-correct-common-misspellings']['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
+        for (const replacementFileInfo of (runOptions.settings.ruleConfigs['auto-correct-common-misspellings'] as {[k: string]: CustomAutoCorrectContent[] | null})['extra-auto-correct-files'] ?? [] as CustomAutoCorrectContent[]) {
           if (replacementFileInfo.filePath == runOptions.fileInfo.path) {
             skipRule = true;
             break;
@@ -102,18 +130,10 @@ export class RulesRunner {
         }
       }
 
-      [newText] = RuleBuilderBase.applyIfEnabledBase(rule, newText, runOptions.settings, {
-        fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
-        fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
-        fileName: runOptions.fileInfo.name,
-        locale: runOptions.momentLocale,
-        minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
-        aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
-        tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
-        defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
-        removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
-      });
+      rulesToRun.push(rule);
     }
+
+    newText = this.runRulesInBatches(rulesToRun, newText, runOptions.settings, extraOptions);
 
     const customRegexLogText = getTextInLanguage('logs.custom-regex');
     timingBegin(customRegexLogText);
@@ -123,6 +143,67 @@ export class RulesRunner {
     runOptions.oldText = newText;
 
     return this.runAfterRegularRules(originalText, runOptions);
+  }
+
+  private runRulesInBatches(rulesToRun: Rule[], text: string, settings: LinterSettings, extraOptions: Options): string {
+    return this.runBatches(rulesToRun, text, settings, extraOptions,
+        (rule) => rule.type === RuleType.YAML || rulesThatMustSeeEarlierWork.includes(rule.alias));
+  }
+
+  private runBatches(rulesToRun: Rule[], text: string, settings: LinterSettings, extraOptions: Options, mustRunOnItsOwn: (rule: Rule) => boolean): string {
+    let index = 0;
+    while (index < rulesToRun.length) {
+      const snapshot = text;
+      // Every rule in a batch is given this exact text, so the parse of it and the regions of it
+      // each rule has to leave alone are worked out once and shared by all of them. The context
+      // describes this snapshot and nothing else, so it is dropped as soon as the batch's changes
+      // are applied and the text moves on.
+      const context = LintContext.for(snapshot);
+      const batchedEdits: textReplacement[] = [];
+
+      while (index < rulesToRun.length) {
+        const rule = rulesToRun[index];
+
+        // A disabled rule will not read the snapshot, so it does not need a batch boundary.
+        const optionsFromSettings = rule.getOptions(settings) as Record<string, unknown>;
+        if (!optionsFromSettings[rule.enabledOptionName()]) {
+          index++;
+          continue;
+        }
+
+        // Some rules cannot be told apart by looking only at what they changed. The yaml rules
+        // build on each other, one inserting a key and another deciding how its value is written.
+        // The rules that move content about, or that look at the document as a whole, decide what
+        // to do from where everything already is, so whether they need to do anything depends on
+        // what ran before them. Those are given the result of the rule before them.
+        const runsOnItsOwn = mustRunOnItsOwn(rule);
+        if (runsOnItsOwn && batchedEdits.length > 0) {
+          break;
+        }
+
+        const [ruleOutput] = RuleBuilderBase.applyIfEnabledBase(rule, snapshot, settings, extraOptions, context);
+        if (ruleOutput === snapshot) {
+          index++;
+          continue;
+        }
+
+        if (!addEditsIfTheyDoNotClash(batchedEdits, getEditsBetween(snapshot, ruleOutput), snapshot)) {
+          break;
+        }
+
+        index++;
+
+        if (runsOnItsOwn) {
+          break;
+        }
+      }
+
+      // a rule that clashed has not been counted as run, so it leads the next batch and gets to
+      // see what the rules before it settled on
+      text = replaceTextRanges(snapshot, batchedEdits);
+    }
+
+    return text;
   }
 
   private runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
@@ -164,15 +245,19 @@ export class RulesRunner {
       removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
     });
 
-    [newText] = BlockquoteStyle.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+    const cleanupRules = [BlockquoteStyle.getRule(), ForceYamlEscape.getRule(), TrailingSpaces.getRule(), ConsecutiveBlankLines.getRule()].filter((rule) => {
+      if (this.disabledRules.includes(rule.alias)) {
+        logDebug(rule.alias + ' ' + getTextInLanguage('logs.disabled-text'));
+        return false;
+      }
 
-    [newText] = ForceYamlEscape.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
-      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+      return true;
     });
-
-    [newText] = TrailingSpaces.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
-
-    [newText] = ConsecutiveBlankLines.applyIfEnabled(newText, runOptions.settings, this.disabledRules);
+    // These adjacent cleanup rules can share a snapshot, including the frontmatter-only escape
+    // rule. Clashes still start a fresh batch; the title and timestamp barriers stay sequential.
+    newText = this.runBatches(cleanupRules, newText, runOptions.settings, {
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+    }, () => false);
 
     const yaml = newText.match(yamlRegex);
     if (yaml != null) {
@@ -201,7 +286,7 @@ export class RulesRunner {
       currentTime = currentTime.utc();
     }
     [newText] = YamlKeySort.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
-      currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
+      currentTimeFormatted: currentTime.format(yamlTimestampOptions.format?.trimEnd()),
       yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
       dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
     });
@@ -230,44 +315,43 @@ export class RulesRunner {
         commandsRun.add(commandInfo.id);
         commands.executeCommandById(commandInfo.id);
       } catch (error) {
-        wrapLintError(error, `${getTextInLanguage('logs.custom-lint-error-message')} ${commandInfo.id}`);
+        wrapLintError(error instanceof Error ? error : new Error(String(error)), `${getTextInLanguage('logs.custom-lint-error-message')} ${commandInfo.id}`);
       }
     }
   }
 
   runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
-    return ignoreListOfTypes([IgnoreTypes.customIgnore], oldText, (text: string) => {
-      logDebug(getTextInLanguage('logs.running-custom-regex'));
+    logDebug(getTextInLanguage('logs.running-custom-regex'));
 
-      let newText = text;
-      let initialText = text;
-      for (const eachRegex of customRegexes) {
-        const findIsEmpty = eachRegex.find === undefined || eachRegex.find == '' || eachRegex.find === null;
-        const replaceIsEmpty = eachRegex.replace === undefined || eachRegex.replace === null;
-        if (findIsEmpty || replaceIsEmpty || !eachRegex.enabled) {
-          continue;
-        }
-
-        let debugMsg = eachRegex.label;
-        if (debugMsg && debugMsg.trim() != '') {
-          debugMsg += ':\n';
-        }
-        debugMsg +=`/${eachRegex.find}/${eachRegex.flags}/${eachRegex.replace}/`;
-
-        logDebug(debugMsg);
-        const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
-        // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
-        newText = newText.replace(regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace));
-
-        if (initialText != newText) {
-          logDebug(newText);
-        }
-
-        initialText = newText;
+    let newText = oldText;
+    let initialText = oldText;
+    for (const eachRegex of customRegexes) {
+      const findIsEmpty = eachRegex.find === undefined || eachRegex.find == '' || eachRegex.find === null;
+      const replaceIsEmpty = eachRegex.replace === undefined || eachRegex.replace === null;
+      if (findIsEmpty || replaceIsEmpty || !eachRegex.enabled) {
+        continue;
       }
 
-      return newText;
-    });
+      let debugMsg = eachRegex.label;
+      if (debugMsg && debugMsg.trim() != '') {
+        debugMsg += ':\n';
+      }
+      debugMsg +=`/${eachRegex.find}/${eachRegex.flags}/${eachRegex.replace}/`;
+
+      logDebug(debugMsg);
+      const regex = new RegExp(`${eachRegex.find}`, eachRegex.flags);
+      const protectedRanges = LintContext.for(newText).protectedRangesFor([IgnoreTypes.customIgnore]);
+      // make sure that characters are not string escaped unescape in the replace value to make sure things like \n and \t are correctly inserted
+      newText = replaceUnprotectedRegexMatches(newText, regex, convertStringVersionOfEscapeCharactersToEscapeCharacters(eachRegex.replace), protectedRanges);
+
+      if (initialText != newText) {
+        logDebug(newText);
+      }
+
+      initialText = newText;
+    }
+
+    return newText;
   }
 
   runPasteLint(currentLine: string, selectedText: string, runOptions: RunLinterRulesOptions): string {
@@ -308,7 +392,7 @@ export class RulesRunner {
   }
 }
 
-export function createRunLinterRulesOptions(text: string, file: TFile = null, momentLocale: string, settings: LinterSettings, defaultMisspellings: Map<string, string>): RunLinterRulesOptions {
+export function createRunLinterRulesOptions(text: string, file: TFile | null = null, momentLocale: string, settings: LinterSettings, defaultMisspellings: Map<string, string>): RunLinterRulesOptions {
   const createdAt = (file && file.stat.ctime !== 0) ? moment(file.stat.ctime): moment();
   createdAt.locale(momentLocale);
   const modifiedAt = file ? moment(file.stat.mtime): moment();

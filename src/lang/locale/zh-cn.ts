@@ -93,7 +93,6 @@ export default {
     'empty-clipboard': '剪贴板为空',
     'characters-added': '个字符被添加',
     'characters-removed': '个字符被移除',
-    'copy-to-clipboard-failed': '将内容复制到剪贴板时失败: ',
   },
 
   // rule-alias-suggester.ts
@@ -108,8 +107,7 @@ export default {
   'file-backup-text': '请确保你已备份文件',
   'custom-command-warning': '启用自定义命令时格式化多个文件需要启用侧边栏，同时会显著的更加耗时，请保持耐心',
   'cancel-button-text': '取消',
-
-  'copy-aria-label': '复制',
+  'do-not-show-again': '不再显示此确认',
 
   'disabled-other-rule-notice': '如果启用规则 <code>{NAME_1}</code>，则将禁用规则 <code>{NAME_2}</code>。',
   'disabled-conflicting-rule-notice': '{NAME_1} 因与 {NAME_2} 冲突而禁用。',
@@ -138,8 +136,6 @@ export default {
       'paste': '粘贴',
       'debug': 'Debug',
     },
-    // tab-searcher.ts
-    'default-search-bar-text': '搜索设置项',
     'general': {
       // general-tab.ts
       'lint-on-save': {
@@ -149,6 +145,10 @@ export default {
       'display-message': {
         'name': '格式化后显示消息',
         'description': '格式化后显示修改了多少字符',
+      },
+      'suppress-message-when-no-change': {
+        'name': '无修改时不显示消息',
+        'description': '开启后，若无实际改动发生则不显示消息。',
       },
       'lint-on-file-change': {
         'name': '文件修改时格式化',
@@ -163,17 +163,20 @@ export default {
         'description': '需要忽略的文件夹（格式化所有文件或保存时格式化时生效），每行输入一个文件夹路径',
         'folder-search-placeholder-text': '文件夹',
         'add-input-button-text': '添加要忽略的文件夹',
-        'delete-tooltip': '删除',
       },
       'files-to-ignore': {
         'name': '忽略文件',
         'description': '需要忽略的文件（格式化所有文件或保存时格式化时生效）',
         'file-search-placeholder-text': '正则表达式',
         'add-input-button-text': '添加正则表达式',
-        'delete-tooltip': '删除',
         'label-placeholder-text': '名称',
         'flags-placeholder-text': '修饰符',
-        'warning': '如果您不知道正则表达式是什么，请谨慎使用。此外，如果在 iOS 移动设备上使用后行断言，请确保系统版本支持',
+      },
+      'additional-file-extensions': {
+        'name': '额外文件扩展名',
+        'description': '除 md 外要参与 Lint 的文件扩展名。例如 mdx 或 svx。不要包含开头的点号。<b>注意：无论添加何种扩展名，只有 Obsidian 视为 Markdown 的文件（无论是原生或通过其他插件）才会被 Lint。</b>',
+        'extension-placeholder': '例如：mdx',
+        'add-input-button-text': '添加扩展名',
       },
       'override-locale': {
         'name': '覆盖默认地区语言',
@@ -227,27 +230,19 @@ export default {
       // custom-command-option.ts
       'name': '自定义命令',
       'description': '自定义命令是在 Linter 完成格式化后运行的 Obsidian 命令。这意味着 Obsidian 命令会在 YAML 时间戳修改之后运行，因此它们可能会导致在下次运行 Linter 时触发 YAML 时间戳修改。一个 Obsidian 命令只能选择一次。',
-      'warning': '选择命令时，请确保使用鼠标或按回车键选择该选项，其他选择方法可能不起作用。只有 Obsidian 命令或空字符串会被保存',
 
       'add-input-button-text': '添加新命令',
       'command-search-placeholder-text': 'Obsidian 命令',
-      'move-up-tooltip': '上移',
-      'move-down-tooltip': '下移',
-      'delete-tooltip': '删除',
     },
     'custom-replace': {
       // custom-replace-option.ts
       'name': '自定义正则表达式替换',
       'description': '自定义正则表达式替换可将任意的正则匹配内容替换为指定值。查找值和替换值必须是有效的正则表达式',
-      'warning': '如果您不知道正则表达式是什么，请谨慎使用。此外，如果在 iOS 移动设备上使用后行断言，请确保系统版本支持',
       'add-input-button-text': '添加新的正则替换规则',
       'regex-to-find-placeholder-text': '查找用正则表达式',
       'flags-placeholder-text': '修饰符',
       'regex-to-replace-placeholder-text': '替换用正则表达式',
       'label-placeholder-text': '名称',
-      'move-up-tooltip': '上移',
-      'move-down-tooltip': '下移',
-      'delete-tooltip': '删除',
     },
     'custom-auto-correct': {
       'delete-tooltip': '删除',
@@ -372,7 +367,7 @@ export default {
         'description': '打开以对普通 YAML 数组中的值去重',
       },
       'ignore-keys': {
-        'name': '要忽略的 YAML 键',
+        'name': '在对 YAML 数组值进行去重时需忽略的 YAML 键',
         'description': '要忽略的 YAML 键列表，每行一个键',
       },
     },
@@ -491,7 +486,7 @@ export default {
       'description': '确保标题前后有一个空行，除非它在文档的开头或结尾',
       'bottom': {
         'name': '标题后空行',
-        'description': '在标题后插入一个空行',
+        'description': '在标题后插入一个空行（禁用此功能后，不会删除标题后的空行）',
       },
       'empty-line-after-yaml': {
         'name': 'YAML 与标题之间的空行',
@@ -741,7 +736,7 @@ export default {
         'description': '打开以对普通 YAML 数组中的值排序',
       },
       'ignore-keys': {
-        'name': '要忽略的 YAML 键',
+        'name': '在对 YAML 数组值进行排序时需忽略的 YAML 键',
         'description': '要忽略的 YAML 键列表，每行一个键',
       },
       'sort-order': {
@@ -874,7 +869,7 @@ export default {
         'description': '这样的别名通常是冗余的',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': '使用 YAML 键 <code>linter-yaml-title-alias</code> 来保留标题修改记录',
+        'name': '使用 YAML 键 linter-yaml-title-alias 来保留标题修改记录',
         'description': '如果设置，当第一个 H1 标题更改或文档名更改时，此键中存储的旧 aliases 将替换为新值，而不仅仅是在 aliases 中插入新条目',
       },
       'alias-helper-key': {

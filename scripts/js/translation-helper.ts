@@ -1,0 +1,240 @@
+import * as readline from 'readline';
+import {stdout, stdin, exit} from 'process';
+import {LanguageStringKey, setLanguage, getTextInLanguage, localeHasKey, localeMap, LanguageLocale, getLanguageSourceFile} from '../../src/lang/helpers';
+import {getString} from '../../src/utils/nested-keyof';
+import * as fs from 'fs';
+import {ValidationInfo, validateSelectedKey, validateLanguageSelected} from '../../src/lang/validation';
+import dedent from 'ts-dedent';
+
+const rl = readline.createInterface({
+  input: stdin,
+  output: stdout,
+});
+
+const availableLanguages = Object.keys(localeMap).join(', ');
+const englishKeys = getObjectKeys(localeMap['en']);
+const translationOptions = dedent`
+  =========================================================================
+  Select a translation mode to use:
+  [A]dd a translation value for a specific language.
+  [L]ist untranslated keys in the specified language.
+  [R]eplace translated value with a new value for the specified key.
+  [T]ranslate all untranslated keys in a language one at a time.
+  =========================================================================
+`;
+
+setLanguage('en');
+
+selectTranslationModeAndKickOffTheAssociatedLogic();
+
+function selectTranslationModeAndKickOffTheAssociatedLogic() {
+  console.log(translationOptions);
+
+  getUserInput('Select a translation mode to use: ', (mode: string) => {
+    switch (mode.toLowerCase()) {
+      case 'a':
+        selectLanguageAndDoAction('Enter which language to have a value added to: ', addANewValueToALanguage);
+        break;
+      case 'l':
+        selectLanguageAndDoAction('Enter which language to list the untranslated keys for: ', listUntranslatedKeysInALanguage);
+        break;
+      case 'r':
+        selectLanguageAndDoAction('Enter which language to have a value replaced in: ', replaceLanguageKeyWithANewValue);
+        break;
+      case 't':
+        selectLanguageAndDoAction('Enter which language to translate all keys from: ', translateAllKeysInALanguage);
+        break;
+      default:
+        console.log('"' + mode + '" is not a valid translation mode.');
+        endProgram(true);
+    }
+  });
+}
+
+function getUserInput(prompt: string, handleResponse: (answer: string) => void) {
+  rl.question(prompt, (answer) => {
+    handleResponse(answer);
+  });
+}
+
+function selectLanguageAndDoAction(prompt: string, action: (language: string, selectedLanguage: LanguageLocale) => void) {
+  console.log('Valid languages:\n\t' + availableLanguages + '\n');
+  getUserInput(prompt, (language) => {
+    logMsgAndExitIfValidationFailed(validateLanguageSelected(language));
+
+    action(language, localeMap[language]);
+  });
+}
+
+function addANewValueToALanguage(language: string, selectedLanguage: LanguageLocale) {
+  getUserInput('Enter the key of the value to add: ', (keyToAdd: string) => {
+    logMsgAndExitIfValidationFailed(validateSelectedKey(selectedLanguage, keyToAdd as LanguageStringKey));
+
+    getUserInput(`Enter the value for "${keyToAdd}": `, (replacementValue: string) => {
+      const key = keyToAdd as LanguageStringKey;
+      setValueInLanguage(language, key, replacementValue);
+      replaceTranslationValuesInFile(language);
+      endProgram();
+    });
+  });
+}
+
+function replaceLanguageKeyWithANewValue(language: string, selectedLanguage: LanguageLocale) {
+  getUserInput('Enter the key to replace the value of: ', (keyToReplace: string) => {
+    logMsgAndExitIfValidationFailed(validateSelectedKey(selectedLanguage, keyToReplace as LanguageStringKey));
+
+    setLanguage(language);
+    const currentValue = getTextInLanguage(keyToReplace as LanguageStringKey);
+    setLanguage('en');
+
+    getUserInput(`Enter the replacement value for "${currentValue}": `, (replacementValue: string) => {
+      const key = keyToReplace as LanguageStringKey;
+      setValueInLanguage(language, key, replacementValue);
+      replaceTranslationValuesInFile(language);
+      endProgram();
+    });
+  });
+}
+
+function listUntranslatedKeysInALanguage(language: string, selectedLanguage: LanguageLocale) {
+  const missingKeys = getMissingKeysInLanguage(selectedLanguage, language);
+
+  if (missingKeys.length === 0) {
+    console.log('"' + language + '" has no values that need translating.');
+    endProgram();
+  } else {
+    const keyText = missingKeys.length > 1 ? 'keys' : 'key';
+    console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}.`);
+    getUserInput('Would you like to list the missing keys? (y/n) ', (answer: string) => {
+      if (answer.toLowerCase() === 'y') {
+        missingKeys.forEach((element) => {
+          console.log(`${element}: ` + getTextInLanguage(element as LanguageStringKey) );
+        });
+      }
+
+      endProgram();
+    });
+  }
+}
+
+function translateAllKeysInALanguage(language: string, selectedLanguage: LanguageLocale) {
+  const missingKeys = getMissingKeysInLanguage(selectedLanguage, language);
+
+  if (missingKeys.length === 0) {
+    console.log('"' + language + '" has no values that need translating.');
+    endProgram();
+  } else {
+    const keyText = missingKeys.length > 1 ? 'keys' : 'key';
+    console.log('"' + language + `" is missing ${missingKeys.length} ${keyText}.`);
+
+    const firstElement = missingKeys.shift() ?? '';
+    getNextTranslation(missingKeys, firstElement, language);
+  }
+}
+
+function getNextTranslation(missingKeys: string[], element: string, language: string) {
+  getUserInput(`Enter 'q' for quit, 's' for skip, or a translation for '${getTextInLanguage(element as LanguageStringKey)}':`, (translatedValue: string) => {
+    switch (translatedValue) {
+      case 'q':
+        console.log(`Stopping the translation of values for language '${language}'.`);
+        replaceTranslationValuesInFile(language);
+        endProgram();
+        return;
+      case 's':
+        break;
+      default:
+        setValueInLanguage(language, element, translatedValue);
+    }
+
+    const nextKey = missingKeys.shift() ?? '';
+    getNextTranslation(missingKeys, nextKey, language);
+    if (missingKeys.length === 0) {
+      replaceTranslationValuesInFile(language);
+      endProgram();
+    }
+  });
+}
+
+function setValueInLanguage(language: string, key: string, value: string) {
+  let object = localeMap[language] as {[k: string]: unknown};
+  const keyParts = key.split('.');
+  keyParts.forEach((keyPart: string, index: number) => {
+    if (keyParts.length -1 === index) {
+      object[keyPart] = value;
+
+      return;
+    }
+
+    if (object[keyPart] == undefined) {
+      object[keyPart] = {};
+    }
+
+    object = (object[keyPart] as ({[k: string]: unknown}));
+  });
+}
+
+function getMissingKeysInLanguage(selectedLanguage: LanguageLocale, language: string): string[] {
+  const missingKeys = [] as string[];
+  for (const nestedKey of englishKeys) {
+    if (localeHasKey(localeMap['en'], nestedKey as LanguageStringKey)) {
+      const isMissingInLanguage = !localeHasKey(selectedLanguage, nestedKey as LanguageStringKey);
+      const isSameAsEnglish = language != 'en' && getString(selectedLanguage, nestedKey) === getString(localeMap['en'], nestedKey);
+      if (isMissingInLanguage || isSameAsEnglish) {
+        missingKeys.push(nestedKey);
+      }
+    }
+  }
+
+  return missingKeys;
+}
+
+function getObjectKeys(obj: unknown, prefix: string = ''): string[] {
+  return Object.entries(obj as object).reduce((collector: string[], [key, val]) => {
+    const newKeys = [...collector, prefix ? `${prefix}.${key}` : key];
+    if (Object.prototype.toString.call(val) === '[object Object]') {
+      const newPrefix = prefix ? `${prefix}.${key}` : key;
+      const otherKeys = getObjectKeys(val, newPrefix);
+
+      return [...newKeys, ...otherKeys];
+    }
+
+    return newKeys;
+  }, []);
+}
+
+function replaceTranslationValuesInFile(language: string) {
+  const filePath = getLanguageSourceFile(language);
+  try {
+    const originalData = fs.readFileSync(filePath, 'utf8');
+
+    const newData = originalData.substring(0, originalData.indexOf('export') - 1) + '\nexport default ' + JSON.stringify(localeMap[language], null, 2) + ';';
+
+    try {
+      fs.writeFileSync(filePath, newData);
+    } catch (err) {
+      console.error(err);
+      endProgram(true);
+    }
+  } catch (err) {
+    console.error(err);
+    endProgram(true);
+  }
+}
+
+function endProgram(withError: boolean = false) {
+  rl.close();
+
+  if (withError === true) {
+    exit(-1);
+  }
+
+  exit();
+}
+
+function logMsgAndExitIfValidationFailed(validationResult: ValidationInfo) {
+  if (!validationResult.isValid) {
+    console.log(validationResult.validationMsg);
+
+    endProgram(true);
+  }
+}

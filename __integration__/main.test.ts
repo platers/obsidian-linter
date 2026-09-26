@@ -1,11 +1,12 @@
 import {Editor, MarkdownView, Notice, Plugin, TFile, normalizePath} from 'obsidian';
-import LinterPlugin from 'src/main';
+import LinterPlugin from '../src/main';
 import {obsidianModeTestCases} from './obsidian-mode.test';
 import {setWorkspaceItemMode} from './utils.test';
 import {customCommandTestCases} from './custom-commands.test';
 import {obsidianYAMLRuleTestCases} from './yaml-rule.test';
 import expect from 'expect';
 import {ignoreTestCases} from './ignore.test';
+import {DiffPreviewView, diffPreviewViewType} from '../src/ui/views/diff-preview-view';
 
 export type IntegrationTestCase = {
   name: string,
@@ -34,7 +35,7 @@ export default class TestLinterPlugin extends Plugin {
   ignoreTests: Array<IntegrationIgnoreTestCase> = ignoreTestCases;
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
-  private timeoutId: any = undefined;
+  private timeoutId: unknown = undefined;
   private testRunNotice: Notice;
 
   async onload() {
@@ -43,14 +44,14 @@ export default class TestLinterPlugin extends Plugin {
       name: 'Run Linter Tests',
       callback: async () => {
         if (this.timeoutId != undefined) {
-          clearTimeout(this.timeoutId);
+          window.clearTimeout(this.timeoutId);
         }
 
         await this.setup();
 
         const testStatuses = [] as testStatus[];
         const expectedTestCount = this.regularTests.length + this.ignoreTests.length + this.afterCacheUpdateTests.length;
-        this.timeoutId = setTimeout(() => {
+        this.timeoutId = window.setTimeout(() => {
           console.log(testStatuses);
           if (testStatuses.length != expectedTestCount) {
             if (this.testRunNotice) {
@@ -152,7 +153,7 @@ export default class TestLinterPlugin extends Plugin {
           await t.setup(this);
         }
 
-        if (this.plugin.shouldIgnoreFile(file) == t.expectedShouldIgnore) {
+        if ((!this.plugin.isMarkdownFile(file) || this.plugin.shouldIgnoreFile(file)) == t.expectedShouldIgnore) {
           this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
           console.log('✅', t.name);
         } else {
@@ -175,15 +176,13 @@ export default class TestLinterPlugin extends Plugin {
       return;
     }
 
-    const that = this;
-
     this.plugin.setCustomCommandCallback(async (file: TFile) => {
       if (file !== activeLeaf.file) {
         return;
       }
 
       if (originalText == null) {
-        that.plugin.setCustomCommandCallback(null);
+        this.plugin.setCustomCommandCallback(null);
       }
 
       const t = tests[index];
@@ -199,13 +198,13 @@ export default class TestLinterPlugin extends Plugin {
         this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
       }
 
-      await that.resetFileContents(activeLeaf, originalText);
+      await this.resetFileContents(activeLeaf, originalText);
 
       originalText = null;
       if (index+1 < tests.length) {
-        originalText = await that.setupMetadataTest(that, tests[++index], activeLeaf, testStatuses, totalTestCount);
+        originalText = await this.setupMetadataTest(this, tests[++index], activeLeaf, testStatuses, totalTestCount);
       } else { // remove the custom commands callback once all tests have run
-        that.plugin.setCustomCommandCallback(null);
+        this.plugin.setCustomCommandCallback(null);
       }
     });
   }
@@ -240,9 +239,16 @@ export default class TestLinterPlugin extends Plugin {
     return originalText;
   }
 
-  async onunload(): Promise<void> {
+  async onunload(): void {
     if (this.plugin) {
-      await this.plugin.onunload();
+      // based on https://github.com/dbarenholz/obsidian-plaintext/blob/2c30a6e957e5cc9ac7757cc9fbeb641de1b158dc/src/main.ts#L160
+      const view = this.app.workspace.getActiveViewOfType(DiffPreviewView);
+      if (view) {
+        view.leaf.detach();
+      }
+      
+      this.app.viewRegistry.unregisterView(diffPreviewViewType);
+      this.plugin.onunload();
     }
   }
 

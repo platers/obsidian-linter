@@ -11,7 +11,7 @@ format:
 priority: 2
 publisher: Pokemon Publisher
 readingStatus: easy
-related: 
+related:
 researchArea:
   - scifi
 status: 

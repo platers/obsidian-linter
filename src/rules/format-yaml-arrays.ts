@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
@@ -15,6 +15,7 @@ import {convertAliasValueToStringOrStringArray,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
   TagSpecificArrayFormats} from '../utils/yaml';
+import { isValidYamlKeyOnly } from '../utils/validation';
 
 class FormatYamlArrayOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -34,7 +35,7 @@ class FormatYamlArrayOptions implements Options {
 }
 
 @RuleBuilder.register
-export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
+export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions> {
   constructor() {
     super({
       nameKey: 'rules.format-yaml-array.name',
@@ -90,7 +91,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays, arrays of objects, ignored keys, and already accounted for keys
-          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || (yaml[key].length !== 0 && typeof yaml[key][0] === 'object' && yaml[key][0] !== null)) {
+          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || ((yaml as {[k: string]: object[]})[key].length !== 0 && typeof (yaml as {[k: string]: object[]})[key][0] === 'object' && (yaml as {[k: string]: object[]})[key][0] !== null)) {
             continue;
           }
 
@@ -251,7 +252,7 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         optionsKey: 'defaultArrayStyle',
         records: [
           {
-            value: NormalArrayFormats.MultiLine as NormalArrayFormats,
+            value: NormalArrayFormats.MultiLine,
             description: '```key:\\n  - value```',
           },
           {
@@ -266,17 +267,23 @@ export default class RuleTemplate extends RuleBuilder<FormatYamlArrayOptions> {
         descriptionKey: 'rules.format-yaml-array.default-array-keys.description',
         optionsKey: 'formatArrayKeys',
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
         nameKey: 'rules.format-yaml-array.force-single-line-array-style.name',
         descriptionKey: 'rules.format-yaml-array.force-single-line-array-style.description',
+        emptyStateKey: 'rules.format-yaml-array.force-single-line-array-style.empty-state',
+        fieldNamePlaceholderKey: 'rules.format-yaml-array.force-single-line-array-style.placeholder-text',
         optionsKey: 'forceSingleLineArrayStyle',
+        validator: isValidYamlKeyOnly,
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,
         nameKey: 'rules.format-yaml-array.force-multi-line-array-style.name',
         descriptionKey: 'rules.format-yaml-array.force-multi-line-array-style.description',
+        emptyStateKey: 'rules.format-yaml-array.force-multi-line-array-style.empty-state',
+        fieldNamePlaceholderKey: 'rules.format-yaml-array.force-multi-line-array-style.placeholder-text',
         optionsKey: 'forceMultiLineArrayStyle',
+        validator: isValidYamlKeyOnly,
       }),
     ];
   }

@@ -3,6 +3,10 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {checklistBoxIndicator} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
+import {getEditsBetween} from '../utils/text-edits';
 
 class RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions implements Options {}
 
@@ -19,29 +23,42 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
   get OptionsClass(): new () => RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions {
     return RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions;
   }
-  apply(text: string, options: RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions): string {
+  apply(text: string, options: RemoveEmptyLinesBetweenListMarkersAndChecklistsOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    // Keep the repeated, ordered passes on the decision view, never on the source.
+    let projectedText = projection.text;
     // account for '- [.]' where the period is any character except a line break character
     const checkBoxMarkerRegexText = `(( |\\t)*- ${checklistBoxIndicator}( |\\t)+.+)`;
-    text = this.replaceEmptyLinesBetweenList(text, checkBoxMarkerRegexText);
+    projectedText = this.replaceEmptyLinesBetweenList(projectedText, checkBoxMarkerRegexText);
 
     // account for ordered list marker
     const orderedMarkerRegexText = '(( |\\t)*\\d+\\.( |\\t)+.+)';
-    text = this.replaceEmptyLinesBetweenList(text, orderedMarkerRegexText);
+    projectedText = this.replaceEmptyLinesBetweenList(projectedText, orderedMarkerRegexText);
 
     // account for '+' list marker
     const plusMarkerRegexText = '(( |\\t)*\\+( |\\t)+.+)';
-    text = this.replaceEmptyLinesBetweenList(text, plusMarkerRegexText);
+    projectedText = this.replaceEmptyLinesBetweenList(projectedText, plusMarkerRegexText);
 
     // account for '-' list marker
     const dashMarkerRegexText = `(( |\\t)*-(?! ${checklistBoxIndicator})( |\\t)+.+)`;
-    text = this.replaceEmptyLinesBetweenList(text, dashMarkerRegexText);
+    projectedText = this.replaceEmptyLinesBetweenList(projectedText, dashMarkerRegexText);
 
     // account for '*' list marker
     const splatMarkerRegexText = '(( |\\t)*\\*( |\\t)+.+)';
-    return this.replaceEmptyLinesBetweenList(text, splatMarkerRegexText);
+    projectedText = this.replaceEmptyLinesBetweenList(projectedText, splatMarkerRegexText);
+
+    const replacements: textReplacement[] = [];
+    for (const edit of getEditsBetween(projection.text, projectedText)) {
+      const range = projection.editRangeToSource(edit);
+      if (range) {
+        replacements.push({...range, value: edit.value});
+      }
+    }
+
+    return applyNonOverlappingReplacements(text, replacements);
   }
   replaceEmptyLinesBetweenList = function(text: string, listIndicatorRegexText: string): string {
-    const listRegex = new RegExp(`^${listIndicatorRegexText}\n{2,}${listIndicatorRegexText}$`, 'gm');
+    const listRegex = new RegExp(`^${listIndicatorRegexText}\n(?:(?:[\t\v\f\r \u00a0\u2000-\u200b\u2028-\u2029\u3000]+)?\n){1,}${listIndicatorRegexText}$`, 'gm');
     let match;
     let newText = text;
 
@@ -67,7 +84,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
         `,
       }),
       new ExampleBuilder({
-        description: 'Blank lines are removed between list items when the list indicator is \'-\'',
+        description: 'Blank lines are removed between list items when the list marker is \'-\'',
         before: dedent`
           - Item 1
           ${''}
@@ -97,7 +114,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
         `,
       }),
       new ExampleBuilder({
-        description: 'Blank lines are removed between list items when the list indicator is \'+\'',
+        description: 'Blank lines are removed between list items when the list marker is \'+\'',
         before: dedent`
           + Item 1
           ${''}
@@ -112,7 +129,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
         `,
       }),
       new ExampleBuilder({
-        description: 'Blank lines are removed between list items when the list indicator is \'*\'',
+        description: 'Blank lines are removed between list items when the list marker is \'*\'',
         before: dedent`
           * Item 1
           ${''}
@@ -127,7 +144,7 @@ export default class RemoveEmptyLinesBetweenListMarkersAndChecklists extends Rul
         `,
       }),
       new ExampleBuilder({
-        description: 'Blanks lines are removed between like list types (ordered, specific list item indicators, and checklists) while blanks are left between different kinds of list item indicators',
+        description: 'Blanks lines are removed between like list types (ordered, specific list item markers, and checklists) while blanks are left between different kinds of list item markers',
         before: dedent`
           1. Item 1
           ${''}

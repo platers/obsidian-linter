@@ -31,7 +31,7 @@ export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOption
   get exampleBuilders(): ExampleBuilder<FormatTagsInYamlOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Format Tags in YAML frontmatter',
+        description: 'Format tags in YAML frontmatter',
         before: dedent`
           ---
           tags: #one #two #three #nested/four/five

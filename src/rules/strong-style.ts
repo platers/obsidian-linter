@@ -3,6 +3,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {makeEmphasisOrBoldConsistent, MDAstTypes} from '../utils/mdast';
+import type {ProtectedRanges} from '../utils/protected-ranges';
 
 type StrongStyleValues = 'consistent' | 'asterisk' | 'underscore';
 
@@ -23,8 +24,8 @@ export default class StrongStyle extends RuleBuilder<StrongStyleOptions> {
   get OptionsClass(): new () => StrongStyleOptions {
     return StrongStyleOptions;
   }
-  apply(text: string, options: StrongStyleOptions): string {
-    return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Bold);
+  apply(text: string, options: StrongStyleOptions, protectedRanges: ProtectedRanges): string {
+    return makeEmphasisOrBoldConsistent(text, options.style, MDAstTypes.Bold, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<StrongStyleOptions>[] {
     return [

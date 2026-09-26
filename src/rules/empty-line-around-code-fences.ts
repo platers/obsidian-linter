@@ -2,6 +2,7 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {ensureEmptyLinesAroundFencedCodeBlocks} from '../utils/mdast';
+import {ProtectedRanges} from '../utils/protected-ranges';
 
 class EmptyLineAroundCodeFencesOptions implements Options {}
 
@@ -17,8 +18,8 @@ export default class EmptyLineAroundCodeFences extends RuleBuilder<EmptyLineArou
   get OptionsClass(): new () => EmptyLineAroundCodeFencesOptions {
     return EmptyLineAroundCodeFencesOptions;
   }
-  apply(text: string, options: EmptyLineAroundCodeFencesOptions): string {
-    return ensureEmptyLinesAroundFencedCodeBlocks(text);
+  apply(text: string, options: EmptyLineAroundCodeFencesOptions, protectedRanges: ProtectedRanges): string {
+    return ensureEmptyLinesAroundFencedCodeBlocks(text, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundCodeFencesOptions>[] {
     return [

@@ -84,7 +84,7 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
         suggestedValue = `${suggestedValue}\n  -`;
       }
 
-      (this.context.editor as Editor).replaceRange(
+      (this.context.editor).replaceRange(
           `${suggestedValue} `,
           this.context.start,
           this.context.end,

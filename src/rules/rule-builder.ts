@@ -1,10 +1,13 @@
 import {Example, Options, Rule, RuleType, registerRule, wrapLintError} from '../rules';
-import {BooleanOption, DropdownOption, DropdownRecord, MdFilePickerOption, MomentFormatOption, Option, TextAreaOption, TextOption} from '../option';
+import {BooleanOption, DropdownOption, DropdownRecord, MdFilePickerOption, MomentFormatOption, Option, ListItemOption, TextOption} from '../option';
 import {logDebug, timingBegin, timingEnd} from '../utils/logger';
 import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
 import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
-import {LinterSettings} from 'src/settings-data';
+import {LintContext, ProtectedRanges} from '../utils/protected-ranges';
+import {LinterSettings} from '../settings-data';
 import {App} from 'obsidian';
+import LinterPlugin from '../main';
+import type {ListItemValidation} from '../ui/modals/add-list-entry-modals';
 
 // limit the amount of text that can be written to the logs to try to prevent memory issues
 const maxFileSizeLength = 10000;
@@ -15,25 +18,28 @@ export abstract class RuleBuilderBase {
   static #noSettingsControlMap = new Map<string, string[]>();
 
   static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
-    if (!RuleBuilderBase.#ruleMap.has(this.name)) {
-      const builder = new this();
+    // Keyed on the rule's alias rather than the name of the class it was built from. Three rules
+    // were left named `RuleTemplate` after being copied from the template, so they shared an entry
+    // and two of them silently became the third.
+    const builder = new this();
+    if (!RuleBuilderBase.#ruleMap.has(builder.alias)) {
       const rule = new Rule(builder.nameKey, builder.descriptionKey, builder.settingsKey, builder.alias, builder.type, builder.safeApply.bind(builder), builder.exampleBuilders.map((b) => b.example), builder.optionBuilders.map((b) => b.option), builder.hasSpecialExecutionOrder, builder.ignoreTypes, builder.disableConflictingOptions);
-      RuleBuilderBase.#ruleMap.set(this.name, rule);
+      RuleBuilderBase.#ruleMap.set(builder.alias, rule);
       RuleBuilderBase.#ruleBuilderMap.set(builder.alias, builder);
     }
 
-    return RuleBuilderBase.#ruleMap.get(this.name);
+    return RuleBuilderBase.#ruleMap.get(builder.alias);
   }
 
-  static applyIfEnabledBase(rule: Rule, text: string, settings: LinterSettings, extraOptions: Options): [result: string, isEnabled: boolean] {
+  static applyIfEnabledBase(rule: Rule, text: string, settings: LinterSettings, extraOptions: Options, context?: LintContext): [result: string, isEnabled: boolean] {
     const optionsFromSettings = rule.getOptions(settings);
     if (optionsFromSettings[rule.enabledOptionName()]) {
       timingBegin(rule.alias);
-      const options = Object.assign({}, optionsFromSettings, extraOptions) as Options;
+      const options = Object.assign({}, optionsFromSettings, extraOptions);
       logDebug(`${getTextInLanguage('logs.run-rule-text')} ${rule.getName()}`);
 
       try {
-        const newText = rule.apply(text, options);
+        const newText = rule.apply(text, options, context);
         timingEnd(rule.alias);
 
         if (newText.length > maxFileSizeLength) {
@@ -45,11 +51,11 @@ export abstract class RuleBuilderBase {
         return [newText, true];
       } catch (error) {
         timingEnd(rule.alias);
-        wrapLintError(error, rule.getName());
+        wrapLintError(error instanceof Error ? error : new Error(String(error)), rule.getName());
       }
-    } else {
-      return [text, false];
-    }
+    } 
+
+    return [text, false];
   }
 
   static getBuilderByName(name: string): RuleBuilderBase {
@@ -76,7 +82,7 @@ type RuleBuilderConstructorArgs = {
   // ignore types to use on the entirety of the rule and not just a part
   // Note: this value should not contain custom ignore as that is added to all rules except Paste rules which do not use this property
   ruleIgnoreTypes?: IgnoreType[],
-  disableConflictingOptions?: (value: boolean, app: App) => void,
+  disableConflictingOptions?: (value: boolean, app: App, plugin: LinterPlugin) => void,
 };
 
 export default abstract class RuleBuilder<TOptions extends Options> extends RuleBuilderBase {
@@ -87,7 +93,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   public type: RuleType;
   public hasSpecialExecutionOrder: boolean;
   public ignoreTypes: IgnoreType[];
-  public disableConflictingOptions: (value: boolean, app: App) => void;
+  public disableConflictingOptions: (value: boolean, app: App, plugin: LinterPlugin) => void;
   constructor(args: RuleBuilderConstructorArgs) {
     super();
 
@@ -109,19 +115,19 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
 
   abstract get OptionsClass(): (new() => TOptions);
 
-  static register<TOptions extends Options>(RuleBuilderClass: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>)): void {
-    const rule = RuleBuilderClass.getRule();
-    registerRule(rule);
-  }
+  static register<TOptions extends Options, T extends typeof RuleBuilderBase & (new () => RuleBuilder<TOptions>)>(this: void, ruleBuilderClass: T, _context: ClassDecoratorContext,): void {
+  const rule = ruleBuilderClass.getRule();
+  registerRule(rule);
+}
 
-  safeApply(text: string, options?: Options): string {
-    return this.apply(text, this.buildRuleOptions(options));
+  safeApply(text: string, options?: Options, protectedRanges?: ProtectedRanges): string {
+    return this.apply(text, this.buildRuleOptions(options), protectedRanges);
   }
 
   buildRuleOptions(options?: Options): TOptions {
     options = options ?? {};
     const defaultOptions = new this.OptionsClass();
-    const ruleOptions = Object.assign(defaultOptions, options) as TOptions;
+    const ruleOptions = Object.assign(defaultOptions, options);
 
     for (const optionBuilder of this.optionBuilders) {
       optionBuilder.setRuleOption(ruleOptions, options);
@@ -130,18 +136,18 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     return ruleOptions;
   }
 
-  abstract apply(text: string, options: TOptions): string;
+  abstract apply(text: string, options: TOptions, protectedRanges?: ProtectedRanges): string;
   abstract get exampleBuilders(): ExampleBuilder<TOptions>[];
   abstract get optionBuilders(): OptionBuilderBase<TOptions>[];
 
-  static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions): [result: string, isEnabled: boolean] {
+  static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions, context?: LintContext): [result: string, isEnabled: boolean] {
     const rule = this.getRule();
     if (disabledRules.includes(rule.alias)) {
       logDebug(rule.alias + ' ' + getTextInLanguage('logs.disabled-text'));
       return [text, false];
     }
 
-    return RuleBuilderBase.applyIfEnabledBase(rule, text, settings, extraOptions);
+    return RuleBuilderBase.applyIfEnabledBase(rule, text, settings, extraOptions, context);
   }
 
   static getRuleOptions<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>), settings: LinterSettings): TOptions {
@@ -152,19 +158,27 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   }
 
   static noSettingControl() {
-    return (target: Object, propertyKey: string) => {
-      const optionsClassName = target.constructor.name;
-      RuleBuilderBase.setNoSettingControl(optionsClassName, propertyKey);
-    };
+  return function (
+    _value: unknown,
+    context: ClassFieldDecoratorContext,
+  ): void {
+    const propertyKey = String(context.name);
+
+    context.addInitializer(function () {
+      RuleBuilderBase.setNoSettingControl(
+        this.constructor.name,
+        propertyKey,
+      );
+    });
+  };
   }
+
 }
 
 export class ExampleBuilder<TOptions extends Options> {
   readonly example: Example;
 
-  // HACK to bypass the Typescript generics system flaw
-  // https://github.com/microsoft/TypeScript/wiki/FAQ#why-is-astring-assignable-to-anumber-for-interface-at--
-  // eslint-disable-next-line no-unused-private-class-members
+  // eslint-disable-next-line no-unused-private-class-members --  HACK to bypass the Typescript generics system flaw https://github.com/microsoft/TypeScript/wiki/FAQ#why-is-astring-assignable-to-anumber-for-interface-at--
   #_: TOptions;
 
   constructor(args: {
@@ -251,7 +265,7 @@ export class BooleanOptionBuilder<TOptions extends Options> extends OptionBuilde
   }
 }
 
-export class NumberOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, Number> {
+export class NumberOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, number> {
   protected buildOption(): Option {
     return new TextOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue);
   }
@@ -275,31 +289,39 @@ export class DropdownOptionBuilder<TOptions extends Options, TValue extends stri
   }
 }
 
-export class TextAreaOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string[]> {
-  separator: string;
-  splitter: RegExp;
-  constructor(args: OptionBuilderConstructorArgs<TOptions, string[]> & {
-    separator?: string,
-    splitter?: RegExp
-  }) {
+
+
+export class ListItemOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string[]> {
+  private validator?: ListItemValidation = undefined;
+  private emptyStateKey: LanguageStringKey;
+  private fieldNamePlaceholderKey: LanguageStringKey;
+  private allowReorder: boolean;
+  private trimItemWhitespace: boolean;
+  constructor(args: OptionBuilderConstructorArgs<TOptions, string[]> & { validator?: ListItemValidation, emptyStateKey: LanguageStringKey, fieldNamePlaceholderKey: LanguageStringKey, allowReorder?: boolean, trimItemWhitespace?: boolean }) {
     super(args);
-    this.separator = args.separator ?? '\n';
-    this.splitter = args.splitter ?? /\n/;
+
+    this.validator = args.validator;
+    this.emptyStateKey = args.emptyStateKey;
+    this.fieldNamePlaceholderKey = args.fieldNamePlaceholderKey;
+    this.allowReorder = args.allowReorder ?? false;
+    this.trimItemWhitespace = args.trimItemWhitespace ?? false;
   }
 
 
   protected buildOption(): Option {
-    return new TextAreaOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue.join(this.separator));
+    return new ListItemOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue ?? [], this.validator, this.emptyStateKey, this.fieldNamePlaceholderKey, this.allowReorder, this.trimItemWhitespace);
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
     if (options[this.configKey] !== undefined) {
       // `as string[]` is not enough because of the https://github.com/microsoft/TypeScript/issues/48992
       // make sure to remove any empty strings as well as they are not valid values
-      const optionValue = ((options[this.configKey] as string).split(this.splitter) as TOptions[KeysOfObjectMatchingPropertyValueType<TOptions, string[]>]).filter(function(el: string) {
-        return el != '';
-      });
-      ruleOptions[this.optionsKey] = optionValue;
+      const optionValue = (options[this.configKey] as string[])
+        .filter((el: string) => el !== '');
+
+      ruleOptions[this.optionsKey] = optionValue as TOptions[
+        KeysOfObjectMatchingPropertyValueType<TOptions, string[]>
+      ];
     }
   }
 }

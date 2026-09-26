@@ -1,7 +1,8 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {getYAMLText, removeYamlSection} from '../utils/yaml';
+import { isValidYamlKey } from '../utils/validation';
 
 class RemoveYamlKeysOptions implements Options {
   yamlKeysToRemove: string[] = [];
@@ -44,7 +45,7 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
   get exampleBuilders(): ExampleBuilder<RemoveYamlKeysOptions>[] {
     return [
       new ExampleBuilder({
-        description: 'Removes the values specified in `YAML Keys to Remove` = "status:\nkeywords\ndate"',
+        description: 'Removes the values specified in `YAML keys to remove` = "status:\nkeywords\ndate"',
         before: dedent`
           ---
           language: Typescript
@@ -84,11 +85,14 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
   }
   get optionBuilders(): OptionBuilderBase<RemoveYamlKeysOptions>[] {
     return [
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: RemoveYamlKeysOptions,
         nameKey: 'rules.remove-yaml-keys.yaml-keys-to-remove.name',
         descriptionKey: 'rules.remove-yaml-keys.yaml-keys-to-remove.description',
+         emptyStateKey: 'rules.remove-yaml-keys.yaml-keys-to-remove.empty-state',
+        fieldNamePlaceholderKey: 'rules.remove-yaml-keys.yaml-keys-to-remove.placeholder-text',
         optionsKey: 'yamlKeysToRemove',
+        validator: isValidYamlKey,
       }),
     ];
   }

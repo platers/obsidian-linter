@@ -1,0 +1,17 @@
+name: Documentation request
+description: Create a request to have documentation added, updated, or removed for a feature or process
+title: 'Doc: '
+labels: [documentation]
+body:
+  - type: textarea
+    id: documentation-request
+    attributes:
+      label: What You Would Like Documented
+      description: |
+        Feature, process, etc. that would benefit from better documentation or that needs a documentation to make it accurate or better clarify how it works.
+      placeholder: |
+        I think it would help users if they were able to see documentation on why rule x does y.
+    validations:
+      required: true
+
+

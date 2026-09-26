@@ -101,6 +101,7 @@ export default {
   // lint-confirmation-modal.ts
   'warning-text': 'Uyarı',
   'file-backup-text': 'Dosyalarınızın yedeğini aldığınızdan emin olun.',
+  'do-not-show-again': 'Bu onayı bir daha gösterme',
 
   'tabs': {
     'names': {
@@ -115,8 +116,6 @@ export default {
       'paste': 'Yapıştır',
       'debug': 'Hata ayıkla',
     },
-    // tab-searcher.ts
-    'default-search-bar-text': 'Tüm ayarları ara',
     'general': {
       // general-tab.ts
       'lint-on-save': {
@@ -126,6 +125,10 @@ export default {
       'display-message': {
         'name': 'Düzeltme sonrası mesajı göster',
         'description': 'Düzeltme sonrası değişen karakter sayısını gösterir',
+      },
+      'suppress-message-when-no-change': {
+        'name': 'Değişiklik Olmadığında Mesajı Bastır',
+        'description': 'Etkinleştirildiğinde, gerçek değişiklikler olmadığında mesaj gösterilmez.',
       },
       'lint-on-file-change': {
         'name': 'Dosya Değişikliğinde Düzeltme',
@@ -138,6 +141,12 @@ export default {
       'folders-to-ignore': {
         'name': 'Yoksayılacak klasörler',
         'description': 'Tüm dosyaları düzeltirken veya kaydederken düzeltme işleminin yoksayılacağı klasörler. Klasör yollarını yeni satırlarla ayırarak girin',
+      },
+      'additional-file-extensions': {
+        'name': 'Ek dosya uzantıları',
+        'description': 'md dosyalarına ek olarak lintlenecek dosya uzantıları. Örneğin mdx veya svx. Baştaki noktayı eklemeyin. <b>Not: Yalnızca Obsidian\'ın markdown olarak gördüğü dosyalar (yerel veya diğer eklentiler aracılığıyla) lintlenecektir, eklenen uzantılardan bağımsız olarak.</b>',
+        'extension-placeholder': 'örn. mdx',
+        'add-input-button-text': 'Başka uzantı ekle',
       },
       'override-locale': {
         'name': 'Yerel ayarların üzerine yaz',
@@ -166,7 +175,7 @@ export default {
       },
     },
     'debug': {
-    // debug-tab.ts
+      // debug-tab.ts
       'log-level': {
         'name': 'Log Düzeyi',
         'description': 'Hizmetin loglamaya izin verdiği log türleri. Varsayılan ERROR\'dur.',
@@ -191,27 +200,19 @@ export default {
       // custom-command-option.ts
       'name': 'Özel Komutlar',
       'description': 'Özel komutlar, linter normal kurallarını çalıştırmayı bitirdikten sonra çalıştırılan Obsidyen komutlardır. Bu, YAML zaman damgası mantığı çalışmadan önce çalışmadıkları anlamına gelir, dolayısıyla linterin bir sonraki çalışmasında YAML zaman damgasının tetiklenmesine neden olabilirler. Bir Obsidyen komutunu yalnızca bir kez seçebilirsiniz.',
-      'warning': 'Bir seçeneği seçerken, seçeneği fareyi kullanarak veya enter tuşuna basarak seçtiğinizden emin olun. Diğer seçim yöntemleri çalışmayabilir ve yalnızca gerçek bir Obsidian komutunun veya boş bir dizinin seçimleri kaydedilir.',
 
       'add-input-button-text': 'Yeni komut ekle',
       'command-search-placeholder-text': 'Obsidian komutu',
-      'move-up-tooltip': 'Yukarı',
-      'move-down-tooltip': 'Aşağı',
-      'delete-tooltip': 'Sil',
     },
     'custom-replace': {
       // custom-replace-option.ts
       'name': 'Özel Regex Değiştirme',
       'description': 'Özel regex değiştirme, bulunan regex ile eşleşen her şeyi değiştirme değeri ile değiştirmek için kullanılabilir. Değiştirme ve bulma değerleri geçerli regex değerleri olmalıdır.',
-      'warning': 'Regex hakkında bilginiz yoksa dikkatli kullanın. Ayrıca, lütle iOS mobil platformunda regexinizde geriye dönük aramaları kullanmayın çünkü bu, o platformda desteklenmediği için lint işleminin başarısız olmasına neden olur.',
       'add-input-button-text': 'Yeni regex değiştirme ekle',
       'regex-to-find-placeholder-text': 'bulunacak regex',
       'flags-placeholder-text': 'bayraklar',
       'regex-to-replace-placeholder-text': 'değiştirilecek regex',
       'label-placeholder-text': 'etiket',
-      'move-up-tooltip': 'Yukarı taşı',
-      'move-down-tooltip': 'Aşağı taşı',
-      'delete-tooltip': 'Sil',
     },
   },
 
@@ -219,6 +220,7 @@ export default {
   'rules': {
     // auto-correct-common-misspellings.ts
     'auto-correct-common-misspellings': {
+      'delete-tooltip': 'Sil',
       'name': 'Yaygın Yanlış Yazımları Otomatik Düzelt',
       'description': 'Yaygın yanlış yazımların sözlüğünü kullanarak bunları doğru yazımlarına otomatik olarak dönüştürür. Otomatik düzeltilen kelimelerin tam listesi için <a href="https://github.com/platers/obsidian-linter/tree/master/src/utils/default-misspellings.md">otomatik-düzeltme haritasına</a> bakın.',
       'ignore-words': {
@@ -395,7 +397,7 @@ export default {
       'description': 'Tüm başlıkların hem öncesinde hem de sonrasında birer boş satır olmalıdır (başlık belgenin başında veya sonunda olduğunda bu durum geçerli değildir).',
       'bottom': {
         'name': 'Alt',
-        'description': 'Başlıkların sonrasına boş satır ekler',
+        'description': 'Başlıkların sonrasına boş satır ekler (Devre dışı bırakıldığında, başlıkların ardından gelen boş satırları kaldırmaz)',
       },
       'empty-line-after-yaml': {
         'name': 'YAML ve Başlık Arasında Boş Satır',
@@ -492,7 +494,7 @@ export default {
       'name': 'üç nokta karakteriyle',
       'description': 'Gövde içeriğindeki alıntıları belirtilen tek ve çift alıntı stillerine günceller.',
       'single-quote-enabled': {
-        'name': '<code>Tek Alıntı Stili</code> Kullanımı',
+        'name': 'Tek Alıntı Stili Kullanımı',
         'description': 'Seçilen tek alıntı stilinin kullanılacağını belirtir.',
       },
       'single-quote-style': {
@@ -500,7 +502,7 @@ export default {
         'description': 'Kullanılacak tek alıntı stilidir.',
       },
       'double-quote-enabled': {
-        'name': '<code>Çift Alıntı Stili</code> Kullanımı',
+        'name': 'Çift Alıntı Stili Kullanımı',
         'description': 'Seçilen çift alıntı stilinin kullanılacağını belirtir.',
       },
       'double-quote-style': {
@@ -712,7 +714,7 @@ export default {
         'description': 'Bu tür takma adlar genellikle gereksizdir',
       },
       'use-yaml-key-to-keep-track-of-old-filename-or-heading': {
-        'name': '<code>linter-yaml-title-alias</code> YAML anahtarını kullanarak eski dosya adı ve başlık değişikliklerini takip et',
+        'name': 'linter-yaml-title-alias YAML anahtarını kullanarak eski dosya adı ve başlık değişikliklerini takip et',
         'description': 'Ayarlanırsa, ilk H1 başlığı değiştiğinde veya ilk H1 yoksa dosya adı değiştiğinde, bu anahtarda saklanan eski takma ad, takma adlar dizisine yeni bir giriş eklemek yerine yeni değerle değiştirilir',
       },
     },

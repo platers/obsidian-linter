@@ -1,235 +1,4 @@
 /**
- * Based on https://github.com/Fevol/obsidian-translate/blob/master/src/ui/translator-components/SettingsPage.svelte 
- */
-
-.linter-navigation-item {
-  cursor: pointer;
-  border-radius: 100px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px 8px 2px 2px;
-
-  font-weight: bold;
-  font-size: 16px;
-
-  display: flex;
-  flex-direction: row;
-  white-space: nowrap;
-
-  padding: 4px 6px;
-  align-items: center;
-  gap: 4px;
-  overflow: hidden;
-
-  background-color: var(--background-primary-secondary-alt);
-  
-  transition: color 0.25s ease-in-out,
-        padding 0.25s ease-in-out,
-        background-color 0.35s cubic-bezier(0.45, 0.25, 0.83, 0.67),
-        max-width 0.35s cubic-bezier(0.57, 0.04, 0.58, 1);
-  height: 32px;
-}
-
-@media screen and (max-width: 1325px) {
-  .linter-navigation-item.linter-desktop {
-		max-width: 32px;
-  }
-}
-
-@media screen and (max-width: 800px) {
-  .linter-navigation-item.linter-mobile {
-		max-width: 32px;
-  }
-}
-
-.linter-navigation-item-icon, .linter-warning {
-  padding-top: 5px;
-}
-
-.linter-navigation-item:hover {
-  border-color: var(--interactive-accent-hover);
-  border-bottom: 0px;
-}
-
-.linter-navigation-item-selected {
-  background-color: var(--interactive-accent) !important;
-  color: var(--text-on-accent);
-  padding: 4px 9px !important;
-  max-width: 100% !important;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px 8px 2px 2px;
-  border-bottom: 0px;
-  transition: color 0.25s ease-in-out,
-        padding 0.25s ease-in-out,
-        background-color 0.35s cubic-bezier(0.45, 0.25, 0.83, 0.67),
-        max-width 0.45s cubic-bezier(0.57, 0.04, 0.58, 1) 0.2s;
-}
-
-/**
- * Based on https://github.com/phibr0/obsidian-commander/blob/main/src/styles.scss
- */
-.linter {
-  transition: transform 400ms 0s;
-}
-
-.linter-setting-title {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 30px;
-}
-.linter-setting-title.linter-mobile {
-  justify-content: space-around;
-}
-.linter-setting-title h1 {
-  font-weight: 900;
-  margin-top: 6px;
-  margin-bottom: 12px;
-}
-
-.linter-setting-header {
-  margin-bottom: 24px;
-  overflow-y: hidden;
-  overflow-x: auto;
-}
-
-.linter-setting-header .linter-setting-tab-group {
-  display: flex;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  width: 100%;
-}
-.linter-setting-tab-group {
-  margin-top: 6px;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-bottom: 2px solid var(--background-modifier-border);
-}
-
-.linter-setting-header .linter-tab-settings {
-  padding: 6px 12px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  border-left: 2px solid transparent;
-  border-right: 2px solid transparent;
-}
-.linter-setting-header .linter-tab-settings:first-child {
-  margin-left: 6px;
-}
-.linter-setting-header .linter-tab-settings.linter-tab-settings-active {
-  border-bottom: 2px solid var(--background-primary);
-  transform: translateY(2px);
-  border-radius: 2px;
-  border-left: 2px solid var(--background-modifier-border);
-  border-top: 2px solid var(--background-modifier-border);
-  border-right: 2px solid var(--background-modifier-border);
-}
-
-/** Hide linter element css 
- * Based on https://zellwk.com/blog/hide-content-accessibly/
- */
-.linter-navigation-item:not(.linter-navigation-item-selected) > span:nth-child(2),
-.linter-visually-hidden {
-  border: 0;
-  clip: rect(0 0 0 0);
-  clip-path: rect(0 0 0 0);
-  height: auto;
-  margin: 0;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
-  white-space: nowrap;
-}
-
-/**
-* Full-width text areas
-* Based on https://github.com/nyable/obsidian-code-block-enhancer/blob/bb0c636c1e7609b6d26c48a8d7ca15d5cd9abdcf/src/styles/index.scss
-*/
-textarea.full-width {
-  width: 100%;
-  min-height: 10em;
-  margin-top: 0.8em;
-  margin-bottom: 0.8em;
-}
-
-.full-width-textbox-input-wrapper {
-  position: relative;
-}
-
-.settings-copy-button {
-  position: absolute;
-  top: 0.8em;
-  right: 0.8em;
-  margin: 0 0 0 auto;
-  padding: 4px;
-}
-
-.settings-copy-button svg.linter-clipboard path {
-  fill: var(--text-faint);
-}
-.settings-copy-button svg.linter-success path {
-  fill: var(--interactive-success);
-}
-.settings-copy-button:hover, .settings-copy-button:active {
-  cursor: pointer;
-}
-.settings-copy-button:hover svg path, .settings-copy-button:active svg path {
-  fill: var(--text-accent-hover);
-  transition: all ease 0.3s;
-}
-.settings-copy-button:focus {
-  outline: 0;
-}
-
-/**
-* Custom regex replacement
-*/
-.linter-custom-regex-replacement-container div:last-child {
-  border: none;
-}
-.linter-custom-regex-replacement {
-  margin-bottom: 15px;
-  border: none;
-  border-bottom: var(--hr-thickness) solid;
-  border-color: var(--hr-color);
-}
-.linter-custom-regex-replacement-row2 {
-  flex-wrap: wrap;
-}
-.linter-custom-regex-replacement-normal-input {
-  width: 40%;
-}
-.linter-custom-regex-replacement-flags {
-  width: 15%;
-}
-.linter-custom-regex-replacement-label {
-  flex-direction: row-reverse;
-}
-.linter-custom-regex-replacement-label-input {
-  width: 50%;
-}
-
-/**
-* Files to ignore
-*/
-.linter-files-to-ignore-container div:last-child {
-  border: none;
-}
-.linter-files-to-ignore {
-  margin-bottom: 15px;
-  border: none;
-  border-bottom: var(--hr-thickness) solid;
-  border-color: var(--hr-color);
-}
-.linter-files-to-ignore-normal-input {
-  width: 40%;
-}
-.linter-files-to-ignore-flags {
-  width: 15%;
-}
-
-/**
 * Setting item no border
 */
 .linter-no-border {
@@ -243,13 +12,6 @@ textarea.full-width {
   border-top: 0px;
   border-bottom: 1px solid var(--background-modifier-border);
   margin-bottom: .75em;
-}
-
-/**
-* Settings item padding top removal to make toggles and other elements line up with description when no info is present
-*/
-.linter-no-padding-top {
-  padding-top: 0px;
 }
 
 /**
@@ -270,3 +32,131 @@ textarea.full-width {
   text-align: center;
 }
 
+.confirm-modal-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/** disabled text **/
+.disabled-list-entry {
+  color: var(--text-faint);
+}
+
+/** Linter diff prview **/
+.linter-diff-preview-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.linter-diff-preview-empty {
+  color: var(--text-muted);
+  padding: 16px;
+}
+
+.linter-diff-preview-header {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--background-modifier-border);
+  display: flex;
+  flex: 0 0 auto;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 14px;
+}
+
+.linter-diff-preview-title-group {
+  min-width: 0;
+}
+
+.linter-diff-preview-header h3 {
+  font-size: var(--font-ui-medium);
+  line-height: 1.3;
+  margin: 0 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linter-diff-preview-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.linter-diff-preview-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 14px 16px;
+}
+
+.linter-diff-preview-view .linter-diff-summary {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  color: var(--text-normal);
+  display: inline-block;
+  font-size: var(--font-ui-small);
+  margin: 0 0 10px;
+  padding: 5px 8px;
+}
+
+.linter-diff-preview-view .linter-diff {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  font-family: var(--font-monospace);
+  font-size: var(--font-smaller);
+  line-height: 1.45;
+  margin: 0;
+  overflow: hidden;
+  padding: 6px 0;
+}
+
+.linter-diff-preview-view .linter-diff-line {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  min-height: 20px;
+  padding: 1px 10px 1px 0;
+}
+
+.linter-diff-preview-view .linter-diff-marker {
+  color: var(--text-muted);
+  padding-right: 8px;
+  text-align: right;
+  user-select: none;
+}
+
+.linter-diff-preview-view .linter-diff-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.linter-diff-preview-view .linter-diff-skip {
+  border-bottom: 1px solid var(--background-modifier-border);
+  border-top: 1px solid var(--background-modifier-border);
+  color: var(--text-faint);
+  font-family: var(--font-interface);
+  font-size: var(--font-ui-smaller);
+  padding: 4px 12px;
+  text-align: center;
+}
+
+.linter-diff-preview-view .linter-diff-added {
+  background: rgba(var(--color-green-rgb), 0.12);
+  color: var(--text-normal);
+}
+
+.linter-diff-preview-view .linter-diff-removed {
+  background: rgba(var(--color-red-rgb), 0.12);
+  color: var(--text-normal);
+}
+
+.linter-diff-preview-view .linter-diff-context {
+  color: var(--text-muted);
+}

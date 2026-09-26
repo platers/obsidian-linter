@@ -6,6 +6,23 @@ ruleTest({
   RuleBuilderClass: RemoveLinkSpacing,
   testCases: [
     {
+      testName: 'A link in a section the linter was told to leave alone keeps its spacing',
+      before: dedent`
+        [ trimmed ](path/fileName.md)
+
+        <!-- linter-disable -->
+        [ left alone ](path/fileName.md)
+        <!-- linter-enable -->
+      `,
+      after: dedent`
+        [trimmed](path/fileName.md)
+
+        <!-- linter-disable -->
+        [ left alone ](path/fileName.md)
+        <!-- linter-enable -->
+      `,
+    },
+    {
       // accounts for https://github.com/platers/obsidian-linter/issues/236
       testName: 'Link after checkbox is not affected by removing whitespace in links',
       before: dedent`

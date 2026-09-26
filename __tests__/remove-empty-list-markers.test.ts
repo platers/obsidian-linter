@@ -6,6 +6,28 @@ ruleTest({
   RuleBuilderClass: RemoveEmptyListMarkers,
   testCases: [
     {
+      testName: 'Leaves empty markers inside fenced code alone',
+      before: '```\n-\n- [ ]\n```\n-\noutside',
+      after: '```\n-\n- [ ]\n```\noutside',
+    },
+    {
+      testName: 'Leaves empty markers inside disabled sections alone',
+      before: '<!-- linter-disable -->\n-\n- [ ]\n<!-- linter-enable -->\n-\noutside',
+      after: '<!-- linter-disable -->\n-\n- [ ]\n<!-- linter-enable -->\noutside',
+    },
+    {
+      // The source regex consumes the protected indented-code line as a blockquote prefix.
+      // Masking hides that prefix and still removes the final marker; a whole-match guard cannot.
+      testName: 'Preserves masking behavior after indented code ending in a quote marker',
+      before: '    >\n-',
+      after: '    >',
+    },
+    {
+      testName: 'The trailing-marker pass sees the line break left by earlier removals',
+      before: 'text\n-\n-',
+      after: 'text',
+    },
+    {
       testName: 'Remove empty list markers that do not have a new line after them',
       before: dedent`
         * Some list item 1

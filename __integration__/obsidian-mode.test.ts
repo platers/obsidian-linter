@@ -16,12 +16,12 @@ function modeSetup(plugin: TestLinterPlugin, editor: Editor): Promise<void> {
 
   editor.setCursor(editor.offsetToPos(cursorStart));
 
-  return;
+  return Promise.resolve();
 }
 
 function modeAssertions(editor: Editor) {
-  // one character was added before the cursor
-  expect(editor.posToOffset(editor.getCursor())).toBe(cursorStart+1);
+  // a space was removed in the test so it will be at the start instead of one character after the start (1-1 = 0)
+  expect(editor.posToOffset(editor.getCursor())).toBe(cursorStart);
 }
 
 function edgeCaseExpectedTextModifications(text: string, file: TFile):string {
@@ -81,7 +81,7 @@ function edgeCaseSetup(plugin: TestLinterPlugin, _: Editor): Promise<void> {
     'style': 'asterisk',
   };
 
-  return;
+  return Promise.resolve();
 }
 
 function moveToYamlSetup(plugin: TestLinterPlugin, _: Editor): Promise<void> {
@@ -91,7 +91,7 @@ function moveToYamlSetup(plugin: TestLinterPlugin, _: Editor): Promise<void> {
     'tags-to-ignore': '',
   };
 
-  return;
+  return Promise.resolve();
 }
 
 export const obsidianModeTestCases: IntegrationTestCase[] = [
@@ -99,7 +99,7 @@ export const obsidianModeTestCases: IntegrationTestCase[] = [
     name: 'Updating YAML in live preview mode does not break YAML and keeps cursor at the expected location',
     filePath: 'obsidian-mode/mode-yaml.md',
     async setup(plugin: TestLinterPlugin, editor: Editor) {
-      await modeSetup(plugin, editor),
+      await modeSetup(plugin, editor);
       await setWorkspaceItemMode(plugin.app, false);
     },
     assertions: modeAssertions,
@@ -114,7 +114,7 @@ export const obsidianModeTestCases: IntegrationTestCase[] = [
     name: 'Updating YAML in live preview mode does not break YAML when an update is being made to the end of the frontmatter',
     filePath: 'obsidian-mode/edge-case-yaml.md',
     async setup(plugin: TestLinterPlugin, editor: Editor) {
-      await edgeCaseSetup(plugin, editor),
+      await edgeCaseSetup(plugin, editor);
       await setWorkspaceItemMode(plugin.app, false);
     },
     modifyExpected: edgeCaseExpectedTextModifications,
@@ -129,7 +129,7 @@ export const obsidianModeTestCases: IntegrationTestCase[] = [
     name: 'Moving tag to YAML when just the tag is present works in live preview mode',
     filePath: 'obsidian-mode/move-tag-to-yaml.md',
     async setup(plugin: TestLinterPlugin, editor: Editor) {
-      await moveToYamlSetup(plugin, editor),
+      await moveToYamlSetup(plugin, editor);
       await setWorkspaceItemMode(plugin.app, false);
     },
   },
@@ -142,7 +142,7 @@ export const obsidianModeTestCases: IntegrationTestCase[] = [
     name: 'Moving tag to YAML when some text and then a tag is present works in live preview mode',
     filePath: 'obsidian-mode/move-tag-to-yaml-2.md',
     async setup(plugin: TestLinterPlugin, editor: Editor) {
-      await moveToYamlSetup(plugin, editor),
+      await moveToYamlSetup(plugin, editor);
       await setWorkspaceItemMode(plugin.app, false);
     },
   },

@@ -98,11 +98,15 @@ export function timingBegin(timingKey: string) {
 export function timingEnd(timingKey: string) {
   if (log.getLevel() > log.levels.DEBUG) {
     return;
-  } else if (!timingInfo.has(timingKey)) {
+  } 
+  const startTime = timingInfo.get(timingKey);
+
+  if (!startTime) {
     logWarn(getTextInLanguage('logs.timing-key-not-found').replace('{TIMING_KEY}', timingKey));
+    return;
   }
 
-  const totalTimeInMilliseconds = performance.now() - timingInfo.get(timingKey);
+  const totalTimeInMilliseconds = performance.now() - startTime;
   logDebug(`${timingKey}: ${totalTimeInMilliseconds} ` + getTextInLanguage('logs.milliseconds-abbreviation'));
 }
 
@@ -126,6 +130,10 @@ export function setCollectLogs(enabled: boolean) {
  * @param {string} logLevel The minimum log level to display in the console
  */
 export function setLogLevel(logLevel: string) {
+  if (!isLogLevel(logLevel)) {
+    return;
+  }
+
   switch (logLevel) {
     case LogLevels.Info: {
       log.setLevel('info');
@@ -175,5 +183,10 @@ export function convertNumberToLogLevel(logLevel: number): string {
       return LogLevels.Warn;
     }
   }
+
+  return '';
 }
 
+function isLogLevel(value: string): value is LogLevels {
+  return Object.values(LogLevels).includes(value as LogLevels);
+}

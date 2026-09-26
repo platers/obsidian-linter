@@ -2,6 +2,7 @@ import {IgnoreTypes} from '../utils/ignore-types';
 import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
 import {ensureFencedCodeBlocksHasLanguage} from '../utils/mdast';
+import {ProtectedRanges} from '../utils/protected-ranges';
 import dedent from 'ts-dedent';
 
 class DefaultLanguageForCodeFencesOptions implements Options {
@@ -15,14 +16,14 @@ export default class DefaultLanguageForCodeFences extends RuleBuilder<DefaultLan
       nameKey: 'rules.default-language-for-code-fences.name',
       descriptionKey: 'rules.default-language-for-code-fences.description',
       type: RuleType.CONTENT,
-      ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      ruleIgnoreTypes: [IgnoreTypes.yaml, IgnoreTypes.math, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => DefaultLanguageForCodeFencesOptions {
     return DefaultLanguageForCodeFencesOptions;
   }
-  apply(text: string, options: DefaultLanguageForCodeFencesOptions): string {
-    return ensureFencedCodeBlocksHasLanguage(text, options.defaultLanguage);
+  apply(text: string, options: DefaultLanguageForCodeFencesOptions, protectedRanges: ProtectedRanges): string {
+    return ensureFencedCodeBlocksHasLanguage(text, options.defaultLanguage, protectedRanges);
   }
   get exampleBuilders(): ExampleBuilder<DefaultLanguageForCodeFencesOptions>[] {
     return [

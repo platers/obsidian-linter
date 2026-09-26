@@ -1,7 +1,8 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {escapeStringIfNecessaryAndPossible, formatYAML, getYamlSectionValue, isValueEscapedAlready, QuoteCharacter, setYamlSection} from '../utils/yaml';
+import { isValidYamlKeyOnly } from '../utils/validation';
 
 class ForceYamlEscapeOptions implements Options {
   @RuleBuilder.noSettingControl()
@@ -59,7 +60,7 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
         `,
       }),
       new ExampleBuilder({
-        description: 'Force YAML keys to be escaped with double quotes where not already escaped with `Force YAML Escape on Keys = \'key\'\\n\'title\'\\n\'bool\'`',
+        description: 'Force YAML keys to be escaped with double quotes where not already escaped with `Force YAML escape on keys = \'key\'\\n\'title\'\\n\'bool\'`',
         before: dedent`
           ---
           key: 'Already escaped value'
@@ -89,11 +90,14 @@ export default class ForceYamlEscape extends RuleBuilder<ForceYamlEscapeOptions>
   }
   get optionBuilders(): OptionBuilderBase<ForceYamlEscapeOptions>[] {
     return [
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: ForceYamlEscapeOptions,
         nameKey: 'rules.force-yaml-escape.force-yaml-escape-keys.name',
         descriptionKey: 'rules.force-yaml-escape.force-yaml-escape-keys.description',
+        emptyStateKey: 'rules.force-yaml-escape.force-yaml-escape-keys.empty-state',
+        fieldNamePlaceholderKey: 'rules.force-yaml-escape.force-yaml-escape-keys.placeholder-text',
         optionsKey: 'forceYamlEscape',
+        validator: isValidYamlKeyOnly,
       }),
     ];
   }

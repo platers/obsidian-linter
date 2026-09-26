@@ -1,10 +1,39 @@
 import YamlTitle from '../src/rules/yaml-title';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
+import process from 'node:process';
 
 ruleTest({
   RuleBuilderClass: YamlTitle,
   testCases: [
+    {
+      testName: 'Keeps a tag as heading text rather than falling back to the filename',
+      before: '# #a',
+      after: '---\ntitle: "#a"\n---\n# #a',
+      options: {fileName: 'Filename'},
+    },
+    {
+      testName: 'Uses the first visible heading after a fenced code block',
+      before: '```\n# Hidden\n```\n# Visible\n# Later',
+      after: '---\ntitle: Visible\n---\n```\n# Hidden\n```\n# Visible\n# Later',
+    },
+    {
+      testName: 'Uses the first visible heading after a linter-disable section',
+      before: '<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
+      after: '---\ntitle: Visible\n---\n<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
+    },
+    {
+      testName: 'Uses the first normal heading rather than a later heading',
+      before: '# First\n# Later',
+      after: '---\ntitle: First\n---\n# First\n# Later',
+    },
+    {
+      // The old code produced invalid YAML by copying the masked code block into the title.
+      testName: 'Does not use a heading match that crosses into a protected code block',
+      before: '#\n```\n```',
+      after: '---\ntitle: ""\n---\n#\n```\n```',
+      options: {mode: 'first-h1', fileName: 'Filename'},
+    },
     {
       testName: 'Keeps unescaped title if possible',
       before: dedent`
@@ -374,5 +403,29 @@ ruleTest({
         # Hello world
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1428
+      testName: 'Unescapes H1 markdown special characters',
+      before: dedent`
+        # Escape \\[\\_\\]
+      `,
+      after: dedent`
+        ---
+        title: Escape [_]
+        ---
+        # Escape \\[\\_\\]
+      `,
+    },
   ],
+});
+
+describe('yaml-title', () => {
+  it('should not show warning for invalid YAML string', () => {
+    const emitWarningSpy = jest
+      .spyOn(process, 'emitWarning')
+      .mockImplementation(() => {});
+
+    YamlTitle.getRule().apply('# !wrong-yaml-string');
+
+    expect(emitWarningSpy).not.toHaveBeenCalled();
+  });
 });

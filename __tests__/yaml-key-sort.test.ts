@@ -359,5 +359,23 @@ ruleTest({
         yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1532
+      testName: 'Dollar signs in YAML values are preserved when sorting keys',
+      before: dedent`
+        ---
+        zeta: last
+        alpha: $$$$
+        ---
+      `,
+      after: dedent`
+        ---
+        alpha: $$$$
+        zeta: last
+        ---
+      `,
+      options: {
+        yamlSortOrderForOtherKeys: 'Ascending Alphabetical',
+      },
+    },
   ],
 });

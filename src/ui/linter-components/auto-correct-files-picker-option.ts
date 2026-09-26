@@ -4,8 +4,7 @@ import {AddCustomRefreshableRow} from '../components/add-custom-refreshable-row'
 import MdFileSuggester from '../suggesters/md-file-suggester';
 import {parseCustomReplacements, stripCr} from '../../utils/strings';
 import {ParseResultsModal} from '../modals/parse-results-modal';
-
-export type CustomAutoCorrectContent = {filePath: string, customReplacements: Map<string, string>};
+import { CustomAutoCorrectContent } from '../../settings-data';
 
 export class AutoCorrectFilesPickerOption extends AddCustomRefreshableRow {
   private selectedFiles: string[] = [];

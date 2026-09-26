@@ -12,6 +12,7 @@ node_modules
 # build
 *.js
 *.js.map
+!eslint-rules/*.js
 
 # obsidian
 data.json
@@ -40,6 +41,6 @@ yarn.lock
 .DS_Store
 
 !__mocks__/*.js
-!/.eslintrc.js
+!eslint.config.mjs
 !babel.config.js
 !postcss.config.js

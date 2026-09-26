@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, TextAreaOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
@@ -15,6 +15,7 @@ import {convertAliasValueToStringOrStringArray,
   SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
   TagSpecificArrayFormats} from '../utils/yaml';
+import { isValidYamlKeyOnly } from '../utils/validation';
 
 type YamlArraySortOrder = 'Ascending Alphabetical' | 'Descending Alphabetical'
 
@@ -35,7 +36,7 @@ class SortYamlArrayValuesOptions implements Options {
 }
 
 @RuleBuilder.register
-export default class RuleTemplate extends RuleBuilder<SortYamlArrayValuesOptions> {
+export default class SortYamlArrayValues extends RuleBuilder<SortYamlArrayValuesOptions> {
   constructor() {
     super({
       nameKey: 'rules.sort-yaml-array-values.name',
@@ -91,7 +92,7 @@ export default class RuleTemplate extends RuleBuilder<SortYamlArrayValuesOptions
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays, arrays of objects, ignored keys, and already accounted for keys
-          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || (yaml[key].length !== 0 && typeof yaml[key][0] === 'object' && yaml[key][0] !== null)) {
+          if (keysToIgnore.includes(key) || !Array.isArray((yaml as {[k: string]: object})[key]) || ((yaml as {[k: string]: object[]})[key].length !== 0 && typeof (yaml as {[k: string]: object[]})[key][0] === 'object' && (yaml as {[k: string]: object[]})[key][0] !== null)) {
             continue;
           }
 
@@ -187,10 +188,11 @@ export default class RuleTemplate extends RuleBuilder<SortYamlArrayValuesOptions
         `,
         options: {
           aliasArrayStyle: NormalArrayFormats.MultiLine,
+          sortOrder: 'Descending Alphabetical',
         },
       }),
       new ExampleBuilder({
-        description: 'Sort YAML Arrays respects list of keys to not sort values of for normal arrays (keys to ignore is just `arr2` for this example)',
+        description: 'Sort YAML arrays respects list of keys to not sort values of for normal arrays (keys to ignore is just `arr2` for this example)',
         before: dedent`
           ---
           tags: [computer, research]
@@ -244,11 +246,14 @@ export default class RuleTemplate extends RuleBuilder<SortYamlArrayValuesOptions
         descriptionKey: 'rules.sort-yaml-array-values.sort-array-keys.description',
         optionsKey: 'sortArrayKeys',
       }),
-      new TextAreaOptionBuilder({
+      new ListItemOptionBuilder({
         OptionsClass: SortYamlArrayValuesOptions,
         nameKey: 'rules.sort-yaml-array-values.ignore-keys.name',
         descriptionKey: 'rules.sort-yaml-array-values.ignore-keys.description',
+        emptyStateKey: 'rules.sort-yaml-array-values.ignore-keys.empty-state',
+        fieldNamePlaceholderKey: 'rules.sort-yaml-array-values.ignore-keys.placeholder-text',
         optionsKey: 'ignoreSortArrayKeys',
+        validator: isValidYamlKeyOnly,
       }),
       new DropdownOptionBuilder<SortYamlArrayValuesOptions, YamlArraySortOrder>({
         OptionsClass: SortYamlArrayValuesOptions,

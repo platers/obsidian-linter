@@ -6,6 +6,10 @@ import {allHeadersRegex} from '../utils/regex';
 import {BooleanOption} from '../option';
 import {ConfirmRuleDisableModal} from '../ui/modals/confirm-rule-disable-modal';
 import {App} from 'obsidian';
+import LinterPlugin from '../main';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
 
 class HeaderIncrementOptions implements Options {
   startAtH2?: boolean = false;
@@ -24,7 +28,9 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
   get OptionsClass(): new () => HeaderIncrementOptions {
     return HeaderIncrementOptions;
   }
-  apply(text: string, options: HeaderIncrementOptions): string {
+  apply(text: string, options: HeaderIncrementOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    const replacements: textReplacement[] = [];
     let lastLevel = 0; // level of last header processed
     const minimumLevel = options.startAtH2 ? 2: 1;
     const headingLevelStartNumbers: Array<number> = [];
@@ -33,8 +39,13 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
     const headingLevels = [0, 0, 0, 0, 0, 0];
     const highestHeadingLevel = headingLevels.length;
 
-    return text.replace(allHeadersRegex, (_: string, $1: string = '', $2: string = '', $3: string = '', $4: string = '', $5: string = '') => {
-      let level = $2.length;
+    for (const match of projection.text.matchAll(allHeadersRegex)) {
+      const startIndex = match.index + match[1].length;
+      const range = projection.editRangeToSource({startIndex, endIndex: startIndex + match[2].length});
+      if (!range) {
+        continue;
+      }
+      let level = match[2].length;
       level = level <= highestHeadingLevel ? level : highestHeadingLevel;
 
       if (headingLevels[level - 1] >= 0 && level < lastLevel) {
@@ -70,8 +81,9 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
 
       lastLevel = level;
 
-      return $1 + '#'.repeat(headingLevels[level - 1]) + $3 + $4 + $5;
-    });
+      replacements.push({...range, value: '#'.repeat(headingLevels[level - 1])});
+    }
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<HeaderIncrementOptions>[] {
     return [
@@ -140,7 +152,7 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
         `,
       }),
       new ExampleBuilder({
-        description: 'When `Start Header Increment at Heading Level 2 = true`, H1s become H2s and the other headers are incremented accordingly',
+        description: 'When `Start header increment at heading level 2 = true`, H1s become H2s and the other headers are incremented accordingly',
         before: dedent`
           # H1 becomes H2
           #### H4 becomes H3
@@ -172,15 +184,15 @@ export default class HeaderIncrement extends RuleBuilder<HeaderIncrementOptions>
         nameKey: 'rules.header-increment.start-at-h2.name',
         descriptionKey: 'rules.header-increment.start-at-h2.description',
         optionsKey: 'startAtH2',
-        onChange(value: boolean, app: App): void {
+        onChange(value: boolean, app: App, plugin: LinterPlugin): void {
           const filenameHeadingEnableOption = rulesDict['file-name-heading'].options[0] as BooleanOption;
 
-          if (value && filenameHeadingEnableOption.getValue()) {
-            new ConfirmRuleDisableModal(app, 'rules.header-increment.start-at-h2.name', 'rules.file-name-heading.name', () => {
-              filenameHeadingEnableOption.setValue(false);
+          if (value && filenameHeadingEnableOption.getValue(plugin)) {
+            new ConfirmRuleDisableModal(app, 'rules.header-increment.start-at-h2.name', 'rules.file-name-heading.name', async () => {
+              await filenameHeadingEnableOption.setValue(false, plugin);
             },
-            () => {
-              (rulesDict['header-increment'].options[1] as BooleanOption).setValue(false);
+            async () => {
+              await (rulesDict['header-increment'].options[1] as BooleanOption).setValue(false, plugin);
             }).open();
           }
         },

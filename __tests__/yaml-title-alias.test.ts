@@ -1,11 +1,39 @@
 import YamlTitleAlias from '../src/rules/yaml-title-alias';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
-import {NormalArrayFormats, SpecialArrayFormats} from '../src/utils/yaml';
+import { ruleTest } from './common';
+import { NormalArrayFormats, SpecialArrayFormats } from '../src/utils/yaml';
 
 ruleTest({
   RuleBuilderClass: YamlTitleAlias,
   testCases: [
+    {
+      testName: 'Keeps a tag as heading text rather than falling back to the filename',
+      before: '# #a',
+      after: '---\naliases:\n  - "#a"\nlinter-yaml-title-alias: "#a"\n---\n# #a',
+      options: { fileName: 'Filename' },
+    },
+    {
+      testName: 'Uses the first visible heading after a fenced code block',
+      before: '```\n# Hidden\n```\n# Visible\n# Later',
+      after: '---\naliases:\n  - Visible\nlinter-yaml-title-alias: Visible\n---\n```\n# Hidden\n```\n# Visible\n# Later',
+    },
+    {
+      testName: 'Uses the first visible heading after a linter-disable section',
+      before: '<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
+      after: '---\naliases:\n  - Visible\nlinter-yaml-title-alias: Visible\n---\n<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
+    },
+    {
+      testName: 'Uses the first normal heading rather than a later heading',
+      before: '# First\n# Later',
+      after: '---\naliases:\n  - First\nlinter-yaml-title-alias: First\n---\n# First\n# Later',
+    },
+    {
+      // The old code produced invalid YAML by copying the masked code block into the title.
+      testName: 'Does not use a heading match that crosses into a protected code block',
+      before: '#\n```\n```',
+      after: '---\naliases:\n  - Filename\nlinter-yaml-title-alias: Filename\n---\n#\n```\n```',
+      options: { fileName: 'Filename', keepAliasThatMatchesTheFilename: true },
+    },
     {
       testName: 'Creates multi-line array aliases when missing',
       before: dedent`
@@ -635,8 +663,6 @@ ruleTest({
         # Filename
       `,
       after: dedent`
-        ---
-        ---
         # Filename
       `,
       options: {
@@ -1062,12 +1088,30 @@ ruleTest({
         # Filename
       `,
       after: dedent`
+        # Filename
+      `,
+      options: {
+        fileName: 'Filename',
+        removeAliasKeyWhenEmpty: true,
+      },
+    },
+    {
+      testName: 'Doesn\'t remove empty alias section if title matches the filename and removeAliasKeyWhenEmpty false',
+      before: dedent`
         ---
+        aliases:
+        ---
+        # Filename
+      `,
+      after: dedent`
+        ---
+        aliases:
         ---
         # Filename
       `,
       options: {
         fileName: 'Filename',
+        removeAliasKeyWhenEmpty: false,
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/449
@@ -1411,6 +1455,43 @@ ruleTest({
         preserveExistingAliasesSectionStyle: true,
         aliasHelperKey: 'aliases2',
         keepAliasThatMatchesTheFilename: true,
+        fileName: 'Filename',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1293
+      testName: 'Make sure that a blank YAML block is not added when there is no value to be added by the rule',
+      before: dedent`
+        # Filename
+      `,
+      after: dedent`
+        # Filename
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        defaultEscapeCharacter: '"',
+        preserveExistingAliasesSectionStyle: true,
+        aliasHelperKey: 'aliases2',
+        keepAliasThatMatchesTheFilename: false,
+        fileName: 'Filename',
+      },
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/1293
+      testName: 'Make sure that a blank YAML block is not added when there is no value to be added by the rule and that extra space is removed before the first piece of content',
+      before: dedent`
+        ---
+        ---
+        ${''}
+        # Filename
+      `,
+      after: dedent`
+        # Filename
+      `,
+      options: {
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        defaultEscapeCharacter: '"',
+        preserveExistingAliasesSectionStyle: true,
+        aliasHelperKey: 'aliases2',
+        keepAliasThatMatchesTheFilename: false,
         fileName: 'Filename',
       },
     },

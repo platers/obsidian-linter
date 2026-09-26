@@ -11,7 +11,7 @@ The values in the text box are expected to be folder paths from the base of the 
 
 ![Setting for ignoring specific folders](../assets/folders-to-ignore.jpg)
 
-For example, in the above image, the `templates` folder will be ignored when the Linter attempts to run its rules. Nested folders are also allowed as well.
+For example, in the above image, the `templates` folder will be ignored when the Linter attempts to run its rules. Nested folders are ignored as well.
 
 ## Ignoring Files via Regex
 

@@ -551,5 +551,28 @@ ruleTest({
         dateModifiedSourceOfTruth: 'user or Linter edits',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1411
+      testName: 'When the format for the file has escaped characters, if it matches the original format and the source of truth is not filesystem, then it should not update the date modified',
+      before: dedent`
+        ---
+        modified_on: "[[2025-10-11]]"
+        ---
+      `,
+      after: dedent`
+        ---
+        modified_on: "[[2025-10-11]]"
+        ---
+      `,
+      options: {
+        dateCreated: false,
+        format: '"[[[]YYYY-MM-DD[]]]"',
+        dateModifiedKey: 'modified_on',
+        fileCreatedTime: '2020-01-01T00:00:00-00:00',
+        fileModifiedTime: '2020-02-05T18:00:00-00:00',
+        currentTime: moment('Tuesday, February 5th 2026, 6:00:07 pm', 'dddd, MMMM Do YYYY, h:mm:ss a'),
+        alreadyModified: false,
+        dateModifiedSourceOfTruth: 'user or Linter edits',
+      },
+    },
   ],
 });

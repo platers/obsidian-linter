@@ -6,7 +6,7 @@
         "typescriptreact"
     ],
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true,
+        "source.fixAll.eslint": "explicit"
     },
     "editor.tabSize": 2,
     "files.eol": "\n",
@@ -14,4 +14,5 @@
     "editor.detectIndentation": true,
     "files.encoding": "utf8",
     "files.trimTrailingWhitespace": false,
+    "js/ts.validate.enabled": false
 }

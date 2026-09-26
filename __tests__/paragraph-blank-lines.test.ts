@@ -6,6 +6,16 @@ ruleTest({
   RuleBuilderClass: ParagraphBlankLines,
   testCases: [
     {
+      testName: 'Separates a paragraph from an adjacent multiline comment',
+      before: 'A\n%%\nB\n%%',
+      after: 'A\n\n%%\nB\n%%',
+    },
+    {
+      testName: 'Separates a protected table from a heading and following paragraphs',
+      before: '# H\n| a |\n| - |\n| b |\nParagraph\nNext',
+      after: '# H\n\n| a |\n| - |\n| b |\n\nParagraph\n\nNext',
+    },
+    {
       testName: 'Ignores codeblocks',
       before: dedent`
         ---
@@ -314,7 +324,7 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/704
-      testName: 'Make sure that an empty list indicator does not have an extra empty line added around it',
+      testName: 'Make sure that an empty list marker does not have an extra empty line added around it',
       before: dedent`
         ## Attendees
         ${''}
@@ -331,7 +341,7 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/787
-      testName: 'Make sure that an empty list indicator does not have an extra empty line added around it',
+      testName: 'Make sure that an empty list marker does not have an extra empty line added around it',
       before: dedent`
         - reference to footnote 1 [^1]
         - reference to footnote 2 [^2]
@@ -563,6 +573,24 @@ ruleTest({
         \t* [y] abc
         \t\tabc
         \t\tbb
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1395
+      testName: 'A paragraph starting with an asterisk for either italics or bold should have a blank line added',
+      before: dedent`
+        # Header
+        **emphasis** blah blah...
+        *italics* more content here...
+        abcabc
+      `,
+      after: dedent`
+        # Header
+        ${''}
+        **emphasis** blah blah...
+        ${''}
+        *italics* more content here...
+        ${''}
+        abcabc
       `,
     },
   ],

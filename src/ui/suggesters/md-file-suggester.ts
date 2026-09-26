@@ -1,43 +1,34 @@
-import {TextInputSuggest} from './suggest';
-import {App, TFile} from 'obsidian';
+import {AbstractInputSuggest, App, TFile} from 'obsidian';
 
-export default class MdFileSuggester extends TextInputSuggest<string> {
+export default class MdFileSuggester extends AbstractInputSuggest<string> {
   constructor(
-    public app: App,
-    public inputEl: HTMLInputElement,
-    public valuesToExclude: string[] = [],
+      app: App,
+      public inputEl: HTMLInputElement,
+      public valuesToExclude: string[] = [],
   ) {
     super(app, inputEl);
   }
 
-  getSuggestions(input_str: string): string[] {
-    const all_md_files = this.app.vault.getAllLoadedFiles().filter((f) => f instanceof TFile && f.path.endsWith('.md')).map((f) => f.path);
-    if (!all_md_files) {
-      return [];
-    }
+  protected getSuggestions(inputStr: string): string[] {
+    const allMdFiles = this.app.vault.getAllLoadedFiles()
+        .filter((f): f is TFile => f instanceof TFile && f.path.endsWith('.md'))
+        .map((f) => f.path);
 
-    const nonSelectedMdFiles = all_md_files.filter((el: string) => {
-      return !this.valuesToExclude.includes(el) || el === this.inputEl.getAttribute('fileName');
+    const selected = this.inputEl.getAttribute('fileName');
+    const lower = inputStr.toLowerCase();
+    return allMdFiles.filter((path) => {
+      if (this.valuesToExclude.includes(path) && path !== selected) return false;
+      return path.toLowerCase().contains(lower);
     });
-
-    const files: string[] = [];
-    const lower_input_str = input_str.toLowerCase();
-    nonSelectedMdFiles.forEach((folderPath: string) => {
-      if (folderPath.toLowerCase().contains(lower_input_str)) {
-        files.push(folderPath);
-      }
-    });
-
-    return files;
   }
 
   renderSuggestion(filePath: string, el: HTMLElement): void {
     el.setText(filePath);
   }
 
-  selectSuggestion(filePath: string): void {
+  selectSuggestion(filePath: string, _evt: MouseEvent | KeyboardEvent): void {
     this.inputEl.setAttribute('fileName', filePath);
-    this.inputEl.value = filePath;
+    this.setValue(filePath);
     this.inputEl.trigger('input');
     this.close();
   }

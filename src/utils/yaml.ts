@@ -1,9 +1,9 @@
-import {getTextInLanguage} from '../lang/helpers';
-import {escapeDollarSigns, yamlRegex} from './regex';
-import {isNumeric} from './strings';
-import {parse, parseDocument, Document, stringify, CST, YAMLMap} from 'yaml';
-import {YamlNode} from 'src/typings/yaml';
-import {FlowCollection} from 'yaml/dist/parse/cst';
+import { getTextInLanguage } from '../lang/helpers';
+import type { Position } from 'unist';
+import { escapeDollarSigns, multipleBlankLinesRegex, yamlRegex } from './regex';
+import { isNumeric } from './strings';
+import { parse, parseDocument, Document, stringify, CST, YAMLMap, isMap, visit, Scalar } from 'yaml';
+import { YamlNode } from '../typings/yaml';
 
 export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
 export const OBSIDIAN_TAG_KEY_PLURAL = 'tags';
@@ -36,65 +36,443 @@ export function getYAMLText(text: string): string | null {
 }
 
 export function formatYAML(text: string, func: (text: string) => string): string {
-  if (!text.match(yamlRegex)) {
+  const oldYamlMatch = text.match(yamlRegex);
+  if (!oldYamlMatch) {
     return text;
   }
 
-  const oldYaml = text.match(yamlRegex)[0];
+  const oldYaml = oldYamlMatch[0];
   const newYaml = func(oldYaml);
   text = text.replace(oldYaml, escapeDollarSigns(newYaml));
 
   return text;
 }
 
-function getYamlSectionRegExp(rawKey: string, allowNestedKey: boolean = true): RegExp {
-  if (allowNestedKey) {
-    return new RegExp(`^([\\t ]*)${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm');
-  }
+type YamlSourceNode = {
+  value?: unknown;
+  range?: [number, number, number];
+  srcToken?: {
+    start?: number;
+    end?: number;
+  };
+};
 
-  return new RegExp(`^${rawKey}:[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm');
-}
+type YamlPair = {
+  key?: YamlSourceNode;
+  value?: YamlSourceNode;
+};
 
-export function setYamlSection(yaml: string, rawKey: string, rawValue: string): string {
-  const yamlSectionEscaped = `${rawKey}:${rawValue}\n`;
-  let isReplaced = false;
-  let result = yaml.replace(getYamlSectionRegExp(rawKey), (_, $1: string) => {
-    isReplaced = true;
-    return $1 + yamlSectionEscaped;
+function parseYamlForSectionLookup(yaml: string): Document {
+  /*
+   * CST offsets are relative to the exact string passed to parseDocument().
+   * Do not normalize tabs or otherwise modify the string here.
+   */
+  return parseDocument(yaml, {
+    keepSourceTokens: true,
   });
-  if (!isReplaced) {
-    result = `${yaml}${yamlSectionEscaped}`;
-  }
-  return result;
 }
 
-export function getYamlSectionValue(yaml: string, rawKey: string, allowNestedKey: boolean = true): string | null {
-  const match = yaml.match(getYamlSectionRegExp(rawKey, allowNestedKey));
-  if (match == null) {
+function getYamlNodeStart(node: unknown): number | null {
+  if (!node || typeof node !== 'object') {
     return null;
   }
 
-  let result = match[2];
-  if (!allowNestedKey) {
-    result = match[1];
+  const yamlNode = node as YamlSourceNode;
+
+  if (yamlNode.range && typeof yamlNode.range[0] === 'number') {
+    return yamlNode.range[0];
   }
 
-  return result;
+  if (yamlNode.srcToken && typeof yamlNode.srcToken.start === 'number') {
+    return yamlNode.srcToken.start;
+  }
+
+  return null;
+}
+
+function getYamlNodeEnd(node: unknown): number | null {
+  if (!node || typeof node !== 'object') {
+    return null;
+  }
+
+  const yamlNode = node as YamlSourceNode;
+
+  /*
+   * A YAML node range is [start, end, valueEnd].
+   */
+  if (yamlNode.range && typeof yamlNode.range[1] === 'number') {
+    return yamlNode.range[1];
+  }
+
+  if (yamlNode.srcToken && typeof yamlNode.srcToken.end === 'number') {
+    return yamlNode.srcToken.end;
+  }
+
+  return null;
+}
+
+function getComparableYamlKey(rawKey: unknown): string | null {
+  if (typeof rawKey !== 'string') {
+    return null;
+  }
+
+  const key = rawKey.trim();
+
+  if (key.length >= 2 &&
+    ((key.startsWith('"') && key.endsWith('"')) ||
+      (key.startsWith('\'') && key.endsWith('\'')))
+  ) {
+    return key.substring(1, key.length - 1);
+  }
+
+  return key;
+}
+
+function findYamlPair(map: YAMLMap, rawKey: unknown, allowNestedKey: boolean): YamlPair | null {
+  const comparableKey = getComparableYamlKey(rawKey);
+
+  if (comparableKey == null) {
+    return null;
+  }
+
+  for (const item of map.items) {
+    const pair = item as YamlPair;
+
+    const parsedKey =
+      pair.key &&
+        typeof pair.key.value === 'string'
+        ? pair.key.value
+        : null;
+
+    if (parsedKey === comparableKey) {
+      return pair;
+    }
+
+    if (allowNestedKey && pair.value && isMap(pair.value)) {
+      const nestedPair = findYamlPair(pair.value, rawKey, true);
+
+      if (nestedPair) {
+        return nestedPair;
+      }
+    }
+  }
+
+  return null;
+}
+
+function getYamlPair(yaml: string, rawKey: unknown, allowNestedKey: boolean): YamlPair | null {
+  if (typeof rawKey !== 'string') {
+    return null;
+  }
+
+  const document = parseYamlForSectionLookup(yaml);
+
+  if (!document.contents || !isMap(document.contents)) {
+    return null;
+  }
+
+  return findYamlPair(document.contents, rawKey, allowNestedKey);
+}
+
+function getLineStart(text: string, offset: number,): number {
+  const newline = text.lastIndexOf('\n', offset - 1);
+
+  return newline === -1 ? 0 : newline + 1;
+}
+
+function getLineEnd(text: string, offset: number): number {
+  const newline = text.indexOf('\n', offset);
+
+  return newline === -1 ? text.length : newline;
+}
+
+/**
+ * Finds the colon separating a YAML key from its value.
+ *
+ * The colon inside a quoted key is ignored:
+ *
+ *   "key:with:colons": value
+ *   'key:with:colons': value
+ */
+function findKeyColon(line: string, keyStartInLine: number,): number {
+  let quote: '"' | '\'' | null = null;
+
+  for (let index = keyStartInLine; index < line.length; index++) {
+    const character = line[index];
+
+    if (quote !== null) {
+      if (character === quote) {
+        /*
+         * YAML escapes double quotes with a backslash. Single-quoted YAML
+         * strings escape a quote by doubling it.
+         */
+        if (quote === '"' && line[index - 1] !== '\\') {
+          quote = null;
+        } else if (quote === '\'' && line[index + 1] === '\'') {
+          index++;
+        } else if (quote === '\'') {
+          quote = null;
+        }
+      }
+
+      continue;
+    }
+
+    if (character === '"' || character === '\'') {
+      quote = character;
+      continue;
+    }
+
+    if (character === ':') {
+      return index;
+    }
+  }
+
+  return -1;
+}
+
+function getYamlKeySourceRange(yaml: string, pair: YamlPair): { start: number; end: number; colon: number } | null {
+  const keyStart = getYamlNodeStart(pair.key);
+
+  if (keyStart == null) {
+    return null;
+  }
+
+  const lineStart = getLineStart(yaml, keyStart);
+  const lineEnd = getLineEnd(yaml, keyStart);
+  const line = yaml.substring(lineStart, lineEnd);
+  const keyStartInLine = keyStart - lineStart;
+  const colonInLine = findKeyColon(line, keyStartInLine);
+
+  if (colonInLine === -1) {
+    return null;
+  }
+
+  const colon = lineStart + colonInLine;
+
+  return {
+    start: keyStart,
+    end: colon,
+    colon,
+  };
+}
+
+function getYamlValueRange(yaml: string, pair: YamlPair): { start: number; end: number } | null {
+  const keyRange = getYamlKeySourceRange(yaml, pair);
+
+  if (!keyRange) {
+    return null;
+  }
+
+  /*
+   * Start immediately after the colon, omitting spaces and tabs on the same
+   * line. For a block value, the newline is intentionally preserved.
+   */
+  let valueStart = keyRange.colon + 1;
+  const keyLineEnd = getLineEnd(yaml, keyRange.colon);
+
+  while (valueStart < keyLineEnd && (yaml[valueStart] === ' ' || yaml[valueStart] === '\t')) {
+    valueStart++;
+  }
+
+  const valueNodeStart = getYamlNodeStart(pair.value);
+  const valueNodeEnd = getYamlNodeEnd(pair.value);
+
+  /*
+   * Empty values such as `key:` have no value node.
+   */
+  if (valueNodeStart == null || valueNodeEnd == null) {
+    return {
+      start: valueStart,
+      end: keyLineEnd,
+    };
+  }
+
+  let valueEnd = valueNodeEnd;
+
+  /*
+   * A CST node does not include an inline comment. Keep an inline comment
+   * attached to the returned value and to the section being replaced.
+   */
+  const valueLineEnd = getLineEnd(yaml, valueNodeEnd);
+  const textAfterValue = yaml.substring(valueNodeEnd, valueLineEnd);
+
+  if (/^[ \t]*#/.test(textAfterValue)) {
+    valueEnd = valueLineEnd;
+  }
+
+  /*
+   * The start comes from the colon rather than the value node. This retains
+   * the newline and indentation before the first item of a block sequence:
+   *
+   *   key:
+   *     - first
+   *     - second
+   */
+  return { start: valueStart, end: valueEnd };
+}
+
+function getYamlSectionRange(yaml: string, pair: YamlPair): { start: number; end: number } | null {
+  const keyStart = getYamlNodeStart(pair.key);
+  const valueRange = getYamlValueRange(yaml, pair);
+
+  if (keyStart == null || valueRange == null) {
+    return null;
+  }
+
+  const start = getLineStart(yaml, keyStart);
+  let end = valueRange.end;
+
+  /*
+   * Match the previous regex behavior by consuming the newline terminating
+   * the key's value.
+   */
+  if (yaml[end] === '\n') {
+    end++;
+  }
+
+  return { start, end };
+}
+
+export function getYamlSectionValue(yaml: string, rawKey: string, allowNestedKey: boolean = true): string | null {
+  const pair = getYamlPair(yaml, rawKey, allowNestedKey);
+
+  if (!pair) {
+    return null;
+  }
+
+  const valueRange = getYamlValueRange(yaml, pair);
+
+  if (!valueRange) {
+    return null;
+  }
+
+  return yaml.substring(valueRange.start, valueRange.end);
+}
+
+export function setYamlSection(yaml: string, rawKey: string, rawValue: string): string {
+  const pair = getYamlPair(yaml, rawKey, true);
+
+  if (!pair) {
+    return `${yaml}${rawKey}:${rawValue}\n`;
+  }
+
+  const sectionRange = getYamlSectionRange(yaml, pair);
+  const keyRange = getYamlKeySourceRange(yaml, pair);
+
+  if (!sectionRange || !keyRange) {
+    return yaml;
+  }
+
+  const lineStart = getLineStart(yaml, keyRange.start);
+  const indentation = yaml.substring(lineStart, keyRange.start);
+
+  /*
+   * Use the original key source, not rawKey. This preserves:
+   *
+   *   "key1":
+   *   'key2':
+   */
+  const originalKey = yaml.substring(keyRange.start, keyRange.end).trimEnd();
+
+  const replacement = `${indentation}${originalKey}:${rawValue}\n`;
+
+  return yaml.substring(0, sectionRange.start) + replacement + yaml.substring(sectionRange.end);
 }
 
 export function removeYamlSection(yaml: string, rawKey: string, allowNestedKey: boolean = true): string {
-  const result = yaml.replace(getYamlSectionRegExp(rawKey, allowNestedKey), '');
-  return result;
+  const pair = getYamlPair(yaml, rawKey, allowNestedKey);
+
+  if (!pair) {
+    return yaml;
+  }
+
+  const sectionRange = getYamlSectionRange(yaml, pair);
+
+  if (!sectionRange) {
+    return yaml;
+  }
+
+  return yaml.substring(0, sectionRange.start) + yaml.substring(sectionRange.end);
 }
 
-export function loadYAML(yaml_text: string): any {
+/**
+ * getBlockScalarPositions returns the postions of the actual block scalars in the YAML
+ * @param yaml the YAML text without the indicators
+ * @returns Positions that only have their offsets set in the actual position info
+ */
+function getBlockScalarPositions(yamlText: string): Position[] {
+  const doc = parseDocument(yamlText, {
+    keepSourceTokens: true,
+  });
+
+  const blockScalarPositions: Position[] = [];
+
+  visit(doc, (_key, node) => {
+    if (!(node instanceof Scalar)) {
+      return;
+    }
+
+    if (node.type !== 'BLOCK_LITERAL' && node.type !== 'BLOCK_FOLDED') {
+      return;
+    }
+
+    if (node.range == null || node.range.length < 3) {
+      return;
+    }
+
+    blockScalarPositions.push({
+      start: {
+        line: 0,
+        column: 0,
+        offset: node.range[0],
+      },
+      end: {
+        line: 0,
+        column: 0,
+        offset: node.range[2],
+      },
+    });
+  });
+
+  return blockScalarPositions;
+}
+
+function overlaps(start: number, end: number, position: Position): boolean {
+  const positionStart = position.start.offset ?? 0;
+  const positionEnd = position.end.offset ?? 0;
+
+  return start < positionEnd && end > positionStart;
+}
+
+export function removeBlankLinesOutsideBlockScalars(text: string): string {
+  const blockScalarPositions = getBlockScalarPositions(text);
+
+  // The match includes:
+  //   - the newline before the blank line
+  //   - spaces/tabs on the blank line
+  //
+  // The following newline is retained.
+  return text.replace(multipleBlankLinesRegex, (match, offset: number) => {
+    const start = offset;
+    const end = offset + match.length;
+
+    const isInsideBlockScalar = blockScalarPositions.some((position) => {
+      return overlaps(start, end, position);
+    });
+
+    return isInsideBlockScalar ? match : '\n';
+  });
+}
+
+export function loadYAML(yaml_text: string): null | object {
   if (yaml_text == null) {
     return null;
   }
 
   // replacing tabs at the beginning of new lines with 2 spaces fixes loading YAML that has tabs at the start of a line
   // https://github.com/platers/obsidian-linter/issues/157
-  const parsed_yaml = parse(yaml_text.replace(/\n(\t)+/g, '\n  ')) as {};
+  const parsed_yaml = parse(yaml_text.replace(/\n(\t)+/g, '\n  ')) as unknown;
   if (parsed_yaml == null) {
     return {};
   }
@@ -102,14 +480,14 @@ export function loadYAML(yaml_text: string): any {
   return parsed_yaml;
 }
 
-export function parseYAML(yaml_text: string): Document {
+export function parseYAML(yaml_text: string): null | Document {
   if (yaml_text == null) {
     return null;
   }
 
   // replacing tabs at the beginning of new lines with 2 spaces fixes loading YAML that has tabs at the start of a line
   // https://github.com/platers/obsidian-linter/issues/157
-  const parsed_yaml = parseDocument(yaml_text.replace(/\n(\t)+/g, '\n  '), {keepSourceTokens: true});
+  const parsed_yaml = parseDocument(yaml_text.replace(/\n(\t)+/g, '\n  '), { keepSourceTokens: true });
   if (parsed_yaml == null) {
     return null;
   }
@@ -121,7 +499,7 @@ export function getEmptyDocument(doc: Document): Document {
   const newDocument = new Document(doc.options);
   newDocument.contents = new YAMLMap();
 
-  const originalToken = doc.contents.srcToken as FlowCollection;
+  const originalToken = doc.contents?.srcToken as CST.FlowCollection;
   newDocument.contents.srcToken = {
     offset: originalToken.offset,
     type: originalToken.type,
@@ -135,7 +513,7 @@ export function getEmptyDocument(doc: Document): Document {
 }
 
 export function astToString(ast: Document): string {
-  if (!ast || !ast.contents) {
+  if (!ast || !ast.contents || !ast.contents.srcToken) {
     return '';
   }
 
@@ -211,6 +589,13 @@ export function formatYamlArrayValue(value: string | string[], format: NormalArr
         return ' ' + value[0];
       }
     case NormalArrayFormats.SingleLine:
+      // make sure that any values with a comma get properly escaped first
+      for (let i = 0; i < value.length; i++) {
+        if (value[i].includes(',') && !isValueEscapedAlready(value[i])) {
+          value[i] = escapeStringIfNecessaryAndPossible(value[i], defaultEscapeCharacter, true);
+        }
+      }
+
       return ' ' + convertStringArrayToSingleLineArray(value);
     case SpecialArrayFormats.SingleStringToMultiLine:
       if (value.length === 1) {
@@ -225,6 +610,13 @@ export function formatYamlArrayValue(value: string | string[], format: NormalArr
 
       return ' ' + value.join(' ');
     case SpecialArrayFormats.SingleStringCommaDelimited:
+      // make sure that any values with a comma get properly escaped first
+      for (let i = 0; i < value.length; i++) {
+        if (value[i].includes(',') && !isValueEscapedAlready(value[i])) {
+          value[i] = escapeStringIfNecessaryAndPossible(value[i], defaultEscapeCharacter, true);
+        }
+      }
+
       if (value.length === 1) {
         return ' ' + value[0];
       }
@@ -237,11 +629,11 @@ export function formatYamlArrayValue(value: string | string[], format: NormalArr
 
       return ' ' + convertStringArrayToSingleLineArray(value).replaceAll(', ', ' ');
   }
-  /* eslint-enable no-fallthrough */
+  /* eslint-enable no-fallthrough -- needed to renable fallthrough checks disabled above */
 }
 
 function getDefaultYAMLArrayValue(format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats): string {
-  /* eslint-disable no-fallthrough */
+
   switch (format) {
     case NormalArrayFormats.SingleLine:
     case TagSpecificArrayFormats.SingleLineSpaceDelimited:
@@ -253,7 +645,7 @@ function getDefaultYAMLArrayValue(format: NormalArrayFormats | SpecialArrayForma
     case SpecialArrayFormats.SingleStringCommaDelimited:
       return ' ';
   }
-  /* eslint-enable no-fallthrough */
+
 }
 
 function convertStringArrayToSingleLineArray(arrayItems: string[]): string {
@@ -275,9 +667,9 @@ function convertStringArrayToMultilineArray(arrayItems: string[]): string {
 /**
  * Parses single-line and multi-line arrays into an array that can be used for formatting down the line
  * @param {string} value The value to see about parsing if it is a sing-line or multi-line array
- * @return {string|string[]} The original value if it was not a single or multi-line array or the an array of the values from the array (multi-line arrays will have empty values removed)
+ * @return {null|string|string[]} The original value if it was not a single or multi-line array or the an array of the values from the array (multi-line arrays will have empty values removed)
  */
-export function splitValueIfSingleOrMultilineArray(value: string): string | string[] {
+export function splitValueIfSingleOrMultilineArray(value: string): null | string | string[] {
   if (value == null || value.length === 0) {
     return null;
   }
@@ -295,7 +687,7 @@ export function splitValueIfSingleOrMultilineArray(value: string): string | stri
       return null;
     }
 
-    const arrayItems = convertYAMLStringToArray(value, ',');
+    const arrayItems = convertYAMLStringToArray(value, ',') ?? [];
 
     return arrayItems.filter((el: string) => {
       return el != '';
@@ -310,7 +702,7 @@ export function splitValueIfSingleOrMultilineArray(value: string): string | stri
       return el != '';
     });
 
-    if (arrayItems == null || arrayItems.length === 0 ) {
+    if (arrayItems == null || arrayItems.length === 0) {
       return null;
     }
 
@@ -331,13 +723,13 @@ export function convertTagValueToStringOrStringArray(value: string | string[]): 
   }
 
   const tags: string[] = [];
-  let originalTagValues: string[] = [];
+  let originalTagValues: string[];
   if (Array.isArray(value)) {
     originalTagValues = value;
   } else if (value.includes(',')) {
-    originalTagValues = convertYAMLStringToArray(value, ',');
+    originalTagValues = convertYAMLStringToArray(value, ',') ?? [];
   } else {
-    originalTagValues = convertYAMLStringToArray(value, ' ');
+    originalTagValues = convertYAMLStringToArray(value, ' ') ?? [];
   }
 
   for (const tagValue of originalTagValues) {
@@ -354,13 +746,13 @@ export function convertTagValueToStringOrStringArray(value: string | string[]): 
  */
 export function convertAliasValueToStringOrStringArray(value: string | string[]): string[] {
   if (typeof value === 'string') {
-    return convertYAMLStringToArray(value, ',');
+    return convertYAMLStringToArray(value, ',') ?? [];
   }
 
   return value;
 }
 
-export function convertYAMLStringToArray(value: string, delimiter: string = ','): string[] {
+export function convertYAMLStringToArray(value: string, delimiter: string = ','): null | string[] {
   if (value == '' || value == null) {
     return null;
   }
@@ -381,7 +773,7 @@ export function convertYAMLStringToArray(value: string, delimiter: string = ',')
       currentItem = '';
     } else if (currentChar === '"' || currentChar === '\'') {
       // if there is an escape character check to see if there is a closing escape character and if so, skip to it as the next part of the value
-      const endOfEscapedValue = value.indexOf(currentChar, index+1);
+      const endOfEscapedValue = value.indexOf(currentChar, index + 1);
       if (endOfEscapedValue != -1) {
         currentItem += value.substring(index, endOfEscapedValue + 1);
         index = endOfEscapedValue;
@@ -428,7 +820,7 @@ export function escapeStringIfNecessaryAndPossible(value: string, defaultEscapeC
   }
 
   try {
-    const unescaped = parse(basicEscape) as string;
+    const unescaped = parse(basicEscape, { logLevel: 'error' }) as string;
     if (unescaped === value) {
       return basicEscape;
     }
@@ -494,7 +886,7 @@ export function getExactDisabledRuleValue(yaml_text: string): string[] {
 
   const parsed_yaml = loadYAML(disabledRulesKeyAndValue);
   let disabled_rules = (parsed_yaml as { 'disabled rules': string[] | string })[
-      'disabled rules'
+    'disabled rules'
   ];
   if (!disabled_rules) {
     return [];

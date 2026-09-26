@@ -6,6 +6,26 @@ ruleTest({
   RuleBuilderClass: MoveFootnotesToTheBottom,
   testCases: [
     {
+      testName: 'A footnote definition inside a fenced code block is not moved',
+      before: '[^hidden]\n\n```\n[^hidden]: code\n```\n\nAfter',
+      after: '[^hidden]\n\n```\n[^hidden]: code\n```\n\nAfter',
+    },
+    {
+      testName: 'A duplicate footnote key inside a code block does not count as a definition',
+      before: '[^a]\n\n```\n[^a]: hidden\n```\n\n[^a]: visible\n\nAfter',
+      after: '[^a]\n\n```\n[^a]: hidden\n```\n\nAfter\n\n[^a]: visible',
+    },
+    {
+      testName: 'Backward reference discovery continues past inline code',
+      before: '[^a] [^b] `[^a]`\n\n[^b]: second\n[^a]: first',
+      after: '[^a] [^b] `[^a]`\n\n[^a]: first\n[^b]: second',
+    },
+    {
+      testName: 'Interspersed definitions do not shift protected reference discovery',
+      before: '[^a]\n\n[^a]: first\n\n```\n[^b]\n```\n\n[^b]\n\n[^b]: second\n\nAfter',
+      after: '[^a]\n\n```\n[^b]\n```\n\n[^b]\n\nAfter\n\n[^a]: first\n[^b]: second',
+    },
+    {
       testName: 'Simple case',
       before: dedent`
         This has a footnote reference at the end [^alpha]
@@ -304,6 +324,121 @@ ruleTest({
         [^2]: [2222](222)
         [^3]: [3333](333)
       `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1392
+      testName: 'Moving footnotes to the bottom of the file when including blank lines between footnotes should not change a file with footnotes at the end with blank lines between them already',
+      before: dedent`
+        This is the first footnote.[^1] This is the second.[^2]
+        ${''}
+        [^1]: Hey, I am a footnote!
+        ${''}
+        [^2]: Me too!
+      `,
+      after: dedent`
+        This is the first footnote.[^1] This is the second.[^2]
+        ${''}
+        [^1]: Hey, I am a footnote!
+        ${''}
+        [^2]: Me too!
+      `,
+      options: {
+        includeBlankLineBetweenFootnotes: true,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1481
+      testName: 'Moving footnotes to the bottom of the file when the file is empty should not add a blank line',
+      before: dedent``,
+      after: dedent``,
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/1481
+      testName: 'Moving footnotes to the bottom of the file when the file has no footnotes should not add a blank line',
+      before: dedent`
+        Here is some content
+      `,
+      after: dedent`
+        Here is some content
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1439
+      testName: 'Moving footnotes to the bottom preserves inline code values in the body when footnotes are interspersed',
+      before: dedent`
+        Here is \`first code\` in the body.[^1]
+        ${''}
+        [^1]: Footnote one.
+        ${''}
+        Here is \`second code\` in the body.[^2]
+        ${''}
+        [^2]: Footnote two.
+      `,
+      after: dedent`
+        Here is \`first code\` in the body.[^1]
+        ${''}
+        Here is \`second code\` in the body.[^2]
+        ${''}
+        [^1]: Footnote one.
+        [^2]: Footnote two.
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1439
+      testName: 'Moving footnotes to the bottom preserves inline code values inside footnotes',
+      before: dedent`
+        Body text.[^1]
+        ${''}
+        [^1]: Footnote with \`code inside\`.
+        ${''}
+        More body text.
+      `,
+      after: dedent`
+        Body text.[^1]
+        ${''}
+        More body text.
+        ${''}
+        [^1]: Footnote with \`code inside\`.
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1439
+      testName: 'Moving footnotes to the bottom does not mix inline code between body and footnotes with multiple occurrences',
+      before: dedent`
+        Body has \`alpha\` and \`beta\`.[^1]
+        ${''}
+        [^1]: Footnote has \`gamma\`.
+        ${''}
+        More body has \`delta\`.[^2]
+        ${''}
+        [^2]: Another footnote has \`epsilon\`.
+      `,
+      after: dedent`
+        Body has \`alpha\` and \`beta\`.[^1]
+        ${''}
+        More body has \`delta\`.[^2]
+        ${''}
+        [^1]: Footnote has \`gamma\`.
+        [^2]: Another footnote has \`epsilon\`.
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1439
+      testName: 'Moving footnotes to the bottom does not mix inline code between body and footnotes when includeBlankLineBetweenFootnotes is true',
+      before: dedent`
+        Body has \`body-code\`.[^1]
+        ${''}
+        [^1]: Footnote has \`footnote-code-1\`.
+        ${''}
+        More body.[^2]
+        ${''}
+        [^2]: Another footnote has \`footnote-code-2\`.
+      `,
+      after: dedent`
+        Body has \`body-code\`.[^1]
+        ${''}
+        More body.[^2]
+        ${''}
+        [^1]: Footnote has \`footnote-code-1\`.
+        ${''}
+        [^2]: Another footnote has \`footnote-code-2\`.
+      `,
+      options: {
+        includeBlankLineBetweenFootnotes: true,
+      },
     },
   ],
 });

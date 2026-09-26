@@ -5,6 +5,11 @@ on:
     tags:
       - "*"
 
+permissions:
+  id-token: write
+  contents: write
+  attestations: write
+
 env:
   PLUGIN_NAME: obsidian-linter
 
@@ -18,13 +23,20 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "16.x"
+          node-version: "20.19.x"
 
       - name: Build plugin and minfy css
         run: |
           npm ci
           npm run build
           npm run minify-css
+      
+      - name: Generate artifact attestation
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            main.js
+            styles.css
 
       - name: Create Manual Install Zip
         run: |
@@ -32,14 +44,27 @@ jobs:
           cp main.js manifest.json styles.css src/utils/default-misspellings.md ${{ env.PLUGIN_NAME }}
           zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
 
+      - name: Run Obsidain scanner checks
+        uses: obsidianmd/obsidian-workflows@v1
+        with:
+          mode: pr
+          scanner-lint: true
+          node-version: "20.19.x"
+
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
 
+          prerelease=""
+          if [[ "$tag" == *-rc* ]]; then
+            prerelease="--prerelease"
+          fi
+
           gh release create "$tag" \
             --title="$tag" \
             --generate-notes \
             --draft \
+            $prerelease \
             main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}.zip

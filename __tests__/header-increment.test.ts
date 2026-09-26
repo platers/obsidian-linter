@@ -6,6 +6,16 @@ ruleTest({
   RuleBuilderClass: HeaderIncrement,
   testCases: [
     {
+      testName: 'Does not count or rewrite headings inside fenced code',
+      before: '```\n# inside heading\n```\n### outside heading',
+      after: '```\n# inside heading\n```\n# outside heading',
+    },
+    {
+      testName: 'Does not count or rewrite headings inside disabled sections',
+      before: '<!-- linter-disable -->\n# inside heading\n<!-- linter-enable -->\n\n### outside heading',
+      after: '<!-- linter-disable -->\n# inside heading\n<!-- linter-enable -->\n\n# outside heading',
+    },
+    {
       testName: 'Handles large increments',
       before: dedent`
         # H1

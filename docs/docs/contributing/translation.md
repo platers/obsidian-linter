@@ -65,8 +65,6 @@ export default {
       'paste': 'Paste Settings',
       'debug': 'Debug Settings',
     },
-    // tab-searcher.ts
-    'default-search-bar-text': 'Search all settings',
     'general': {...},
     'debug': {...},
   },

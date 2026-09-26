@@ -1,7 +1,7 @@
-import {calloutRegex, codeBlockBlockquoteRegex} from './regex';
-import {getTextInLanguage} from '../lang/helpers';
-import {logWarn} from './logger';
-import {getAllTablesInText} from './mdast';
+import { calloutRegex, codeBlockBlockquoteRegex } from './regex';
+import { getTextInLanguage } from '../lang/helpers';
+import { logWarn } from './logger';
+import { getAllTablesInText } from './mdast';
 /**
  * Inserts a string at the given position in a string.
  * @param {string} str - The string to insert into
@@ -23,6 +23,35 @@ export function insert(str: string, index: number, value: string): string {
  */
 export function replaceTextBetweenStartAndEndWithNewValue(str: string, start: number, end: number, value: string): string {
   return str.substring(0, start) + value + str.substring(end);
+}
+
+export type textReplacement = { startIndex: number, endIndex: number, value: string }
+
+/**
+ * Applies every replacement to the string in one pass.
+ *
+ * Replacing ranges one at a time copies the whole string for each replacement, which gets
+ * expensive quickly on a large file with a lot of matches. The replacements must be in ascending
+ * order and must not overlap, and their positions are all relative to the string as passed in.
+ * @param {string} str The string to replace values in
+ * @param {textReplacement[]} replacements The replacements to apply, ascending and non-overlapping
+ * @return {string} The string with every replacement applied
+ */
+export function replaceTextRanges(str: string, replacements: textReplacement[]): string {
+  if (replacements.length === 0) {
+    return str;
+  }
+
+  const segments: string[] = [];
+  let startOfNextSegment = 0;
+  for (const replacement of replacements) {
+    segments.push(str.substring(startOfNextSegment, replacement.startIndex), replacement.value);
+    startOfNextSegment = replacement.endIndex;
+  }
+
+  segments.push(str.substring(startOfNextSegment));
+
+  return segments.join('');
 }
 
 /**
@@ -155,7 +184,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
   }
 
   const indexOfLastNewLine = text.lastIndexOf('\n', startOfNewContent - 1);
-  let priorLine = '';
+  let priorLine: string;
   if (indexOfLastNewLine === -1) {
     priorLine = text.substring(0, startOfNewContent);
   } else {
@@ -163,7 +192,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
   }
 
   let firstLineOfBlockquote: string;
-  const indexOfEndOfFirstLine = text.indexOf('\n', startOfContent+1);
+  const indexOfEndOfFirstLine = text.indexOf('\n', startOfContent + 1);
   if (indexOfEndOfFirstLine === -1) {
     firstLineOfBlockquote = text.substring(startOfContent);
   } else {
@@ -281,7 +310,7 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
   }
 
   const indexOfSecondNewLineAfterContent = text.indexOf('\n', endOfNewContent + 1);
-  let nextLine = '';
+  let nextLine: string;
   if (indexOfSecondNewLineAfterContent === -1) {
     nextLine = text.substring(endOfNewContent);
   } else {
@@ -289,11 +318,11 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
   }
 
   let lastLineOfBlockquote: string;
-  const indexOfEndOfLastLine = text.lastIndexOf('\n', endOfContent-1);
+  const indexOfEndOfLastLine = text.lastIndexOf('\n', endOfContent - 1);
   if (indexOfEndOfLastLine === -1) {
     lastLineOfBlockquote = text.substring(0, endOfNewContent);
   } else {
-    lastLineOfBlockquote = text.substring(indexOfEndOfLastLine+1, endOfContent);
+    lastLineOfBlockquote = text.substring(indexOfEndOfLastLine + 1, endOfContent);
   }
 
   let emptyLine: string;
@@ -304,9 +333,13 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     // we can change this to the necessary implementation when this scenario is encountered
     emptyLine = text.substring(endOfContent, endOfNewContent).trimEnd();
   } else {
-    emptyLine = getEmptyLine(nextLine);
+    // we need to make sure that the next line is not a callout. If it is, then we need to use the current line instead of the next line (see https://github.com/platers/obsidian-linter/issues/1596)
+    if (nextLine.match(calloutRegex)) {
+      emptyLine = getEmptyLine(startOfLine);
+    } else {
+      emptyLine = getEmptyLine(nextLine);
+    }
   }
-
 
   return text.substring(0, endOfContent) + emptyLine + text.substring(endOfNewContent);
 }
@@ -359,14 +392,14 @@ export function hashString53Bit(str: string, seed: number = 0): number {
 }
 
 /**
- * Takes a string and converts string that have the string escaped form of escape characters such as new line, backspace,
+ * Takes a string and converts string that have the string escaped form of escape characters such as new line,
  * form feed, carriage return, horizontal tab, and vertical tab and makes sure they are their escaped character values.
  * @param {string} val - The string to make sure has the escape characters as escape characters rather than a stringified form.
  * @return {string} The string with the escape characters converted to their escape character form.
  */
 export function convertStringVersionOfEscapeCharactersToEscapeCharacters(val: string): string {
-  // replace string version of backspace character with the actual backspace character
-  val = val.replaceAll('\\b', '\b');
+  // replace string version of escaped \ with the single instance of \
+  val = val.replaceAll('\\\\', '\\');
   // replace string version of form feed character with the actual form feed character
   val = val.replaceAll('\\f', '\f');
   // replace string version of new line character with the actual new line character
@@ -408,7 +441,7 @@ export function replaceAt(text: string, search: string, replace: string, start: 
   }
 
   return text.slice(0, start) +
-      text.slice(start, text.length).replace(search, replace);
+    text.slice(start, text.length).replace(search, replace);
 }
 
 // based on https://stackoverflow.com/a/21730166/8353749
@@ -432,7 +465,7 @@ export function isNumeric(str: string) {
   const type = typeof str;
   if (type != 'string') return type === 'number'; // we only process strings so if the value is not already a number the result is false
   return !isNaN(str as unknown as number) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-         !isNaN(parseFloat(str)); // ...and ensure strings of whitespace fail
+    !isNaN(parseFloat(str)); // ...and ensure strings of whitespace fail
 }
 
 export function getSubstringIndex(substring: string, text: string): number[] {
@@ -447,8 +480,8 @@ export function getSubstringIndex(substring: string, text: string): number[] {
 
 function getIndexOfStartOfFirstNonEmptyLine(text: string, currentStartOfBlockquote: number, blockquoteLevel: number): number {
   let actualStartOfBlockquote = currentStartOfBlockquote;
-  let blockquoteIndex = currentStartOfBlockquote+1;
-  let currentChar = '';
+  let blockquoteIndex = currentStartOfBlockquote + 1;
+  let currentChar: string;
   let foundNewStart = false;
   let level = 0;
   while (blockquoteIndex < text.length) {
@@ -479,8 +512,8 @@ function getIndexOfStartOfFirstNonEmptyLine(text: string, currentStartOfBlockquo
 
 function getIndexOfEndOfLastNonEmptyLine(text: string, currentEndOfBlockquote: number, blockquoteLevel: number): number {
   let actualEndOfBlockquote = currentEndOfBlockquote;
-  let blockquoteIndex = currentEndOfBlockquote-1;
-  let currentChar = '';
+  let blockquoteIndex = currentEndOfBlockquote - 1;
+  let currentChar: string;
   let foundNewEnd = false;
   let level = 0;
   while (blockquoteIndex >= 0) {
@@ -513,9 +546,9 @@ export function parseCustomReplacements(text: string): Map<string, string> {
   const tableInfo = getAllTablesInText(text);
   const customReplacements = new Map<string, string>();
 
-  let tableContent = '';
-  let tableRows = [] as string[];
-  let rowParts = [] as string[];
+  let tableContent: string;
+  let tableRows: string[];
+  let rowParts: string[];
   for (const table of tableInfo) {
     tableContent = text.substring(table.startIndex, table.endIndex);
     tableRows = tableContent.split('\n');
@@ -534,4 +567,38 @@ export function parseCustomReplacements(text: string): Map<string, string> {
   }
 
   return customReplacements;
+}
+
+/**
+ * Escapes the markdown special characters in the provided text.
+ *
+ * @param {string} text The text to escape the markdown special characters in.
+ * @return {string} The text with the markdown special characters escaped.
+ *
+ * @example
+ * ```ts
+ * escapeMarkdownSpecialCharacters('Escape [_]'); // Escape \[\_\]
+ * ```
+ */
+export function escapeMarkdownSpecialCharacters(text: string): string {
+  return text.replace(/[\\[\]<>_*~=`$]/g, '\\$&');
+}
+
+/**
+ * Unescapes the markdown special characters in the provided text.
+ *
+ * @param {string} text - The text to unescape the markdown special characters in.
+ * @return {string} The text with the markdown special characters unescaped.
+ *
+ * @example
+ * ```ts
+ * unescapeMarkdownSpecialCharacters('Escape \\[\\_\\]'); // Escape [_]
+ * ```
+ */
+export function unescapeMarkdownSpecialCharacters(text: string): string {
+  return text.replace(/(\\+)([!"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~])/g, (_, backslashes: string, specialChar) => {
+    const backslashCount = backslashes.length;
+    const keepCount = Math.floor(backslashCount / 2);
+    return '\\'.repeat(keepCount) + specialChar;
+  });
 }

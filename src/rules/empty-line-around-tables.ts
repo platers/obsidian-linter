@@ -3,6 +3,10 @@ import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {IgnoreTypes} from '../utils/ignore-types';
 import {ensureEmptyLinesAroundTables} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
+import {getEditsBetween} from '../utils/text-edits';
 
 class EmptyLineAroundTablesOptions implements Options {}
 
@@ -19,8 +23,19 @@ export default class EmptyLineAroundTables extends RuleBuilder<EmptyLineAroundTa
   get OptionsClass(): new () => EmptyLineAroundTablesOptions {
     return EmptyLineAroundTablesOptions;
   }
-  apply(text: string, options: EmptyLineAroundTablesOptions): string {
-    return ensureEmptyLinesAroundTables(text);
+  apply(text: string, options: EmptyLineAroundTablesOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    // Table discovery and surrounding-line decisions are lexical; neither parses the projection.
+    const projectedText = ensureEmptyLinesAroundTables(projection.text);
+    const replacements: textReplacement[] = [];
+    for (const edit of getEditsBetween(projection.text, projectedText)) {
+      const range = projection.editRangeToSource(edit);
+      if (range) {
+        replacements.push({...range, value: edit.value});
+      }
+    }
+
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<EmptyLineAroundTablesOptions>[] {
     return [

@@ -19,6 +19,11 @@ declare module 'obsidian' {
       appContainerEl: HTMLElement;
     };
     workspace: Workspace;
+    viewRegistry: ViewRegistry
+  }
+
+  interface ViewRegistry {
+    unregisterView(type: string): void
   }
 
   interface Workspace {
@@ -53,15 +58,15 @@ declare module 'obsidian' {
     /**
      * @public
      */
-    getState(): any;
+    getState(): Record<string, unknown>;
 
     /**
      * @public
      */
-    setState(state: any, result: ViewStateResult): Promise<void>;
+    setState(state: unknown, result: ViewStateResult): Promise<void>;
   }
 
-  export interface ViewStateResult {
+  interface ViewStateResult {
     /**
      * Set this to true to indicate that there is a state change which should be recorded in the navigation history.
      * @public
@@ -74,6 +79,18 @@ declare module 'obsidian' {
      * CodeMirror editor instance
      */
     cm?: EditorView;
+  }
+
+  interface WorkspaceLeaf{
+    rebuildView(): Promise<void>;
+  }
+
+  interface Modal {
+    headerEl: HTMLElement;
+  }
+
+  interface ButtonComponent {
+    setLoading?: (v: boolean) => void
   }
 }
 

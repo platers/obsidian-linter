@@ -3,6 +3,10 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {lineStartingWithWhitespaceOrBlockquoteTemplate} from '../utils/regex';
+import {ProtectedRanges} from '../utils/protected-ranges';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
+import {getEditsBetween} from '../utils/text-edits';
 
 class RemoveEmptyListMarkersOptions implements Options {}
 
@@ -19,14 +23,28 @@ export default class RemoveEmptyListMarkers extends RuleBuilder<RemoveEmptyListM
   get OptionsClass(): new () => RemoveEmptyListMarkersOptions {
     return RemoveEmptyListMarkersOptions;
   }
-  apply(text: string, options: RemoveEmptyListMarkersOptions): string {
+  apply(text: string, options: RemoveEmptyListMarkersOptions, protectedRanges: ProtectedRanges): string {
+    const projection = protectedRanges.projection();
+    let projectedText = projection.text;
     const emptyListMarkerRegex = new RegExp(`^${lineStartingWithWhitespaceOrBlockquoteTemplate}(-|\\*|\\+|\\d+[.)]|- (\\[(.)\\]))\\s*?$`, 'gm');
     // remove all empty list markers followed by a new line
-    text = text.replace(new RegExp(emptyListMarkerRegex.source + '\\n', 'gm'), '');
+    projectedText = projectedText.replace(new RegExp(emptyListMarkerRegex.source + '\\n', 'gm'), '');
     // remove all empty list markers proceeded by a new line
-    text = text.replace(new RegExp('\\n' + emptyListMarkerRegex.source, 'gm'), '');
+    projectedText = projectedText.replace(new RegExp('\\n' + emptyListMarkerRegex.source, 'gm'), '');
     // remove all empty list markers where they are the only line in the file
-    return text.replace(emptyListMarkerRegex, '');
+    projectedText = projectedText.replace(emptyListMarkerRegex, '');
+
+    // The passes consume each other's newlines. Map their net deletions, not overlapping matches
+    // collected against the initial text, and never copy the projection's tokens into the source.
+    const replacements: textReplacement[] = [];
+    for (const edit of getEditsBetween(projection.text, projectedText)) {
+      const range = projection.editRangeToSource(edit);
+      if (range) {
+        replacements.push({...range, value: edit.value});
+      }
+    }
+
+    return applyNonOverlappingReplacements(text, replacements);
   }
   get exampleBuilders(): ExampleBuilder<RemoveEmptyListMarkersOptions>[] {
     return [

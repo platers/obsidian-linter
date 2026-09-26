@@ -1,6 +1,6 @@
 import EmptyLineAroundBlockquotes from '../src/rules/empty-line-around-blockquotes';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
+import { ruleTest } from './common';
 
 ruleTest({
   RuleBuilderClass: EmptyLineAroundBlockquotes,
@@ -261,6 +261,24 @@ ruleTest({
         >> 2
         ${''}
         > 4
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1371
+      testName: 'Make sure a nested callout is properly handled with a blank line being added before and after it',
+      before: dedent`
+        > [!quote]
+        > Text
+        > > [!quote]
+        > > Text
+        > Text
+      `,
+      after: dedent`
+        > [!quote]
+        > Text
+        >
+        > > [!quote]
+        > > Text
+        > Text
       `,
     },
   ],

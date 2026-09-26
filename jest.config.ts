@@ -1,21 +1,20 @@
-process.env.TZ = 'UTC'; // eslint-disable-line no-undef
+process.env.TZ = 'UTC';  
 
 // jest.config.ts
 import type {Config} from '@jest/types';
 
 // Sync object
 const config: Config.InitialOptions = {
+  maxWorkers: 5,
+
   transformIgnorePatterns: [
     '"/node_modules/(?!unified-lint-rule)',
   ],
   testMatch: [
-    '**/__tests__/**/*.[jt]s?(x)',
-    '**/?(*.)+(spec|test).[jt]s?(x)',
+    '**/__tests__/**/*.ts',
     '!**/__tests__/common.ts',
-    '!**/__integration__/*.[jt]s?(x)',
-    '!**/test-vault/**/*.[jt]s?(x)',
+    '!**/__integration__/*.ts?(x)',
+    '!**/test-vault/**/*.ts?(x)',
   ],
-  // try to fix memory issues with jest when the UTs run
-  workerIdleMemoryLimit: '200MB',
 };
 export default config;

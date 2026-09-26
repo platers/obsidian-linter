@@ -3,7 +3,9 @@ import {Options, RuleType} from '../rules';
 import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase} from './rule-builder';
 import dedent from 'ts-dedent';
 import {smartDoubleQuoteRegex, smartSingleQuoteRegex, unicodeLetterRegex} from '../utils/regex';
-import {replaceTextBetweenStartAndEndWithNewValue, getSubstringIndex} from '../utils/strings';
+import {textReplacement} from '../utils/strings';
+import {applyNonOverlappingReplacements} from '../utils/text-edits';
+import {collectUnprotectedRegexReplacements, ProtectedRanges, redactProtected} from '../utils/protected-ranges';
 
 export enum SingleQuoteStyles {
   Straight = '\'\'',
@@ -29,84 +31,80 @@ export default class QuoteStyle extends RuleBuilder<QuoteStyleOptions> {
       nameKey: 'rules.quote-style.name',
       descriptionKey: 'rules.quote-style.description',
       type: RuleType.CONTENT,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.templaterCommand, IgnoreTypes.image],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.inlineMath, IgnoreTypes.html, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.templaterCommand, IgnoreTypes.image],
     });
   }
   get OptionsClass(): new () => QuoteStyleOptions {
     return QuoteStyleOptions;
   }
-  apply(text: string, options: QuoteStyleOptions): string {
-    let newText = text;
+  apply(text: string, options: QuoteStyleOptions, protectedRanges: ProtectedRanges): string {
+    const replacements: textReplacement[] = [];
     if (options.doubleQuoteStyleEnabled) {
       if (options.doubleQuoteStyle === DoubleQuoteStyles.Straight) {
-        newText = this.convertSmartDoubleQuotesToStraightQuotes(newText);
+        replacements.push(...this.collectSmartQuotesToStraightQuotes(text, smartDoubleQuoteRegex, '"', protectedRanges));
       } else {
-        newText = this.convertStraightQuoteToSmartQuote(newText, '"', DoubleQuoteStyles.SmartQuote[0], DoubleQuoteStyles.SmartQuote[1], false);
+        replacements.push(...this.collectStraightQuoteToSmartQuoteReplacements(text, '"', DoubleQuoteStyles.SmartQuote[0], DoubleQuoteStyles.SmartQuote[1], false, protectedRanges));
       }
     }
 
     if (options.singleQuoteStyleEnabled) {
       if (options.singleQuoteStyle === SingleQuoteStyles.Straight) {
-        newText = this.convertSmartSingleQuotesToStraightQuotes(newText);
+        replacements.push(...this.collectSmartQuotesToStraightQuotes(text, smartSingleQuoteRegex, '\'', protectedRanges));
       } else {
-        newText = this.convertStraightQuoteToSmartQuote(newText, '\'', SingleQuoteStyles.SmartQuote[0], SingleQuoteStyles.SmartQuote[1], true);
+        replacements.push(...this.collectStraightQuoteToSmartQuoteReplacements(text, '\'', SingleQuoteStyles.SmartQuote[0], SingleQuoteStyles.SmartQuote[1], true, protectedRanges));
       }
     }
 
-    return newText;
+    // The two quote families are disjoint, and converting either one does not change the
+    // letter/whitespace classification used by the other, so both read the original text.
+    return applyNonOverlappingReplacements(text, replacements);
   }
-  convertSmartSingleQuotesToStraightQuotes(text: string): string {
-    return text.replace(smartSingleQuoteRegex, '\'');
+  collectSmartQuotesToStraightQuotes(text: string, regex: RegExp, straightQuote: string, protectedRanges: ProtectedRanges): textReplacement[] {
+    const replacement = (match: RegExpMatchArray, startIndex: number): textReplacement => ({startIndex, endIndex: startIndex + match[0].length, value: straightQuote});
+    return collectUnprotectedRegexReplacements(text, regex, protectedRanges, {editRange: replacement, guardRange: replacement});
   }
-  convertSmartDoubleQuotesToStraightQuotes(text: string): string {
-    return text.replace(smartDoubleQuoteRegex, '"');
-  }
-  convertStraightQuoteToSmartQuote(text: string, straightQuote: string, openingSmartQuote: string, closingSmartQuote: string, isForSingleQuotes: boolean): string {
-    const indices = getSubstringIndex(straightQuote, text);
-    if (indices.length === 0) {
-      return text;
-    }
-
-    const endOfText = text.length - 1;
+  collectStraightQuoteToSmartQuoteReplacements(text: string, straightQuote: string, openingSmartQuote: string, closingSmartQuote: string, isForSingleQuotes: boolean, protectedRanges: ProtectedRanges): textReplacement[] {
     let quoteReplacement: string;
-    let previousChar = '';
-    let nextChar = '';
-    let previousCharIsALetter = false;
-    let nextCharIsALetter = false;
-    let previousCharIsWhitespace = false;
-    let nextCharIsWhitespace = false;
-    let isContraction = false;
+    let previousChar: string;
+    let nextChar: string;
+    let previousCharIsALetter: boolean;
+    let nextCharIsALetter: boolean;
+    let previousCharIsWhitespace: boolean;
+    let nextCharIsWhitespace: boolean;
+    let isContraction: boolean;
     let previousQuote = '';
-    for (const index of indices) {
-      previousChar = index == 0 ? '' : text.charAt(index - 1);
-      nextChar = index === endOfText ? '' : text.charAt(index + 1);
-      previousCharIsALetter = unicodeLetterRegex.test(previousChar);
-      nextCharIsALetter = unicodeLetterRegex.test(nextChar);
-      isContraction = previousCharIsALetter && nextCharIsALetter;
-      previousCharIsWhitespace = previousChar != '' && previousChar.trim() === '';
-      nextCharIsWhitespace = nextChar != '' && nextChar.trim() === '';
-      if (isContraction && isForSingleQuotes) {
-        quoteReplacement = closingSmartQuote;
-      } else if (nextCharIsWhitespace && !previousCharIsWhitespace) {
-        quoteReplacement = closingSmartQuote;
-        previousQuote = quoteReplacement;
-      } else if (previousCharIsWhitespace && !nextCharIsWhitespace) {
-        quoteReplacement = openingSmartQuote;
-        previousQuote = quoteReplacement;
-      } else { // this case is meant for languages that do not have a concept of letters like Japanese or Chinese or in the case that we have a scenario where no non-whitespace surrounding the quote
-        if (previousQuote === '' || previousQuote === closingSmartQuote) {
-          quoteReplacement = openingSmartQuote;
-        } else {
+    return collectUnprotectedRegexReplacements(text, new RegExp(straightQuote, 'g'), protectedRanges, {
+      // A placeholder contains no quotes, so protected quotes must not update previousQuote.
+      guardRange: (match, index) => ({startIndex: index, endIndex: index + match[0].length}),
+      editRange: (match, index) => {
+        previousChar = redactProtected(text, protectedRanges, Math.max(0, index - 1), index).slice(-1);
+        nextChar = redactProtected(text, protectedRanges, index + 1, Math.min(text.length, index + 2)).charAt(0);
+        previousCharIsALetter = unicodeLetterRegex.test(previousChar);
+        nextCharIsALetter = unicodeLetterRegex.test(nextChar);
+        isContraction = previousCharIsALetter && nextCharIsALetter;
+        previousCharIsWhitespace = previousChar != '' && previousChar.trim() === '';
+        nextCharIsWhitespace = nextChar != '' && nextChar.trim() === '';
+        if (isContraction && isForSingleQuotes) {
           quoteReplacement = closingSmartQuote;
+        } else if (nextCharIsWhitespace && !previousCharIsWhitespace) {
+          quoteReplacement = closingSmartQuote;
+          previousQuote = quoteReplacement;
+        } else if (previousCharIsWhitespace && !nextCharIsWhitespace) {
+          quoteReplacement = openingSmartQuote;
+          previousQuote = quoteReplacement;
+        } else { // this case is meant for languages that do not have a concept of letters like Japanese or Chinese or in the case that we have a scenario where no non-whitespace surrounding the quote
+          if (previousQuote === '' || previousQuote === closingSmartQuote) {
+            quoteReplacement = openingSmartQuote;
+          } else {
+            quoteReplacement = closingSmartQuote;
+          }
+
+          previousQuote = quoteReplacement;
         }
 
-        previousQuote = quoteReplacement;
-      }
-
-      text = replaceTextBetweenStartAndEndWithNewValue(text, index, index + 1, quoteReplacement);
-    }
-
-    return text;
+        return {startIndex: index, endIndex: index + 1, value: quoteReplacement};
+      },
+    });
   }
   get exampleBuilders(): ExampleBuilder<QuoteStyleOptions>[] {
     return [

@@ -146,5 +146,28 @@ ruleTest({
         > $$
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1396
+      testName: 'Math indicators in indented blockquotes should not have unnecessary blank lines added',
+      before: dedent`
+        ${' '}> [!important]
+        ${' '}>
+        ${' '}> $$
+        ${' '}> f(x)
+        ${' '}> $$
+
+        ${'  '}> $$f(x)$$
+      `,
+      after: dedent`
+        ${' '}> [!important]
+        ${' '}>
+        ${' '}> $$
+        ${' '}> f(x)
+        ${' '}> $$
+
+        ${'  '}> $$
+        ${'  '}> f(x)
+        ${'  '}> $$
+      `,
+    },
   ],
 });
