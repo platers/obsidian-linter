@@ -1,11 +1,11 @@
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder, TextOptionBuilder} from './rule-builder';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder, TextOptionBuilder } from './rule-builder';
 import dedent from 'ts-dedent';
-import {IgnoreTypes} from '../utils/ignore-types';
-import {allHeadersRegex, escapeRegExp, whitespaceSplitterRegex} from '../utils/regex';
-import {ProtectedRanges} from '../utils/protected-ranges';
-import {textReplacement} from '../utils/strings';
-import {applyNonOverlappingReplacements} from '../utils/text-edits';
+import { IgnoreTypes } from '../utils/ignore-types';
+import { allHeadersRegex, escapeRegExp, whitespaceSplitterRegex } from '../utils/regex';
+import { ProtectedRanges } from '../utils/protected-ranges';
+import { textReplacement } from '../utils/strings';
+import { applyNonOverlappingReplacements } from '../utils/text-edits';
 import { noWhitespace } from '../utils/validation';
 
 type Style = 'Title Case' | 'ALL CAPS' | 'First letter';
@@ -336,10 +336,15 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
     const projection = protectedRanges.projection();
     const replacements: textReplacement[] = [];
     for (const match of projection.text.matchAll(allHeadersRegex)) {
+      // skip empty headers as there is nothing to capitalize (see https://github.com/platers/obsidian-linter/issues/1531)
+      if (!match[4] || match[4].trim() == '') {
+        continue
+      }
+
       const addReplacement = (startIndex: number, endIndex: number, value: string) => {
-        const range = projection.editRangeToSource({startIndex: match.index + startIndex, endIndex: match.index + endIndex});
+        const range = projection.editRangeToSource({ startIndex: match.index + startIndex, endIndex: match.index + endIndex });
         if (range && text.substring(range.startIndex, range.endIndex) !== value) {
-          replacements.push({...range, value});
+          replacements.push({ ...range, value });
         }
       };
       if (options.style === 'ALL CAPS') {

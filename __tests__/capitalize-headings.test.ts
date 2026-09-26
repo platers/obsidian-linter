@@ -1,6 +1,6 @@
 import CapitalizeHeadings from '../src/rules/capitalize-headings';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
+import { ruleTest } from './common';
 
 ruleTest({
   RuleBuilderClass: CapitalizeHeadings,
@@ -19,7 +19,7 @@ ruleTest({
       testName: 'Uppercases heading text without changing ignored constructs or expanding their casing',
       before: '# straße `mixed ß` [[mixed]] [mixed](url) #mixed',
       after: '# STRASSE `mixed ß` [[mixed]] [mixed](url) #mixed',
-      options: {style: 'ALL CAPS'},
+      options: { style: 'ALL CAPS' },
     },
     {
       testName: 'Leaves backticks spanning a heading and the following line unchanged',
@@ -256,6 +256,18 @@ ruleTest({
         # Long Way (Known Good)
         # 'Twas the Night before Christmas
         # (Here's a Heading with Nested "Ignored Characters")
+      `,
+      options: {
+        style: 'Title Case',
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1531
+      testName: 'Make sure that blank headers are left alone when capitalize headings runs since there is nothing for the logic to do',
+      before: dedent`
+        #${' '}
+      `,
+      after: dedent`
+        #${' '}
       `,
       options: {
         style: 'Title Case',
