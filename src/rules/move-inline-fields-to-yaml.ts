@@ -58,16 +58,17 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
       nameKey: 'rules.move-inline-fields-to-yaml.name',
       descriptionKey: 'rules.move-inline-fields-to-yaml.description',
       type: RuleType.YAML,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html],
+      // Dataview scopes fields on list items and tasks to the list item, so those are always left alone.
+      // Tables and comments are left alone as removing a line from them would change their contents.
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.inlineMath, IgnoreTypes.html, IgnoreTypes.list, IgnoreTypes.table, IgnoreTypes.obsidianMultiLineComments],
     });
   }
   get OptionsClass(): new () => MoveInlineFieldsToYamlOptions {
     return MoveInlineFieldsToYamlOptions;
   }
   apply(text: string, options: MoveInlineFieldsToYamlOptions, protectedRanges: ProtectedRanges): string {
-    // Dataview scopes fields on list items and tasks to the list item, so those are always left alone.
-    // Tables and comments are left alone as removing a line from them would change their contents.
-    const bodyProtectedRanges = protectedRanges.combinedWith([IgnoreTypes.yaml, IgnoreTypes.list, IgnoreTypes.table, IgnoreTypes.obsidianMultiLineComments]);
+    // the frontmatter is updated below, so it is only left alone when looking for fields
+    const bodyProtectedRanges = protectedRanges.combinedWith([IgnoreTypes.yaml]);
     const fields = this.getInlineFields(text, bodyProtectedRanges, options);
     if (fields.length === 0) {
       return text;
