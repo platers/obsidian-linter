@@ -26,7 +26,7 @@ type ExistingKeyOperations = 'Skip' | 'Merge into list' | 'Overwrite';
 class MoveInlineFieldsToYamlOptions implements Options {
   howToHandleBracketedFields?: BracketedFieldOperations = 'Leave in place';
   howToHandleExistingKeys?: ExistingKeyOperations = 'Skip';
-  keysToIgnore?: string[] = [];
+  inlineKeysToIgnore?: string[] = [];
   @RuleBuilder.noSettingControl()
     defaultEscapeCharacter?: QuoteCharacter = '"';
 }
@@ -162,7 +162,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
             for (const field of bracketedFields) {
               const startIndex = lineStartIndex + field.start;
               const endIndex = lineStartIndex + field.end;
-              if (field.key === '' || options.keysToIgnore.includes(field.key) || protectedRanges.isProtected(startIndex, endIndex)) {
+              if (field.key === '' || options.inlineKeysToIgnore.includes(field.key) || protectedRanges.isProtected(startIndex, endIndex)) {
                 continue;
               }
 
@@ -171,7 +171,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
           }
         } else {
           const field = extractFullLineField(line);
-          if (field != null && field.key !== '' && !options.keysToIgnore.includes(field.key) && !protectedRanges.isProtected(lineStartIndex, lineEndIndex)) {
+          if (field != null && field.key !== '' && !options.inlineKeysToIgnore.includes(field.key) && !protectedRanges.isProtected(lineStartIndex, lineEndIndex)) {
             fields.push({key: field.key, value: field.value, startIndex: lineStartIndex, endIndex: lineEndIndex, lineStartIndex, lineEndIndex, isBracketed: false});
           }
         }
@@ -463,7 +463,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
         },
       }),
       new ExampleBuilder({
-        description: 'Leaves fields alone when their key is in `Keys to ignore = \'related\'`',
+        description: 'Leaves fields alone when their key is in `Inline keys to ignore = \'related\'`',
         before: dedent`
           related:: [[Another note]]
           topic:: linting
@@ -475,7 +475,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
           related:: [[Another note]]
         `,
         options: {
-          keysToIgnore: ['related'],
+          inlineKeysToIgnore: ['related'],
         },
       }),
     ];
@@ -524,11 +524,11 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
       }),
       new ListItemOptionBuilder({
         OptionsClass: MoveInlineFieldsToYamlOptions,
-        nameKey: 'rules.move-inline-fields-to-yaml.keys-to-ignore.name',
-        descriptionKey: 'rules.move-inline-fields-to-yaml.keys-to-ignore.description',
-        emptyStateKey: 'rules.move-inline-fields-to-yaml.keys-to-ignore.empty-state',
-        fieldNamePlaceholderKey: 'rules.move-inline-fields-to-yaml.keys-to-ignore.placeholder-text',
-        optionsKey: 'keysToIgnore',
+        nameKey: 'rules.move-inline-fields-to-yaml.inline-keys-to-ignore.name',
+        descriptionKey: 'rules.move-inline-fields-to-yaml.inline-keys-to-ignore.description',
+        emptyStateKey: 'rules.move-inline-fields-to-yaml.inline-keys-to-ignore.empty-state',
+        fieldNamePlaceholderKey: 'rules.move-inline-fields-to-yaml.inline-keys-to-ignore.placeholder-text',
+        optionsKey: 'inlineKeysToIgnore',
         validator: isValidYamlKeyOnly,
       }),
     ];

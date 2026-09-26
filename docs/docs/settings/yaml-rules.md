@@ -670,7 +670,7 @@ Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter 
 | ---- | ----------- | ---------- | ------------- |
 | `Bracketed inline fields` | What to do with inline fields wrapped in square brackets or parentheses like <code>[key:: value]</code> and <code>(key:: value)</code> | `Leave in place`: Does not move bracketed fields like `[key:: value]` and `(key:: value)`<br/><br/>`Move and keep value in text`: Moves bracketed fields to the YAML frontmatter and replaces them with their value<br/><br/>`Move and remove`: Moves bracketed fields to the YAML frontmatter and removes them from the body, removing the line if only whitespace is left | `Leave in place` |
 | `When the key already exists` | What to do when an inline field has the same key as a key already in the YAML frontmatter. Keys have to match exactly, including their case. | `Skip`: Leaves the fields in the body and the YAML frontmatter value as is<br/><br/>`Merge into list`: Adds the field values to the YAML frontmatter value, turning it into a list<br/><br/>`Overwrite`: Replaces the YAML frontmatter value with the field values | `Skip` |
-| `Keys to ignore` | The inline field keys that will not be moved to the YAML frontmatter | N/A | `null` |
+| `Inline keys to ignore` | The inline field keys that will not be moved to the YAML frontmatter | N/A | `null` |
 
 
 
@@ -833,7 +833,7 @@ status: published
 ---
 ``````
 </details>
-<details><summary>Leaves fields alone when their key is in `Keys to ignore = 'related'`</summary>
+<details><summary>Leaves fields alone when their key is in `Inline keys to ignore = 'related'`</summary>
 
 Before:
 
@@ -1554,8 +1554,9 @@ Inserts or updates the title of the file into the YAML frontmatter's aliases sec
 | ---- | ----------- | ---------- | ------------- |
 | `Preserve existing aliases section style` | If set, the <code>YAML aliases section style</code> setting applies only to the newly created sections | N/A | `true` |
 | `Keep alias that matches the filename` | Such aliases are usually redundant | N/A | false |
-| `Use the YAML key specified by <code>Alias helper key</code> to help with filename and heading changes` | If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array | N/A | `true` |
+| `Use the YAML key specified by Alias helper key to help with filename and heading changes` | If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array | N/A | `true` |
 | `Alias helper key` | The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule. | N/A | `linter-yaml-title-alias` |
+| `Remove alias if empty` | Removes the alias key if the alias key for the file ends up being empty. | N/A | `true` |
 
 ### Additional Info
 

@@ -421,7 +421,7 @@ ruleTest({
       options: {howToHandleExistingKeys: 'Overwrite'},
     },
     {
-      testName: 'Keys to ignore applies to full-line and bracketed fields and is case sensitive',
+      testName: 'Inline keys to ignore applies to full-line and bracketed fields and is case sensitive',
       before: dedent`
         related:: [[Note]]
         Related:: [[Other]]
@@ -436,7 +436,7 @@ ruleTest({
       `,
       options: {
         howToHandleBracketedFields: 'Move and remove',
-        keysToIgnore: ['related'],
+        inlineKeysToIgnore: ['related'],
       },
     },
     {

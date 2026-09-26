@@ -619,11 +619,11 @@ export default {
         'name': 'When the key already exists',
         'description': 'What to do when an inline field has the same key as a key already in the YAML frontmatter. Keys have to match exactly, including their case.',
       },
-      'keys-to-ignore': {
-        'name': 'Keys to ignore',
+      'inline-keys-to-ignore': {
+        'name': 'Inline keys to ignore',
         'description': 'The inline field keys that will not be moved to the YAML frontmatter',
-        'empty-state': 'No keys to ignore yet.',
-        'placeholder-text': 'Key to ignore',
+        'empty-state': 'No inline keys to ignore yet.',
+        'placeholder-text': 'Inline key to ignore',
       },
     },
     // move-math-block-indicators-to-their-own-line.ts
