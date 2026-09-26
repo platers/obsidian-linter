@@ -976,7 +976,7 @@ export default {
       },
       'remove-alias-if-empty': {
         'name': 'Remove alias if empty',
-        'description': 'Removes the alias key if the alias for the file ends up being empty.',
+        'description': 'Removes the alias key if the alias key for the file ends up being empty.',
       },
     },
     // yaml-title.ts
