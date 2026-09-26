@@ -1,6 +1,7 @@
 import MoveInlineFieldsToYaml from '../src/rules/move-inline-fields-to-yaml';
 import dedent from 'ts-dedent';
 import {ruleTest} from './common';
+import {NormalArrayFormats, TagSpecificArrayFormats} from '../src/utils/yaml';
 
 ruleTest({
   RuleBuilderClass: MoveInlineFieldsToYaml,
@@ -571,6 +572,88 @@ ruleTest({
       options: {
         howToHandleBracketedFields: 'Move and remove',
         inlineKeysToIgnore: ['related'],
+      },
+    },
+    {
+      testName: 'Tags are split up, have their hashtags removed, and use the tag array style',
+      before: dedent`
+        tags:: #book #fiction
+        tag:: to-read, #series/discworld
+      `,
+      after: dedent`
+        ---
+        tags:
+          - book
+          - fiction
+        tag:
+          - to-read
+          - series/discworld
+        ---
+      `,
+      options: {tagArrayStyle: NormalArrayFormats.MultiLine},
+    },
+    {
+      testName: 'A single tag still uses the tag array style',
+      before: 'tags:: #book',
+      after: dedent`
+        ---
+        tags: [book]
+        ---
+      `,
+    },
+    {
+      testName: 'Tags that are not valid tags are left alone',
+      before: 'tags:: [[Some Note]]',
+      after: 'tags:: [[Some Note]]',
+    },
+    {
+      testName: 'Merge into list adds tags to the existing tags without duplicates',
+      before: dedent`
+        ---
+        tags: book fiction
+        ---
+        tags:: #fiction #to-read
+      `,
+      after: dedent`
+        ---
+        tags: book fiction to-read
+        ---
+      `,
+      options: {
+        howToHandleExistingKeys: 'Merge into list',
+        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+      },
+    },
+    {
+      testName: 'Aliases are split on commas, numbers are escaped, and the alias array style is used',
+      before: dedent`
+        aliases:: Pratchett, "Sir Terry, Author"
+        aliases:: 1984
+      `,
+      after: dedent`
+        ---
+        aliases: [Pratchett, "Sir Terry, Author", "1984"]
+        ---
+      `,
+    },
+    {
+      testName: 'Merge into list adds aliases to the existing aliases using the alias array style',
+      before: dedent`
+        ---
+        aliases: [Pratchett]
+        ---
+        aliases:: Sir Terry
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Pratchett
+          - Sir Terry
+        ---
+      `,
+      options: {
+        howToHandleExistingKeys: 'Merge into list',
+        aliasArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
     {

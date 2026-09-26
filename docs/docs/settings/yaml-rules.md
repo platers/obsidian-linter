@@ -662,7 +662,7 @@ animal: cat
 
 Alias: `move-inline-fields-to-yaml`
 
-Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item.
+Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item. Tag and alias fields use the tag and alias array styles from the general settings.
 
 ### Options
 
@@ -730,6 +730,24 @@ After:
 ---
 "Date Read": 2024-01-01
 "Project Status": in progress
+---
+``````
+</details>
+<details><summary>Tags have their hashtags removed and tags and aliases are split up and use the tag and alias array styles from the general settings</summary>
+
+Before:
+
+`````` markdown
+tags:: #book #fiction
+aliases:: Pratchett, Sir Terry
+``````
+
+After:
+
+`````` markdown
+---
+tags: [book, fiction]
+aliases: [Pratchett, Sir Terry]
 ---
 ``````
 </details>

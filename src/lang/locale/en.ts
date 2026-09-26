@@ -610,7 +610,7 @@ export default {
     // move-inline-fields-to-yaml.ts
     'move-inline-fields-to-yaml': {
       'name': 'Move inline fields to YAML',
-      'description': 'Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item.',
+      'description': 'Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item. Tag and alias fields use the tag and alias array styles from the general settings.',
       'how-to-handle-full-line-fields': {
         'name': 'Full-line inline fields',
         'description': 'What to do with inline fields that take up a whole line like <code>key:: value</code>',

@@ -4,6 +4,7 @@ import {setLanguage} from '../src/lang/helpers';
 import {rules} from '../src/rules';
 import {RulesRunner} from '../src/rules-runner';
 import {DEFAULT_SETTINGS, LinterSettings} from '../src/settings-data';
+import {NormalArrayFormats, SpecialArrayFormats} from '../src/utils/yaml';
 import '../src/rules-registry';
 
 function settingsWithRulesEnabled(ruleConfigs: Record<string, Record<string, unknown>>): LinterSettings {
@@ -59,6 +60,26 @@ describe('Move inline fields to YAML run order', () => {
         - home
         - garden
       title: Note
+      ---
+    `);
+  });
+
+  it('uses the tag and alias array styles from the general settings', () => {
+    const settings = settingsWithRulesEnabled({'move-inline-fields-to-yaml': {}});
+    settings.commonStyles.tagArrayStyle = NormalArrayFormats.MultiLine;
+    settings.commonStyles.aliasArrayStyle = SpecialArrayFormats.SingleStringCommaDelimited;
+
+    const before = dedent`
+      tags:: #book #fiction
+      aliases:: Pratchett, Sir Terry
+    `;
+
+    expect(lint(before, settings)).toBe(dedent`
+      ---
+      tags:
+        - book
+        - fiction
+      aliases: Pratchett, Sir Terry
       ---
     `);
   });

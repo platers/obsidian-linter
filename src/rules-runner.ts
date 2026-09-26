@@ -228,6 +228,9 @@ export class RulesRunner {
     // moves inline fields last so that the YAML rules that run after this, like YAML Key Sort, include the keys it adds
     [newText] = MoveInlineFieldsToYaml.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+      tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
+      aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
+      removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
     });
 
     return newText;

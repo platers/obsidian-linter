@@ -7,6 +7,8 @@ import {ProtectedRanges} from '../utils/protected-ranges';
 import {textReplacement} from '../utils/strings';
 import {applyNonOverlappingReplacements} from '../utils/text-edits';
 import {
+  convertAliasValueToStringOrStringArray,
+  convertTagValueToStringOrStringArray,
   escapeStringIfNecessaryAndPossible,
   formatYAML,
   formatYamlArrayValue,
@@ -14,11 +16,15 @@ import {
   getYamlSectionValue,
   initYAML,
   NormalArrayFormats,
+  OBSIDIAN_ALIASES_KEYS,
+  OBSIDIAN_TAG_KEYS,
   QuoteCharacter,
   setYamlSection,
+  SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
+  TagSpecificArrayFormats,
 } from '../utils/yaml';
-import {isValidYamlKeyOnly} from '../utils/validation';
+import {isValidTag, isValidYamlKeyOnly} from '../utils/validation';
 
 type FullLineFieldOperations = 'Leave in place' | 'Move and keep in text' | 'Move and remove';
 type BracketedFieldOperations = 'Leave in place' | 'Move and keep in text' | 'Move and keep value in text' | 'Move and remove';
@@ -31,7 +37,15 @@ class MoveInlineFieldsToYamlOptions implements Options {
   inlineKeysToIgnore?: string[] = [];
   @RuleBuilder.noSettingControl()
     defaultEscapeCharacter?: QuoteCharacter = '"';
+  @RuleBuilder.noSettingControl()
+    tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  @RuleBuilder.noSettingControl()
+    aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  @RuleBuilder.noSettingControl()
+    removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
+
+type ObsidianListKey = 'tags' | 'aliases';
 
 type InlineField = {
   key: string,
@@ -93,18 +107,27 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
     const yamlUpdates: {key: string, value: string}[] = [];
     const movedFields: InlineField[] = [];
     for (const [key, keyFields] of fieldsByKey) {
-      const newValues = keyFields.map((field) => field.value).filter((value) => value !== '').map((value) => this.escapeValue(value, options.defaultEscapeCharacter));
+      const listKey = getObsidianListKey(key);
+      const newValues = this.getNewValues(keyFields.map((field) => field.value).filter((value) => value !== ''), listKey, options);
+      if (newValues == null) {
+        continue;
+      }
+
       const existingValue = getYamlSectionValue(existingYaml, key, false);
 
       // an existing array keeps its style, otherwise several values become a single-line array
       const existingArrayFormat = existingValue == null ? null : getArrayFormat(existingValue);
       let yamlValue: string;
       if (existingValue == null || options.howToHandleExistingKeys === 'Overwrite') {
-        yamlValue = this.formatValues(newValues, existingArrayFormat, options.defaultEscapeCharacter);
+        yamlValue = this.formatValues(newValues, existingArrayFormat, listKey, options);
       } else if (options.howToHandleExistingKeys === 'Merge into list') {
-        const existingValues = this.getMergeableValues(existingValue);
+        let existingValues = this.getMergeableValues(existingValue);
         if (existingValues == null) {
           continue;
+        } else if (listKey === 'tags') {
+          existingValues = existingValues.flatMap((value) => convertTagValueToStringOrStringArray(value));
+        } else if (listKey === 'aliases') {
+          existingValues = existingValues.flatMap((value) => convertAliasValueToStringOrStringArray(value));
         }
 
         // values are compared without their quotes so that `a`, `'a'`, and `"a"` count as the same value
@@ -123,7 +146,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
           continue;
         }
 
-        yamlValue = this.formatValues([...existingValues, ...valuesToAdd], existingArrayFormat, options.defaultEscapeCharacter);
+        yamlValue = this.formatValues([...existingValues, ...valuesToAdd], existingArrayFormat, listKey, options);
         yamlUpdates.push({key: this.formatKey(key, options.defaultEscapeCharacter), value: yamlValue});
         continue;
       } else {
@@ -313,7 +336,38 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
 
     return escapeStringIfNecessaryAndPossible(key, defaultEscapeCharacter, true);
   }
-  formatValues(values: string[], arrayFormat: NormalArrayFormats | null, defaultEscapeCharacter: QuoteCharacter): string {
+  /**
+   * Gets the values to add to the YAML frontmatter for the values of the inline fields with a key.
+   * @param {string[]} values The values of the inline fields
+   * @param {ObsidianListKey | null} listKey Whether the key is one of Obsidian's tag or alias keys
+   * @param {MoveInlineFieldsToYamlOptions} options The options of the rule
+   * @return {string[] | null} The values to add or null when the values are not valid for the key
+   */
+  getNewValues(values: string[], listKey: ObsidianListKey | null, options: MoveInlineFieldsToYamlOptions): string[] | null {
+    if (listKey === 'tags') {
+      // tags are split up like they are in the tags key of the YAML frontmatter and have their hashtags removed
+      // like Format tags in YAML does since Obsidian does not allow them there
+      const tags = values.flatMap((value) => convertTagValueToStringOrStringArray(value)).map((tag) => tag.replace(/^#/, '')).filter((tag) => tag !== '');
+      if (tags.some((tag) => !isValidTag(tag)[0])) {
+        return null;
+      }
+
+      return tags;
+    } else if (listKey === 'aliases') {
+      values = values.flatMap((value) => convertAliasValueToStringOrStringArray(value));
+    }
+
+    return values.map((value) => this.escapeValue(value, options.defaultEscapeCharacter));
+  }
+  formatValues(values: string[], arrayFormat: NormalArrayFormats | null, listKey: ObsidianListKey | null, options: MoveInlineFieldsToYamlOptions): string {
+    // tags and aliases always use the array style from the settings, like Format YAML array and Move tags to YAML do
+    if (listKey === 'tags') {
+      return formatYamlArrayValue(values, options.tagArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays);
+    } else if (listKey === 'aliases') {
+      return formatYamlArrayValue(values, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true);
+    }
+
+    const defaultEscapeCharacter = options.defaultEscapeCharacter;
     if (arrayFormat == null) {
       if (values.length === 0) {
         return '';
@@ -405,6 +459,19 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
           ---
           "Date Read": 2024-01-01
           "Project Status": in progress
+          ---
+        `,
+      }),
+      new ExampleBuilder({
+        description: 'Tags have their hashtags removed and tags and aliases are split up and use the tag and alias array styles from the general settings',
+        before: dedent`
+          tags:: #book #fiction
+          aliases:: Pratchett, Sir Terry
+        `,
+        after: dedent`
+          ---
+          tags: [book, fiction]
+          aliases: [Pratchett, Sir Terry]
           ---
         `,
       }),
@@ -609,6 +676,16 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
       }),
     ];
   }
+}
+
+function getObsidianListKey(key: string): ObsidianListKey | null {
+  if (OBSIDIAN_TAG_KEYS.includes(key)) {
+    return 'tags';
+  } else if (OBSIDIAN_ALIASES_KEYS.includes(key)) {
+    return 'aliases';
+  }
+
+  return null;
 }
 
 /**
