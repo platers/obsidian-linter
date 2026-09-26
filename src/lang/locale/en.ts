@@ -108,6 +108,9 @@ export default {
     'wrapper-yaml-error': 'error in the YAML: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'unknown error: {ERROR_MESSAGE}',
     'error-message-format': '"{RULE_NAME}" ecountered an {ERROR_MESSAGE}'
+
+    //table.ts
+    'unexpected-pre-table-content': 'Trying to trim the start of a table row resulted in an unexpected result finding some non-whitespace value in blockquote prior to the table row start for "{TABLE_ROW}" and start of line "{START_OF_LINE}".',
   },
 
   'validation': {

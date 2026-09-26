@@ -2,6 +2,7 @@
 
 import { getEAW } from 'meaw';
 import { countInstances } from './strings';
+import { getTextInLanguage } from '../lang/helpers';
 
 function computeWidth(str: string) {
   let width = 0;
@@ -135,7 +136,7 @@ export class MarkdownTableFormatter {
       } else if (char === '|') { // found the start of the table, so we trim up to here
         break;
       } else if (char.trim() !== '') { // something is wrong, so we need to stop here
-        throw new Error(`Trying to trim the start of a table row resulted in an unexpected result finding some non-whitespace value in blockquote prior to the table row start for "${tableRow}" and start of line "${this.startOfLine}".`);
+        throw new Error(getTextInLanguage('logs.unexpected-pre-table-content').replace('{TABLE_ROW}', tableRow).replace('{START_OF_LINE}', this.startOfLine));
         break;
       }
 
