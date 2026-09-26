@@ -20,10 +20,12 @@ import {
 } from '../utils/yaml';
 import {isValidYamlKeyOnly} from '../utils/validation';
 
-type BracketedFieldOperations = 'Leave in place' | 'Move and keep value in text' | 'Move and remove';
+type FullLineFieldOperations = 'Leave in place' | 'Move and keep in text' | 'Move and remove';
+type BracketedFieldOperations = 'Leave in place' | 'Move and keep in text' | 'Move and keep value in text' | 'Move and remove';
 type ExistingKeyOperations = 'Skip' | 'Merge into list' | 'Overwrite';
 
 class MoveInlineFieldsToYamlOptions implements Options {
+  howToHandleFullLineFields?: FullLineFieldOperations = 'Move and remove';
   howToHandleBracketedFields?: BracketedFieldOperations = 'Leave in place';
   howToHandleExistingKeys?: ExistingKeyOperations = 'Skip';
   inlineKeysToIgnore?: string[] = [];
@@ -135,7 +137,8 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
     });
 
     const yamlLengthChange = newText.length - text.length;
-    const bodyEdits = this.getBodyEdits(text, movedFields, options).map((edit) => {
+    const fieldsToChange = movedFields.filter((field) => (field.isBracketed ? options.howToHandleBracketedFields : options.howToHandleFullLineFields) !== 'Move and keep in text');
+    const bodyEdits = this.getBodyEdits(text, fieldsToChange, options).map((edit) => {
       let startIndex = edit.startIndex + yamlLengthChange;
       // A newly inserted frontmatter supplies the line ending before a removal of the whole file.
       if (edit.startIndex === 0 && edit.endIndex === text.length && !text.endsWith('\n') && newText.charAt(startIndex - 1) === '\n') {
@@ -173,7 +176,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
             }
           }
         } else {
-          const field = extractFullLineField(line);
+          const field = options.howToHandleFullLineFields === 'Leave in place' ? undefined : extractFullLineField(line);
           if (field != null && field.key !== '' && !options.inlineKeysToIgnore.includes(field.key) && !protectedRanges.isProtected(lineStartIndex, lineEndIndex)) {
             fields.push({key: field.key, value: field.value, startIndex: lineStartIndex, endIndex: lineEndIndex, lineStartIndex, lineEndIndex, isBracketed: false});
           }
@@ -378,6 +381,24 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
         `,
       }),
       new ExampleBuilder({
+        description: 'Adds full-line fields to the YAML frontmatter and leaves their lines, including any Markdown or emoji around the key, as they are when `Full-line inline fields = \'Move and keep in text\'`',
+        before: dedent`
+          # 🎉 Party:: yes
+          > **Status**:: done
+        `,
+        after: dedent`
+          ---
+          Party: yes
+          Status: done
+          ---
+          # 🎉 Party:: yes
+          > **Status**:: done
+        `,
+        options: {
+          howToHandleFullLineFields: 'Move and keep in text',
+        },
+      }),
+      new ExampleBuilder({
         description: 'Moves bracketed fields and keeps their values in the text when `Bracketed inline fields = \'Move and keep value in text\'`',
         before: dedent`
           I want to eat [taste:: pie] after (meal:: dinner).
@@ -485,6 +506,26 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
   }
   get optionBuilders(): OptionBuilderBase<MoveInlineFieldsToYamlOptions>[] {
     return [
+      new DropdownOptionBuilder<MoveInlineFieldsToYamlOptions, FullLineFieldOperations>({
+        OptionsClass: MoveInlineFieldsToYamlOptions,
+        nameKey: 'rules.move-inline-fields-to-yaml.how-to-handle-full-line-fields.name',
+        descriptionKey: 'rules.move-inline-fields-to-yaml.how-to-handle-full-line-fields.description',
+        optionsKey: 'howToHandleFullLineFields',
+        records: [
+          {
+            value: 'Leave in place',
+            description: 'Does not move full-line fields like `key:: value`',
+          },
+          {
+            value: 'Move and keep in text',
+            description: 'Adds full-line fields to the YAML frontmatter and leaves their lines as they are',
+          },
+          {
+            value: 'Move and remove',
+            description: 'Moves full-line fields to the YAML frontmatter and removes their lines',
+          },
+        ],
+      }),
       new DropdownOptionBuilder<MoveInlineFieldsToYamlOptions, BracketedFieldOperations>({
         OptionsClass: MoveInlineFieldsToYamlOptions,
         nameKey: 'rules.move-inline-fields-to-yaml.how-to-handle-bracketed-fields.name',
@@ -494,6 +535,10 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
           {
             value: 'Leave in place',
             description: 'Does not move bracketed fields like `[key:: value]` and `(key:: value)`',
+          },
+          {
+            value: 'Move and keep in text',
+            description: 'Adds bracketed fields to the YAML frontmatter and leaves them in the text as they are',
           },
           {
             value: 'Move and keep value in text',

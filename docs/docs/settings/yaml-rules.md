@@ -662,13 +662,14 @@ animal: cat
 
 Alias: `move-inline-fields-to-yaml`
 
-Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Full-line fields are removed from the body once moved. Fields on list items and tasks are left alone since Dataview scopes them to the list item.
+Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item.
 
 ### Options
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Bracketed inline fields` | What to do with inline fields wrapped in square brackets or parentheses like <code>[key:: value]</code> and <code>(key:: value)</code> | `Leave in place`: Does not move bracketed fields like `[key:: value]` and `(key:: value)`<br/><br/>`Move and keep value in text`: Moves bracketed fields to the YAML frontmatter and replaces them with their value<br/><br/>`Move and remove`: Moves bracketed fields to the YAML frontmatter and removes them from the body, removing the line if only whitespace is left | `Leave in place` |
+| `Full-line inline fields` | What to do with inline fields that take up a whole line like <code>key:: value</code> | `Leave in place`: Does not move full-line fields like `key:: value`<br/><br/>`Move and keep in text`: Adds full-line fields to the YAML frontmatter and leaves their lines as they are<br/><br/>`Move and remove`: Moves full-line fields to the YAML frontmatter and removes their lines | `Move and remove` |
+| `Bracketed inline fields` | What to do with inline fields wrapped in square brackets or parentheses like <code>[key:: value]</code> and <code>(key:: value)</code> | `Leave in place`: Does not move bracketed fields like `[key:: value]` and `(key:: value)`<br/><br/>`Move and keep in text`: Adds bracketed fields to the YAML frontmatter and leaves them in the text as they are<br/><br/>`Move and keep value in text`: Moves bracketed fields to the YAML frontmatter and replaces them with their value<br/><br/>`Move and remove`: Moves bracketed fields to the YAML frontmatter and removes them from the body, removing the line if only whitespace is left | `Leave in place` |
 | `When the key already exists` | What to do when an inline field has the same key as a key already in the YAML frontmatter. Keys have to match exactly, including their case. | `Skip`: Leaves the fields in the body and the YAML frontmatter value as is<br/><br/>`Merge into list`: Adds the field values to the YAML frontmatter value, turning it into a list<br/><br/>`Overwrite`: Replaces the YAML frontmatter value with the field values | `Skip` |
 | `Inline keys to ignore` | The inline field keys that will not be moved to the YAML frontmatter | N/A | `null` |
 
@@ -730,6 +731,26 @@ After:
 "Date Read": 2024-01-01
 "Project Status": in progress
 ---
+``````
+</details>
+<details><summary>Adds full-line fields to the YAML frontmatter and leaves their lines, including any Markdown or emoji around the key, as they are when `Full-line inline fields = 'Move and keep in text'`</summary>
+
+Before:
+
+`````` markdown
+# 🎉 Party:: yes
+> **Status**:: done
+``````
+
+After:
+
+`````` markdown
+---
+Party: yes
+Status: done
+---
+# 🎉 Party:: yes
+> **Status**:: done
 ``````
 </details>
 <details><summary>Moves bracketed fields and keeps their values in the text when `Bracketed inline fields = 'Move and keep value in text'`</summary>

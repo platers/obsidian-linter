@@ -91,6 +91,62 @@ ruleTest({
       `,
     },
     {
+      testName: 'Full-line fields are not moved when Full-line inline fields is Leave in place',
+      before: dedent`
+        status:: done
+        Text [owner:: me]
+      `,
+      after: dedent`
+        ---
+        owner: me
+        ---
+        status:: done
+        Text
+      `,
+      options: {
+        howToHandleFullLineFields: 'Leave in place',
+        howToHandleBracketedFields: 'Move and remove',
+      },
+    },
+    {
+      testName: 'Bracketed fields are added to the YAML frontmatter and left in the text when Bracketed inline fields is Move and keep in text',
+      before: dedent`
+        status:: done
+        Text [owner:: me] and (due:: tomorrow)
+      `,
+      after: dedent`
+        ---
+        status: done
+        owner: me
+        due: tomorrow
+        ---
+        Text [owner:: me] and (due:: tomorrow)
+      `,
+      options: {howToHandleBracketedFields: 'Move and keep in text'},
+    },
+    {
+      testName: 'Fields kept in the text do not change the YAML frontmatter again once it has their values',
+      before: dedent`
+        ---
+        context: [home, garden]
+        ---
+        context:: home
+        Text [context:: garden]
+      `,
+      after: dedent`
+        ---
+        context: [home, garden]
+        ---
+        context:: home
+        Text [context:: garden]
+      `,
+      options: {
+        howToHandleFullLineFields: 'Move and keep in text',
+        howToHandleBracketedFields: 'Move and keep in text',
+        howToHandleExistingKeys: 'Merge into list',
+      },
+    },
+    {
       testName: 'A line whose text before the separator is not a valid key is not a full-line field',
       before: dedent`
         Some.Thing:: value
