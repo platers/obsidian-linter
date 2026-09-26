@@ -96,23 +96,36 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
       const newValues = keyFields.map((field) => field.value).filter((value) => value !== '').map((value) => this.escapeValue(value, options.defaultEscapeCharacter));
       const existingValue = getYamlSectionValue(existingYaml, key, false);
 
+      // an existing array keeps its style, otherwise several values become a single-line array
+      const existingArrayFormat = existingValue == null ? null : getArrayFormat(existingValue);
       let yamlValue: string;
       if (existingValue == null || options.howToHandleExistingKeys === 'Overwrite') {
-        yamlValue = this.formatValues(newValues, NormalArrayFormats.SingleLine, options.defaultEscapeCharacter);
+        yamlValue = this.formatValues(newValues, existingArrayFormat, options.defaultEscapeCharacter);
       } else if (options.howToHandleExistingKeys === 'Merge into list') {
         const existingValues = this.getMergeableValues(existingValue);
         if (existingValues == null) {
           continue;
         }
 
+        // values are compared without their quotes so that `a`, `'a'`, and `"a"` count as the same value
+        const valuesPresent = new Set(existingValues.map(getScalarText));
+        const valuesToAdd: string[] = [];
         for (const value of newValues) {
-          if (!existingValues.includes(value)) {
-            existingValues.push(value);
+          if (!valuesPresent.has(getScalarText(value))) {
+            valuesPresent.add(getScalarText(value));
+            valuesToAdd.push(value);
           }
         }
 
-        const format = existingValue.startsWith('\n') ? NormalArrayFormats.MultiLine : NormalArrayFormats.SingleLine;
-        yamlValue = this.formatValues(existingValues, format, options.defaultEscapeCharacter);
+        movedFields.push(...keyFields);
+        if (valuesToAdd.length === 0) {
+          // the existing value is left exactly as it is written when it already has every value
+          continue;
+        }
+
+        yamlValue = this.formatValues([...existingValues, ...valuesToAdd], existingArrayFormat, options.defaultEscapeCharacter);
+        yamlUpdates.push({key: this.formatKey(key, options.defaultEscapeCharacter), value: yamlValue});
+        continue;
       } else {
         continue;
       }
@@ -270,6 +283,17 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
     return [...edits, ...removals];
   }
   escapeValue(value: string, defaultEscapeCharacter: QuoteCharacter): string {
+    // Dataview reads a value in double quotes as the text inside of them, so the quotes are kept when YAML reads it
+    // the same way and otherwise the text inside of them is what gets moved
+    const dataviewString = getDataviewStringContents(value);
+    if (dataviewString != null) {
+      if (parseYamlScalar(value) === dataviewString) {
+        return value;
+      }
+
+      value = dataviewString;
+    }
+
     // numbers, booleans, and plain strings keep their type when left unescaped
     try {
       const parsedValue = parse(value, {logLevel: 'error'}) as unknown;
@@ -289,14 +313,18 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
 
     return escapeStringIfNecessaryAndPossible(key, defaultEscapeCharacter, true);
   }
-  formatValues(values: string[], format: NormalArrayFormats, defaultEscapeCharacter: QuoteCharacter): string {
-    if (values.length === 0) {
-      return '';
-    } else if (values.length === 1) {
-      return ' ' + values[0];
+  formatValues(values: string[], arrayFormat: NormalArrayFormats | null, defaultEscapeCharacter: QuoteCharacter): string {
+    if (arrayFormat == null) {
+      if (values.length === 0) {
+        return '';
+      } else if (values.length === 1) {
+        return ' ' + values[0];
+      }
+
+      arrayFormat = NormalArrayFormats.SingleLine;
     }
 
-    return formatYamlArrayValue(values, format, defaultEscapeCharacter, false);
+    return formatYamlArrayValue(values, arrayFormat, defaultEscapeCharacter, false);
   }
   /**
    * Gets the values of an existing YAML key that inline values can be added to.
@@ -581,6 +609,75 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
       }),
     ];
   }
+}
+
+/**
+ * Gets the array style of a YAML value.
+ * @param {string} value The value of a YAML key
+ * @return {NormalArrayFormats | null} The style of the array or null when the value is not an array
+ */
+function getArrayFormat(value: string): NormalArrayFormats | null {
+  const trimmedValue = value.trim();
+  if (trimmedValue.startsWith('[')) {
+    return NormalArrayFormats.SingleLine;
+  } else if (trimmedValue.startsWith('-') && value.startsWith('\n')) {
+    return NormalArrayFormats.MultiLine;
+  }
+
+  return null;
+}
+
+function parseYamlScalar(value: string): unknown {
+  try {
+    return parse(value, {logLevel: 'error'}) as unknown;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Gets the text of a YAML scalar without any quotes around it.
+ * @param {string} value The YAML scalar as it is written
+ * @return {string} The text of the scalar or the value as it is written when it is not a scalar
+ */
+function getScalarText(value: string): string {
+  const parsedValue = parseYamlScalar(value);
+  if (typeof parsedValue === 'string' || typeof parsedValue === 'number' || typeof parsedValue === 'boolean') {
+    return String(parsedValue);
+  }
+
+  return value;
+}
+
+/**
+ * Gets the text Dataview reads from a value in double quotes, which follows Dataview's `string` parser.
+ * @param {string} value The inline field value
+ * @return {string | null} The text inside of the quotes or null when the value is not a single string in double quotes
+ */
+function getDataviewStringContents(value: string): string | null {
+  if (value.length < 2 || !value.startsWith('"') || !value.endsWith('"')) {
+    return null;
+  }
+
+  let contents = '';
+  for (let index = 1; index < value.length - 1; index++) {
+    const char = value.charAt(index);
+    if (char === '"') {
+      return null;
+    } else if (char === '\\') {
+      index++;
+      if (index >= value.length - 1) {
+        return null;
+      }
+
+      const escapedChar = value.charAt(index);
+      contents += escapedChar === '"' || escapedChar === '\\' ? escapedChar : '\\' + escapedChar;
+    } else {
+      contents += char;
+    }
+  }
+
+  return contents;
 }
 
 function isSpaceOrTab(char: string): boolean {

@@ -34,6 +34,24 @@ ruleTest({
       options: {howToHandleExistingKeys: 'Overwrite'},
     },
     {
+      testName: 'An existing key keeps its quotes when they differ from the escape character in the settings',
+      before: dedent`
+        ---
+        'Test Key': 1
+        "Other Key": 2
+        ---
+        Test Key:: 1234
+        Other Key:: 5678
+      `,
+      after: dedent`
+        ---
+        'Test Key': 1234
+        "Other Key": 5678
+        ---
+      `,
+      options: {howToHandleExistingKeys: 'Overwrite', defaultEscapeCharacter: '"'},
+    },
+    {
       testName: 'Keys use the escape character from the settings',
       before: 'Test Key:: 1234',
       after: dedent`
@@ -44,13 +62,16 @@ ruleTest({
       options: {defaultEscapeCharacter: '\''},
     },
     {
-      testName: 'Values that are not plain YAML are escaped',
+      testName: 'Values that are not plain YAML are escaped and values Dataview reads as a quoted string keep their quotes when YAML reads them the same way',
       before: dedent`
         link:: [[Some Note|alias]]
         links:: [[One]], [[Two]]
         time:: 10: 30
         heading:: #not-a-comment
         quoted:: "already quoted"
+        quoted-with-escapes:: "say \\"hi\\""
+        dataview-only-escape:: "a \\d"
+        two-strings:: "one" and "two"
         number:: 42
         flag:: true
       `,
@@ -60,7 +81,10 @@ ruleTest({
         links: "[[One]], [[Two]]"
         time: "10: 30"
         heading: "#not-a-comment"
-        quoted: '"already quoted"'
+        quoted: "already quoted"
+        quoted-with-escapes: "say \\"hi\\""
+        dataview-only-escape: a \\d
+        two-strings: '"one" and "two"'
         number: 42
         flag: true
         ---
@@ -430,6 +454,58 @@ ruleTest({
       options: {howToHandleExistingKeys: 'Merge into list'},
     },
     {
+      testName: 'Merge into list does not add values that are already there with or without quotes and keeps the quotes of existing values',
+      before: dedent`
+        ---
+        context: ['home', "garden"]
+        ---
+        context:: home
+        context:: "garden"
+        context:: shed
+      `,
+      after: dedent`
+        ---
+        context: ['home', "garden", shed]
+        ---
+      `,
+      options: {howToHandleExistingKeys: 'Merge into list'},
+    },
+    {
+      testName: 'Merge into list leaves an existing array as it is written when it already has every value',
+      before: dedent`
+        ---
+        context: [home]
+        other:
+            - a
+        ---
+        context:: home
+        other:: "a"
+      `,
+      after: dedent`
+        ---
+        context: [home]
+        other:
+            - a
+        ---
+      `,
+      options: {howToHandleExistingKeys: 'Merge into list'},
+    },
+    {
+      testName: 'Overwrite keeps an existing single value array an array',
+      before: dedent`
+        ---
+        context: [work]
+        ---
+        context:: home
+      `,
+      after: dedent`
+        ---
+        context: [home]
+        ---
+      `,
+      options: {howToHandleExistingKeys: 'Overwrite'},
+    },
+    {
       testName: 'Merge into list skips keys whose existing value is a map, a block scalar, or has a comment',
       before: dedent`
         ---
@@ -458,7 +534,7 @@ ruleTest({
       options: {howToHandleExistingKeys: 'Merge into list'},
     },
     {
-      testName: 'Overwrite replaces an existing multi-line array with every value of the key',
+      testName: 'Overwrite replaces an existing multi-line array with every value of the key and keeps it multi-line',
       before: dedent`
         ---
         context:
@@ -470,7 +546,9 @@ ruleTest({
       `,
       after: dedent`
         ---
-        context: [home, garden]
+        context:
+          - home
+          - garden
         title: Note
         ---
       `,
