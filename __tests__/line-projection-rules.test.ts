@@ -3,7 +3,7 @@ import EmptyLineAroundCodeFences from '../src/rules/empty-line-around-code-fence
 import EmptyLineAroundHorizontalRules from '../src/rules/empty-line-around-horizontal-rules';
 import EmptyLineAroundMathBlock from '../src/rules/empty-line-around-math-block';
 import MoveMathBlockIndicatorsToOwnLine from '../src/rules/move-math-block-indicators-to-own-line';
-import {ruleTest} from './common';
+import { ruleTest } from './common';
 
 ruleTest({
   RuleBuilderClass: MoveMathBlockIndicatorsToOwnLine,
@@ -78,7 +78,7 @@ ruleTest({
     {
       testName: 'Preserves fence adjacency to math in a blockquote',
       before: '> ```\n> code\n> ```\n> $$\n> x\n> $$',
-      after: '> ```\n> code\n> ```\n> $$\n> x\n> $$',
+      after: '> ```\n> code\n> ```\n>\n> $$\n> x\n> $$',
     },
   ],
 });
