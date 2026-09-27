@@ -206,7 +206,7 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
 }
 
 function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFile(text: string, endOfContent: number): string {
-  if (endOfContent === (text.length - 1)) {
+  if (endOfContent >= (text.length - 1)) {
     return text;
   }
 
@@ -235,7 +235,7 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFile(text: string
 }
 
 function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote(text: string, startOfLine: string, endOfContent: number, isCallout: boolean = false, addingEmptyLinesAroundBlockquotes: boolean = false): string {
-  if (endOfContent === (text.length - 1)) {
+  if (endOfContent >= (text.length - 1)) {
     return text;
   }
 
