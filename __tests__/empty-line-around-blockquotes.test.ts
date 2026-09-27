@@ -281,5 +281,54 @@ ruleTest({
         > Text
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1319
+      testName: 'Make sure that empty lines around blockquotes handles an empty line prior to the blockqoute that is nested one blockquote level more than the blockquote is',
+      before: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > > 
+        > | D | E |
+        > |:---:|:--- |
+        > | F | G |
+      `,
+      after: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > >
+        > | D | E |
+        > |:---:|:--- |
+        > | F | G |
+      `
+    },
+    {
+      testName: 'Make sure that empty lines around blockqoutes handles an empty line after the table that is nested one blockquote level more than the blockquote is',
+      before: dedent`
+        > AAA
+        >
+        > | D | E |
+        > |:---:|:--- |
+        > | F | G |
+        > > **BBB:**
+        > >
+        > > - CCC
+      `,
+      after: dedent`
+        > AAA
+        >
+        > | D | E |
+        > |:---:|:--- |
+        > | F | G |
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+      `
+    },
   ],
 });

@@ -340,7 +340,7 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
     }
 
     emptyLine = getEmptyLineForAfterBlockquote(lineWithIndicators, isCallout, nestingLevel);
-  } else if (codeBlockBlockquoteRegex.test(nextLine) || codeBlockBlockquoteRegex.test(lastLineOfBlockquote)) {
+  } else if ((codeBlockBlockquoteRegex.test(nextLine) || codeBlockBlockquoteRegex.test(lastLineOfBlockquote)) && endOfContent != endOfNewContent) {
     // for now we will assume that the current empty line is correct if we are dealing with a table on the current or next line
     // we can change this to the necessary implementation when this scenario is encountered
     emptyLine = text.substring(endOfContent, endOfNewContent).trimEnd();

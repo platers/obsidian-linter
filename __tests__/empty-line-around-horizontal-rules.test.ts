@@ -1,13 +1,13 @@
 import dedent from 'ts-dedent';
 import EmptyLineAroundHorizontalRules from '../src/rules/empty-line-around-horizontal-rules';
-import {ruleTest} from './common';
+import { ruleTest } from './common';
 
 ruleTest({
   RuleBuilderClass: EmptyLineAroundHorizontalRules,
   testCases: [
     {
       testName:
-      'Horizontal rules that start a document do get an empty line before them.',
+        'Horizontal rules that start a document do get an empty line before them.',
       before: dedent`
         ***
         ${''}
@@ -196,6 +196,47 @@ ruleTest({
         ${''}
         qwer
       `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1319
+      testName: 'Make sure that empty lines around horizontal rules handles an empty line prior to the horizontal rule that is nested one blockquote level more than the horizontal rule is',
+      before: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > > 
+        > -----
+      `,
+      after: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > >
+        > -----
+      `
+    },
+    {
+      testName: 'Make sure that empty lines around horizontal rules handles an empty line after the horizontal rule that is nested one blockquote level more than the horizontal rule is',
+      before: dedent`
+        > AAA
+        >
+        > -----
+        > > **BBB:**
+        > >
+        > > - CCC
+      `,
+      after: dedent`
+        > AAA
+        >
+        > -----
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+      `
     },
   ],
 });

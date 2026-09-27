@@ -247,5 +247,54 @@ ruleTest({
         > > > > 	- Enables Extract Image Scans operation
       `
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1319
+      testName: 'Make sure that empty lines around code fences handles an empty line prior to the code fence that is nested one blockquote level more than the code fence is',
+      before: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > > 
+        > \`\`\`
+        > Some code
+        > \`\`\`
+      `,
+      after: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > >
+        > \`\`\`
+        > Some code
+        > \`\`\`
+      `
+    },
+    {
+      testName: 'Make sure that empty lines around table handles an empty line after the code fence that is nested one blockquote level more than the code fence is',
+      before: dedent`
+        > AAA
+        >
+        > \`\`\`
+        > Some code
+        > \`\`\`
+        > > **BBB:**
+        > >
+        > > - CCC
+      `,
+      after: dedent`
+        > AAA
+        >
+        > \`\`\`
+        > Some code
+        > \`\`\`
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+      `
+    },
   ],
 });

@@ -172,7 +172,7 @@ ruleTest({
       `,
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/1319
-      testName: 'Make sure that empty lines around the table handles an empty line prior to the table that is nested one blockquote level more than the table is',
+      testName: 'Make sure that empty lines around table handles an empty line prior to the table that is nested one blockquote level more than the table is',
       before: dedent`
         > AAA
         >
@@ -197,7 +197,7 @@ ruleTest({
       `
     },
     {
-      testName: 'Make sure that empty lines around the table handles an empty line after the table that is nested one blockquote level more than the table is',
+      testName: 'Make sure that empty lines around table handles an empty line after the table that is nested one blockquote level more than the table is',
       before: dedent`
         > AAA
         >
