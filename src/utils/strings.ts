@@ -143,7 +143,6 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
   const nestingLevel = startOfLine.split('>').length - 1;
   let index = startOfContent;
   let startOfNewContent = startOfContent;
-  let lineNestingLevel = 0;
   let foundABlankLine = false;
   let previousChar = '';
   while (index >= 0) {
@@ -155,18 +154,11 @@ function makeSureContentHasASingleEmptyLineBeforeItUnlessItStartsAFileForBlockqu
       if (foundABlankLine) {
         break;
       }
-
-      lineNestingLevel++;
     } else if (currentChar === '\n') {
-      if (lineNestingLevel === 0 || lineNestingLevel === nestingLevel || (lineNestingLevel + 1) === nestingLevel) {
-        startOfNewContent = index;
-        lineNestingLevel = 0;
+      startOfNewContent = index;
 
-        if (previousChar === '\n') {
-          foundABlankLine = true;
-        }
-      } else {
-        break;
+      if (previousChar === '\n') {
+        foundABlankLine = true;
       }
     }
     index--;
@@ -274,7 +266,6 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
   let index = endOfContent;
   let endOfNewContent = endOfContent;
   let isFirstNewLine = true;
-  let lineNestingLevel = 0;
   let foundABlankLine = false;
   let previousChar = '';
   let firstChar = true;
@@ -293,22 +284,15 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
       if (foundABlankLine) {
         break;
       }
-
-      lineNestingLevel++;
     } else if (currentChar === '\n') {
-      if (lineNestingLevel === 0 || lineNestingLevel === nestingLevel || (lineNestingLevel + 1) === nestingLevel) {
-        lineNestingLevel = 0;
-        if (isFirstNewLine) {
-          isFirstNewLine = false;
-        } else {
-          endOfNewContent = index;
-        }
-
-        if (previousChar === '\n') {
-          foundABlankLine = true;
-        }
+      if (isFirstNewLine) {
+        isFirstNewLine = false;
       } else {
-        break;
+        endOfNewContent = index;
+      }
+
+      if (previousChar === '\n') {
+        foundABlankLine = true;
       }
     }
     index++;
@@ -350,18 +334,23 @@ function makeSureContentHasASingleEmptyLineAfterItUnlessItEndsAFileForBlockquote
 
   let emptyLine: string;
   if (addingEmptyLinesAroundBlockquotes) {
-    emptyLine = getEmptyLineForAfterBlockquote(nextLine, isCallout, nestingLevel);
+    let lineWithIndicators = nextLine;
+    if (nextLine.includes('>')) {
+      lineWithIndicators = startOfLine;
+    }
+
+    emptyLine = getEmptyLineForAfterBlockquote(lineWithIndicators, isCallout, nestingLevel);
   } else if (codeBlockBlockquoteRegex.test(nextLine) || codeBlockBlockquoteRegex.test(lastLineOfBlockquote)) {
     // for now we will assume that the current empty line is correct if we are dealing with a table on the current or next line
     // we can change this to the necessary implementation when this scenario is encountered
     emptyLine = text.substring(endOfContent, endOfNewContent).trimEnd();
   } else {
-    // we need to make sure that the next line is not a callout. If it is, then we need to use the current line instead of the next line (see https://github.com/platers/obsidian-linter/issues/1596)
-    if (nextLine.match(calloutRegex)) {
-      emptyLine = getEmptyLine(startOfLine);
-    } else {
-      emptyLine = getEmptyLine(nextLine);
+    let lineWithIndicators = nextLine;
+    if (nextLine.includes('>')) {
+      lineWithIndicators = startOfLine;
     }
+
+    emptyLine = getEmptyLine(lineWithIndicators);
   }
 
   return text.substring(0, endOfContent) + emptyLine + text.substring(endOfNewContent);
