@@ -172,6 +172,71 @@ ruleTest({
       },
     },
     {
+      testName: 'A new key with several values uses the default array style',
+      before: dedent`
+        context:: home
+        context:: garden
+      `,
+      after: dedent`
+        ---
+        context:
+          - home
+          - garden
+        ---
+      `,
+      options: {defaultArrayStyle: NormalArrayFormats.MultiLine},
+    },
+    {
+      testName: 'A new key with one value stays a plain value when the default array style is multi-line',
+      before: dedent`
+        context:: home
+      `,
+      after: dedent`
+        ---
+        context: home
+        ---
+      `,
+      options: {defaultArrayStyle: NormalArrayFormats.MultiLine},
+    },
+    {
+      testName: 'An existing single-line array keeps its style when the default array style is multi-line',
+      before: dedent`
+        ---
+        context: [work]
+        ---
+        context:: home
+      `,
+      after: dedent`
+        ---
+        context: [work, home]
+        ---
+      `,
+      options: {
+        howToHandleExistingKeys: 'Merge into list',
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    {
+      testName: 'Merging into an existing plain value uses the default array style',
+      before: dedent`
+        ---
+        context: work
+        ---
+        context:: home
+      `,
+      after: dedent`
+        ---
+        context:
+          - work
+          - home
+        ---
+      `,
+      options: {
+        howToHandleExistingKeys: 'Merge into list',
+        defaultArrayStyle: NormalArrayFormats.MultiLine,
+      },
+    },
+    {
       testName: 'A line whose text before the separator is not a valid key is not a full-line field',
       before: dedent`
         Some.Thing:: value

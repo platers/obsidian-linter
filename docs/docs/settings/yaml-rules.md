@@ -521,7 +521,6 @@ Allows for the formatting of regular YAML arrays as either multi-line or single-
 | ---- | ----------- | ---------- | ------------- |
 | `Format YAML aliases section` | Turns on formatting for the YAML aliases section. You should not enable this option alongside the rule <code>YAML title alias</code> as they may not work well together or they may have different format styles selected causing unexpected results. | N/A | `true` |
 | `Format YAML tags section` | Turns on formatting for the YAML tags section. | N/A | `true` |
-| `Default YAML array section style` | The style of other YAML arrays that are not <code>tags</code>, <code>aliases</code> or  in <code>Force key values to be single-line arrays</code> and <code>Force key values to be multi-line arrays</code> | `multi-line`: ```key:\n  - value```<br/><br/>`single-line`: ```key: [value]``` | `single-line` |
 | `Format YAML array sections` | Turns on formatting for regular YAML arrays | N/A | `true` |
 | `Force key values to be single-line arrays` | Forces the YAML array keys to be in single-line format (leave empty to disable this option) | N/A | `null` |
 | `Force key values to be multi-line arrays` | Forces the YAML array keys to be in multi-line format (leave empty to disable this option) | N/A | `null` |
@@ -662,7 +661,7 @@ animal: cat
 
 Alias: `move-inline-fields-to-yaml`
 
-Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item. Tag and alias fields use the tag and alias array styles from the general settings.
+Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item. Tag and alias fields use the tag and alias array styles from the general settings, and other keys that get more than one value use the default YAML array section style from the general settings.
 
 ### Options
 
@@ -884,6 +883,25 @@ After:
 `````` markdown
 ---
 context: [work, home, garden]
+---
+``````
+</details>
+<details><summary>A key found more than once becomes an array that uses the default array style from the general settings</summary>
+
+Before:
+
+`````` markdown
+context:: home
+context:: garden
+``````
+
+After:
+
+`````` markdown
+---
+context:
+  - home
+  - garden
 ---
 ``````
 </details>

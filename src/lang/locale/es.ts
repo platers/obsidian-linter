@@ -137,6 +137,10 @@ export default {
         'name': 'Estilo de sección de etiquetas de YAML',
         'description': 'El estilo de la sección de etiquetas de YAML',
       },
+      'default-array-style': {
+        'name': 'Estilo de sección de matriz predeterminado de YAML',
+        'description': 'El estilo de otras matrices de YAML que no son `etiquetas`, `alias` o en `Forzar valores de clave para que sean matrices de una sola línea` y `Forzar valores de clave para que sean matrices multilínea`',
+      },
       'default-escape-character': {
         'name': 'Carácter de escape predeterminado',
         'description': 'El carácter predeterminado que se va a usar para escapar de los valores YAML cuando no hay comillas simples y comillas dobles.',
@@ -314,10 +318,6 @@ export default {
       'tag-key': {
         'name': 'Dar formato a la sección de etiquetas de YAML',
         'description': 'Activa el formato para la sección de etiquetas de YAML.',
-      },
-      'default-array-style': {
-        'name': 'Estilo de sección de matriz predeterminado de YAML',
-        'description': 'El estilo de otras matrices de YAML que no son `etiquetas`, `alias` o en `Forzar valores de clave para que sean matrices de una sola línea` y `Forzar valores de clave para que sean matrices multilínea`',
       },
       'default-array-keys': {
         'name': 'Dar formato a las secciones de matrices de YAML',

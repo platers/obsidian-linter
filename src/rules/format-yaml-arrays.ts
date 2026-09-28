@@ -1,5 +1,5 @@
 import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
+import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
 import dedent from 'ts-dedent';
 import {convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
@@ -24,7 +24,8 @@ class FormatYamlArrayOptions implements Options {
   @RuleBuilder.noSettingControl()
     tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   formatTagKey?: boolean = true;
-  defaultArrayStyle?: NormalArrayFormats = NormalArrayFormats.SingleLine;
+  @RuleBuilder.noSettingControl()
+    defaultArrayStyle?: NormalArrayFormats = NormalArrayFormats.SingleLine;
   formatArrayKeys?: boolean = true;
   forceSingleLineArrayStyle?: string[] = [];
   forceMultiLineArrayStyle?: string[] = [];
@@ -244,22 +245,6 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
         nameKey: 'rules.format-yaml-array.tag-key.name',
         descriptionKey: 'rules.format-yaml-array.tag-key.description',
         optionsKey: 'formatTagKey',
-      }),
-      new DropdownOptionBuilder({
-        OptionsClass: FormatYamlArrayOptions,
-        nameKey: 'rules.format-yaml-array.default-array-style.name',
-        descriptionKey: 'rules.format-yaml-array.default-array-style.description',
-        optionsKey: 'defaultArrayStyle',
-        records: [
-          {
-            value: NormalArrayFormats.MultiLine,
-            description: '```key:\\n  - value```',
-          },
-          {
-            value: NormalArrayFormats.SingleLine,
-            description: '```key: [value]```',
-          },
-        ],
       }),
       new BooleanOptionBuilder({
         OptionsClass: FormatYamlArrayOptions,

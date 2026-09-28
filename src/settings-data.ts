@@ -6,6 +6,7 @@ import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArra
 export type CommonStyles = {
   aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats;
   tagArrayStyle: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
+  defaultArrayStyle: NormalArrayFormats;
   minimumNumberOfDollarSignsToBeAMathBlock: number;
   escapeCharacter: QuoteCharacter;
   removeUnnecessaryEscapeCharsForMultiLineArrays: boolean;
@@ -37,6 +38,7 @@ export interface LinterSettings {
   suppressLintAllFilesInFolderConfirmationModal?: boolean;
   settingsConvertedToConfigKeyValues: boolean;
   textAreaSettingsConvertedToListItemSettings: boolean;
+  defaultArrayStyleMovedToCommonStyles: boolean;
   recordLintOnSaveLogs: boolean;
   lintOnFileChange: boolean;
   displayLintOnFileChangeNotice: boolean;
@@ -65,6 +67,7 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   displayLintOnFileChangeNotice: false,
   settingsConvertedToConfigKeyValues: false,
   textAreaSettingsConvertedToListItemSettings: false,
+  defaultArrayStyleMovedToCommonStyles: false,
   additionalFileExtensions: [],
   foldersToIgnore: [],
   filesToIgnore: [],
@@ -75,8 +78,35 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   commonStyles: {
     aliasArrayStyle: NormalArrayFormats.SingleLine,
     tagArrayStyle: NormalArrayFormats.SingleLine,
+    defaultArrayStyle: NormalArrayFormats.SingleLine,
     minimumNumberOfDollarSignsToBeAMathBlock: 2,
     escapeCharacter: '"',
     removeUnnecessaryEscapeCharsForMultiLineArrays: false,
   },
 };
+
+/**
+ * Moves the default array style from the Format YAML array rule to the common styles, since it is now used by more than one rule.
+ * @param {LinterSettings} settings The settings to update
+ * @return {boolean} Whether a change was made to the settings
+ */
+export function moveDefaultArrayStyleToCommonStyles(settings: LinterSettings): boolean {
+  let updateMade = false;
+  const formatYamlArraySettings = settings.ruleConfigs['format-yaml-array'] as {[key: string]: unknown} | undefined;
+  if (formatYamlArraySettings != undefined && Object.hasOwn(formatYamlArraySettings, 'default-array-style')) {
+    const value = formatYamlArraySettings['default-array-style'] as NormalArrayFormats;
+    if (Object.values(NormalArrayFormats).includes(value)) {
+      settings.commonStyles.defaultArrayStyle = value;
+    }
+
+    delete formatYamlArraySettings['default-array-style'];
+    updateMade = true;
+  }
+
+  if (!Object.values(NormalArrayFormats).includes(settings.commonStyles.defaultArrayStyle)) {
+    settings.commonStyles.defaultArrayStyle = NormalArrayFormats.SingleLine;
+    updateMade = true;
+  }
+
+  return updateMade;
+}

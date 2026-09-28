@@ -42,6 +42,8 @@ class MoveInlineFieldsToYamlOptions implements Options {
   @RuleBuilder.noSettingControl()
     aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
   @RuleBuilder.noSettingControl()
+    defaultArrayStyle?: NormalArrayFormats = NormalArrayFormats.SingleLine;
+  @RuleBuilder.noSettingControl()
     removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
 
@@ -115,7 +117,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
 
       const existingValue = getYamlSectionValue(existingYaml, key, false);
 
-      // an existing array keeps its style, otherwise several values become a single-line array
+      // an existing array keeps its style, otherwise several values use the default array style from the general settings
       const existingArrayFormat = existingValue == null ? null : getArrayFormat(existingValue);
       let yamlValue: string;
       if (existingValue == null || options.howToHandleExistingKeys === 'Overwrite') {
@@ -375,7 +377,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
         return ' ' + values[0];
       }
 
-      arrayFormat = NormalArrayFormats.SingleLine;
+      arrayFormat = options.defaultArrayStyle;
     }
 
     return formatYamlArrayValue(values, arrayFormat, defaultEscapeCharacter, false);
@@ -594,6 +596,23 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
         `,
         options: {
           howToHandleExistingKeys: 'Merge into list',
+        },
+      }),
+      new ExampleBuilder({
+        description: 'A key found more than once becomes an array that uses the default array style from the general settings',
+        before: dedent`
+          context:: home
+          context:: garden
+        `,
+        after: dedent`
+          ---
+          context:
+            - home
+            - garden
+          ---
+        `,
+        options: {
+          defaultArrayStyle: NormalArrayFormats.MultiLine,
         },
       }),
       new ExampleBuilder({

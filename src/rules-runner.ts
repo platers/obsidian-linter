@@ -97,6 +97,7 @@ export class RulesRunner {
       minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
       aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
       tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
+      defaultArrayStyle: runOptions.settings.commonStyles.defaultArrayStyle,
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
       removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
     };
@@ -230,6 +231,7 @@ export class RulesRunner {
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
       tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
       aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
+      defaultArrayStyle: runOptions.settings.commonStyles.defaultArrayStyle,
       removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
     });
 

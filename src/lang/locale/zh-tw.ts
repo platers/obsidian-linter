@@ -199,6 +199,10 @@ export default {
         'name': 'YAML 標籤區段樣式',
         'description': 'YAML 標籤區段的樣式',
       },
+      'default-array-style': {
+        'name': '預設 YAML 陣列區段樣式',
+        'description': '其他 YAML 陣列的樣式，這些陣列不是 <code>tags</code>、<code>aliases</code> 或在 <code>強制鍵值為單行陣列</code> 和 <code>強制鍵值為多行陣列</code> 中的陣列',
+      },
       'default-escape-character': {
         'name': '預設逸出字元',
         'description': '當單引號和雙引號不存在時，用於逸出 YAML 值的預設字元。',
@@ -455,10 +459,6 @@ export default {
       'tag-key': {
         'name': '格式化 YAML 標籤區段',
         'description': '開啟 YAML 標籤區段的格式化功能。',
-      },
-      'default-array-style': {
-        'name': '預設 YAML 陣列區段樣式',
-        'description': '其他 YAML 陣列的樣式，這些陣列不是 <code>tags</code>、<code>aliases</code> 或在 <code>強制鍵值為單行陣列</code> 和 <code>強制鍵值為多行陣列</code> 中的陣列',
       },
       'default-array-keys': {
         'name': '格式化 YAML 陣列區段',

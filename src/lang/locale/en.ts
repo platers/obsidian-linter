@@ -250,6 +250,10 @@ export default {
         'name': 'YAML tags section style',
         'description': 'The style of the YAML tags section',
       },
+      'default-array-style': {
+        'name': 'Default YAML array section style',
+        'description': 'The style of YAML arrays that are not <code>tags</code> or <code>aliases</code>. <code>Format YAML array</code> uses it for arrays not in <code>Force key values to be single-line arrays</code> or <code>Force key values to be multi-line arrays</code>, and <code>Move inline fields to YAML</code> uses it for keys that get more than one value.',
+      },
       'default-escape-character': {
         'name': 'Default escape character',
         'description': 'The default character to use to escape YAML values when a single quote and double quote are not present.',
@@ -534,10 +538,6 @@ export default {
         'name': 'Format YAML tags section',
         'description': 'Turns on formatting for the YAML tags section.',
       },
-      'default-array-style': {
-        'name': 'Default YAML array section style',
-        'description': 'The style of other YAML arrays that are not <code>tags</code>, <code>aliases</code> or  in <code>Force key values to be single-line arrays</code> and <code>Force key values to be multi-line arrays</code>',
-      },
       'default-array-keys': {
         'name': 'Format YAML array sections',
         'description': 'Turns on formatting for regular YAML arrays',
@@ -610,7 +610,7 @@ export default {
     // move-inline-fields-to-yaml.ts
     'move-inline-fields-to-yaml': {
       'name': 'Move inline fields to YAML',
-      'description': 'Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item. Tag and alias fields use the tag and alias array styles from the general settings.',
+      'description': 'Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item. Tag and alias fields use the tag and alias array styles from the general settings, and other keys that get more than one value use the default YAML array section style from the general settings.',
       'how-to-handle-full-line-fields': {
         'name': 'Full-line inline fields',
         'description': 'What to do with inline fields that take up a whole line like <code>key:: value</code>',

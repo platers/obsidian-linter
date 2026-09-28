@@ -40,7 +40,7 @@ describe('Move inline fields to YAML run order', () => {
     const settings = settingsWithRulesEnabled({
       'move-inline-fields-to-yaml': {},
       // alphabetically this runs before Move inline fields to YAML, so it only sees the moved keys if they are moved first
-      'format-yaml-array': {'default-array-style': 'multi-line'},
+      'format-yaml-array': {'force-multi-line-array-style': ['context']},
       'yaml-key-sort': {'yaml-sort-order-for-other-keys': 'Ascending Alphabetical'},
     });
 
@@ -60,6 +60,24 @@ describe('Move inline fields to YAML run order', () => {
         - home
         - garden
       title: Note
+      ---
+    `);
+  });
+
+  it('uses the default array style from the general settings', () => {
+    const settings = settingsWithRulesEnabled({'move-inline-fields-to-yaml': {}});
+    settings.commonStyles.defaultArrayStyle = NormalArrayFormats.MultiLine;
+
+    const before = dedent`
+      context:: home
+      context:: garden
+    `;
+
+    expect(lint(before, settings)).toBe(dedent`
+      ---
+      context:
+        - home
+        - garden
       ---
     `);
   });

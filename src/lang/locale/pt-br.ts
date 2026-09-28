@@ -204,6 +204,10 @@ export default {
         'name': 'Estilo da seção de tags do YAML',
         'description': 'O estilo da seção de tags do YAML',
       },
+      'default-array-style': {
+        'name': 'Estilo de seção padrão do array no YAML',
+        'description': 'O estilo de outros arrays no YAML que não são <code>tags</code>, <code>aliases</code> ou que não estejam em <code>Forçar valores das chaves a serem arrays de linha única</code> e <code>Forçar valores das chaves a serem arrays de múltiplas linhas</code>',
+      },
       'default-escape-character': {
         'name': 'Caractere de escape padrão',
         'description': 'O caractere padrão a ser usado para escapar valores no YAML quando aspas simples e duplas não estiverem presentes.',
@@ -469,10 +473,6 @@ export default {
       'tag-key': {
         'name': 'Formatar seção de tags no YAML',
         'description': 'Ativa a formatação para a seção de tags do YAML.',
-      },
-      'default-array-style': {
-        'name': 'Estilo de seção padrão do array no YAML',
-        'description': 'O estilo de outros arrays no YAML que não são <code>tags</code>, <code>aliases</code> ou que não estejam em <code>Forçar valores das chaves a serem arrays de linha única</code> e <code>Forçar valores das chaves a serem arrays de múltiplas linhas</code>',
       },
       'default-array-keys': {
         'name': 'Formatar seção de array no YAML',
