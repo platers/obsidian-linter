@@ -26,7 +26,7 @@ export const lineStartingWithWhitespaceOrBlockquoteTemplate = `\\s*(>\\s*)*`;
 export const emptyLineMathBlockquoteRegex = /^ {0,3}(>( |\t)*)+\$*?$/m;
 export const startsWithBlockquote = /^\s*(>\s*)+/m;
 export const tableSeparator = /(\|? *:?-{1,}:? *\|?)(\| *:?-{1,}:? *\|?)*( |\t)*$/gm;
-export const tableStartingPipe = /^(((>[ ]?)*)|([ ]{0,3}))\|/m;
+export const tableStartingPipe = /^(((?:>[ \t]*)+)|([ ]{0,3}))\|/m;
 export const tableRow = /[^\n]*?\|[^\n]*?(\n|$)/m;
 // based on https://gist.github.com/skeller88/5eb73dc0090d4ff1249a
 export const simpleURIRegex = /(([a-z\-0-9]+:)\/{2,3})([^\s/?#]*[^\s")'.?!/]|[/])?(([/?#][^\s")']*[^\s")'.?!])|[/])?/gi;

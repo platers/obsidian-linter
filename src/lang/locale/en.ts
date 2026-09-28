@@ -107,7 +107,10 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'error in the YAML: {ERROR_MESSAGE}',
     'wrapper-unknown-error': 'unknown error: {ERROR_MESSAGE}',
-    'error-message-format': '"{RULE_NAME}" ecountered an {ERROR_MESSAGE}'
+    'error-message-format': '"{RULE_NAME}" ecountered an {ERROR_MESSAGE}',
+
+    //table.ts
+    'unexpected-pre-table-content': 'Trying to trim the start of a table row resulted in an unexpected result finding some non-whitespace value in blockquote prior to the table row start for "{TABLE_ROW}" and start of line "{START_OF_LINE}".',
   },
 
   'validation': {
@@ -354,6 +357,11 @@ export default {
     'add-blank-line-after-yaml': {
       'name': 'Add blank line after YAML',
       'description': 'Adds a blank line after the YAML block if it does not end the current file or it is not already followed by at least 1 blank line',
+    },
+    // align-table-columns.ts
+    'align-table-columns': {
+      'name': 'Align Table Columns',
+      'description': 'Aligns the table so that all columns have the same length.',
     },
     // blockquotify-on-paste.ts
     'add-blockquote-indentation-on-paste': {

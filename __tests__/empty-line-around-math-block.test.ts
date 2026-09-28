@@ -26,5 +26,54 @@ ruleTest({
         > > Text under nested callout.
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1319
+      testName: 'Make sure that empty lines around math blocks handles an empty line prior to the math block that is nested one blockquote level more than the math block is',
+      before: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > > 
+        > $$
+        > Some math here
+        > $$
+      `,
+      after: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > >
+        > $$
+        > Some math here
+        > $$
+      `
+    },
+    {
+      testName: 'Make sure that empty lines around math blocks handles an empty line after the math block that is nested one blockquote level more than the math block is',
+      before: dedent`
+        > AAA
+        >
+        > $$
+        > Some math here
+        > $$
+        > > **BBB:**
+        > >
+        > > - CCC
+      `,
+      after: dedent`
+        > AAA
+        >
+        > $$
+        > Some math here
+        > $$
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+      `
+    },
   ],
 });

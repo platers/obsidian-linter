@@ -1,11 +1,11 @@
-import {getAllTablesInText} from '../src/utils/mdast';
+import { getAllTablesInText } from '../src/utils/mdast';
 import dedent from 'ts-dedent';
 
 type tablesInTextTestCase = {
   name: string,
   text: string,
   expectedTablesInText: number,
-  expectedPositions: {startIndex:number, endIndex: number}[]
+  expectedPositions: { startIndex: number, endIndex: number }[]
 };
 
 const getTablesInTextTestCases: tablesInTextTestCase[] = [
@@ -18,7 +18,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       | data1   | data2   |
     `,
     expectedTablesInText: 1,
-    expectedPositions: [{startIndex: 18, endIndex: 83}],
+    expectedPositions: [{ startIndex: 18, endIndex: 83 }],
   },
   {
     name: 'matches empty table as a single table',
@@ -28,7 +28,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       |-|-|
     `,
     expectedTablesInText: 1,
-    expectedPositions: [{startIndex: 18, endIndex: 27}],
+    expectedPositions: [{ startIndex: 18, endIndex: 27 }],
   },
   {
     name: 'does not get a table where the header and delimiter have a different cell count',
@@ -48,7 +48,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       |-|-|
     `,
     expectedTablesInText: 1,
-    expectedPositions: [{startIndex: 18, endIndex: 41}],
+    expectedPositions: [{ startIndex: 18, endIndex: 41 }],
   },
   {
     name: 'matches table where delimiter has some pipes while the header is missing optional pipes',
@@ -58,7 +58,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       |-|-
     `,
     expectedTablesInText: 1,
-    expectedPositions: [{startIndex: 18, endIndex: 40}],
+    expectedPositions: [{ startIndex: 18, endIndex: 40 }],
   },
   {
     name: 'matches table where there is trailing space at the end of the table header and delimiter',
@@ -68,7 +68,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       |-|-|${'  '}
     `,
     expectedTablesInText: 1,
-    expectedPositions: [{startIndex: 18, endIndex: 47}],
+    expectedPositions: [{ startIndex: 18, endIndex: 47 }],
   },
   {
     name: 'matches table that uses the alignment operators (:) in table delimiter',
@@ -78,7 +78,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       |:-|-:|-| :----:  |   -${'      '}
     `,
     expectedTablesInText: 1,
-    expectedPositions: [{startIndex: 18, endIndex: 93}],
+    expectedPositions: [{ startIndex: 18, endIndex: 93 }],
   },
   {
     name: 'does not match table with a delimiter row that has an empty cell devoid of any characters',
@@ -116,7 +116,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       |-|
     `,
     expectedTablesInText: 1,
-    expectedPositions: [{startIndex: 0, endIndex: 21}],
+    expectedPositions: [{ startIndex: 0, endIndex: 21 }],
   },
   {
     name: 'does not match table in blockquote that is missing table separator row',
@@ -138,7 +138,42 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       > | One | More |
     `,
     expectedTablesInText: 1,
-    expectedPositions: [{startIndex: 22, endIndex: 90}],
+    expectedPositions: [{ startIndex: 22, endIndex: 90 }],
+  },
+  {
+    name: 'matches a table in a blockquote with indentation after the indicator',
+    text: dedent`
+      >     | Looks like a table | Column2 |
+      >     | :--- | ----: |
+      >     | One | More |
+    `,
+    expectedTablesInText: 1,
+    expectedPositions: [{ startIndex: 6, endIndex: 82 }],
+  },
+  {
+    name: 'matches a table in a list item with indentation',
+    text: dedent`
+      ${''}- An item
+      ${''}- Some item
+      ${''}
+      ${''}  | Column 1 | Column 2 |
+      ${''}  |----------|----------|
+      ${''}  | foo1     | bar1     |
+      ${''}  | foo2     | bar2     |
+      ${''}  | foo3     | bar3     |
+    `,
+    expectedTablesInText: 1,
+    expectedPositions: [{ startIndex: 25, endIndex: 152 }],
+  },
+  {
+    name: 'matches a table in a blockquote with indentation after the indicator',
+    text: dedent`
+      >     | Looks like a table | Column2 |
+      >     | :--- | ----: |
+      >     | One | More |
+    `,
+    expectedTablesInText: 1,
+    expectedPositions: [{startIndex: 6, endIndex: 82}],
   },
   {
     name: 'matches recognizes two separate tables in a blockquote/callout when there is a blank line between them',
@@ -155,7 +190,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       Some more text here...
     `,
     expectedTablesInText: 2,
-    expectedPositions: [{startIndex: 95, endIndex: 164}, {startIndex: 22, endIndex: 90}],
+    expectedPositions: [{ startIndex: 95, endIndex: 164 }, { startIndex: 22, endIndex: 90 }],
   },
   {
     name: 'matches two tables with a blank line between them',
@@ -170,7 +205,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       | data3   | data4   |
     `,
     expectedTablesInText: 2,
-    expectedPositions: [{startIndex: 85, endIndex: 150}, {startIndex: 18, endIndex: 83}],
+    expectedPositions: [{ startIndex: 85, endIndex: 150 }, { startIndex: 18, endIndex: 83 }],
   },
   {
     name: 'matches indented table',
@@ -181,7 +216,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       ${'   '}| data1   | data2   |
     `,
     expectedTablesInText: 1,
-    expectedPositions: [{startIndex: 18, endIndex: 92}],
+    expectedPositions: [{ startIndex: 21, endIndex: 92 }],
   },
   {
     name: 'does not match YAML indicators',
@@ -230,7 +265,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       | 3 | 4 |
     `,
     expectedTablesInText: 2,
-    expectedPositions: [{startIndex: 35, endIndex: 112}, {startIndex: 0, endIndex: 33}],
+    expectedPositions: [{ startIndex: 35, endIndex: 112 }, { startIndex: 0, endIndex: 33 }],
   },
   { // accounts for https://github.com/platers/obsidian-linter/issues/1235
     name: 'handle tables with --- in a row',
@@ -251,7 +286,7 @@ const getTablesInTextTestCases: tablesInTextTestCase[] = [
       | five  |
     `,
     expectedTablesInText: 1,
-    expectedPositions: [{startIndex: 0, endIndex: 139}],
+    expectedPositions: [{ startIndex: 0, endIndex: 139 }],
   },
 ];
 

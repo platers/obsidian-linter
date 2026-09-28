@@ -1,5 +1,5 @@
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
+import { ruleTest } from './common';
 import EmptyLineAroundTables from '../src/rules/empty-line-around-tables';
 
 ruleTest({
@@ -170,6 +170,55 @@ ruleTest({
         | four  |
         | five  |
       `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1319
+      testName: 'Make sure that empty lines around table handles an empty line prior to the table that is nested one blockquote level more than the table is',
+      before: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > > 
+        > | D | E |
+        > |:---:|:--- |
+        > | F | G |
+      `,
+      after: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > >
+        > | D | E |
+        > |:---:|:--- |
+        > | F | G |
+      `
+    },
+    {
+      testName: 'Make sure that empty lines around table handles an empty line after the table that is nested one blockquote level more than the table is',
+      before: dedent`
+        > AAA
+        >
+        > | D | E |
+        > |:---:|:--- |
+        > | F | G |
+        > > **BBB:**
+        > >
+        > > - CCC
+      `,
+      after: dedent`
+        > AAA
+        >
+        > | D | E |
+        > |:---:|:--- |
+        > | F | G |
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+      `
     },
   ],
 });

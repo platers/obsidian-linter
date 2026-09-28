@@ -1,6 +1,6 @@
 import EmptyLineAroundCodeFences from '../src/rules/empty-line-around-code-fences';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
+import { ruleTest } from './common';
 
 ruleTest({
   RuleBuilderClass: EmptyLineAroundCodeFences,
@@ -168,6 +168,133 @@ ruleTest({
         > > another query or basic code-block
         > > \`\`\`
       `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1367
+      testName: 'Indented code blocks in a blockquote should be deterministic and not make changes in this case',
+      before: dedent`
+        > 1. OpenCV Installation:
+        >${' '}
+        > 	- After Python is installed, open Command Prompt as administrator
+        > 	- Install OpenCV by running:
+        >
+        > 		\`\`\` title: unwarp
+        >         pip install opencv-python
+        >         \`\`\`
+        >
+        > 	- Verify installation:
+        >
+        > 		\`\`\` title: unwarp
+        >         python -c "import cv2"
+        >         \`\`\`
+        >
+        > 	- Enables Extract Image Scans operation
+      `,
+      after: dedent`
+        > 1. OpenCV Installation:
+        >${' '}
+        > 	- After Python is installed, open Command Prompt as administrator
+        > 	- Install OpenCV by running:
+        >
+        > 		\`\`\` title: unwarp
+        >         pip install opencv-python
+        >         \`\`\`
+        >
+        > 	- Verify installation:
+        >
+        > 		\`\`\` title: unwarp
+        >         python -c "import cv2"
+        >         \`\`\`
+        >
+        > 	- Enables Extract Image Scans operation
+      `
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1367
+      testName: 'Indented code blocks in a very nested blockquote should be deterministic and not make changes in this case',
+      before: dedent`
+        > > > > 1. OpenCV Installation:
+        > > > >${' '}
+        > > > > 	- After Python is installed, open Command Prompt as administrator
+        > > > > 	- Install OpenCV by running:
+        > > > >
+        > > > > 		\`\`\` title: unwarp
+        > > > >         pip install opencv-python
+        > > > >         \`\`\`
+        > > > >
+        > > > > 	- Verify installation:
+        > > > >
+        > > > > 		\`\`\` title: unwarp
+        > > > >         python -c "import cv2"
+        > > > >         \`\`\`
+        > > > >
+        > > > > 	- Enables Extract Image Scans operation
+      `,
+      after: dedent`
+        > > > > 1. OpenCV Installation:
+        > > > >${' '}
+        > > > > 	- After Python is installed, open Command Prompt as administrator
+        > > > > 	- Install OpenCV by running:
+        > > > >
+        > > > > 		\`\`\` title: unwarp
+        > > > >         pip install opencv-python
+        > > > >         \`\`\`
+        > > > >
+        > > > > 	- Verify installation:
+        > > > >
+        > > > > 		\`\`\` title: unwarp
+        > > > >         python -c "import cv2"
+        > > > >         \`\`\`
+        > > > >
+        > > > > 	- Enables Extract Image Scans operation
+      `
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1319
+      testName: 'Make sure that empty lines around code fences handles an empty line prior to the code fence that is nested one blockquote level more than the code fence is',
+      before: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > > 
+        > \`\`\`
+        > Some code
+        > \`\`\`
+      `,
+      after: dedent`
+        > AAA
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+        > >
+        > \`\`\`
+        > Some code
+        > \`\`\`
+      `
+    },
+    {
+      testName: 'Make sure that empty lines around table handles an empty line after the code fence that is nested one blockquote level more than the code fence is',
+      before: dedent`
+        > AAA
+        >
+        > \`\`\`
+        > Some code
+        > \`\`\`
+        > > **BBB:**
+        > >
+        > > - CCC
+      `,
+      after: dedent`
+        > AAA
+        >
+        > \`\`\`
+        > Some code
+        > \`\`\`
+        >
+        > > **BBB:**
+        > >
+        > > - CCC
+      `
     },
   ],
 });
