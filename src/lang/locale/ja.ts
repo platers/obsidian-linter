@@ -203,6 +203,10 @@ export default {
         'name': 'YAMLタグセクションのスタイル',
         'description': 'YAMLタグセクションのスタイル',
       },
+      'default-array-style': {
+        'name': 'デフォルトのYAML配列セクションスタイル',
+        'description': 'YAML配列のスタイル（"タグ"、"エイリアス"、および"単一行配列に強制するキーの値"や"複数行配列に強制するキーの値"に含まれないもの）',
+      },
       'default-escape-character': {
         'name': 'デフォルトのエスケープ文字',
         'description': 'シングルクォートとダブルクォートが存在しない場合に、YAMLの値をエスケープするために使用するデフォルトの文字。',
@@ -460,10 +464,6 @@ export default {
       'tag-key': {
         'name': 'YAMLタグセクションのフォーマット',
         'description': 'YAMLタグセクションのフォーマットを有効にします。',
-      },
-      'default-array-style': {
-        'name': 'デフォルトのYAML配列セクションスタイル',
-        'description': 'YAML配列のスタイル（"タグ"、"エイリアス"、および"単一行配列に強制するキーの値"や"複数行配列に強制するキーの値"に含まれないもの）',
       },
       'default-array-keys': {
         'name': 'YAML配列セクションのフォーマット',

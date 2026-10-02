@@ -191,6 +191,10 @@ export default {
         'name': 'YAML tags 样式',
         'description': 'YAML tags 样式',
       },
+      'default-array-style': {
+        'name': '默认的 YAML 数组格式',
+        'description': '除了 tags, aliases 或将键值强制为单行数组和将键值强制为多行数组之外，其他为常规 YAML 数组的样式',
+      },
       'default-escape-character': {
         'name': '默认转义字符',
         'description': '当单引号或双引号不存在时用于转义 YAML 值的默认字符',
@@ -453,10 +457,6 @@ export default {
       'tag-key': {
         'name': '格式化 YAML tags',
         'description': '打开 YAML tags 部分的格式设置',
-      },
-      'default-array-style': {
-        'name': '默认的 YAML 数组格式',
-        'description': '除了 tags, aliases 或将键值强制为单行数组和将键值强制为多行数组之外，其他为常规 YAML 数组的样式',
       },
       'default-array-keys': {
         'name': '格式化 YAML 数组',

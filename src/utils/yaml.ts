@@ -350,8 +350,8 @@ export function getYamlSectionValue(yaml: string, rawKey: string, allowNestedKey
   return yaml.substring(valueRange.start, valueRange.end);
 }
 
-export function setYamlSection(yaml: string, rawKey: string, rawValue: string): string {
-  const pair = getYamlPair(yaml, rawKey, true);
+export function setYamlSection(yaml: string, rawKey: string, rawValue: string, allowNestedKey: boolean = true): string {
+  const pair = getYamlPair(yaml, rawKey, allowNestedKey);
 
   if (!pair) {
     return `${yaml}${rawKey}:${rawValue}\n`;

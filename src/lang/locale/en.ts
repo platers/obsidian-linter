@@ -253,6 +253,10 @@ export default {
         'name': 'YAML tags section style',
         'description': 'The style of the YAML tags section',
       },
+      'default-array-style': {
+        'name': 'Default YAML array section style',
+        'description': 'The style of YAML arrays that are not <code>tags</code> or <code>aliases</code>. <code>Format YAML array</code> uses it for arrays not in <code>Force key values to be single-line arrays</code> or <code>Force key values to be multi-line arrays</code>, and <code>Move inline fields to YAML</code> uses it for keys that get more than one value.',
+      },
       'default-escape-character': {
         'name': 'Default escape character',
         'description': 'The default character to use to escape YAML values when a single quote and double quote are not present.',
@@ -542,10 +546,6 @@ export default {
         'name': 'Format YAML tags section',
         'description': 'Turns on formatting for the YAML tags section.',
       },
-      'default-array-style': {
-        'name': 'Default YAML array section style',
-        'description': 'The style of other YAML arrays that are not <code>tags</code>, <code>aliases</code> or  in <code>Force key values to be single-line arrays</code> and <code>Force key values to be multi-line arrays</code>',
-      },
       'default-array-keys': {
         'name': 'Format YAML array sections',
         'description': 'Turns on formatting for regular YAML arrays',
@@ -613,6 +613,29 @@ export default {
       'include-blank-line-between-footnotes': {
         'name': 'Include blank line between footnotes',
         'description': 'Includes a blank line between footnotes when enabled.',
+      },
+    },
+    // move-inline-fields-to-yaml.ts
+    'move-inline-fields-to-yaml': {
+      'name': 'Move inline fields to YAML',
+      'description': 'Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter of the document. Fields on list items and tasks are left alone since Dataview scopes them to the list item. Tag and alias fields use the tag and alias array styles from the general settings, and other keys that get more than one value use the default YAML array section style from the general settings.',
+      'how-to-handle-full-line-fields': {
+        'name': 'Full-line inline fields',
+        'description': 'What to do with inline fields that take up a whole line like <code>key:: value</code>',
+      },
+      'how-to-handle-bracketed-fields': {
+        'name': 'Bracketed inline fields',
+        'description': 'What to do with inline fields wrapped in square brackets or parentheses like <code>[key:: value]</code> and <code>(key:: value)</code>',
+      },
+      'how-to-handle-existing-keys': {
+        'name': 'When the key already exists',
+        'description': 'What to do when an inline field has the same key as a key already in the YAML frontmatter. Keys have to match exactly, including their case.',
+      },
+      'inline-keys-to-ignore': {
+        'name': 'Inline keys to ignore',
+        'description': 'The inline field keys that will not be moved to the YAML frontmatter',
+        'empty-state': 'No inline keys to ignore yet.',
+        'placeholder-text': 'Inline key to ignore',
       },
     },
     // move-math-block-indicators-to-their-own-line.ts
@@ -1021,6 +1044,14 @@ export default {
     'Nothing': 'Nothing',
     'Remove hashtag': 'Remove hashtag',
     'Remove whole tag': 'Remove whole tag',
+    // move-inline-fields-to-yaml.ts
+    'Leave in place': 'Leave in place',
+    'Move and keep in text': 'Move and keep in text',
+    'Move and keep value in text': 'Move and keep value in text',
+    'Move and remove': 'Move and remove',
+    'Skip': 'Skip',
+    'Merge into list': 'Merge into list',
+    'Overwrite': 'Overwrite',
     'asterisk': 'asterisk',
     'underscore': 'underscore',
     'consistent': 'consistent',

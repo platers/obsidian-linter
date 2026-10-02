@@ -161,6 +161,10 @@ export default {
         'name': 'YAML etiketleri bölümü stili',
         'description': 'YAML etiketleri bölümünün stili',
       },
+      'default-array-style': {
+        'name': 'Varsayılan YAML dizi bölümü stili',
+        'description': '<code>tags</code>, <code>aliases</code> veya <code>Force key values to be single-line arrays</code> ve <code>Force key values to be multi-line arrays</code> olmayan diğer YAML dizilerinin stili',
+      },
       'default-escape-character': {
         'name': 'Varsayılan Kaçış Karakteri',
         'description': 'Tek tırnak ve çift tırnak bulunmayan YAML değerlerinden kaçmak için kullanılacak varsayılan karakter.',
@@ -364,10 +368,6 @@ export default {
       'tag-key': {
         'name': 'YAML etiketleri bölümünü biçimlendir',
         'description': 'YAML etiketleri bölümü için biçimlendirmeyi açar.',
-      },
-      'default-array-style': {
-        'name': 'Varsayılan YAML dizi bölümü stili',
-        'description': '<code>tags</code>, <code>aliases</code> veya <code>Force key values to be single-line arrays</code> ve <code>Force key values to be multi-line arrays</code> olmayan diğer YAML dizilerinin stili',
       },
       'default-array-keys': {
         'name': 'YAML dizi bölümlerini biçimlendir',

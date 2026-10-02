@@ -163,6 +163,10 @@ export default {
         'name': 'Abschnittsstil für YAML-Tags',
         'description': 'Der Stil des YAML-Tags-Abschnitts',
       },
+      'default-array-style': {
+        'name': 'Standardmäßiger YAML-Array-Abschnittsstil',
+        'description': 'Der Stil anderer YAML-Arrays, die nicht <code>tags</code> oder <code>aliases</code> sind oder bei <code>Erzwingt für Schlüsselwerte einzeilige Arrays</code> und <code>Erzwingt für Schlüsselwerte mehrzeilige Arrays</code>',
+      },
       'default-escape-character': {
         'name': 'Standard-Escape-Zeichen',
         'description': 'Das Standardzeichen, das zum Maskieren von YAML-Werten verwendet werden soll, wenn ein einfaches Anführungszeichen und kein doppeltes Anführungszeichen vorhanden sind.',
@@ -365,10 +369,6 @@ export default {
       'tag-key': {
         'name': 'Abschnitt "YAML-Tags formatieren"',
         'description': 'Aktiviert die Formatierung für den Abschnitt YAML-Tags.',
-      },
-      'default-array-style': {
-        'name': 'Standardmäßiger YAML-Array-Abschnittsstil',
-        'description': 'Der Stil anderer YAML-Arrays, die nicht <code>tags</code> oder <code>aliases</code> sind oder bei <code>Erzwingt für Schlüsselwerte einzeilige Arrays</code> und <code>Erzwingt für Schlüsselwerte mehrzeilige Arrays</code>',
       },
       'default-array-keys': {
         'name': 'Formatieren von YAML-Array-Abschnitten',

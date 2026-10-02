@@ -195,6 +195,18 @@ export class SettingTab extends PluginSettingTab {
           },
         },
         {
+          name: getTextInLanguage('tabs.general.default-array-style.name'),
+          desc: richDescription(getTextInLanguage('tabs.general.default-array-style.description')),
+          control: {
+            type: 'dropdown',
+            key: 'commonStyles.defaultArrayStyle',
+            options: enumOptions([
+              NormalArrayFormats.MultiLine,
+              NormalArrayFormats.SingleLine,
+            ]),
+          },
+        },
+        {
           name: getTextInLanguage('tabs.general.default-escape-character.name'),
           desc: richDescription(getTextInLanguage('tabs.general.default-escape-character.description')),
           control: {

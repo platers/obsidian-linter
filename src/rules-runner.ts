@@ -28,6 +28,7 @@ import {IgnoreTypes} from './utils/ignore-types';
 import {LintContext, replaceUnprotectedRegexMatches} from './utils/protected-ranges';
 import {addEditsIfTheyDoNotClash, getEditsBetween} from './utils/text-edits';
 import MoveMathBlockIndicatorsToOwnLine from './rules/move-math-block-indicators-to-own-line';
+import MoveInlineFieldsToYaml from './rules/move-inline-fields-to-yaml';
 import {LinterSettings} from './settings-data';
 import TrailingSpaces from './rules/trailing-spaces';
 import { CustomAutoCorrectContent } from './settings-data';
@@ -96,6 +97,7 @@ export class RulesRunner {
       minimumNumberOfDollarSignsToBeAMathBlock: runOptions.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock,
       aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
       tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
+      defaultArrayStyle: runOptions.settings.commonStyles.defaultArrayStyle,
       defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
       removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
     };
@@ -222,6 +224,15 @@ export class RulesRunner {
 
     [newText] = AutoCorrectCommonMisspellings.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
       misspellingToCorrection: runOptions.defaultMisspellings,
+    });
+
+    // moves inline fields last so that the YAML rules that run after this, like YAML Key Sort, include the keys it adds
+    [newText] = MoveInlineFieldsToYaml.applyIfEnabled(newText, runOptions.settings, this.disabledRules, {
+      defaultEscapeCharacter: runOptions.settings.commonStyles.escapeCharacter,
+      tagArrayStyle: runOptions.settings.commonStyles.tagArrayStyle,
+      aliasArrayStyle: runOptions.settings.commonStyles.aliasArrayStyle,
+      defaultArrayStyle: runOptions.settings.commonStyles.defaultArrayStyle,
+      removeUnnecessaryEscapeCharsForMultiLineArrays: runOptions.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays,
     });
 
     return newText;

@@ -15,7 +15,7 @@ import { SettingTab } from './ui/settings';
 import { escapeRegExp, urlRegex, wordSplitterRegex } from './utils/regex';
 import { getTextInLanguage, LanguageStringKey, setLanguage } from './lang/helpers';
 import { RuleAliasSuggest } from './cm6/rule-alias-suggester';
-import { AfterFileChangeLintTimes, DEFAULT_SETTINGS, LinterSettings } from './settings-data';
+import { AfterFileChangeLintTimes, DEFAULT_SETTINGS, LinterSettings, moveDefaultArrayStyleToCommonStyles } from './settings-data';
 import AsyncLock from 'async-lock';
 import { warn } from 'loglevel';
 import { CustomAutoCorrectContent } from './settings-data';
@@ -112,6 +112,11 @@ export default class LinterPlugin extends Plugin {
       if (await this.moveTextAreaSettingsToListItemSettings()) {
         await this.saveSettings();
       }
+    }
+
+    // settings that still use the setting names as keys get migrated once the layout is ready
+    if (this.settings.settingsConvertedToConfigKeyValues && !this.settings.defaultArrayStyleMovedToCommonStyles) {
+      await this.moveDefaultArrayStyleToCommonStyles();
     }
 
     this.settingsTab = new SettingTab(this.app, this);
@@ -772,6 +777,10 @@ export default class LinterPlugin extends Plugin {
       updateMade = await this.moveTextAreaSettingsToListItemSettings();
     }
 
+    if (!this.settings.defaultArrayStyleMovedToCommonStyles) {
+      updateMade = await this.moveDefaultArrayStyleToCommonStyles() || updateMade;
+    }
+
     // check for and fix invalid settings
     let noticeText = 'Obsidian Linter:';
     let conflictingRulePresent = false;
@@ -1288,6 +1297,15 @@ export default class LinterPlugin extends Plugin {
     }
 
     this.settings.textAreaSettingsConvertedToListItemSettings = true;
+    await this.saveSettings();
+
+    return updateMade;
+  }
+
+  private async moveDefaultArrayStyleToCommonStyles(): Promise<boolean> {
+    const updateMade = moveDefaultArrayStyleToCommonStyles(this.settings);
+
+    this.settings.defaultArrayStyleMovedToCommonStyles = true;
     await this.saveSettings();
 
     return updateMade;
