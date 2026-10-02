@@ -16,7 +16,9 @@ import {
   getYamlSectionValue,
   initYAML,
   NormalArrayFormats,
+  OBSIDIAN_ALIAS_KEY_PLURAL,
   OBSIDIAN_ALIASES_KEYS,
+  OBSIDIAN_TAG_KEY_PLURAL,
   OBSIDIAN_TAG_KEYS,
   QuoteCharacter,
   setYamlSection,
@@ -47,7 +49,7 @@ class MoveInlineFieldsToYamlOptions implements Options {
     removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
 
-type ObsidianListKey = 'tags' | 'aliases';
+type ObsidianListKey = typeof OBSIDIAN_TAG_KEY_PLURAL | typeof OBSIDIAN_ALIAS_KEY_PLURAL;
 
 type InlineField = {
   key: string,
@@ -126,9 +128,9 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
         let existingValues = this.getMergeableValues(existingValue);
         if (existingValues == null) {
           continue;
-        } else if (listKey === 'tags') {
+        } else if (listKey === OBSIDIAN_TAG_KEY_PLURAL) {
           existingValues = existingValues.flatMap((value) => convertTagValueToStringOrStringArray(value));
-        } else if (listKey === 'aliases') {
+        } else if (listKey === OBSIDIAN_ALIAS_KEY_PLURAL) {
           existingValues = existingValues.flatMap((value) => convertAliasValueToStringOrStringArray(value));
         }
 
@@ -346,7 +348,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
    * @return {string[] | null} The values to add or null when the values are not valid for the key
    */
   getNewValues(values: string[], listKey: ObsidianListKey | null, options: MoveInlineFieldsToYamlOptions): string[] | null {
-    if (listKey === 'tags') {
+    if (listKey === OBSIDIAN_TAG_KEY_PLURAL) {
       // tags are split up like they are in the tags key of the YAML frontmatter and have their hashtags removed
       // like Format tags in YAML does since Obsidian does not allow them there
       const tags = values.flatMap((value) => convertTagValueToStringOrStringArray(value)).map((tag) => tag.replace(/^#/, '')).filter((tag) => tag !== '');
@@ -355,7 +357,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
       }
 
       return tags;
-    } else if (listKey === 'aliases') {
+    } else if (listKey === OBSIDIAN_ALIAS_KEY_PLURAL) {
       values = values.flatMap((value) => convertAliasValueToStringOrStringArray(value));
     }
 
@@ -363,9 +365,9 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
   }
   formatValues(values: string[], arrayFormat: NormalArrayFormats | null, listKey: ObsidianListKey | null, options: MoveInlineFieldsToYamlOptions): string {
     // tags and aliases always use the array style from the settings, like Format YAML array and Move tags to YAML do
-    if (listKey === 'tags') {
+    if (listKey === OBSIDIAN_TAG_KEY_PLURAL) {
       return formatYamlArrayValue(values, options.tagArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays);
-    } else if (listKey === 'aliases') {
+    } else if (listKey === OBSIDIAN_ALIAS_KEY_PLURAL) {
       return formatYamlArrayValue(values, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true);
     }
 
@@ -771,9 +773,9 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
 
 function getObsidianListKey(key: string): ObsidianListKey | null {
   if (OBSIDIAN_TAG_KEYS.includes(key)) {
-    return 'tags';
+    return OBSIDIAN_TAG_KEY_PLURAL;
   } else if (OBSIDIAN_ALIASES_KEYS.includes(key)) {
-    return 'aliases';
+    return OBSIDIAN_ALIAS_KEY_PLURAL;
   }
 
   return null;
