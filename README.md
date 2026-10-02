@@ -70,6 +70,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 
 ### Spacing rules
 
+- [align-table-columns](https://platers.github.io/obsidian-linter/settings/spacing-rules/#align-table-columns)
 - [compact-yaml](https://platers.github.io/obsidian-linter/settings/spacing-rules/#compact-yaml)
 - [consecutive-blank-lines](https://platers.github.io/obsidian-linter/settings/spacing-rules/#consecutive-blank-lines)
 - [convert-spaces-to-tabs](https://platers.github.io/obsidian-linter/settings/spacing-rules/#convert-spaces-to-tabs)
