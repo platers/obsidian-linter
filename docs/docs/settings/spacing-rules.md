@@ -4,6 +4,85 @@
 # Spacing Rules
 
 
+## Align Table Columns
+
+Alias: `align-table-columns`
+
+Aligns the table so that all columns have the same length.
+
+
+
+
+
+### Examples
+
+<details><summary>Make sure columns are aligned properly</summary>
+
+Before:
+
+`````` markdown
+| Column 1 | Column 2 |
+|-------|-------|
+| foo1| bar1|
+| foo2 | bar2                  |
+| foo3   | bar3    |
+``````
+
+After:
+
+`````` markdown
+| Column 1 | Column 2 |
+|----------|----------|
+| foo1     | bar1     |
+| foo2     | bar2     |
+| foo3     | bar3     |
+``````
+</details>
+<details><summary>Make sure column alignment works with CJK characters</summary>
+
+Before:
+
+`````` markdown
+| Column 1 | Column 2 |
+|-------|-------|
+| foo1| bar1|
+| CJK| 你好|
+| foo3   | bar3    |
+``````
+
+After:
+
+`````` markdown
+| Column 1 | Column 2 |
+|----------|----------|
+| foo1     | bar1     |
+| CJK      | 你好     |
+| foo3     | bar3     |
+``````
+</details>
+<details><summary>Missing separators get added to the table if they are missing</summary>
+
+Before:
+
+`````` markdown
+| Column 1 | Column 2 |
+|-------|-------
+| foo1| bar1
+| CJK| 你好|
+| foo3   | bar3    |
+``````
+
+After:
+
+`````` markdown
+| Column 1 | Column 2 |
+|----------|----------|
+| foo1     | bar1     |
+| CJK      | 你好     |
+| foo3     | bar3     |
+``````
+</details>
+
 ## Compact YAML
 
 Alias: `compact-yaml`

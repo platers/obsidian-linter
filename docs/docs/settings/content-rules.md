@@ -900,9 +900,9 @@ Updates the quotes in the body content to be updated to the specified single and
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Enable <code>Single quote style</code>` | Specifies that the selected single quote style should be used. | N/A | `true` |
+| `Enable Single quote style` | Specifies that the selected single quote style should be used. | N/A | `true` |
 | `Single quote style` | The style of single quotes to use. | `''`: Uses "'" instead of smart single quotes<br/><br/>`‘’`: Uses "‘" and "’" instead of straight single quotes | `''` |
-| `Enable <code>Double quote style</code>` | Specifies that the selected double quote style should be used. | N/A | `true` |
+| `Enable Double quote style` | Specifies that the selected double quote style should be used. | N/A | `true` |
 | `Double quote style` | The style of double quotes to use. | `""`: Uses '"' instead of smart double quotes<br/><br/>`“”`: Uses '“' and '”' instead of straight double quotes | `""` |
 
 

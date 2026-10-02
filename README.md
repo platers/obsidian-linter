@@ -26,7 +26,6 @@ Each rule is its own set of logic and is designed to be run independently. This 
 - [format-tags-in-yaml](https://platers.github.io/obsidian-linter/settings/yaml-rules/#format-tags-in-yaml)
 - [format-yaml-array](https://platers.github.io/obsidian-linter/settings/yaml-rules/#format-yaml-array)
 - [insert-yaml-attributes](https://platers.github.io/obsidian-linter/settings/yaml-rules/#insert-yaml-attributes)
-- [move-inline-fields-to-yaml](https://platers.github.io/obsidian-linter/settings/yaml-rules/#move-inline-fields-to-yaml)
 - [move-tags-to-yaml](https://platers.github.io/obsidian-linter/settings/yaml-rules/#move-tags-to-yaml)
 - [remove-yaml-keys](https://platers.github.io/obsidian-linter/settings/yaml-rules/#remove-yaml-keys)
 - [sort-yaml-array-values](https://platers.github.io/obsidian-linter/settings/yaml-rules/#sort-yaml-array-values)
@@ -70,6 +69,7 @@ Each rule is its own set of logic and is designed to be run independently. This 
 
 ### Spacing rules
 
+- [align-table-columns](https://platers.github.io/obsidian-linter/settings/spacing-rules/#align-table-columns)
 - [compact-yaml](https://platers.github.io/obsidian-linter/settings/spacing-rules/#compact-yaml)
 - [consecutive-blank-lines](https://platers.github.io/obsidian-linter/settings/spacing-rules/#consecutive-blank-lines)
 - [convert-spaces-to-tabs](https://platers.github.io/obsidian-linter/settings/spacing-rules/#convert-spaces-to-tabs)
