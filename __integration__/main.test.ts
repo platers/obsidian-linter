@@ -8,6 +8,8 @@ import expect from 'expect';
 import { ignoreTestCases } from './ignore.test';
 import { ruleTests } from './rule-tests'; // keep the name the same unless you change it in the generation logic
 import { DiffPreviewView, diffPreviewViewType } from '../src/ui/views/diff-preview-view';
+import { DEFAULT_SETTINGS, LinterSettings } from '../src/settings-data';
+import { rules } from '../src/rules';
 
 export type IntegrationTestCase = {
   name: string,
@@ -36,8 +38,9 @@ export default class TestLinterPlugin extends Plugin {
   ignoreTests: Array<IntegrationIgnoreTestCase> = ignoreTestCases;
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
-  private timeoutId: unknown = undefined;
+  private timeoutId: number | undefined = undefined;
   private testRunNotice: Notice;
+  private settingsBaseline: LinterSettings;
 
   async onload() {
     this.addCommand({
@@ -75,10 +78,15 @@ export default class TestLinterPlugin extends Plugin {
     if (!this.plugin) {
       this.plugin = new LinterPlugin(this.app, this.manifest);
 
+      // saveSettings' 5s debounce holds a live reference to the settings object test cases
+      // mutate, so without this stub it persists one test's rule configs for all later ones.
+      this.plugin.saveData = () => Promise.resolve();
+      this.settingsBaseline = this.buildSettingsBaseline();
+
       await this.plugin.onload();
-    } else {
-      await this.resetSettings();
     }
+
+    await this.resetSettings();
   }
 
   async runTests(testStatuses: testStatus[], totalTestCount: number) {
@@ -100,12 +108,15 @@ export default class TestLinterPlugin extends Plugin {
       }
 
       await activeLeaf.leaf.openFile(file);
-      const originalText = activeLeaf.editor.getValue();
+      // Consecutive cases reuse a fixture and openFile will not reload an already-open file,
+      // so an editor read would adopt the previous case's end state as this case's baseline.
+      const originalText = await this.app.vault.read(file);
       await this.resetSettings();
 
       try {
         if (t.setup) {
           await t.setup(this, activeLeaf.editor);
+          await this.refreshDerivedSettingsState();
         }
 
         await this.plugin.runLinterEditor(activeLeaf.editor);
@@ -119,7 +130,7 @@ export default class TestLinterPlugin extends Plugin {
 
         this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
       } finally {
-        await this.resetFileContents(activeLeaf, originalText);
+        await this.resetFileContents(file, originalText);
       }
     }
 
@@ -198,9 +209,8 @@ export default class TestLinterPlugin extends Plugin {
 
         this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
       } finally {
-        await this.resetFileContents(activeLeaf, originalText);
+        await this.resetFileContents(file, originalText);
       }
-
 
       originalText = null;
       if (index + 1 < tests.length) {
@@ -215,6 +225,7 @@ export default class TestLinterPlugin extends Plugin {
     const file = this.getFileFromPath(t.filePath);
     if (!file) {
       console.error('failed to get file: ' + t.filePath);
+      this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
       return null;
     }
 
@@ -225,6 +236,7 @@ export default class TestLinterPlugin extends Plugin {
     try {
       if (t.setup) {
         await t.setup(this, activeLeaf.editor);
+        await testPlugin.refreshDerivedSettingsState();
       }
 
       await testPlugin.plugin.runLinterEditor(activeLeaf.editor);
@@ -233,7 +245,7 @@ export default class TestLinterPlugin extends Plugin {
 
       console.log('❌', t.name);
       console.error(e);
-      await testPlugin.resetFileContents(activeLeaf, originalText);
+      await testPlugin.resetFileContents(file, originalText);
 
       return null;
     }
@@ -241,7 +253,7 @@ export default class TestLinterPlugin extends Plugin {
     return originalText;
   }
 
-  async onunload(): void {
+  onunload(): void {
     if (this.plugin) {
       // based on https://github.com/dbarenholz/obsidian-plaintext/blob/2c30a6e957e5cc9ac7757cc9fbeb641de1b158dc/src/main.ts#L160
       const view = this.app.workspace.getActiveViewOfType(DiffPreviewView);
@@ -270,14 +282,18 @@ export default class TestLinterPlugin extends Plugin {
     return;
   }
 
-  private async resetFileContents(activeLeaf: MarkdownView, originalText: string) {
-    if (!activeLeaf?.file) return;
-
-    // Restore the open editor as well.
-    if (activeLeaf.editor.getValue() !== originalText) {
-      activeLeaf.editor.setValue(originalText);
+  private async resetFileContents(file: TFile, originalText: string) {
+    // Resolved per call rather than reusing the leaf captured before the run, since custom
+    // commands and the diff preview can both leave a different leaf active.
+    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (view && view.file === file && view.editor.getValue() !== originalText) {
+      view.editor.setValue(originalText);
+      // Obsidian's autosave is debounced well past the start of the next test, and the mode
+      // switch below rebuilds the editor, which would drop an unflushed setValue.
+      await view.save();
     }
 
+    await this.app.vault.process(file, () => originalText);
     await setWorkspaceItemMode(this.app, true);
   }
 
@@ -307,14 +323,27 @@ export default class TestLinterPlugin extends Plugin {
     return null;
   }
 
-  private async resetSettings() {
-    await this.plugin.loadSettings();
-    // disable all rules to prevent bleed over for tests
-    for (const ruleAlias in this.plugin.settings.ruleConfigs) {
-      if (this.plugin.settings.ruleConfigs[ruleAlias] && this.plugin.settings.ruleConfigs[ruleAlias]['enabled']) {
-        this.plugin.settings.ruleConfigs[ruleAlias]['enabled'] = false;
-      }
+  private buildSettingsBaseline(): LinterSettings {
+    const baseline = JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as LinterSettings;
+    // DEFAULT_SETTINGS ships an empty ruleConfigs; the plugin fills it in from an un-awaited
+    // onLayoutReady callback, so seeding it here keeps the baseline free of that race. Every
+    // rule's 'enabled' option defaults to false, which is what prevents bleed over for tests.
+    for (const rule of rules) {
+      baseline.ruleConfigs[rule.alias] = rule.getDefaultOptions();
     }
+
+    return baseline;
+  }
+
+  private async resetSettings() {
+    this.plugin.settings = JSON.parse(JSON.stringify(this.settingsBaseline)) as LinterSettings;
+    await this.plugin.saveSettings();
+  }
+
+  // hasCustomCommands and overridePaste are only recomputed by loadSettings/saveSettings, so a
+  // test case that assigns settings directly needs this or the plugin ignores its lintCommands.
+  private async refreshDerivedSettingsState() {
+    await this.plugin.saveSettings();
   }
 
   private handleTestCompletion(testName: string, succeeded: boolean, testStatuses: testStatus[], totalTestCount: number) {
