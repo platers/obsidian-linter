@@ -1,0 +1,3 @@
+---
+context: [work, home, garden]
+---

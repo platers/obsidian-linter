@@ -1,0 +1,3 @@
+---
+tags: [#one #two #three]
+---

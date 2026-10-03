@@ -1,12 +1,13 @@
-import {Editor, MarkdownView, Notice, Plugin, TFile, normalizePath} from 'obsidian';
+import { Editor, MarkdownView, Notice, Plugin, TFile, normalizePath } from 'obsidian';
 import LinterPlugin from '../src/main';
-import {obsidianModeTestCases} from './obsidian-mode.test';
-import {setWorkspaceItemMode} from './utils.test';
-import {customCommandTestCases} from './custom-commands.test';
-import {obsidianYAMLRuleTestCases} from './yaml-rule.test';
+import { obsidianModeTestCases } from './obsidian-mode.test';
+import { setWorkspaceItemMode } from './utils.test';
+import { customCommandTestCases } from './custom-commands.test';
+import { obsidianYAMLRuleTestCases } from './yaml-rule.test';
 import expect from 'expect';
-import {ignoreTestCases} from './ignore.test';
-import {DiffPreviewView, diffPreviewViewType} from '../src/ui/views/diff-preview-view';
+import { ignoreTestCases } from './ignore.test';
+import { ruleTests } from './rule-tests'; // keep the name the same unless you change it in the generation logic
+import { DiffPreviewView, diffPreviewViewType } from '../src/ui/views/diff-preview-view';
 
 export type IntegrationTestCase = {
   name: string,
@@ -31,7 +32,7 @@ type testStatus = {
 const testTimeout = 15000;
 
 export default class TestLinterPlugin extends Plugin {
-  regularTests: Array<IntegrationTestCase> = [...obsidianModeTestCases, ...obsidianYAMLRuleTestCases];
+  regularTests: Array<IntegrationTestCase> = [...obsidianModeTestCases, ...obsidianYAMLRuleTestCases, ...ruleTests];
   ignoreTests: Array<IntegrationIgnoreTestCase> = ignoreTestCases;
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
@@ -55,9 +56,9 @@ export default class TestLinterPlugin extends Plugin {
           console.log(testStatuses);
           if (testStatuses.length != expectedTestCount) {
             if (this.testRunNotice) {
-              this.testRunNotice.setMessage(`❌: Tests took too long to run with only ${testStatuses.length} of ${expectedTestCount} tests running in ${testTimeout/1000}s.`);
+              this.testRunNotice.setMessage(`❌: Tests took too long to run with only ${testStatuses.length} of ${expectedTestCount} tests running in ${testTimeout / 1000}s.`);
             } else {
-              console.log('❌', `Tests took too long to run with only ${testStatuses.length} of ${expectedTestCount} tests running in ${testTimeout/1000}s.`);
+              console.log('❌', `Tests took too long to run with only ${testStatuses.length} of ${expectedTestCount} tests running in ${testTimeout / 1000}s.`);
             }
           } else {
             this.handleTestFinalization(testStatuses);
@@ -201,7 +202,7 @@ export default class TestLinterPlugin extends Plugin {
       await this.resetFileContents(activeLeaf, originalText);
 
       originalText = null;
-      if (index+1 < tests.length) {
+      if (index + 1 < tests.length) {
         originalText = await this.setupMetadataTest(this, tests[++index], activeLeaf, testStatuses, totalTestCount);
       } else { // remove the custom commands callback once all tests have run
         this.plugin.setCustomCommandCallback(null);
@@ -246,7 +247,7 @@ export default class TestLinterPlugin extends Plugin {
       if (view) {
         view.leaf.detach();
       }
-      
+
       this.app.viewRegistry.unregisterView(diffPreviewViewType);
       this.plugin.onunload();
     }
@@ -306,10 +307,10 @@ export default class TestLinterPlugin extends Plugin {
 
   private handleTestCompletion(testName: string, succeeded: boolean, testStatuses: testStatus[], totalTestCount: number) {
     testStatuses.push(
-        {
-          name: testName,
-          succeeded: succeeded,
-        });
+      {
+        name: testName,
+        succeeded: succeeded,
+      });
 
     let numberOfSuccesses = 0;
     let numberOfFailures = 0;

@@ -26,8 +26,8 @@ const mockedPlugins = [replace({
     // update usage of moment from obsidian to the node implementation of moment we have
     'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
     // remove the use of obsidian in the options to allow for docs.js to run
-    'import {App, ExtraButtonComponent, normalizePath, TFile, ToggleComponent} from \'obsidian\';': '',
-    'import type {SettingDefinition, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage} from \'obsidian\';': '',
+    'import { App, ExtraButtonComponent, normalizePath, TFile, ToggleComponent } from \'obsidian\';': '',
+    'import type { SettingDefinition, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage } from \'obsidian\';': '',
     // remove the use of obsidian in the auto-correct files picker to allow for docs.js to run
     'import {Setting, App, TFile, normalizePath, ExtraButtonComponent} from \'obsidian\';': '',
     // remove the use of obsidian in add custom row to allow for docs.js to run
@@ -96,6 +96,7 @@ const esbuildArgs = [
   createEsbuildArgs(banner, 'src/main.ts', 'main.js', unusedCodeForProduction),
   createEsbuildArgs(mockedBanner, 'scripts/js/docs.ts', 'docs.js', mockedPlugins),
   createEsbuildArgs(mockedBanner, 'scripts/js/translation-helper.ts', 'translation-helper.js', mockedPlugins),
+  createEsbuildArgs(mockedBanner, 'scripts/js/integration-tests.ts', 'integration-tests.js', mockedPlugins),
 ];
 
 if (!prod) {

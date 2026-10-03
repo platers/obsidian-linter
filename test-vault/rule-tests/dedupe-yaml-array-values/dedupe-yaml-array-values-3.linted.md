@@ -1,0 +1,12 @@
+---
+tags: [computer, research]
+aliases:
+  - Title 1
+  - Title2
+arr1: [val, val1, val2, Val]
+arr2:
+  - Val
+  - val
+  - val2
+  - Val2
+---

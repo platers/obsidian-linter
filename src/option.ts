@@ -1,15 +1,15 @@
-import {App, ExtraButtonComponent, normalizePath, TFile, ToggleComponent} from 'obsidian';
-import type {SettingDefinition, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage} from 'obsidian';
-import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
+import { App, ExtraButtonComponent, normalizePath, TFile, ToggleComponent } from 'obsidian';
+import type { SettingDefinition, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage } from 'obsidian';
+import { getTextInLanguage, LanguageStringKey } from './lang/helpers';
 import LinterPlugin from './main';
-import {richDescription} from './ui/helpers';
-import {LinterSettings} from './settings-data';
+import { richDescription } from './ui/helpers';
+import { LinterSettings } from './settings-data';
 import { CustomAutoCorrectContent } from './settings-data';
 import MdFileSuggester from './ui/suggesters/md-file-suggester';
-import {ParseResultsModal} from './ui/modals/parse-results-modal';
-import {ListItemsModal, ListItemValidation} from './ui/modals/add-list-entry-modals'
-import {parseCustomReplacements, stripCr} from './utils/strings';
-import {LinterSettingsKeys} from './settings-data';
+import { ParseResultsModal } from './ui/modals/parse-results-modal';
+import { ListItemsModal, ListItemValidation } from './ui/modals/add-list-entry-modals'
+import { parseCustomReplacements, stripCr } from './utils/strings';
+import { LinterSettingsKeys } from './settings-data';
 
 function getFileFromPath(app: App, filePath: string): TFile | null {
   const file = app.vault.getAbstractFileByPath(normalizePath(filePath));
@@ -93,7 +93,7 @@ export class BooleanOption extends Option {
                 await this.writeAndSave(value, plugin);
                 this.onChange?.(value, plugin.app, plugin);
               })
-        });
+          });
         },
       };
     }
@@ -101,7 +101,7 @@ export class BooleanOption extends Option {
     return {
       name: this.getName(),
       desc: richDescription(this.getDescription()),
-      control: {type: 'toggle', key: this.controlKey(), defaultValue: this.defaultValue},
+      control: { type: 'toggle', key: this.controlKey(), defaultValue: this.defaultValue },
     };
   }
 
@@ -129,15 +129,15 @@ export class TextOption extends Option {
     return {
       name: this.getName(),
       desc: richDescription(this.getDescription()),
-      control: {type: 'text', key: this.controlKey(), defaultValue: this.defaultValue ?? ''},
+      control: { type: 'text', key: this.controlKey(), defaultValue: this.defaultValue ?? '' },
     };
   }
 }
 
 export class ListItemOption extends Option {
-  public defaultValue: string[];
+  public defaultValue: string[] = [];
 
-  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: unknown, ruleAlias?: string | null, private validator: ListItemValidation | undefined, private emptyStateKey: LanguageStringKey, private fieldPlaceholderKey: LanguageStringKey, private allowReorder: boolean, private trimItemWhitespace: boolean) {
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: string[], ruleAlias?: string | null, private validator: ListItemValidation | undefined, private emptyStateKey: LanguageStringKey, private fieldPlaceholderKey: LanguageStringKey, private allowReorder: boolean, private trimItemWhitespace: boolean) {
     super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
   }
 
@@ -151,31 +151,31 @@ export class ListItemOption extends Option {
 
     return createListManagementPage({
       name: this.getName(),
-        desc: richDescription(this.getDescription()),
-        addButtonText: getTextInLanguage('add-tooltip'),
-        emptyState: getTextInLanguage(this.emptyStateKey),
-        values: values,
-        allowReorder: this.allowReorder,
-        openAddForm: () => new ListItemsModal(plugin.app, null, this.fieldPlaceholderKey, this.trimItemWhitespace, async (entry) => {
-          values.push(entry);
-          await this.writeAndSave(values, plugin);
-          update();
-        },
+      desc: richDescription(this.getDescription()),
+      addButtonText: getTextInLanguage('add-tooltip'),
+      emptyState: getTextInLanguage(this.emptyStateKey),
+      values: values,
+      allowReorder: this.allowReorder,
+      openAddForm: () => new ListItemsModal(plugin.app, null, this.fieldPlaceholderKey, this.trimItemWhitespace, async (entry) => {
+        values.push(entry);
+        await this.writeAndSave(values, plugin);
+        update();
+      },
         this.validator).open(),
-        openEditForm: (entry, index) => new ListItemsModal(plugin.app, entry, this.fieldPlaceholderKey, this.trimItemWhitespace, async (updated) => {
-          values[index] = updated;
-          await this.writeAndSave(values, plugin);
-          update();
-        },
+      openEditForm: (entry, index) => new ListItemsModal(plugin.app, entry, this.fieldPlaceholderKey, this.trimItemWhitespace, async (updated) => {
+        values[index] = updated;
+        await this.writeAndSave(values, plugin);
+        update();
+      },
         this.validator).open(),
-        editTooltip: getTextInLanguage('edit-tooltip'),
-        onDelete: (index) => {
-          values.splice(index, 1);
-          this.writeValue(values, plugin);
-        },
-        itemName: (entry) => entry, // we may want to add a default place holder here if we start allowing empty entries
-        plugin: plugin,
-      });
+      editTooltip: getTextInLanguage('edit-tooltip'),
+      onDelete: (index) => {
+        values.splice(index, 1);
+        this.writeValue(values, plugin);
+      },
+      itemName: (entry) => entry, // we may want to add a default place holder here if we start allowing empty entries
+      plugin: plugin,
+    });
   }
 }
 
@@ -188,11 +188,11 @@ export class MomentFormatOption extends Option {
       desc: richDescription(this.getDescription()),
       render: (setting) => {
         setting.addMomentFormat((format) => format
-            .setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a')
-            .setValue((this.getCurrentValue(plugin) as string | undefined) ?? '')
-            .onChange(async (value) => {
-              await this.writeAndSave(value, plugin);
-            }));
+          .setPlaceholder('dddd, MMMM Do YYYY, h:mm:ss a')
+          .setValue((this.getCurrentValue(plugin) as string | undefined) ?? '')
+          .onChange(async (value) => {
+            await this.writeAndSave(value, plugin);
+          }));
       },
     };
   }
@@ -229,7 +229,7 @@ export class DropdownOption extends Option {
     return {
       name: this.getName(),
       desc: richDescription(this.getDescription()),
-      control: {type: 'dropdown', key: this.controlKey(), defaultValue: this.defaultValue, options},
+      control: { type: 'dropdown', key: this.controlKey(), defaultValue: this.defaultValue, options },
     };
   }
 }
@@ -240,8 +240,8 @@ export class MdFilePickerOption extends Option {
   }
 
   public getSettingDefinition(plugin: LinterPlugin, update: () => void): SettingDefinitionItem {
-    (plugin.settings.ruleConfigs[this.ruleAlias] as {[k:string]: {[k:string]: CustomAutoCorrectContent[]}})[this.configKey] =
-        plugin.settings.ruleConfigs[this.ruleAlias][this.configKey] as CustomAutoCorrectContent[] | undefined ?? [];
+    (plugin.settings.ruleConfigs[this.ruleAlias] as { [k: string]: { [k: string]: CustomAutoCorrectContent[] } })[this.configKey] =
+      plugin.settings.ruleConfigs[this.ruleAlias][this.configKey] as CustomAutoCorrectContent[] | undefined ?? [];
     const filesPicked: CustomAutoCorrectContent[] = plugin.settings.ruleConfigs[this.ruleAlias][this.configKey] as CustomAutoCorrectContent[];
     const app = plugin.app;
     const ruleName = getTextInLanguage('rules.auto-correct-common-misspellings.name');
@@ -258,32 +258,32 @@ export class MdFilePickerOption extends Option {
         setting.addSearch((cb) => {
           new MdFileSuggester(app, cb.inputEl, selectedFiles);
           cb.setPlaceholder(getTextInLanguage('options.custom-auto-correct.file-search-placeholder-text'))
-              .setValue(pickedFile.filePath)
-              .onChange(async (newPath) => {
-                if (newPath === '' || newPath === cb.inputEl.getAttribute('fileName')) {
-                  const file = getFileFromPath(app, newPath);
-                  pickedFile.filePath = newPath;
-                  if (file) {
-                    pickedFile.customReplacements = parseCustomReplacements(stripCr(await app.vault.read(file)));
-                    infoButton.setDisabled(false);
-                    infoButton.extraSettingsEl.addClass('clickable-icon');
-                  } else {
-                    pickedFile.customReplacements = null;
-                    infoButton.setDisabled(true);
-                    infoButton.extraSettingsEl.removeClass('clickable-icon');
-                  }
-                  filesPicked[index] = pickedFile;
-                  await plugin.saveSettings();
+            .setValue(pickedFile.filePath)
+            .onChange(async (newPath) => {
+              if (newPath === '' || newPath === cb.inputEl.getAttribute('fileName')) {
+                const file = getFileFromPath(app, newPath);
+                pickedFile.filePath = newPath;
+                if (file) {
+                  pickedFile.customReplacements = parseCustomReplacements(stripCr(await app.vault.read(file)));
+                  infoButton.setDisabled(false);
+                  infoButton.extraSettingsEl.addClass('clickable-icon');
+                } else {
+                  pickedFile.customReplacements = null;
+                  infoButton.setDisabled(true);
+                  infoButton.extraSettingsEl.removeClass('clickable-icon');
                 }
-              });
+                filesPicked[index] = pickedFile;
+                await plugin.saveSettings();
+              }
+            });
         });
         setting.addExtraButton((cb) => {
           infoButton = cb;
           cb.setIcon('info')
-              .setTooltip(getTextInLanguage('options.custom-auto-correct.show-parsed-contents-tooltip'))
-              .onClick(() => {
-                new ParseResultsModal(app, pickedFile).open();
-              });
+            .setTooltip(getTextInLanguage('options.custom-auto-correct.show-parsed-contents-tooltip'))
+            .onClick(() => {
+              new ParseResultsModal(app, pickedFile).open();
+            });
           if (pickedFile.filePath === '') {
             cb.setDisabled(true);
             cb.extraSettingsEl.removeClass('clickable-icon');
@@ -299,26 +299,26 @@ export class MdFilePickerOption extends Option {
         name: getTextInLanguage('options.custom-auto-correct.add-new-replacement-file-tooltip'),
         // eslint-disable-next-line @typescript-eslint/no-misused-promises -- I don't have control over this, so we may as well ignore the promise mismatch
         action: async () => {
-          filesPicked.push({filePath: '', customReplacements: null});
+          filesPicked.push({ filePath: '', customReplacements: null });
           await plugin.saveSettings();
           update();
         },
       },
       extraButtons: [
         (btn) => btn
-            .setIcon('refresh-cw')
-            .setTooltip(getTextInLanguage('options.custom-auto-correct.refresh-tooltip-text'))
-            .onClick(async () => {
-              for (const replacementFileInfo of filesPicked) {
-                if (replacementFileInfo.filePath !== '') {
-                  const file = getFileFromPath(app, replacementFileInfo.filePath);
-                  if (file) {
-                    replacementFileInfo.customReplacements = parseCustomReplacements(stripCr(await app.vault.cachedRead(file)));
-                  }
+          .setIcon('refresh-cw')
+          .setTooltip(getTextInLanguage('options.custom-auto-correct.refresh-tooltip-text'))
+          .onClick(async () => {
+            for (const replacementFileInfo of filesPicked) {
+              if (replacementFileInfo.filePath !== '') {
+                const file = getFileFromPath(app, replacementFileInfo.filePath);
+                if (file) {
+                  replacementFileInfo.customReplacements = parseCustomReplacements(stripCr(await app.vault.cachedRead(file)));
                 }
               }
-              await plugin.saveSettings();
-            }),
+            }
+            await plugin.saveSettings();
+          }),
       ],
       // eslint-disable-next-line @typescript-eslint/no-misused-promises -- I don't have control over this, so we may as well ignore the promise mismatch
       onDelete: async (index) => {
@@ -339,71 +339,71 @@ export class MdFilePickerOption extends Option {
 }
 
 export function createListManagementPage<T>(opts: {
-    name: string;
-    desc: string | DocumentFragment;
-    addButtonText: string;
-    emptyState: string;
-    values: T[];
-    openAddForm: () => void;
-    onDelete: (index: number) => void;
-    itemName: (entry: T) => string;
-    itemDesc?: (entry: T) => string | undefined;
-    itemIsDisabled?: (entry: T) => boolean;
-    allowReorder?: boolean | undefined;
-    openEditForm?: (entry: T, index: number) => void;
-    editTooltip?: string;
-    plugin: LinterPlugin;
-  }): SettingDefinitionPage<LinterSettingsKeys> {
-    const list: SettingDefinitionList<LinterSettingsKeys> = {
-      type: 'list',
-      emptyState: opts.emptyState,
-      addItem: {
-        name: opts.addButtonText,
-        action: opts.openAddForm,
-      },
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises -- I don't have control over this, so we may as well ignore the promise mismatch
-      onDelete: async (index: number) => {
-        opts.onDelete(index);
-        await opts.plugin.saveSettings();
-        opts.plugin.settingsTab.update();
-      },
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises -- I don't have control over this, so we may as well ignore the promise mismatch
-      onReorder: !opts.allowReorder ? undefined : async (oldIndex: number, newIndex: number) => {
-        const [moved] = opts.values.splice(oldIndex, 1);
-        opts.values.splice(newIndex, 0, moved);
-        await  opts.plugin.saveSettings();
-      },
-      items: opts.values.map((entry): SettingDefinition<LinterSettingsKeys> => {
-        const base = {
-          name: opts.itemName(entry),
-          desc: opts.itemDesc?.(entry),
-          searchable: false,
-        } as const;
-        if (!opts.openEditForm) return base;
-        return {
-          ...base,
-          render: (setting) => {
-            setting.setName(base.name);
-            if (base.desc !== undefined) setting.setDesc(base.desc);
-            if (opts.itemIsDisabled && opts.itemIsDisabled(entry)) {
-              setting.nameEl.addClass('disabled-list-entry');
-              setting.descEl.addClass('disabled-list-entry');
-            }
-            setting.addExtraButton((cb) => cb
-                .setIcon('lucide-pencil')
-                .setTooltip(opts.editTooltip ?? 'Edit')
-                // Resolve the live index at click time — a captured map index
-                // goes stale after a reorder or delete.
-                .onClick(() => opts.openEditForm(entry, opts.values.indexOf(entry))));
-          },
-        };
-      }),
-    };
+  name: string;
+  desc: string | DocumentFragment;
+  addButtonText: string;
+  emptyState: string;
+  values: T[];
+  openAddForm: () => void;
+  onDelete: (index: number) => void;
+  itemName: (entry: T) => string;
+  itemDesc?: (entry: T) => string | undefined;
+  itemIsDisabled?: (entry: T) => boolean;
+  allowReorder?: boolean | undefined;
+  openEditForm?: (entry: T, index: number) => void;
+  editTooltip?: string;
+  plugin: LinterPlugin;
+}): SettingDefinitionPage<LinterSettingsKeys> {
+  const list: SettingDefinitionList<LinterSettingsKeys> = {
+    type: 'list',
+    emptyState: opts.emptyState,
+    addItem: {
+      name: opts.addButtonText,
+      action: opts.openAddForm,
+    },
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises -- I don't have control over this, so we may as well ignore the promise mismatch
+    onDelete: async (index: number) => {
+      opts.onDelete(index);
+      await opts.plugin.saveSettings();
+      opts.plugin.settingsTab.update();
+    },
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises -- I don't have control over this, so we may as well ignore the promise mismatch
+    onReorder: !opts.allowReorder ? undefined : async (oldIndex: number, newIndex: number) => {
+      const [moved] = opts.values.splice(oldIndex, 1);
+      opts.values.splice(newIndex, 0, moved);
+      await opts.plugin.saveSettings();
+    },
+    items: opts.values.map((entry): SettingDefinition<LinterSettingsKeys> => {
+      const base = {
+        name: opts.itemName(entry),
+        desc: opts.itemDesc?.(entry),
+        searchable: false,
+      } as const;
+      if (!opts.openEditForm) return base;
+      return {
+        ...base,
+        render: (setting) => {
+          setting.setName(base.name);
+          if (base.desc !== undefined) setting.setDesc(base.desc);
+          if (opts.itemIsDisabled && opts.itemIsDisabled(entry)) {
+            setting.nameEl.addClass('disabled-list-entry');
+            setting.descEl.addClass('disabled-list-entry');
+          }
+          setting.addExtraButton((cb) => cb
+            .setIcon('lucide-pencil')
+            .setTooltip(opts.editTooltip ?? 'Edit')
+            // Resolve the live index at click time — a captured map index
+            // goes stale after a reorder or delete.
+            .onClick(() => opts.openEditForm(entry, opts.values.indexOf(entry))));
+        },
+      };
+    }),
+  };
 
-    return {
-      type: 'page',
-      name: opts.name,
-      desc: opts.desc,
-      items: [list],
-    };
-  }
+  return {
+    type: 'page',
+    name: opts.name,
+    desc: opts.desc,
+    items: [list],
+  };
+}
