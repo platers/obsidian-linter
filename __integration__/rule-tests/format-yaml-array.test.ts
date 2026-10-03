@@ -3,8 +3,8 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
   "enabled": true,
   "alias-key": true,
   "tag-key": true,
@@ -17,11 +17,13 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   ]
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
+    return Promise.resolve();
+  }
+
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
   "enabled": true,
   "alias-key": true,
   "tag-key": true,
@@ -32,11 +34,13 @@ function setup2(plugin: TestLinterPlugin): Promise<void> {
   "tagArrayStyle": "single string space delimited"
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'single string space delimited';
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
+    return Promise.resolve();
+  }
+
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
   "enabled": true,
   "alias-key": true,
   "tag-key": true,
@@ -47,8 +51,10 @@ function setup3(plugin: TestLinterPlugin): Promise<void> {
   "defaultArrayStyle": "single-line"
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.defaultArrayStyle = 'single-line';
+
+    return Promise.resolve();
+  }
 
 export const formatYamlArrayRuleTestCases: IntegrationTestCase[] = [
   {

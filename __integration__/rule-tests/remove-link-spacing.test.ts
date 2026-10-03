@@ -3,21 +3,21 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-link-spacing'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-link-spacing'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-link-spacing'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-link-spacing'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const removeLinkSpacingRuleTestCases: IntegrationTestCase[] = [
   {

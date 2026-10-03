@@ -3,29 +3,29 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['line-break-at-document-end'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['line-break-at-document-end'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['line-break-at-document-end'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['line-break-at-document-end'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['line-break-at-document-end'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['line-break-at-document-end'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const lineBreakAtDocumentEndRuleTestCases: IntegrationTestCase[] = [
   {

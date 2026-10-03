@@ -3,59 +3,59 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title'] = {
   "enabled": true,
   "title-key": "title",
   "mode": "first-h1-or-filename-if-h1-missing",
   "fileName": "Filename"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title'] = {
   "enabled": true,
   "title-key": "title",
   "mode": "first-h1-or-filename-if-h1-missing",
   "fileName": "Filename"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title'] = {
   "enabled": true,
   "title-key": "title",
   "mode": "first-h1-or-filename-if-h1-missing"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title'] = {
+  function setup4(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title'] = {
   "enabled": true,
   "title-key": "title",
   "mode": "first-h1",
   "fileName": "Filename"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup5(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title'] = {
+  function setup5(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title'] = {
   "enabled": true,
   "title-key": "title",
   "mode": "filename",
   "fileName": "Filename"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const yamlTitleRuleTestCases: IntegrationTestCase[] = [
   {

@@ -3,24 +3,24 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-footnotes-to-the-bottom'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['move-footnotes-to-the-bottom'] = {
   "enabled": true,
   "include-blank-line-between-footnotes": false
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-footnotes-to-the-bottom'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['move-footnotes-to-the-bottom'] = {
   "enabled": true,
   "include-blank-line-between-footnotes": false,
   "includeBlankLineBetweenFootnotes": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const moveFootnotesToTheBottomRuleTestCases: IntegrationTestCase[] = [
   {

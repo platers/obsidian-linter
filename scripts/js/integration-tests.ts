@@ -155,31 +155,69 @@ function generateSetupFunction(rule: Rule, example: typeof rules[number]['exampl
    * If an example supplies settings, those are emitted into the generated
    * setup function below.
    */
-  const settings = getExampleSettings(rule, example);
-  if (settings === null) {
-    return [funcName, dedent`
-        function ${funcName}(plugin: TestLinterPlugin): Promise<void> {
-        plugin.plugin.settings.ruleConfigs['${rule.alias}'] = {
-          'enabled': true,
-        };
-
-        return Promise.resolve();
-      }
-    `];
-  }
+  const settings = getExampleSettings(rule, example) ?? {};
 
   settings['enabled'] = true;
 
+  const extraSetup = getCommonStyleSettingsSetup(settings);
+
   return [funcName, dedent`
     function ${funcName}(plugin: TestLinterPlugin): Promise<void> {
-      plugin.plugin.settings.ruleConfigs['${rule.alias}'] = ${JSON.stringify(settings, null, 2)};
-
+      plugin.plugin.settings.ruleConfigs['${rule.alias}'] = ${JSON.stringify(settings, null, 2)};${extraSetup}
+  
       return Promise.resolve();
     }
   `];
 }
 
-function getExampleSettings(rule: Rule, example: typeof rules[number]['examples'][number]): Record<string, unknown> | null {
+
+function getCommonStyleSettingsSetup(settings: Record<string, unknown>): string {
+  let commonStylesSetup = ''
+  if (settings.minimumNumberOfDollarSignsToBeAMathBlock) {
+    commonStylesSetup += dedent`
+      plugin.plugin.settings.commonStyles.minimumNumberOfDollarSignsToBeAMathBlock = ${settings.minimumNumberOfDollarSignsToBeAMathBlock} ;
+    `;
+  }
+
+  if (settings.aliasArrayStyle) {
+    commonStylesSetup += dedent`
+      plugin.plugin.settings.commonStyles.aliasArrayStyle = '${settings.aliasArrayStyle}';
+    `;
+  }
+
+  if (settings.tagArrayStyle) {
+    commonStylesSetup += dedent`
+      plugin.plugin.settings.commonStyles.aliasArrayStyle = '${settings.tagArrayStyle}';
+    `;
+  }
+
+  if (settings.defaultArrayStyle) {
+    commonStylesSetup += dedent`
+      plugin.plugin.settings.commonStyles.defaultArrayStyle = '${settings.defaultArrayStyle}';
+    `;
+  }
+
+  if (settings.defaultEscapeCharacter) {
+    commonStylesSetup += dedent`
+      plugin.plugin.settings.commonStyles.escapeCharacter = ${settings.defaultEscapeCharacter as string === '"' ? "'\"'" : "\"'\""};
+    `;
+  }
+
+  if (settings.removeUnnecessaryEscapeCharsForMultiLineArrays) {
+    commonStylesSetup += dedent`
+      plugin.plugin.settings.commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays = ${settings.removeUnnecessaryEscapeCharsForMultiLineArrays as boolean ? 'true' : 'false'};
+    `;
+  }
+
+  if (commonStylesSetup != '') {
+    commonStylesSetup = '\n\n' + commonStylesSetup
+  }
+
+  return commonStylesSetup;
+}
+
+
+function getExampleSettings(rule: Rule, example: typeof rules[number]['examples'][number]): Record<string, unknown> {
   /*
    * Rule examples in the current codebase expose before/after/description.
    * This helper intentionally supports an optional settings/options property
@@ -187,7 +225,6 @@ function getExampleSettings(rule: Rule, example: typeof rules[number]['examples'
    * changing the generated-test format.
    */
   const candidate = example as typeof example & {
-    settings?: Record<string, unknown>;
     options?: Record<string, unknown>;
   };
 

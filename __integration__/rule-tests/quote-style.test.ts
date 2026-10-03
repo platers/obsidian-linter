@@ -3,8 +3,8 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['quote-style'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['quote-style'] = {
   "enabled": true,
   "single-quote-enabled": true,
   "single-quote-style": "''",
@@ -12,11 +12,11 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   "double-quote-style": "\"\""
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['quote-style'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['quote-style'] = {
   "enabled": true,
   "single-quote-enabled": true,
   "single-quote-style": "''",
@@ -26,8 +26,8 @@ function setup2(plugin: TestLinterPlugin): Promise<void> {
   "doubleQuoteStyle": "“”"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const quoteStyleRuleTestCases: IntegrationTestCase[] = [
   {

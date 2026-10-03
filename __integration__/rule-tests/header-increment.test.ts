@@ -3,33 +3,33 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['header-increment'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['header-increment'] = {
   "enabled": true,
   "start-at-h2": false
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['header-increment'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['header-increment'] = {
   "enabled": true,
   "start-at-h2": false
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['header-increment'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['header-increment'] = {
   "enabled": true,
   "start-at-h2": false,
   "startAtH2": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const headerIncrementRuleTestCases: IntegrationTestCase[] = [
   {

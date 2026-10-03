@@ -3,13 +3,13 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['consecutive-blank-lines'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['consecutive-blank-lines'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const consecutiveBlankLinesRuleTestCases: IntegrationTestCase[] = [
   {

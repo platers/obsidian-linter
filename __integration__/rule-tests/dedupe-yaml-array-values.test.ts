@@ -3,8 +3,8 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
   "enabled": true,
   "dedupe-alias-key": true,
   "dedupe-tag-key": true,
@@ -13,11 +13,13 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   "aliasArrayStyle": "multi-line"
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
+    return Promise.resolve();
+  }
+
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
   "enabled": true,
   "dedupe-alias-key": true,
   "dedupe-tag-key": true,
@@ -26,11 +28,13 @@ function setup2(plugin: TestLinterPlugin): Promise<void> {
   "aliasArrayStyle": "multi-line"
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
+    return Promise.resolve();
+  }
+
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
   "enabled": true,
   "dedupe-alias-key": true,
   "dedupe-tag-key": true,
@@ -39,11 +43,13 @@ function setup3(plugin: TestLinterPlugin): Promise<void> {
   "aliasArrayStyle": "multi-line"
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
+    return Promise.resolve();
+  }
+
+  function setup4(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
   "enabled": true,
   "dedupe-alias-key": true,
   "dedupe-tag-key": true,
@@ -55,8 +61,10 @@ function setup4(plugin: TestLinterPlugin): Promise<void> {
   ]
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
+
+    return Promise.resolve();
+  }
 
 export const dedupeYamlArrayValuesRuleTestCases: IntegrationTestCase[] = [
   {

@@ -303,6 +303,12 @@ export default class TestLinterPlugin extends Plugin {
 
   private async resetSettings() {
     await this.plugin.loadSettings();
+    // disable all rules to prevent bleed over for tests
+    for (const ruleAlias in this.plugin.settings.ruleConfigs) {
+      if (this.plugin.settings[ruleAlias] && this.plugin.settings[ruleAlias]['enabled']) {
+        this.plugin.settings[ruleAlias]['enabled'] = false;
+      }
+    }
   }
 
   private handleTestCompletion(testName: string, succeeded: boolean, testStatuses: testStatus[], totalTestCount: number) {

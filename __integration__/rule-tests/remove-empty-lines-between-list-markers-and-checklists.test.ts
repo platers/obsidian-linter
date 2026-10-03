@@ -3,53 +3,53 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
+  function setup4(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup5(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
+  function setup5(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup6(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
+  function setup6(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
   "enabled": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const removeEmptyLinesBetweenListMarkersAndChecklistsRuleTestCases: IntegrationTestCase[] = [
   {

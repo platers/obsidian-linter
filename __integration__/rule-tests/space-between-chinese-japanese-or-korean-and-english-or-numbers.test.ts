@@ -3,75 +3,75 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
   "enabled": true,
   "english-symbols-punctuation-before": "-+;:'\"°%$)]",
   "english-symbols-punctuation-after": "-+'\"([¥$"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
   "enabled": true,
   "english-symbols-punctuation-before": "-+;:'\"°%$)]",
   "english-symbols-punctuation-after": "-+'\"([¥$"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
   "enabled": true,
   "english-symbols-punctuation-before": "-+;:'\"°%$)]",
   "english-symbols-punctuation-after": "-+'\"([¥$"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
+  function setup4(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
   "enabled": true,
   "english-symbols-punctuation-before": "-+;:'\"°%$)]",
   "english-symbols-punctuation-after": "-+'\"([¥$"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup5(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
+  function setup5(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
   "enabled": true,
   "english-symbols-punctuation-before": "-+;:'\"°%$)]",
   "english-symbols-punctuation-after": "-+'\"([¥$"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup6(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
+  function setup6(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
   "enabled": true,
   "english-symbols-punctuation-before": "-+;:'\"°%$)]",
   "english-symbols-punctuation-after": "-+'\"([¥$"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup7(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
+  function setup7(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
   "enabled": true,
   "english-symbols-punctuation-before": "-+;:'\"°%$)]",
   "english-symbols-punctuation-after": "-+'\"([¥$"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const spaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersRuleTestCases: IntegrationTestCase[] = [
   {

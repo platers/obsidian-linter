@@ -3,44 +3,44 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['unordered-list-style'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['unordered-list-style'] = {
   "enabled": true,
   "list-style": "consistent"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['unordered-list-style'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['unordered-list-style'] = {
   "enabled": true,
   "list-style": "consistent",
   "listStyle": "-"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['unordered-list-style'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['unordered-list-style'] = {
   "enabled": true,
   "list-style": "consistent",
   "listStyle": "*"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['unordered-list-style'] = {
+  function setup4(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['unordered-list-style'] = {
   "enabled": true,
   "list-style": "consistent",
   "listStyle": "+"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const unorderedListStyleRuleTestCases: IntegrationTestCase[] = [
   {

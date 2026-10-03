@@ -3,8 +3,8 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
   "enabled": true,
   "how-to-handle-existing-tags": "Nothing",
   "tags-to-ignore": [],
@@ -13,21 +13,21 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   ]
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
   "enabled": true,
   "how-to-handle-existing-tags": "Nothing",
   "tags-to-ignore": []
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
   "enabled": true,
   "how-to-handle-existing-tags": "Nothing",
   "tags-to-ignore": [],
@@ -37,19 +37,19 @@ function setup3(plugin: TestLinterPlugin): Promise<void> {
   ]
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
+  function setup4(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
   "enabled": true,
   "how-to-handle-existing-tags": "Nothing",
   "tags-to-ignore": [],
   "howToHandleExistingTags": "Remove whole tag"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const moveTagsToYamlRuleTestCases: IntegrationTestCase[] = [
   {

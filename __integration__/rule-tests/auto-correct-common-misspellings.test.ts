@@ -3,41 +3,41 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
   "enabled": true,
   "ignore-words": [],
   "skip-words-with-multiple-capitals": false,
   "extra-auto-correct-files": []
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
   "enabled": true,
   "ignore-words": [],
   "skip-words-with-multiple-capitals": false,
   "extra-auto-correct-files": []
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
   "enabled": true,
   "ignore-words": [],
   "skip-words-with-multiple-capitals": false,
   "extra-auto-correct-files": []
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
+  function setup4(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
   "enabled": true,
   "ignore-words": [],
   "skip-words-with-multiple-capitals": false,
@@ -45,8 +45,8 @@ function setup4(plugin: TestLinterPlugin): Promise<void> {
   "skipWordsWithMultipleCapitals": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const autoCorrectCommonMisspellingsRuleTestCases: IntegrationTestCase[] = [
   {

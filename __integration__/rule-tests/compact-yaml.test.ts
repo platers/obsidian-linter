@@ -3,24 +3,24 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['compact-yaml'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['compact-yaml'] = {
   "enabled": true,
   "inner-new-lines": false
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['compact-yaml'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['compact-yaml'] = {
   "enabled": true,
   "inner-new-lines": false,
   "innerNewLines": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const compactYamlRuleTestCases: IntegrationTestCase[] = [
   {

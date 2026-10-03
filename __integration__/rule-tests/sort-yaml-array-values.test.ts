@@ -3,8 +3,8 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
   "enabled": true,
   "sort-alias-key": true,
   "sort-tag-key": true,
@@ -14,11 +14,13 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   "aliasArrayStyle": "multi-line"
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
+    return Promise.resolve();
+  }
+
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
   "enabled": true,
   "sort-alias-key": true,
   "sort-tag-key": true,
@@ -29,11 +31,13 @@ function setup2(plugin: TestLinterPlugin): Promise<void> {
   "sortOrder": "Descending Alphabetical"
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
+    return Promise.resolve();
+  }
+
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
   "enabled": true,
   "sort-alias-key": true,
   "sort-tag-key": true,
@@ -46,8 +50,10 @@ function setup3(plugin: TestLinterPlugin): Promise<void> {
   ]
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
+
+    return Promise.resolve();
+  }
 
 export const sortYamlArrayValuesRuleTestCases: IntegrationTestCase[] = [
   {

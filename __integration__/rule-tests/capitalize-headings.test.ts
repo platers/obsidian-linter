@@ -3,8 +3,8 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['capitalize-headings'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['capitalize-headings'] = {
   "enabled": true,
   "style": "Title Case",
   "ignore-case-words": true,
@@ -15,11 +15,11 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   "ignoreCasedWords": false
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['capitalize-headings'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['capitalize-headings'] = {
   "enabled": true,
   "style": "Title Case",
   "ignore-case-words": true,
@@ -30,11 +30,11 @@ function setup2(plugin: TestLinterPlugin): Promise<void> {
   "ignoreCasedWords": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['capitalize-headings'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['capitalize-headings'] = {
   "enabled": true,
   "style": "First letter",
   "ignore-case-words": true,
@@ -44,11 +44,11 @@ function setup3(plugin: TestLinterPlugin): Promise<void> {
   "ending-word-ignore-characters": ".?!,:;'\")”’0123456789-"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['capitalize-headings'] = {
+  function setup4(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['capitalize-headings'] = {
   "enabled": true,
   "style": "ALL CAPS",
   "ignore-case-words": true,
@@ -58,8 +58,8 @@ function setup4(plugin: TestLinterPlugin): Promise<void> {
   "ending-word-ignore-characters": ".?!,:;'\")”’0123456789-"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const capitalizeHeadingsRuleTestCases: IntegrationTestCase[] = [
   {

@@ -3,8 +3,8 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['insert-yaml-attributes'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['insert-yaml-attributes'] = {
   "enabled": true,
   "text-to-insert": [],
   "textToInsert": [
@@ -14,8 +14,8 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   ]
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const insertYamlAttributesRuleTestCases: IntegrationTestCase[] = [
   {

@@ -3,23 +3,23 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['file-name-heading'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['file-name-heading'] = {
   "enabled": true,
   "fileName": "File Name"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['file-name-heading'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['file-name-heading'] = {
   "enabled": true,
   "fileName": "File Name"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const fileNameHeadingRuleTestCases: IntegrationTestCase[] = [
   {

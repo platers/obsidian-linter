@@ -3,43 +3,45 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
   "enabled": true,
   "try-to-escape-single-line-arrays": false
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
   "enabled": true,
   "try-to-escape-single-line-arrays": false
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
   "enabled": true,
   "try-to-escape-single-line-arrays": false,
   "defaultEscapeCharacter": "'"
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.escapeCharacter = "'";
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
+    return Promise.resolve();
+  }
+
+  function setup4(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
   "enabled": true,
   "try-to-escape-single-line-arrays": false,
   "tryToEscapeSingleLineArrays": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const escapeYamlSpecialCharactersRuleTestCases: IntegrationTestCase[] = [
   {

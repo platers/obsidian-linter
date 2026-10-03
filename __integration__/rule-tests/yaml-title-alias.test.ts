@@ -3,8 +3,8 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
   "enabled": true,
   "preserve-existing-alias-section-style": true,
   "keep-alias-that-matches-the-filename": false,
@@ -13,11 +13,11 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   "remove-alias-if-empty": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
   "enabled": true,
   "preserve-existing-alias-section-style": true,
   "keep-alias-that-matches-the-filename": false,
@@ -27,11 +27,11 @@ function setup2(plugin: TestLinterPlugin): Promise<void> {
   "useYamlKeyToKeepTrackOfOldFilenameOrHeading": false
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
   "enabled": true,
   "preserve-existing-alias-section-style": true,
   "keep-alias-that-matches-the-filename": false,
@@ -42,11 +42,11 @@ function setup3(plugin: TestLinterPlugin): Promise<void> {
   "keepAliasThatMatchesTheFilename": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
+  function setup4(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
   "enabled": true,
   "preserve-existing-alias-section-style": true,
   "keep-alias-that-matches-the-filename": false,
@@ -58,11 +58,11 @@ function setup4(plugin: TestLinterPlugin): Promise<void> {
   "useYamlKeyToKeepTrackOfOldFilenameOrHeading": false
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup5(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
+  function setup5(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
   "enabled": true,
   "preserve-existing-alias-section-style": true,
   "keep-alias-that-matches-the-filename": false,
@@ -73,11 +73,11 @@ function setup5(plugin: TestLinterPlugin): Promise<void> {
   "keepAliasThatMatchesTheFilename": true
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup6(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
+  function setup6(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
   "enabled": true,
   "preserve-existing-alias-section-style": true,
   "keep-alias-that-matches-the-filename": false,
@@ -87,11 +87,13 @@ function setup6(plugin: TestLinterPlugin): Promise<void> {
   "aliasArrayStyle": "multi-line"
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
 
-function setup7(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
+    return Promise.resolve();
+  }
+
+  function setup7(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['yaml-title-alias'] = {
   "enabled": true,
   "preserve-existing-alias-section-style": true,
   "keep-alias-that-matches-the-filename": false,
@@ -104,8 +106,10 @@ function setup7(plugin: TestLinterPlugin): Promise<void> {
   "aliasHelperKey": "title"
 };
 
-  return Promise.resolve();
-}
+plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
+
+    return Promise.resolve();
+  }
 
 export const yamlTitleAliasRuleTestCases: IntegrationTestCase[] = [
   {

@@ -3,32 +3,32 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-function setup1(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-trailing-punctuation-in-heading'] = {
+  function setup1(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-trailing-punctuation-in-heading'] = {
   "enabled": true,
   "punctuation-to-remove": ".,;:!。，；：！"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-trailing-punctuation-in-heading'] = {
+  function setup2(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-trailing-punctuation-in-heading'] = {
   "enabled": true,
   "punctuation-to-remove": ".,;:!。，；：！"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-trailing-punctuation-in-heading'] = {
+  function setup3(plugin: TestLinterPlugin): Promise<void> {
+    plugin.plugin.settings.ruleConfigs['remove-trailing-punctuation-in-heading'] = {
   "enabled": true,
   "punctuation-to-remove": ".,;:!。，；：！"
 };
 
-  return Promise.resolve();
-}
+    return Promise.resolve();
+  }
 
 export const removeTrailingPunctuationInHeadingRuleTestCases: IntegrationTestCase[] = [
   {
