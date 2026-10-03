@@ -3,7 +3,7 @@ import process from 'process';
 import { builtinModules as builtins } from 'node:module';
 import importGlobPlugin from 'esbuild-plugin-import-glob';
 import { replace } from 'esbuild-plugin-replace';
-import { copyFile } from 'node:fs';
+import { copyFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const banner =
@@ -125,6 +125,6 @@ function copySetupForIntegrationTests() {
     - manifest file
   */
 
-  copyFile('manifest.json', join(testVaultPluginPath, 'manifest.json'));
-  copyFile('src/utils/default-misspellings.md', join(testVaultPluginPath, 'default-misspellings.md'));
+  copyFileSync('manifest.json', join(testVaultPluginPath, 'manifest.json'));
+  copyFileSync('src/utils/default-misspellings.md', join(testVaultPluginPath, 'default-misspellings.md'));
 }
