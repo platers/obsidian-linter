@@ -218,7 +218,7 @@ export default class TestLinterPlugin extends Plugin {
     }
 
     await activeLeaf.leaf.openFile(file);
-    const originalText = activeLeaf.editor.getValue();
+    const originalText = await this.app.vault.read(file);
     await testPlugin.resetSettings();
 
     try {
@@ -270,10 +270,17 @@ export default class TestLinterPlugin extends Plugin {
   }
 
   private async resetFileContents(activeLeaf: MarkdownView, originalText: string) {
-    if (activeLeaf) {
+    if (!activeLeaf?.file) return;
+
+    // Restore persisted file contents.
+    await this.app.vault.modify(activeLeaf.file, originalText);
+
+    // Restore the open editor as well.
+    if (activeLeaf.editor.getValue() !== originalText) {
       activeLeaf.editor.setValue(originalText);
-      await setWorkspaceItemMode(this.app, true);
     }
+
+    await setWorkspaceItemMode(this.app, true);
   }
 
   private getActiveLeaf(): MarkdownView {
