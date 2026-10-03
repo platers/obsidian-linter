@@ -11,22 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['line-break-at-document-end'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['line-break-at-document-end'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const lineBreakAtDocumentEndRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Appending a line break to the end of the document.",
@@ -36,11 +20,11 @@ export const lineBreakAtDocumentEndRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Removing trailing line breaks to the end of the document, except one.",
     filePath: "rule-tests/line-break-at-document-end/line-break-at-document-end-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Empty files will not have a blank line added",
     filePath: "rule-tests/line-break-at-document-end/line-break-at-document-end-3.md",
-    setup: setup3,
+    setup: setup1,
   }
 ];

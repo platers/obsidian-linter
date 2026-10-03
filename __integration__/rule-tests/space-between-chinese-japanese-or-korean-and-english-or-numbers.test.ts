@@ -11,54 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup5(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup6(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup7(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['space-between-chinese-japanese-or-korean-and-english-or-numbers'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const spaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Space between Chinese and English",
@@ -68,31 +20,31 @@ export const spaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersRuleTestCases
   {
     name: "Space between Chinese and link",
     filePath: "rule-tests/space-between-chinese-japanese-or-korean-and-english-or-numbers/space-between-chinese-japanese-or-korean-and-english-or-numbers-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Space between Chinese and inline code block",
     filePath: "rule-tests/space-between-chinese-japanese-or-korean-and-english-or-numbers/space-between-chinese-japanese-or-korean-and-english-or-numbers-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "No space between Chinese and English in tag",
     filePath: "rule-tests/space-between-chinese-japanese-or-korean-and-english-or-numbers/space-between-chinese-japanese-or-korean-and-english-or-numbers-4.md",
-    setup: setup4,
+    setup: setup1,
   },
   {
     name: "Make sure that spaces are not added between italics and Chinese characters to preserve markdown syntax",
     filePath: "rule-tests/space-between-chinese-japanese-or-korean-and-english-or-numbers/space-between-chinese-japanese-or-korean-and-english-or-numbers-5.md",
-    setup: setup5,
+    setup: setup1,
   },
   {
     name: "Images and links are ignored",
     filePath: "rule-tests/space-between-chinese-japanese-or-korean-and-english-or-numbers/space-between-chinese-japanese-or-korean-and-english-or-numbers-6.md",
-    setup: setup6,
+    setup: setup1,
   },
   {
     name: "Space between CJK and English",
     filePath: "rule-tests/space-between-chinese-japanese-or-korean-and-english-or-numbers/space-between-chinese-japanese-or-korean-and-english-or-numbers-7.md",
-    setup: setup7,
+    setup: setup1,
   }
 ];

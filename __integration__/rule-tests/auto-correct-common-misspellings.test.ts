@@ -6,27 +6,8 @@ import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 async function setup1(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
   "enabled": true
-};plugin.plugin.hasLoadedMisspellingFiles = false;
-
-await plugin.plugin.loadAutoCorrectFiles(false);
-
-  return Promise.resolve();
-}
-
-async function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
-  "enabled": true
-};plugin.plugin.hasLoadedMisspellingFiles = false;
-
-await plugin.plugin.loadAutoCorrectFiles(false);
-
-  return Promise.resolve();
-}
-
-async function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
-  "enabled": true
-};plugin.plugin.hasLoadedMisspellingFiles = false;
+};
+plugin.plugin.hasLoadedMisspellingFiles = false;
 
 await plugin.plugin.loadAutoCorrectFiles(false);
 
@@ -37,7 +18,8 @@ async function setup4(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
   "skip-words-with-multiple-capitals": true,
   "enabled": true
-};plugin.plugin.hasLoadedMisspellingFiles = false;
+};
+plugin.plugin.hasLoadedMisspellingFiles = false;
 
 await plugin.plugin.loadAutoCorrectFiles(false);
 
@@ -53,12 +35,12 @@ export const autoCorrectCommonMisspellingsRuleTestCases: IntegrationTestCase[] =
   {
     name: "Auto-correct misspellings keeps first letter's case",
     filePath: "rule-tests/auto-correct-common-misspellings/auto-correct-common-misspellings-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Links should not be auto-corrected",
     filePath: "rule-tests/auto-correct-common-misspellings/auto-correct-common-misspellings-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Auto-correct misspellings skips words with multiple capital letters in them if `Skip Words with Multiple Capitals` is Enabled",

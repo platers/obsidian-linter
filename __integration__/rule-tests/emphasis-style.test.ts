@@ -30,15 +30,6 @@ function setup3(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['emphasis-style'] = {
-  "style": "consistent",
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const emphasisStyleRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Emphasis indicators should use underscores when style is set to 'underscore'",
@@ -58,6 +49,6 @@ export const emphasisStyleRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Emphasis indicators should use consistent style based on first emphasis indicator in a file when style is set to 'consistent'",
     filePath: "rule-tests/emphasis-style/emphasis-style-4.md",
-    setup: setup4,
+    setup: setup3,
   }
 ];

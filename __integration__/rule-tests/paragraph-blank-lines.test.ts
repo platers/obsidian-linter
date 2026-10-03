@@ -11,14 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['paragraph-blank-lines'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const paragraphBlankLinesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Paragraphs should be surrounded by blank lines",
@@ -28,6 +20,6 @@ export const paragraphBlankLinesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Paragraphs can be extended via the use of 2 or more spaces at the end of a line, a line break html or xml, or a backslash (\\)",
     filePath: "rule-tests/paragraph-blank-lines/paragraph-blank-lines-2.md",
-    setup: setup2,
+    setup: setup1,
   }
 ];

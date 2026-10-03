@@ -11,14 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['header-increment'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 function setup3(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['header-increment'] = {
   "start-at-h2": true,
@@ -37,7 +29,7 @@ export const headerIncrementRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Skipped headings in sections that would be decremented will result in those headings not having the same meaning",
     filePath: "rule-tests/header-increment/header-increment-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "When `Start header increment at heading level 2 = true`, H1s become H2s and the other headers are incremented accordingly",

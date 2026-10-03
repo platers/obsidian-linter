@@ -11,38 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-horizontal-rules'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-horizontal-rules'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-horizontal-rules'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup5(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-horizontal-rules'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const emptyLineAroundHorizontalRulesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Horizontal rules that start a document do not get an empty line before them.",
@@ -52,21 +20,21 @@ export const emptyLineAroundHorizontalRulesRuleTestCases: IntegrationTestCase[] 
   {
     name: "Horizontal rules that end a document do not get an empty line after them.",
     filePath: "rule-tests/empty-line-around-horizontal-rules/empty-line-around-horizontal-rules-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "All types of horizontal rules are affected by this rule",
     filePath: "rule-tests/empty-line-around-horizontal-rules/empty-line-around-horizontal-rules-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "YAML frontmatter is not affected by this rule",
     filePath: "rule-tests/empty-line-around-horizontal-rules/empty-line-around-horizontal-rules-4.md",
-    setup: setup4,
+    setup: setup1,
   },
   {
     name: "Paragraphs above `---` are treated as a heading and not spaced apart",
     filePath: "rule-tests/empty-line-around-horizontal-rules/empty-line-around-horizontal-rules-5.md",
-    setup: setup5,
+    setup: setup1,
   }
 ];

@@ -11,22 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-blockquotes'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-blockquotes'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const emptyLineAroundBlockquotesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Blockquotes that start a document do not get an empty line before them.",
@@ -36,11 +20,11 @@ export const emptyLineAroundBlockquotesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Blockquotes that end a document do not get an empty line after them.",
     filePath: "rule-tests/empty-line-around-blockquotes/empty-line-around-blockquotes-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Blockquotes that are nested have the proper empty line added",
     filePath: "rule-tests/empty-line-around-blockquotes/empty-line-around-blockquotes-3.md",
-    setup: setup3,
+    setup: setup1,
   }
 ];

@@ -11,46 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup5(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup6(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-lines-between-list-markers-and-checklists'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const removeEmptyLinesBetweenListMarkersAndChecklistsRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Blank lines are removed between ordered list items",
@@ -60,26 +20,26 @@ export const removeEmptyLinesBetweenListMarkersAndChecklistsRuleTestCases: Integ
   {
     name: "Blank lines are removed between list items when the list marker is '-'",
     filePath: "rule-tests/remove-empty-lines-between-list-markers-and-checklists/remove-empty-lines-between-list-markers-and-checklists-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Blank lines are removed between checklist items",
     filePath: "rule-tests/remove-empty-lines-between-list-markers-and-checklists/remove-empty-lines-between-list-markers-and-checklists-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Blank lines are removed between list items when the list marker is '+'",
     filePath: "rule-tests/remove-empty-lines-between-list-markers-and-checklists/remove-empty-lines-between-list-markers-and-checklists-4.md",
-    setup: setup4,
+    setup: setup1,
   },
   {
     name: "Blank lines are removed between list items when the list marker is '*'",
     filePath: "rule-tests/remove-empty-lines-between-list-markers-and-checklists/remove-empty-lines-between-list-markers-and-checklists-5.md",
-    setup: setup5,
+    setup: setup1,
   },
   {
     name: "Blanks lines are removed between like list types (ordered, specific list item markers, and checklists) while blanks are left between different kinds of list item markers",
     filePath: "rule-tests/remove-empty-lines-between-list-markers-and-checklists/remove-empty-lines-between-list-markers-and-checklists-6.md",
-    setup: setup6,
+    setup: setup1,
   }
 ];

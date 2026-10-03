@@ -20,22 +20,6 @@ function setup2(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 function setup5(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
   "how-to-handle-full-line-fields": "Move and keep in text",
@@ -48,23 +32,6 @@ function setup5(plugin: TestLinterPlugin): Promise<void> {
 function setup6(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
   "how-to-handle-bracketed-fields": "Move and keep value in text",
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup7(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "how-to-handle-bracketed-fields": "Move and remove",
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup8(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
   "enabled": true
 };
 
@@ -86,15 +53,6 @@ function setup10(plugin: TestLinterPlugin): Promise<void> {
 };
 
 plugin.plugin.settings.commonStyles.defaultArrayStyle = "multi-line";
-
-  return Promise.resolve();
-}
-
-function setup11(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "how-to-handle-existing-keys": "Merge into list",
-  "enabled": true
-};
 
   return Promise.resolve();
 }
@@ -133,12 +91,12 @@ export const moveInlineFieldsToYamlRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Keys that are not plain YAML keys are escaped and Markdown around a full-line key is removed",
     filePath: "rule-tests/move-inline-fields-to-yaml/move-inline-fields-to-yaml-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Tags have their hashtags removed and tags and aliases are split up and use the tag and alias array styles from the general settings",
     filePath: "rule-tests/move-inline-fields-to-yaml/move-inline-fields-to-yaml-4.md",
-    setup: setup4,
+    setup: setup1,
   },
   {
     name: "Adds full-line fields to the YAML frontmatter and leaves their lines, including any Markdown or emoji around the key, as they are when `Full-line inline fields = 'Move and keep in text'`",
@@ -153,12 +111,12 @@ export const moveInlineFieldsToYamlRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Moves bracketed fields and removes them when `Bracketed inline fields = 'Move and remove'`, removing lines that are left with only whitespace",
     filePath: "rule-tests/move-inline-fields-to-yaml/move-inline-fields-to-yaml-7.md",
-    setup: setup7,
+    setup: setup2,
   },
   {
     name: "Leaves fields whose key is already in the YAML frontmatter alone when `When the key already exists = 'Skip'`",
     filePath: "rule-tests/move-inline-fields-to-yaml/move-inline-fields-to-yaml-8.md",
-    setup: setup8,
+    setup: setup1,
   },
   {
     name: "Adds values to the existing key when `When the key already exists = 'Merge into list'`",
@@ -173,7 +131,7 @@ export const moveInlineFieldsToYamlRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Leaves fields in the body when `When the key already exists = 'Merge into list'` and the existing value is a block scalar, a map, or has a YAML comment, since those cannot be turned into a list without losing part of them",
     filePath: "rule-tests/move-inline-fields-to-yaml/move-inline-fields-to-yaml-11.md",
-    setup: setup11,
+    setup: setup9,
   },
   {
     name: "Replaces the value of the existing key when `When the key already exists = 'Overwrite'`",

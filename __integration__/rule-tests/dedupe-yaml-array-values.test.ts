@@ -13,26 +13,6 @@ plugin.plugin.settings.commonStyles.aliasArrayStyle = "multi-line";
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
-  "enabled": true
-};
-
-plugin.plugin.settings.commonStyles.aliasArrayStyle = "multi-line";
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
-  "enabled": true
-};
-
-plugin.plugin.settings.commonStyles.aliasArrayStyle = "multi-line";
-
-  return Promise.resolve();
-}
-
 function setup4(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['dedupe-yaml-array-values'] = {
   "ignore-keys": [
@@ -55,12 +35,12 @@ export const dedupeYamlArrayValuesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Dedupe YAML aliases is case sensitive and will use your default format for aliases.",
     filePath: "rule-tests/dedupe-yaml-array-values/dedupe-yaml-array-values-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Dedupe YAML array keys is case sensitive and will try to preserve the original array format.",
     filePath: "rule-tests/dedupe-yaml-array-values/dedupe-yaml-array-values-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Dedupe YAML respects list of keys to not remove duplicates of for normal arrays (keys to ignore is just `arr2` for this example)",

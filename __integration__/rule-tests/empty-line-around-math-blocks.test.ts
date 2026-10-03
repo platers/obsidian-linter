@@ -11,38 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup5(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const emptyLineAroundMathBlocksRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Math blocks that start a document do not get an empty line before them.",
@@ -52,21 +20,21 @@ export const emptyLineAroundMathBlocksRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Math blocks that are singe-line are updated based on the value of `Number of dollar signs to indicate a math block` (in this case its value is 2)",
     filePath: "rule-tests/empty-line-around-math-blocks/empty-line-around-math-blocks-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Math blocks that end a document do not get an empty line after them.",
     filePath: "rule-tests/empty-line-around-math-blocks/empty-line-around-math-blocks-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Math blocks that are not at the start or the end of the document will have an empty line added before and after them",
     filePath: "rule-tests/empty-line-around-math-blocks/empty-line-around-math-blocks-4.md",
-    setup: setup4,
+    setup: setup1,
   },
   {
     name: "Math blocks in callouts or blockquotes have the appropriately formatted blank lines added",
     filePath: "rule-tests/empty-line-around-math-blocks/empty-line-around-math-blocks-5.md",
-    setup: setup5,
+    setup: setup1,
   }
 ];

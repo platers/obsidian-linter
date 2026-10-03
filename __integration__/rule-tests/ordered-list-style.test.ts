@@ -11,25 +11,9 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 function setup3(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
   "number-style": "lazy",
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
   "enabled": true
 };
 
@@ -75,16 +59,6 @@ function setup8(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup9(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "number-style": "lazy",
-  "preserve-start": true,
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 function setup10(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
   "number-style": "preserve",
@@ -103,7 +77,7 @@ export const orderedListStyleRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Nested ordered lists have list items set to ascending numerical order when Number style is `ascending`.",
     filePath: "rule-tests/ordered-list-style/ordered-list-style-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Ordered list in blockquote has list items set to '1.' when Number style is `lazy`.",
@@ -113,7 +87,7 @@ export const orderedListStyleRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Ordered list in blockquote has list items set to ascending numerical order when Number style is `ascending`.",
     filePath: "rule-tests/ordered-list-style/ordered-list-style-4.md",
-    setup: setup4,
+    setup: setup1,
   },
   {
     name: "Nested ordered list has list items set to '1)' when Number style is `lazy` and Ordered list indicator end style is `)`.",
@@ -138,7 +112,7 @@ export const orderedListStyleRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Nested ordered lists have list items set to initial indicator number when Number style is `lazy` and `preserveStart` is enabled",
     filePath: "rule-tests/ordered-list-style/ordered-list-style-9.md",
-    setup: setup9,
+    setup: setup8,
   },
   {
     name: "Ordered lists items are not modified when Number style is `preserve`",

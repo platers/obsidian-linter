@@ -11,22 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-trailing-punctuation-in-heading'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-trailing-punctuation-in-heading'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const removeTrailingPunctuationInHeadingRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Removes punctuation from the end of a heading",
@@ -36,11 +20,11 @@ export const removeTrailingPunctuationInHeadingRuleTestCases: IntegrationTestCas
   {
     name: "HTML Entities at the end of a heading is ignored",
     filePath: "rule-tests/remove-trailing-punctuation-in-heading/remove-trailing-punctuation-in-heading-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Removes punctuation from the end of a heading when followed by whitespace",
     filePath: "rule-tests/remove-trailing-punctuation-in-heading/remove-trailing-punctuation-in-heading-3.md",
-    setup: setup3,
+    setup: setup1,
   }
 ];

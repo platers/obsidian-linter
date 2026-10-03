@@ -11,30 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-list-markers'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-list-markers'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-empty-list-markers'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const removeEmptyListMarkersRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Removes empty list markers.",
@@ -44,16 +20,16 @@ export const removeEmptyListMarkersRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Removes empty ordered list markers.",
     filePath: "rule-tests/remove-empty-list-markers/remove-empty-list-markers-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Removes empty checklist markers.",
     filePath: "rule-tests/remove-empty-list-markers/remove-empty-list-markers-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Removes empty list, checklist, and ordered list markers in callouts/blockquotes",
     filePath: "rule-tests/remove-empty-list-markers/remove-empty-list-markers-4.md",
-    setup: setup4,
+    setup: setup1,
   }
 ];

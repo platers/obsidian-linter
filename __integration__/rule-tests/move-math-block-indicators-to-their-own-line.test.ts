@@ -11,22 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-math-block-indicators-to-their-own-line'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['move-math-block-indicators-to-their-own-line'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const moveMathBlockIndicatorsToTheirOwnLineRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Moving math block indicator to its own line when `Number of dollar signs to indicate a math block` = 2",
@@ -36,11 +20,11 @@ export const moveMathBlockIndicatorsToTheirOwnLineRuleTestCases: IntegrationTest
   {
     name: "Moving math block indicator to its own line when `Number of dollar signs to indicate a math block` = 3 and opening indicator is on the same line as the start of the content",
     filePath: "rule-tests/move-math-block-indicators-to-their-own-line/move-math-block-indicators-to-their-own-line-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Moving math block indicator to its own line when `Number of dollar signs to indicate a math block` = 2 and ending indicator is on the same line as the ending line of the content",
     filePath: "rule-tests/move-math-block-indicators-to-their-own-line/move-math-block-indicators-to-their-own-line-3.md",
-    setup: setup3,
+    setup: setup1,
   }
 ];

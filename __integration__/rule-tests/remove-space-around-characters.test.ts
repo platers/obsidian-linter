@@ -11,14 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-space-around-characters'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const removeSpaceAroundCharactersRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Remove spaces and tabs around fullwidth characters",
@@ -28,6 +20,6 @@ export const removeSpaceAroundCharactersRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Fullwidth characters in list do not affect list markdown syntax",
     filePath: "rule-tests/remove-space-around-characters/remove-space-around-characters-2.md",
-    setup: setup2,
+    setup: setup1,
   }
 ];

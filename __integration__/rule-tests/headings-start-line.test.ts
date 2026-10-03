@@ -11,14 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['headings-start-line'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const headingsStartLineRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Removes spaces prior to a heading",
@@ -28,6 +20,6 @@ export const headingsStartLineRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Tags are not affected by this",
     filePath: "rule-tests/headings-start-line/headings-start-line-2.md",
-    setup: setup2,
+    setup: setup1,
   }
 ];

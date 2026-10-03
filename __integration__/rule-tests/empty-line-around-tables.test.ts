@@ -11,30 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-tables'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-tables'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-tables'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const emptyLineAroundTablesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Tables that start a document do not get an empty line before them.",
@@ -44,16 +20,16 @@ export const emptyLineAroundTablesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Tables that end a document do not get an empty line after them.",
     filePath: "rule-tests/empty-line-around-tables/empty-line-around-tables-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Tables that are not at the start or the end of the document will have an empty line added before and after them",
     filePath: "rule-tests/empty-line-around-tables/empty-line-around-tables-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Tables in callouts or blockquotes have the appropriately formatted blank lines added",
     filePath: "rule-tests/empty-line-around-tables/empty-line-around-tables-4.md",
-    setup: setup4,
+    setup: setup1,
   }
 ];

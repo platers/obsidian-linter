@@ -11,30 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['re-index-footnotes'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['re-index-footnotes'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['re-index-footnotes'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const reIndexFootnotesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Re-indexing footnotes after having deleted previous footnotes",
@@ -44,16 +20,16 @@ export const reIndexFootnotesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Re-indexing footnotes after inserting a footnote between",
     filePath: "rule-tests/re-index-footnotes/re-index-footnotes-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Re-indexing footnotes preserves multiple references to the same footnote index",
     filePath: "rule-tests/re-index-footnotes/re-index-footnotes-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Re-indexing footnotes condense duplicate footnotes into 1 when key and footnote are the same",
     filePath: "rule-tests/re-index-footnotes/re-index-footnotes-4.md",
-    setup: setup4,
+    setup: setup1,
   }
 ];

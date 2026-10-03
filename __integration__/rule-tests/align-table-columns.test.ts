@@ -11,22 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['align-table-columns'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['align-table-columns'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const alignTableColumnsRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Make sure columns are aligned properly",
@@ -36,11 +20,11 @@ export const alignTableColumnsRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Make sure column alignment works with CJK characters",
     filePath: "rule-tests/align-table-columns/align-table-columns-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Missing separators get added to the table if they are missing",
     filePath: "rule-tests/align-table-columns/align-table-columns-3.md",
-    setup: setup3,
+    setup: setup1,
   }
 ];

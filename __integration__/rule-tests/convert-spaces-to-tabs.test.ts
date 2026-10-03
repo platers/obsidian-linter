@@ -12,15 +12,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['convert-spaces-to-tabs'] = {
-  "tabsize": 3,
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const convertSpacesToTabsRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Converting spaces to tabs with `tabsize = 3`",
@@ -30,6 +21,6 @@ export const convertSpacesToTabsRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Converting spaces to tabs with `tabsize = 3` works in blockquotes",
     filePath: "rule-tests/convert-spaces-to-tabs/convert-spaces-to-tabs-2.md",
-    setup: setup2,
+    setup: setup1,
   }
 ];

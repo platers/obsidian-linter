@@ -11,22 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 function setup4(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
   "no-bare-uris": true,
@@ -45,12 +29,12 @@ export const noBareUrlsRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Angle brackets are added if the url is not the only text in the single quotes(') or double quotes(\")",
     filePath: "rule-tests/no-bare-urls/no-bare-urls-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Multiple angle brackets at the start and or end of a url will be reduced down to 1",
     filePath: "rule-tests/no-bare-urls/no-bare-urls-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Puts angle brackets around URIs when `No Bare URIs` is enabled",

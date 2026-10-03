@@ -11,14 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 function setup3(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
   "enabled": true
@@ -47,7 +39,7 @@ export const escapeYamlSpecialCharactersRuleTestCases: IntegrationTestCase[] = [
   {
     name: "YAML with unescaped values",
     filePath: "rule-tests/escape-yaml-special-characters/escape-yaml-special-characters-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "YAML with unescaped values in an expanded list with `Default escape character = '`",

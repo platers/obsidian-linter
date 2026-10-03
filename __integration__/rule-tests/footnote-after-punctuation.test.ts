@@ -11,14 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['footnote-after-punctuation'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const footnoteAfterPunctuationRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Placing footnotes after punctuation.",
@@ -28,6 +20,6 @@ export const footnoteAfterPunctuationRuleTestCases: IntegrationTestCase[] = [
   {
     name: "A footnote at the start of a task is not moved to after the punctuation",
     filePath: "rule-tests/footnote-after-punctuation/footnote-after-punctuation-2.md",
-    setup: setup2,
+    setup: setup1,
   }
 ];

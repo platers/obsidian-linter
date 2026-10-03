@@ -11,30 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['format-tags-in-yaml'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['format-tags-in-yaml'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['format-tags-in-yaml'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const formatTagsInYamlRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Format tags in YAML frontmatter",
@@ -44,16 +20,16 @@ export const formatTagsInYamlRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Format tags in array",
     filePath: "rule-tests/format-tags-in-yaml/format-tags-in-yaml-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Format tags in array with `tag` as the tags key",
     filePath: "rule-tests/format-tags-in-yaml/format-tags-in-yaml-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Format tags in list",
     filePath: "rule-tests/format-tags-in-yaml/format-tags-in-yaml-4.md",
-    setup: setup4,
+    setup: setup1,
   }
 ];

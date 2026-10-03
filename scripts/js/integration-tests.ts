@@ -104,6 +104,7 @@ function generateRule(rule: Rule): void {
   mkdirSync(ruleDirectory, { recursive: true });
 
   const setupFunctions: string[] = [];
+  const testBodyToFuncName = new Map<string, string>();
   const testCases = rule.examples.map((example, index) => {
     const exampleNumber = index + 1;
     const beforePath = join(ruleDirectory, `${rule.alias}-${exampleNumber}.md`);
@@ -112,7 +113,7 @@ function generateRule(rule: Rule): void {
     writeFileSync(beforePath, example.before);
     writeFileSync(afterPath, example.after);
 
-    const [setupFuncName, setupFunc] = generateSetupFunction(rule, example, exampleNumber);
+    const [setupFuncName, setupFunc] = generateSetupFunction(rule, example, exampleNumber, testBodyToFuncName);
     if (setupFunc) {
       setupFunctions.push(setupFunc);
     }
@@ -188,8 +189,8 @@ function getExampleSettings(rule: Rule, example: typeof rules[number]['examples'
   return { ruleSettings, commonStyles };
 }
 
-function generateSetupFunction(rule: Rule, example: typeof rules[number]['examples'][number], exampleNumber: number): [setupFuncName: string, setupFunction: string] {
-  const funcName = 'setup' + exampleNumber;
+function generateSetupFunction(rule: Rule, example: typeof rules[number]['examples'][number], exampleNumber: number, testBodyToFuncName: Map<string, string>): [setupFuncName: string, setupFunction: string] {
+  let funcName = 'setup' + exampleNumber;
 
   const {
     ruleSettings,
@@ -202,6 +203,7 @@ function generateSetupFunction(rule: Rule, example: typeof rules[number]['exampl
   let modifier = '';
   if (rule.alias === 'auto-correct-common-misspellings') {
     extraSetup = dedent`
+
       plugin.plugin.hasLoadedMisspellingFiles = false;
 
       await plugin.plugin.loadAutoCorrectFiles(false);
@@ -210,13 +212,24 @@ function generateSetupFunction(rule: Rule, example: typeof rules[number]['exampl
     modifier = 'async ';
   }
 
-  return [funcName, dedent`
-    ${modifier}function ${funcName}(plugin: TestLinterPlugin): Promise<void> {
+  let setupFunc = '';
+  const genericTestBody = dedent`
+    ${modifier}function {REPLACE_ME}(plugin: TestLinterPlugin): Promise<void> {
       plugin.plugin.settings.ruleConfigs['${rule.settingsKey}'] = ${JSON.stringify(ruleSettings, null, 2)};${commonStylesSetup}${extraSetup}
 
       return Promise.resolve();
     }
-  `];
+  `
+
+  if (testBodyToFuncName.has(genericTestBody)) {
+    funcName = testBodyToFuncName.get(genericTestBody) ?? funcName;
+
+  } else {
+    testBodyToFuncName.set(genericTestBody, funcName);
+    setupFunc = genericTestBody.replace('{REPLACE_ME}', funcName);
+  }
+
+  return [funcName, setupFunc];
 }
 
 function generateCommonStylesSetup(commonStyles: Record<string, unknown>): string {

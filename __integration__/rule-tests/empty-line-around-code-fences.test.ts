@@ -11,30 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-code-fences'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-code-fences'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['empty-line-around-code-fences'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const emptyLineAroundCodeFencesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Fenced code blocks that start a document do not get an empty line before them.",
@@ -44,16 +20,16 @@ export const emptyLineAroundCodeFencesRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Fenced code blocks that end a document do not get an empty line after them.",
     filePath: "rule-tests/empty-line-around-code-fences/empty-line-around-code-fences-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "Fenced code blocks that are in a blockquote have the proper empty line added",
     filePath: "rule-tests/empty-line-around-code-fences/empty-line-around-code-fences-3.md",
-    setup: setup3,
+    setup: setup1,
   },
   {
     name: "Nested fenced code blocks get empty lines added around them",
     filePath: "rule-tests/empty-line-around-code-fences/empty-line-around-code-fences-4.md",
-    setup: setup4,
+    setup: setup1,
   }
 ];

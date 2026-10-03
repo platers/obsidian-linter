@@ -30,15 +30,6 @@ function setup3(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup4(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['strong-style'] = {
-  "style": "consistent",
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const strongStyleRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Strong indicators should use underscores when style is set to 'underscore'",
@@ -58,6 +49,6 @@ export const strongStyleRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Strong indicators should use consistent style based on first strong indicator in a file when style is set to 'consistent'",
     filePath: "rule-tests/strong-style/strong-style-4.md",
-    setup: setup4,
+    setup: setup3,
   }
 ];

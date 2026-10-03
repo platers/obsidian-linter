@@ -11,22 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['add-blank-line-after-yaml'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
-function setup3(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['add-blank-line-after-yaml'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const addBlankLineAfterYamlRuleTestCases: IntegrationTestCase[] = [
   {
     name: "A file with just YAML in it does not get a blank line after the YAML",
@@ -36,11 +20,11 @@ export const addBlankLineAfterYamlRuleTestCases: IntegrationTestCase[] = [
   {
     name: "A file with YAML followed directly by content has an empty line added",
     filePath: "rule-tests/add-blank-line-after-yaml/add-blank-line-after-yaml-2.md",
-    setup: setup2,
+    setup: setup1,
   },
   {
     name: "A file with YAML that already has a blank line after it and before content has no empty line added",
     filePath: "rule-tests/add-blank-line-after-yaml/add-blank-line-after-yaml-3.md",
-    setup: setup3,
+    setup: setup1,
   }
 ];

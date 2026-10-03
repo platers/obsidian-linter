@@ -11,14 +11,6 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   return Promise.resolve();
 }
 
-function setup2(plugin: TestLinterPlugin): Promise<void> {
-  plugin.plugin.settings.ruleConfigs['remove-link-spacing'] = {
-  "enabled": true
-};
-
-  return Promise.resolve();
-}
-
 export const removeLinkSpacingRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Space in regular markdown link text",
@@ -28,6 +20,6 @@ export const removeLinkSpacingRuleTestCases: IntegrationTestCase[] = [
   {
     name: "Space in wiki link text",
     filePath: "rule-tests/remove-link-spacing/remove-link-spacing-2.md",
-    setup: setup2,
+    setup: setup1,
   }
 ];
