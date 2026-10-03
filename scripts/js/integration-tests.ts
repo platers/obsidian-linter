@@ -109,8 +109,8 @@ function generateRule(rule: Rule): void {
     const beforePath = join(ruleDirectory, `${rule.alias}-${exampleNumber}.md`);
     const afterPath = join(ruleDirectory, `${rule.alias}-${exampleNumber}.linted.md`);
 
-    writeFileSync(beforePath, ensureTrailingNewline(example.before));
-    writeFileSync(afterPath, ensureTrailingNewline(example.after));
+    writeFileSync(beforePath, example.before);
+    writeFileSync(afterPath, example.after);
 
     const [setupFuncName, setupFunc] = generateSetupFunction(rule, example, exampleNumber);
     if (setupFunc) {
@@ -231,10 +231,6 @@ function getTestCaseExportName(alias: string): string {
     .replace(/[^a-zA-Z0-9]/g, '');
 
   return `${name || 'rule'}RuleTestCases`;
-}
-
-function ensureTrailingNewline(text: string): string {
-  return text.endsWith('\n') ? text : `${text}\n`;
 }
 
 function recreateDirectory(directory: string): void {
