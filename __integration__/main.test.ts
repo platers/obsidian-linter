@@ -306,8 +306,8 @@ export default class TestLinterPlugin extends Plugin {
     await this.plugin.loadSettings();
     // disable all rules to prevent bleed over for tests
     for (const ruleAlias in this.plugin.settings.ruleConfigs) {
-      if (this.plugin.settings[ruleAlias] && this.plugin.settings[ruleAlias]['enabled']) {
-        this.plugin.settings[ruleAlias]['enabled'] = false;
+      if (this.plugin.settings.ruleConfigs[ruleAlias] && this.plugin.settings.ruleConfigs[ruleAlias]['enabled']) {
+        this.plugin.settings.ruleConfigs[ruleAlias]['enabled'] = false;
       }
     }
   }

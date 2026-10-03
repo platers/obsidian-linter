@@ -39,6 +39,8 @@ const skipRules = new Set<string>([
   'yaml-title',
   'yaml-title-alias',
   'file-name-heading',
+  // mispellings need loading for the tests to work...
+  'auto-correct-common-misspellings'
 ]);
 
 sortRules();

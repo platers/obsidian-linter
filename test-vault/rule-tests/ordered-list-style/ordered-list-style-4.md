@@ -1,5 +1,5 @@
 > 1. Item 1
-> 4. Item 2
+> 2. Item 2
 > > 1. Subitem 1
-> > 5. Subitem 2
-> > 2. Subitem 3
+> > 2. Subitem 2
+> > 3. Subitem 3

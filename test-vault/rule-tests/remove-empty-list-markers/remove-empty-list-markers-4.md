@@ -7,8 +7,8 @@
 > Ordered List in blockquote
 > > 1. item 1
 > > 2.
-> > 3. item 2
-> > 4.  
+> > 2. item 2
+> > 3.  
 
 > Regular lists in blockquote
 >

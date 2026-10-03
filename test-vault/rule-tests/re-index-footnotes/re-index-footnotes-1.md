@@ -1,4 +1,4 @@
-Lorem ipsum at aliquet felis.[^3] Donec dictum turpis quis pellentesque,[^5] et iaculis tortor condimentum.
+Lorem ipsum at aliquet felis.[^1] Donec dictum turpis quis pellentesque,[^2] et iaculis tortor condimentum.
 
-[^3]: first footnote
-[^5]: second footnote
+[^1]: first footnote
+[^2]: second footnote
