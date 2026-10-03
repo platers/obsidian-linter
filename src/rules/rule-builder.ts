@@ -1,13 +1,13 @@
-import {Example, Options, Rule, RuleType, registerRule, wrapLintError} from '../rules';
-import {BooleanOption, DropdownOption, DropdownRecord, MdFilePickerOption, MomentFormatOption, Option, ListItemOption, TextOption} from '../option';
-import {logDebug, timingBegin, timingEnd} from '../utils/logger';
-import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
-import {IgnoreType, IgnoreTypes} from '../utils/ignore-types';
-import {LintContext, ProtectedRanges} from '../utils/protected-ranges';
-import {LinterSettings} from '../settings-data';
-import {App} from 'obsidian';
+import { Example, Options, Rule, RuleType, registerRule, wrapLintError } from '../rules';
+import { BooleanOption, DropdownOption, DropdownRecord, MdFilePickerOption, MomentFormatOption, Option, ListItemOption, TextOption } from '../option';
+import { logDebug, timingBegin, timingEnd } from '../utils/logger';
+import { getTextInLanguage, LanguageStringKey } from '../lang/helpers';
+import { IgnoreType, IgnoreTypes } from '../utils/ignore-types';
+import { LintContext, ProtectedRanges } from '../utils/protected-ranges';
+import { LinterSettings } from '../settings-data';
+import { App } from 'obsidian';
 import LinterPlugin from '../main';
-import type {ListItemValidation} from '../ui/modals/add-list-entry-modals';
+import type { ListItemValidation } from '../ui/modals/add-list-entry-modals';
 
 // limit the amount of text that can be written to the logs to try to prevent memory issues
 const maxFileSizeLength = 10000;
@@ -17,7 +17,7 @@ export abstract class RuleBuilderBase {
   static #ruleBuilderMap = new Map<string, RuleBuilderBase>();
   static #noSettingsControlMap = new Map<string, string[]>();
 
-  static getRule<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>)): Rule {
+  static getRule<TOptions extends Options>(this: (new () => RuleBuilder<TOptions>)): Rule {
     // Keyed on the rule's alias rather than the name of the class it was built from. Three rules
     // were left named `RuleTemplate` after being copied from the template, so they shared an entry
     // and two of them silently became the third.
@@ -43,7 +43,7 @@ export abstract class RuleBuilderBase {
         timingEnd(rule.alias);
 
         if (newText.length > maxFileSizeLength) {
-          logDebug(newText.slice(0, maxFileSizeLength -1) + '...');
+          logDebug(newText.slice(0, maxFileSizeLength - 1) + '...');
         } else {
           logDebug(newText);
         }
@@ -53,7 +53,7 @@ export abstract class RuleBuilderBase {
         timingEnd(rule.alias);
         wrapLintError(error instanceof Error ? error : new Error(String(error)), rule.getName());
       }
-    } 
+    }
 
     return [text, false];
   }
@@ -72,6 +72,8 @@ export abstract class RuleBuilderBase {
   static hasSettingControl(optionsClassName: string, optionsClassKey: string) {
     return !RuleBuilderBase.#noSettingsControlMap.has(optionsClassName) || !RuleBuilderBase.#noSettingsControlMap.get(optionsClassName).includes(optionsClassKey);
   }
+
+  abstract getOptionBuilderByOptionsKey(optionsKey: string): { configKey: string; } | undefined;
 }
 
 type RuleBuilderConstructorArgs = {
@@ -98,7 +100,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     super();
 
     // cut "rules." from the start and ".name" from the end
-    this.alias = args.nameKey.substring(6, args.nameKey.length-5);
+    this.alias = args.nameKey.substring(6, args.nameKey.length - 5);
     this.settingsKey = this.alias;
     this.nameKey = args.nameKey;
     this.descriptionKey = args.descriptionKey;
@@ -113,12 +115,12 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     }
   }
 
-  abstract get OptionsClass(): (new() => TOptions);
+  abstract get OptionsClass(): (new () => TOptions);
 
   static register<TOptions extends Options, T extends typeof RuleBuilderBase & (new () => RuleBuilder<TOptions>)>(this: void, ruleBuilderClass: T, _context: ClassDecoratorContext,): void {
-  const rule = ruleBuilderClass.getRule();
-  registerRule(rule);
-}
+    const rule = ruleBuilderClass.getRule();
+    registerRule(rule);
+  }
 
   safeApply(text: string, options?: Options, protectedRanges?: ProtectedRanges): string {
     return this.apply(text, this.buildRuleOptions(options), protectedRanges);
@@ -140,7 +142,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   abstract get exampleBuilders(): ExampleBuilder<TOptions>[];
   abstract get optionBuilders(): OptionBuilderBase<TOptions>[];
 
-  static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions, context?: LintContext): [result: string, isEnabled: boolean] {
+  static applyIfEnabled<TOptions extends Options>(this: typeof RuleBuilderBase & (new () => RuleBuilder<TOptions>), text: string, settings: LinterSettings, disabledRules: string[], extraOptions?: TOptions, context?: LintContext): [result: string, isEnabled: boolean] {
     const rule = this.getRule();
     if (disabledRules.includes(rule.alias)) {
       logDebug(rule.alias + ' ' + getTextInLanguage('logs.disabled-text'));
@@ -150,7 +152,7 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
     return RuleBuilderBase.applyIfEnabledBase(rule, text, settings, extraOptions, context);
   }
 
-  static getRuleOptions<TOptions extends Options>(this: (new() => RuleBuilder<TOptions>), settings: LinterSettings): TOptions {
+  static getRuleOptions<TOptions extends Options>(this: (new () => RuleBuilder<TOptions>), settings: LinterSettings): TOptions {
     const rule = RuleBuilderBase.getRule.bind(this)();
     const builder = new this();
     const optionsFromSettings = rule.getOptions(settings);
@@ -158,21 +160,24 @@ export default abstract class RuleBuilder<TOptions extends Options> extends Rule
   }
 
   static noSettingControl() {
-  return function (
-    _value: unknown,
-    context: ClassFieldDecoratorContext,
-  ): void {
-    const propertyKey = String(context.name);
+    return function (
+      _value: unknown,
+      context: ClassFieldDecoratorContext,
+    ): void {
+      const propertyKey = String(context.name);
 
-    context.addInitializer(function () {
-      RuleBuilderBase.setNoSettingControl(
-        this.constructor.name,
-        propertyKey,
-      );
-    });
-  };
+      context.addInitializer(function () {
+        RuleBuilderBase.setNoSettingControl(
+          this.constructor.name,
+          propertyKey,
+        );
+      });
+    };
   }
 
+  getOptionBuilderByOptionsKey(optionsKey: string): { configKey: string } | undefined {
+    return this.optionBuilders.find(optionBuilder => optionBuilder.optionsKey === optionsKey);
+  }
 }
 
 export class ExampleBuilder<TOptions extends Options> {
@@ -191,10 +196,10 @@ export class ExampleBuilder<TOptions extends Options> {
   }
 }
 
-type KeysOfObjectMatchingPropertyValueType<TObject, TValue> = {[TKey in keyof TObject]-?: TObject[TKey] extends TValue ? (TValue extends TObject[TKey] ? TKey : never) : never }[keyof TObject & string];
+type KeysOfObjectMatchingPropertyValueType<TObject, TValue> = { [TKey in keyof TObject]-?: TObject[TKey] extends TValue ? (TValue extends TObject[TKey] ? TKey : never) : never }[keyof TObject & string];
 
 type OptionBuilderConstructorArgs<TOptions extends Options, TValue> = {
-  OptionsClass: (new() => TOptions),
+  OptionsClass: (new () => TOptions),
   nameKey: LanguageStringKey
   descriptionKey: LanguageStringKey,
   optionsKey: KeysOfObjectMatchingPropertyValueType<TOptions, TValue>;
@@ -206,7 +211,7 @@ export abstract class OptionBuilderBase<TOptions extends Options> {
 }
 
 export abstract class OptionBuilder<TOptions extends Options, TValue> {
-  readonly OptionsClass: (new() => TOptions);
+  readonly OptionsClass: (new () => TOptions);
   readonly configKey: string;
   readonly nameKey: LanguageStringKey;
   readonly descriptionKey: LanguageStringKey;

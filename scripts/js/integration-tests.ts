@@ -174,9 +174,7 @@ function getExampleSettings(rule: Rule, example: typeof rules[number]['examples'
       continue;
     }
 
-    const optionBuilder = builder.optionBuilders.find(
-      optionBuilder => optionBuilder.optionsKey === exampleKey,
-    );
+    const optionBuilder = builder.getOptionBuilderByOptionsKey(exampleKey);
 
     if (!optionBuilder) {
       throw new Error(`Unknown option "${exampleKey}" for rule "${rule.alias}"`);
