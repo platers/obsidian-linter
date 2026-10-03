@@ -118,9 +118,9 @@ export default class TestLinterPlugin extends Plugin {
         console.error(e);
 
         this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+      } finally {
+        await this.resetFileContents(activeLeaf, originalText);
       }
-
-      await this.resetFileContents(activeLeaf, originalText);
     }
 
     await this.runIgnoreTests(testStatuses, totalTestCount);
@@ -197,9 +197,10 @@ export default class TestLinterPlugin extends Plugin {
         console.error(e);
 
         this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+      } finally {
+        await this.resetFileContents(activeLeaf, originalText);
       }
 
-      await this.resetFileContents(activeLeaf, originalText);
 
       originalText = null;
       if (index + 1 < tests.length) {
@@ -218,7 +219,7 @@ export default class TestLinterPlugin extends Plugin {
     }
 
     await activeLeaf.leaf.openFile(file);
-    const originalText = await this.app.vault.read(file);
+    const originalText = activeLeaf.editor.getValue();
     await testPlugin.resetSettings();
 
     try {
@@ -271,9 +272,6 @@ export default class TestLinterPlugin extends Plugin {
 
   private async resetFileContents(activeLeaf: MarkdownView, originalText: string) {
     if (!activeLeaf?.file) return;
-
-    // Restore persisted file contents.
-    await this.app.vault.modify(activeLeaf.file, originalText);
 
     // Restore the open editor as well.
     if (activeLeaf.editor.getValue() !== originalText) {
