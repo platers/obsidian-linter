@@ -1,7 +1,7 @@
-import TestLinterPlugin, {IntegrationTestCase} from './main.test';
-import {Editor, TFile} from 'obsidian';
+import TestLinterPlugin, { IntegrationTestCase } from './main.test';
+import { Editor, TFile } from 'obsidian';
 import expect from 'expect';
-import {setWorkspaceItemMode} from './utils.test';
+import { setWorkspaceItemMode } from './utils.test';
 import moment from 'moment';
 
 const cursorStart = 319;
@@ -9,7 +9,7 @@ const cursorStart = 319;
 function modeSetup(plugin: TestLinterPlugin, editor: Editor): Promise<void> {
   plugin.plugin.settings.ruleConfigs['yaml-key-sort'] = {
     'enabled': true,
-    'yaml-key-priority-sort-order': '',
+    'yaml-key-priority-sort-order': [],
     'priority-keys-at-start-of-yaml': false,
     'yaml-sort-order-for-other-keys': 'Ascending Alphabetical',
   };
@@ -24,7 +24,7 @@ function modeAssertions(editor: Editor) {
   expect(editor.posToOffset(editor.getCursor())).toBe(cursorStart);
 }
 
-function edgeCaseExpectedTextModifications(text: string, file: TFile):string {
+function edgeCaseExpectedTextModifications(text: string, file: TFile): string {
   text = text.replace('{{created_date}}', moment(file.stat.ctime ?? '').format('YYYY-MM-DD'));
   text = text.replace('{{modified_date}}', moment().format('YYYY-MM-DD'));
 
@@ -88,7 +88,7 @@ function moveToYamlSetup(plugin: TestLinterPlugin, _: Editor): Promise<void> {
   plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
     'enabled': true,
     'how-to-handle-existing-tags': 'Remove whole tag',
-    'tags-to-ignore': '',
+    'tags-to-ignore': [],
   };
 
   return Promise.resolve();

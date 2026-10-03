@@ -3,6 +3,8 @@ import process from 'process';
 import { builtinModules as builtins } from 'node:module';
 import importGlobPlugin from 'esbuild-plugin-import-glob';
 import { replace } from 'esbuild-plugin-replace';
+import { copyFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const banner =
   `/*
@@ -11,6 +13,7 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `;
 
+const testVaultPluginPath = "test-vault/.obsidian/plugins/obsidian-linter";
 const dummyMocksForDocs = `
 document = {
   createElement: function() {},
@@ -26,8 +29,8 @@ const mockedPlugins = [replace({
     // update usage of moment from obsidian to the node implementation of moment we have
     'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
     // remove the use of obsidian in the options to allow for docs.js to run
-    'import {App, ExtraButtonComponent, normalizePath, TFile, ToggleComponent} from \'obsidian\';': '',
-    'import type {SettingDefinition, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage} from \'obsidian\';': '',
+    'import { App, ExtraButtonComponent, normalizePath, TFile, ToggleComponent } from \'obsidian\';': '',
+    'import type { SettingDefinition, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage } from \'obsidian\';': '',
     // remove the use of obsidian in the auto-correct files picker to allow for docs.js to run
     'import {Setting, App, TFile, normalizePath, ExtraButtonComponent} from \'obsidian\';': '',
     // remove the use of obsidian in add custom row to allow for docs.js to run
@@ -96,10 +99,12 @@ const esbuildArgs = [
   createEsbuildArgs(banner, 'src/main.ts', 'main.js', unusedCodeForProduction),
   createEsbuildArgs(mockedBanner, 'scripts/js/docs.ts', 'docs.js', mockedPlugins),
   createEsbuildArgs(mockedBanner, 'scripts/js/translation-helper.ts', 'translation-helper.js', mockedPlugins),
+  createEsbuildArgs(mockedBanner, 'scripts/js/integration-tests.ts', 'integration-tests.js', mockedPlugins),
 ];
 
 if (!prod) {
-  esbuildArgs.push(createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []));
+  esbuildArgs.push(createEsbuildArgs(banner, '__integration__/main.test.ts', join(testVaultPluginPath, 'main.js'), []));
+  copySetupForIntegrationTests();
 }
 
 for (let i = 0; i < esbuildArgs.length; i++) {
@@ -111,4 +116,15 @@ for (let i = 0; i < esbuildArgs.length; i++) {
     const context = await esbuild.context(esbuildArgs[i]);
     await context.watch();
   }
+}
+
+
+function copySetupForIntegrationTests() {
+  /* copy the following files to test vault:
+    - Default common mispellings
+    - manifest file
+  */
+
+  copyFileSync('manifest.json', join(testVaultPluginPath, 'manifest.json'));
+  copyFileSync('src/utils/default-misspellings.md', join(testVaultPluginPath, 'default-misspellings.md'));
 }

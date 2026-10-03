@@ -23,7 +23,7 @@ jq ".version=\"${NEW_VERSION}\"" manifest-beta.json > manifest-beta.tmp.json && 
 minAppVersion=$(jq -r '.minAppVersion' manifest.json)
 jq ". + {\"${NEW_VERSION}\": \"$minAppVersion\"}" versions.json > versions.tmp.json && mv versions.tmp.json versions.json
 
-npm run build && npm run docs
+npm run build && npm run docs && npm run generate-integration-tests
 
 # Create commit & commit.
 git commit -a -m "Auto-release ${NEW_VERSION}"

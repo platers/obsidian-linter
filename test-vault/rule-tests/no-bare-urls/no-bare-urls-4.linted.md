@@ -1,0 +1,1 @@
+<obsidian://show-plugin?id=cycle-in-sidebar>

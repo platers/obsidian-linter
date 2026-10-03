@@ -1,0 +1,4 @@
+日本語englishひらがな
+カタカナenglishカタカナ
+ﾊﾝｶｸｶﾀｶﾅenglish１２３全角数字
+한글english한글
