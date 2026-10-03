@@ -73,7 +73,7 @@ export default defineConfig([
       'docs.js',
       'main.js',
       'translation-helper.js',
-      'integration-test.js',
+      'integration-tests.js',
       'eslint.config.mjs',
       'esbuild.config.mjs',
       'babel.config.js',
