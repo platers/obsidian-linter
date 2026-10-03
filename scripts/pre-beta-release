@@ -19,6 +19,8 @@ rm -f manifest-beta.tmp.json
 jq ".version=\"${NEW_VERSION}\"" package.json > package.tmp.json && mv package.tmp.json package.json
 jq ".version=\"${NEW_VERSION}\"" manifest-beta.json > manifest-beta.tmp.json && mv manifest-beta.tmp.json manifest-beta.json
 
+npm run build && npm run docs && npm run generate-integration-tests
+
 # Create commit & commit.
 git commit -a -m "Auto-release beta ${NEW_VERSION}"
 git push

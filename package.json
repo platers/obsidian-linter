@@ -15,7 +15,7 @@
     "generate-differential": "UPDATE_SNAPSHOT=1 npx jest __tests__/rules-runner-differential.test.ts",
     "docs": "node docs.js",
     "translate": "npm run build && node translation-helper.js",
-    "generate-integration-tests": "npm run build && node integration-tests.js",
+    "generate-integration-tests": "node integration-tests.js",
     "compile": "npm run build && npm run docs && npm run lint && npm run test",
     "lint": "npx eslint --fix",
     "clear-jest": "jest --clearCache",
