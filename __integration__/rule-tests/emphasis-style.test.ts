@@ -3,41 +3,41 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['emphasis-style'] = {
-  "enabled": true,
-  "style": "underscore"
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['emphasis-style'] = {
+  "style": "underscore",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['emphasis-style'] = {
-  "enabled": true,
-  "style": "asterisk"
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['emphasis-style'] = {
+  "style": "asterisk",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['emphasis-style'] = {
-  "enabled": true,
-  "style": "consistent"
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['emphasis-style'] = {
+  "style": "consistent",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup4(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['emphasis-style'] = {
-  "enabled": true,
-  "style": "consistent"
+function setup4(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['emphasis-style'] = {
+  "style": "consistent",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const emphasisStyleRuleTestCases: IntegrationTestCase[] = [
   {

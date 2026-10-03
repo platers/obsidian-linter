@@ -3,13 +3,13 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['remove-consecutive-list-markers'] = {
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['remove-consecutive-list-markers'] = {
   "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const removeConsecutiveListMarkersRuleTestCases: IntegrationTestCase[] = [
   {

@@ -3,19 +3,18 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['remove-yaml-keys'] = {
-  "enabled": true,
-  "yaml-keys-to-remove": [],
-  "yamlKeysToRemove": [
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['remove-yaml-keys'] = {
+  "yaml-keys-to-remove": [
     "status:",
     "keywords",
     "date"
-  ]
+  ],
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const removeYamlKeysRuleTestCases: IntegrationTestCase[] = [
   {

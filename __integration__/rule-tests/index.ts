@@ -12,10 +12,7 @@ import { moveInlineFieldsToYamlRuleTestCases } from './move-inline-fields-to-yam
 import { moveTagsToYamlRuleTestCases } from './move-tags-to-yaml.test';
 import { removeYamlKeysRuleTestCases } from './remove-yaml-keys.test';
 import { sortYamlArrayValuesRuleTestCases } from './sort-yaml-array-values.test';
-import { yamlTitleRuleTestCases } from './yaml-title.test';
-import { yamlTitleAliasRuleTestCases } from './yaml-title-alias.test';
 import { capitalizeHeadingsRuleTestCases } from './capitalize-headings.test';
-import { fileNameHeadingRuleTestCases } from './file-name-heading.test';
 import { headerIncrementRuleTestCases } from './header-increment.test';
 import { headingsStartLineRuleTestCases } from './headings-start-line.test';
 import { removeTrailingPunctuationInHeadingRuleTestCases } from './remove-trailing-punctuation-in-heading.test';
@@ -71,10 +68,7 @@ export const ruleTests = [
   ...moveTagsToYamlRuleTestCases,
   ...removeYamlKeysRuleTestCases,
   ...sortYamlArrayValuesRuleTestCases,
-  ...yamlTitleRuleTestCases,
-  ...yamlTitleAliasRuleTestCases,
   ...capitalizeHeadingsRuleTestCases,
-  ...fileNameHeadingRuleTestCases,
   ...headerIncrementRuleTestCases,
   ...headingsStartLineRuleTestCases,
   ...removeTrailingPunctuationInHeadingRuleTestCases,

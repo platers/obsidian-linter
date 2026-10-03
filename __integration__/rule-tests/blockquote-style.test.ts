@@ -3,23 +3,22 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['blockquote-style'] = {
-  "enabled": true,
-  "style": "space"
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['blockquote-style'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['blockquote-style'] = {
-  "enabled": true,
-  "style": "no space"
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['blockquote-style'] = {
+  "style": "no space",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const blockquoteStyleRuleTestCases: IntegrationTestCase[] = [
   {

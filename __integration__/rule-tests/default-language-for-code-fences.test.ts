@@ -3,35 +3,32 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['default-language-for-code-fences'] = {
-  "enabled": true,
-  "default-language": "",
-  "defaultLanguage": "javascript"
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['default-language-for-code-fences'] = {
+  "default-language": "javascript",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['default-language-for-code-fences'] = {
-  "enabled": true,
-  "default-language": "",
-  "defaultLanguage": "shell"
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['default-language-for-code-fences'] = {
+  "default-language": "shell",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['default-language-for-code-fences'] = {
-  "enabled": true,
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['default-language-for-code-fences'] = {
   "default-language": "",
-  "defaultLanguage": ""
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const defaultLanguageForCodeFencesRuleTestCases: IntegrationTestCase[] = [
   {

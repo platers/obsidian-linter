@@ -3,15 +3,13 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['remove-space-before-or-after-characters'] = {
-  "enabled": true,
-  "characters-to-remove-space-before": ",!?;:).’”]",
-  "characters-to-remove-space-after": "¿¡‘“(["
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['remove-space-before-or-after-characters'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const removeSpaceBeforeOrAfterCharactersRuleTestCases: IntegrationTestCase[] = [
   {

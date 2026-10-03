@@ -3,24 +3,22 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['trailing-spaces'] = {
-  "enabled": true,
-  "two-space-line-break": false
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['trailing-spaces'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['trailing-spaces'] = {
-  "enabled": true,
-  "two-space-line-break": false,
-  "twoSpaceLineBreak": true
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['trailing-spaces'] = {
+  "two-space-line-break": true,
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const trailingSpacesRuleTestCases: IntegrationTestCase[] = [
   {

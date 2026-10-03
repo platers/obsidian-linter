@@ -3,45 +3,45 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
   "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
   "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
   "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup4(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
+function setup4(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
   "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup5(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
+function setup5(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['empty-line-around-math-blocks'] = {
   "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const emptyLineAroundMathBlocksRuleTestCases: IntegrationTestCase[] = [
   {

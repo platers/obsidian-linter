@@ -3,42 +3,38 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
-  "enabled": true,
-  "no-bare-uris": false
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
-  "enabled": true,
-  "no-bare-uris": false
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
-  "enabled": true,
-  "no-bare-uris": false
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup4(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
-  "enabled": true,
-  "no-bare-uris": false,
-  "noBareURIs": true
+function setup4(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['no-bare-urls'] = {
+  "no-bare-uris": true,
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const noBareUrlsRuleTestCases: IntegrationTestCase[] = [
   {

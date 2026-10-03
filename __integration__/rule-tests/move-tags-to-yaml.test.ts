@@ -3,53 +3,45 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-existing-tags": "Nothing",
-  "tags-to-ignore": [],
-  "tagsToIgnore": [
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
+  "tags-to-ignore": [
     "ignored-tag"
-  ]
+  ],
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-existing-tags": "Nothing",
-  "tags-to-ignore": []
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-existing-tags": "Nothing",
-  "tags-to-ignore": [],
-  "howToHandleExistingTags": "Remove hashtag",
-  "tagsToIgnore": [
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
+  "how-to-handle-existing-tags": "Remove hashtag",
+  "tags-to-ignore": [
     "yet-another-ignored-tag"
-  ]
+  ],
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup4(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-existing-tags": "Nothing",
-  "tags-to-ignore": [],
-  "howToHandleExistingTags": "Remove whole tag"
+function setup4(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-tags-to-yaml'] = {
+  "how-to-handle-existing-tags": "Remove whole tag",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const moveTagsToYamlRuleTestCases: IntegrationTestCase[] = [
   {

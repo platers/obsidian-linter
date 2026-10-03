@@ -3,29 +3,21 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['remove-space-around-characters'] = {
-  "enabled": true,
-  "include-fullwidth-forms": true,
-  "include-cjk-symbols-and-punctuation": true,
-  "include-dashes": true,
-  "other-symbols": ""
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['remove-space-around-characters'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['remove-space-around-characters'] = {
-  "enabled": true,
-  "include-fullwidth-forms": true,
-  "include-cjk-symbols-and-punctuation": true,
-  "include-dashes": true,
-  "other-symbols": ""
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['remove-space-around-characters'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const removeSpaceAroundCharactersRuleTestCases: IntegrationTestCase[] = [
   {

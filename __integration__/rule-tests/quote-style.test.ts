@@ -3,31 +3,23 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['quote-style'] = {
-  "enabled": true,
-  "single-quote-enabled": true,
-  "single-quote-style": "''",
-  "double-quote-enabled": true,
-  "double-quote-style": "\"\""
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['quote-style'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['quote-style'] = {
-  "enabled": true,
-  "single-quote-enabled": true,
-  "single-quote-style": "''",
-  "double-quote-enabled": true,
-  "double-quote-style": "\"\"",
-  "singleQuoteStyle": "‘’",
-  "doubleQuoteStyle": "“”"
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['quote-style'] = {
+  "single-quote-style": "‘’",
+  "double-quote-style": "“”",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const quoteStyleRuleTestCases: IntegrationTestCase[] = [
   {

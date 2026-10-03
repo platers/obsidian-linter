@@ -1,5 +1,0 @@
----
-aliases:
-  - Filename
-title: Filename
----

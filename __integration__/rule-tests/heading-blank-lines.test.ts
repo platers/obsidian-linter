@@ -3,37 +3,33 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['heading-blank-lines'] = {
-  "enabled": true,
-  "bottom": true,
-  "empty-line-after-yaml": true
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['heading-blank-lines'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['heading-blank-lines'] = {
-  "enabled": true,
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['heading-blank-lines'] = {
   "bottom": false,
   "empty-line-after-yaml": true,
-  "emptyLineAfterYaml": true
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['heading-blank-lines'] = {
-  "enabled": true,
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['heading-blank-lines'] = {
   "bottom": true,
-  "empty-line-after-yaml": true,
-  "emptyLineAfterYaml": false
+  "empty-line-after-yaml": false,
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const headingBlankLinesRuleTestCases: IntegrationTestCase[] = [
   {

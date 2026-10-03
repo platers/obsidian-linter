@@ -3,23 +3,23 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['convert-spaces-to-tabs'] = {
-  "enabled": true,
-  "tabsize": 3
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['convert-spaces-to-tabs'] = {
+  "tabsize": 3,
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['convert-spaces-to-tabs'] = {
-  "enabled": true,
-  "tabsize": 3
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['convert-spaces-to-tabs'] = {
+  "tabsize": 3,
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const convertSpacesToTabsRuleTestCases: IntegrationTestCase[] = [
   {

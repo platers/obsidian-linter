@@ -3,57 +3,39 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
-  "enabled": true,
-  "sort-alias-key": true,
-  "sort-tag-key": true,
-  "sort-array-keys": true,
-  "ignore-keys": [],
-  "sort-order": "Ascending Alphabetical",
-  "aliasArrayStyle": "multi-line"
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
+  "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
+plugin.plugin.settings.commonStyles.aliasArrayStyle = "multi-line";
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
-  "enabled": true,
-  "sort-alias-key": true,
-  "sort-tag-key": true,
-  "sort-array-keys": true,
-  "ignore-keys": [],
-  "sort-order": "Ascending Alphabetical",
-  "aliasArrayStyle": "multi-line",
-  "sortOrder": "Descending Alphabetical"
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
+  "sort-order": "Descending Alphabetical",
+  "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
+plugin.plugin.settings.commonStyles.aliasArrayStyle = "multi-line";
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
-  "enabled": true,
-  "sort-alias-key": true,
-  "sort-tag-key": true,
-  "sort-array-keys": true,
-  "ignore-keys": [],
-  "sort-order": "Ascending Alphabetical",
-  "aliasArrayStyle": "multi-line",
-  "ignoreSortArrayKeys": [
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['sort-yaml-array-values'] = {
+  "ignore-keys": [
     "arr2"
-  ]
+  ],
+  "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
+plugin.plugin.settings.commonStyles.aliasArrayStyle = "multi-line";
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const sortYamlArrayValuesRuleTestCases: IntegrationTestCase[] = [
   {

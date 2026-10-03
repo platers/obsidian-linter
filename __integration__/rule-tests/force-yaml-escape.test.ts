@@ -3,31 +3,28 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['force-yaml-escape'] = {
-  "enabled": true,
-  "force-yaml-escape-keys": []
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['force-yaml-escape'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['force-yaml-escape'] = {
-  "enabled": true,
-  "force-yaml-escape-keys": [],
-  "forceYamlEscape": [
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['force-yaml-escape'] = {
+  "force-yaml-escape-keys": [
     "key",
     "title",
     "bool"
   ],
-  "defaultEscapeCharacter": "\""
+  "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.escapeCharacter = '"';
+plugin.plugin.settings.commonStyles.escapeCharacter = "\"";
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const forceYamlEscapeRuleTestCases: IntegrationTestCase[] = [
   {

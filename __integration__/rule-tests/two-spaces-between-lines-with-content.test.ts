@@ -3,15 +3,14 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['two-spaces-between-lines-with-content'] = {
-  "enabled": true,
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['two-spaces-between-lines-with-content'] = {
   "line-break-indicator": "  ",
-  "lineBreakIndicator": "  "
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const twoSpacesBetweenLinesWithContentRuleTestCases: IntegrationTestCase[] = [
   {

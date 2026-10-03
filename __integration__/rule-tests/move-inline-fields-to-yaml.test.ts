@@ -3,174 +3,121 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": []
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": [],
-  "howToHandleBracketedFields": "Move and remove"
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "how-to-handle-bracketed-fields": "Move and remove",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": []
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup4(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": []
+function setup4(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup5(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": [],
-  "howToHandleFullLineFields": "Move and keep in text"
+function setup5(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "how-to-handle-full-line-fields": "Move and keep in text",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup6(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": [],
-  "howToHandleBracketedFields": "Move and keep value in text"
+function setup6(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "how-to-handle-bracketed-fields": "Move and keep value in text",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup7(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": [],
-  "howToHandleBracketedFields": "Move and remove"
+function setup7(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "how-to-handle-bracketed-fields": "Move and remove",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup8(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": []
+function setup8(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup9(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": [],
-  "howToHandleExistingKeys": "Merge into list"
+function setup9(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "how-to-handle-existing-keys": "Merge into list",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup10(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": [],
-  "defaultArrayStyle": "multi-line"
+function setup10(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.defaultArrayStyle = 'multi-line';
+plugin.plugin.settings.commonStyles.defaultArrayStyle = "multi-line";
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup11(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": [],
-  "howToHandleExistingKeys": "Merge into list"
+function setup11(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "how-to-handle-existing-keys": "Merge into list",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup12(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": [],
-  "howToHandleExistingKeys": "Overwrite"
+function setup12(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "how-to-handle-existing-keys": "Overwrite",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup13(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
-  "enabled": true,
-  "how-to-handle-full-line-fields": "Move and remove",
-  "how-to-handle-bracketed-fields": "Leave in place",
-  "how-to-handle-existing-keys": "Skip",
-  "inline-keys-to-ignore": [],
-  "inlineKeysToIgnore": [
+function setup13(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['move-inline-fields-to-yaml'] = {
+  "inline-keys-to-ignore": [
     "related"
-  ]
+  ],
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const moveInlineFieldsToYamlRuleTestCases: IntegrationTestCase[] = [
   {

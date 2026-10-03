@@ -3,58 +3,40 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
-  "enabled": true,
-  "alias-key": true,
-  "tag-key": true,
-  "default-array-keys": true,
-  "force-single-line-array-style": [],
-  "force-multi-line-array-style": [],
-  "aliasArrayStyle": "multi-line",
-  "forceSingleLineArrayStyle": [
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
+  "force-single-line-array-style": [
     "test"
-  ]
+  ],
+  "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.aliasArrayStyle = 'multi-line';
+plugin.plugin.settings.commonStyles.aliasArrayStyle = "multi-line";
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
-  "enabled": true,
-  "alias-key": true,
-  "tag-key": true,
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
+  "alias-key": false,
+  "enabled": true
+};
+
+plugin.plugin.settings.commonStyles.tagArrayStyle = "single string space delimited";
+
+  return Promise.resolve();
+}
+
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
   "default-array-keys": true,
-  "force-single-line-array-style": [],
-  "force-multi-line-array-style": [],
-  "formatAliasKey": false,
-  "tagArrayStyle": "single string space delimited"
+  "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.aliasArrayStyle = 'single string space delimited';
+plugin.plugin.settings.commonStyles.defaultArrayStyle = "single-line";
 
-    return Promise.resolve();
-  }
-
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['format-yaml-array'] = {
-  "enabled": true,
-  "alias-key": true,
-  "tag-key": true,
-  "default-array-keys": true,
-  "force-single-line-array-style": [],
-  "force-multi-line-array-style": [],
-  "formatArrayKeys": true,
-  "defaultArrayStyle": "single-line"
-};
-
-plugin.plugin.settings.commonStyles.defaultArrayStyle = 'single-line';
-
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const formatYamlArrayRuleTestCases: IntegrationTestCase[] = [
   {

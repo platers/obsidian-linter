@@ -3,116 +3,96 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true,
-  "number-style": "ascending",
-  "list-end-style": "."
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true,
-  "number-style": "ascending",
-  "list-end-style": "."
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true,
-  "number-style": "ascending",
-  "list-end-style": ".",
-  "numberStyle": "lazy"
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
+  "number-style": "lazy",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup4(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true,
-  "number-style": "ascending",
-  "list-end-style": "."
+function setup4(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup5(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true,
-  "number-style": "ascending",
-  "list-end-style": ".",
-  "listEndStyle": ")",
-  "numberStyle": "lazy"
+function setup5(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
+  "list-end-style": ")",
+  "number-style": "lazy",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup6(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true,
+function setup6(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
   "number-style": "ascending",
-  "list-end-style": ".",
-  "numberStyle": "ascending",
-  "preserveStart": true
+  "preserve-start": true,
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup7(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true,
-  "number-style": "ascending",
-  "list-end-style": ".",
-  "preserveStart": true
+function setup7(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
+  "preserve-start": true,
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup8(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true,
-  "number-style": "ascending",
-  "list-end-style": ".",
-  "numberStyle": "lazy",
-  "preserveStart": true
+function setup8(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
+  "number-style": "lazy",
+  "preserve-start": true,
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup9(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true,
-  "number-style": "ascending",
-  "list-end-style": ".",
-  "numberStyle": "lazy",
-  "preserveStart": true
+function setup9(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
+  "number-style": "lazy",
+  "preserve-start": true,
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup10(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
-  "enabled": true,
-  "number-style": "ascending",
-  "list-end-style": ".",
-  "numberStyle": "preserve"
+function setup10(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['ordered-list-style'] = {
+  "number-style": "preserve",
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const orderedListStyleRuleTestCases: IntegrationTestCase[] = [
   {

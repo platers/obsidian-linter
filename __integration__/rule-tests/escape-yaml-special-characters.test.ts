@@ -3,45 +3,40 @@
 
 import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
 
-  function setup1(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
-  "enabled": true,
-  "try-to-escape-single-line-arrays": false
+function setup1(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup2(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
-  "enabled": true,
-  "try-to-escape-single-line-arrays": false
+function setup2(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup3(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
-  "enabled": true,
-  "try-to-escape-single-line-arrays": false,
-  "defaultEscapeCharacter": "'"
+function setup3(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
+  "enabled": true
 };
 
 plugin.plugin.settings.commonStyles.escapeCharacter = "'";
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
-  function setup4(plugin: TestLinterPlugin): Promise<void> {
-    plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
-  "enabled": true,
-  "try-to-escape-single-line-arrays": false,
-  "tryToEscapeSingleLineArrays": true
+function setup4(plugin: TestLinterPlugin): Promise<void> {
+  plugin.plugin.settings.ruleConfigs['escape-yaml-special-characters'] = {
+  "try-to-escape-single-line-arrays": true,
+  "enabled": true
 };
 
-    return Promise.resolve();
-  }
+  return Promise.resolve();
+}
 
 export const escapeYamlSpecialCharactersRuleTestCases: IntegrationTestCase[] = [
   {
