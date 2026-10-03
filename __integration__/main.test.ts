@@ -230,7 +230,7 @@ export default class TestLinterPlugin extends Plugin {
     }
 
     await activeLeaf.leaf.openFile(file);
-    const originalText = activeLeaf.editor.getValue();
+    const originalText = await this.app.vault.read(file);
     await testPlugin.resetSettings();
 
     try {
