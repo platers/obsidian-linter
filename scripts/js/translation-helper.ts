@@ -1,9 +1,9 @@
 import * as readline from 'readline';
-import {stdout, stdin, exit} from 'process';
-import {LanguageStringKey, setLanguage, getTextInLanguage, localeHasKey, localeMap, LanguageLocale, getLanguageSourceFile} from '../../src/lang/helpers';
-import {getString} from '../../src/utils/nested-keyof';
+import { stdout, stdin, exit } from 'process';
+import { LanguageStringKey, setLanguage, getTextInLanguage, localeHasKey, localeMap, LanguageLocale, getLanguageSourceFile } from '../../src/lang/helpers';
+import { getString } from '../../src/utils/nested-keyof';
 import * as fs from 'fs';
-import {ValidationInfo, validateSelectedKey, validateLanguageSelected} from '../../src/lang/validation';
+import { ValidationInfo, validateSelectedKey, validateLanguageSelected } from '../../src/lang/validation';
 import dedent from 'ts-dedent';
 
 const rl = readline.createInterface({
@@ -108,7 +108,7 @@ function listUntranslatedKeysInALanguage(language: string, selectedLanguage: Lan
     getUserInput('Would you like to list the missing keys? (y/n) ', (answer: string) => {
       if (answer.toLowerCase() === 'y') {
         missingKeys.forEach((element) => {
-          console.log(`${element}: ` + getTextInLanguage(element as LanguageStringKey) );
+          console.log(`${element}: ` + getTextInLanguage(element as LanguageStringKey));
         });
       }
 
@@ -156,10 +156,10 @@ function getNextTranslation(missingKeys: string[], element: string, language: st
 }
 
 function setValueInLanguage(language: string, key: string, value: string) {
-  let object = localeMap[language] as {[k: string]: unknown};
+  let object = localeMap[language] as { [k: string]: unknown };
   const keyParts = key.split('.');
   keyParts.forEach((keyPart: string, index: number) => {
-    if (keyParts.length -1 === index) {
+    if (keyParts.length - 1 === index) {
       object[keyPart] = value;
 
       return;
@@ -169,7 +169,7 @@ function setValueInLanguage(language: string, key: string, value: string) {
       object[keyPart] = {};
     }
 
-    object = (object[keyPart] as ({[k: string]: unknown}));
+    object = (object[keyPart] as ({ [k: string]: unknown }));
   });
 }
 

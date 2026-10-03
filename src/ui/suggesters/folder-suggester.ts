@@ -1,18 +1,18 @@
-import {AbstractInputSuggest, App, TFolder} from 'obsidian';
+import { AbstractInputSuggest, App, TFolder } from 'obsidian';
 
 export default class FolderSuggester extends AbstractInputSuggest<string> {
   constructor(
-      app: App,
-      public inputEl: HTMLInputElement,
-      public valuesToExclude: string[] = [],
+    app: App,
+    public inputEl: HTMLInputElement,
+    public valuesToExclude: string[] = [],
   ) {
     super(app, inputEl);
   }
 
   protected getSuggestions(inputStr: string): string[] {
     const allFolders = this.app.vault.getAllLoadedFiles()
-        .filter((f): f is TFolder => f instanceof TFolder && f.path !== '/')
-        .map((f) => f.path);
+      .filter((f): f is TFolder => f instanceof TFolder && f.path !== '/')
+      .map((f) => f.path);
 
     const selected = this.inputEl.getAttribute('folderName');
     const lower = inputStr.toLowerCase();

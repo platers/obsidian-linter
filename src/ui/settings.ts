@@ -1,15 +1,15 @@
-import {App, PluginSettingTab, moment} from 'obsidian';
-import type {SettingDefinition, SettingDefinitionGroup, SettingDefinitionItem, SettingDefinitionPage, SettingGroupItem} from 'obsidian';
+import { App, PluginSettingTab, moment } from 'obsidian';
+import type { SettingDefinition, SettingDefinitionGroup, SettingDefinitionItem, SettingDefinitionPage, SettingGroupItem } from 'obsidian';
 import log from 'loglevel';
 import LinterPlugin from '../main';
-import {Rule, RuleType, ruleTypeToRules} from '../rules';
-import {richDescription} from './helpers';
-import {getTextInLanguage, LanguageStringKey} from '../lang/helpers';
-import {LinterSettingsKeys} from '../settings-data';
-import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '../utils/yaml';
-import {logsFromLastRun, setLogLevel} from '../utils/logger';
-import {getPath, setPath} from '../utils/nested-keyof';
-import {CustomCommandModal, AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal, CustomRegexModal} from './modals/add-list-entry-modals';
+import { Rule, RuleType, ruleTypeToRules } from '../rules';
+import { richDescription } from './helpers';
+import { getTextInLanguage, LanguageStringKey } from '../lang/helpers';
+import { LinterSettingsKeys } from '../settings-data';
+import { NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats } from '../utils/yaml';
+import { logsFromLastRun, setLogLevel } from '../utils/logger';
+import { getPath, setPath } from '../utils/nested-keyof';
+import { CustomCommandModal, AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal, CustomRegexModal } from './modals/add-list-entry-modals';
 import { createListManagementPage } from '../option';
 
 const tabNameKeys: Record<RuleType | 'Custom' | 'Debug', LanguageStringKey> = {
@@ -71,12 +71,12 @@ export class SettingTab extends PluginSettingTab {
       desc: richDescription(getTextInLanguage('tabs.general.lint-on-save.description')),
       render: (setting) => {
         setting.addToggle((tg) => tg
-            .setValue(settings.lintOnSave)
-            .onChange(async (value) => {
-              settings.lintOnSave = value;
-              await this.plugin.saveSettings();
-              this.refreshDomState();
-            }));
+          .setValue(settings.lintOnSave)
+          .onChange(async (value) => {
+            settings.lintOnSave = value;
+            await this.plugin.saveSettings();
+            this.refreshDomState();
+          }));
       },
     });
 
@@ -84,7 +84,7 @@ export class SettingTab extends PluginSettingTab {
       name: getTextInLanguage('tabs.general.display-message.name'),
       desc: richDescription(getTextInLanguage('tabs.general.display-message.description')),
       visible: () => settings.lintOnSave,
-      control: {type: 'toggle', key: 'displayChanged'},
+      control: { type: 'toggle', key: 'displayChanged' },
     });
 
     items.push({
@@ -92,12 +92,12 @@ export class SettingTab extends PluginSettingTab {
       desc: richDescription(getTextInLanguage('tabs.general.lint-on-file-change.description')),
       render: (setting) => {
         setting.addToggle((tg) => tg
-            .setValue(settings.lintOnFileChange)
-            .onChange(async (value) => {
-              settings.lintOnFileChange = value;
-              await this.plugin.saveSettings();
-              this.refreshDomState();
-            }));
+          .setValue(settings.lintOnFileChange)
+          .onChange(async (value) => {
+            settings.lintOnFileChange = value;
+            await this.plugin.saveSettings();
+            this.refreshDomState();
+          }));
       },
     });
 
@@ -105,19 +105,19 @@ export class SettingTab extends PluginSettingTab {
       name: getTextInLanguage('tabs.general.display-lint-on-file-change-message.name'),
       desc: richDescription(getTextInLanguage('tabs.general.display-lint-on-file-change-message.description')),
       visible: () => settings.lintOnFileChange,
-      control: {type: 'toggle', key: 'displayLintOnFileChangeNotice'},
+      control: { type: 'toggle', key: 'displayLintOnFileChangeNotice' },
     });
 
     items.push({
       name: getTextInLanguage('tabs.general.suppress-message-when-no-change.name'),
       desc: richDescription(getTextInLanguage('tabs.general.suppress-message-when-no-change.description')),
-      control: {type: 'toggle', key: 'suppressMessageWhenNoChange'},
+      control: { type: 'toggle', key: 'suppressMessageWhenNoChange' },
     });
 
     items.push({
       name: getTextInLanguage('tabs.general.enable-diff-preview-view.name'),
       desc: richDescription(getTextInLanguage('tabs.general.enable-diff-preview-view.description')),
-      control: {type: 'toggle', key: 'enableDiffPreviewView'},
+      control: { type: 'toggle', key: 'enableDiffPreviewView' },
     });
 
     const sysLocale = navigator.language?.toLowerCase();
@@ -212,13 +212,13 @@ export class SettingTab extends PluginSettingTab {
           control: {
             type: 'dropdown',
             key: 'commonStyles.escapeCharacter',
-            options: {'"': '"', '\'': '\''},
+            options: { '"': '"', '\'': '\'' },
           },
         },
         {
           name: getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.name'),
           desc: richDescription(getTextInLanguage('tabs.general.remove-unnecessary-escape-chars-in-multi-line-arrays.description')),
-          control: {type: 'toggle', key: 'commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays'},
+          control: { type: 'toggle', key: 'commonStyles.removeUnnecessaryEscapeCharsForMultiLineArrays' },
         },
         {
           name: getTextInLanguage('tabs.general.number-of-dollar-signs-to-indicate-math-block.name'),
@@ -314,23 +314,23 @@ export class SettingTab extends PluginSettingTab {
       aliases: [rule.alias],
       render: (setting) => {
         setting
-            .setDesc(richDescription(rule.getDescription()))
-            .addExtraButton((component) => component
-                .setIcon('book-open')
-                .onClick(() => {
-                  window.open(rule.getURL(), '_blank');
-                }))
-            .addToggle((tg) => tg
-                .setValue(enabled)
-                .onChange(async (value) => {
-                  if (!settings.ruleConfigs[rule.alias]) {
-                    settings.ruleConfigs[rule.alias] = rule.getDefaultOptions();
-                  }
-                  settings.ruleConfigs[rule.alias].enabled = value;
-                  rule.runEnabledSideEffect(value, this.app, this.plugin);
-                  await this.plugin.saveSettings();
-                  this.update();
-                }));
+          .setDesc(richDescription(rule.getDescription()))
+          .addExtraButton((component) => component
+            .setIcon('book-open')
+            .onClick(() => {
+              window.open(rule.getURL(), '_blank');
+            }))
+          .addToggle((tg) => tg
+            .setValue(enabled)
+            .onChange(async (value) => {
+              if (!settings.ruleConfigs[rule.alias]) {
+                settings.ruleConfigs[rule.alias] = rule.getDefaultOptions();
+              }
+              settings.ruleConfigs[rule.alias].enabled = value;
+              rule.runEnabledSideEffect(value, this.app, this.plugin);
+              await this.plugin.saveSettings();
+              this.update();
+            }));
       },
     };
 
@@ -449,12 +449,12 @@ export class SettingTab extends PluginSettingTab {
         desc: richDescription(getTextInLanguage('tabs.debug.log-collection.description')),
         render: (setting) => {
           setting.addToggle((tg) => tg
-              .setValue(settings.recordLintOnSaveLogs)
-              .onChange(async (value) => {
-                settings.recordLintOnSaveLogs = value;
-                await this.plugin.saveSettings();
-                this.refreshDomState();
-              }));
+            .setValue(settings.recordLintOnSaveLogs)
+            .onChange(async (value) => {
+              settings.recordLintOnSaveLogs = value;
+              await this.plugin.saveSettings();
+              this.refreshDomState();
+            }));
         },
       },
       {

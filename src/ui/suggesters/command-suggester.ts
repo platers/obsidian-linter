@@ -1,12 +1,12 @@
-import {AbstractInputSuggest, App, Command} from 'obsidian';
+import { AbstractInputSuggest, App, Command } from 'obsidian';
 import { LintCommand } from "../../settings-data";
 
 export default class CommandSuggester extends AbstractInputSuggest<Command> {
   constructor(
-      app: App,
-      public inputEl: HTMLInputElement,
-      public valuesToExclude: LintCommand[] = [],
-      initial: LintCommand | null = null,
+    app: App,
+    public inputEl: HTMLInputElement,
+    public valuesToExclude: LintCommand[] = [],
+    initial: LintCommand | null = null,
   ) {
     super(app, inputEl);
 

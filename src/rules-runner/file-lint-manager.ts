@@ -2,19 +2,19 @@
  * based on https://github.com/blacksmithgu/obsidian-dataview/blob/75b564bcfd23876f12fa3faf7f86184cdfcd91f1/src/data-import/web-worker/import-manager.ts
 */
 
-// @ts-ignore because this is a web worker and it does not play well with Typescript checking
 import Worker from './rules-runner.worker';
-import {TFile, Vault, moment} from 'obsidian';
-import {createRunLinterRulesOptions} from './rules-runner';
-import {LinterSettings} from '../settings-data';
-import {LinterWorker, RunLinterRulesOptions} from '../typings/worker';
+import { TFile, Vault, moment } from 'obsidian';
+import { createRunLinterRulesOptions } from './rules-runner';
+import { LinterSettings } from '../settings-data';
+import { LinterWorker, RunLinterRulesOptions } from '../typings/worker';
 import YamlTimestamp from '../rules/yaml-timestamp';
 import YamlKeySort from '../rules/yaml-key-sort';
-import {setLogs} from '../utils/logger';
-import {stripCr} from '../utils/strings';
+import { setLogs } from '../utils/logger';
+import { stripCr } from '../utils/strings';
+import AddBlankLineAfterYAML from '../rules/add-blank-line-after-yaml';
 
 /** Callback when a file is resolved. */
-type FileCallback = (runOptions: RunLinterRulesOptions) => void;
+type FileCallback = (runOptions: RunLinterRulesOptions) => Promise<void>;
 
 /** Multi-threaded file linter which debounces rapid file requests automatically. */
 export class FileLintManager {
@@ -39,9 +39,9 @@ export class FileLintManager {
     this.callbacks = new Map();
 
     for (let index = 0; index < numWorkers; index++) {
-      // eslint-disable-next-line new-cap
+
       const worker = Worker();
-      worker.onmessage = async (resp: any) => {
+      worker.onmessage = async (resp: unknown) => {
         await this.finish(resp.data as RunLinterRulesOptions, index);
       };
 
@@ -111,9 +111,16 @@ export class FileLintManager {
         locale: data.momentLocale,
       });
 
+      if (data.runAddBlankAfterYamlPostTimestamp) {
+        [newText] = AddBlankLineAfterYAML.applyIfEnabled(newText, data.settings, data.disabledRules);
+      }
+
       const yamlTimestampOptions = YamlTimestamp.getRuleOptions(data.settings);
       currentTime = moment();
       currentTime.locale(data.momentLocale);
+      if (yamlTimestampOptions.convertToUTC) {
+        currentTime = currentTime.utc();
+      }
       [newText] = YamlKeySort.applyIfEnabled(newText, data.settings, data.disabledRules, {
         currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
         yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
@@ -133,7 +140,7 @@ export class FileLintManager {
     }
   }
 
-  // /** Send a new task to the given worker ID. */
+  /** Send a new task to the given worker ID. */
   private send(file: TFile, workerId: number) {
     this.busy[workerId] = true;
     void this.vault.read(file).then((oldText: string) => {
@@ -142,7 +149,7 @@ export class FileLintManager {
     });
   }
 
-  // /** Find the next available, non-busy worker; return undefined if all workers are busy. */
+  /** Find the next available, non-busy worker; return undefined if all workers are busy. */
   private nextAvailableWorker(): number | undefined {
     const index = this.busy.indexOf(false);
     return index == -1 ? undefined : index;

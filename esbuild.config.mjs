@@ -20,6 +20,8 @@ document = {
   createElement: function () { },
 };
 class AbstractInputSuggest { };
+
+class Modal {};
 `;
 
 const prod = (process.argv[2] === 'production');
@@ -28,32 +30,32 @@ const mockedBanner = banner + dummyMocksForDocsAndWorker;
 const mockedPlugins = [replace({
   values: {
     // update usage of moment from obsidian to the node implementation of moment we have
-    'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
+    'import { moment } from \'obsidian\';': 'import moment from \'moment\';',
     // remove the use of obsidian in the options to allow for docs.js to run
     'import { App, ExtraButtonComponent, normalizePath, TFile, ToggleComponent } from \'obsidian\';': '',
     'import type { SettingDefinition, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage } from \'obsidian\';': '',
     // remove the use of obsidian in the auto-correct files picker to allow for docs.js to run
-    'import {Setting, App, TFile, normalizePath, ExtraButtonComponent} from \'obsidian\';': '',
+    'import { Setting, App, TFile, normalizePath, ExtraButtonComponent } from \'obsidian\';': '',
     // remove the use of obsidian in add custom row to allow for docs.js to run
-    'import {App, Setting} from \'obsidian\';': '',
+    'import { App, Setting } from \'obsidian\';': '',
     // remove the use of obsidian in md file suggester to allow for docs.js to run
-    'import {AbstractInputSuggest, App, TFile} from \'obsidian\';': '',
+    'import { AbstractInputSuggest, App, TFile } from \'obsidian\';': '',
     // remove the use of obsidian in md folder suggester to allow for docs.js to run
-    'import {AbstractInputSuggest, App, TFolder} from \'obsidian\';': '',
+    'import { AbstractInputSuggest, App, TFolder } from \'obsidian\';': '',
     // remove the use of obsidian in parse results modal to allow for docs.js to run
-    'import {Modal, App} from \'obsidian\';': 'class Modal {}',
+    'import { Modal, App } from \'obsidian\';': '',
     // remove the use of obsidian in modals to allow for docs.js to run
-    'import {Notice, Modal, App} from \'obsidian\';': 'class Modal {}',
+    'import { Notice, Modal, App } from \'obsidian\';': '',
     // remove the use of app from a couple of settings for docs.js to run
-    'import {App} from \'obsidian\';': '',
+    'import { App } from \'obsidian\';': '',
     // remove the use of obsidian in list item modal to allow for docs.js to run
-    'import {App, displayTooltip} from \'obsidian\';': '',
+    'import { App, displayTooltip } from \'obsidian\';': '',
     // remove the use of obsidian from form modals for docs.js to run
-    'import { App, ButtonComponent, DropdownComponent, Modal, Platform, setIcon, TextComponent, ToggleComponent } from \'obsidian\';': 'class Modal {}',
+    'import { App, ButtonComponent, DropdownComponent, Modal, Platform, setIcon, TextComponent, ToggleComponent } from \'obsidian\';': '',
     // remove the use of sanitizeHTMLToDom from the ui helpers for docs.js to run
     'import { sanitizeHTMLToDom } from \'obsidian\';': '',
     // remove the use of obsidian inside command suggester for docs.js to run
-    'import {AbstractInputSuggest, App, Command} from \'obsidian\';': '',
+    'import { AbstractInputSuggest, App, Command } from \'obsidian\';': '',
   },
   delimiters: ['', ''],
 })];
@@ -61,45 +63,6 @@ const unusedCodeForProduction = [replace({
   values: {
     // remove values for examples as they are not necessary in the actual plugin when it goes out to users
     'abstract get exampleBuilders(): ExampleBuilder<TOptions>[];': '',
-    // add the multiline comment to remove the examples
-    'get exampleBuilders():': '/*',
-    // add the ending of the multiline comment that will remove the examples
-    '}\n  get optionBuilders()': '*/ get optionBuilders()',
-    // removes the logic that adds the examples to the rule
-    'builder.exampleBuilders.map((b) => b.example),': '',
-    // removes the expectation that examples will exist on the rule class
-    'public examples: Array<Example>,': '',
-  },
-  delimiters: ['', ''],
-})];
-const webWorkerIgnores = [replace({
-  values: {
-    // update usage of moment from obsidian to the node implementation of moment we have
-    'import {moment} from \'obsidian\';': '',
-    // remove the use of obsidian in the options to allow for docs.js to run
-    'import {App, Setting, ToggleComponent} from \'obsidian\';': '',
-    // remove the use of obsidian in settings helper to allow for docs.js to run
-    'import {App, MarkdownRenderer} from \'obsidian\';': '',
-    // remove the use of obsidian in the auto-correct files picker to allow for docs.js to run
-    'import {Setting, App, TFile, normalizePath, ExtraButtonComponent} from \'obsidian\';': '',
-    // remove the use of obsidian in add custom row to allow for docs.js to run
-    'import {App, Setting} from \'obsidian\';': '',
-    // remove the use of obsidian in suggest to allow for docs.js to run
-    'import {App, ISuggestOwner, Scope} from \'obsidian\';': '',
-    // remove the use of obsidian in md file suggester to allow for docs.js to run
-    'import {App, TFile} from \'obsidian\';': '',
-    // remove the use of obsidian in parse results modal to allow for docs.js to run
-    'import {Modal, App} from \'obsidian\';': 'class Modal {}',
-    // remove the use of app from a couple of settings for docs.js to run
-    'import {App} from \'obsidian\';': '',
-    // remove values for examples as they are not necessary in the actual plugin when it goes out to users
-    'abstract get exampleBuilders(): ExampleBuilder<TOptions>[];': '',
-    // removes eslint disabling that was just meant for examples
-    '/* eslint-disable no-tabs */': '',
-    '/* eslint-disable no-mixed-spaces-and-tabs, no-tabs */': '',
-    // remove eslint enabling that was just meant for examples
-    '/* eslint-enable no-tabs */': '',
-    '/* eslint-enable no-mixed-spaces-and-tabs, no-tabs */': '',
     // add the multiline comment to remove the examples
     'get exampleBuilders():': '/*',
     // add the ending of the multiline comment that will remove the examples
@@ -125,14 +88,15 @@ const createEsbuildArgs = function (banner, entryPoint, outfile, extraPlugins) {
         {
           js: dummyMocksForDocsAndWorker,
         },
-        external: externalPackages,
         format: 'cjs',
-        plugins: [importGlobPlugin.default(), ...webWorkerIgnores],
+        plugins: [importGlobPlugin.default(), ...mockedPlugins],
       }),
       ...extraPlugins,
     ],
     bundle: true,
-    external: externalPackages,
+    external: [
+      'obsidian',
+      ...builtins],
     format: 'cjs',
     target: 'es2020',
     sourcemap: prod ? false : 'inline',

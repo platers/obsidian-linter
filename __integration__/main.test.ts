@@ -34,7 +34,7 @@ type testStatus = {
 const testTimeout = 15000;
 
 export default class TestLinterPlugin extends Plugin {
-  regularTests: Array<IntegrationTestCase> = [...obsidianModeTestCases, ...obsidianYAMLRuleTestCases, ...ruleTests];
+  regularTests: Array<IntegrationTestCase> = [...ruleTests, ...obsidianModeTestCases, ...obsidianYAMLRuleTestCases];
   ignoreTests: Array<IntegrationIgnoreTestCase> = ignoreTestCases;
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
@@ -98,54 +98,140 @@ export default class TestLinterPlugin extends Plugin {
       return;
     }
 
-    for (const t of this.regularTests) {
-      const file = this.getFileFromPath(t.filePath);
-      if (!file) {
-        console.error('failed to get file: ' + t.filePath);
+    await this.runRegularTest(0, totalTestCount, activeLeaf, testStatuses);
 
-        this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
-        continue;
-      }
+    // for (const t of this.regularTests) {
+    //   const file = this.getFileFromPath(t.filePath);
+    //   if (!file) {
+    //     console.error('failed to get file: ' + t.filePath);
 
-      await activeLeaf.leaf.openFile(file);
-      // Consecutive cases reuse a fixture and openFile will not reload an already-open file,
-      // so an editor read would adopt the previous case's end state as this case's baseline.
-      const originalText = await this.app.vault.read(file);
-      await this.resetSettings();
+    //     this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+    //     continue;
+    //   }
 
-      try {
-        if (t.setup) {
-          await t.setup(this, activeLeaf.editor);
-          await this.refreshDerivedSettingsState();
-        }
+    //   await activeLeaf.leaf.openFile(file);
+    //   // Consecutive cases reuse a fixture and openFile will not reload an already-open file,
+    //   // so an editor read would adopt the previous case's end state as this case's baseline.
+    //   const originalText = await this.app.vault.read(file);
+    //   await this.resetSettings();
 
-        await this.plugin.runLinterEditor(activeLeaf.editor);
-        await this.handleAssertions(t, activeLeaf, file);
+    //   try {
+    //     if (t.setup) {
+    //       await t.setup(this, activeLeaf.editor);
+    //       await this.refreshDerivedSettingsState();
+    //     }
 
-        console.log('✅', t.name);
-        this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
-      } catch (e) {
-        console.log('❌', t.name);
-        console.error(e);
+    //     await this.plugin.runLinterEditor(activeLeaf.editor, () => {
+    //       try {
+    //         await this.handleAssertions(t, activeLeaf, file);
 
-        this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
-      } finally {
-        await this.resetFileContents(file, originalText);
-      }
-    }
+    //         console.log('✅', t.name);
+    //         this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
+    //       } catch (e) {
+    //         console.log('❌', t.name);
+    //         console.error(e);
 
-    await this.runIgnoreTests(testStatuses, totalTestCount);
+    //         this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+    //       }
+    //       finally {
+    //         await this.resetFileContents(file, originalText);
+    //         // todo queue next test...
+    //       }
+    //     });
 
-    if (testStatuses.length != (this.regularTests.length + this.ignoreTests.length)) {
-      if (this.testRunNotice) {
-        this.testRunNotice.setMessage(`❌ failed to run all ${this.regularTests.length + this.ignoreTests.length} regular and ignore tests before attempting to start the metadata tests.`);
-      } else {
-        console.log(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
-      }
+
+    //   } catch (e) {
+    //     console.log('❌', t.name);
+    //     console.error(e);
+
+    //     this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+    //   }
+    // }
+
+    // await this.runIgnoreTests(testStatuses, totalTestCount);
+
+    // if (testStatuses.length != (this.regularTests.length + this.ignoreTests.length)) {
+    //   if (this.testRunNotice) {
+    //     this.testRunNotice.setMessage(`❌ failed to run all ${this.regularTests.length + this.ignoreTests.length} regular and ignore tests before attempting to start the metadata tests.`);
+    //   } else {
+    //     console.log(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
+    //   }
+    //   return;
+    // }
+
+    // await this.runMetadataTests(this.afterCacheUpdateTests, activeLeaf, testStatuses, totalTestCount);
+  }
+
+  async runRegularTest(index: number, totalTestCount: number, activeLeaf: MarkdownView, testStatuses: testStatus[]) {
+    if (index < 0 || index >= this.regularTests.length) {
       return;
     }
 
-    await this.runMetadataTests(this.afterCacheUpdateTests, activeLeaf, testStatuses, totalTestCount);
+    // debugger;
+    const t = this.regularTests[index]
+    const file = this.getFileFromPath(t.filePath);
+    if (!file) {
+      console.error('failed to get file: ' + t.filePath);
+
+      this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+      await this.nextRegularTest(index, totalTestCount, activeLeaf, testStatuses);
+    }
+
+    await activeLeaf.leaf.openFile(file);
+    // Consecutive cases reuse a fixture and openFile will not reload an already-open file,
+    // so an editor read would adopt the previous case's end state as this case's baseline.
+    const originalText = await this.app.vault.read(file);
+    await this.resetSettings();
+
+    try {
+      if (t.setup) {
+        await t.setup(this, activeLeaf.editor);
+        await this.refreshDerivedSettingsState();
+      }
+
+      void this.plugin.runLinterEditor(activeLeaf.editor, async () => {
+        // debugger;
+        try {
+          await this.handleAssertions(t, activeLeaf, file);
+
+          console.log('✅', t.name);
+          this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
+        } catch (e) {
+          console.log('❌', t.name);
+          console.error(e);
+
+          this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+        }
+        finally {
+          await this.resetFileContents(file, originalText);
+
+          await this.nextRegularTest(index, totalTestCount, activeLeaf, testStatuses);
+        }
+      });
+    } catch (e) {
+      console.log('❌', t.name);
+      console.error(e);
+
+      this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
+    }
+  }
+
+  async nextRegularTest(index: number, totalTestCount: number, activeLeaf: MarkdownView, testStatuses: testStatus[]) {
+    if (index < this.regularTests.length - 1) {
+      await this.runRegularTest(index + 1, totalTestCount, activeLeaf, testStatuses);
+    } else {
+      await this.runIgnoreTests(testStatuses, totalTestCount);
+
+      if (testStatuses.length != (this.regularTests.length + this.ignoreTests.length)) {
+        if (this.testRunNotice) {
+          this.testRunNotice.setMessage(`❌ failed to run all ${this.regularTests.length + this.ignoreTests.length} regular and ignore tests before attempting to start the metadata tests.`);
+        } else {
+          console.log(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
+        }
+      } else {
+        await this.runMetadataTests(this.afterCacheUpdateTests, activeLeaf, testStatuses, totalTestCount);
+      }
+    }
   }
 
   async runIgnoreTests(testStatuses: testStatus[], totalTestCount: number) {
