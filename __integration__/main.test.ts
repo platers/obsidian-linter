@@ -289,7 +289,8 @@ export default class TestLinterPlugin extends Plugin {
       return;
     }
 
-    return await this.app.vault.cachedRead(file);
+    // do not use cached read as it seems to add an extra newline character for some reason..
+    return await this.app.vault.read(file);
   }
 
   private getFileFromPath(filePath: string): TFile {
