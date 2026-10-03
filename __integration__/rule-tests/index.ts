@@ -19,6 +19,7 @@ import { removeTrailingPunctuationInHeadingRuleTestCases } from './remove-traili
 import { footnoteAfterPunctuationRuleTestCases } from './footnote-after-punctuation.test';
 import { moveFootnotesToTheBottomRuleTestCases } from './move-footnotes-to-the-bottom.test';
 import { reIndexFootnotesRuleTestCases } from './re-index-footnotes.test';
+import { autoCorrectCommonMisspellingsRuleTestCases } from './auto-correct-common-misspellings.test';
 import { blockquoteStyleRuleTestCases } from './blockquote-style.test';
 import { convertBulletListMarkersRuleTestCases } from './convert-bullet-list-markers.test';
 import { defaultLanguageForCodeFencesRuleTestCases } from './default-language-for-code-fences.test';
@@ -74,6 +75,7 @@ export const ruleTests = [
   ...footnoteAfterPunctuationRuleTestCases,
   ...moveFootnotesToTheBottomRuleTestCases,
   ...reIndexFootnotesRuleTestCases,
+  ...autoCorrectCommonMisspellingsRuleTestCases,
   ...blockquoteStyleRuleTestCases,
   ...convertBulletListMarkersRuleTestCases,
   ...defaultLanguageForCodeFencesRuleTestCases,

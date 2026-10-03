@@ -39,8 +39,6 @@ const skipRules = new Set<string>([
   'yaml-title',
   'yaml-title-alias',
   'file-name-heading',
-  // mispellings need loading for the tests to work...
-  'auto-correct-common-misspellings'
 ]);
 
 sortRules();
@@ -202,9 +200,21 @@ function generateSetupFunction(rule: Rule, example: typeof rules[number]['exampl
 
   const commonStylesSetup = generateCommonStylesSetup(commonStyles);
 
+  let extraSetup = '';
+  let modifier = '';
+  if (rule.alias === 'auto-correct-common-misspellings') {
+    extraSetup = dedent`
+      plugin.plugin.hasLoadedMisspellingFiles = false;
+
+      await plugin.plugin.loadAutoCorrectFiles(false);
+    `;
+
+    modifier = 'async ';
+  }
+
   return [funcName, dedent`
-    function ${funcName}(plugin: TestLinterPlugin): Promise<void> {
-      plugin.plugin.settings.ruleConfigs['${rule.settingsKey}'] = ${JSON.stringify(ruleSettings, null, 2)};${commonStylesSetup}
+    ${modifier}function ${funcName}(plugin: TestLinterPlugin): Promise<void> {
+      plugin.plugin.settings.ruleConfigs['${rule.settingsKey}'] = ${JSON.stringify(ruleSettings, null, 2)};${commonStylesSetup}${extraSetup}
 
       return Promise.resolve();
     }
