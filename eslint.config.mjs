@@ -9,18 +9,18 @@ import tsPlugin from '@typescript-eslint/eslint-plugin'
 import globals from 'globals';
 
 const typescriptLanguageOptions = {
-    parser: tsparser,
-    ecmaVersion: 2021,
-    parserOptions: {
-        projectService: true,
-        extraFileExtensions: [".json"],
-    },
-    globals: {
-        ...globals.es2020,
-        ...globals.node,
-        ...globals.browser,
-        ...globals.jest,
-    },
+  parser: tsparser,
+  ecmaVersion: 2021,
+  parserOptions: {
+    projectService: true,
+    extraFileExtensions: [".json"],
+  },
+  globals: {
+    ...globals.es2020,
+    ...globals.node,
+    ...globals.browser,
+    ...globals.jest,
+  },
 };
 
 const commonRules = {
@@ -68,71 +68,72 @@ const commonDisabledRules = {
 }
 
 export default defineConfig([
-    {
-      ignores: [
-        'docs.js',
-        'main.js',
-        'translation-helper.js',
-        'eslint.config.mjs',
-        'esbuild.config.mjs',
-        'babel.config.js',
-        'postcss.config.js',
-        'eslint-rules/**',
-        'test-vault'
-      ],
+  {
+    ignores: [
+      'docs.js',
+      'main.js',
+      'translation-helper.js',
+      'integration-test.js',
+      'eslint.config.mjs',
+      'esbuild.config.mjs',
+      'babel.config.js',
+      'postcss.config.js',
+      'eslint-rules/**',
+      'test-vault'
+    ],
+  },
+  js.configs.recommended,
+  ...obsidianmd.configs.recommended,
+  {
+    files: ['package.json'],
+    languageOptions: typescriptLanguageOptions,
+    plugins: {
+      unicorn,
     },
-    js.configs.recommended,
-    ...obsidianmd.configs.recommended,
-    {
-      files: ['package.json'],
-      languageOptions: typescriptLanguageOptions,
-      plugins: {
-          unicorn,
-      },
-      rules:  {
-        ...commonDisabledRules,
-      },
+    rules: {
+      ...commonDisabledRules,
     },
-    {
-      files: ['src/**/*.ts'],
-      languageOptions: typescriptLanguageOptions,
-      plugins: {
-          'obsidian-linter': obsidianLinterPlugin,
-          unicorn,
-          '@typescript-eslint': tsPlugin
-      },
-      rules:  {
-        ...commonRules,
-        ...commonDisabledRules,
-      },
+  },
+  {
+    files: ['src/**/*.ts'],
+    languageOptions: typescriptLanguageOptions,
+    plugins: {
+      'obsidian-linter': obsidianLinterPlugin,
+      unicorn,
+      '@typescript-eslint': tsPlugin
     },
-    {
-      files: ['__integration__/**/*.ts', '__tests__/**/*.ts', '__mocks__/**/*.ts'],
-      languageOptions: typescriptLanguageOptions,
-      plugins: {
-          'obsidian-linter': obsidianLinterPlugin,
-          unicorn,
-          '@typescript-eslint': tsPlugin,
-          jest: jestPlugin
-      },
-      rules:  {
-        ...commonRules,
-        ...nonSrcRules,
-        ...commonDisabledRules,
-      },
+    rules: {
+      ...commonRules,
+      ...commonDisabledRules,
     },
-    {
-      files: ['jest.config.ts', 'scripts/js/*.ts'],
-      languageOptions: typescriptLanguageOptions,
-      plugins: {
-          'obsidian-linter': obsidianLinterPlugin,
-          unicorn,
-          '@typescript-eslint': tsPlugin
-      },
-      rules:  {
-        ...commonRules,
-        ...nonSrcRules,
-        ...commonDisabledRules,
-      },
+  },
+  {
+    files: ['__integration__/**/*.ts', '__tests__/**/*.ts', '__mocks__/**/*.ts'],
+    languageOptions: typescriptLanguageOptions,
+    plugins: {
+      'obsidian-linter': obsidianLinterPlugin,
+      unicorn,
+      '@typescript-eslint': tsPlugin,
+      jest: jestPlugin
     },
+    rules: {
+      ...commonRules,
+      ...nonSrcRules,
+      ...commonDisabledRules,
+    },
+  },
+  {
+    files: ['jest.config.ts', 'scripts/js/*.ts'],
+    languageOptions: typescriptLanguageOptions,
+    plugins: {
+      'obsidian-linter': obsidianLinterPlugin,
+      unicorn,
+      '@typescript-eslint': tsPlugin
+    },
+    rules: {
+      ...commonRules,
+      ...nonSrcRules,
+      ...commonDisabledRules,
+    },
+  },
 ]);

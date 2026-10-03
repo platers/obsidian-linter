@@ -3,6 +3,8 @@ import process from 'process';
 import { builtinModules as builtins } from 'node:module';
 import importGlobPlugin from 'esbuild-plugin-import-glob';
 import { replace } from 'esbuild-plugin-replace';
+import { copyFile } from 'node:fs';
+import { join } from 'node:path';
 
 const banner =
   `/*
@@ -11,6 +13,7 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `;
 
+const testVaultPluginPath = "test-vault/.obsidian/plugins/obsidian-linter";
 const dummyMocksForDocs = `
 document = {
   createElement: function() {},
@@ -100,7 +103,8 @@ const esbuildArgs = [
 ];
 
 if (!prod) {
-  esbuildArgs.push(createEsbuildArgs(banner, '__integration__/main.test.ts', 'test-vault/.obsidian/plugins/obsidian-linter/main.js', []));
+  esbuildArgs.push(createEsbuildArgs(banner, '__integration__/main.test.ts', join(testVaultPluginPath, 'main.js'), []));
+  copySetupForIntegrationTests();
 }
 
 for (let i = 0; i < esbuildArgs.length; i++) {
@@ -112,4 +116,15 @@ for (let i = 0; i < esbuildArgs.length; i++) {
     const context = await esbuild.context(esbuildArgs[i]);
     await context.watch();
   }
+}
+
+
+function copySetupForIntegrationTests() {
+  /* copy the following files to test vault:
+    - Default common mispellings
+    - manifest file
+  */
+
+  copyFile('manifest.json', join(testVaultPluginPath, 'manifest.json'));
+  copyFile('src/utils/default-misspellings.md', join(testVaultPluginPath, 'default-misspellings.md'));
 }
