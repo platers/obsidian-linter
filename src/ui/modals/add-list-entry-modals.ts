@@ -1,8 +1,8 @@
-import {App, displayTooltip} from 'obsidian';
-import {getTextInLanguage, LanguageStringKey} from '../../lang/helpers';
+import { App, displayTooltip } from 'obsidian';
+import { getTextInLanguage, LanguageStringKey } from '../../lang/helpers';
 import { FileToIgnore } from "../../settings-data";
 import FolderSuggester from '../suggesters/folder-suggester';
-import {FormModal} from './form-modal';
+import { FormModal } from './form-modal';
 import CommandSuggester from '../suggesters/command-suggester';
 import { LintCommand } from "../../settings-data";
 import { CustomReplace } from "../../settings-data";
@@ -15,9 +15,9 @@ export class AddFolderToIgnoreModal extends FormModal {
   private inputEl: HTMLInputElement | undefined;
 
   constructor(
-      app: App,
-      private existing: string[],
-      private onAdd: (path: string) => void | Promise<void>,
+    app: App,
+    private existing: string[],
+    private onAdd: (path: string) => void | Promise<void>,
   ) {
     super(app);
     this.setTitle(getTextInLanguage('tabs.general.folders-to-ignore.add-input-button-text'));
@@ -27,9 +27,9 @@ export class AddFolderToIgnoreModal extends FormModal {
       field.addText((cb) => {
         new FolderSuggester(app, cb.inputEl, existing);
         cb.setPlaceholder(getTextInLanguage('tabs.general.folders-to-ignore.folder-search-placeholder-text'))
-            .onChange((v) => {
-              this.value = v;
-            });
+          .onChange((v) => {
+            this.value = v;
+          });
         cb.inputEl.addEventListener('keydown', (evt) => {
           if (!evt.isComposing && evt.key === 'Enter') {
             evt.preventDefault();
@@ -48,11 +48,11 @@ export class AddFolderToIgnoreModal extends FormModal {
   onSubmit() {
     const value = this.value.trim();
     if (!value) {
-      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), { classes: ['mod-error'] });
       return;
     }
     if (this.existing.includes(value)) {
-      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('already-in-list'), {classes: ['mod-error']});
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('already-in-list'), { classes: ['mod-error'] });
       return;
     }
     void this.onAdd(value);
@@ -67,8 +67,8 @@ export class AddFileToIgnoreModal extends FormModal {
   private firstInputEl: HTMLInputElement | undefined;
 
   constructor(
-      app: App,
-      private onAdd: (entry: FileToIgnore) => void | Promise<void>,
+    app: App,
+    private onAdd: (entry: FileToIgnore) => void | Promise<void>,
   ) {
     super(app);
     this.setTitle(getTextInLanguage('tabs.general.files-to-ignore.add-input-button-text'));
@@ -77,9 +77,9 @@ export class AddFileToIgnoreModal extends FormModal {
       field.setName(getTextInLanguage('tabs.general.files-to-ignore.label-placeholder-text'));
       field.addText((cb) => {
         cb.setPlaceholder(getTextInLanguage('tabs.general.files-to-ignore.label-placeholder-text'))
-            .onChange((v) => {
-              this.label = v;
-            });
+          .onChange((v) => {
+            this.label = v;
+          });
         this.firstInputEl = cb.inputEl;
       });
     });
@@ -88,9 +88,9 @@ export class AddFileToIgnoreModal extends FormModal {
       field.setName(getTextInLanguage('tabs.general.files-to-ignore.file-search-placeholder-text'));
       field.addText((cb) => {
         cb.setPlaceholder(getTextInLanguage('tabs.general.files-to-ignore.file-search-placeholder-text'))
-            .onChange((v) => {
-              this.match = v;
-            });
+          .onChange((v) => {
+            this.match = v;
+          });
       });
     });
 
@@ -98,10 +98,10 @@ export class AddFileToIgnoreModal extends FormModal {
       field.setName(getTextInLanguage('tabs.general.files-to-ignore.flags-placeholder-text'));
       field.addText((cb) => {
         cb.setPlaceholder(getTextInLanguage('tabs.general.files-to-ignore.flags-placeholder-text'))
-            .setValue(filesToIgnoreDefaultFlags)
-            .onChange((v) => {
-              this.flags = v;
-            });
+          .setValue(filesToIgnoreDefaultFlags)
+          .onChange((v) => {
+            this.flags = v;
+          });
       });
     });
   }
@@ -113,10 +113,10 @@ export class AddFileToIgnoreModal extends FormModal {
   onSubmit() {
     const match = this.match.trim();
     if (!match) {
-      if (this.firstInputEl) displayTooltip(this.firstInputEl, getTextInLanguage('tabs.general.files-to-ignore.pattern-required'), {classes: ['mod-error']});
+      if (this.firstInputEl) displayTooltip(this.firstInputEl, getTextInLanguage('tabs.general.files-to-ignore.pattern-required'), { classes: ['mod-error'] });
       return;
     }
-    void this.onAdd({label: this.label.trim(), match, flags: this.flags.trim()});
+    void this.onAdd({ label: this.label.trim(), match, flags: this.flags.trim() });
     this.close();
   }
 }
@@ -126,9 +126,9 @@ export class AddFileExtensionModal extends FormModal {
   private inputEl: HTMLInputElement | undefined;
 
   constructor(
-      app: App,
-      private existing: string[],
-      private onAdd: (extension: string) => void | Promise<void>,
+    app: App,
+    private existing: string[],
+    private onAdd: (extension: string) => void | Promise<void>,
   ) {
     super(app);
     this.setTitle(getTextInLanguage('tabs.general.additional-file-extensions.add-input-button-text'));
@@ -137,9 +137,9 @@ export class AddFileExtensionModal extends FormModal {
       field.setName(getTextInLanguage('tabs.general.additional-file-extensions.extension-placeholder'));
       field.addText((cb) => {
         cb.setPlaceholder(getTextInLanguage('tabs.general.additional-file-extensions.extension-placeholder'))
-            .onChange((v) => {
-              this.value = v;
-            });
+          .onChange((v) => {
+            this.value = v;
+          });
         cb.inputEl.addEventListener('keydown', (evt) => {
           if (!evt.isComposing && evt.key === 'Enter') {
             evt.preventDefault();
@@ -158,11 +158,11 @@ export class AddFileExtensionModal extends FormModal {
   onSubmit() {
     const value = this.value.trim().toLowerCase().replace(/^\./, '');
     if (!value) {
-      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), { classes: ['mod-error'] });
       return;
     }
     if (this.existing.includes(value)) {
-      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('already-in-list'), {classes: ['mod-error']});
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('already-in-list'), { classes: ['mod-error'] });
       return;
     }
     void this.onAdd(value);
@@ -176,10 +176,10 @@ export class CustomCommandModal extends FormModal {
   private inputEl: HTMLInputElement | undefined;
 
   constructor(
-      app: App,
-      private initial: LintCommand | null,
-      private existing: LintCommand[],
-      private onSubmitEntry: (command: LintCommand) => void | Promise<void>,
+    app: App,
+    private initial: LintCommand | null,
+    private existing: LintCommand[],
+    private onSubmitEntry: (command: LintCommand) => void | Promise<void>,
   ) {
     super(app);
     this.value = initial?.name ?? '';
@@ -192,9 +192,9 @@ export class CustomCommandModal extends FormModal {
       field.addText((cb) => {
         new CommandSuggester(app, cb.inputEl, existing, initial);
         cb.setPlaceholder(getTextInLanguage('options.custom-command.command-search-placeholder-text'))
-            .onChange((v) => {
-              this.value = v;
-            });
+          .onChange((v) => {
+            this.value = v;
+          });
         cb.inputEl.addEventListener('keydown', (evt) => {
           if (!evt.isComposing && evt.key === 'Enter') {
             evt.preventDefault();
@@ -209,9 +209,9 @@ export class CustomCommandModal extends FormModal {
       field.setName(getTextInLanguage('options.custom-command.enabled'));
       field.addToggle((cb) => {
         cb.setValue(this.enabled)
-            .onChange((b) => {
-              this.enabled = b;
-            });
+          .onChange((b) => {
+            this.enabled = b;
+          });
       });
     });
   }
@@ -224,18 +224,18 @@ export class CustomCommandModal extends FormModal {
     const value = this.value.trim();
     const id = this.inputEl?.getAttribute('commandId');
     if (!value || !id) {
-      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), { classes: ['mod-error'] });
       return;
     }
 
     for (const lintCommand of this.existing) {
       if (lintCommand.id === id && (!this.initial || this.initial.id != id)) {
-        if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('already-in-list'), {classes: ['mod-error']});
+        if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('already-in-list'), { classes: ['mod-error'] });
         return;
       }
     }
 
-    void this.onSubmitEntry({enabled: this.enabled, id: id, name: value});
+    void this.onSubmitEntry({ enabled: this.enabled, id: id, name: value });
     this.close();
   }
 }
@@ -253,9 +253,9 @@ export class CustomRegexModal extends FormModal {
   private flagsInputEl: HTMLInputElement | undefined;
 
   constructor(
-      app: App,
-      initial: CustomReplace | null,
-      private onSubmitEntry: (entry: CustomReplace) => void | Promise<void>,
+    app: App,
+    initial: CustomReplace | null,
+    private onSubmitEntry: (entry: CustomReplace) => void | Promise<void>,
   ) {
     super(app);
     this.label = initial?.label ?? '';
@@ -270,10 +270,10 @@ export class CustomRegexModal extends FormModal {
       field.setName(getTextInLanguage('options.custom-replace.label-placeholder-text'));
       field.addText((cb) => {
         cb.setPlaceholder(getTextInLanguage('options.custom-replace.label-placeholder-text'))
-            .setValue(this.label)
-            .onChange((v) => {
-              this.label = v;
-            });
+          .setValue(this.label)
+          .onChange((v) => {
+            this.label = v;
+          });
       });
     });
 
@@ -281,10 +281,10 @@ export class CustomRegexModal extends FormModal {
       field.setName(getTextInLanguage('options.custom-replace.regex-to-find-placeholder-text'));
       field.addText((cb) => {
         cb.setPlaceholder(getTextInLanguage('options.custom-replace.regex-to-find-placeholder-text'))
-            .setValue(this.find)
-            .onChange((v) => {
-              this.find = v;
-            });
+          .setValue(this.find)
+          .onChange((v) => {
+            this.find = v;
+          });
         this.findInputEl = cb.inputEl;
       });
     });
@@ -293,10 +293,10 @@ export class CustomRegexModal extends FormModal {
       field.setName(getTextInLanguage('options.custom-replace.flags-placeholder-text'));
       field.addText((cb) => {
         cb.setPlaceholder(getTextInLanguage('options.custom-replace.flags-placeholder-text'))
-            .setValue(this.flags)
-            .onChange((v) => {
-              this.flags = v;
-            });
+          .setValue(this.flags)
+          .onChange((v) => {
+            this.flags = v;
+          });
         this.flagsInputEl = cb.inputEl;
       });
     });
@@ -305,10 +305,10 @@ export class CustomRegexModal extends FormModal {
       field.setName(getTextInLanguage('options.custom-replace.regex-to-replace-placeholder-text'));
       field.addText((cb) => {
         cb.setPlaceholder(getTextInLanguage('options.custom-replace.regex-to-replace-placeholder-text'))
-            .setValue(this.replace)
-            .onChange((v) => {
-              this.replace = v;
-            });
+          .setValue(this.replace)
+          .onChange((v) => {
+            this.replace = v;
+          });
       });
     });
 
@@ -316,9 +316,9 @@ export class CustomRegexModal extends FormModal {
       field.setName(getTextInLanguage('options.custom-replace.enabled'));
       field.addToggle((cb) => {
         cb.setValue(this.enabled)
-            .onChange((b) => {
-              this.enabled = b;
-            });
+          .onChange((b) => {
+            this.enabled = b;
+          });
       });
     });
   }
@@ -330,14 +330,14 @@ export class CustomRegexModal extends FormModal {
   onSubmit() {
     const find = this.find; // find can be whitespace, so triming the value is not valid (see https://github.com/platers/obsidian-linter/issues/1591)
     if (!find) {
-      if (this.findInputEl) displayTooltip(this.findInputEl, getTextInLanguage('required'), {classes: ['mod-error']});
+      if (this.findInputEl) displayTooltip(this.findInputEl, getTextInLanguage('required'), { classes: ['mod-error'] });
       return;
     }
     try {
       new RegExp(find, this.flags);
     } catch (e) {
       const target = e instanceof SyntaxError && /flags/i.test(e.message) ? this.flagsInputEl : this.findInputEl;
-      if (target) displayTooltip(target, getTextInLanguage('options.custom-replace.invalid-regex'), {classes: ['mod-error']});
+      if (target) displayTooltip(target, getTextInLanguage('options.custom-replace.invalid-regex'), { classes: ['mod-error'] });
       return;
     }
 
@@ -359,12 +359,12 @@ export class ListItemsModal extends FormModal {
   private inputEl: HTMLInputElement | undefined;
 
   constructor(
-      app: App,
-      initial: string | null,
-      fieldNameKey: LanguageStringKey,
-      private trimItemWhitespace: boolean,
-      private onSubmitEntry: (entry: string) => void | Promise<void>,
-      private isValidInput?: ListItemValidation = undefined,
+    app: App,
+    initial: string | null,
+    fieldNameKey: LanguageStringKey,
+    private trimItemWhitespace: boolean,
+    private onSubmitEntry: (entry: string) => void | Promise<void>,
+    private isValidInput?: ListItemValidation = undefined,
   ) {
     super(app);
     this.value = initial ?? '';
@@ -375,10 +375,10 @@ export class ListItemsModal extends FormModal {
       field.setName(getTextInLanguage(fieldNameKey));
       field.addText((cb) => {
         cb.setPlaceholder(getTextInLanguage(fieldNameKey))
-            .setValue(this.value)
-            .onChange((v) => {
-              this.value = v;
-            });
+          .setValue(this.value)
+          .onChange((v) => {
+            this.value = v;
+          });
 
         this.inputEl = cb.inputEl;
       });
@@ -393,14 +393,14 @@ export class ListItemsModal extends FormModal {
     const value = this.trimItemWhitespace ? this.value.trim() : this.value;
     const trimmedValue = this.value.trim();
     if (!trimmedValue) {
-      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), {classes: ['mod-error']});
+      if (this.inputEl) displayTooltip(this.inputEl, getTextInLanguage('required'), { classes: ['mod-error'] });
       return;
     }
 
     if (this.isValidInput) {
       const [isValid, validationMsg] = this.isValidInput(value);
       if (!isValid) {
-        if (this.inputEl) displayTooltip(this.inputEl, validationMsg, {classes: ['mod-error']});
+        if (this.inputEl) displayTooltip(this.inputEl, validationMsg, { classes: ['mod-error'] });
         return;
       }
     }

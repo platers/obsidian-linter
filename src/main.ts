@@ -8,7 +8,7 @@ import { logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clea
 import { moment } from 'obsidian';
 import './rules-registry';
 import { iconInfo } from './ui/icons';
-import { createRunLinterRulesOptions, RulesRunner } from './rules-runner';
+import { createRunLinterRulesOptions } from './rules-runner';
 import { LinterError } from './linter-error';
 import { LintConfirmationModal } from './ui/modals/lint-confirmation-modal';
 import { SettingTab } from './ui/settings';
@@ -678,7 +678,7 @@ export default class LinterPlugin extends Plugin {
     }).open();
   }
 
-  async runLinterEditor(editor: Editor) {
+  async runLinterEditor(editor: Editor, extraCallback?: () => Promise<void>) {
     setCollectLogs(this.settings.recordLintOnSaveLogs);
     clearLogs();
 
@@ -688,32 +688,20 @@ export default class LinterPlugin extends Plugin {
     try {
       // newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
       this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
-        const changes = this.updateEditor(runOptions.oldText, runOptions.newText, editor);
-        const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
-        const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
+        this.applyEditorTextChange(runOptions.oldText, runOptions.newText, editor, file);
 
-        this.displayChangedMessage(charsAdded, charsRemoved);
-
-        if (!runOptions.skipFile) {
-          // run custom commands now since no change was made
-          if (!charsAdded && !charsRemoved) {
-            void this.runCustomCommands(file);
-          } else {
-            this.updateFileDebouncerText(file, runOptions.newText);
-            this.editorLintFiles.push(file);
-          }
+        if (extraCallback) {
+          await extraCallback();
         }
 
         setCollectLogs(false);
       });
     } catch (error) {
       this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+
+      setCollectLogs(false);
       return;
     }
-
-    this.applyEditorTextChange(oldText, newText, editor, file);
-
-    setCollectLogs(false);
   }
 
   async previewLinterEditor(editor: Editor) {
@@ -723,18 +711,18 @@ export default class LinterPlugin extends Plugin {
     logInfo(getTextInLanguage('logs.linter-run'));
 
     const file = this.app.workspace.getActiveFile();
-    const oldText = stripCr(editor.getValue());
-    let newText: string;
     try {
-      newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
+      this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
+        void this.openDiffPreview(getTextInLanguage('notice-text.lint-preview-title'), runOptions.oldText, runOptions.newText, editor, file);
+
+        setCollectLogs(false);
+      });
     } catch (error) {
       this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       setCollectLogs(false);
       return;
     }
 
-    void this.openDiffPreview(getTextInLanguage('notice-text.lint-preview-title'), oldText, newText, editor, file);
-    setCollectLogs(false);
   }
 
   private async openDiffPreview(title: string, oldText: string, newText: string, editor: Editor, file: TFile) {
@@ -928,28 +916,20 @@ export default class LinterPlugin extends Plugin {
           let newText: string;
           if (oldText != activeFileChangeInfo.originalText) {
             logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
-            // try {
-            //   newText = this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
-            // } catch (error) {
-            //   this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
-            //   return;
-            // }
+            try {
+              newText = runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
+            } catch (error) {
+              this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+              return;
+            }
 
-            // if (activeFileChangeInfo.markdownInfo instanceof MarkdownView) {
-            //   const markdownInfo = activeFileChangeInfo.markdownInfo;
-            //   const state = markdownInfo.getState();
-            //   if (state.mode === "source") {
-            //     this.updateEditor(oldText, newText, editor);
-            //   } else {
-            //     await this.app.vault.process(file, () => newText);
-            let newText = oldText;
-            if (oldText != activeFileChangeInfo.originalText) {
-              logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
-              try {
-                newText = runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
-              } catch (error) {
-                this.handleLintError(file, error, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
-                return;
+            if (activeFileChangeInfo.markdownInfo instanceof MarkdownView) {
+              const markdownInfo = activeFileChangeInfo.markdownInfo;
+              const state = markdownInfo.getState();
+              if (state.mode === "source") {
+                this.updateEditor(oldText, newText, editor);
+              } else {
+                await this.app.vault.process(file, () => newText);
               }
             }
           } else {
@@ -963,7 +943,7 @@ export default class LinterPlugin extends Plugin {
             await this.app.vault.process(file, (data: string) => {
               logInfo(getTextInLanguage('logs.file-change-yaml-lint-run'));
               try {
-                return this.rulesRunner.runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
+                return runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
               } catch (error) {
                 this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
                 return data;

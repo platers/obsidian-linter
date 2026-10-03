@@ -1,20 +1,20 @@
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, MomentFormatOptionBuilder, OptionBuilderBase, TextOptionBuilder} from './rule-builder';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { BooleanOptionBuilder, DropdownOptionBuilder, ExampleBuilder, MomentFormatOptionBuilder, OptionBuilderBase, TextOptionBuilder } from './rule-builder';
 import dedent from 'ts-dedent';
-import {formatYAML, initYAML} from '../utils/yaml';
-import {moment} from 'obsidian';
-import {escapeDollarSigns} from '../utils/regex';
-import {insert} from '../utils/strings';
+import { formatYAML, initYAML } from '../utils/yaml';
+import { moment } from 'obsidian';
+import { escapeDollarSigns } from '../utils/regex';
+import { insert } from '../utils/strings';
 import parseFormat from 'moment-parseformat';
-import {getTextInLanguage} from '../lang/helpers';
-import {AfterFileChangeLintTimes} from '../settings-data';
+import { getTextInLanguage } from '../lang/helpers';
+import { AfterFileChangeLintTimes } from '../settings-data';
 
 type DateCreatedSourceOfTruth = 'file system' | 'frontmatter';
 type DateModifiedSourceOfTruth = 'file system' | 'user or Linter edits';
 
 class YamlTimestampOptions implements Options {
   @RuleBuilder.noSettingControl()
-    alreadyModified?: boolean;
+  alreadyModified?: boolean;
 
   dateCreatedKey?: string = 'date created';
   dateCreated?: boolean = true;
@@ -22,7 +22,7 @@ class YamlTimestampOptions implements Options {
   dateModifiedSourceOfTruth?: DateModifiedSourceOfTruth = 'file system';
 
   @RuleBuilder.noSettingControl()
-    fileCreatedTime?: string;
+  fileCreatedTime?: string;
 
   format?: string = 'dddd, MMMM Do YYYY, h:mm:ss a';
   dateModified?: boolean = true;
@@ -32,19 +32,19 @@ class YamlTimestampOptions implements Options {
 
   // This is not used in the rule itself. It is used for running this rule as a standalone when
   // editor content is updated.
-  timestampUpdateOnFileContentUpdated?: AfterFileChangeLintTimes =AfterFileChangeLintTimes.Never;
+  timestampUpdateOnFileContentUpdated?: AfterFileChangeLintTimes = AfterFileChangeLintTimes.Never;
 
   @RuleBuilder.noSettingControl()
-    fileModifiedTime?: string;
+  fileModifiedTime?: string;
 
   @RuleBuilder.noSettingControl()
-    locale?: string = 'en';
+  locale?: string = 'en';
 
   @RuleBuilder.noSettingControl()
-    currentTime?: moment.Moment;
+  currentTime?: moment.Moment;
 
   @RuleBuilder.noSettingControl()
-    fileName?: string;
+  fileName?: string;
 }
 
 @RuleBuilder.register
@@ -97,17 +97,17 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
     const keyWithValueFound = created_match.test(text);
     if (!keyWithValueFound && created_key_match.test(text)) {
       text = text.replace(
-          created_key_match,
-          escapeDollarSigns(created_date_line) + '\n',
+        created_key_match,
+        escapeDollarSigns(created_date_line) + '\n',
       );
 
       textModified = true;
     } else if (!keyWithValueFound) {
       const yaml_end = text.indexOf('\n---');
       text = insert(
-          text,
-          yaml_end,
-          `\n${options.dateCreatedKey}: ${formatted_date}`,
+        text,
+        yaml_end,
+        `\n${options.dateCreatedKey}: ${formatted_date}`,
       );
 
       textModified = true;
@@ -125,8 +125,8 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         if (formattedYamlCreatedDate !== createdDateString) {
           const created_date_yaml_line = `\n${options.dateCreatedKey}: ${formattedYamlCreatedDate}`;
           text = text.replace(
-              created_match,
-              escapeDollarSigns(created_date_yaml_line) + '\n',
+            created_match,
+            escapeDollarSigns(created_date_yaml_line) + '\n',
           );
 
           textModified = true;
@@ -139,8 +139,8 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
         // to keep backwards compatibility, we will just go ahead and say that the format output must be equal if the format is not blank
         if (createdDateTime == undefined || !createdDateTime.isValid() || (options.format !== '' && createdDateTime.format(options.format) != createdDateString)) {
           text = text.replace(
-              created_match,
-              escapeDollarSigns(created_date_line) + '\n',
+            created_match,
+            escapeDollarSigns(created_date_line) + '\n',
           );
 
           textModified = true;
@@ -177,17 +177,17 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       // there is a more than 5 second difference between the date modified in the frontmatter and
       // the filesystem
       if (textModified || modifiedDateTime == undefined || !modifiedDateTime.isValid() || modifiedDateTime.format(options.format) != originalString ||
-            (options.dateModifiedSourceOfTruth != 'user or Linter edits' && this.getTimeDifferenceInSeconds(modifiedDateTime, modified_date, options) > 5)
+        (options.dateModifiedSourceOfTruth != 'user or Linter edits' && this.getTimeDifferenceInSeconds(modifiedDateTime, modified_date, options) > 5)
       ) {
         text = text.replace(
-            modified_match,
-            escapeDollarSigns(modified_date_line) + '\n',
+          modified_match,
+          escapeDollarSigns(modified_date_line) + '\n',
         );
       }
     } else if (modified_key_match.test(text)) {
       text = text.replace(
-          modified_key_match,
-          escapeDollarSigns(modified_date_line) + '\n',
+        modified_key_match,
+        escapeDollarSigns(modified_date_line) + '\n',
       );
     } else if (!keyWithValueFound) {
       const yaml_end = text.indexOf('\n---');
@@ -212,7 +212,7 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       date.locale(locale);
 
       const formattedDateStr = utc ? date.utc().format(format) : date.format(format);
-      return utc ? moment.utc(formattedDateStr, format, locale, true): moment(formattedDateStr, format, locale, true);
+      return utc ? moment.utc(formattedDateStr, format, locale, true) : moment(formattedDateStr, format, locale, true);
     }
 
     return null;

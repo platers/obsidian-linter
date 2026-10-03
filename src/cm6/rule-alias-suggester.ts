@@ -1,8 +1,8 @@
-import {Editor, EditorPosition, EditorSuggest, EditorSuggestContext, EditorSuggestTriggerInfo, TFile} from 'obsidian';
+import { Editor, EditorPosition, EditorSuggest, EditorSuggestContext, EditorSuggestTriggerInfo, TFile } from 'obsidian';
 import LinterPlugin from '../main';
-import {getDisabledRules, rules} from '../rules';
-import {DISABLED_RULES_KEY, getYamlSectionValue} from '../utils/yaml';
-import {getTextInLanguage} from '../lang/helpers';
+import { getDisabledRules, rules } from '../rules';
+import { DISABLED_RULES_KEY, getYamlSectionValue } from '../utils/yaml';
+import { getTextInLanguage } from '../lang/helpers';
 
 const openingYAMLIndicator = /^---\n/gm;
 const disableRulesKeyWithColon = `${DISABLED_RULES_KEY}:`;
@@ -21,17 +21,17 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
     super(plugin.app);
 
     const allName = getTextInLanguage('all-rules-option');
-    this.ruleInfo = [{displayName: allName, name: allName.toLowerCase(), alias: 'all'}];
+    this.ruleInfo = [{ displayName: allName, name: allName.toLowerCase(), alias: 'all' }];
     for (const rule of rules) {
       const name = rule.getName();
-      this.ruleInfo.push({displayName: name, name: name.toLowerCase(), alias: rule.alias});
+      this.ruleInfo.push({ displayName: name, name: name.toLowerCase(), alias: rule.alias });
     }
   }
   inline = false;
   onTrigger(cursor: EditorPosition, editor: Editor, _: TFile): EditorSuggestTriggerInfo | null {
     const lineContents = editor.getLine(cursor.line).toLowerCase();
     const onFrontmatterDisabledRulesLine = lineContents.startsWith(disableRulesKeyWithColon) ||
-    this.disabledRulesIsEndOfStartOfFileToCursor(editor.getRange({line: 0, ch: 0}, cursor));
+      this.disabledRulesIsEndOfStartOfFileToCursor(editor.getRange({ line: 0, ch: 0 }, cursor));
 
     if (onFrontmatterDisabledRulesLine) {
       this.inline = lineContents.startsWith(disableRulesKeyWithColon);
@@ -54,7 +54,7 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
   }
 
   getSuggestions(context: EditorSuggestContext): ruleInfo[] {
-    const [disabledRules, allIncluded]= getDisabledRules(context.editor.getValue());
+    const [disabledRules, allIncluded] = getDisabledRules(context.editor.getValue());
     if (allIncluded) {
       return [];
     }
@@ -70,9 +70,9 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
   renderSuggestion(suggestion: ruleInfo, el: HTMLElement): void {
     el.addClass('mod-complex');
 
-    const outer = el.createDiv({cls: 'suggestion-content'});
-    outer.createDiv({cls: 'suggestion-title'}).setText(`${suggestion.displayName}`);
-    outer.createDiv({cls: 'suggestion-note'}).setText(`${suggestion.alias}`);
+    const outer = el.createDiv({ cls: 'suggestion-content' });
+    outer.createDiv({ cls: 'suggestion-title' }).setText(`${suggestion.displayName}`);
+    outer.createDiv({ cls: 'suggestion-note' }).setText(`${suggestion.alias}`);
   }
 
   selectSuggestion(suggestion: ruleInfo): void {
@@ -85,9 +85,9 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
       }
 
       (this.context.editor).replaceRange(
-          `${suggestedValue} `,
-          this.context.start,
-          this.context.end,
+        `${suggestedValue} `,
+        this.context.start,
+        this.context.end,
       );
     }
   }

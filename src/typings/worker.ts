@@ -1,4 +1,4 @@
-import {LinterSettings} from 'src/settings-data';
+import { LinterSettings } from "../settings-data";
 
 export interface TFile {
   /**
@@ -59,6 +59,7 @@ export type RunLinterRulesOptions = {
   disabledRules: string[],
   logsFromRun: string[],
   defaultMisspellings: Map<string, string>,
+  runAddBlankAfterYamlPostTimestamp: boolean,
 }
 
 type FileInfo = {
@@ -66,4 +67,9 @@ type FileInfo = {
   name: string,
   createdAtFormatted: string,
   modifiedAtFormatted: string,
+}
+
+declare module '*.worker' {
+  const Worker: () => LinterWorker;
+  export default Worker;
 }

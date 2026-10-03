@@ -1,7 +1,7 @@
-import {moment} from 'obsidian';
+import { moment } from 'obsidian';
 import YamlTimestamp from '../rules/yaml-timestamp';
-import {RunLinterRulesOptions} from '../typings/worker';
-import {getDisabledRules} from '../rules';
+import { RunLinterRulesOptions } from '../typings/worker';
+import { getDisabledRules } from '../rules';
 
 export function runYAMLTimestampByItself(runOptions: RunLinterRulesOptions): string {
   let newText = runOptions.oldText;
