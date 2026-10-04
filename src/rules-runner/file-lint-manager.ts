@@ -45,6 +45,19 @@ export class FileLintManager {
         await this.finish(resp.data as RunLinterRulesOptions, index);
       };
 
+      worker.onerror = function (event) {
+        console.error('Linter worker error', {
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno,
+          error: event.error,
+        });
+
+        // Prevent immediate termination
+        event.preventDefault();
+      };
+
       this.workers.push(worker);
       this.busy.push(false);
     }
@@ -78,7 +91,6 @@ export class FileLintManager {
 
     this.workers = [];
   }
-
 
   // Finish the parsing of a file, potentially queueing a new file.
   private async finish(data: RunLinterRulesOptions, index: number) {
