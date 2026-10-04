@@ -189,7 +189,7 @@ export default class TestLinterPlugin extends Plugin {
         await this.refreshDerivedSettingsState();
       }
 
-      void this.plugin.runLinterEditor(activeLeaf.editor, async () => {
+      await this.plugin.runLinterEditor(activeLeaf.editor, async () => {
         // debugger;
         try {
           await this.handleAssertions(t, activeLeaf, file);
@@ -199,6 +199,7 @@ export default class TestLinterPlugin extends Plugin {
         } catch (e) {
           console.log('❌', t.name);
           console.error(e);
+          console.log('active rules: ' + this.getEnabledRules().join(', '))
 
           this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
         }
@@ -422,7 +423,11 @@ export default class TestLinterPlugin extends Plugin {
   }
 
   private async resetSettings() {
-    this.plugin.settings = JSON.parse(JSON.stringify(this.settingsBaseline)) as LinterSettings;
+    const baseline = JSON.parse(
+      JSON.stringify(this.settingsBaseline)
+    ) as LinterSettings;
+
+    Object.assign(this.plugin.settings, baseline);
     await this.plugin.saveSettings();
   }
 
@@ -430,6 +435,18 @@ export default class TestLinterPlugin extends Plugin {
   // test case that assigns settings directly needs this or the plugin ignores its lintCommands.
   private async refreshDerivedSettingsState() {
     await this.plugin.saveSettings();
+  }
+
+  private getEnabledRules(): string[] {
+    const activeRules = [];
+    for (const setting in this.plugin.settings.ruleConfigs) {
+      const rule = this.plugin.settings.ruleConfigs[setting];
+      if (rule && rule["enabled"]) {
+        activeRules.push(setting);
+      }
+    }
+
+    return activeRules;
   }
 
   private handleTestCompletion(testName: string, succeeded: boolean, testStatuses: testStatus[], totalTestCount: number) {
