@@ -1,6 +1,7 @@
 import { moment } from 'obsidian';
 import { logDebug, logWarn, timingBegin, timingEnd } from '../utils/logger';
-import { rules, wrapLintError, RuleType, Rule, Options } from '../rules';
+import { rules, RuleType, Rule, Options } from '../rules';
+import { wrapLintError } from '../utils/error';
 import BlockquotifyOnPaste from '../rules/blockquotify-on-paste';
 import EscapeYamlSpecialCharacters from '../rules/escape-yaml-special-characters';
 import ForceYamlEscape from '../rules/force-yaml-escape';
@@ -32,7 +33,6 @@ import AddBlankLineAfterYAML from '../rules/add-blank-line-after-yaml';
 import { LintContext, replaceUnprotectedRegexMatches } from '../utils/protected-ranges';
 import { addEditsIfTheyDoNotClash, getEditsBetween } from '../utils/text-edits';
 import MoveInlineFieldsToYaml from '../rules/move-inline-fields-to-yaml';
-
 
 const rulesThatMustSeeEarlierWork = [
   'move-footnotes-to-the-bottom',
@@ -152,7 +152,7 @@ function runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
 }
 
 function runAfterRegularRules(currentText: string, runOptions: RunLinterRulesOptions): string {
-  let newText = runOptions.oldText;
+  let newText = currentText;
   const postRuleLogText = getTextInLanguage('logs.post-rules');
   timingBegin(postRuleLogText);
   [newText] = CapitalizeHeadings.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
@@ -294,7 +294,7 @@ export function runCustomCommands(lintCommands: LintCommand[], commands: Obsidia
   logDebug(getTextInLanguage('logs.running-custom-lint-command'));
   const commandsRun = new Set<string>();
   for (const commandInfo of lintCommands) {
-    if (!commandInfo.id) {
+    if (!commandInfo.id || !commandInfo.enabled) {
       continue;
     } else if (commandsRun.has(commandInfo.id)) {
       logWarn(getTextInLanguage('logs.custom-lint-duplicate-warning').replace('{COMMAND_NAME}', commandInfo.name));

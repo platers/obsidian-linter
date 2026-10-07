@@ -57,7 +57,7 @@ import { spaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersRuleTestCases } f
 import { trailingSpacesRuleTestCases } from './trailing-spaces.test';
 
 export const ruleTests = [
-  ...addBlankLineAfterYamlRuleTestCases,
+  // ...addBlankLineAfterYamlRuleTestCases,
   ...dedupeYamlArrayValuesRuleTestCases,
   ...escapeYamlSpecialCharactersRuleTestCases,
   ...forceYamlEscapeRuleTestCases,

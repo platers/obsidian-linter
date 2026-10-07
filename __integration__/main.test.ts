@@ -99,67 +99,6 @@ export default class TestLinterPlugin extends Plugin {
     }
 
     await this.runRegularTest(0, totalTestCount, activeLeaf, testStatuses);
-
-    // for (const t of this.regularTests) {
-    //   const file = this.getFileFromPath(t.filePath);
-    //   if (!file) {
-    //     console.error('failed to get file: ' + t.filePath);
-
-    //     this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
-    //     continue;
-    //   }
-
-    //   await activeLeaf.leaf.openFile(file);
-    //   // Consecutive cases reuse a fixture and openFile will not reload an already-open file,
-    //   // so an editor read would adopt the previous case's end state as this case's baseline.
-    //   const originalText = await this.app.vault.read(file);
-    //   await this.resetSettings();
-
-    //   try {
-    //     if (t.setup) {
-    //       await t.setup(this, activeLeaf.editor);
-    //       await this.refreshDerivedSettingsState();
-    //     }
-
-    //     await this.plugin.runLinterEditor(activeLeaf.editor, () => {
-    //       try {
-    //         await this.handleAssertions(t, activeLeaf, file);
-
-    //         console.log('✅', t.name);
-    //         this.handleTestCompletion(t.name, true, testStatuses, totalTestCount);
-    //       } catch (e) {
-    //         console.log('❌', t.name);
-    //         console.error(e);
-
-    //         this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
-    //       }
-    //       finally {
-    //         await this.resetFileContents(file, originalText);
-    //         // todo queue next test...
-    //       }
-    //     });
-
-
-    //   } catch (e) {
-    //     console.log('❌', t.name);
-    //     console.error(e);
-
-    //     this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
-    //   }
-    // }
-
-    // await this.runIgnoreTests(testStatuses, totalTestCount);
-
-    // if (testStatuses.length != (this.regularTests.length + this.ignoreTests.length)) {
-    //   if (this.testRunNotice) {
-    //     this.testRunNotice.setMessage(`❌ failed to run all ${this.regularTests.length + this.ignoreTests.length} regular and ignore tests before attempting to start the metadata tests.`);
-    //   } else {
-    //     console.log(`❌ failed to run all ${this.regularTests.length} regular tests before attempting to start the metadata tests.`);
-    //   }
-    //   return;
-    // }
-
-    // await this.runMetadataTests(this.afterCacheUpdateTests, activeLeaf, testStatuses, totalTestCount);
   }
 
   async runRegularTest(index: number, totalTestCount: number, activeLeaf: MarkdownView, testStatuses: testStatus[]) {
@@ -167,7 +106,6 @@ export default class TestLinterPlugin extends Plugin {
       return;
     }
 
-    // debugger;
     const t = this.regularTests[index]
     const file = this.getFileFromPath(t.filePath);
     if (!file) {
@@ -190,7 +128,6 @@ export default class TestLinterPlugin extends Plugin {
       }
 
       await this.plugin.runLinterEditor(activeLeaf.editor, async () => {
-        // debugger;
         try {
           await this.handleAssertions(t, activeLeaf, file);
 
@@ -199,7 +136,6 @@ export default class TestLinterPlugin extends Plugin {
         } catch (e) {
           console.log('❌', t.name);
           console.error(e);
-          console.log('active rules: ' + this.getEnabledRules().join(', '))
 
           this.handleTestCompletion(t.name, false, testStatuses, totalTestCount);
         }
@@ -435,18 +371,6 @@ export default class TestLinterPlugin extends Plugin {
   // test case that assigns settings directly needs this or the plugin ignores its lintCommands.
   private async refreshDerivedSettingsState() {
     await this.plugin.saveSettings();
-  }
-
-  private getEnabledRules(): string[] {
-    const activeRules = [];
-    for (const setting in this.plugin.settings.ruleConfigs) {
-      const rule = this.plugin.settings.ruleConfigs[setting];
-      if (rule && rule["enabled"]) {
-        activeRules.push(setting);
-      }
-    }
-
-    return activeRules;
   }
 
   private handleTestCompletion(testName: string, succeeded: boolean, testStatuses: testStatus[], totalTestCount: number) {

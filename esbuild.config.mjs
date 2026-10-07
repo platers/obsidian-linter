@@ -56,6 +56,8 @@ const mockedPlugins = [replace({
     'import { sanitizeHTMLToDom } from \'obsidian\';': '',
     // remove the use of obsidian inside command suggester for docs.js to run
     'import { AbstractInputSuggest, App, Command } from \'obsidian\';': '',
+    // remove the use of obsidian inside error helpers
+    'import { Notice, TFile } from "obsidian";': '',
   },
   delimiters: ['', ''],
 })];
