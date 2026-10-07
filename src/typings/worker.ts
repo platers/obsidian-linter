@@ -60,6 +60,15 @@ export type RunLinterRulesOptions = {
   logsFromRun: string[],
   defaultMisspellings: Map<string, string>,
   runAddBlankAfterYamlPostTimestamp: boolean,
+  errorTemplateString: string,
+  useLogTemplateInNotice: boolean,
+  errorNoticeTimeout: number,
+  // errors should already be of the type LinterError when they get here
+  error: {
+    name: string,
+    message: string,
+    stack: string | undefined,
+  } | undefined;
 }
 
 type FileInfo = {

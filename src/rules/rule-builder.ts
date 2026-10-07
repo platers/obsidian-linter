@@ -1,4 +1,5 @@
-import { Example, Options, Rule, RuleType, registerRule, wrapLintError } from '../rules';
+import { Example, Options, Rule, RuleType, registerRule } from '../rules';
+import { wrapLintError } from '../utils/error';
 import { BooleanOption, DropdownOption, DropdownRecord, MdFilePickerOption, MomentFormatOption, Option, ListItemOption, TextOption } from '../option';
 import { logDebug, timingBegin, timingEnd } from '../utils/logger';
 import { getTextInLanguage, LanguageStringKey } from '../lang/helpers';

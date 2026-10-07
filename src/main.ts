@@ -28,6 +28,7 @@ import { FileLintManager } from './rules-runner/file-lint-manager';
 import { RunLinterRulesOptions } from './typings/worker';
 import { runCustomCommands, runPasteLint, createRunLinterRulesOptions } from './rules-runner/rules-runner';
 import { runYAMLTimestampByItself } from './rules-runner/yaml-timestamp-by-itself';
+import { handleLintError } from './utils/error';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -542,10 +543,12 @@ export default class LinterPlugin extends Plugin {
       return;
     }
 
+    const errorTemplateString = getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'';
+    const useLogTemplateInNotice = false;
     try {
-      await this.runLinterFile(this.lastActiveFile, true);
+      await this.runLinterFile(this.lastActiveFile, errorTemplateString, useLogTemplateInNotice, true);
     } catch (error) {
-      this.handleLintError(this.lastActiveFile, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      handleLintError(this.lastActiveFile, error instanceof Error ? error : new Error(String(error)), userClickTimeout, errorTemplateString, useLogTemplateInNotice);
     } finally {
       this.lastActiveFile = currentActiveFile;
     }
@@ -578,8 +581,8 @@ export default class LinterPlugin extends Plugin {
     return file && (file.extension === 'md' || this.settings.additionalFileExtensions.includes(file.extension));
   }
 
-  async runLinterFile(file: TFile, lintingLastActiveFile: boolean = false) {
-    this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
+  async runLinterFile(file: TFile, errorTemplateString: string, useLogTemplateInNotice: boolean, lintingLastActiveFile: boolean = false) {
+    this.lintFileManager.lintFile({ file: file, errorNoticeTimeout: userClickTimeout, useLogTemplateInNotice: useLogTemplateInNotice, errorTemplateString: errorTemplateString }, async (runOptions: RunLinterRulesOptions) => {
       if (runOptions.oldText != runOptions.newText) {
         await this.app.vault.modify(file, runOptions.newText);
 
@@ -611,10 +614,12 @@ export default class LinterPlugin extends Plugin {
     let numberOfErrors = 0;
     await Promise.all(app.vault.getMarkdownFiles().map(async (file) => {
       if (!this.shouldIgnoreFile(file)) {
+        const errorTemplateString = getTextInLanguage('commands.lint-all-files.error-message') + ' \'{FILE_PATH}\'';
+        const useLogTemplateInNotice = true;
         try {
-          await this.runLinterFile(file);
+          await this.runLinterFile(file, errorTemplateString, useLogTemplateInNotice);
         } catch (error) {
-          this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-all-files.error-message') + ' \'{FILE_PATH}\'');
+          handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, errorTemplateString, useLogTemplateInNotice);
 
           numberOfErrors += 1;
         }
@@ -637,10 +642,12 @@ export default class LinterPlugin extends Plugin {
     const filesInFolder = this.getAllFilesInFolder(folder);
     await Promise.all(filesInFolder.map(async (file) => {
       if (!this.shouldIgnoreFile(file)) {
+        const errorTemplateString = getTextInLanguage('commands.lint-all-files-in-folder.error-message') + ' \'{FILE_PATH}\'';
+        const useLogTemplateInNotice = true;
         try {
-          await this.runLinterFile(file);
+          await this.runLinterFile(file, errorTemplateString, useLogTemplateInNotice);
         } catch (error) {
-          this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-all-files-in-folder.error-message') + ' \'{FILE_PATH}\'');
+          handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, errorTemplateString, useLogTemplateInNotice);
 
           numberOfErrors += 1;
         }
@@ -674,26 +681,27 @@ export default class LinterPlugin extends Plugin {
     }).open();
   }
 
-  async runLinterEditor(editor: Editor, extraCallback?: () => Promise<void>) {
+  async runLinterEditor(editor: Editor, extraCallback?: (runOptions: RunLinterRulesOptions) => Promise<void>) {
     setCollectLogs(this.settings.recordLintOnSaveLogs);
     clearLogs();
 
     logInfo(getTextInLanguage('logs.linter-run'));
 
     const file = this.app.workspace.getActiveFile();
+    const errorTemplateString = getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'';
+    const useLogTemplateInNotice = false;
     try {
-      // newText = this.rulesRunner.lintText(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, this.defaultAutoCorrectMisspellings));
-      this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
+      this.lintFileManager.lintFile({ file: file, errorNoticeTimeout: userClickTimeout, useLogTemplateInNotice: useLogTemplateInNotice, errorTemplateString: errorTemplateString }, async (runOptions: RunLinterRulesOptions) => {
         this.applyEditorTextChange(runOptions.oldText, runOptions.newText, editor, file);
 
         if (extraCallback) {
-          await extraCallback();
+          await extraCallback(runOptions);
         }
 
         setCollectLogs(false);
       });
     } catch (error) {
-      this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, errorTemplateString, useLogTemplateInNotice);
 
       setCollectLogs(false);
       return;
@@ -714,7 +722,7 @@ export default class LinterPlugin extends Plugin {
         setCollectLogs(false);
       });
     } catch (error) {
-      this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+      handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       setCollectLogs(false);
       return;
     }
@@ -915,7 +923,7 @@ export default class LinterPlugin extends Plugin {
             try {
               newText = runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
             } catch (error) {
-              this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+              handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
               return;
             }
 
@@ -941,7 +949,7 @@ export default class LinterPlugin extends Plugin {
               try {
                 return runYAMLTimestampByItself(createRunLinterRulesOptions(oldText, file, this.momentLocale, this.settings, null));
               } catch (error) {
-                this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+                handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
                 return data;
               }
             });
@@ -988,23 +996,6 @@ export default class LinterPlugin extends Plugin {
       `;
       new Notice(message);
     }
-  }
-
-  private handleLintError(file: TFile, error: Error, logErrorStringTemplate: string, useLogTemplateInNotice: boolean = true) {
-    const errorMessage = logErrorStringTemplate.replace('{FILE_PATH}', file.path);
-    const seeConsoleText = getTextInLanguage('logs.see-console');
-
-    if (error instanceof LinterError) {
-      if (useLogTemplateInNotice) {
-        new Notice(`${errorMessage} ${error.message}.\n${seeConsoleText}`, userClickTimeout);
-      } else {
-        new Notice(`${error.message}.\n${seeConsoleText}`, userClickTimeout);
-      }
-    } else {
-      new Notice(`${getTextInLanguage('logs.unknown-error')} ${seeConsoleText}`, userClickTimeout);
-    }
-
-    logError(errorMessage, error);
   }
 
   // based on https://github.com/chrisgrieser/obsidian-smarter-paste/blob/master/main.ts#L43-L79
@@ -1168,7 +1159,7 @@ export default class LinterPlugin extends Plugin {
       try {
         runCustomCommands(this.settings.lintCommands, this.app.commands);
       } catch (error) {
-        this.handleLintError(file, error instanceof Error ? error : new Error(String(error)), getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
+        handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       }
 
       if (this.customCommandsCallback) {
