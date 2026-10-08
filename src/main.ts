@@ -692,7 +692,44 @@ export default class LinterPlugin extends Plugin {
     const useLogTemplateInNotice = false;
     try {
       this.lintFileManager.lintFile({ file: file, errorNoticeTimeout: userClickTimeout, useLogTemplateInNotice: useLogTemplateInNotice, errorTemplateString: errorTemplateString }, async (runOptions: RunLinterRulesOptions) => {
-        this.applyEditorTextChange(runOptions.oldText, runOptions.newText, editor, file);
+        if (runOptions.skipFile) {
+          if (extraCallback) {
+            await extraCallback(runOptions);
+          }
+
+          setCollectLogs(false);
+          return;
+        }
+
+        const currentFile = this.app.workspace.getActiveFile();
+        const currentEditor = this.getEditor();
+        if (file == currentFile) {
+          // when the editor has not changed between lints, the change can be made.
+          if (runOptions.oldText === stripCr(currentEditor.getValue())) {
+            this.applyEditorTextChange(runOptions.oldText, runOptions.newText, currentEditor, file);
+          } else {
+            new Notice(getTextInLanguage('logs.file-content-changed-mid-lint').replace('{FILE_NAME}', file.path), 5000);
+          }
+        } else {
+          // there is not good information to go off of since the original leaf does not exist, so we must read the existing value from the vault and then apply the changes accordingly
+          const currentFileText = stripCr(await this.app.vault.read(file));
+          if (runOptions.oldText == currentFileText) {
+            const [charsAdded, charsRemoved] = this.calculateCharDiff(runOptions.oldText, runOptions.newText);
+            this.displayChangedMessage(charsAdded, charsRemoved);
+
+            if (runOptions.oldText != runOptions.newText) {
+              await this.app.vault.modify(file, runOptions.newText);
+
+              // when a change is made to the file we know that the cache will update down the road
+              // so we can defer running the custom commands to the cache callback
+              this.fileLintFiles.add(file);
+            } else {
+              await this.runCustomCommandsInSidebar(file);
+            }
+          } else {
+            new Notice(getTextInLanguage('logs.file-content-changed-mid-lint').replace('{FILE_NAME}', file.path), 5000);
+          }
+        }
 
         if (extraCallback) {
           await extraCallback(runOptions);
@@ -761,6 +798,16 @@ export default class LinterPlugin extends Plugin {
       this.updateFileDebouncerText(file, newText);
       this.editorLintFiles.push(file);
     }
+  }
+
+  private calculateCharDiff(oldText: string, newText: string): [charsAdded: number, charsRemoved: number] {
+    const dmp = new DiffMatchPatch.diff_match_patch();
+    const changes = dmp.diff_main(oldText, newText);
+
+    const charsAdded = changes.map((change) => change[0] == DiffMatchPatch.DIFF_INSERT ? change[1].length : 0).reduce((a, b) => a + b, 0);
+    const charsRemoved = changes.map((change) => change[0] == DiffMatchPatch.DIFF_DELETE ? change[1].length : 0).reduce((a, b) => a + b, 0);
+
+    return [charsAdded, charsRemoved];
   }
 
   private async getDiffPreviewLeaf(): Promise<WorkspaceLeaf> {
