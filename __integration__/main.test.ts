@@ -35,7 +35,7 @@ type testStatus = {
 const testTimeout = 15000;
 
 export default class TestLinterPlugin extends Plugin {
-  regularTests: Array<IntegrationTestCase> = [...ruleTests, ...obsidianModeTestCases, ...obsidianYAMLRuleTestCases, ...disabledRulesTestCases];
+  regularTests: Array<IntegrationTestCase> = [...obsidianModeTestCases, ...obsidianYAMLRuleTestCases, ...disabledRulesTestCases, ...ruleTests];
   ignoreTests: Array<IntegrationIgnoreTestCase> = ignoreTestCases;
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
