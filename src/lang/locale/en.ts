@@ -74,6 +74,7 @@ export default {
     'moment-locale-not-found': 'Trying to switch Moment.js locale to {MOMENT_LOCALE}, got {CURRENT_LOCALE}',
     'file-change-lint-message-start': 'Linted',
     'custom-command-callback-warning': 'Please only set the custom command callback for integration tests.',
+    'file-content-changed-mid-lint': 'Lint results discarded for {FILE_NAME} due to changes in the file between when the lint started and the lint ended',
 
     // rules-runner.ts
     'pre-rules': 'rules before regular rules',
