@@ -10,6 +10,7 @@ import { ruleTests } from './rule-tests'; // keep the name the same unless you c
 import { DiffPreviewView, diffPreviewViewType } from '../src/ui/views/diff-preview-view';
 import { DEFAULT_SETTINGS, LinterSettings } from '../src/settings-data';
 import { rules } from '../src/rules';
+import { disabledRulesTestCases } from './disable-rules.test';
 
 export type IntegrationTestCase = {
   name: string,
@@ -34,7 +35,7 @@ type testStatus = {
 const testTimeout = 15000;
 
 export default class TestLinterPlugin extends Plugin {
-  regularTests: Array<IntegrationTestCase> = [...ruleTests, ...obsidianModeTestCases, ...obsidianYAMLRuleTestCases];
+  regularTests: Array<IntegrationTestCase> = [...ruleTests, ...obsidianModeTestCases, ...obsidianYAMLRuleTestCases, ...disabledRulesTestCases];
   ignoreTests: Array<IntegrationIgnoreTestCase> = ignoreTestCases;
   afterCacheUpdateTests: Array<IntegrationTestCase> = [...customCommandTestCases];
   plugin: LinterPlugin;
