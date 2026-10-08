@@ -4,12 +4,11 @@ import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import { parseCustomReplacements, stripCr } from './utils/strings';
 import { diffToEditorChanges } from './utils/editor-changes';
-import { logInfo, logError, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel } from './utils/logger';
+import { logInfo, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, convertNumberToLogLevel } from './utils/logger';
 import { moment } from 'obsidian';
 import './rules-registry';
 import { iconInfo } from './ui/icons';
 import { createRunLinterRulesOptions } from './rules-runner';
-import { LinterError } from './linter-error';
 import { LintConfirmationModal } from './ui/modals/lint-confirmation-modal';
 import { SettingTab } from './ui/settings';
 import { escapeRegExp, urlRegex, wordSplitterRegex } from './utils/regex';
@@ -1189,25 +1188,27 @@ export default class LinterPlugin extends Plugin {
       return;
     }
 
-    const sidebarTab = this.app.workspace.getRightLeaf(false);
+    const sidebarTab = this.app.workspace.getRightLeaf(true);
     const activeEditor = this.getEditor();
 
-    await this.customCommandsLock.acquire('command', async () => {
-      this.currentlyOpeningSidebar = true;
+    try {
+      await this.customCommandsLock.acquire('command', async () => {
+        this.currentlyOpeningSidebar = true;
 
-      await sidebarTab.openFile(file, { active: true });
-
-      runCustomCommands(this.settings.lintCommands, this.app.commands);
-      if (this.customCommandsCallback) {
-        await this.customCommandsCallback(file);
+        await sidebarTab.openFile(file, { active: true });
+        await runCustomCommands(this.settings.lintCommands, this.app.commands);
+        if (this.customCommandsCallback) {
+          await this.customCommandsCallback(file);
+        }
+      });
+    } finally {
+      sidebarTab.detach();
+      if (activeEditor) {
+        activeEditor.focus();
       }
-    });
-    sidebarTab.detach();
-    if (activeEditor) {
-      activeEditor.focus();
-    }
 
-    this.currentlyOpeningSidebar = false;
+      this.currentlyOpeningSidebar = false;
+    }
   }
 
   private async runCustomCommands(file: TFile) {
@@ -1217,7 +1218,7 @@ export default class LinterPlugin extends Plugin {
 
     await this.customCommandsLock.acquire('command', async () => {
       try {
-        runCustomCommands(this.settings.lintCommands, this.app.commands);
+        await runCustomCommands(this.settings.lintCommands, this.app.commands);
       } catch (error) {
         handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       }
