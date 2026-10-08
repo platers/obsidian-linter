@@ -1,4 +1,4 @@
-import { moment } from 'obsidian';
+import { Command, moment } from 'obsidian';
 import { logDebug, logWarn, timingBegin, timingEnd } from '../utils/logger';
 import { rules, RuleType, Rule, Options } from '../rules';
 import { wrapLintError } from '../utils/error';
@@ -290,7 +290,7 @@ function runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: stri
   return newText;
 }
 
-export function runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface) {
+export async function runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface): Promise<void> {
   logDebug(getTextInLanguage('logs.running-custom-lint-command'));
   const commandsRun = new Set<string>();
   for (const commandInfo of lintCommands) {
@@ -303,7 +303,17 @@ export function runCustomCommands(lintCommands: LintCommand[], commands: Obsidia
 
     try {
       commandsRun.add(commandInfo.id);
-      commands.executeCommandById(commandInfo.id);
+      if (!(commandInfo.id in commands.commands)) {
+        continue;
+      }
+
+      const command = commands.commands[commandInfo.id] as Command;
+      if (command.checkCallback && command.checkCallback(true)) {
+        command.checkCallback();
+      } else if (command.callback) {
+        await command.callback();
+      }
+
     } catch (error) {
       wrapLintError(error instanceof Error ? error : new Error(String(error)), `${getTextInLanguage('logs.custom-lint-error-message')} ${commandInfo.id}`);
     }
