@@ -8,7 +8,6 @@ import { logInfo, logDebug, setLogLevel, logWarn, setCollectLogs, clearLogs, con
 import { moment } from 'obsidian';
 import './rules-registry';
 import { iconInfo } from './ui/icons';
-import { createRunLinterRulesOptions } from './rules-runner';
 import { LintConfirmationModal } from './ui/modals/lint-confirmation-modal';
 import { SettingTab } from './ui/settings';
 import { escapeRegExp, urlRegex, wordSplitterRegex } from './utils/regex';
@@ -82,7 +81,6 @@ export default class LinterPlugin extends Plugin {
   // search and other operations faster
   private fileLintFiles: Set<TFile> = new Set();
   private customCommandsCallback: (file: TFile) => Promise<void> = null;
-  private currentlyOpeningSidebar: boolean = false;
   private activeFileChangeDebouncer: Map<string, FileChangeUpdateInfo> = new Map();
   private defaultAutoCorrectMisspellings: Map<string, string> = new Map();
   private hasLoadedMisspellingFiles = false;
@@ -91,6 +89,7 @@ export default class LinterPlugin extends Plugin {
     await this.saveData(settings);
   }, 5000);
   private lintFileManager: FileLintManager = undefined;
+  private activeLeafChangesToIgnore: string[] = [];
 
   async onload() {
     sortRules();
@@ -531,12 +530,19 @@ export default class LinterPlugin extends Plugin {
   }
 
   async onActiveLeafChange() {
-    if (!this.isEnabled || this.currentlyOpeningSidebar) {
+    if (!this.isEnabled) {
+      return;
+    }
+
+    const index = this.activeLeafChangesToIgnore.indexOf(this.lastActiveFile?.path ?? '');
+    if (index > -1) {
+      this.activeLeafChangesToIgnore.splice(index, 1);
       return;
     }
 
     const currentActiveFile = this.app.workspace.getActiveFile();
     const lastActiveFileExists = this.lastActiveFile == null ? false : await this.app.vault.adapter.exists(this.lastActiveFile.path);
+
     if (!this.settings.lintOnFileChange || !lastActiveFileExists || this.lastActiveFile === currentActiveFile || !this.isMarkdownFile(this.lastActiveFile) || this.shouldIgnoreFile(this.lastActiveFile)) {
       this.lastActiveFile = currentActiveFile;
       return;
@@ -582,86 +588,83 @@ export default class LinterPlugin extends Plugin {
 
   async runLinterFile(file: TFile, errorTemplateString: string, useLogTemplateInNotice: boolean, lintingLastActiveFile: boolean = false) {
     this.lintFileManager.lintFile({ file: file, errorNoticeTimeout: userClickTimeout, useLogTemplateInNotice: useLogTemplateInNotice, errorTemplateString: errorTemplateString }, async (runOptions: RunLinterRulesOptions) => {
-      if (runOptions.oldText != runOptions.newText) {
-        await this.app.vault.modify(file, runOptions.newText);
-
-        if (lintingLastActiveFile) {
-          const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + file.path;
-          if (this.settings.displayLintOnFileChangeNotice) {
-            new Notice(message);
-          }
-
-          logInfo(message);
-        }
-
-        if (!runOptions.skipFile) {
-          // when a change is made to the file we know that the cache will update down the road
-          // so we can defer running the custom commands to the cache callback
-          this.fileLintFiles.add(file);
-        }
-
+      if (runOptions.skipFile) {
         return;
       }
 
-      if (!runOptions.skipFile) {
-        await this.runCustomCommandsInSidebar(file);
+      // there is not good information to go off of since the original leaf does not exist, so we must read the existing value from the vault and then apply the changes accordingly
+      const currentFileText = stripCr(await this.app.vault.read(file));
+      if (runOptions.oldText == currentFileText) {
+        if (runOptions.oldText != runOptions.newText) {
+          await this.app.vault.modify(file, runOptions.newText);
+
+          if (lintingLastActiveFile) {
+            const message = getTextInLanguage('logs.file-change-lint-message-start') + ' ' + file.path;
+            if (this.settings.displayLintOnFileChangeNotice) {
+              new Notice(message);
+            }
+
+            logInfo(message);
+          }
+
+          // when a change is made to the file we know that the cache will update down the road
+          // so we can defer running the custom commands to the cache callback
+          this.fileLintFiles.add(file);
+        } else {
+          await this.runCustomCommandsInSidebar(file);
+        }
+      } else {
+        new Notice(getTextInLanguage('logs.file-content-changed-mid-lint').replace('{FILE_NAME}', file.path), 5000);
       }
     });
   }
 
   async runLinterAllFiles(app: App) {
-    let numberOfErrors = 0;
-    await Promise.all(app.vault.getMarkdownFiles().map(async (file) => {
-      if (!this.shouldIgnoreFile(file)) {
-        const errorTemplateString = getTextInLanguage('commands.lint-all-files.error-message') + ' \'{FILE_PATH}\'';
-        const useLogTemplateInNotice = true;
-        try {
-          await this.runLinterFile(file, errorTemplateString, useLogTemplateInNotice);
-        } catch (error) {
-          handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, errorTemplateString, useLogTemplateInNotice);
+    const files = app.vault.getMarkdownFiles().filter((file) => !this.shouldIgnoreFile(file));
+    const errorTemplateString = getTextInLanguage('commands.lint-all-files.error-message') + ' \'{FILE_PATH}\'';
+    const useLogTemplateInNotice = true;
 
-          numberOfErrors += 1;
-        }
+    this.lintFileManager.lintBatch(files, userClickTimeout, errorTemplateString, useLogTemplateInNotice, async (runOptions: RunLinterRulesOptions) => {
+      if (runOptions.skipFile) {
+        return;
       }
-    }));
 
-    if (numberOfErrors === 0) {
-      new Notice(getTextInLanguage('commands.lint-all-files.success-message'), userClickTimeout);
-    } else {
-      const errorMessage = numberOfErrors === 1 ? getTextInLanguage('commands.lint-all-files.errors-message-singular') : getTextInLanguage('commands.lint-all-files.errors-message-plural').replace('{NUM}', numberOfErrors.toString());
-      new Notice(errorMessage, userClickTimeout);
-    }
+      const file = this.getFileFromPath(runOptions.fileInfo.path);
+      await this.handleLintResultForFileInBackground(runOptions, file, false);
+    }, (completed: number, errors: number) => {
+      if (errors === 0) {
+        new Notice(getTextInLanguage('commands.lint-all-files.success-message'), userClickTimeout);
+      } else {
+        const errorMessage = errors === 1 ? getTextInLanguage('commands.lint-all-files.errors-message-singular') : getTextInLanguage('commands.lint-all-files.errors-message-plural').replace('{NUM}', errors.toString());
+        new Notice(errorMessage, userClickTimeout);
+      }
+    });
   }
 
   async runLinterAllFilesInFolder(folder: TFolder) {
     logInfo(getTextInLanguage('logs.folder-lint') + folder.name);
 
-    let numberOfErrors = 0;
-    let lintedFiles = 0;
     const filesInFolder = this.getAllFilesInFolder(folder);
-    await Promise.all(filesInFolder.map(async (file) => {
-      if (!this.shouldIgnoreFile(file)) {
-        const errorTemplateString = getTextInLanguage('commands.lint-all-files-in-folder.error-message') + ' \'{FILE_PATH}\'';
-        const useLogTemplateInNotice = true;
-        try {
-          await this.runLinterFile(file, errorTemplateString, useLogTemplateInNotice);
-        } catch (error) {
-          handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, errorTemplateString, useLogTemplateInNotice);
-
-          numberOfErrors += 1;
-        }
-
-        lintedFiles++;
+    const files = filesInFolder.filter((file) => !this.shouldIgnoreFile(file));
+    const errorTemplateString = getTextInLanguage('commands.lint-all-files-in-folder.error-message') + ' \'{FILE_PATH}\'';
+    const useLogTemplateInNotice = true;
+    this.lintFileManager.lintBatch(files, userClickTimeout, errorTemplateString, useLogTemplateInNotice, async (runOptions: RunLinterRulesOptions) => {
+      if (runOptions.skipFile) {
+        return;
       }
-    }));
 
-    if (numberOfErrors === 0) {
-      new Notice(getTextInLanguage('commands.lint-all-files-in-folder.success-message').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name), userClickTimeout);
-    } else {
-      const errorMessageText = numberOfErrors === 1 ? getTextInLanguage('commands.lint-all-files-in-folder.message-singular').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name) :
-        getTextInLanguage('commands.lint-all-files-in-folder.message-plural').replace('{FILE_COUNT}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name).replace('{ERROR_COUNT}', numberOfErrors.toString());
-      new Notice(errorMessageText, userClickTimeout);
-    }
+      const file = this.getFileFromPath(runOptions.fileInfo.path);
+      await this.handleLintResultForFileInBackground(runOptions, file, false);
+    }, (completed: number, errors: number) => {
+      const lintedFiles = completed + errors;
+      if (errors === 0) {
+        new Notice(getTextInLanguage('commands.lint-all-files-in-folder.success-message').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name), userClickTimeout);
+      } else {
+        const errorMessageText = errors === 1 ? getTextInLanguage('commands.lint-all-files-in-folder.message-singular').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name) :
+          getTextInLanguage('commands.lint-all-files-in-folder.message-plural').replace('{FILE_COUNT}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name).replace('{ERROR_COUNT}', errors.toString());
+        new Notice(errorMessageText, userClickTimeout);
+      }
+    });
   }
 
   // handles the creation of the folder linting modal since this happens in multiple places and it should be consistent
@@ -710,24 +713,7 @@ export default class LinterPlugin extends Plugin {
             new Notice(getTextInLanguage('logs.file-content-changed-mid-lint').replace('{FILE_NAME}', file.path), 5000);
           }
         } else {
-          // there is not good information to go off of since the original leaf does not exist, so we must read the existing value from the vault and then apply the changes accordingly
-          const currentFileText = stripCr(await this.app.vault.read(file));
-          if (runOptions.oldText == currentFileText) {
-            const [charsAdded, charsRemoved] = this.calculateCharDiff(runOptions.oldText, runOptions.newText);
-            this.displayChangedMessage(charsAdded, charsRemoved);
-
-            if (runOptions.oldText != runOptions.newText) {
-              await this.app.vault.modify(file, runOptions.newText);
-
-              // when a change is made to the file we know that the cache will update down the road
-              // so we can defer running the custom commands to the cache callback
-              this.fileLintFiles.add(file);
-            } else {
-              await this.runCustomCommandsInSidebar(file);
-            }
-          } else {
-            new Notice(getTextInLanguage('logs.file-content-changed-mid-lint').replace('{FILE_NAME}', file.path), 5000);
-          }
+          await this.handleLintResultForFileInBackground(runOptions, file, true);
         }
 
         if (extraCallback) {
@@ -1179,7 +1165,11 @@ export default class LinterPlugin extends Plugin {
 
     try {
       await this.customCommandsLock.acquire('command', async () => {
-        this.currentlyOpeningSidebar = true;
+        if (this.lastActiveFile) {
+          this.activeLeafChangesToIgnore.push(this.lastActiveFile.path);
+        }
+
+        this.activeLeafChangesToIgnore.push(file.path);
 
         await sidebarTab.openFile(file, { active: true });
         console.log('Active file should be: ' + file.name);
@@ -1194,8 +1184,29 @@ export default class LinterPlugin extends Plugin {
       if (activeEditor) {
         activeEditor.focus();
       }
+    }
+  }
 
-      this.currentlyOpeningSidebar = false;
+  private async handleLintResultForFileInBackground(runOptions: RunLinterRulesOptions, file: TFile, displayCharactersChanged: boolean) {
+    // there is not good information to go off of since the original leaf does not exist, so we must read the existing value from the vault and then apply the changes accordingly
+    const currentFileText = stripCr(await this.app.vault.read(file));
+    if (runOptions.oldText == currentFileText) {
+      if (displayCharactersChanged) {
+        const [charsAdded, charsRemoved] = this.calculateCharDiff(runOptions.oldText, runOptions.newText);
+        this.displayChangedMessage(charsAdded, charsRemoved);
+      }
+
+      if (runOptions.oldText != runOptions.newText) {
+        await this.app.vault.modify(file, runOptions.newText);
+
+        // when a change is made to the file we know that the cache will update down the road
+        // so we can defer running the custom commands to the cache callback
+        this.fileLintFiles.add(file);
+      } else {
+        await this.runCustomCommandsInSidebar(file);
+      }
+    } else {
+      new Notice(getTextInLanguage('logs.file-content-changed-mid-lint').replace('{FILE_NAME}', file.path), 5000);
     }
   }
 
@@ -1438,5 +1449,14 @@ export default class LinterPlugin extends Plugin {
     this.settings.foldersToIgnore.push(folder.path);
 
     await this.saveSettings();
+  }
+
+  private getFileFromPath(filePath: string): TFile {
+    const file = this.app.vault.getAbstractFileByPath(normalizePath(filePath));
+    if (file instanceof TFile) {
+      return file;
+    }
+
+    return null;
   }
 }

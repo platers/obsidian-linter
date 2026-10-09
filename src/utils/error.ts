@@ -33,3 +33,17 @@ export function wrapLintError(error: Error, ruleName: string) {
   throw new LinterError(getTextInLanguage('logs.error-message-format').replace('{RULE_NAME}', ruleName).replace('{ERROR_MESSAGE}', errorMessage), error);
 }
 
+export function ensureIsLinteError(error): LinterError {
+  let newErr = error as LinterError;
+  if (!(error instanceof LinterError)) {
+    try {
+      // TODO: may want to add unknown for the rule name
+      wrapLintError(error instanceof Error ? error : new Error(String(error), ''));
+    }
+    catch (err) {
+      newErr = err as LinterError
+    }
+  }
+
+  return newErr;
+}
