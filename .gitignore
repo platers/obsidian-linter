@@ -13,6 +13,7 @@ node_modules
 *.js
 *.js.map
 !eslint-rules/*.js
+!scrits/js/*.js
 
 # obsidian
 data.json
