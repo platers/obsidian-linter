@@ -15,6 +15,8 @@ import AddBlankLineAfterYAML from '../rules/add-blank-line-after-yaml';
 import { handleLintError } from '../utils/error';
 import { LinterError } from '../linter-error';
 
+type LintBatch = { pending: number; completed: number; errors: number; finishedAdding: boolean; onComplete: (completed: number, errors: number) => Promise<void> };
+
 type LintQueueEntry = { file: TFile, errorNoticeTimeout: number, errorTemplateString: string, useLogTemplateInNotice: boolean };
 
 /** Callback when a file is resolved. */
@@ -29,6 +31,9 @@ export class FileLintManager {
 
   /** List of files which have been queued to be linted */
   lintQueue: TFile[];
+
+  fileToBatches: Map<string, LintBatch[]>;
+
   /** Paths -> callback function to run once file linting has finished running rules.
    * Note: this does not mean that the logic for running custom commands has run.
   */
@@ -41,6 +46,7 @@ export class FileLintManager {
 
     this.lintQueue = [];
     this.callbacks = new Map();
+    this.fileToBatches = new Map();
 
     for (let index = 0; index < numWorkers; index++) {
       const worker = Worker();
@@ -61,15 +67,18 @@ export class FileLintManager {
 
           handleLintError(data.fileInfo, err, data.errorNoticeTimeout, data.errorTemplateString, data.useLogTemplateInNotice);
 
+          await this.updateBatchesForFile(data.fileInfo.path, false)
+
           // Queue a new job onto this worker.
           const job = this.lintQueue.shift();
           if (job !== undefined) {
-            this.send(job, index);
+            void this.send(job, index);
           }
 
           return;
         }
 
+        // TODO: probably needs to be in a try catch...
         await this.finish(data, index);
       };
 
@@ -97,6 +106,26 @@ export class FileLintManager {
     } else {
       this.lintQueue.push(entry);
     }
+  }
+
+  public lintBatch(files: TFile[], errorNoticeTimeout: number, errorTemplateString: string, useLogTemplateInNotice: boolean, callback: FileCallback, onComplete: (completed: number, errors: number) => Promise<void>) {
+    const batch: LintBatch = {
+      pending: files.length,
+      errors: 0,
+      completed: 0,
+      finishedAdding: false,
+      onComplete
+    };
+
+    for (const file of files) {
+      const batches = this.fileToBatches.get(file.path) ?? [];
+      batches.push(batch);
+      this.fileToBatches.set(file.path, batches);
+
+      this.lintFile({ file, errorNoticeTimeout, errorTemplateString, useLogTemplateInNotice }, callback);
+    }
+
+    batch.finishedAdding = true;
   }
 
   public terminateWorkers(): void {
@@ -155,7 +184,6 @@ export class FileLintManager {
       });
     }
 
-
     const callback = this.callbacks.get(data.fileInfo.path);
     if (callback) {
       this.callbacks.delete(data.fileInfo.path);
@@ -163,6 +191,8 @@ export class FileLintManager {
 
       await callback(data);
     }
+
+    await this.updateBatchesForFile(data.fileInfo.path, true);
   }
 
   /** Send a new task to the given worker ID. */
@@ -181,5 +211,34 @@ export class FileLintManager {
   private nextAvailableWorker(): number | undefined {
     const index = this.busy.indexOf(false);
     return index == -1 ? undefined : index;
+  }
+
+  private async updateBatchesForFile(path: string, success: boolean) {
+    const batches = this.fileToBatches.get(path) ?? [];
+
+    try {
+      for (const batch of batches) {
+        await this.handleBatchUpdate(batch, success);
+      }
+    }
+    finally {
+      this.fileToBatches.delete(path);
+    }
+  }
+
+  private async handleBatchUpdate(batch: LintBatch, success: boolean): Promise<void> {
+    batch.pending--;
+    if (success) {
+      batch.completed++;
+    } else {
+      batch.errors++;
+    }
+
+    console.log(batch.pending, batch.completed, batch.errors);
+    if (!batch.finishedAdding || batch.pending !== 0) {
+      return;
+    }
+
+    await batch.onComplete(batch.completed, batch.errors)
   }
 }

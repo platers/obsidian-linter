@@ -5,8 +5,7 @@ import { WorkerMessage } from '../typings/worker';
 import { getDisabledRules } from '../rules';
 import { lintText } from './rules-runner';
 import '../rules-registry';
-import { wrapLintError } from '../utils/error';
-import { LinterError } from '../linter-error';
+import { ensureIsLinteError } from '../utils/error';
 import { getTextInLanguage } from '../lang/helpers';
 
 onmessage = (event: WorkerMessage) => {
@@ -34,17 +33,7 @@ onmessage = (event: WorkerMessage) => {
     postMessage(event.data);
     clearLogs();
   } catch (error) {
-    let newErr = error as LinterError;
-    if (!(error instanceof LinterError)) {
-      try {
-        // TODO: may want to add unknown for the rule name
-        wrapLintError(error instanceof Error ? error : new Error(String(error), ''));
-      }
-      catch (err) {
-        newErr = err as LinterError;
-      }
-    }
-    const err = newErr;
+    const err = ensureIsLinteError(error);
     postMessage({
       ...event.data,
       error: {
