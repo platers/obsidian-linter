@@ -739,12 +739,11 @@ export default class LinterPlugin extends Plugin {
         }
 
         setCollectLogs(false);
-      });
+      }, editor.getValue());
     } catch (error) {
       handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, errorTemplateString, useLogTemplateInNotice);
 
       setCollectLogs(false);
-      return;
     }
   }
 
@@ -1196,12 +1195,14 @@ export default class LinterPlugin extends Plugin {
         this.currentlyOpeningSidebar = true;
 
         await sidebarTab.openFile(file, { active: true });
+        console.log('Active file should be: ' + file.name);
         await runCustomCommands(this.settings.lintCommands, this.app.commands);
         if (this.customCommandsCallback) {
           await this.customCommandsCallback(file);
         }
       });
     } finally {
+      console.log('Active file should no longer be: ' + file.name);
       sidebarTab.detach();
       if (activeEditor) {
         activeEditor.focus();
