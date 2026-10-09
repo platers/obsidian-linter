@@ -1,12 +1,13 @@
 // This worker here is designed expressly for the purpose of running lint rules as possible off of the main thread.
 
-import { clearLogs, logsFromLastRun, setCollectLogs, setLogLevel } from '../utils/logger';
+import { clearLogs, logInfo, logsFromLastRun, setCollectLogs, setLogLevel } from '../utils/logger';
 import { WorkerMessage } from '../typings/worker';
 import { getDisabledRules } from '../rules';
 import { lintText } from './rules-runner';
 import '../rules-registry';
 import { wrapLintError } from '../utils/error';
 import { LinterError } from '../linter-error';
+import { getTextInLanguage } from '../lang/helpers';
 
 onmessage = (event: WorkerMessage) => {
   try {
@@ -22,6 +23,8 @@ onmessage = (event: WorkerMessage) => {
     event.data.newText = event.data.oldText;
     if (!skipFile) {
       event.data.newText = lintText(event.data);
+    } else {
+      logInfo(getTextInLanguage('logs.file-skipped').replace('{FILE_NAME}', event.data.fileInfo.path));
     }
 
     if (event.data.settings.recordLintOnSaveLogs) {
@@ -53,7 +56,8 @@ onmessage = (event: WorkerMessage) => {
   }
 };
 
-onerror = function () {
+onerror = function (event) {
   // TODO: add a log for something went pretty wrong and the worker is not able to recover...
+  console.error('code no worky: ' + event)
   return true;
 }; 

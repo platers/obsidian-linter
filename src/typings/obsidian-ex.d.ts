@@ -1,5 +1,5 @@
-import {Command} from 'obsidian';
-import {EditorView} from '@codemirror/view';
+import { Command } from 'obsidian';
+import { EditorView } from '@codemirror/view';
 
 export interface ObsidianCommandInterface {
   executeCommandById(id: string): void;
@@ -81,7 +81,7 @@ declare module 'obsidian' {
     cm?: EditorView;
   }
 
-  interface WorkspaceLeaf{
+  interface WorkspaceLeaf {
     rebuildView(): Promise<void>;
   }
 

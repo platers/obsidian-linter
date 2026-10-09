@@ -15,7 +15,6 @@ import AddBlankLineAfterYAML from '../rules/add-blank-line-after-yaml';
 import { handleLintError } from '../utils/error';
 import { LinterError } from '../linter-error';
 
-
 type LintQueueEntry = { file: TFile, errorNoticeTimeout: number, errorTemplateString: string, useLogTemplateInNotice: boolean };
 
 /** Callback when a file is resolved. */
@@ -83,7 +82,7 @@ export class FileLintManager {
     this.defaultMisspellings = defaultMisspellings;
   }
 
-  public lintFile(entry: LintQueueEntry, callback: FileCallback): void {
+  public lintFile(entry: LintQueueEntry, callback: FileCallback, editorText: string = null): void {
     // if the file is already in the list of files to process, we should skip it
     if (this.callbacks.has(entry.file.path)) {
       return;
@@ -94,7 +93,7 @@ export class FileLintManager {
     // Immediately run this task if there are available workers; otherwise, add it to the queue.
     const workerId = this.nextAvailableWorker();
     if (workerId !== undefined) {
-      this.send(entry, workerId);
+      void this.send(entry, workerId, editorText);
     } else {
       this.lintQueue.push(entry);
     }
@@ -116,7 +115,7 @@ export class FileLintManager {
     // Queue a new job onto this worker.
     const job = this.lintQueue.shift();
     if (job !== undefined) {
-      this.send(job, index);
+      void this.send(job, index);
     }
 
     if (data.settings.recordLintOnSaveLogs) {
@@ -167,15 +166,15 @@ export class FileLintManager {
   }
 
   /** Send a new task to the given worker ID. */
-  private send(entry: LintQueueEntry, workerId: number) {
+  private async send(entry: LintQueueEntry, workerId: number, editorText: string | null) {
     this.busy[workerId] = true;
-    void this.vault.read(entry.file).then((oldText: string) => {
-      const lintRunnerSettings = createRunLinterRulesOptions(stripCr(oldText), entry.file, this.momentLocale, this.settings, this.defaultMisspellings);
-      lintRunnerSettings.errorTemplateString = entry.errorTemplateString;
-      lintRunnerSettings.errorNoticeTimeout = entry.errorNoticeTimeout;
-      lintRunnerSettings.useLogTemplateInNotice = entry.useLogTemplateInNotice;
-      this.workers[workerId].postMessage(lintRunnerSettings);
-    });
+
+    const oldText = stripCr(editorText ?? await this.vault.read(entry.file))
+    const lintRunnerSettings = createRunLinterRulesOptions(stripCr(oldText), entry.file, this.momentLocale, this.settings, this.defaultMisspellings);
+    lintRunnerSettings.errorTemplateString = entry.errorTemplateString;
+    lintRunnerSettings.errorNoticeTimeout = entry.errorNoticeTimeout;
+    lintRunnerSettings.useLogTemplateInNotice = entry.useLogTemplateInNotice;
+    this.workers[workerId].postMessage(lintRunnerSettings);
   }
 
   /** Find the next available, non-busy worker; return undefined if all workers are busy. */
