@@ -12,7 +12,7 @@ import YamlKeySort from '../rules/yaml-key-sort';
 import { setLogs } from '../utils/logger';
 import { stripCr } from '../utils/strings';
 import AddBlankLineAfterYAML from '../rules/add-blank-line-after-yaml';
-import { handleLintError } from '../utils/error';
+import { ensureIsLinteError, handleLintError } from '../utils/error';
 import { LinterError } from '../linter-error';
 
 type LintBatch = { pending: number; completed: number; errors: number; finishedAdding: boolean; onComplete: (completed: number, errors: number) => Promise<void> };
@@ -78,7 +78,6 @@ export class FileLintManager {
           return;
         }
 
-        // TODO: probably needs to be in a try catch...
         await this.finish(data, index);
       };
 
@@ -138,61 +137,68 @@ export class FileLintManager {
 
   // Finish the parsing of a file, potentially queueing a new file.
   private async finish(data: RunLinterRulesOptions, index: number) {
-    // Notify the queue this file is available for new work.
-    this.busy[index] = false;
+    try {
+      // Notify the queue this file is available for new work.
+      this.busy[index] = false;
 
-    // Queue a new job onto this worker.
-    const job = this.lintQueue.shift();
-    if (job !== undefined) {
-      void this.send(job, index);
-    }
-
-    if (data.settings.recordLintOnSaveLogs) {
-      setLogs(data.logsFromRun);
-    }
-
-    let newText = data.newText;
-    if (!data.skipFile) {
-      // run lint actions related to moment and other areas that cannot be run in the worker
-      let currentTime = moment();
-      currentTime.locale(data.momentLocale);
-
-      // run YAML timestamp at the end to help determine if something has changed
-      let isYamlTimestampEnabled: boolean;
-      [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(data.newText, data.settings, data.disabledRules, {
-        fileCreatedTime: data.fileInfo.createdAtFormatted,
-        fileModifiedTime: data.fileInfo.modifiedAtFormatted,
-        currentTime: currentTime,
-        alreadyModified: data.oldText != data.newText,
-        locale: data.momentLocale,
-      });
-
-      if (data.runAddBlankAfterYamlPostTimestamp) {
-        [newText] = AddBlankLineAfterYAML.applyIfEnabled(newText, data.settings, data.disabledRules);
+      // Queue a new job onto this worker.
+      const job = this.lintQueue.shift();
+      if (job !== undefined) {
+        void this.send(job, index);
       }
 
-      const yamlTimestampOptions = YamlTimestamp.getRuleOptions(data.settings);
-      currentTime = moment();
-      currentTime.locale(data.momentLocale);
-      if (yamlTimestampOptions.convertToUTC) {
-        currentTime = currentTime.utc();
+      if (data.settings.recordLintOnSaveLogs) {
+        setLogs(data.logsFromRun);
       }
-      [newText] = YamlKeySort.applyIfEnabled(newText, data.settings, data.disabledRules, {
-        currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
-        yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
-        dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
-      });
+
+      let newText = data.newText;
+      if (!data.skipFile) {
+        // run lint actions related to moment and other areas that cannot be run in the worker
+        let currentTime = moment();
+        currentTime.locale(data.momentLocale);
+
+        // run YAML timestamp at the end to help determine if something has changed
+        let isYamlTimestampEnabled: boolean;
+        [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(data.newText, data.settings, data.disabledRules, {
+          fileCreatedTime: data.fileInfo.createdAtFormatted,
+          fileModifiedTime: data.fileInfo.modifiedAtFormatted,
+          currentTime: currentTime,
+          alreadyModified: data.oldText != data.newText,
+          locale: data.momentLocale,
+        });
+
+        if (data.runAddBlankAfterYamlPostTimestamp) {
+          [newText] = AddBlankLineAfterYAML.applyIfEnabled(newText, data.settings, data.disabledRules);
+        }
+
+        const yamlTimestampOptions = YamlTimestamp.getRuleOptions(data.settings);
+        currentTime = moment();
+        currentTime.locale(data.momentLocale);
+        if (yamlTimestampOptions.convertToUTC) {
+          currentTime = currentTime.utc();
+        }
+        [newText] = YamlKeySort.applyIfEnabled(newText, data.settings, data.disabledRules, {
+          currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
+          yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
+          dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
+        });
+      }
+
+      const callback = this.callbacks.get(data.fileInfo.path);
+      if (callback) {
+        this.callbacks.delete(data.fileInfo.path);
+        data.newText = newText;
+
+        await callback(data);
+      }
+
+      await this.updateBatchesForFile(data.fileInfo.path, true);
+    } catch (error) {
+      const err = ensureIsLinteError(error);
+      handleLintError(data.fileInfo, err, data.errorNoticeTimeout, data.errorTemplateString, data.useLogTemplateInNotice);
+
+      await this.updateBatchesForFile(data.fileInfo.path, false);
     }
-
-    const callback = this.callbacks.get(data.fileInfo.path);
-    if (callback) {
-      this.callbacks.delete(data.fileInfo.path);
-      data.newText = newText;
-
-      await callback(data);
-    }
-
-    await this.updateBatchesForFile(data.fileInfo.path, true);
   }
 
   /** Send a new task to the given worker ID. */

@@ -1172,14 +1172,12 @@ export default class LinterPlugin extends Plugin {
         this.activeLeafChangesToIgnore.push(file.path);
 
         await sidebarTab.openFile(file, { active: true });
-        console.log('Active file should be: ' + file.name);
         await runCustomCommands(this.settings.lintCommands, this.app.commands);
         if (this.customCommandsCallback) {
           await this.customCommandsCallback(file);
         }
       });
     } finally {
-      console.log('Active file should no longer be: ' + file.name);
       sidebarTab.detach();
       if (activeEditor) {
         activeEditor.focus();
