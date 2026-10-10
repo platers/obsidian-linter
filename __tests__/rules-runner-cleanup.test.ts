@@ -1,52 +1,52 @@
-import {moment} from 'obsidian';
-import {setLanguage} from '../src/lang/helpers';
-import {rules} from '../src/rules';
-import {RulesRunner} from '../src/rules-runner';
+import { moment } from 'obsidian';
+import { setLanguage } from '../src/lang/helpers';
+import { rules } from '../src/rules';
 import BlockquoteStyle from '../src/rules/blockquote-style';
 import ConsecutiveBlankLines from '../src/rules/consecutive-blank-lines';
 import ForceYamlEscape from '../src/rules/force-yaml-escape';
 import TrailingSpaces from '../src/rules/trailing-spaces';
-import {DEFAULT_SETTINGS, LinterSettings} from '../src/settings-data';
+import { DEFAULT_SETTINGS, LinterSettings } from '../src/settings-data';
 import * as textEdits from '../src/utils/text-edits';
 import '../src/rules-registry';
+import { runAfterRules } from './common';
 
 const cleanupRules = [BlockquoteStyle.getRule(), ForceYamlEscape.getRule(), TrailingSpaces.getRule(), ConsecutiveBlankLines.getRule()];
 const documents = [
-  {name: 'nested blockquotes', text: '>>one  \n> >\ttwo\t\n> >\n>three\n'},
-  {name: 'blockquotes in lists', text: '- item\n\n  >quote  \n  >>nested\t\n\n- next\n'},
-  {name: 'callouts', text: '>[!note]\n>\tcontent  \n>>nested\t\n>\t\n>last\n'},
-  {name: 'marker-only lines', text: '> \t\n>\n>\t\n'},
-  {name: 'blockquote at EOF', text: '>quote  '},
-  {name: 'marker at EOF', text: '>\t'},
-  {name: 'whitespace-only document', text: ' \t\n\t\n   \n'},
-  {name: 'blank runs', text: 'before\n \t\n\t\n   \nafter\n'},
-  {name: 'blank runs at EOF', text: 'before\n \t\n\t\n   '},
-  {name: 'code boundaries', text: 'before\n \t\n\t\n```\ncode  \n \t\n\n```\n \t\n\t\nafter\n'},
-  {name: 'math boundaries', text: 'before\n \t\n\t\n$$\nx  \n\n\n$$\n \t\n\t\nafter\n'},
-  {name: 'custom ignore boundaries', text: 'before\n \t\n\t\n<!-- linter-disable -->\n>quote  \n \t\n\n<!-- linter-enable -->\n \t\n\t\nafter\n'},
-  {name: 'link boundaries', text: '[link](url)\n \t\n\t\n[[wiki]]\n \t\n\t\n`code`\n'},
-  {name: 'list boundaries', text: 'before\n \t\n\t\n- item  \n \t\n\t\n- next\n \t\n\t\nafter\n'},
-  {name: 'nested list boundaries', text: '- item\n  - nested  \n \t\n\t\n  - next\n\n\nafter\n'},
-  {name: 'frontmatter directly before content', text: '---\nkey: value\n---\n>quote  \n'},
-  {name: 'frontmatter before one blank line', text: '---\nkey: value\n---\n\n>quote  \n'},
-  {name: 'frontmatter before several blank lines', text: '---\nkey: value\n---\n \t\n\t\n\n>quote  \n'},
-  {name: 'frontmatter-only file', text: '---\nkey: value\n---\n'},
-  {name: 'closing delimiter at EOF', text: '---\nkey: value\n---'},
-  {name: 'empty frontmatter', text: '---\n---'},
-  {name: 'empty file', text: ''},
+  { name: 'nested blockquotes', text: '>>one  \n> >\ttwo\t\n> >\n>three\n' },
+  { name: 'blockquotes in lists', text: '- item\n\n  >quote  \n  >>nested\t\n\n- next\n' },
+  { name: 'callouts', text: '>[!note]\n>\tcontent  \n>>nested\t\n>\t\n>last\n' },
+  { name: 'marker-only lines', text: '> \t\n>\n>\t\n' },
+  { name: 'blockquote at EOF', text: '>quote  ' },
+  { name: 'marker at EOF', text: '>\t' },
+  { name: 'whitespace-only document', text: ' \t\n\t\n   \n' },
+  { name: 'blank runs', text: 'before\n \t\n\t\n   \nafter\n' },
+  { name: 'blank runs at EOF', text: 'before\n \t\n\t\n   ' },
+  { name: 'code boundaries', text: 'before\n \t\n\t\n```\ncode  \n \t\n\n```\n \t\n\t\nafter\n' },
+  { name: 'math boundaries', text: 'before\n \t\n\t\n$$\nx  \n\n\n$$\n \t\n\t\nafter\n' },
+  { name: 'custom ignore boundaries', text: 'before\n \t\n\t\n<!-- linter-disable -->\n>quote  \n \t\n\n<!-- linter-enable -->\n \t\n\t\nafter\n' },
+  { name: 'link boundaries', text: '[link](url)\n \t\n\t\n[[wiki]]\n \t\n\t\n`code`\n' },
+  { name: 'list boundaries', text: 'before\n \t\n\t\n- item  \n \t\n\t\n- next\n \t\n\t\nafter\n' },
+  { name: 'nested list boundaries', text: '- item\n  - nested  \n \t\n\t\n  - next\n\n\nafter\n' },
+  { name: 'frontmatter directly before content', text: '---\nkey: value\n---\n>quote  \n' },
+  { name: 'frontmatter before one blank line', text: '---\nkey: value\n---\n\n>quote  \n' },
+  { name: 'frontmatter before several blank lines', text: '---\nkey: value\n---\n \t\n\t\n\n>quote  \n' },
+  { name: 'frontmatter-only file', text: '---\nkey: value\n---\n' },
+  { name: 'closing delimiter at EOF', text: '---\nkey: value\n---' },
+  { name: 'empty frontmatter', text: '---\n---' },
+  { name: 'empty file', text: '' },
 ];
 
 function cleanupSettings(mask: number, style: string = 'space', twoSpaceLineBreak: boolean = false): LinterSettings {
   const settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as LinterSettings;
   for (const rule of rules) {
-    settings.ruleConfigs[rule.settingsKey] = {...rule.getDefaultOptions(), enabled: false};
+    settings.ruleConfigs[rule.settingsKey] = { ...rule.getDefaultOptions(), enabled: false };
   }
   for (const [index, rule] of cleanupRules.entries()) {
-    settings.ruleConfigs[rule.settingsKey] = {...settings.ruleConfigs[rule.settingsKey], enabled: (mask & (1 << index)) !== 0};
+    settings.ruleConfigs[rule.settingsKey] = { ...settings.ruleConfigs[rule.settingsKey], enabled: (mask & (1 << index)) !== 0 };
   }
-  settings.ruleConfigs['blockquote-style'] = {...settings.ruleConfigs['blockquote-style'], style};
-  settings.ruleConfigs['trailing-spaces'] = {...settings.ruleConfigs['trailing-spaces'], 'two-space-line-break': twoSpaceLineBreak};
-  settings.ruleConfigs['force-yaml-escape'] = {...settings.ruleConfigs['force-yaml-escape'], 'force-yaml-escape-keys': ['key']};
+  settings.ruleConfigs['blockquote-style'] = { ...settings.ruleConfigs['blockquote-style'], style };
+  settings.ruleConfigs['trailing-spaces'] = { ...settings.ruleConfigs['trailing-spaces'], 'two-space-line-break': twoSpaceLineBreak };
+  settings.ruleConfigs['force-yaml-escape'] = { ...settings.ruleConfigs['force-yaml-escape'], 'force-yaml-escape-keys': ['key'] };
   return settings;
 }
 
@@ -61,16 +61,14 @@ function sequentialCleanup(text: string, settings: LinterSettings, disabledRules
 }
 
 function runCleanup(text: string, settings: LinterSettings, disabledRules: string[] = []): string {
-  const runner = new RulesRunner();
-  runner['disabledRules'] = disabledRules;
-  return runner['runAfterRegularRules'](text, {
+  return runAfterRules(text, {
     oldText: text,
-    fileInfo: {name: 'note', createdAtFormatted: '', modifiedAtFormatted: '', path: 'note.md'},
+    fileInfo: { name: 'note', createdAtFormatted: '', modifiedAtFormatted: '', path: 'note.md' },
     settings,
     momentLocale: 'en',
-    getCurrentTime: () => moment('2025-05-31T12:38:50-04:00'),
+    disabledRules: disabledRules,
     defaultMisspellings: new Map<string, string>(),
-  });
+  }, () => moment('2025-05-31T12:38:50-04:00'));
 }
 
 describe('the four adjacent cleanup rules', () => {
@@ -92,8 +90,8 @@ describe('the four adjacent cleanup rules', () => {
               const input = document.text.replace(/\n/g, newline);
               const expected = sequentialCleanup(input, settings);
               const actual = runCleanup(input, settings);
-              expect({name: document.name, input, mask, style, twoSpaceLineBreak, output: actual})
-                  .toEqual({name: document.name, input, mask, style, twoSpaceLineBreak, output: expected});
+              expect({ name: document.name, input, mask, style, twoSpaceLineBreak, output: actual })
+                .toEqual({ name: document.name, input, mask, style, twoSpaceLineBreak, output: expected });
             }
           }
         }
@@ -123,10 +121,10 @@ describe('the four adjacent cleanup rules', () => {
   });
 
   it.each([
-    {name: 'blockquote markers', text: '> \t\n>\n'},
-    {name: 'LF blank runs', text: 'before\n \t\n\t\n   \nafter\n'},
-    {name: 'CRLF blank runs', text: 'before\r\n \t\r\n\t\r\n   \r\nafter\r\n'},
-  ])('retries genuine overlapping whitespace edits on $name', ({name, text}) => {
+    { name: 'blockquote markers', text: '> \t\n>\n' },
+    { name: 'LF blank runs', text: 'before\n \t\n\t\n   \nafter\n' },
+    { name: 'CRLF blank runs', text: 'before\r\n \t\r\n\t\r\n   \r\nafter\r\n' },
+  ])('retries genuine overlapping whitespace edits on $name', ({ name, text }) => {
     const settings = cleanupSettings(15);
     const expected = sequentialCleanup(text, settings);
     const clashes = jest.spyOn(textEdits, 'addEditsIfTheyDoNotClash');

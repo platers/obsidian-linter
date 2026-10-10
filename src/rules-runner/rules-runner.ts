@@ -153,7 +153,7 @@ function runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
   return newText;
 }
 
-function runAfterRegularRules(currentText: string, runOptions: RunLinterRulesOptions): string {
+export function runAfterRegularRules(currentText: string, runOptions: RunLinterRulesOptions): string {
   let newText = currentText;
   const postRuleLogText = getTextInLanguage('logs.post-rules');
   timingBegin(postRuleLogText);
@@ -197,7 +197,7 @@ function runAfterRegularRules(currentText: string, runOptions: RunLinterRulesOpt
   return newText;
 }
 
-function runRulesInBatches(rulesToRun: Rule[], text: string, settings: LinterSettings, extraOptions: Options): string {
+export function runRulesInBatches(rulesToRun: Rule[], text: string, settings: LinterSettings, extraOptions: Options): string {
   return runBatches(rulesToRun, text, settings, extraOptions,
     (rule) => rule.type === RuleType.YAML || rulesThatMustSeeEarlierWork.includes(rule.alias));
 }
@@ -258,15 +258,15 @@ function runBatches(rulesToRun: Rule[], text: string, settings: LinterSettings, 
   return text;
 }
 
-export function runMainThreadRules(runOptions: RunLinterRulesOptions) {
-  if (!runOptions.skipFile) {
-    return
+export function runMainThreadRules(runOptions: RunLinterRulesOptions, getCurrentTime: () => moment.Moment) {
+  if (runOptions.skipFile) {
+    return;
   }
 
   let newText = runOptions.newText;
 
   // run lint actions related to moment and other areas that cannot be run in the worker
-  let currentTime = moment();
+  let currentTime = getCurrentTime();
   currentTime.locale(runOptions.momentLocale);
 
   // run YAML timestamp at the end to help determine if something has changed
@@ -284,13 +284,13 @@ export function runMainThreadRules(runOptions: RunLinterRulesOptions) {
   }
 
   const yamlTimestampOptions = YamlTimestamp.getRuleOptions(runOptions.settings);
-  currentTime = moment();
+  currentTime = getCurrentTime();
   currentTime.locale(runOptions.momentLocale);
   if (yamlTimestampOptions.convertToUTC) {
     currentTime = currentTime.utc();
   }
   [newText] = YamlKeySort.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules, {
-    currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
+    currentTimeFormatted: currentTime.format(yamlTimestampOptions.format?.trimEnd()),
     yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
     dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
   });
@@ -298,7 +298,7 @@ export function runMainThreadRules(runOptions: RunLinterRulesOptions) {
   runOptions.newText = newText;
 }
 
-function runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
+export function runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
   logDebug(getTextInLanguage('logs.running-custom-regex'));
 
   let newText = oldText;
