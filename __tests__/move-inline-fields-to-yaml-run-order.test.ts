@@ -2,10 +2,10 @@ import { moment } from 'obsidian';
 import dedent from 'ts-dedent';
 import { setLanguage } from '../src/lang/helpers';
 import { rules } from '../src/rules';
-import { RulesRunner } from '../src/rules-runner';
 import { DEFAULT_SETTINGS, LinterSettings } from '../src/settings-data';
 import { ArrayFormats } from '../src/utils/yaml';
 import '../src/rules-registry';
+import { runRules } from './common';
 
 function settingsWithRulesEnabled(ruleConfigs: Record<string, Record<string, unknown>>): LinterSettings {
   const settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as LinterSettings;
@@ -21,14 +21,15 @@ function settingsWithRulesEnabled(ruleConfigs: Record<string, Record<string, unk
 }
 
 function lint(text: string, settings: LinterSettings): string {
-  return new RulesRunner().lintText({
+  return runRules({
     oldText: text,
+    newText: text,
     fileInfo: { name: 'note', createdAtFormatted: '', modifiedAtFormatted: '', path: 'note.md' },
     settings,
+    disabledRules: [],
     momentLocale: 'en',
-    getCurrentTime: () => moment('2025-05-31T12:38:50-04:00'),
     defaultMisspellings: new Map<string, string>(),
-  });
+  }, () => moment('2025-05-31T12:38:50-04:00'));
 }
 
 describe('Move inline fields to YAML run order', () => {
@@ -89,7 +90,7 @@ describe('Move inline fields to YAML run order', () => {
 
     const before = dedent`
       tags:: #book #fiction
-      aliases:: Pratchett, Sir Terry
+      aliases:: "Pratchett, Sir Terry"
     `;
 
     expect(lint(before, settings)).toBe(dedent`

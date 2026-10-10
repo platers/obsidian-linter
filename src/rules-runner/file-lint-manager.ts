@@ -3,7 +3,7 @@
 */
 
 import Worker from './rules-runner.worker';
-import { TFile, Vault } from 'obsidian';
+import { moment, TFile, Vault } from 'obsidian';
 import { createRunLinterRulesOptions, runMainThreadRules } from './rules-runner';
 import { LinterSettings } from '../settings-data';
 import { LinterWorker, RunLinterRulesOptions } from '../typings/worker';
@@ -148,7 +148,7 @@ export class FileLintManager {
         setLogs(data.logsFromRun);
       }
 
-      runMainThreadRules(data);
+      runMainThreadRules(data, () => moment());
 
       const callback = this.callbacks.get(data.fileInfo.path);
       if (callback) {
