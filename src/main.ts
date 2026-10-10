@@ -1454,12 +1454,14 @@ export default class LinterPlugin extends Plugin {
     });
 
     await this.saveSettings();
+    this.settingsTab.update();
   }
 
   private async addFolderToIgnoreList(folder: TFolder) {
     this.settings.foldersToIgnore.push(folder.path);
 
     await this.saveSettings();
+    this.settingsTab.update();
   }
 
   private getFileFromPath(filePath: string): TFile {
