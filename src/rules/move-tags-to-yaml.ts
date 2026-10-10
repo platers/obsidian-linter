@@ -1,11 +1,11 @@
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder } from './rule-builder';
 import dedent from 'ts-dedent';
-import {IgnoreTypes} from '../utils/ignore-types';
-import {tagWithLeadingWhitespaceRegex} from '../utils/regex';
-import {ProtectedRanges} from '../utils/protected-ranges';
-import {textReplacement} from '../utils/strings';
-import {applyNonOverlappingReplacements, getEditsBetween} from '../utils/text-edits';
+import { IgnoreTypes } from '../utils/ignore-types';
+import { tagWithLeadingWhitespaceRegex } from '../utils/regex';
+import { ProtectedRanges } from '../utils/protected-ranges';
+import { textReplacement } from '../utils/strings';
+import { applyNonOverlappingReplacements, getEditsBetween } from '../utils/text-edits';
 import {
   convertTagValueToStringOrStringArray,
   getYamlSectionValue,
@@ -14,11 +14,8 @@ import {
   formatYamlArrayValue,
   initYAML,
   formatYAML,
-  OBSIDIAN_TAG_KEYS,
-  NormalArrayFormats,
-  SpecialArrayFormats,
-  TagSpecificArrayFormats,
-  OBSIDIAN_TAG_KEY_PLURAL,
+  OBSIDIAN_TAG_KEY,
+  ArrayFormats,
   QuoteCharacter,
 } from '../utils/yaml';
 import { isValidTag } from '../utils/validation';
@@ -27,13 +24,13 @@ type tagOperations = 'Nothing' | 'Remove hashtag' | 'Remove whole tag';
 
 class MoveTagsToYamlOptions implements Options {
   @RuleBuilder.noSettingControl()
-    tagArrayStyle? : TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  tagArrayStyle?: ArrayFormats = ArrayFormats.SingleLine;
   howToHandleExistingTags?: tagOperations = 'Nothing';
   tagsToIgnore?: string[] = [];
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: QuoteCharacter = '"';
+  defaultEscapeCharacter?: QuoteCharacter = '"';
   @RuleBuilder.noSettingControl()
-    removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
+  removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
 
 @RuleBuilder.register
@@ -55,7 +52,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
     // need to ignore YAML when getting regex matches to avoid improper matches with YAML contents
     // https://github.com/platers/obsidian-linter/issues/661
     const tagMatches = [...bodyProjection.text.matchAll(tagWithLeadingWhitespaceRegex)].filter((match) => {
-      return bodyProjection.editRangeToSource({startIndex: match.index, endIndex: match.index + match[0].length}) !== undefined;
+      return bodyProjection.editRangeToSource({ startIndex: match.index, endIndex: match.index + match[0].length }) !== undefined;
     });
     const tags = tagMatches.map((match) => match[2]);
 
@@ -68,16 +65,11 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
       text = text.replace('---\n', '').replace('---', '');
 
       let tagValue: string[] = [];
-      let existingTagKey = OBSIDIAN_TAG_KEY_PLURAL;
+      let existingTagKey = OBSIDIAN_TAG_KEY;
 
-      for (const tagKey of OBSIDIAN_TAG_KEYS) {
-        const tempTagValue = getYamlSectionValue(text, tagKey);
-        if (tempTagValue != null) {
-          tagValue = convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(tempTagValue));
-          existingTagKey = tagKey;
-
-          break;
-        }
+      const tempTagValue = getYamlSectionValue(text, OBSIDIAN_TAG_KEY);
+      if (tempTagValue != null) {
+        tagValue = convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(tempTagValue));
       }
 
       const existingTags = new Set<string>();
@@ -112,18 +104,18 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         if (options.tagsToIgnore.includes(match[2].substring(1))) {
           continue;
         }
-        const sourceRange = bodyProjection.editRangeToSource({startIndex: match.index, endIndex: match.index + match[0].length});
+        const sourceRange = bodyProjection.editRangeToSource({ startIndex: match.index, endIndex: match.index + match[0].length });
         let startIndex = projection.sourceToProjection(sourceRange.startIndex) + yamlLengthChange;
         const endIndex = projection.sourceToProjection(sourceRange.endIndex) + yamlLengthChange;
         if (options.howToHandleExistingTags === 'Remove hashtag') {
           startIndex += match[1].length;
-          removals.push({startIndex, endIndex: startIndex + 1, value: ''});
+          removals.push({ startIndex, endIndex: startIndex + 1, value: '' });
         } else {
           // A newly inserted frontmatter supplies the leading newline for a tag at offset zero.
           if (match.index === 0 && match[1] === '' && yamlLengthChange > 0) {
             startIndex--;
           }
-          removals.push({startIndex, endIndex, value: ''});
+          removals.push({ startIndex, endIndex, value: '' });
         }
       }
     }
@@ -137,7 +129,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
     for (const edit of getEditsBetween(projection.text, text)) {
       const range = projection.editRangeToSource(edit);
       if (range) {
-        replacements.push({...range, value: edit.value});
+        replacements.push({ ...range, value: edit.value });
       }
     }
     return applyNonOverlappingReplacements(projection.source, replacements);
@@ -263,7 +255,7 @@ export default class MoveTagsToYaml extends RuleBuilder<MoveTagsToYamlOptions> {
         OptionsClass: MoveTagsToYamlOptions,
         nameKey: 'rules.move-tags-to-yaml.tags-to-ignore.name',
         descriptionKey: 'rules.move-tags-to-yaml.tags-to-ignore.description',
-         emptyStateKey: 'rules.move-tags-to-yaml.tags-to-ignore.empty-state',
+        emptyStateKey: 'rules.move-tags-to-yaml.tags-to-ignore.empty-state',
         fieldNamePlaceholderKey: 'rules.move-tags-to-yaml.tags-to-ignore.placeholder-text',
         optionsKey: 'tagsToIgnore',
         validator: isValidTag,

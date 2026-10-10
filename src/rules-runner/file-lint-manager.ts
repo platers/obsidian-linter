@@ -3,15 +3,12 @@
 */
 
 import Worker from './rules-runner.worker';
-import { TFile, Vault, moment } from 'obsidian';
-import { createRunLinterRulesOptions } from './rules-runner';
+import { TFile, Vault } from 'obsidian';
+import { createRunLinterRulesOptions, runMainThreadRules } from './rules-runner';
 import { LinterSettings } from '../settings-data';
 import { LinterWorker, RunLinterRulesOptions } from '../typings/worker';
-import YamlTimestamp from '../rules/yaml-timestamp';
-import YamlKeySort from '../rules/yaml-key-sort';
 import { setLogs } from '../utils/logger';
 import { stripCr } from '../utils/strings';
-import AddBlankLineAfterYAML from '../rules/add-blank-line-after-yaml';
 import { ensureIsLinteError, handleLintError } from '../utils/error';
 import { LinterError } from '../linter-error';
 
@@ -151,43 +148,11 @@ export class FileLintManager {
         setLogs(data.logsFromRun);
       }
 
-      let newText = data.newText;
-      if (!data.skipFile) {
-        // run lint actions related to moment and other areas that cannot be run in the worker
-        let currentTime = moment();
-        currentTime.locale(data.momentLocale);
-
-        // run YAML timestamp at the end to help determine if something has changed
-        let isYamlTimestampEnabled: boolean;
-        [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(data.newText, data.settings, data.disabledRules, {
-          fileCreatedTime: data.fileInfo.createdAtFormatted,
-          fileModifiedTime: data.fileInfo.modifiedAtFormatted,
-          currentTime: currentTime,
-          alreadyModified: data.oldText != data.newText,
-          locale: data.momentLocale,
-        });
-
-        if (data.runAddBlankAfterYamlPostTimestamp) {
-          [newText] = AddBlankLineAfterYAML.applyIfEnabled(newText, data.settings, data.disabledRules);
-        }
-
-        const yamlTimestampOptions = YamlTimestamp.getRuleOptions(data.settings);
-        currentTime = moment();
-        currentTime.locale(data.momentLocale);
-        if (yamlTimestampOptions.convertToUTC) {
-          currentTime = currentTime.utc();
-        }
-        [newText] = YamlKeySort.applyIfEnabled(newText, data.settings, data.disabledRules, {
-          currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
-          yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
-          dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
-        });
-      }
+      runMainThreadRules(data);
 
       const callback = this.callbacks.get(data.fileInfo.path);
       if (callback) {
         this.callbacks.delete(data.fileInfo.path);
-        data.newText = newText;
 
         await callback(data);
       }

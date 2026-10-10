@@ -33,6 +33,8 @@ import AddBlankLineAfterYAML from '../rules/add-blank-line-after-yaml';
 import { LintContext, replaceUnprotectedRegexMatches } from '../utils/protected-ranges';
 import { addEditsIfTheyDoNotClash, getEditsBetween } from '../utils/text-edits';
 import MoveInlineFieldsToYaml from '../rules/move-inline-fields-to-yaml';
+import YamlTimestamp from '../rules/yaml-timestamp';
+import YamlKeySort from '../rules/yaml-key-sort';
 
 const rulesThatMustSeeEarlierWork = [
   'move-footnotes-to-the-bottom',
@@ -254,6 +256,46 @@ function runBatches(rulesToRun: Rule[], text: string, settings: LinterSettings, 
   }
 
   return text;
+}
+
+export function runMainThreadRules(runOptions: RunLinterRulesOptions) {
+  if (!runOptions.skipFile) {
+    return
+  }
+
+  let newText = runOptions.newText;
+
+  // run lint actions related to moment and other areas that cannot be run in the worker
+  let currentTime = moment();
+  currentTime.locale(runOptions.momentLocale);
+
+  // run YAML timestamp at the end to help determine if something has changed
+  let isYamlTimestampEnabled: boolean;
+  [newText, isYamlTimestampEnabled] = YamlTimestamp.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules, {
+    fileCreatedTime: runOptions.fileInfo.createdAtFormatted,
+    fileModifiedTime: runOptions.fileInfo.modifiedAtFormatted,
+    currentTime: currentTime,
+    alreadyModified: runOptions.oldText != newText,
+    locale: runOptions.momentLocale,
+  });
+
+  if (runOptions.runAddBlankAfterYamlPostTimestamp) {
+    [newText] = AddBlankLineAfterYAML.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
+  }
+
+  const yamlTimestampOptions = YamlTimestamp.getRuleOptions(runOptions.settings);
+  currentTime = moment();
+  currentTime.locale(runOptions.momentLocale);
+  if (yamlTimestampOptions.convertToUTC) {
+    currentTime = currentTime.utc();
+  }
+  [newText] = YamlKeySort.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules, {
+    currentTimeFormatted: currentTime.format(yamlTimestampOptions.format.trimEnd()),
+    yamlTimestampDateModifiedEnabled: isYamlTimestampEnabled && yamlTimestampOptions.dateModified,
+    dateModifiedKey: yamlTimestampOptions.dateModifiedKey,
+  });
+
+  runOptions.newText = newText;
 }
 
 function runCustomRegexReplacement(customRegexes: CustomReplace[], oldText: string): string {
