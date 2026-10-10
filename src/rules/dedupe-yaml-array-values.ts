@@ -8,23 +8,21 @@ import {
   formatYamlArrayValue,
   getYamlSectionValue,
   loadYAML,
-  NormalArrayFormats,
-  OBSIDIAN_ALIASES_KEYS,
-  OBSIDIAN_TAG_KEYS,
+  ArrayFormats,
   QuoteCharacter,
   setYamlSection,
-  SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
-  TagSpecificArrayFormats
+  OBSIDIAN_TAG_KEY,
+  OBSIDIAN_ALIAS_KEY
 } from '../utils/yaml';
 import { isValidYamlKeyOnly } from '../utils/validation';
 
 class DedupeYamlArrayValuesOptions implements Options {
   @RuleBuilder.noSettingControl()
-  aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  aliasArrayStyle?: ArrayFormats = ArrayFormats.SingleLine;
   dedupeAliasKey?: boolean = true;
   @RuleBuilder.noSettingControl()
-  tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  tagArrayStyle?: ArrayFormats = ArrayFormats.SingleLine;
   dedupeTagKey?: boolean = true;
   dedupeArrayKeys?: boolean = true;
   ignoreDedupeArrayKeys?: string[] = [];
@@ -53,41 +51,34 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
         return text;
       }
 
-      for (const aliasKey of OBSIDIAN_ALIASES_KEYS) {
-        if (options.dedupeAliasKey && Object.keys(yaml).includes(aliasKey)) {
-          text = setYamlSection(text,
-            aliasKey,
-            formatYamlArrayValue(
-              convertAliasValueToStringOrStringArray(this.getUniqueArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, aliasKey)))),
-              options.aliasArrayStyle,
-              options.defaultEscapeCharacter,
-              options.removeUnnecessaryEscapeCharsForMultiLineArrays,
-              true, // escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747
-            ),
-          );
-
-          break;
-        }
+      if (options.dedupeAliasKey && Object.keys(yaml).includes(OBSIDIAN_ALIAS_KEY)) {
+        text = setYamlSection(text,
+          OBSIDIAN_ALIAS_KEY,
+          formatYamlArrayValue(
+            convertAliasValueToStringOrStringArray(this.getUniqueArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, OBSIDIAN_ALIAS_KEY)))),
+            options.aliasArrayStyle,
+            options.defaultEscapeCharacter,
+            options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+            true, // escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747
+          ),
+        );
       }
 
-      for (const tagKey of OBSIDIAN_TAG_KEYS) {
-        if (options.dedupeTagKey && Object.keys(yaml).includes(tagKey)) {
-          text = setYamlSection(text,
-            tagKey,
-            formatYamlArrayValue(
-              convertTagValueToStringOrStringArray(this.getUniqueArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, tagKey)))),
-              options.tagArrayStyle,
-              options.defaultEscapeCharacter,
-              options.removeUnnecessaryEscapeCharsForMultiLineArrays,
-            ),
-          );
+      if (options.dedupeTagKey && Object.keys(yaml).includes(OBSIDIAN_TAG_KEY)) {
+        text = setYamlSection(text,
+          OBSIDIAN_TAG_KEY,
+          formatYamlArrayValue(
+            convertTagValueToStringOrStringArray(this.getUniqueArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, OBSIDIAN_TAG_KEY)))),
+            options.tagArrayStyle,
+            options.defaultEscapeCharacter,
+            options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+          ),
+        );
 
-          break;
-        }
       }
 
       if (options.dedupeArrayKeys) {
-        const keysToIgnore = [...OBSIDIAN_ALIASES_KEYS, ...OBSIDIAN_TAG_KEYS, ...options.ignoreDedupeArrayKeys];
+        const keysToIgnore = [OBSIDIAN_ALIAS_KEY, OBSIDIAN_TAG_KEY, ...options.ignoreDedupeArrayKeys];
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays, arrays of objects, ignored keys, and already accounted for keys
@@ -96,9 +87,9 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
           }
 
           const currentYamlText = getYamlSectionValue(text, key);
-          let arrayType = NormalArrayFormats.SingleLine;
+          let arrayType = ArrayFormats.SingleLine;
           if (currentYamlText.includes('\n')) {
-            arrayType = NormalArrayFormats.MultiLine;
+            arrayType = ArrayFormats.MultiLine;
           }
 
           const newVal = this.getUniqueArray(splitValueIfSingleOrMultilineArray(currentYamlText));
@@ -175,7 +166,7 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
           ---
         `,
         options: {
-          aliasArrayStyle: NormalArrayFormats.MultiLine,
+          aliasArrayStyle: ArrayFormats.MultiLine,
         },
       }),
       new ExampleBuilder({
@@ -201,7 +192,7 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
           ---
         `,
         options: {
-          aliasArrayStyle: NormalArrayFormats.MultiLine,
+          aliasArrayStyle: ArrayFormats.MultiLine,
         },
       }),
       new ExampleBuilder({
@@ -236,7 +227,7 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
           ---
         `,
         options: {
-          aliasArrayStyle: NormalArrayFormats.MultiLine,
+          aliasArrayStyle: ArrayFormats.MultiLine,
         },
       }),
       new ExampleBuilder({
@@ -272,7 +263,7 @@ export default class DedupeYamlArrayValues extends RuleBuilder<DedupeYamlArrayVa
           ---
         `,
         options: {
-          aliasArrayStyle: NormalArrayFormats.MultiLine,
+          aliasArrayStyle: ArrayFormats.MultiLine,
           ignoreDedupeArrayKeys: ['arr2'],
         },
       }),

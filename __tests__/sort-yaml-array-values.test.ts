@@ -1,7 +1,7 @@
 import SortYamlArrayValues from '../src/rules/sort-yaml-array-values';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
-import {NormalArrayFormats} from '../src/utils/yaml';
+import { ruleTest } from './common';
+import { ArrayFormats } from '../src/utils/yaml';
 
 ruleTest({
   RuleBuilderClass: SortYamlArrayValues,
@@ -27,7 +27,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: NormalArrayFormats.MultiLine,
+        tagArrayStyle: ArrayFormats.MultiLine,
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/1385
@@ -55,7 +55,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: NormalArrayFormats.MultiLine,
+        tagArrayStyle: ArrayFormats.MultiLine,
       },
     },
   ],

@@ -1,7 +1,7 @@
 import { Options, RuleType } from '../rules';
 import RuleBuilder, { BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextOptionBuilder } from './rule-builder';
 import dedent from 'ts-dedent';
-import { convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, DEFAULT_LINTER_ALIASES_HELPER_KEY, loadYAML, NormalArrayFormats, OBSIDIAN_ALIASES_KEYS, OBSIDIAN_ALIAS_KEY_PLURAL, QuoteCharacter, removeYamlSection, setYamlSection, SpecialArrayFormats, splitValueIfSingleOrMultilineArray, isValueEscapedAlready } from '../utils/yaml';
+import { convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, DEFAULT_LINTER_ALIASES_HELPER_KEY, loadYAML, ArrayFormats, OBSIDIAN_ALIAS_KEY, QuoteCharacter, removeYamlSection, setYamlSection, splitValueIfSingleOrMultilineArray, isValueEscapedAlready } from '../utils/yaml';
 import { IgnoreTypes } from '../utils/ignore-types';
 import { getFirstHeaderOneText, yamlRegex } from '../utils/regex';
 import { ProtectedRanges } from '../utils/protected-ranges';
@@ -15,7 +15,7 @@ class YamlTitleAliasOptions implements Options {
   aliasHelperKey?: string = DEFAULT_LINTER_ALIASES_HELPER_KEY;
 
   @RuleBuilder.noSettingControl()
-  aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
+  aliasArrayStyle?: ArrayFormats = ArrayFormats.MultiLine;
 
   @RuleBuilder.noSettingControl()
   fileName?: string;
@@ -67,27 +67,17 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     let aliasKeyForFile: string = null;
     const yamlKeys = Object.keys(parsedYaml);
-    for (const aliasKey of OBSIDIAN_ALIASES_KEYS) {
-      if (yamlKeys.includes(aliasKey)) {
-        aliasKeyForFile = aliasKey;
-
-        break;
-      }
+    if (yamlKeys.includes(OBSIDIAN_ALIAS_KEY)) {
+      aliasKeyForFile = OBSIDIAN_ALIAS_KEY;
     }
 
     if (aliasKeyForFile != null) {
       const aliasesValue = getYamlSectionValue(newYaml, aliasKeyForFile);
-      let currentAliasStyle: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.MultiLine;
+      let currentAliasStyle: ArrayFormats = ArrayFormats.MultiLine;
       const isEmpty = aliasesValue === '';
       let isSingleString = false;
-      if (!aliasesValue.includes('\n') && !(aliasesValue === '[]' && options.aliasArrayStyle === NormalArrayFormats.MultiLine)) {
-        if (aliasesValue.match(/^\[.*\]/) === null) {
-          // Note that the value here is just really a placeholder to indicate it is not single-line or multi-line
-          currentAliasStyle = SpecialArrayFormats.SingleStringToSingleLine;
-          isSingleString = true;
-        } else {
-          currentAliasStyle = NormalArrayFormats.SingleLine;
-        }
+      if (!aliasesValue.includes('\n') && !(aliasesValue === '[]' && options.aliasArrayStyle === ArrayFormats.MultiLine)) {
+        currentAliasStyle = ArrayFormats.SingleLine;
       }
 
       const currentAliasValue = convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(aliasesValue));
@@ -107,7 +97,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         newYaml = setYamlSection(newYaml, aliasKeyForFile, formatYamlArrayValue(newAliasValue, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true/* escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747*/));
       }
     } else if (!shouldRemoveTitleAlias) {
-      newYaml = setYamlSection(newYaml, OBSIDIAN_ALIAS_KEY_PLURAL, formatYamlArrayValue(title, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true/* escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747*/));
+      newYaml = setYamlSection(newYaml, OBSIDIAN_ALIAS_KEY, formatYamlArrayValue(title, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true/* escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747*/));
     }
 
     if (!options.useYamlKeyToKeepTrackOfOldFilenameOrHeading || shouldRemoveTitleAlias) {
@@ -130,7 +120,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     return text;
   }
-  getTitleInfo(text: string, fileName: string, aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats, defaultEscapeCharacter: QuoteCharacter, protectedRanges: ProtectedRanges): [string, string] {
+  getTitleInfo(text: string, fileName: string, aliasArrayStyle: ArrayFormats, defaultEscapeCharacter: QuoteCharacter, protectedRanges: ProtectedRanges): [string, string] {
     let unescapedTitle = getFirstHeaderOneText(text, protectedRanges.combinedWith([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag]));
     unescapedTitle = unescapedTitle || fileName;
 
@@ -138,8 +128,8 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     return [unescapedTitle, escapedTitle];
   }
-  forceEscape(title: string, aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats): boolean {
-    return isNumeric(title) || (title.includes(',') && (aliasArrayStyle === NormalArrayFormats.SingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringToSingleLine || aliasArrayStyle === SpecialArrayFormats.SingleStringCommaDelimited));
+  forceEscape(title: string, aliasArrayStyle: ArrayFormats): boolean {
+    return isNumeric(title) || (title.includes(',') && aliasArrayStyle === ArrayFormats.SingleLine);
   }
   getNewAliasValue(originalValue: string | string[], shouldRemoveTitle: boolean, title: string, previousTitle: string): string | string[] {
     if (originalValue == null) {
@@ -295,7 +285,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
           # This is a [Heading](markdown.md)
         `,
         options: {
-          aliasArrayStyle: NormalArrayFormats.MultiLine,
+          aliasArrayStyle: ArrayFormats.MultiLine,
         },
       }),
       new ExampleBuilder({ // accounts for https://github.com/platers/obsidian-linter/issues/1044
@@ -314,7 +304,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         options: {
           fileName: 'Filename',
           keepAliasThatMatchesTheFilename: true,
-          aliasArrayStyle: NormalArrayFormats.MultiLine,
+          aliasArrayStyle: ArrayFormats.MultiLine,
           aliasHelperKey: 'title',
         },
       }),

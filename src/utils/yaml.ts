@@ -5,12 +5,8 @@ import { isNumeric } from './strings';
 import { parse, parseDocument, Document, stringify, CST, YAMLMap, isMap, visit, Scalar } from 'yaml';
 import { YamlNode } from '../typings/yaml';
 
-export const OBSIDIAN_TAG_KEY_SINGULAR = 'tag';
-export const OBSIDIAN_TAG_KEY_PLURAL = 'tags';
-export const OBSIDIAN_TAG_KEYS = [OBSIDIAN_TAG_KEY_SINGULAR, OBSIDIAN_TAG_KEY_PLURAL];
-export const OBSIDIAN_ALIAS_KEY_SINGULAR = 'alias';
-export const OBSIDIAN_ALIAS_KEY_PLURAL = 'aliases';
-export const OBSIDIAN_ALIASES_KEYS = [OBSIDIAN_ALIAS_KEY_SINGULAR, OBSIDIAN_ALIAS_KEY_PLURAL];
+export const OBSIDIAN_TAG_KEY = 'tags';
+export const OBSIDIAN_ALIAS_KEY = 'aliases';
 export const DEFAULT_LINTER_ALIASES_HELPER_KEY = 'linter-yaml-title-alias';
 export const DISABLED_RULES_KEY = 'disabled rules';
 
@@ -525,45 +521,36 @@ export function astToString(ast: Document): string {
   return CST.stringify(ast.contents.srcToken);
 }
 
-export enum TagSpecificArrayFormats {
-  SingleStringSpaceDelimited = 'single string space delimited',
-  SingleLineSpaceDelimited = 'single-line space delimited',
-}
-
-export enum SpecialArrayFormats {
-  SingleStringToSingleLine = 'single string to single-line',
-  SingleStringToMultiLine = 'single string to multi-line',
-  SingleStringCommaDelimited = 'single string comma delimited',
-}
-
-export enum NormalArrayFormats {
+export enum ArrayFormats {
   SingleLine = 'single-line',
   MultiLine = 'multi-line',
 }
+
+const defaultArrayValue = ' []';
 
 export type QuoteCharacter = '\'' | '"';
 
 /**
  * Formats the YAML array value passed in with the specified format.
  * @param {string | string[]} value The value(s) that will be used as the parts of the array that is assumed to already be broken down into the appropriate format to be put in the array.
- * @param {NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats} format The format that the array should be converted into.
+ * @param {ArrayFormats} format The format that the array should be converted into.
  * @param {string} defaultEscapeCharacter The character escape to use around the value if a specific escape character is not needed.
  * @param {boolean} removeEscapeCharactersIfPossibleWhenGoingToMultiLine Whether or not to remove no longer needed escape values when converting to a multi-line format.
  * @param {boolean} escapeNumericValues Whether or not to escape any numeric values found in the array.
  * @return {string} The formatted array in the specified YAML/obsidian YAML format.
  */
-export function formatYamlArrayValue(value: string | string[], format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats, defaultEscapeCharacter: QuoteCharacter, removeEscapeCharactersIfPossibleWhenGoingToMultiLine: boolean, escapeNumericValues: boolean = false): string {
+export function formatYamlArrayValue(value: string | string[], format: ArrayFormats, defaultEscapeCharacter: QuoteCharacter, removeEscapeCharactersIfPossibleWhenGoingToMultiLine: boolean, escapeNumericValues: boolean = false): string {
   if (typeof value === 'string') {
     value = [value];
   }
 
   // handle default values here
   if (value == null || value.length === 0) {
-    return getDefaultYAMLArrayValue(format);
+    return defaultArrayValue;
   }
 
   // handle escaping numeric values and the removal of escape characters where applicable for multiline arrays
-  const shouldRemoveEscapeCharactersIfPossible = removeEscapeCharactersIfPossibleWhenGoingToMultiLine && (format == NormalArrayFormats.MultiLine || (format == SpecialArrayFormats.SingleStringToMultiLine && value.length > 1));
+  const shouldRemoveEscapeCharactersIfPossible = removeEscapeCharactersIfPossibleWhenGoingToMultiLine && (format == ArrayFormats.MultiLine);
   if (escapeNumericValues || shouldRemoveEscapeCharactersIfPossible) {
     for (let i = 0; i < value.length; i++) {
       let currentValue = value[i];
@@ -582,13 +569,9 @@ export function formatYamlArrayValue(value: string | string[], format: NormalArr
   }
 
   // handle the values that are present based on the format of the array
-  /* eslint-disable no-fallthrough -- we are falling through here because it makes the most sense for the cases below */
+
   switch (format) {
-    case SpecialArrayFormats.SingleStringToSingleLine:
-      if (value.length === 1) {
-        return ' ' + value[0];
-      }
-    case NormalArrayFormats.SingleLine:
+    case ArrayFormats.SingleLine:
       // make sure that any values with a comma get properly escaped first
       for (let i = 0; i < value.length; i++) {
         if (value[i].includes(',') && !isValueEscapedAlready(value[i])) {
@@ -597,53 +580,8 @@ export function formatYamlArrayValue(value: string | string[], format: NormalArr
       }
 
       return ' ' + convertStringArrayToSingleLineArray(value);
-    case SpecialArrayFormats.SingleStringToMultiLine:
-      if (value.length === 1) {
-        return ' ' + value[0];
-      }
-    case NormalArrayFormats.MultiLine:
+    case ArrayFormats.MultiLine:
       return convertStringArrayToMultilineArray(value);
-    case TagSpecificArrayFormats.SingleStringSpaceDelimited:
-      if (value.length === 1) {
-        return ' ' + value[0];
-      }
-
-      return ' ' + value.join(' ');
-    case SpecialArrayFormats.SingleStringCommaDelimited:
-      // make sure that any values with a comma get properly escaped first
-      for (let i = 0; i < value.length; i++) {
-        if (value[i].includes(',') && !isValueEscapedAlready(value[i])) {
-          value[i] = escapeStringIfNecessaryAndPossible(value[i], defaultEscapeCharacter, true);
-        }
-      }
-
-      if (value.length === 1) {
-        return ' ' + value[0];
-      }
-
-      return ' ' + value.join(', ');
-    case TagSpecificArrayFormats.SingleLineSpaceDelimited:
-      if (value.length === 1) {
-        return ' ' + value[0];
-      }
-
-      return ' ' + convertStringArrayToSingleLineArray(value).replaceAll(', ', ' ');
-  }
-  /* eslint-enable no-fallthrough -- needed to renable fallthrough checks disabled above */
-}
-
-function getDefaultYAMLArrayValue(format: NormalArrayFormats | SpecialArrayFormats | TagSpecificArrayFormats): string {
-
-  switch (format) {
-    case NormalArrayFormats.SingleLine:
-    case TagSpecificArrayFormats.SingleLineSpaceDelimited:
-    case NormalArrayFormats.MultiLine:
-      return ' []';
-    case SpecialArrayFormats.SingleStringToSingleLine:
-    case SpecialArrayFormats.SingleStringToMultiLine:
-    case TagSpecificArrayFormats.SingleStringSpaceDelimited:
-    case SpecialArrayFormats.SingleStringCommaDelimited:
-      return ' ';
   }
 
 }

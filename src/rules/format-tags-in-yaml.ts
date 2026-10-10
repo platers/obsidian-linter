@@ -1,9 +1,9 @@
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {ExampleBuilder, OptionBuilderBase} from './rule-builder';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { ExampleBuilder, OptionBuilderBase } from './rule-builder';
 import dedent from 'ts-dedent';
-import {formatYAML, OBSIDIAN_TAG_KEY_SINGULAR, OBSIDIAN_TAG_KEY_PLURAL} from '../utils/yaml';
+import { formatYAML, OBSIDIAN_TAG_KEY } from '../utils/yaml';
 
-class FormatTagsInYamlOptions implements Options {}
+class FormatTagsInYamlOptions implements Options { }
 
 @RuleBuilder.register
 export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOptions> {
@@ -21,10 +21,10 @@ export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOption
   apply(text: string, options: FormatTagsInYamlOptions): string {
     return formatYAML(text, (text) => {
       return text.replace(
-          new RegExp(`^(${OBSIDIAN_TAG_KEY_PLURAL}|${OBSIDIAN_TAG_KEY_SINGULAR}):[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm'),
-          function(tagsYAML) {
-            return tagsYAML.replaceAll('#', '');
-          },
+        new RegExp(`^(${OBSIDIAN_TAG_KEY}):[ \\t]*(\\S.*|(?:(?:\\n *- \\S.*)|((?:\\n *- *))*|(\\n([ \\t]+[^\\n]*))*)*)\\n`, 'm'),
+        function (tagsYAML) {
+          return tagsYAML.replaceAll('#', '');
+        },
       );
     });
   }
@@ -53,19 +53,6 @@ export default class FormatTagsInYaml extends RuleBuilder<FormatTagsInYamlOption
         after: dedent`
           ---
           tags: [one two three]
-          ---
-        `,
-      }),
-      new ExampleBuilder({ // relates to https://github.com/platers/obsidian-linter/issues/441
-        description: 'Format tags in array with `tag` as the tags key',
-        before: dedent`
-          ---
-          tag: [#one #two #three]
-          ---
-        `,
-        after: dedent`
-          ---
-          tag: [one two three]
           ---
         `,
       }),

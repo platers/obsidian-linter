@@ -1,152 +1,19 @@
 import FormatYamlArray from '../src/rules/format-yaml-arrays';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
-import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '../src/utils/yaml';
+import { ruleTest } from './common';
+import { ArrayFormats } from '../src/utils/yaml';
 
 ruleTest({
   RuleBuilderClass: FormatYamlArray,
   testCases: [
     // tags
     {
-      testName: 'Convert tags from single-line with spaces to multi-line array',
+      testName: 'Convert tags from single-line to multi-line array',
       before: dedent`
-        ---
-        tags: tag1 tag2 tag3 tag4
-        ---
-      `,
-      after: dedent`
-        ---
-        tags:
-          - tag1
-          - tag2
-          - tag3
-          - tag4
-        ---
-      `,
-      options: {
-        tagArrayStyle: NormalArrayFormats.MultiLine,
-      },
-    },
-    {
-      testName: 'Convert tags from single-line with spaces to single-line array',
-      before: dedent`
-        ---
-        tags: tag1 tag2 tag3 tag4
-        ---
-      `,
-      after: dedent`
         ---
         tags: [tag1, tag2, tag3, tag4]
         ---
       `,
-      options: {
-        tagArrayStyle: NormalArrayFormats.SingleLine,
-      },
-    },
-    {
-      testName: 'Convert tags from single-line with spaces to single-line with commas',
-      before: dedent`
-        ---
-        tags: tag1 tag2 tag3 tag4
-        ---
-      `,
-      after: dedent`
-        ---
-        tags: tag1, tag2, tag3, tag4
-        ---
-      `,
-      options: {
-        tagArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
-      },
-    },
-    {
-      testName: 'Convert tags from single-line with spaces to single-line array which is space delimited',
-      before: dedent`
-        ---
-        tags: tag1 tag2 tag3 tag4
-        ---
-      `,
-      after: dedent`
-        ---
-        tags: [tag1 tag2 tag3 tag4]
-        ---
-      `,
-      options: {
-        tagArrayStyle: TagSpecificArrayFormats.SingleLineSpaceDelimited,
-      },
-    },
-    {
-      testName: 'Convert tags from single-line with spaces to single-line with spaces',
-      before: dedent`
-        ---
-        tags: tag1 tag2 tag3 tag4
-        ---
-      `,
-      after: dedent`
-        ---
-        tags: tag1 tag2 tag3 tag4
-        ---
-      `,
-      options: {
-        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
-      },
-    },
-    {
-      testName: 'Convert tags from single-line array with spaces to single-line with spaces',
-      before: dedent`
-        ---
-        tags: [tag1 tag2 tag3 tag4]
-        ---
-      `,
-      after: dedent`
-        ---
-        tags: tag1 tag2 tag3 tag4
-        ---
-      `,
-      options: {
-        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
-      },
-    },
-    {
-      testName: 'Convert tags from multi-line array with spaces to single string when 1 element is present',
-      before: dedent`
-        ---
-        tags:
-          - tag1
-        ---
-      `,
-      after: dedent`
-        ---
-        tags: tag1
-        ---
-      `,
-      options: {
-        tagArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
-      },
-    },
-    {
-      testName: 'Convert tags from single-line with commas to single-line array when multiple elements present and option is single string to single-line',
-      before: dedent`
-        ---
-        tags: tag1, tag2, tag3, tag4
-        ---
-      `,
-      after: dedent`
-        ---
-        tags: [tag1, tag2, tag3, tag4]
-        ---
-      `,
-      options: {
-        tagArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
-      },
-    },
-    {
-      testName: 'Convert tags from single-line array with spaces to multi-line array when multiple elements present and option is single string to multi-line',
-      before: dedent`
-        ---
-        tags: tag1 tag2 tag3 tag4
-        ---
-      `,
       after: dedent`
         ---
         tags:
@@ -157,96 +24,36 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-      },
-    },
-    {
-      testName: 'Convert tags from single-line string to single-line string when there is only 1 element and the style is single string to multi-line',
-      before: dedent`
-        ---
-        tags: tag1, tag2, tag3, tag4
-        ---
-      `,
-      after: dedent`
-        ---
-        tags:
-          - tag1
-          - tag2
-          - tag3
-          - tag4
-        ---
-      `,
-      options: {
-        tagArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
+        tagArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {
       testName: 'Formatting YAML tags does nothing when disabled',
       before: dedent`
         ---
-        tags: tag1, tag2, tag3, tag4
+        tags: [tag1, tag2, tag3, tag4]
         ---
       `,
       after: dedent`
         ---
-        tags: tag1, tag2, tag3, tag4
+        tags: [tag1, tag2, tag3, tag4]
         ---
       `,
       options: {
-        tagArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
+        tagArrayStyle: ArrayFormats.MultiLine,
         formatTagKey: false,
-      },
-    },
-    { // relates to https://github.com/platers/obsidian-linter/issues/441
-      testName: 'Convert tags from single-line string to single-line string when there is only 1 element and the style is single string to multi-line and existing key is `tag`',
-      before: dedent`
-        ---
-        tag: tag1, tag2, tag3, tag4
-        ---
-      `,
-      after: dedent`
-        ---
-        tag:
-          - tag1
-          - tag2
-          - tag3
-          - tag4
-        ---
-      `,
-      options: {
-        tagArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-      },
-    },
-    { // accounts for https://github.com/platers/obsidian-linter/issues/509
-      testName: 'Convert tags from single-line array to multi-line array when there is no space after one of the commas and the key for tags is `tag`',
-      before: dedent`
-        ---
-        tag: [tag1,tag2, tag3, tag4]
-        ---
-      `,
-      after: dedent`
-        ---
-        tag:
-          - tag1
-          - tag2
-          - tag3
-          - tag4
-        ---
-      `,
-      options: {
-        tagArrayStyle: NormalArrayFormats.MultiLine,
       },
     },
     {
       testName: 'Convert tags from single-line array to multi-line array with no changes removes unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = true`',
       before: dedent`
         ---
-        tag: ["tag1", tag2, tag3, tag4]
+        tags: ["tag1", tag2, tag3, tag4]
         ---
       `,
       after: dedent`
         ---
-        tag:
+        tags:
           - tag1
           - tag2
           - tag3
@@ -254,7 +61,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: NormalArrayFormats.MultiLine,
+        tagArrayStyle: ArrayFormats.MultiLine,
         removeUnnecessaryEscapeCharsForMultiLineArrays: true,
       },
     },
@@ -262,12 +69,12 @@ ruleTest({
       testName: 'Convert tags from single-line array to multi-line array with no changes doesn\'t remove unnecessary escape values when `removeUnnecessaryEscapeCharsForMultiLineArrays = false`',
       before: dedent`
         ---
-        tag: ["tag1", tag2, tag3, tag4]
+        tags: ["tag1", tag2, tag3, tag4]
         ---
       `,
       after: dedent`
         ---
-        tag:
+        tags:
           - "tag1"
           - tag2
           - tag3
@@ -275,7 +82,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: NormalArrayFormats.MultiLine,
+        tagArrayStyle: ArrayFormats.MultiLine,
       },
     },
 
@@ -296,101 +103,11 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
-      },
-    },
-    { // relates to https://github.com/platers/obsidian-linter/issues/441
-      testName: 'Convert aliases from single-line to multi-line array when exisiting key is `alias`',
-      before: dedent`
-        ---
-        alias: [title1, title2, title3]
-        ---
-      `,
-      after: dedent`
-        ---
-        alias:
-          - title1
-          - title2
-          - title3
-        ---
-      `,
-      options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {
-      testName: 'Convert aliases from multi-line to single string which is comma delimited',
-      before: dedent`
-        ---
-        aliases:
-          - title1
-          - title2
-          - title3
-        ---
-      `,
-      after: dedent`
-        ---
-        aliases: title1, title2, title3
-        ---
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
-      },
-    },
-    {
-      testName: 'Convert multi-line to single string when there is 1 element and the style is single string to single-line',
-      before: dedent`
-        ---
-        aliases:
-          - title
-        ---
-      `,
-      after: dedent`
-        ---
-        aliases: title
-        ---
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
-      },
-    },
-    {
-      testName: 'Convert multi-line to single string when there is 1 element and the style is single string to multi-line',
-      before: dedent`
-        ---
-        aliases:
-          - title
-        ---
-      `,
-      after: dedent`
-        ---
-        aliases: title
-        ---
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-      },
-    },
-    {
-      testName: 'Convert single-line to multi-line string when there is more than 1 element and the style is single string to multi-line',
-      before: dedent`
-        ---
-        aliases: [title, other title]
-        ---
-      `,
-      after: dedent`
-        ---
-        aliases:
-          - title
-          - other title
-        ---
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-      },
-    },
-    {
-      testName: 'Convert multi-line to single-line when there is more than 1 element and the style is single string to single-line',
+      testName: 'Convert multi-line to single-line',
       before: dedent`
         ---
         aliases:
@@ -404,7 +121,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
       },
     },
     {
@@ -424,7 +141,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         formatAliasKey: false,
       },
     },
@@ -445,7 +162,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
         removeUnnecessaryEscapeCharsForMultiLineArrays: true,
       },
     },
@@ -466,7 +183,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
       },
     },
 
@@ -486,7 +203,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.SingleLine,
+        defaultArrayStyle: ArrayFormats.SingleLine,
       },
     },
     {
@@ -504,7 +221,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {
@@ -520,7 +237,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
         formatArrayKeys: false,
       },
     },
@@ -537,7 +254,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
         forceSingleLineArrayStyle: ['key'],
       },
     },
@@ -558,7 +275,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.SingleLine,
+        defaultArrayStyle: ArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key'],
       },
     },
@@ -577,7 +294,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {
@@ -595,7 +312,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {
@@ -613,7 +330,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
         removeUnnecessaryEscapeCharsForMultiLineArrays: true,
       },
     },
@@ -634,7 +351,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
         forceSingleLineArrayStyle: ['key'],
       },
     },
@@ -655,7 +372,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
         forceSingleLineArrayStyle: ['key1'],
       },
     },
@@ -672,7 +389,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
         forceSingleLineArrayStyle: ['key'],
       },
     },
@@ -693,7 +410,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.SingleLine,
+        defaultArrayStyle: ArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key'],
       },
     },
@@ -710,7 +427,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.SingleLine,
+        defaultArrayStyle: ArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key1'],
       },
     },
@@ -727,7 +444,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.SingleLine,
+        defaultArrayStyle: ArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key1'],
       },
     },
@@ -745,7 +462,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.SingleLine,
+        defaultArrayStyle: ArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key'],
       },
     },
@@ -764,7 +481,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.SingleLine,
+        defaultArrayStyle: ArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key'],
       },
     },
@@ -783,7 +500,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.SingleLine,
+        defaultArrayStyle: ArrayFormats.SingleLine,
         forceMultiLineArrayStyle: ['key'],
         removeUnnecessaryEscapeCharsForMultiLineArrays: true,
       },
@@ -823,22 +540,6 @@ ruleTest({
       },
     },
     {
-      testName: 'Trying to format tags to a single string when it is has an empty single-line will result in an empty single string',
-      before: dedent`
-        ---
-        tags: []
-        ---
-      `,
-      after: dedent`
-        ---
-        tags: 
-        ---
-      `,
-      options: {
-        tagArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
-      },
-    },
-    {
       testName: 'Trying to format tags to a multi-line when it is has an empty single-line will leave it as is',
       before: dedent`
         ---
@@ -851,55 +552,7 @@ ruleTest({
         ---
       `,
       options: {
-        tagArrayStyle: NormalArrayFormats.MultiLine,
-      },
-    },
-    {
-      testName: 'Trying to format tags to a single string separated by commas when it is has an empty single-line will result in an empty string',
-      before: dedent`
-        ---
-        tags: []
-        ---
-      `,
-      after: dedent`
-        ---
-        tags: 
-        ---
-      `,
-      options: {
-        tagArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
-      },
-    },
-    {
-      testName: 'Trying to format tags to a single string separated by spaces when it is has an empty single-line will result in an empty string',
-      before: dedent`
-        ---
-        tags: []
-        ---
-      `,
-      after: dedent`
-        ---
-        tags: 
-        ---
-      `,
-      options: {
-        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
-      },
-    },
-    {
-      testName: 'Trying to format tags to a single-line separated by spaces when it is has an empty single-line will result in an empty single-line',
-      before: dedent`
-        ---
-        tags: []
-        ---
-      `,
-      after: dedent`
-        ---
-        tags: []
-        ---
-      `,
-      options: {
-        tagArrayStyle: TagSpecificArrayFormats.SingleLineSpaceDelimited,
+        tagArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {
@@ -915,7 +568,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
       },
     },
     {
@@ -1019,14 +672,14 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/525
-      testName: 'Converting a single string comma separated array to a multi-line array should respect escaped entries',
+      testName: 'Converting a single-line array to a multi-line array should respect escaped entries',
       before: dedent`
         ---
-        aliases: Scott, "Scott, Jr."
+        aliases: [Scott, "Scott, Jr."]
         ---
       `,
       after: dedent`
@@ -1037,7 +690,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {
@@ -1055,40 +708,23 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {
       testName: 'Numeric aliases are escaped when aliases are otherwise unchanged',
       before: dedent`
         ---
-        aliases: 1234, alias1
+        aliases: [1234, alias1]
         ---
       `,
       after: dedent`
         ---
-        aliases: "1234", alias1
+        aliases: ["1234", alias1]
         ---
       `,
       options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
-      },
-    },
-    { // relates to https://github.com/platers/obsidian-linter/issues/1434
-      testName: 'Converting from a multi-line array to a single comma delimited string should result in strings with commas in them being escaped',
-      before: dedent`
-        ---
-        aliases:
-          - Denver, Co
-        ---
-      `,
-      after: dedent`
-        ---
-        aliases: "Denver, Co"
-        ---
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
+        aliasArrayStyle: ArrayFormats.SingleLine,
       },
     },
     { // fixes https://github.com/platers/obsidian-linter/issues/1434
@@ -1105,7 +741,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/1384
@@ -1123,7 +759,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/1384
@@ -1141,7 +777,7 @@ ruleTest({
         ---
       `,
       options: {
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
       },
     },
   ],
