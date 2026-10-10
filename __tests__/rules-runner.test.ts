@@ -10,7 +10,7 @@ import RemoveYamlKeys from '../src/rules/remove-yaml-keys';
 import ProperEllipsis from '../src/rules/proper-ellipsis';
 import RemoveMultipleSpaces from '../src/rules/remove-multiple-spaces';
 import StrongStyle from '../src/rules/strong-style';
-import { runAfterRegularRules, runCustomCommands, runCustomRegexReplacement, runRulesInBatches } from '../src/rules-runner/rules-runner';
+import { runCustomCommands, runCustomRegexReplacement, runRulesInBatches } from '../src/rules-runner/rules-runner';
 
 describe('settings enablement before batch barriers', () => {
   afterEach(() => {
@@ -77,6 +77,16 @@ const appCommandsMock: AppCommandsMock = {
     'editor:save-file': {
       checkCallback: () => { },
     },
+    'first id': {
+      checkCallback: () => {
+        appCommandsMock.executeCommandById('first id');
+      },
+    },
+    'second id': {
+      checkCallback: () => {
+        appCommandsMock.executeCommandById('second id');
+      },
+    }
   },
   listCommands(): Command[] {
     return [];
