@@ -27,6 +27,7 @@ import { RunLinterRulesOptions } from './typings/worker';
 import { runCustomCommands, runPasteLint, createRunLinterRulesOptions } from './rules-runner/rules-runner';
 import { runYAMLTimestampByItself } from './rules-runner/yaml-timestamp-by-itself';
 import { handleLintError } from './utils/error';
+import { ArrayFormats } from './utils/yaml';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -845,6 +846,16 @@ export default class LinterPlugin extends Plugin {
 
     if (!this.settings.defaultArrayStyleMovedToCommonStyles) {
       updateMade = await this.moveDefaultArrayStyleToCommonStyles() || updateMade;
+    }
+
+    if (this.settings.commonStyles.aliasArrayStyle != ArrayFormats.SingleLine && this.settings.commonStyles.aliasArrayStyle != ArrayFormats.MultiLine) {
+      this.settings.commonStyles.aliasArrayStyle = ArrayFormats.SingleLine;
+      updateMade = true;
+    }
+
+    if (this.settings.commonStyles.tagArrayStyle != ArrayFormats.SingleLine && this.settings.commonStyles.tagArrayStyle != ArrayFormats.MultiLine) {
+      this.settings.commonStyles.tagArrayStyle = ArrayFormats.SingleLine;
+      updateMade = true;
     }
 
     // check for and fix invalid settings
