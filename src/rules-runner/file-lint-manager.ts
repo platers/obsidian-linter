@@ -132,7 +132,7 @@ export class FileLintManager {
 
   public terminateWorkers(): void {
     for (const worker of this.workers) {
-      worker.terminate();
+      worker.worker.terminate();
     }
 
     this.workers = [];
