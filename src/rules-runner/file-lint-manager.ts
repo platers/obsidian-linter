@@ -46,10 +46,10 @@ export class FileLintManager {
     this.fileToBatches = new Map();
 
     for (let index = 0; index < numWorkers; index++) {
-      const worker = Worker();
+      const worker = ((Worker as unknown)() as LinterWorker);
 
-      worker.onmessage = async (resp: unknown) => {
-        const data = resp.data as RunLinterRulesOptions;
+      worker.onmessage = async (event: MessageEvent<RunLinterRulesOptions>) => {
+        const data = event.data;
         if (data.error) {
           const d = data.error;
           const err = new LinterError(d.message, null, d.stack);
@@ -205,7 +205,6 @@ export class FileLintManager {
       batch.errors++;
     }
 
-    console.log(batch.pending, batch.completed, batch.errors);
     if (!batch.finishedAdding || batch.pending !== 0) {
       return;
     }

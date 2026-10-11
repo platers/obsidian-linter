@@ -39,15 +39,12 @@ export type WorkerMessage = {
   data: RunLinterRulesOptions,
 }
 
-export type WorkerResponseMessage = {
-  data: RunLinterRulesOptions,
+export interface LinterWorker {
+  postMessage(data: RunLinterRulesOptions): void;
+  onmessage: ((event: WorkerMessage) => Promise<void>) | null;
+  terminate(): void;
 }
 
-export interface LinterWorker {
-  postMessage: (data: RunLinterRulesOptions) => void;
-  onmessage: (data: WorkerResponseMessage) => void;
-  terminate: () => void;
-}
 
 export type RunLinterRulesOptions = {
   oldText: string,
