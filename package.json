@@ -68,7 +68,7 @@
     "diff-match-patch": "^1.0.5",
     "loglevel": "^1.9.2",
     "lru-cache": "^11.5.2",
-    "mdast-util-from-markdown": "^2.0.3",
+    "mdast-util-from-markdown": "^2.0.4",
     "mdast-util-frontmatter": "^2.0.1",
     "mdast-util-gfm-autolink-literal": "^2.0.1",
     "mdast-util-gfm-footnote": "^2.1.0",
