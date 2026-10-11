@@ -1,41 +1,47 @@
 // This worker here is designed expressly for the purpose of running lint rules as possible off of the main thread.
 
 import { clearLogs, logInfo, logsFromLastRun, setCollectLogs, setLogLevel } from '../utils/logger';
-import { WorkerMessage } from '../typings/worker';
+import { RunLinterRulesOptions, WorkerMessage } from '../typings/worker';
 import { getDisabledRules } from '../rules';
 import { lintText } from './rules-runner';
 import '../rules-registry';
 import { ensureIsLinteError } from '../utils/error';
 import { getTextInLanguage } from '../lang/helpers';
 
+let currentRunOptions: RunLinterRulesOptions | null = null;
+let workerId: string | null = null;
+
 onmessage = (event: WorkerMessage) => {
   try {
-    setLogLevel(event.data.settings.logLevel);
-    setCollectLogs(event.data.settings.recordLintOnSaveLogs);
+    currentRunOptions = event.data.data;
+    workerId = event.data.id;
+    const data = event.data.data;
+    setLogLevel(data.settings.logLevel);
+    setCollectLogs(data.settings.recordLintOnSaveLogs);
     clearLogs();
 
-    const originalText = event.data.oldText;
+    const originalText = data.oldText;
     const [disabledRules, skipFile] = getDisabledRules(originalText);
-    event.data.skipFile = skipFile;
-    event.data.disabledRules = disabledRules;
+    data.skipFile = skipFile;
+    data.disabledRules = disabledRules;
 
-    event.data.newText = event.data.oldText;
+    data.newText = data.oldText;
     if (!skipFile) {
-      event.data.newText = lintText(event.data);
+      data.newText = lintText(data);
     } else {
-      logInfo(getTextInLanguage('logs.file-skipped').replace('{FILE_NAME}', event.data.fileInfo.path));
+      logInfo(getTextInLanguage('logs.file-skipped').replace('{FILE_NAME}', data.fileInfo.path));
     }
 
-    if (event.data.settings.recordLintOnSaveLogs) {
-      event.data.logsFromRun = logsFromLastRun;
+    if (data.settings.recordLintOnSaveLogs) {
+      data.logsFromRun = logsFromLastRun;
     }
 
-    postMessage(event.data);
+    postMessage(data);
     clearLogs();
   } catch (error) {
-    const err = ensureIsLinteError(error);
+    const err = ensureIsLinteError(error, event.data.id);
     postMessage({
-      ...event.data,
+      ...event.data.data,
       error: {
         name: err.name,
         message: err.message,
@@ -45,8 +51,18 @@ onmessage = (event: WorkerMessage) => {
   }
 };
 
-onerror = function (event) {
-  // TODO: add a log for something went pretty wrong and the worker is not able to recover...
-  console.error('code no worky: ' + event)
+onerror = function (message: string, _1, _2, _3, error: Error) {
+  const identifier = workerId ?? getTextInLanguage('logs.worker-identifier').replace(' {NUM}', '');
+  const err = ensureIsLinteError(error, identifier);
+  postMessage({
+    fileInfo: { path: '' }, // this should make it so that things don't error out on the main thread
+    ...currentRunOptions,
+    error: {
+      name: err.name,
+      message: err.message,
+      stack: err.stack,
+    },
+  });
+
   return true;
 }; 

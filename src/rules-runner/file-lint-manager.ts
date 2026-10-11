@@ -6,11 +6,12 @@ import Worker from './rules-runner.worker';
 import { moment, TFile, Vault } from 'obsidian';
 import { createRunLinterRulesOptions, runMainThreadRules } from './rules-runner';
 import { LinterSettings } from '../settings-data';
-import { LinterWorker, RunLinterRulesOptions } from '../typings/worker';
+import { LinterWorker, LinterWorkerInfo, RunLinterRulesOptions } from '../typings/worker';
 import { setLogs } from '../utils/logger';
 import { stripCr } from '../utils/strings';
 import { ensureIsLinteError, handleLintError } from '../utils/error';
 import { LinterError } from '../linter-error';
+import { getTextInLanguage } from '../lang/helpers';
 
 type LintBatch = { pending: number; completed: number; errors: number; finishedAdding: boolean; onComplete: (completed: number, errors: number) => Promise<void> };
 
@@ -22,7 +23,7 @@ type FileCallback = (runOptions: RunLinterRulesOptions) => Promise<void>;
 /** Multi-threaded file linter which debounces rapid file requests automatically. */
 export class FileLintManager {
   /* Background workers which do the actual file linting. */
-  workers: LinterWorker[];
+  workers: LinterWorkerInfo[];
   /** Tracks which workers are actively linting a file, to make sure we properly delegate results. */
   busy: boolean[];
 
@@ -44,6 +45,8 @@ export class FileLintManager {
     this.lintQueue = [];
     this.callbacks = new Map();
     this.fileToBatches = new Map();
+
+    const identifierTemplate = getTextInLanguage('logs.worker-identifier');
 
     for (let index = 0; index < numWorkers; index++) {
       const worker = ((Worker as unknown)() as LinterWorker);
@@ -78,7 +81,10 @@ export class FileLintManager {
         await this.finish(data, index);
       };
 
-      this.workers.push(worker);
+      this.workers.push({
+        id: identifierTemplate.replace('{NUM}', index + 1),
+        worker: worker
+      });
       this.busy.push(false);
     }
   }
@@ -175,7 +181,7 @@ export class FileLintManager {
     lintRunnerSettings.errorTemplateString = entry.errorTemplateString;
     lintRunnerSettings.errorNoticeTimeout = entry.errorNoticeTimeout;
     lintRunnerSettings.useLogTemplateInNotice = entry.useLogTemplateInNotice;
-    this.workers[workerId].postMessage(lintRunnerSettings);
+    this.workers[workerId].worker.postMessage({ id: this.workers[workerId].id, data: lintRunnerSettings });
   }
 
   /** Find the next available, non-busy worker; return undefined if all workers are busy. */
