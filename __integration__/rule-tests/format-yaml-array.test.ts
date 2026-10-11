@@ -22,7 +22,7 @@ function setup2(plugin: TestLinterPlugin): Promise<void> {
   "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.tagArrayStyle = "single string space delimited";
+plugin.plugin.settings.commonStyles.tagArrayStyle = "multi-line";
 
   return Promise.resolve();
 }
@@ -45,7 +45,7 @@ export const formatYamlArrayRuleTestCases: IntegrationTestCase[] = [
     setup: setup1,
   },
   {
-    name: "Format tags as a single string with space delimiters, ignore aliases, and format regular YAML arrays as single-line arrays",
+    name: "Format tags as multiline, ignore aliases, and format regular YAML arrays as single-line arrays",
     filePath: "rule-tests/format-yaml-array/format-yaml-array-2.md",
     setup: setup2,
   },
