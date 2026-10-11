@@ -36,15 +36,22 @@ export interface TFile {
 }
 
 export type WorkerMessage = {
-  data: RunLinterRulesOptions,
+  data: {
+    id: string,
+    data: RunLinterRulesOptions,
+  }
 }
 
 export interface LinterWorker {
-  postMessage(data: RunLinterRulesOptions): void;
+  postMessage(event: WorkerMessage): void;
   onmessage: ((event: WorkerMessage) => Promise<void>) | null;
   terminate(): void;
 }
 
+export type LinterWorkerInfo = {
+  id: string,
+  worker: LinterWorker,
+}
 
 export type RunLinterRulesOptions = {
   oldText: string,

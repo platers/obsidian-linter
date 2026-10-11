@@ -21,7 +21,12 @@ export function handleLintError(file: TFile, error: Error, noticeTimeout: number
   logError(errorMessage, error);
 }
 
-export function wrapLintError(error: Error, ruleName: string) {
+/**
+ * Makes sure that an error gets converted to a LinterError and rethrown.
+ * @param error The error to include in the log
+ * @param identifier The identifier for where the error came from (a rule, a specific worker, etc.)
+ */
+export function wrapLintError(error: Error, identifier: string) {
   let errorMessage: string;
   if (error instanceof YAMLParseError) {
     errorMessage = error.toString();
@@ -30,15 +35,14 @@ export function wrapLintError(error: Error, ruleName: string) {
     errorMessage = getTextInLanguage('logs.wrapper-unknown-error').replace('{ERROR_MESSAGE}', error.message);
   }
 
-  throw new LinterError(getTextInLanguage('logs.error-message-format').replace('{RULE_NAME}', ruleName).replace('{ERROR_MESSAGE}', errorMessage), error);
+  throw new LinterError(getTextInLanguage('logs.error-message-format').replace('{RULE_NAME}', identifier).replace('{ERROR_MESSAGE}', errorMessage), error);
 }
 
-export function ensureIsLinteError(error): LinterError {
+export function ensureIsLinteError(error, identifier: string): LinterError {
   let newErr = error as LinterError;
   if (!(error instanceof LinterError)) {
     try {
-      // TODO: may want to add unknown for the rule name
-      wrapLintError(error instanceof Error ? error : new Error(String(error), ''));
+      wrapLintError(error instanceof Error ? error : new Error(String(error)), identifier);
     }
     catch (err) {
       newErr = err as LinterError

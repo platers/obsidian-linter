@@ -113,6 +113,9 @@ export default {
 
     //table.ts
     'unexpected-pre-table-content': 'Trying to trim the start of a table row resulted in an unexpected result finding some non-whitespace value in blockquote prior to the table row start for "{TABLE_ROW}" and start of line "{START_OF_LINE}".',
+
+    // worker
+    'worker-identifier': 'Linter Web Worker {NUM}'
   },
 
   'validation': {
