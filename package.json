@@ -7,7 +7,6 @@
     "node": ">=20.19.0"
   },
   "scripts": {
-    "postinstall": "patch-package",
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
     "test": "jest",
@@ -57,7 +56,6 @@
     "jest": "^30.5.1",
     "moment": "2.29.4",
     "obsidian": "^1.13.0",
-    "patch-package": "^8.0.1",
     "postcss": "^8.5.28",
     "postcss-cli": "^11.0.1",
     "ts-node": "^10.9.2",
@@ -70,7 +68,7 @@
     "diff-match-patch": "^1.0.5",
     "loglevel": "^1.9.2",
     "lru-cache": "^11.5.2",
-    "mdast-util-from-markdown": "^2.0.3",
+    "mdast-util-from-markdown": "^2.0.4",
     "mdast-util-frontmatter": "^2.0.1",
     "mdast-util-gfm-autolink-literal": "^2.0.1",
     "mdast-util-gfm-footnote": "^2.1.0",
