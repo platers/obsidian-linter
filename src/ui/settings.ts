@@ -168,7 +168,7 @@ export class SettingTab extends PluginSettingTab {
           control: {
             type: 'dropdown',
             key: 'commonStyles.aliasArrayStyle',
-            options: enumOptions([ // TODO: need to swap to handle converting the format from other values to this
+            options: enumOptions([
               ArrayFormats.MultiLine,
               ArrayFormats.SingleLine
             ]),
