@@ -352,7 +352,9 @@ export default class LinterPlugin extends Plugin {
     this.eventRefs.push(eventRef);
 
     eventRef = this.app.workspace.on('editor-change', async (editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
-      if ((this.settings.ruleConfigs['yaml-timestamp']['update-on-file-contents-updated'] ?? AfterFileChangeLintTimes.Never) == AfterFileChangeLintTimes.Never) {
+      const currentValue = this.settings.ruleConfigs['yaml-timestamp'] != undefined ? this.settings.ruleConfigs['yaml-timestamp']['update-on-file-contents-updated'] as AfterFileChangeLintTimes | undefined ?? AfterFileChangeLintTimes.Never : AfterFileChangeLintTimes.Never;
+
+      if (currentValue == AfterFileChangeLintTimes.Never) {
         return;
       }
 
@@ -1286,6 +1288,11 @@ export default class LinterPlugin extends Plugin {
     let updateMade = false;
     for (const migration of textAreaToListItemMigrations) {
       const ruleSettings = this.settings.ruleConfigs[migration.ruleName];
+      if (!ruleSettings) {
+        // the value is empty, so it should be handled by the default values getting filled in
+        continue;
+      }
+
       const value = (ruleSettings as { [k: string]: string })[migration.key];
       if (ruleSettings != undefined && typeof value === 'string') {
         const replacementValue = value.split(migration.splitter);
