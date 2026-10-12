@@ -1,7 +1,7 @@
 import MoveTagsToYaml from '../src/rules/move-tags-to-yaml';
-import {NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats} from '../src/utils/yaml';
+import { NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats } from '../src/utils/yaml';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
+import { ruleTest } from './common';
 
 ruleTest({
   RuleBuilderClass: MoveTagsToYaml,
@@ -10,13 +10,13 @@ ruleTest({
       testName: 'Does not collect or remove tags inside fenced code',
       before: '```\n#inside\n```\n\nText #outside',
       after: '---\ntags: [outside]\n---\n```\n#inside\n```\n\nText',
-      options: {howToHandleExistingTags: 'Remove whole tag'},
+      options: { howToHandleExistingTags: 'Remove whole tag' },
     },
     {
       testName: 'Does not collect or remove tags inside disabled sections',
       before: '<!-- linter-disable -->\n#inside\n<!-- linter-enable -->\n\nText #outside',
       after: '---\ntags: [outside]\n---\n<!-- linter-disable -->\n#inside\n<!-- linter-enable -->\n\nText',
-      options: {howToHandleExistingTags: 'Remove whole tag'},
+      options: { howToHandleExistingTags: 'Remove whole tag' },
     },
     {
       testName: 'Nothing happens when there is no tag in the content of the text',
@@ -414,5 +414,23 @@ ruleTest({
         Valid tag ending in digits: #1984book
       `,
     },
+    { // accoutns for https://github.com/platers/obsidian-linter/issues/1633
+      testName: 'Preserves embeds containing @ after a line with trailing whitespace',
+      before: dedent`
+        [[note]] 
+        ![[image@2x.png]]
+        ${''}
+        #test
+      `,
+      after: dedent`
+        ---
+        tags: [test]
+        ---
+        [[note]] 
+        ![[image@2x.png]]
+        ${''}
+      `,
+      options: { howToHandleExistingTags: 'Remove whole tag' },
+    }
   ],
 });

@@ -226,8 +226,10 @@ function collectEveryTypesPositions(parsedText: ParsedText): void {
   }
 
   let treeBytes = 2 * parsedText.text.length;
+  let originalTreeBytesForNode: number;
   // Account for every node, including text, without collecting additional position types.
   visit(parsedText.ast, (node: Node & Partial<Record<(typeof nodeStringFields)[number], unknown>>, index: number, parent: Node & Partial<Record<(typeof nodeStringFields)[number], unknown>>) => {
+    originalTreeBytesForNode = treeBytes;
     treeBytes += 384;
     for (const field of nodeStringFields) {
       const value = node[field];
@@ -237,7 +239,14 @@ function collectEveryTypesPositions(parsedText: ParsedText): void {
     }
 
     // there seems to be a bug in the fromMarkdown logic somewhere where it is making some links and paragraphs lack position info, so we will try to reconstruct that info for links because otherwise we fail to handle links properly
-    node.position = node.position ?? reconstructNodePosition(node, parent, index, parsedText.text)
+    node.position = node.position ?? reconstructNodePosition(node, parent, index, parsedText.text);
+    if (!node.position) {
+      // for now, this is not a scenario we can fix, so we will ignore this
+      // we may need to revisit this and see about creating a better long term fix
+      // added due to https://github.com/platers/obsidian-linter/issues/1633
+      treeBytes = originalTreeBytesForNode;
+      return;
+    }
 
     positionsByType.get(node.type)?.push(node.position);
   });
