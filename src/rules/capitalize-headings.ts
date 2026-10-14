@@ -314,7 +314,7 @@ class CapitalizeHeadingsOptions implements Options {
     'it',
   ];
   startingWordIgnoreCharacters?: string = '\'"(‘“-';
-  endingWordIgnoreCharacters?: string = '.?!,:;\'")”’0123456789-';
+  endingWordIgnoreCharacters?: string = '.?!,:;\'\")”’0123456789-';
   ignoreCasedWords?: boolean = true;
 }
 
@@ -325,20 +325,177 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
       nameKey: 'rules.capitalize-headings.name',
       descriptionKey: 'rules.capitalize-headings.description',
       type: RuleType.HEADING,
-      hasSpecialExecutionOrder: true, // this is meant to run at the end after all headers have been updated, added, or removed from the file
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      hasSpecialExecutionOrder: true,
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.yaml, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => CapitalizeHeadingsOptions {
     return CapitalizeHeadingsOptions;
   }
+
+  private isWordToken(token: string, options: CapitalizeHeadingsOptions): boolean {
+    const startingCustomRegexGroup = options.startingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.startingWordIgnoreCharacters)}]?`;
+    const endingCustomRegexGroup = options.endingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.endingWordIgnoreCharacters)}]*`;
+    const wordRegex = new RegExp(`^${startingCustomRegexGroup}[\\p{L}’'-]{1,}${endingCustomRegexGroup}$`, 'u');
+    return !!token.match(wordRegex) && token !== '-' && token !== '\'';
+  }
+
+  private capitalizeSingleWord(token: string, options: CapitalizeHeadingsOptions, isFirstWord: boolean): { value: string, used: boolean } {
+    if (!this.isWordToken(token, options)) {
+      return { value: token, used: false };
+    }
+
+    const capitalizeJustFirstLetter = options.style === 'First letter';
+    const startingCustomRegexGroup = options.startingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.startingWordIgnoreCharacters)}]?`;
+    const endingCustomRegexGroup = options.endingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.endingWordIgnoreCharacters)}]*`;
+    const wordRegex = new RegExp(`^${startingCustomRegexGroup}[\\p{L}’'-]{1,}${endingCustomRegexGroup}$`, 'u');
+    if (!token.match(wordRegex) || token === '-' || token === '\'') {
+      return { value: token, used: false };
+    }
+
+    let indexToCapitalize = 0;
+    if (options.startingWordIgnoreCharacters?.includes(token[0])) {
+      indexToCapitalize = 1;
+    }
+
+    const ignoreCasedWord = options.ignoreCasedWords && token !== token.toLowerCase();
+    const keepWordCasing = ignoreCasedWord || options.ignoreWords.includes(token);
+    if (keepWordCasing) {
+      return { value: token, used: true };
+    }
+
+    let updatedToken = token.toLowerCase();
+    const ignoreWord = options.lowercaseWords.includes(updatedToken);
+    if ((!ignoreWord && !capitalizeJustFirstLetter) || isFirstWord) {
+      if (indexToCapitalize === 0) {
+        updatedToken = updatedToken[indexToCapitalize].toUpperCase() + updatedToken.slice(indexToCapitalize + 1);
+      } else {
+        updatedToken = updatedToken[0] + updatedToken[indexToCapitalize].toUpperCase() + updatedToken.slice(indexToCapitalize + 1);
+      }
+    }
+
+    return { value: updatedToken, used: true };
+  }
+
+  private capitalizeFragment(fragment: string, options: CapitalizeHeadingsOptions, firstWord: boolean): { value: string, firstWord: boolean } {
+    if (!fragment) {
+      return { value: fragment, firstWord };
+    }
+
+    if (options.style === 'ALL CAPS') {
+      return { value: fragment.toUpperCase(), firstWord: false };
+    }
+
+    const parts = fragment.split(/(\s+)/g);
+    let nextFirstWord = firstWord;
+    let result = '';
+    for (const part of parts) {
+      if (part.length === 0 || /\s+/.test(part)) {
+        result += part;
+        continue;
+      }
+
+      const transformed = this.capitalizeSingleWord(part, options, nextFirstWord);
+      result += transformed.value;
+      if (transformed.used) {
+        nextFirstWord = false;
+      }
+    }
+
+    return { value: result, firstWord: nextFirstWord };
+  }
+
+  private capitalizeMarkdownLink(token: string, options: CapitalizeHeadingsOptions, firstWord: boolean): { value: string, firstWord: boolean } {
+    if (token.startsWith('![')) {
+      return { value: token, firstWord };
+    }
+
+    const match = /^\[([^\]]*)\]\(([^)]+)\)$/.exec(token);
+    if (!match) {
+      return { value: token, firstWord };
+    }
+
+    const textFragment = this.capitalizeFragment(match[1], options, firstWord);
+    return { value: `[${textFragment.value}](${match[2]})`, firstWord: textFragment.firstWord };
+  }
+
+  private capitalizeWikiLink(token: string, options: CapitalizeHeadingsOptions, firstWord: boolean): { value: string, firstWord: boolean } {
+    if (token.startsWith('!')) {
+      return { value: token, firstWord };
+    }
+
+    const match = /^\[\[([^\]|]+)(\|([^\]]*))?\]\]$/.exec(token);
+    if (!match) {
+      return { value: token, firstWord };
+    }
+
+    const target = match[1];
+    const alias = match[3] ?? match[1];
+    const textFragment = this.capitalizeFragment(alias, options, firstWord);
+    if (match[3] !== undefined) {
+      return { value: `[[${target}|${textFragment.value}]]`, firstWord: textFragment.firstWord };
+    }
+
+    return { value: `[[${textFragment.value}]]`, firstWord: textFragment.firstWord };
+  }
+
+  capitalizeHeading(text: string, options: CapitalizeHeadingsOptions): string {
+    return text.replace(allHeadersRegex, (headerText: string) => {
+      if (options.style === 'ALL CAPS') {
+        return headerText.replace(/(\[[^\]]*\]\([^)]*\)|\[\[[^\]]+\]\]|\[\[[^\]]+\|[^\]]+\]\]|\S+)/g, (segment: string) => {
+          if (segment.startsWith('![') || segment.startsWith('![')) {
+            return segment;
+          }
+
+          if (segment.startsWith('[[')) {
+            const wiki = this.capitalizeWikiLink(segment, options, true);
+            return wiki.value;
+          }
+
+          if (segment.startsWith('[') && segment.includes('](')) {
+            const markdown = this.capitalizeMarkdownLink(segment, options, true);
+            return markdown.value;
+          }
+
+          return segment.toUpperCase();
+        });
+      }
+
+      let firstWord = true;
+      return headerText.replace(/(\s+|!\[\[[^\]]+\]\]|!\[[^\]]*\]\([^)]*\)|\[\[[^\]]+\]\]|\[\[[^\]]+\|[^\]]+\]\]|\[[^\]]*\]\([^)]*\)|\S+)/g, (segment: string) => {
+        if (/^\s+$/.test(segment)) {
+          return segment;
+        }
+
+        if (segment.startsWith('![') || segment.startsWith('![[') || segment.startsWith('[[') && segment.startsWith('!')) {
+          return segment;
+        }
+
+        if (segment.startsWith('[[')) {
+          const wiki = this.capitalizeWikiLink(segment, options, firstWord);
+          firstWord = wiki.firstWord;
+          return wiki.value;
+        }
+
+        if (segment.startsWith('[') && segment.includes('](')) {
+          const markdown = this.capitalizeMarkdownLink(segment, options, firstWord);
+          firstWord = markdown.firstWord;
+          return markdown.value;
+        }
+
+        const transformed = this.capitalizeFragment(segment, options, firstWord);
+        firstWord = transformed.firstWord;
+        return transformed.value;
+      });
+    });
+  }
+
   apply(text: string, options: CapitalizeHeadingsOptions, protectedRanges: ProtectedRanges): string {
     const projection = protectedRanges.projection();
     const replacements: textReplacement[] = [];
     for (const match of projection.text.matchAll(allHeadersRegex)) {
-      // skip empty headers as there is nothing to capitalize (see https://github.com/platers/obsidian-linter/issues/1531)
       if (!match[4] || match[4].trim() == '') {
-        continue
+        continue;
       }
 
       const addReplacement = (startIndex: number, endIndex: number, value: string) => {
@@ -347,86 +504,28 @@ export default class CapitalizeHeadings extends RuleBuilder<CapitalizeHeadingsOp
           replacements.push({ ...range, value });
         }
       };
+
+      const transformedHeader = this.capitalizeHeading(match[0], options);
+      const sourceHeader = match[0];
+      if (sourceHeader !== transformedHeader) {
+        const range = projection.editRangeToSource({ startIndex: match.index, endIndex: match.index + sourceHeader.length });
+        if (range) {
+          replacements.push({ ...range, value: transformedHeader });
+        }
+      }
+
       if (options.style === 'ALL CAPS') {
-        // Case conversion can expand a character (ß -> SS). Never uppercase protected text,
-        // including tokens that the old case-insensitive restore would have restored unchanged.
         let offset = 0;
         for (const character of match[0]) {
           addReplacement(offset, offset + character.length, character.toUpperCase());
           offset += character.length;
         }
-        continue;
       }
-
-      const words = [...match[0].matchAll(whitespaceSplitterRegex)];
-      const capitalizedWords = this.capitalizeHeading(match[0], options).split(' ');
-      let cursor = 0;
-      for (let index = 0; index < words.length; index++) {
-        const word = words[index];
-        addReplacement(cursor, word.index, index === 0 ? '' : ' ');
-        addReplacement(word.index, word.index + word[0].length, capitalizedWords[index]);
-        cursor = word.index + word[0].length;
-      }
-      addReplacement(cursor, match[0].length, '');
     }
+
     return applyNonOverlappingReplacements(text, replacements);
   }
-  capitalizeHeading(text: string, options: CapitalizeHeadingsOptions): string {
-    return text.replace(allHeadersRegex, (headerText: string) => {
-      if (options.style === 'ALL CAPS') {
-        return headerText.toUpperCase(); // convert full heading to uppercase
-      }
 
-      const capitalizeJustFirstLetter = options.style === 'First letter';
-      // split by whitespace
-      const headerWords = headerText.match(whitespaceSplitterRegex);
-      if (!headerWords) {
-        return headerText;
-      }
-
-      const startingCustomRegexGroup = options.startingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.startingWordIgnoreCharacters)}]?`;
-      const endingCustomRegexGroup = options.endingWordIgnoreCharacters?.length == 0 ? '' : `[${escapeRegExp(options.endingWordIgnoreCharacters)}]*`;
-      const wordRegex = new RegExp(`^${startingCustomRegexGroup}[\\p{L}’'-]{1,}${endingCustomRegexGroup}$`, 'u');
-      const keepCasing = options.ignoreWords;
-      const ignoreShortWords = options.lowercaseWords;
-      let firstWord = true;
-      for (let j = 1; j < headerWords.length; j++) {
-        // based on https://stackoverflow.com/a/62032796 "/\p{L}/u" accounts for all unicode letters across languages
-        const isWord = headerWords[j].match(wordRegex);
-        if (!isWord || headerWords[j] === '-' || headerWords[j] === '\'') {
-          continue;
-        }
-
-        let indexToCapitalize = 0;
-        if (options.startingWordIgnoreCharacters?.includes(headerWords[j][0])) {
-          indexToCapitalize = 1;
-        }
-
-        const ignoreCasedWord = options.ignoreCasedWords && headerWords[j] !== headerWords[j].toLowerCase();
-        const keepWordCasing = ignoreCasedWord || keepCasing.includes(headerWords[j]);
-        if (!keepWordCasing) {
-          headerWords[j] = headerWords[j].toLowerCase();
-          const ignoreWord = ignoreShortWords.includes(headerWords[j]);
-          if ((!ignoreWord && !capitalizeJustFirstLetter) || firstWord === true) {
-            if (indexToCapitalize === 0) {
-              headerWords[j] = headerWords[j][indexToCapitalize].toUpperCase() + headerWords[j].slice(indexToCapitalize + 1);
-            } else {
-              headerWords[j] = headerWords[j][0] + headerWords[j][indexToCapitalize].toUpperCase() + headerWords[j].slice(indexToCapitalize + 1);
-            }
-          }
-        }
-
-        firstWord = false;
-
-        // if the user wants to keep casing and capitalize just the first letter then there is no need to lowercase any other word after the first word
-        if (options.ignoreCasedWords && capitalizeJustFirstLetter) {
-          break;
-        }
-      }
-
-      return headerWords.join(' ');
-    });
-  }
   get exampleBuilders(): ExampleBuilder<CapitalizeHeadingsOptions>[] {
     return [
       new ExampleBuilder({
