@@ -1,4 +1,4 @@
-import { Command, moment } from 'obsidian';
+import { Command, MarkdownView, moment } from 'obsidian';
 import { logDebug, logWarn, timingBegin, timingEnd } from '../utils/logger';
 import { rules, RuleType, Rule, Options } from '../rules';
 import { wrapLintError } from '../utils/error';
@@ -332,7 +332,7 @@ export function runCustomRegexReplacement(customRegexes: CustomReplace[], oldTex
   return newText;
 }
 
-export async function runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface): Promise<void> {
+export async function runCustomCommands(lintCommands: LintCommand[], commands: ObsidianCommandInterface, view: MarkdownView | null): Promise<void> {
   logDebug(getTextInLanguage('logs.running-custom-lint-command'));
   const commandsRun = new Set<string>();
   for (const commandInfo of lintCommands) {
@@ -354,6 +354,11 @@ export async function runCustomCommands(lintCommands: LintCommand[], commands: O
         command.checkCallback();
       } else if (command.callback) {
         await command.callback();
+      } else if (command.editorCheckCallback && view && command.editorCallback(true, view.editor, view)) {
+        // eslint-disable-next-line @typescript-eslint/await-thenable -- disable here just in case it returns a promise
+        await command.editorCheckCallback(false, view.editor, view);
+      } else if (command.editorCallback && view) {
+        await command.editorCallback(view.editor, view);
       }
 
     } catch (error) {

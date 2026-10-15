@@ -1196,7 +1196,8 @@ export default class LinterPlugin extends Plugin {
         this.activeLeafChangesToIgnore.push(file.path);
 
         await sidebarTab.openFile(file, { active: true });
-        await runCustomCommands(this.settings.lintCommands, this.app.commands);
+        const markdownView = this.getMarkdownView();
+        await runCustomCommands(this.settings.lintCommands, this.app.commands, markdownView);
         if (this.customCommandsCallback) {
           await this.customCommandsCallback(file);
         }
@@ -1239,7 +1240,8 @@ export default class LinterPlugin extends Plugin {
 
     await this.customCommandsLock.acquire('command', async () => {
       try {
-        await runCustomCommands(this.settings.lintCommands, this.app.commands);
+        const markdownView = this.getMarkdownView();
+        await runCustomCommands(this.settings.lintCommands, this.app.commands, markdownView);
       } catch (error) {
         handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
       }
@@ -1254,10 +1256,14 @@ export default class LinterPlugin extends Plugin {
    * Gets the current markdown editor if it exists {@link https://github.com/chrisgrieser/obsidian-smarter-paste/blob/master/main.ts#L37-L41|Obsidian Smarter Paste Source}
    * @return {Editor} Returns the current codemirror editor if there is an active view of type markdown or null if there is not one.
    */
-  private getEditor(): Editor {
+  private getEditor(): Editor | null {
     const activeLeaf = this.app.workspace.getActiveViewOfType(MarkdownView);
     if (!activeLeaf) return null;
     return activeLeaf.editor;
+  }
+
+  private getMarkdownView(): MarkdownView | null {
+    return this.app.workspace.getActiveViewOfType(MarkdownView) ?? null;
   }
 
   /**
