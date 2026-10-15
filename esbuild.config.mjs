@@ -59,7 +59,7 @@ const mockedPlugins = [replace({
     // remove the use of obsidian inside error helpers
     'import { Notice, TFile } from "obsidian";': '',
     // remove use of moment and obsidian command
-    'import { Command, moment } from \'obsidian\';': '',
+    'import { Command, MarkdownView, moment } from \'obsidian\';': '',
   },
   delimiters: ['', ''],
 })];
