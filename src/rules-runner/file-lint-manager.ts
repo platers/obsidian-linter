@@ -46,47 +46,7 @@ export class FileLintManager {
     this.callbacks = new Map();
     this.fileToBatches = new Map();
 
-    const identifierTemplate = getTextInLanguage('logs.worker-identifier');
-
-    for (let index = 0; index < numWorkers; index++) {
-      const worker = ((Worker as unknown)() as LinterWorker);
-
-      worker.onmessage = async (event: MessageEvent<RunLinterRulesOptions>) => {
-        const data = event.data;
-        if (data.error) {
-          const d = data.error;
-          const err = new LinterError(d.message, null, d.stack);
-          err.name = d.name;
-
-          // Notify the queue this file is available for new work.
-          this.busy[index] = false;
-
-          if (this.callbacks.has(data.fileInfo.path)) {
-            this.callbacks.delete(data.fileInfo.path);
-          }
-
-          handleLintError(data.fileInfo, err, data.errorNoticeTimeout, data.errorTemplateString, data.useLogTemplateInNotice);
-
-          await this.updateBatchesForFile(data.fileInfo.path, false)
-
-          // Queue a new job onto this worker.
-          const job = this.lintQueue.shift();
-          if (job !== undefined) {
-            void this.send(job, index);
-          }
-
-          return;
-        }
-
-        await this.finish(data, index);
-      };
-
-      this.workers.push({
-        id: identifierTemplate.replace('{NUM}', index + 1),
-        worker: worker
-      });
-      this.busy.push(false);
-    }
+    this.createWorkers(false);
   }
 
   public setDefaultMisspellings(defaultMisspellings: Map<string, string>): void {
@@ -136,6 +96,63 @@ export class FileLintManager {
     }
 
     this.workers = [];
+  }
+
+  public restartWorkers(): void {
+    this.terminateWorkers();
+
+    this.createWorkers(true);
+  }
+
+  private createWorkers(isRestarting: boolean) {
+    const identifierTemplate = getTextInLanguage('logs.worker-identifier');
+
+    for (let index = 0; index < this.numWorkers; index++) {
+      const worker = ((Worker as unknown)() as LinterWorker);
+
+      worker.onmessage = async (event: MessageEvent<RunLinterRulesOptions>) => {
+        const data = event.data;
+        if (data.error) {
+          const d = data.error;
+          const err = new LinterError(d.message, null, d.stack);
+          err.name = d.name;
+
+          // Notify the queue this file is available for new work.
+          this.busy[index] = false;
+
+          if (this.callbacks.has(data.fileInfo.path)) {
+            this.callbacks.delete(data.fileInfo.path);
+          }
+
+          handleLintError(data.fileInfo, err, data.errorNoticeTimeout, data.errorTemplateString, data.useLogTemplateInNotice);
+
+          await this.updateBatchesForFile(data.fileInfo.path, false)
+
+          // Queue a new job onto this worker.
+          const job = this.lintQueue.shift();
+          if (job !== undefined) {
+            void this.send(job, index);
+          }
+
+          return;
+        }
+
+        await this.finish(data, index);
+      };
+
+      this.workers.push({
+        id: identifierTemplate.replace('{NUM}', index + 1),
+        worker: worker
+      });
+      this.busy.push(false);
+
+      if (isRestarting) {
+        const job = this.lintQueue.shift();
+        if (job !== undefined) {
+          void this.send(job, index);
+        }
+      }
+    }
   }
 
   // Finish the parsing of a file, potentially queueing a new file.
