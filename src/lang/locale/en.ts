@@ -12,6 +12,9 @@ export default {
     'preview-lint-file': {
       'name': 'Preview lint changes for the current file',
     },
+    'restart-background-workers': {
+      'name': 'Restart all Linter background workers',
+    },
     'lint-all-files': {
       'name': 'Lint all files in the vault',
       'error-message': 'Lint All Files Error in File',

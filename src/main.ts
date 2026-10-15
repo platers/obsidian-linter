@@ -302,6 +302,14 @@ export default class LinterPlugin extends Plugin {
       icon: iconInfo.ignoreFile.id,
     });
 
+    this.addCommand({
+      id: 'restart-background-workers',
+      name: getTextInLanguage('commands.restart-background-workers.name'),
+      callback: () => {
+        this.lintFileManager.restartWorkers();
+      }
+    });
+
     this.registerDiffPreviewCommands();
   }
 
