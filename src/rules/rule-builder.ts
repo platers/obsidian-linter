@@ -318,7 +318,7 @@ export class ListItemOptionBuilder<TOptions extends Options> extends OptionBuild
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
-    if (options[this.configKey] !== undefined) {
+    if (options[this.configKey] !== undefined && options[this.configKey] !== null) {
       // `as string[]` is not enough because of the https://github.com/microsoft/TypeScript/issues/48992
       // make sure to remove any empty strings as well as they are not valid values
       const optionValue = (options[this.configKey] as string[])
