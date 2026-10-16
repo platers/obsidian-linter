@@ -936,11 +936,6 @@ export default {
     // yaml.ts
     'multi-line': '複数行',
     'single-line': '単一行',
-    'single string to single-line': '単一文字列から単一行へ',
-    'single string to multi-line': '単一文字列から複数行へ',
-    'single string comma delimited': '単一文字列カンマ区切り',
-    'single string space delimited': '単一文字列スペース区切り',
-    'single-line space delimited': '単一行スペース区切り',
     // yaml-title.ts
     'first-h1': '最初のH1',
     'first-h1-or-filename-if-h1-missing': '最初のH1 または H1がない場合はファイル名',

@@ -1074,11 +1074,6 @@ export default {
     // yaml.ts
     'multi-line': 'multi-line',
     'single-line': 'single-line',
-    'single string to single-line': 'single string to single-line',
-    'single string to multi-line': 'single string to multi-line',
-    'single string comma delimited': 'single string comma delimited',
-    'single string space delimited': 'single string space delimited',
-    'single-line space delimited': 'single-line space delimited',
     // yaml-title.ts
     'first-h1': 'First H1',
     'first-h1-or-filename-if-h1-missing': 'First H1 or Filename if H1 is Missing',
