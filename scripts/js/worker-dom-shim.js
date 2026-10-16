@@ -1,6 +1,21 @@
 // worker-dom-shim.js
-import { parseHTML } from "linkedom/worker";
 
-const { document } = parseHTML("<html><body></body></html>");
+import { decodeHTML } from "entities/decode";
+
+const document = {
+  createElement(tagName) {
+    let html = "";
+
+    return {
+      set innerHTML(value) {
+        html = String(value);
+      },
+
+      get textContent() {
+        return decodeHTML(html);
+      },
+    };
+  },
+};
 
 export { document };
