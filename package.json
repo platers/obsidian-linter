@@ -66,6 +66,8 @@
   "dependencies": {
     "async-lock": "^1.4.1",
     "diff-match-patch": "^1.0.5",
+    "entities": "^8.1.0",
+    "esbuild-plugin-inline-worker": "^0.1.1",
     "loglevel": "^1.9.2",
     "lru-cache": "^11.5.2",
     "mdast-util-from-markdown": "^2.0.4",

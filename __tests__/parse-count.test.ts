@@ -1,18 +1,18 @@
-import {existsSync, readFileSync} from 'fs';
-import {moment} from 'obsidian';
-import {rules} from '../src/rules';
-import {RulesRunner} from '../src/rules-runner';
-import {LinterSettings} from '../src/settings-data';
-import {setLanguage} from '../src/lang/helpers';
-import {parseCustomReplacements} from '../src/utils/strings';
+import { existsSync, readFileSync } from 'fs';
+import { moment } from 'obsidian';
+import { rules } from '../src/rules';
+import { LinterSettings } from '../src/settings-data';
+import { setLanguage } from '../src/lang/helpers';
+import { parseCustomReplacements } from '../src/utils/strings';
 import '../src/rules-registry';
+import { runRules } from './common';
 
 // Set LINTER_PERF_FIXTURE to a large Markdown note and LINTER_PERF_SETTINGS to its
 // Linter settings JSON to run this optional performance harness.
 // Parsing the document is the bulk of the cost of linting a large one, and the number of parses is
 // stable from run to run in a way that the elapsed time is not, so it is the number that gets
 // asserted on. jest insists the variable a mock factory closes over is named `mock` something.
-const mockParseStats = {calls: 0, ms: 0};
+const mockParseStats = { calls: 0, ms: 0 };
 
 jest.mock('mdast-util-from-markdown', () => {
   const actual = jest.requireActual<typeof import('mdast-util-from-markdown')>('mdast-util-from-markdown');
@@ -80,14 +80,13 @@ describe('linting a large document', () => {
     mockParseStats.ms = 0;
 
     const start = performance.now();
-    new RulesRunner().lintText({
+    runRules({
       oldText: text,
-      fileInfo: {name: 'note', createdAtFormatted: '2025-05-11T19:34:17-04:00', modifiedAtFormatted: '2025-05-31T12:38:50-04:00', path: 'note.md'},
+      fileInfo: { name: 'note', createdAtFormatted: '2025-05-11T19:34:17-04:00', modifiedAtFormatted: '2025-05-31T12:38:50-04:00', path: 'note.md' },
       settings,
       momentLocale: 'en',
-      getCurrentTime: () => moment('2025-05-31T12:38:50-04:00'),
       defaultMisspellings: misspellings,
-    });
+    }, () => moment('2025-05-31T12:38:50-04:00'));
     const elapsed = performance.now() - start;
 
     process.stdout.write(`\nparses: ${mockParseStats.calls}, parsing: ${Math.round(mockParseStats.ms)}ms, lint: ${Math.round(elapsed)}ms\n`);

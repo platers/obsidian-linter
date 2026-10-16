@@ -23,13 +23,8 @@ export const formatTagsInYamlRuleTestCases: IntegrationTestCase[] = [
     setup: setup1,
   },
   {
-    name: "Format tags in array with `tag` as the tags key",
-    filePath: "rule-tests/format-tags-in-yaml/format-tags-in-yaml-3.md",
-    setup: setup1,
-  },
-  {
     name: "Format tags in list",
-    filePath: "rule-tests/format-tags-in-yaml/format-tags-in-yaml-4.md",
+    filePath: "rule-tests/format-tags-in-yaml/format-tags-in-yaml-3.md",
     setup: setup1,
   }
 ];

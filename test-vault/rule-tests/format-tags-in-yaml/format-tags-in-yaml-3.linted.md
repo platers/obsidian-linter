@@ -1,3 +1,5 @@
 ---
-tag: [one two three]
+tags:
+- tag1
+- tag2
 ---

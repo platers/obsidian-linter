@@ -1,12 +1,12 @@
-import {Options} from './rules';
-import {NestedKeyOf} from './utils/nested-keyof';
-import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from './utils/yaml';
+import { Options } from './rules';
+import { NestedKeyOf } from './utils/nested-keyof';
+import { ArrayFormats, QuoteCharacter } from './utils/yaml';
 
 // CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
 export type CommonStyles = {
-  aliasArrayStyle: NormalArrayFormats | SpecialArrayFormats;
-  tagArrayStyle: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats;
-  defaultArrayStyle: NormalArrayFormats;
+  aliasArrayStyle: ArrayFormats;
+  tagArrayStyle: ArrayFormats;
+  defaultArrayStyle: ArrayFormats;
   minimumNumberOfDollarSignsToBeAMathBlock: number;
   escapeCharacter: QuoteCharacter;
   removeUnnecessaryEscapeCharsForMultiLineArrays: boolean;
@@ -76,9 +76,9 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   lintCommands: [],
   customRegexes: [],
   commonStyles: {
-    aliasArrayStyle: NormalArrayFormats.SingleLine,
-    tagArrayStyle: NormalArrayFormats.SingleLine,
-    defaultArrayStyle: NormalArrayFormats.SingleLine,
+    aliasArrayStyle: ArrayFormats.SingleLine,
+    tagArrayStyle: ArrayFormats.SingleLine,
+    defaultArrayStyle: ArrayFormats.SingleLine,
     minimumNumberOfDollarSignsToBeAMathBlock: 2,
     escapeCharacter: '"',
     removeUnnecessaryEscapeCharsForMultiLineArrays: false,
@@ -92,10 +92,10 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
  */
 export function moveDefaultArrayStyleToCommonStyles(settings: LinterSettings): boolean {
   let updateMade = false;
-  const formatYamlArraySettings = settings.ruleConfigs['format-yaml-array'] as {[key: string]: unknown} | undefined;
+  const formatYamlArraySettings = settings.ruleConfigs['format-yaml-array'] as { [key: string]: unknown } | undefined;
   if (formatYamlArraySettings != undefined && Object.hasOwn(formatYamlArraySettings, 'default-array-style')) {
-    const value = formatYamlArraySettings['default-array-style'] as NormalArrayFormats;
-    if (Object.values(NormalArrayFormats).includes(value)) {
+    const value = formatYamlArraySettings['default-array-style'] as ArrayFormats;
+    if (Object.values(ArrayFormats).includes(value)) {
       settings.commonStyles.defaultArrayStyle = value;
     }
 
@@ -103,8 +103,8 @@ export function moveDefaultArrayStyleToCommonStyles(settings: LinterSettings): b
     updateMade = true;
   }
 
-  if (!Object.values(NormalArrayFormats).includes(settings.commonStyles.defaultArrayStyle)) {
-    settings.commonStyles.defaultArrayStyle = NormalArrayFormats.SingleLine;
+  if (!Object.values(ArrayFormats).includes(settings.commonStyles.defaultArrayStyle)) {
+    settings.commonStyles.defaultArrayStyle = ArrayFormats.SingleLine;
     updateMade = true;
   }
 

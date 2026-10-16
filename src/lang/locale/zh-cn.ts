@@ -925,11 +925,6 @@ export default {
     // yaml.ts
     'multi-line': '多行数组',
     'single-line': '单行数组',
-    'single string to single-line': '字符串转单行数组',
-    'single string to multi-line': '字符串转多行数组',
-    'single string comma delimited': '逗号分隔字符串',
-    'single string space delimited': '空格分隔字符串',
-    'single-line space delimited': '空格分隔单行数组',
     // yaml-title.ts
     'first-h1': '第一个 H1 标题',
     'first-h1-or-filename-if-h1-missing': '第一个 H1 标题或文件名（第一个 H1 标题不存在时）',

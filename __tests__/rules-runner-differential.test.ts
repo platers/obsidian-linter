@@ -4,11 +4,11 @@ import { join } from 'path';
 import { moment } from 'obsidian';
 import dedent from 'ts-dedent';
 import { rules } from '../src/rules';
-import { RulesRunner } from '../src/rules-runner';
 import { DEFAULT_SETTINGS, LinterSettings } from '../src/settings-data';
 import { setLanguage } from '../src/lang/helpers';
 import { parseCustomReplacements } from '../src/utils/strings';
 import '../src/rules-registry';
+import { runRules } from './common';
 
 // Set LINTER_PERF_FIXTURE to a large Markdown note to include its first 600 lines in the optional
 // full-text dump. The committed hash snapshot only covers documents available in a clean checkout.
@@ -67,14 +67,13 @@ function settingsWithEveryRuleEnabled(): LinterSettings {
 }
 
 function lint(text: string, settings: LinterSettings): string {
-  return new RulesRunner().lintText({
+  return runRules({
     oldText: text,
     fileInfo: { name: 'note', createdAtFormatted: '2025-05-11T19:34:17-04:00', modifiedAtFormatted: '2025-05-31T12:38:50-04:00', path: 'note.md' },
     settings,
     momentLocale: 'en',
-    getCurrentTime: () => moment('2025-05-31T12:38:50-04:00'),
     defaultMisspellings: misspellings,
-  });
+  }, () => moment('2025-05-31T12:38:50-04:00'));
 }
 
 type corpusDocument = { name: string, text: string };

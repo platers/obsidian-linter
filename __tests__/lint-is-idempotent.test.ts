@@ -1,12 +1,12 @@
-import {readFileSync} from 'fs';
-import {moment} from 'obsidian';
+import { readFileSync } from 'fs';
+import { moment } from 'obsidian';
 import dedent from 'ts-dedent';
-import {rules} from '../src/rules';
-import {RulesRunner} from '../src/rules-runner';
-import {DEFAULT_SETTINGS, LinterSettings} from '../src/settings-data';
-import {setLanguage} from '../src/lang/helpers';
-import {parseCustomReplacements} from '../src/utils/strings';
+import { rules } from '../src/rules';
+import { DEFAULT_SETTINGS, LinterSettings } from '../src/settings-data';
+import { setLanguage } from '../src/lang/helpers';
+import { parseCustomReplacements } from '../src/utils/strings';
 import '../src/rules-registry';
+import { runRules } from './common';
 
 let misspellings: Map<string, string>;
 
@@ -43,33 +43,33 @@ function settingsForRulesUnderTest(): LinterSettings {
   // every rule needs an entry, since the runner reads the enabled flag off it before doing anything
   settings.ruleConfigs = {};
   for (const rule of rules) {
-    const config = Object.assign(rule.getDefaultOptions(), DEFAULT_SETTINGS.ruleConfigs[rule.settingsKey] ?? {}) as {enabled: boolean};
+    const config = Object.assign(rule.getDefaultOptions(), DEFAULT_SETTINGS.ruleConfigs[rule.settingsKey] ?? {}) as { enabled: boolean };
     config.enabled = rulesUnderTest.includes(rule.alias);
     settings.ruleConfigs[rule.settingsKey] = config;
   }
 
   // the options that the rules actually disagree under, rather than whatever the defaults happen
   // to be, so that this keeps testing the interaction it was written for
-  Object.assign(settings.ruleConfigs['blockquote-style'], {'style': 'space'});
-  Object.assign(settings.ruleConfigs['trailing-spaces'], {'two-space-line-break': true});
-  Object.assign(settings.ruleConfigs['remove-trailing-punctuation-in-heading'], {'punctuation-to-remove': '.,;:!。，；：！'});
+  Object.assign(settings.ruleConfigs['blockquote-style'], { 'style': 'space' });
+  Object.assign(settings.ruleConfigs['trailing-spaces'], { 'two-space-line-break': true });
+  Object.assign(settings.ruleConfigs['remove-trailing-punctuation-in-heading'], { 'punctuation-to-remove': '.,;:!。，；：！' });
 
   settings.logLevel = 'ERROR';
   return settings;
 }
 
 function lint(text: string, settings: LinterSettings): string {
-  return new RulesRunner().lintText({
+  return runRules({
     oldText: text,
-    fileInfo: {name: 'note', createdAtFormatted: '2025-05-11T19:34:17-04:00', modifiedAtFormatted: '2025-05-31T12:38:50-04:00', path: 'note.md'},
+    fileInfo: { name: 'note', createdAtFormatted: '2025-05-11T19:34:17-04:00', modifiedAtFormatted: '2025-05-31T12:38:50-04:00', path: 'note.md' },
+    disabledRules: [],
     settings,
     momentLocale: 'en',
-    getCurrentTime: () => moment('2025-05-31T12:38:50-04:00'),
     defaultMisspellings: misspellings,
-  });
+  }, () => moment('2025-05-31T12:38:50-04:00'),);
 }
 
-const documents: {name: string, text: string}[] = [
+const documents: { name: string, text: string }[] = [
   { // blockquote style used to add a space to empty quote lines that trailing spaces then removed
     name: 'a blockquote with empty lines in it',
     text: dedent`

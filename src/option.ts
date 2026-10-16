@@ -20,7 +20,6 @@ function getFileFromPath(app: App, filePath: string): TFile | null {
 }
 
 /** Class representing an option of a rule */
-
 export abstract class Option {
   public ruleAlias: string;
 
