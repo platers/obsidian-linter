@@ -766,11 +766,6 @@ export default {
     // yaml.ts
     'multi-line': 'mehrzeilig',
     'single-line': 'einzeilig',
-    'single string to single-line': 'Single String zu Single-Line',
-    'single string to multi-line': 'Single String zu Multi-Line',
-    'single string comma delimited': 'Komma mit Trennzeichen für eine Zeichenfolge',
-    'single string space delimited': 'Einzelzeichenfolgenabstand durch Trennzeichen',
-    'single-line space delimited': 'einzeiliger Abstand durch Trennzeichen',
     // yaml-title.ts
     'first-h1': 'erste Überschrift der Ebene 1',
     'first-h1-or-filename-if-h1-missing': 'Erste Überschrift der Ebene 1 oder Dateiname, wenn die Überschrift der Ebene 1 fehlt',

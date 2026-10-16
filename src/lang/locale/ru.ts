@@ -920,11 +920,6 @@ export default {
     // yaml.ts
     'multi-line': 'многострочный',
     'single-line': 'однострочный',
-    'single string to single-line': 'одна строка в однострочный',
-    'single string to multi-line': 'одна строка в многострочный',
-    'single string comma delimited': 'одна строка, разделенная запятыми',
-    'single string space delimited': 'одна строка, разделенная пробелами',
-    'single-line space delimited': 'однострочная строка, разделенная пробелами',
     // yaml-title.ts
     'first-h1': 'Первый H1',
     'first-h1-or-filename-if-h1-missing': 'Первый H1 или название файла, если H1 не найден',

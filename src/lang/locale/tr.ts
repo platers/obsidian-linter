@@ -765,11 +765,6 @@ export default {
     // yaml.ts
     'multi-line': 'çoklu-satır',
     'single-line': 'tek-satır',
-    'single string to single-line': 'tek dizeden tek satıra',
-    'single string to multi-line': 'tek dizeden çok satıra',
-    'single string comma delimited': 'virgülle ayrılmış tek dize',
-    'single string space delimited': 'boşlukla ayrılmış tek dize',
-    'single-line space delimited': 'boşlukla ayrılmış tek satır',
     // yaml-title.ts
     'first-h1': 'İlk H1',
     'first-h1-or-filename-if-h1-missing': 'İlk H1 veya H1 Eksikse Dosya Adı',
