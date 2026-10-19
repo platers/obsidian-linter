@@ -81,3 +81,17 @@ describe('protected ranges preserve the masking contract', () => {
     expect(RemoveSpaceBeforeOrAfterCharacters.getRule().apply(text, options)).toBe('text [link](url) text{literal}text');
   });
 });
+
+describe('inline code is left alone', () => {
+  it.each([
+    '`== ?` stays as it is',
+    'text with `foo ( bar )` stays as it is',
+    'before `a , b` and `c ;` after',
+  ])('does not change spaces inside inline code in %j', (text) => {
+    expect(RemoveSpaceBeforeOrAfterCharacters.getRule().apply(text)).toBe(text);
+  });
+
+  it('still removes the space outside of inline code on the same line', () => {
+    expect(RemoveSpaceBeforeOrAfterCharacters.getRule().apply('is `== ?` the same ?')).toBe('is `== ?` the same?');
+  });
+});
