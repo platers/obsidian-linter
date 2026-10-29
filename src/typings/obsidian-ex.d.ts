@@ -97,7 +97,8 @@ declare module 'obsidian' {
 
 declare global {
   interface Window {
-    CodeMirrorAdapter: {
+    // optional since Obsidian only defines it when its built-in vim support is loaded (i.e., not on mobile)
+    CodeMirrorAdapter?: {
       commands: {
         save(): void;
       }

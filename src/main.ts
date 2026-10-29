@@ -422,9 +422,14 @@ export default class LinterPlugin extends Plugin {
 
     // defines the vim command for saving a file and lets the linter run on save for it
     // accounts for https://github.com/platers/obsidian-linter/issues/19
-    window.CodeMirrorAdapter.commands.save = () => {
-      this.app.commands.executeCommandById('editor:save-file');
-    };
+    // `CodeMirrorAdapter` is not a part of the official plugin API and Obsidian only defines it
+    // when its built-in vim support is loaded, which is not the case on all platforms (i.e., mobile).
+    // Guarding against its absence keeps the plugin from failing to load where it is missing.
+    if (window.CodeMirrorAdapter) {
+      window.CodeMirrorAdapter.commands.save = () => {
+        this.app.commands.executeCommandById('editor:save-file');
+      };
+    }
   }
 
   async onMetadataCacheUpdatedCallback(file: TFile) {
