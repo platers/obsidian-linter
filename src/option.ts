@@ -388,6 +388,9 @@ export function createListManagementPage<T>(opts: {
           if (opts.itemIsDisabled && opts.itemIsDisabled(entry)) {
             setting.nameEl.addClass('disabled-list-entry');
             setting.descEl.addClass('disabled-list-entry');
+          } else {
+            setting.nameEl.removeClass('disabled-list-entry');
+            setting.descEl.removeClass('disabled-list-entry');
           }
           setting.addExtraButton((cb) => cb
             .setIcon('lucide-pencil')
