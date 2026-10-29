@@ -58,6 +58,32 @@ ruleTest({
         # Some text?
       `,
     },
+    {
+      testName: 'Make sure that spaces inside of inline code are not changed',
+      before: dedent`
+        \`== ?\` stays as it is
+        ${''}
+        text with \`foo ( bar )\` stays as it is
+        ${''}
+        before \`a , b\` and \`c ;\` after
+      `,
+      after: dedent`
+        \`== ?\` stays as it is
+        ${''}
+        text with \`foo ( bar )\` stays as it is
+        ${''}
+        before \`a , b\` and \`c ;\` after
+      `,
+    },
+    {
+      testName: 'Make sure that spaces outside of inline code are still removed on the same line',
+      before: dedent`
+        is \`== ?\` the same ?
+      `,
+      after: dedent`
+        is \`== ?\` the same?
+      `,
+    },
   ],
 });
 

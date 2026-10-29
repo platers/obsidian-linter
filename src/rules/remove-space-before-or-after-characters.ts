@@ -19,7 +19,7 @@ export default class RemoveSpaceBeforeOrAfterCharacters extends RuleBuilder<Remo
       nameKey: 'rules.remove-space-before-or-after-characters.name',
       descriptionKey: 'rules.remove-space-before-or-after-characters.description',
       type: RuleType.SPACING,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
     });
   }
   get OptionsClass(): new () => RemoveSpaceBeforeOrAfterCharactersOptions {
