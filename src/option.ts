@@ -372,6 +372,7 @@ export function createListManagementPage<T>(opts: {
       const [moved] = opts.values.splice(oldIndex, 1);
       opts.values.splice(newIndex, 0, moved);
       await opts.plugin.saveSettings();
+      opts.plugin.settingsTab.update();
     },
     items: opts.values.map((entry): SettingDefinition<LinterSettingsKeys> => {
       const base = {
