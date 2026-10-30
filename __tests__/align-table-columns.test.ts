@@ -6,6 +6,27 @@ ruleTest({
   RuleBuilderClass: AlignTable,
   testCases: [
     {
+      testName: 'Already aligned tables with ambiguous width Latin characters are left alone',
+      before: dedent`
+        | Column | Column |
+        |--------|--------|
+        | a      |        |
+        | ßaa    |        |
+        | üaa    |        |
+        | üüü    |        |
+        | é°±    |        |
+      `,
+      after: dedent`
+        | Column | Column |
+        |--------|--------|
+        | a      |        |
+        | ßaa    |        |
+        | üaa    |        |
+        | üüü    |        |
+        | é°±    |        |
+      `,
+    },
+    {
       testName: 'Make sure that formatting a table in a table in a blockqoute works just fine',
       before: dedent`
         > | Column 1 | Column 2 |
