@@ -942,14 +942,23 @@ export default class LinterPlugin extends Plugin {
     const changes = dmp.diff_main(oldText, newText);
     // Batched offsets refer to the pre-transaction document; serialized line endings can invalidate that basis.
     const docLength = editor.cm.state.doc.length;
+    let changeMade = false;
     if (oldText.length !== docLength) {
       editor.cm.dispatch({ changes: { from: 0, to: docLength, insert: newText }, filter: false });
+      changeMade = true;
     } else {
       const editorChanges = diffToEditorChanges(changes);
       if (editorChanges.length > 0) {
         // Bypass the transaction filter that prevents editor.replaceRange from working in Live Preview.
         editor.cm.dispatch({ changes: editorChanges, filter: false });
+        changeMade = true;
       }
+    }
+
+    // If the file content is empty, move the cursor to the end of the lint content.
+    // This is mostly meant to deal with https://github.com/platers/obsidian-linter/issues/1646
+    if (changeMade && oldText.length === 0) {
+      editor.setCursor(newText.length - 1);
     }
 
     return changes;
