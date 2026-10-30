@@ -216,6 +216,10 @@ export default {
         'name': 'Display lint on file change message',
         'description': 'Displays a message when <code>Lint on focused file change</code> occurs',
       },
+      'ignore-outside-vault': {
+        'name': 'Ignore files outside vault',
+        'description': 'Whether to allow files outside the current vault to be linted',
+      },
       'folders-to-ignore': {
         'name': 'Folders to ignore',
         'description': 'Folders to ignore when linting all files or linting on save.',

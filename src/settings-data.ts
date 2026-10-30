@@ -1,6 +1,6 @@
-import {Options} from './rules';
-import {NestedKeyOf} from './utils/nested-keyof';
-import {NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats} from './utils/yaml';
+import { Options } from './rules';
+import { NestedKeyOf } from './utils/nested-keyof';
+import { NormalArrayFormats, QuoteCharacter, SpecialArrayFormats, TagSpecificArrayFormats } from './utils/yaml';
 
 // CommonStyles are settings that are used in multiple places and thus need to be external to rules themselves to help facilitate their use
 export type CommonStyles = {
@@ -41,6 +41,7 @@ export interface LinterSettings {
   defaultArrayStyleMovedToCommonStyles: boolean;
   recordLintOnSaveLogs: boolean;
   lintOnFileChange: boolean;
+  ignoreFilesOutsideVault: boolean;
   displayLintOnFileChangeNotice: boolean;
   additionalFileExtensions: string[];
   foldersToIgnore: string[];
@@ -64,6 +65,7 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
   suppressLintAllFilesConfirmationModal: false,
   suppressLintAllFilesInFolderConfirmationModal: false,
   lintOnFileChange: false,
+  ignoreFilesOutsideVault: false,
   displayLintOnFileChangeNotice: false,
   settingsConvertedToConfigKeyValues: false,
   textAreaSettingsConvertedToListItemSettings: false,
@@ -92,7 +94,7 @@ export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
  */
 export function moveDefaultArrayStyleToCommonStyles(settings: LinterSettings): boolean {
   let updateMade = false;
-  const formatYamlArraySettings = settings.ruleConfigs['format-yaml-array'] as {[key: string]: unknown} | undefined;
+  const formatYamlArraySettings = settings.ruleConfigs['format-yaml-array'] as { [key: string]: unknown } | undefined;
   if (formatYamlArraySettings != undefined && Object.hasOwn(formatYamlArraySettings, 'default-array-style')) {
     const value = formatYamlArraySettings['default-array-style'] as NormalArrayFormats;
     if (Object.values(NormalArrayFormats).includes(value)) {
