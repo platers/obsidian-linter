@@ -15,7 +15,8 @@ function computeWidth(str: string) {
         width += 2;
         break;
       case 'A':
-        width += 2;
+        // ambiguous characters in the Latin-1/Latin Extended range (letters like ü, ß, é and symbols like °, ±) render as a single column
+        width += (char.codePointAt(0) ?? 0) <= 0x024F ? 1 : 2;
         break;
       default:
         width += 1;
