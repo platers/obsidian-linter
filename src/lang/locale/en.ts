@@ -1015,7 +1015,7 @@ export default {
       },
       'alias-helper-key': {
         'name': 'Alias helper key',
-        'description': 'The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule.',
+        'description': 'The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule. The default <code>linter-yaml-title-alias</code> is stored as <code>yaml-title-alias</code> under the <code>linter</code> key, and a top-level <code>linter-yaml-title-alias</code> is moved there on the next lint.',
       },
       'remove-alias-if-empty': {
         'name': 'Remove alias if empty',

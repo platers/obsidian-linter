@@ -31,22 +31,28 @@ rule or rules via the YAML frontmatter or ranged ignores.
 
 ### YAML Frontmatter
 
-In the YAML frontmatter of a file, there is the ability to specify a list of rules to disable for the file using the key `disabled rules`.
+In the YAML frontmatter of a file, there is the ability to specify a list of rules to disable for the file using the key `disabled-rules` under the Linter's own `linter` key.
 Valid values for rules to disable are the rule aliases to disable specific rules or `all` to disable all rules for the file.
 
 For example, the following would disable [capitalize headings](../settings/heading-rules.md#capitalize-headings) and [header increment](../settings/heading-rules.md#header-increment) for the entire file it is found in:
 ``` markdown
 ---
-disabled rules: [capitalize-headings, header-increment]
+linter:
+  disabled-rules: [capitalize-headings, header-increment]
 ---
 ```
 
 The following disables all Linter rules for a file:
 ``` markdown
 ---
-disabled rules: [all]
+linter:
+  disabled-rules: [all]
 ---
 ```
+
+!!! note
+    The top-level `disabled rules` key used by older versions of the Linter is still read. When a file that uses it is linted,
+    its value is moved to `disabled-rules` under `linter`, and merged with any value already there.
 
 ### Range Ignore
 

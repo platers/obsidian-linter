@@ -1,7 +1,7 @@
 import { Options, RuleType } from '../rules';
 import RuleBuilder, { BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, TextOptionBuilder } from './rule-builder';
 import dedent from 'ts-dedent';
-import { convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, DEFAULT_LINTER_ALIASES_HELPER_KEY, loadYAML, ArrayFormats, OBSIDIAN_ALIAS_KEY, QuoteCharacter, removeYamlSection, setYamlSection, splitValueIfSingleOrMultilineArray, isValueEscapedAlready } from '../utils/yaml';
+import { convertAliasValueToStringOrStringArray, escapeStringIfNecessaryAndPossible, formatYamlArrayValue, getYamlSectionValue, initYAML, DEFAULT_LINTER_ALIASES_HELPER_KEY, loadYAML, ArrayFormats, OBSIDIAN_ALIAS_KEY, QuoteCharacter, removeYamlSection, setYamlSection, splitValueIfSingleOrMultilineArray, isValueEscapedAlready, LINTER_NAMESPACE_KEY, LINTER_ALIASES_HELPER_KEY, setLinterNamespaceValue, removeLinterNamespaceValue } from '../utils/yaml';
 import { IgnoreTypes } from '../utils/ignore-types';
 import { getFirstHeaderOneText, yamlRegex } from '../utils/regex';
 import { ProtectedRanges } from '../utils/protected-ranges';
@@ -51,12 +51,20 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
 
     let newYaml = yaml.replace('---\n', '').replace('\n---', '');
     const parsedYaml = loadYAML(yaml);
-    let aliasHelperKey = options.aliasHelperKey ?? DEFAULT_LINTER_ALIASES_HELPER_KEY;
+    let aliasHelperKey = options.aliasHelperKey || DEFAULT_LINTER_ALIASES_HELPER_KEY;
     if (aliasHelperKey.endsWith(':')) {
       aliasHelperKey = aliasHelperKey.substring(0, aliasHelperKey.length - 1);
     }
 
-    previousTitle = ((parsedYaml as { [k: string]: string })[aliasHelperKey]) ?? null;
+    // the default helper key is the Linter's own, so it lives under `linter:` and the old top-level key gets migrated there
+    const useLinterNamespace = aliasHelperKey === DEFAULT_LINTER_ALIASES_HELPER_KEY;
+    if (useLinterNamespace) {
+      const linterNamespace = (parsedYaml as { [k: string]: unknown })[LINTER_NAMESPACE_KEY];
+      previousTitle = (linterNamespace != null && typeof linterNamespace === 'object' ? (linterNamespace as { [k: string]: string })[LINTER_ALIASES_HELPER_KEY] : null) ??
+        ((parsedYaml as { [k: string]: string })[aliasHelperKey]) ?? null;
+    } else {
+      previousTitle = ((parsedYaml as { [k: string]: string })[aliasHelperKey]) ?? null;
+    }
     if (previousTitle != null) {
       // force previousTitle to be a string by concatenating with an empty string to make non-strings like numbers get handled correctly
       previousTitle = previousTitle + '';
@@ -100,7 +108,14 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       newYaml = setYamlSection(newYaml, OBSIDIAN_ALIAS_KEY, formatYamlArrayValue(title, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true/* escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747*/));
     }
 
-    if (!options.useYamlKeyToKeepTrackOfOldFilenameOrHeading || shouldRemoveTitleAlias) {
+    if (useLinterNamespace) {
+      newYaml = removeYamlSection(newYaml, aliasHelperKey, false);
+      if (!options.useYamlKeyToKeepTrackOfOldFilenameOrHeading || shouldRemoveTitleAlias) {
+        newYaml = removeLinterNamespaceValue(newYaml, LINTER_ALIASES_HELPER_KEY);
+      } else {
+        newYaml = setLinterNamespaceValue(newYaml, LINTER_ALIASES_HELPER_KEY, ` ${title}`);
+      }
+    } else if (!options.useYamlKeyToKeepTrackOfOldFilenameOrHeading || shouldRemoveTitleAlias) {
       newYaml = removeYamlSection(newYaml, aliasHelperKey);
     } else {
       newYaml = setYamlSection(newYaml, aliasHelperKey, ` ${title}`);
@@ -189,7 +204,8 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
           ---
           aliases:
             - Obsidian
-          linter-yaml-title-alias: Obsidian
+          linter:
+            yaml-title-alias: Obsidian
           ---
           # Obsidian
         `,
@@ -219,7 +235,8 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
           ---
           aliases:
             - Filename
-          linter-yaml-title-alias: Filename
+          linter:
+            yaml-title-alias: Filename
           ---
           ${''}
         `,
@@ -247,13 +264,14 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
         },
       }),
       new ExampleBuilder({
-        description: 'Replaces old filename with new filename when no header is present and filename is different than the old one listed in `linter-yaml-title-alias`.',
+        description: 'Replaces old filename with new filename when no header is present and filename is different than the old one listed in `yaml-title-alias` under `linter`.',
         before: dedent`
           ---
           aliases:
             - Old Filename
             - Alias 2
-          linter-yaml-title-alias: Old Filename
+          linter:
+            yaml-title-alias: Old Filename
           ---
           ${''}
         `,
@@ -262,7 +280,32 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
           aliases:
             - Filename
             - Alias 2
-          linter-yaml-title-alias: Filename
+          linter:
+            yaml-title-alias: Filename
+          ---
+          ${''}
+        `,
+        options: {
+          fileName: 'Filename',
+          keepAliasThatMatchesTheFilename: true,
+        },
+      }),
+      new ExampleBuilder({
+        description: 'Moves the top-level `linter-yaml-title-alias` used by older versions of the Linter under `linter`.',
+        before: dedent`
+          ---
+          aliases:
+            - Old Filename
+          linter-yaml-title-alias: Old Filename
+          ---
+          ${''}
+        `,
+        after: dedent`
+          ---
+          aliases:
+            - Filename
+          linter:
+            yaml-title-alias: Filename
           ---
           ${''}
         `,
@@ -280,7 +323,8 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
           ---
           aliases:
             - This is a Heading
-          linter-yaml-title-alias: This is a Heading
+          linter:
+            yaml-title-alias: This is a Heading
           ---
           # This is a [Heading](markdown.md)
         `,
