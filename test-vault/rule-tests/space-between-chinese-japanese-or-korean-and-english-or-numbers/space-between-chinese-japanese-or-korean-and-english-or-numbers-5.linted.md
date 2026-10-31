@@ -3,5 +3,5 @@ _这是一个数学公式_
 
 # Handling bold and italics nested in each other is not supported at this time
 
-**_ 这是一 _ 个数学公式**
-*这是一 hello__ 个数学 world 公式 __*
+**_这是一_个数学公式**
+*这是一 hello__个数学 world 公式__*
