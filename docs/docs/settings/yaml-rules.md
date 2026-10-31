@@ -468,24 +468,6 @@ tags: [one two three]
 ---
 ``````
 </details>
-<details><summary>Format tags in array with `tag` as the tags key</summary>
-
-Before:
-
-`````` markdown
----
-tag: [#one #two #three]
----
-``````
-
-After:
-
-`````` markdown
----
-tag: [one two three]
----
-``````
-</details>
 <details><summary>Format tags in list</summary>
 
 Before:
@@ -567,7 +549,7 @@ Nesting YAML arrays may result in unexpected results.
 Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid YAML unless it comes as the last entry in the array.
 ``````
 </details>
-<details><summary>Format tags as a single string with space delimiters, ignore aliases, and format regular YAML arrays as single-line arrays</summary>
+<details><summary>Format tags as multiline, ignore aliases, and format regular YAML arrays as single-line arrays</summary>
 
 Before:
 
@@ -587,7 +569,10 @@ After:
 ---
 aliases: Typescript
 types: [thought provoking, peer reviewed]
-tags: computer science trajectory
+tags:
+  - computer
+  - science
+  - trajectory
 ---
 ``````
 </details>
