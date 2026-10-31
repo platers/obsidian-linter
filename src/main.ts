@@ -1,4 +1,4 @@
-import { App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, WorkspaceLeaf, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer, getLanguage } from 'obsidian';
+import { App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, WorkspaceLeaf, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer, getLanguage, TExternalFile } from 'obsidian';
 import { Options, RuleType, ruleTypeToRules, rules, sortRules } from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -539,6 +539,10 @@ export default class LinterPlugin extends Plugin {
   }
 
   shouldIgnoreFile(file: TFile): boolean {
+    if (this.settings.ignoreFilesOutsideVault && file instanceof TExternalFile) {
+      return true;
+    }
+
     for (const folder of this.settings.foldersToIgnore) {
       // make sure that we check that the folder name is exactly at the start of the path
       // which prevent incorrect matches see https://github.com/platers/obsidian-linter/issues/1208
