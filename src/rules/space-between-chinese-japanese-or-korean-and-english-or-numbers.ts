@@ -95,7 +95,7 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
       puncAndSymbolGroup = `|[${escapeRegExp(englishPunctuationAndSymbols)}]`;
     }
 
-    return new RegExp(`(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})( *)(\\[[^[]*\\]\\(.*\\)|\`[^\`]*\`|\\w+${puncAndSymbolGroup}|\\*[^*])`, 'gmu');
+    return new RegExp(`(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})( *)(\\[[^[]*\\]\\(.*\\)|\`[^\`]*\`|[^\\W_]\\w*${puncAndSymbolGroup}|\\*[^*])`, 'gmu');
   }
   buildTailRegex(englishPunctuationAndSymbols: string): RegExp {
     if (englishPunctuationAndSymbols && englishPunctuationAndSymbols !== '') {
@@ -108,7 +108,7 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
       puncAndSymbolGroup = `|[${escapeRegExp(englishPunctuationAndSymbols)}]`;
     }
 
-    return new RegExp(`(\\[[^[]*\\]\\(.*\\)|\`[^\`]*\`|\\w+${puncAndSymbolGroup}|[^*]\\*)( *)(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})`, 'gmu');
+    return new RegExp(`(\\[[^[]*\\]\\(.*\\)|\`[^\`]*\`|\\w*[^\\W_]${puncAndSymbolGroup}|[^*]\\*)( *)(\\p{sc=Han}|\\p{sc=Katakana}|\\p{sc=Hiragana}|\\p{sc=Hangul})`, 'gmu');
   }
   get exampleBuilders(): ExampleBuilder<SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbersOptions>[] {
     return [
@@ -168,8 +168,8 @@ export default class SpaceBetweenChineseJapaneseOrKoreanAndEnglishOrNumbers exte
           ${''}
           # Handling bold and italics nested in each other is not supported at this time
           ${''}
-          **_ 这是一 _ 个数学公式**
-          *这是一 hello__ 个数学 world 公式 __*
+          **_这是一_个数学公式**
+          *这是一 hello__个数学 world 公式__*
         `,
       }),
       new ExampleBuilder({

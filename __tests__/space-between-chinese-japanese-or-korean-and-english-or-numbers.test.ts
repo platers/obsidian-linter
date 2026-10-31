@@ -180,5 +180,16 @@ ruleTest({
         直接修改数据库 \`library\` 表对应行的 \`exclusionPatterns\` 字段
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1470
+      testName: 'Make sure spaces are not added between CJK characters and underscores',
+      before: dedent`
+        [@盛佳慧_基于风云气象卫星的土壤湿度数据降尺度方法研究_2021]
+        测试_english_测试
+      `,
+      after: dedent`
+        [@盛佳慧_基于风云气象卫星的土壤湿度数据降尺度方法研究_2021]
+        测试_english_测试
+      `,
+    },
   ],
 });
