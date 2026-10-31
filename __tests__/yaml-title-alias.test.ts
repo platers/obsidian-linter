@@ -1,7 +1,7 @@
 import YamlTitleAlias from '../src/rules/yaml-title-alias';
 import dedent from 'ts-dedent';
 import { ruleTest } from './common';
-import { NormalArrayFormats, SpecialArrayFormats } from '../src/utils/yaml';
+import { ArrayFormats } from '../src/utils/yaml';
 
 ruleTest({
   RuleBuilderClass: YamlTitleAlias,
@@ -77,7 +77,7 @@ ruleTest({
         # Title
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
       },
     },
     {
@@ -92,39 +92,7 @@ ruleTest({
         # Title
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
-        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
-      },
-    },
-    {
-      testName: 'Creates single string alias when missing',
-      before: dedent`
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases: Title
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-      },
-    },
-    {
-      testName: 'Creates single string alias when missing without helper key',
-      before: dedent`
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -180,7 +148,7 @@ ruleTest({
         # Title
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
       },
     },
     {
@@ -198,45 +166,7 @@ ruleTest({
         # Title
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
-        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
-      },
-    },
-    {
-      testName: 'Creates single string alias when empty',
-      before: dedent`
-        ---
-        aliases: ${''}
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases: Title
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-      },
-    },
-    {
-      testName: 'Creates single string alias when empty without helper key',
-      before: dedent`
-        ---
-        aliases: ${''}
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -363,101 +293,21 @@ ruleTest({
       },
     },
     {
-      testName: 'Updates single string alias',
+      testName: 'Updates single line alias',
       before: dedent`
         ---
-        aliases: other alias
+        aliases: [other alias]
         linter-yaml-title-alias: other alias
         ---
         # Title
       `,
       after: dedent`
         ---
-        aliases: Title
+        aliases: [Title]
         linter-yaml-title-alias: Title
         ---
         # Title
       `,
-    },
-    {
-      testName: 'Changes single string aliases to multi-line array when adding',
-      before: dedent`
-        ---
-        aliases: other alias
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases:
-          - Title
-          - other alias
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-      },
-    },
-    {
-      testName: 'Changes single string aliases to multi-line array when adding without helper key',
-      before: dedent`
-        ---
-        aliases: other alias
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases:
-          - Title
-          - other alias
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
-      },
-    },
-    {
-      testName: 'Changes single string aliases to single-line array when adding',
-      before: dedent`
-        ---
-        aliases: other alias
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases: [Title, other alias]
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
-      },
-    },
-    {
-      testName: 'Changes single string aliases to single-line array when adding without helper key',
-      before: dedent`
-        ---
-        aliases: other alias
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases: [Title, other alias]
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
-        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
-      },
     },
     {
       testName: 'Titles with special a colon and then a space are escaped',
@@ -595,16 +445,16 @@ ruleTest({
       },
     },
     {
-      testName: 'Does not add alias that matches the filename for single string style aliases section',
+      testName: 'Does not add alias that matches the filename',
       before: dedent`
         ---
-        aliases: alias1
+        aliases: [alias1]
         ---
         # Filename
       `,
       after: dedent`
         ---
-        aliases: alias1
+        aliases: [alias1]
         ---
         # Filename
       `,
@@ -756,52 +606,6 @@ ruleTest({
       },
     },
     {
-      testName: 'Adds alias that matches the filename for single string style aliases section',
-      before: dedent`
-        ---
-        aliases: alias1
-        ---
-        # Filename
-      `,
-      after: dedent`
-        ---
-        aliases:
-          - Filename
-          - alias1
-        linter-yaml-title-alias: Filename
-        ---
-        # Filename
-      `,
-      options: {
-        keepAliasThatMatchesTheFilename: true,
-        fileName: 'Filename',
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-      },
-    },
-    {
-      testName: 'Adds alias that matches the filename for single string style aliases section',
-      before: dedent`
-        ---
-        aliases: alias1
-        ---
-        # Filename
-      `,
-      after: dedent`
-        ---
-        aliases:
-          - Filename
-          - alias1
-        ---
-        # Filename
-      `,
-      options: {
-        keepAliasThatMatchesTheFilename: true,
-        fileName: 'Filename',
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
-      },
-    },
-    {
       testName: 'Replaces alias that matches the filename for multi-line array style aliases section',
       before: dedent`
         ---
@@ -851,14 +655,14 @@ ruleTest({
       testName: 'Replaces alias that matches the filename for single string style aliases section, removes previous alias',
       before: dedent`
         ---
-        aliases: alias1
+        aliases: [alias1]
         linter-yaml-title-alias: alias1
         ---
         # Filename
       `,
       after: dedent`
         ---
-        aliases: Filename
+        aliases: [Filename]
         linter-yaml-title-alias: Filename
         ---
         # Filename
@@ -900,38 +704,15 @@ ruleTest({
         # Title
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
     {
-      testName: 'Converts from single-line array to multi-line array for single string style setting',
+      testName: 'Converts from single line to multi-line array',
       before: dedent`
         ---
-        aliases: [Title, alias2]
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases:
-          - Title
-          - alias2
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-        preserveExistingAliasesSectionStyle: false,
-      },
-    },
-    {
-      testName: 'Converts from single string to multi-line array',
-      before: dedent`
-        ---
-        aliases: Title
+        aliases: [Title]
         linter-yaml-title-alias: Title
         ---
         # Title
@@ -945,7 +726,7 @@ ruleTest({
         # Title
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
@@ -967,115 +748,7 @@ ruleTest({
         # Title
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
-        preserveExistingAliasesSectionStyle: false,
-      },
-    },
-    {
-      testName: 'Converts from multi-line array to single-line array for single string style setting',
-      before: dedent`
-        ---
-        aliases:
-          - Title
-          - alias2
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases: [Title, alias2]
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
-        preserveExistingAliasesSectionStyle: false,
-      },
-    },
-    {
-      testName: 'Converts from single string to single-line array',
-      before: dedent`
-        ---
-        aliases: Title
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases: [Title]
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
-        preserveExistingAliasesSectionStyle: false,
-      },
-    },
-    {
-      testName: 'Converts from multi-line array to single string',
-      before: dedent`
-        ---
-        aliases:
-          - Title
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases: Title
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-        preserveExistingAliasesSectionStyle: false,
-      },
-    },
-    {
-      testName: 'Converts from single-line array to single string',
-      before: dedent`
-        ---
-        aliases: [Title]
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        aliases: Title
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
-        preserveExistingAliasesSectionStyle: false,
-      },
-    },
-    { // relates to https://github.com/platers/obsidian-linter/issues/441
-      testName: 'Converts from single-line array to single string for key `alias`',
-      before: dedent`
-        ---
-        alias: [Title]
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      after: dedent`
-        ---
-        alias: Title
-        linter-yaml-title-alias: Title
-        ---
-        # Title
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToMultiLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         preserveExistingAliasesSectionStyle: false,
       },
     },
@@ -1132,7 +805,7 @@ ruleTest({
         # [[Heading]]
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
       },
     },
     { // relates to https://github.com/platers/obsidian-linter/issues/470
@@ -1154,7 +827,7 @@ ruleTest({
         # This is a [Heading](markdown.md)
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
       },
     },
     { // relates to https://github.com/platers/obsidian-linter/issues/470
@@ -1176,7 +849,7 @@ ruleTest({
         # This is a [[Heading]]
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
       },
     },
     { // accounts for https://github.com/platers/obsidian-linter/issues/439
@@ -1196,7 +869,7 @@ ruleTest({
         # It's strange
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -1215,45 +888,7 @@ ruleTest({
         # Header, with comma
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
-        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
-      },
-    },
-    { // accounts for https://github.com/platers/obsidian-linter/issues/630
-      testName: 'Make sure alias is escaped when a comma is present and the array style is single string to single-line',
-      before: dedent`
-        ---
-        aliases: alias1
-        ---
-        # Header, with comma
-      `,
-      after: dedent`
-        ---
-        aliases: ["Header, with comma", alias1]
-        ---
-        # Header, with comma
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringToSingleLine,
-        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
-      },
-    },
-    { // accounts for https://github.com/platers/obsidian-linter/issues/630
-      testName: 'Make sure alias is escaped when a comma is present and the array style is a comma delimited string',
-      before: dedent`
-        ---
-        aliases: alias1
-        ---
-        # Header, with comma
-      `,
-      after: dedent`
-        ---
-        aliases: "Header, with comma", alias1
-        ---
-        # Header, with comma
-      `,
-      options: {
-        aliasArrayStyle: SpecialArrayFormats.SingleStringCommaDelimited,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -1275,7 +910,7 @@ ruleTest({
         # Header, with comma
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
       },
     },
@@ -1297,7 +932,7 @@ ruleTest({
         # 12456378
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
         defaultEscapeCharacter: '\'',
       },
@@ -1315,7 +950,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
         keepAliasThatMatchesTheFilename: true,
         defaultEscapeCharacter: '"',
@@ -1339,7 +974,7 @@ ruleTest({
         # 1234
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         defaultEscapeCharacter: '"',
       },
     },
@@ -1360,7 +995,7 @@ ruleTest({
         # 1234
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         defaultEscapeCharacter: '"',
       },
     },
@@ -1381,7 +1016,7 @@ ruleTest({
         # 1234
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         defaultEscapeCharacter: '"',
       },
     },
@@ -1410,7 +1045,7 @@ ruleTest({
         # test4
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         defaultEscapeCharacter: '"',
       },
     },
@@ -1431,7 +1066,7 @@ ruleTest({
         # 1234
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.SingleLine,
+        aliasArrayStyle: ArrayFormats.SingleLine,
         defaultEscapeCharacter: '"',
       },
     },
@@ -1450,7 +1085,7 @@ ruleTest({
         ---
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
         defaultEscapeCharacter: '"',
         preserveExistingAliasesSectionStyle: true,
         aliasHelperKey: 'aliases2',
@@ -1467,7 +1102,7 @@ ruleTest({
         # Filename
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
         defaultEscapeCharacter: '"',
         preserveExistingAliasesSectionStyle: true,
         aliasHelperKey: 'aliases2',
@@ -1487,7 +1122,7 @@ ruleTest({
         # Filename
       `,
       options: {
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
         defaultEscapeCharacter: '"',
         preserveExistingAliasesSectionStyle: true,
         aliasHelperKey: 'aliases2',

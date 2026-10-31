@@ -32,7 +32,7 @@
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
     "@codemirror/view": "^6.43.13",
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.30.1",
     "@jest/types": "^30.5.1",
     "@jteppinette/babel-plugin-import-glob": "^0.3.0",
     "@types/async-lock": "^1.4.2",
@@ -66,6 +66,8 @@
   "dependencies": {
     "async-lock": "^1.4.1",
     "diff-match-patch": "^1.0.5",
+    "entities": "^8.1.0",
+    "esbuild-plugin-inline-worker": "^0.1.1",
     "loglevel": "^1.9.2",
     "lru-cache": "^11.5.2",
     "mdast-util-from-markdown": "^2.0.4",

@@ -6,7 +6,7 @@ import { Rule, RuleType, ruleTypeToRules } from '../rules';
 import { richDescription } from './helpers';
 import { getTextInLanguage, LanguageStringKey } from '../lang/helpers';
 import { LinterSettingsKeys } from '../settings-data';
-import { NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats } from '../utils/yaml';
+import { ArrayFormats } from '../utils/yaml';
 import { logsFromLastRun, setLogLevel } from '../utils/logger';
 import { getPath, setPath } from '../utils/nested-keyof';
 import { CustomCommandModal, AddFileExtensionModal, AddFileToIgnoreModal, AddFolderToIgnoreModal, CustomRegexModal } from './modals/add-list-entry-modals';
@@ -174,11 +174,8 @@ export class SettingTab extends PluginSettingTab {
             type: 'dropdown',
             key: 'commonStyles.aliasArrayStyle',
             options: enumOptions([
-              NormalArrayFormats.MultiLine,
-              NormalArrayFormats.SingleLine,
-              SpecialArrayFormats.SingleStringCommaDelimited,
-              SpecialArrayFormats.SingleStringToSingleLine,
-              SpecialArrayFormats.SingleStringToMultiLine,
+              ArrayFormats.MultiLine,
+              ArrayFormats.SingleLine
             ]),
           },
         },
@@ -189,13 +186,8 @@ export class SettingTab extends PluginSettingTab {
             type: 'dropdown',
             key: 'commonStyles.tagArrayStyle',
             options: enumOptions([
-              NormalArrayFormats.MultiLine,
-              NormalArrayFormats.SingleLine,
-              SpecialArrayFormats.SingleStringToSingleLine,
-              SpecialArrayFormats.SingleStringToMultiLine,
-              TagSpecificArrayFormats.SingleLineSpaceDelimited,
-              TagSpecificArrayFormats.SingleStringSpaceDelimited,
-              SpecialArrayFormats.SingleStringCommaDelimited,
+              ArrayFormats.MultiLine,
+              ArrayFormats.SingleLine
             ]),
           },
         },
@@ -206,8 +198,8 @@ export class SettingTab extends PluginSettingTab {
             type: 'dropdown',
             key: 'commonStyles.defaultArrayStyle',
             options: enumOptions([
-              NormalArrayFormats.MultiLine,
-              NormalArrayFormats.SingleLine,
+              ArrayFormats.MultiLine,
+              ArrayFormats.SingleLine,
             ]),
           },
         },

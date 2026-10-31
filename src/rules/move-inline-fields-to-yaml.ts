@@ -1,11 +1,11 @@
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { DropdownOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder } from './rule-builder';
 import dedent from 'ts-dedent';
-import {parse} from 'yaml';
-import {IgnoreTypes} from '../utils/ignore-types';
-import {ProtectedRanges} from '../utils/protected-ranges';
-import {textReplacement} from '../utils/strings';
-import {applyNonOverlappingReplacements} from '../utils/text-edits';
+import { parse } from 'yaml';
+import { IgnoreTypes } from '../utils/ignore-types';
+import { ProtectedRanges } from '../utils/protected-ranges';
+import { textReplacement } from '../utils/strings';
+import { applyNonOverlappingReplacements } from '../utils/text-edits';
 import {
   convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
@@ -15,18 +15,14 @@ import {
   getYAMLText,
   getYamlSectionValue,
   initYAML,
-  NormalArrayFormats,
-  OBSIDIAN_ALIAS_KEY_PLURAL,
-  OBSIDIAN_ALIASES_KEYS,
-  OBSIDIAN_TAG_KEY_PLURAL,
-  OBSIDIAN_TAG_KEYS,
+  ArrayFormats,
+  OBSIDIAN_ALIAS_KEY,
+  OBSIDIAN_TAG_KEY,
   QuoteCharacter,
   setYamlSection,
-  SpecialArrayFormats,
   splitValueIfSingleOrMultilineArray,
-  TagSpecificArrayFormats,
 } from '../utils/yaml';
-import {isValidTag, isValidYamlKeyOnly} from '../utils/validation';
+import { isValidTag, isValidYamlKeyOnly } from '../utils/validation';
 
 type FullLineFieldOperations = 'Leave in place' | 'Move and keep in text' | 'Move and remove';
 type BracketedFieldOperations = 'Leave in place' | 'Move and keep in text' | 'Move and keep value in text' | 'Move and remove';
@@ -38,18 +34,18 @@ class MoveInlineFieldsToYamlOptions implements Options {
   howToHandleExistingKeys?: ExistingKeyOperations = 'Skip';
   inlineKeysToIgnore?: string[] = [];
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: QuoteCharacter = '"';
+  defaultEscapeCharacter?: QuoteCharacter = '"';
   @RuleBuilder.noSettingControl()
-    tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  tagArrayStyle?: ArrayFormats = ArrayFormats.SingleLine;
   @RuleBuilder.noSettingControl()
-    aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  aliasArrayStyle?: ArrayFormats = ArrayFormats.SingleLine;
   @RuleBuilder.noSettingControl()
-    defaultArrayStyle?: NormalArrayFormats = NormalArrayFormats.SingleLine;
+  defaultArrayStyle?: ArrayFormats = ArrayFormats.SingleLine;
   @RuleBuilder.noSettingControl()
-    removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
+  removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
 
-type ObsidianListKey = typeof OBSIDIAN_TAG_KEY_PLURAL | typeof OBSIDIAN_ALIAS_KEY_PLURAL;
+type ObsidianListKey = typeof OBSIDIAN_TAG_KEY | typeof OBSIDIAN_ALIAS_KEY;
 
 type InlineField = {
   key: string,
@@ -62,11 +58,11 @@ type InlineField = {
   isBracketed: boolean,
 };
 
-type LineRelativeField = {key: string, value: string, start: number, end: number};
+type LineRelativeField = { key: string, value: string, start: number, end: number };
 
 // The parsing below follows Dataview's `src/data-import/inline-field.ts` so that the fields moved are the
 // same ones Dataview would read from the file.
-const inlineFieldWrappers: Record<string, string> = {'[': ']', '(': ')'};
+const inlineFieldWrappers: Record<string, string> = { '[': ']', '(': ')' };
 // FULL_LINE_KEY_PART along with the markup that Dataview strips from before and after it
 const fullLineKeyRegex = /^[^0-9\w\p{Letter}]*((?:\p{Extended_Pictographic}|\u{200D}|\u{FE0F}|[0-9\p{Letter}\w\s/-])*)[_*~`]*$/u;
 const plainYamlKeyRegex = /^[\p{Letter}_][\p{Letter}\p{Number}_/-]*$/u;
@@ -108,7 +104,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
     // work out what goes into the frontmatter before changing anything so that a key which cannot be moved
     // leaves all of its fields in the body
     const existingYaml = getYAMLText(text) ?? '';
-    const yamlUpdates: {key: string, value: string}[] = [];
+    const yamlUpdates: { key: string, value: string }[] = [];
     const movedFields: InlineField[] = [];
     for (const [key, keyFields] of fieldsByKey) {
       const listKey = getObsidianListKey(key);
@@ -128,9 +124,9 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
         let existingValues = this.getMergeableValues(existingValue);
         if (existingValues == null) {
           continue;
-        } else if (listKey === OBSIDIAN_TAG_KEY_PLURAL) {
+        } else if (listKey === OBSIDIAN_TAG_KEY) {
           existingValues = existingValues.flatMap((value) => convertTagValueToStringOrStringArray(value));
-        } else if (listKey === OBSIDIAN_ALIAS_KEY_PLURAL) {
+        } else if (listKey === OBSIDIAN_ALIAS_KEY) {
           existingValues = existingValues.flatMap((value) => convertAliasValueToStringOrStringArray(value));
         }
 
@@ -151,13 +147,13 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
         }
 
         yamlValue = this.formatValues([...existingValues, ...valuesToAdd], existingArrayFormat, listKey, options);
-        yamlUpdates.push({key: this.formatKey(key, options.defaultEscapeCharacter), value: yamlValue});
+        yamlUpdates.push({ key: this.formatKey(key, options.defaultEscapeCharacter), value: yamlValue });
         continue;
       } else {
         continue;
       }
 
-      yamlUpdates.push({key: this.formatKey(key, options.defaultEscapeCharacter), value: yamlValue});
+      yamlUpdates.push({ key: this.formatKey(key, options.defaultEscapeCharacter), value: yamlValue });
       movedFields.push(...keyFields);
     }
 
@@ -185,7 +181,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
         startIndex--;
       }
 
-      return {startIndex, endIndex: edit.endIndex + yamlLengthChange, value: edit.value};
+      return { startIndex, endIndex: edit.endIndex + yamlLengthChange, value: edit.value };
     });
 
     return applyNonOverlappingReplacements(newText, bodyEdits);
@@ -212,13 +208,13 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
                 continue;
               }
 
-              fields.push({key: field.key, value: field.value, startIndex, endIndex, lineStartIndex, lineEndIndex, isBracketed: true});
+              fields.push({ key: field.key, value: field.value, startIndex, endIndex, lineStartIndex, lineEndIndex, isBracketed: true });
             }
           }
         } else {
           const field = options.howToHandleFullLineFields === 'Leave in place' ? undefined : extractFullLineField(line);
           if (field != null && field.key !== '' && !options.inlineKeysToIgnore.includes(field.key) && !protectedRanges.isProtected(lineStartIndex, lineEndIndex)) {
-            fields.push({key: field.key, value: field.value, startIndex: lineStartIndex, endIndex: lineEndIndex, lineStartIndex, lineEndIndex, isBracketed: false});
+            fields.push({ key: field.key, value: field.value, startIndex: lineStartIndex, endIndex: lineEndIndex, lineStartIndex, lineEndIndex, isBracketed: false });
           }
         }
       }
@@ -230,7 +226,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
   }
   getBodyEdits(text: string, movedFields: InlineField[], options: MoveInlineFieldsToYamlOptions): textReplacement[] {
     const edits: textReplacement[] = [];
-    const linesToRemove: {startIndex: number, endIndex: number}[] = [];
+    const linesToRemove: { startIndex: number, endIndex: number }[] = [];
     const fieldsByLine = new Map<number, InlineField[]>();
     for (const field of movedFields) {
       if (!fieldsByLine.has(field.lineStartIndex)) {
@@ -243,7 +239,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
     for (const [lineStartIndex, lineFields] of fieldsByLine) {
       const lineEndIndex = lineFields[0].lineEndIndex;
       if (!lineFields[0].isBracketed) {
-        linesToRemove.push({startIndex: lineStartIndex, endIndex: lineEndIndex});
+        linesToRemove.push({ startIndex: lineStartIndex, endIndex: lineEndIndex });
         continue;
       }
 
@@ -251,7 +247,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
       let lastEditEnd = lineStartIndex;
       for (const field of lineFields.sort((a, b) => a.startIndex - b.startIndex)) {
         if (options.howToHandleBracketedFields === 'Move and keep value in text' && field.value !== '') {
-          lineEdits.push({startIndex: field.startIndex, endIndex: field.endIndex, value: field.value});
+          lineEdits.push({ startIndex: field.startIndex, endIndex: field.endIndex, value: field.value });
           lastEditEnd = field.endIndex;
           continue;
         }
@@ -274,15 +270,15 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
           startIndex -= whitespaceBefore;
         }
 
-        lineEdits.push({startIndex, endIndex, value: ''});
+        lineEdits.push({ startIndex, endIndex, value: '' });
         lastEditEnd = endIndex;
       }
 
       const updatedLine = applyNonOverlappingReplacements(text.substring(lineStartIndex, lineEndIndex), lineEdits.map((edit) => {
-        return {startIndex: edit.startIndex - lineStartIndex, endIndex: edit.endIndex - lineStartIndex, value: edit.value};
+        return { startIndex: edit.startIndex - lineStartIndex, endIndex: edit.endIndex - lineStartIndex, value: edit.value };
       }));
       if (updatedLine.trim() === '') {
-        linesToRemove.push({startIndex: lineStartIndex, endIndex: lineEndIndex});
+        linesToRemove.push({ startIndex: lineStartIndex, endIndex: lineEndIndex });
       } else {
         edits.push(...lineEdits);
       }
@@ -297,7 +293,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
       if (previous && previous.endIndex === line.startIndex) {
         previous.endIndex = endIndex;
       } else {
-        removals.push({startIndex: line.startIndex, endIndex, value: ''});
+        removals.push({ startIndex: line.startIndex, endIndex, value: '' });
       }
     }
 
@@ -323,7 +319,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
 
     // numbers, booleans, and plain strings keep their type when left unescaped
     try {
-      const parsedValue = parse(value, {logLevel: 'error'}) as unknown;
+      const parsedValue = parse(value, { logLevel: 'error' }) as unknown;
       if ((typeof parsedValue === 'string' && parsedValue === value) || typeof parsedValue === 'number' || typeof parsedValue === 'boolean') {
         return value;
       }
@@ -348,7 +344,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
    * @return {string[] | null} The values to add or null when the values are not valid for the key
    */
   getNewValues(values: string[], listKey: ObsidianListKey | null, options: MoveInlineFieldsToYamlOptions): string[] | null {
-    if (listKey === OBSIDIAN_TAG_KEY_PLURAL) {
+    if (listKey === OBSIDIAN_TAG_KEY) {
       // tags are split up like they are in the tags key of the YAML frontmatter and have their hashtags removed
       // like Format tags in YAML does since Obsidian does not allow them there
       const tags = values.flatMap((value) => convertTagValueToStringOrStringArray(value)).map((tag) => tag.replace(/^#/, '')).filter((tag) => tag !== '');
@@ -357,17 +353,17 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
       }
 
       return tags;
-    } else if (listKey === OBSIDIAN_ALIAS_KEY_PLURAL) {
+    } else if (listKey === OBSIDIAN_ALIAS_KEY) {
       values = values.flatMap((value) => convertAliasValueToStringOrStringArray(value));
     }
 
     return values.map((value) => this.escapeValue(value, options.defaultEscapeCharacter));
   }
-  formatValues(values: string[], arrayFormat: NormalArrayFormats | null, listKey: ObsidianListKey | null, options: MoveInlineFieldsToYamlOptions): string {
+  formatValues(values: string[], arrayFormat: ArrayFormats | null, listKey: ObsidianListKey | null, options: MoveInlineFieldsToYamlOptions): string {
     // tags and aliases always use the array style from the settings, like Format YAML array and Move tags to YAML do
-    if (listKey === OBSIDIAN_TAG_KEY_PLURAL) {
+    if (listKey === OBSIDIAN_TAG_KEY) {
       return formatYamlArrayValue(values, options.tagArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays);
-    } else if (listKey === OBSIDIAN_ALIAS_KEY_PLURAL) {
+    } else if (listKey === OBSIDIAN_ALIAS_KEY) {
       return formatYamlArrayValue(values, options.aliasArrayStyle, options.defaultEscapeCharacter, options.removeUnnecessaryEscapeCharsForMultiLineArrays, true);
     }
 
@@ -400,7 +396,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
 
     let parsedValue: unknown;
     try {
-      parsedValue = parse(value, {logLevel: 'error'});
+      parsedValue = parse(value, { logLevel: 'error' });
     } catch {
       return null;
     }
@@ -614,7 +610,7 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
           ---
         `,
         options: {
-          defaultArrayStyle: NormalArrayFormats.MultiLine,
+          defaultArrayStyle: ArrayFormats.MultiLine,
         },
       }),
       new ExampleBuilder({
@@ -772,26 +768,27 @@ export default class MoveInlineFieldsToYaml extends RuleBuilder<MoveInlineFields
 }
 
 function getObsidianListKey(key: string): ObsidianListKey | null {
-  if (OBSIDIAN_TAG_KEYS.includes(key)) {
-    return OBSIDIAN_TAG_KEY_PLURAL;
-  } else if (OBSIDIAN_ALIASES_KEYS.includes(key)) {
-    return OBSIDIAN_ALIAS_KEY_PLURAL;
+  switch (key) {
+    case OBSIDIAN_TAG_KEY:
+      return OBSIDIAN_TAG_KEY;
+    case OBSIDIAN_ALIAS_KEY:
+      return OBSIDIAN_ALIAS_KEY;
+    default:
+      return null;
   }
-
-  return null;
 }
 
 /**
  * Gets the array style of a YAML value.
  * @param {string} value The value of a YAML key
- * @return {NormalArrayFormats | null} The style of the array or null when the value is not an array
+ * @return {ArrayFormats | null} The style of the array or null when the value is not an array
  */
-function getArrayFormat(value: string): NormalArrayFormats | null {
+function getArrayFormat(value: string): ArrayFormats | null {
   const trimmedValue = value.trim();
   if (trimmedValue.startsWith('[')) {
-    return NormalArrayFormats.SingleLine;
+    return ArrayFormats.SingleLine;
   } else if (trimmedValue.startsWith('-') && value.startsWith('\n')) {
-    return NormalArrayFormats.MultiLine;
+    return ArrayFormats.MultiLine;
   }
 
   return null;
@@ -799,7 +796,7 @@ function getArrayFormat(value: string): NormalArrayFormats | null {
 
 function parseYamlScalar(value: string): unknown {
   try {
-    return parse(value, {logLevel: 'error'}) as unknown;
+    return parse(value, { logLevel: 'error' }) as unknown;
   } catch {
     return undefined;
   }
@@ -862,7 +859,7 @@ function isSpaceOrTab(char: string): boolean {
  * @param {string} close The closing wrapper character
  * @return {{value: string, endIndex: number} | undefined} The trimmed value and the index after the closing wrapper
  */
-function findClosing(line: string, start: number, open: string, close: string): {value: string, endIndex: number} | undefined {
+function findClosing(line: string, start: number, open: string, close: string): { value: string, endIndex: number } | undefined {
   let nesting = 0;
   let escaped = false;
   for (let index = start; index < line.length; index++) {
@@ -884,7 +881,7 @@ function findClosing(line: string, start: number, open: string, close: string): 
     }
 
     if (nesting < 0) {
-      return {value: line.substring(start, index).trim(), endIndex: index + 1};
+      return { value: line.substring(start, index).trim(), endIndex: index + 1 };
     }
   }
 
@@ -910,7 +907,7 @@ function extractBracketedField(line: string, start: number): LineRelativeField |
     return undefined;
   }
 
-  return {key, value: value.value, start, end: value.endIndex};
+  return { key, value: value.value, start, end: value.endIndex };
 }
 
 function extractBracketedFields(line: string): LineRelativeField[] {
@@ -941,7 +938,7 @@ function extractBracketedFields(line: string): LineRelativeField[] {
   return filteredFields;
 }
 
-function extractFullLineField(line: string): {key: string, value: string} | undefined {
+function extractFullLineField(line: string): { key: string, value: string } | undefined {
   const separatorIndex = line.indexOf('::');
   if (separatorIndex === -1) {
     return undefined;
@@ -952,5 +949,5 @@ function extractFullLineField(line: string): {key: string, value: string} | unde
     return undefined;
   }
 
-  return {key: keyMatch[1].trim(), value: line.substring(separatorIndex + 2).trim()};
+  return { key: keyMatch[1].trim(), value: line.substring(separatorIndex + 2).trim() };
 }

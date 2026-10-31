@@ -1,38 +1,38 @@
-import {Options, RuleType} from '../rules';
-import RuleBuilder, {BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder} from './rule-builder';
+import { Options, RuleType } from '../rules';
+import RuleBuilder, { BooleanOptionBuilder, ExampleBuilder, OptionBuilderBase, ListItemOptionBuilder } from './rule-builder';
 import dedent from 'ts-dedent';
-import {convertAliasValueToStringOrStringArray,
+import {
+  convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
   formatYAML,
   formatYamlArrayValue,
   getYamlSectionValue,
   loadYAML,
-  NormalArrayFormats,
-  OBSIDIAN_ALIASES_KEYS,
-  OBSIDIAN_TAG_KEYS,
+  ArrayFormats,
+  OBSIDIAN_ALIAS_KEY,
+  OBSIDIAN_TAG_KEY,
   QuoteCharacter,
   setYamlSection,
-  SpecialArrayFormats,
-  splitValueIfSingleOrMultilineArray,
-  TagSpecificArrayFormats} from '../utils/yaml';
+  splitValueIfSingleOrMultilineArray
+} from '../utils/yaml';
 import { isValidYamlKeyOnly } from '../utils/validation';
 
 class FormatYamlArrayOptions implements Options {
   @RuleBuilder.noSettingControl()
-    aliasArrayStyle?: NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  aliasArrayStyle?: ArrayFormats = ArrayFormats.SingleLine;
   formatAliasKey?: boolean = true;
   @RuleBuilder.noSettingControl()
-    tagArrayStyle?: TagSpecificArrayFormats | NormalArrayFormats | SpecialArrayFormats = NormalArrayFormats.SingleLine;
+  tagArrayStyle?: ArrayFormats = ArrayFormats.SingleLine;
   formatTagKey?: boolean = true;
   @RuleBuilder.noSettingControl()
-    defaultArrayStyle?: NormalArrayFormats = NormalArrayFormats.SingleLine;
+  defaultArrayStyle?: ArrayFormats = ArrayFormats.SingleLine;
   formatArrayKeys?: boolean = true;
   forceSingleLineArrayStyle?: string[] = [];
   forceMultiLineArrayStyle?: string[] = [];
   @RuleBuilder.noSettingControl()
-    defaultEscapeCharacter?: QuoteCharacter = '"';
+  defaultEscapeCharacter?: QuoteCharacter = '"';
   @RuleBuilder.noSettingControl()
-    removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
+  removeUnnecessaryEscapeCharsForMultiLineArrays?: boolean = false;
 }
 
 @RuleBuilder.register
@@ -54,56 +54,48 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
         return text;
       }
 
-      for (const aliasKey of OBSIDIAN_ALIASES_KEYS) {
-        if (options.formatAliasKey && Object.keys(yaml).includes(aliasKey)) {
-          text = setYamlSection(text,
-              aliasKey,
-              formatYamlArrayValue(
-                  convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, aliasKey))),
-                  options.aliasArrayStyle,
-                  options.defaultEscapeCharacter,
-                  options.removeUnnecessaryEscapeCharsForMultiLineArrays,
-                  true, // escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747
-              ),
-          );
-
-          break;
-        }
+      if (options.formatAliasKey && Object.keys(yaml).includes(OBSIDIAN_ALIAS_KEY)) {
+        text = setYamlSection(text,
+          OBSIDIAN_ALIAS_KEY,
+          formatYamlArrayValue(
+            convertAliasValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, OBSIDIAN_ALIAS_KEY))),
+            options.aliasArrayStyle,
+            options.defaultEscapeCharacter,
+            options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+            true, // escape numeric aliases see https://github.com/platers/obsidian-linter/issues/747
+          ),
+        );
       }
 
-      for (const tagKey of OBSIDIAN_TAG_KEYS) {
-        if (options.formatTagKey && Object.keys(yaml).includes(tagKey)) {
-          text = setYamlSection(text,
-              tagKey,
-              formatYamlArrayValue(
-                  convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, tagKey))),
-                  options.tagArrayStyle,
-                  options.defaultEscapeCharacter,
-                  options.removeUnnecessaryEscapeCharsForMultiLineArrays,
-              ),
-          );
-
-          break;
-        }
+      if (options.formatTagKey && Object.keys(yaml).includes(OBSIDIAN_TAG_KEY)) {
+        text = setYamlSection(text,
+          OBSIDIAN_TAG_KEY,
+          formatYamlArrayValue(
+            convertTagValueToStringOrStringArray(splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, OBSIDIAN_TAG_KEY))),
+            options.tagArrayStyle,
+            options.defaultEscapeCharacter,
+            options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+          ),
+        );
       }
 
       if (options.formatArrayKeys) {
-        const keysToIgnore = [...OBSIDIAN_ALIASES_KEYS, ...OBSIDIAN_TAG_KEYS, ...options.forceMultiLineArrayStyle, ...options.forceSingleLineArrayStyle];
+        const keysToIgnore = [OBSIDIAN_ALIAS_KEY, OBSIDIAN_TAG_KEY, ...options.forceMultiLineArrayStyle, ...options.forceSingleLineArrayStyle];
 
         for (const key of Object.keys(yaml)) {
           // skip non-arrays, arrays of objects, ignored keys, and already accounted for keys
-          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || ((yaml as {[k: string]: object[]})[key].length !== 0 && typeof (yaml as {[k: string]: object[]})[key][0] === 'object' && (yaml as {[k: string]: object[]})[key][0] !== null)) {
+          if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || ((yaml as { [k: string]: object[] })[key].length !== 0 && typeof (yaml as { [k: string]: object[] })[key][0] === 'object' && (yaml as { [k: string]: object[] })[key][0] !== null)) {
             continue;
           }
 
           text = setYamlSection(text,
-              key,
-              formatYamlArrayValue(
-                  splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, key)),
-                  options.defaultArrayStyle,
-                  options.defaultEscapeCharacter,
-                  options.removeUnnecessaryEscapeCharsForMultiLineArrays,
-              ),
+            key,
+            formatYamlArrayValue(
+              splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, key)),
+              options.defaultArrayStyle,
+              options.defaultEscapeCharacter,
+              options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+            ),
           );
         }
       }
@@ -114,13 +106,13 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
         }
 
         text = setYamlSection(text,
-            singleLineArrayKey,
-            formatYamlArrayValue(
-                splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, singleLineArrayKey)),
-                NormalArrayFormats.SingleLine,
-                options.defaultEscapeCharacter,
-                options.removeUnnecessaryEscapeCharsForMultiLineArrays,
-            ),
+          singleLineArrayKey,
+          formatYamlArrayValue(
+            splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, singleLineArrayKey)),
+            ArrayFormats.SingleLine,
+            options.defaultEscapeCharacter,
+            options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+          ),
         );
       }
 
@@ -130,13 +122,13 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
         }
 
         text = setYamlSection(text,
-            multiLineArrayKey,
-            formatYamlArrayValue(
-                splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, multiLineArrayKey)),
-                NormalArrayFormats.MultiLine,
-                options.defaultEscapeCharacter,
-                options.removeUnnecessaryEscapeCharsForMultiLineArrays,
-            ),
+          multiLineArrayKey,
+          formatYamlArrayValue(
+            splitValueIfSingleOrMultilineArray(getYamlSectionValue(text, multiLineArrayKey)),
+            ArrayFormats.MultiLine,
+            options.defaultEscapeCharacter,
+            options.removeUnnecessaryEscapeCharsForMultiLineArrays,
+          ),
         );
       }
 
@@ -178,12 +170,12 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
           Multi-line arrays will have empty values removed only leaving one if it is completely empty. The same is not true for single-line arrays as that is invalid YAML unless it comes as the last entry in the array.
         `,
         options: {
-          aliasArrayStyle: NormalArrayFormats.MultiLine,
+          aliasArrayStyle: ArrayFormats.MultiLine,
           forceSingleLineArrayStyle: ['test'],
         },
       }),
       new ExampleBuilder({
-        description: 'Format tags as a single string with space delimiters, ignore aliases, and format regular YAML arrays as single-line arrays',
+        description: 'Format tags as multiline, ignore aliases, and format regular YAML arrays as single-line arrays',
         before: dedent`
           ---
           aliases: Typescript
@@ -197,12 +189,15 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
           ---
           aliases: Typescript
           types: [thought provoking, peer reviewed]
-          tags: computer science trajectory
+          tags:
+            - computer
+            - science
+            - trajectory
           ---
         `,
         options: {
           formatAliasKey: false,
-          tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+          tagArrayStyle: ArrayFormats.MultiLine,
         },
       }),
       new ExampleBuilder({
@@ -227,7 +222,7 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
         `,
         options: {
           formatArrayKeys: true,
-          defaultArrayStyle: NormalArrayFormats.SingleLine,
+          defaultArrayStyle: ArrayFormats.SingleLine,
         },
       }),
     ];

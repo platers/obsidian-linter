@@ -1,0 +1,237 @@
+/** Makes sure that files are linted and that they are handled appropriately in an asynchronous manner.
+ * based on https://github.com/blacksmithgu/obsidian-dataview/blob/75b564bcfd23876f12fa3faf7f86184cdfcd91f1/src/data-import/web-worker/import-manager.ts
+*/
+
+import Worker from './rules-runner.worker';
+import { moment, TFile, Vault } from 'obsidian';
+import { createRunLinterRulesOptions, runMainThreadRules } from './rules-runner';
+import { LinterSettings } from '../settings-data';
+import { LinterWorker, LinterWorkerInfo, RunLinterRulesOptions } from '../typings/worker';
+import { setLogs } from '../utils/logger';
+import { stripCr } from '../utils/strings';
+import { ensureIsLinteError, handleLintError } from '../utils/error';
+import { LinterError } from '../linter-error';
+import { getTextInLanguage } from '../lang/helpers';
+
+type LintBatch = { pending: number; completed: number; errors: number; finishedAdding: boolean; onComplete: (completed: number, errors: number) => Promise<void> };
+
+type LintQueueEntry = { file: TFile, errorNoticeTimeout: number, errorTemplateString: string, useLogTemplateInNotice: boolean };
+
+/** Callback when a file is resolved. */
+type FileCallback = (runOptions: RunLinterRulesOptions) => Promise<void>;
+
+/** Multi-threaded file linter which debounces rapid file requests automatically. */
+export class FileLintManager {
+  /* Background workers which do the actual file linting. */
+  workers: LinterWorkerInfo[];
+  /** Tracks which workers are actively linting a file, to make sure we properly delegate results. */
+  busy: boolean[];
+
+  /** List of files which have been queued to be linted */
+  lintQueue: TFile[];
+
+  fileToBatches: Map<string, LintBatch[]>;
+
+  /** Paths -> callback function to run once file linting has finished running rules.
+   * Note: this does not mean that the logic for running custom commands has run.
+  */
+  callbacks: Map<string, FileCallback>;
+  defaultMisspellings: Map<string, string>;
+
+  public constructor(public numWorkers: number, public momentLocale: string, private settings: LinterSettings, private vault: Vault) {
+    this.workers = [];
+    this.busy = [];
+
+    this.lintQueue = [];
+    this.callbacks = new Map();
+    this.fileToBatches = new Map();
+
+    this.createWorkers(false);
+  }
+
+  public setDefaultMisspellings(defaultMisspellings: Map<string, string>): void {
+    this.defaultMisspellings = defaultMisspellings;
+  }
+
+  public lintFile(entry: LintQueueEntry, callback: FileCallback, editorText: string = null): void {
+    // if the file is already in the list of files to process, we should skip it
+    if (this.callbacks.has(entry.file.path)) {
+      return;
+    } else {
+      this.callbacks.set(entry.file.path, callback);
+    }
+
+    // Immediately run this task if there are available workers; otherwise, add it to the queue.
+    const workerId = this.nextAvailableWorker();
+    if (workerId !== undefined) {
+      void this.send(entry, workerId, editorText);
+    } else {
+      this.lintQueue.push(entry);
+    }
+  }
+
+  public lintBatch(files: TFile[], errorNoticeTimeout: number, errorTemplateString: string, useLogTemplateInNotice: boolean, callback: FileCallback, onComplete: (completed: number, errors: number) => Promise<void>) {
+    const batch: LintBatch = {
+      pending: files.length,
+      errors: 0,
+      completed: 0,
+      finishedAdding: false,
+      onComplete
+    };
+
+    for (const file of files) {
+      const batches = this.fileToBatches.get(file.path) ?? [];
+      batches.push(batch);
+      this.fileToBatches.set(file.path, batches);
+
+      this.lintFile({ file, errorNoticeTimeout, errorTemplateString, useLogTemplateInNotice }, callback);
+    }
+
+    batch.finishedAdding = true;
+  }
+
+  public terminateWorkers(): void {
+    for (const worker of this.workers) {
+      worker.worker.terminate();
+    }
+
+    this.workers = [];
+  }
+
+  public restartWorkers(): void {
+    this.terminateWorkers();
+
+    this.createWorkers(true);
+  }
+
+  private createWorkers(isRestarting: boolean) {
+    const identifierTemplate = getTextInLanguage('logs.worker-identifier');
+
+    for (let index = 0; index < this.numWorkers; index++) {
+      const worker = ((Worker as unknown)() as LinterWorker);
+
+      worker.onmessage = async (event: MessageEvent<RunLinterRulesOptions>) => {
+        const data = event.data;
+        if (data.error) {
+          const d = data.error;
+          const err = new LinterError(d.message, null, d.stack);
+          err.name = d.name;
+
+          // Notify the queue this file is available for new work.
+          this.busy[index] = false;
+
+          if (this.callbacks.has(data.fileInfo.path)) {
+            this.callbacks.delete(data.fileInfo.path);
+          }
+
+          handleLintError(data.fileInfo, err, data.errorNoticeTimeout, data.errorTemplateString, data.useLogTemplateInNotice);
+
+          await this.updateBatchesForFile(data.fileInfo.path, false)
+
+          // Queue a new job onto this worker.
+          const job = this.lintQueue.shift();
+          if (job !== undefined) {
+            void this.send(job, index);
+          }
+
+          return;
+        }
+
+        await this.finish(data, index);
+      };
+
+      this.workers.push({
+        id: identifierTemplate.replace('{NUM}', index + 1),
+        worker: worker
+      });
+      this.busy.push(false);
+
+      if (isRestarting) {
+        const job = this.lintQueue.shift();
+        if (job !== undefined) {
+          void this.send(job, index);
+        }
+      }
+    }
+  }
+
+  // Finish the parsing of a file, potentially queueing a new file.
+  private async finish(data: RunLinterRulesOptions, index: number) {
+    try {
+      // Notify the queue this file is available for new work.
+      this.busy[index] = false;
+
+      // Queue a new job onto this worker.
+      const job = this.lintQueue.shift();
+      if (job !== undefined) {
+        void this.send(job, index);
+      }
+
+      if (data.settings.recordLintOnSaveLogs) {
+        setLogs(data.logsFromRun);
+      }
+
+      runMainThreadRules(data, () => moment());
+
+      const callback = this.callbacks.get(data.fileInfo.path);
+      if (callback) {
+        this.callbacks.delete(data.fileInfo.path);
+
+        await callback(data);
+      }
+
+      await this.updateBatchesForFile(data.fileInfo.path, true);
+    } catch (error) {
+      const err = ensureIsLinteError(error);
+      handleLintError(data.fileInfo, err, data.errorNoticeTimeout, data.errorTemplateString, data.useLogTemplateInNotice);
+
+      await this.updateBatchesForFile(data.fileInfo.path, false);
+    }
+  }
+
+  /** Send a new task to the given worker ID. */
+  private async send(entry: LintQueueEntry, workerId: number, editorText: string | null) {
+    this.busy[workerId] = true;
+
+    const oldText = stripCr(editorText ?? await this.vault.read(entry.file))
+    const lintRunnerSettings = createRunLinterRulesOptions(stripCr(oldText), entry.file, this.momentLocale, this.settings, this.defaultMisspellings);
+    lintRunnerSettings.errorTemplateString = entry.errorTemplateString;
+    lintRunnerSettings.errorNoticeTimeout = entry.errorNoticeTimeout;
+    lintRunnerSettings.useLogTemplateInNotice = entry.useLogTemplateInNotice;
+    this.workers[workerId].worker.postMessage({ id: this.workers[workerId].id, data: lintRunnerSettings });
+  }
+
+  /** Find the next available, non-busy worker; return undefined if all workers are busy. */
+  private nextAvailableWorker(): number | undefined {
+    const index = this.busy.indexOf(false);
+    return index == -1 ? undefined : index;
+  }
+
+  private async updateBatchesForFile(path: string, success: boolean) {
+    const batches = this.fileToBatches.get(path) ?? [];
+
+    try {
+      for (const batch of batches) {
+        await this.handleBatchUpdate(batch, success);
+      }
+    }
+    finally {
+      this.fileToBatches.delete(path);
+    }
+  }
+
+  private async handleBatchUpdate(batch: LintBatch, success: boolean): Promise<void> {
+    batch.pending--;
+    if (success) {
+      batch.completed++;
+    } else {
+      batch.errors++;
+    }
+
+    if (!batch.finishedAdding || batch.pending !== 0) {
+      return;
+    }
+
+    await batch.onComplete(batch.completed, batch.errors)
+  }
+}

@@ -12,6 +12,9 @@ export default {
     'preview-lint-file': {
       'name': 'Preview lint changes for the current file',
     },
+    'restart-background-workers': {
+      'name': 'Restart all Linter background workers',
+    },
     'lint-all-files': {
       'name': 'Lint all files in the vault',
       'error-message': 'Lint All Files Error in File',
@@ -74,6 +77,8 @@ export default {
     'moment-locale-not-found': 'Trying to switch Moment.js locale to {MOMENT_LOCALE}, got {CURRENT_LOCALE}',
     'file-change-lint-message-start': 'Linted',
     'custom-command-callback-warning': 'Please only set the custom command callback for integration tests.',
+    'file-content-changed-mid-lint': 'Lint results discarded for \'{FILE_NAME}\' due to changes in the file between when the lint started and the lint ended',
+    'file-skipped': 'Linting skipped for \'{FILE_NAME}\': all rules disabled.',
 
     // rules-runner.ts
     'pre-rules': 'rules before regular rules',
@@ -111,6 +116,9 @@ export default {
 
     //table.ts
     'unexpected-pre-table-content': 'Trying to trim the start of a table row resulted in an unexpected result finding some non-whitespace value in blockquote prior to the table row start for "{TABLE_ROW}" and start of line "{START_OF_LINE}".',
+
+    // worker
+    'worker-identifier': 'Linter Web Worker {NUM}'
   },
 
   'validation': {
@@ -1070,11 +1078,6 @@ export default {
     // yaml.ts
     'multi-line': 'multi-line',
     'single-line': 'single-line',
-    'single string to single-line': 'single string to single-line',
-    'single string to multi-line': 'single string to multi-line',
-    'single string comma delimited': 'single string comma delimited',
-    'single string space delimited': 'single string space delimited',
-    'single-line space delimited': 'single-line space delimited',
     // yaml-title.ts
     'first-h1': 'First H1',
     'first-h1-or-filename-if-h1-missing': 'First H1 or Filename if H1 is Missing',

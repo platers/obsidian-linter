@@ -1,7 +1,7 @@
 import MoveInlineFieldsToYaml from '../src/rules/move-inline-fields-to-yaml';
 import dedent from 'ts-dedent';
-import {ruleTest} from './common';
-import {NormalArrayFormats, TagSpecificArrayFormats} from '../src/utils/yaml';
+import { ruleTest } from './common';
+import { ArrayFormats } from '../src/utils/yaml';
 
 ruleTest({
   RuleBuilderClass: MoveInlineFieldsToYaml,
@@ -32,7 +32,7 @@ ruleTest({
         "Other Key": value
         ---
       `,
-      options: {howToHandleExistingKeys: 'Overwrite'},
+      options: { howToHandleExistingKeys: 'Overwrite' },
     },
     {
       testName: 'An existing key keeps its quotes when they differ from the escape character in the settings',
@@ -50,7 +50,7 @@ ruleTest({
         "Other Key": 5678
         ---
       `,
-      options: {howToHandleExistingKeys: 'Overwrite', defaultEscapeCharacter: '"'},
+      options: { howToHandleExistingKeys: 'Overwrite', defaultEscapeCharacter: '"' },
     },
     {
       testName: 'Keys use the escape character from the settings',
@@ -60,7 +60,7 @@ ruleTest({
         'Test Key': 1234
         ---
       `,
-      options: {defaultEscapeCharacter: '\''},
+      options: { defaultEscapeCharacter: '\'' },
     },
     {
       testName: 'Values that are not plain YAML are escaped and values Dataview reads as a quoted string keep their quotes when YAML reads them the same way',
@@ -147,7 +147,7 @@ ruleTest({
         ---
         Text [owner:: me] and (due:: tomorrow)
       `,
-      options: {howToHandleBracketedFields: 'Move and keep in text'},
+      options: { howToHandleBracketedFields: 'Move and keep in text' },
     },
     {
       testName: 'Fields kept in the text do not change the YAML frontmatter again once it has their values',
@@ -184,7 +184,7 @@ ruleTest({
           - garden
         ---
       `,
-      options: {defaultArrayStyle: NormalArrayFormats.MultiLine},
+      options: { defaultArrayStyle: ArrayFormats.MultiLine },
     },
     {
       testName: 'A new key with one value stays a plain value when the default array style is multi-line',
@@ -196,7 +196,7 @@ ruleTest({
         context: home
         ---
       `,
-      options: {defaultArrayStyle: NormalArrayFormats.MultiLine},
+      options: { defaultArrayStyle: ArrayFormats.MultiLine },
     },
     {
       testName: 'An existing single-line array keeps its style when the default array style is multi-line',
@@ -213,7 +213,7 @@ ruleTest({
       `,
       options: {
         howToHandleExistingKeys: 'Merge into list',
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {
@@ -233,7 +233,7 @@ ruleTest({
       `,
       options: {
         howToHandleExistingKeys: 'Merge into list',
-        defaultArrayStyle: NormalArrayFormats.MultiLine,
+        defaultArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {
@@ -269,7 +269,7 @@ ruleTest({
         ---
         See [[Note]] and f(x) = (x + 1) and a \\] b.
       `,
-      options: {howToHandleBracketedFields: 'Move and keep value in text'},
+      options: { howToHandleBracketedFields: 'Move and keep value in text' },
     },
     {
       testName: 'Bracketed keys cannot contain brackets or parentheses',
@@ -279,7 +279,7 @@ ruleTest({
       after: dedent`
         A [[link]] and [ke(y:: value] stay
       `,
-      options: {howToHandleBracketedFields: 'Move and remove'},
+      options: { howToHandleBracketedFields: 'Move and remove' },
     },
     {
       testName: 'A bracketed field with no closing wrapper is left alone',
@@ -289,7 +289,7 @@ ruleTest({
       after: dedent`
         An [unclosed:: field
       `,
-      options: {howToHandleBracketedFields: 'Move and remove'},
+      options: { howToHandleBracketedFields: 'Move and remove' },
     },
     {
       testName: 'Removing bracketed fields at the start and end of a line does not leave extra whitespace',
@@ -306,7 +306,7 @@ ruleTest({
         text in the middle
         text more text
       `,
-      options: {howToHandleBracketedFields: 'Move and remove'},
+      options: { howToHandleBracketedFields: 'Move and remove' },
     },
     {
       testName: 'A line left with only whitespace is removed, including when it is the last line',
@@ -327,7 +327,7 @@ ruleTest({
         ${''}
         Middle line
       `,
-      options: {howToHandleBracketedFields: 'Move and remove'},
+      options: { howToHandleBracketedFields: 'Move and remove' },
     },
     {
       testName: 'Replacing a bracketed field with an empty value removes it',
@@ -340,7 +340,7 @@ ruleTest({
         ---
         Text here
       `,
-      options: {howToHandleBracketedFields: 'Move and keep value in text'},
+      options: { howToHandleBracketedFields: 'Move and keep value in text' },
     },
     {
       testName: 'Fields on list items, tasks, and their continuation lines are always left alone',
@@ -358,7 +358,7 @@ ruleTest({
         1. numbered:: item
         > - quoted:: item
       `,
-      options: {howToHandleBracketedFields: 'Move and remove'},
+      options: { howToHandleBracketedFields: 'Move and remove' },
     },
     {
       testName: 'Fields in code, inline code, math, HTML, tables, comments, and disabled sections are left alone',
@@ -424,7 +424,7 @@ ruleTest({
         disabled:: section
         <!-- linter-enable -->
       `,
-      options: {howToHandleBracketedFields: 'Move and remove'},
+      options: { howToHandleBracketedFields: 'Move and remove' },
     },
     {
       testName: 'A full-line field with inline code in it is left alone',
@@ -466,7 +466,7 @@ ruleTest({
         context:: home
         Text [context:: garden]
       `,
-      options: {howToHandleBracketedFields: 'Move and remove'},
+      options: { howToHandleBracketedFields: 'Move and remove' },
     },
     {
       testName: 'Several fields with the same new key become a list',
@@ -499,7 +499,7 @@ ruleTest({
           - garden
         ---
       `,
-      options: {howToHandleExistingKeys: 'Merge into list'},
+      options: { howToHandleExistingKeys: 'Merge into list' },
     },
     {
       testName: 'Merge into list adds to an existing single-line array and fills an existing empty key',
@@ -517,7 +517,7 @@ ruleTest({
         empty: value
         ---
       `,
-      options: {howToHandleExistingKeys: 'Merge into list'},
+      options: { howToHandleExistingKeys: 'Merge into list' },
     },
     {
       testName: 'Merge into list does not add values that are already there with or without quotes and keeps the quotes of existing values',
@@ -534,7 +534,7 @@ ruleTest({
         context: ['home', "garden", shed]
         ---
       `,
-      options: {howToHandleExistingKeys: 'Merge into list'},
+      options: { howToHandleExistingKeys: 'Merge into list' },
     },
     {
       testName: 'Merge into list leaves an existing array as it is written when it already has every value',
@@ -554,7 +554,7 @@ ruleTest({
             - a
         ---
       `,
-      options: {howToHandleExistingKeys: 'Merge into list'},
+      options: { howToHandleExistingKeys: 'Merge into list' },
     },
     {
       testName: 'Overwrite keeps an existing single value array an array',
@@ -569,7 +569,7 @@ ruleTest({
         context: [home]
         ---
       `,
-      options: {howToHandleExistingKeys: 'Overwrite'},
+      options: { howToHandleExistingKeys: 'Overwrite' },
     },
     {
       testName: 'Overwrite replaces an existing multi-line array with every value of the key and keeps it multi-line',
@@ -590,7 +590,7 @@ ruleTest({
         title: Note
         ---
       `,
-      options: {howToHandleExistingKeys: 'Overwrite'},
+      options: { howToHandleExistingKeys: 'Overwrite' },
     },
     {
       testName: 'Inline keys to ignore applies to full-line and bracketed fields and is case sensitive',
@@ -615,19 +615,15 @@ ruleTest({
       testName: 'Tags are split up, have their hashtags removed, and use the tag array style',
       before: dedent`
         tags:: #book #fiction
-        tag:: to-read, #series/discworld
       `,
       after: dedent`
         ---
         tags:
           - book
           - fiction
-        tag:
-          - to-read
-          - series/discworld
         ---
       `,
-      options: {tagArrayStyle: NormalArrayFormats.MultiLine},
+      options: { tagArrayStyle: ArrayFormats.MultiLine },
     },
     {
       testName: 'A single tag still uses the tag array style',
@@ -647,18 +643,18 @@ ruleTest({
       testName: 'Merge into list adds tags to the existing tags without duplicates',
       before: dedent`
         ---
-        tags: book fiction
+        tags: [book, fiction]
         ---
         tags:: #fiction #to-read
       `,
       after: dedent`
         ---
-        tags: book fiction to-read
+        tags: [book, fiction, to-read]
         ---
       `,
       options: {
         howToHandleExistingKeys: 'Merge into list',
-        tagArrayStyle: TagSpecificArrayFormats.SingleStringSpaceDelimited,
+        tagArrayStyle: ArrayFormats.SingleLine,
       },
     },
     {
@@ -690,7 +686,7 @@ ruleTest({
       `,
       options: {
         howToHandleExistingKeys: 'Merge into list',
-        aliasArrayStyle: NormalArrayFormats.MultiLine,
+        aliasArrayStyle: ArrayFormats.MultiLine,
       },
     },
     {

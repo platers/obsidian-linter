@@ -1,6 +1,6 @@
-import {ItemView, WorkspaceLeaf} from 'obsidian';
+import { ItemView, WorkspaceLeaf } from 'obsidian';
 import DiffMatchPatch from 'diff-match-patch';
-import {getTextInLanguage} from '../../lang/helpers';
+import { getTextInLanguage } from '../../lang/helpers';
 
 export const diffPreviewViewType = 'linter-diff-preview';
 
@@ -73,7 +73,7 @@ export class DiffPreviewView extends ItemView {
 
     const headerEl = this.contentEl.createDiv('linter-diff-preview-header');
     const titleGroupEl = headerEl.createDiv('linter-diff-preview-title-group');
-    titleGroupEl.createEl('h3', {text: this.previewState.title});
+    titleGroupEl.createEl('h3', { text: this.previewState.title });
 
     const hasChanges = this.previewState.oldText !== this.previewState.newText;
     if (!hasChanges) {
@@ -84,15 +84,15 @@ export class DiffPreviewView extends ItemView {
     }
 
     const actionsEl = headerEl.createDiv('linter-diff-preview-actions');
-    actionsEl.createEl('button', {text: getTextInLanguage('close-button-text')})
-        .addEventListener('click', () => {
-          this.previewState = null;
-          this.render();
-        });
+    actionsEl.createEl('button', { text: getTextInLanguage('close-button-text') })
+      .addEventListener('click', () => {
+        this.previewState = null;
+        this.render();
+      });
 
     if (hasChanges) {
       const applyButton = actionsEl.createEl('button', {
-        attr: {type: 'submit'},
+        attr: { type: 'submit' },
         cls: 'mod-cta',
         text: getTextInLanguage('notice-text.apply-lint-preview'),
       });
@@ -105,9 +105,9 @@ export class DiffPreviewView extends ItemView {
     }
 
     if (this.previewState.oldText.length + this.previewState.newText.length > largeDiffCharacterThreshold) {
-      this.bodyEl.createEl('p', {text: getTextInLanguage('notice-text.diff-large-file-warning')});
-      this.bodyEl.createEl('button', {text: getTextInLanguage('notice-text.show-diff')})
-          .addEventListener('click', () => this.renderDiff());
+      this.bodyEl.createEl('p', { text: getTextInLanguage('notice-text.diff-large-file-warning') });
+      this.bodyEl.createEl('button', { text: getTextInLanguage('notice-text.show-diff') })
+        .addEventListener('click', () => this.renderDiff());
       return;
     }
 
@@ -138,19 +138,19 @@ export class DiffPreviewView extends ItemView {
     const summary = this.createSummary(diffs);
     this.bodyEl.createDiv({
       text: getTextInLanguage('notice-text.diff-summary')
-          .replace('{LINES_ADDED}', summary.linesAdded.toString())
-          .replace('{LINES_REMOVED}', summary.linesRemoved.toString())
-          .replace('{CHARS_ADDED}', summary.charsAdded.toString())
-          .replace('{CHARS_REMOVED}', summary.charsRemoved.toString()),
+        .replace('{LINES_ADDED}', summary.linesAdded.toString())
+        .replace('{LINES_REMOVED}', summary.linesRemoved.toString())
+        .replace('{CHARS_ADDED}', summary.charsAdded.toString())
+        .replace('{CHARS_REMOVED}', summary.charsRemoved.toString()),
       cls: 'linter-diff-summary',
     });
 
-    const diffEl = this.bodyEl.createDiv({cls: 'linter-diff'});
+    const diffEl = this.bodyEl.createDiv({ cls: 'linter-diff' });
     this.renderDiffLines(diffEl, this.createVisibleDiffLines(this.expandDiffs(diffs)));
   }
 
   private createLineDiff(oldText: string, newText: string): DiffMatchPatch.Diff[] {
-    const diffMatchPatch = new DiffMatchPatch.diff_match_patch();  
+    const diffMatchPatch = new DiffMatchPatch.diff_match_patch();
     const lineMode = diffMatchPatch.diff_linesToChars_(oldText, newText);
     const diffs = diffMatchPatch.diff_main(lineMode.chars1, lineMode.chars2, false);
     diffMatchPatch.diff_charsToLines_(diffs, lineMode.lineArray);
@@ -168,7 +168,7 @@ export class DiffPreviewView extends ItemView {
       }
 
       return summary;
-    }, {charsAdded: 0, charsRemoved: 0, linesAdded: 0, linesRemoved: 0});
+    }, { charsAdded: 0, charsRemoved: 0, linesAdded: 0, linesRemoved: 0 });
   }
 
   private countLines(text: string): number {
@@ -204,7 +204,7 @@ export class DiffPreviewView extends ItemView {
     return lines;
   }
 
-  private createVisibleDiffLines(lines: DiffLine[]): Array<DiffLine | {skipped: number}> {
+  private createVisibleDiffLines(lines: DiffLine[]): Array<DiffLine | { skipped: number }> {
     const visibleLines = new Array(lines.length).fill(false);
 
     for (let i = 0; i < lines.length; i++) {
@@ -219,12 +219,12 @@ export class DiffPreviewView extends ItemView {
       }
     }
 
-    const result: Array<DiffLine | {skipped: number}> = [];
+    const result: Array<DiffLine | { skipped: number }> = [];
     let skipped = 0;
     for (let i = 0; i < lines.length; i++) {
       if (visibleLines[i]) {
         if (skipped > 0) {
-          result.push({skipped});
+          result.push({ skipped });
           skipped = 0;
         }
 
@@ -235,13 +235,13 @@ export class DiffPreviewView extends ItemView {
     }
 
     if (skipped > 0) {
-      result.push({skipped});
+      result.push({ skipped });
     }
 
     return result;
   }
 
-  private renderDiffLines(diffEl: HTMLDivElement, lines: Array<DiffLine | {skipped: number}>) {
+  private renderDiffLines(diffEl: HTMLDivElement, lines: Array<DiffLine | { skipped: number }>) {
     for (const line of lines) {
       if ('skipped' in line) {
         diffEl.createDiv({
@@ -251,9 +251,9 @@ export class DiffPreviewView extends ItemView {
         continue;
       }
 
-      const lineEl = diffEl.createDiv({cls: this.diffClass(line.operation)});
-      lineEl.createSpan({cls: 'linter-diff-marker', text: this.diffPrefix(line.operation)});
-      lineEl.createSpan({cls: 'linter-diff-text', text: line.text});
+      const lineEl = diffEl.createDiv({ cls: this.diffClass(line.operation) });
+      lineEl.createSpan({ cls: 'linter-diff-marker', text: this.diffPrefix(line.operation) });
+      lineEl.createSpan({ cls: 'linter-diff-text', text: line.text });
     }
   }
 

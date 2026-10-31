@@ -1,7 +1,7 @@
 
-import {normalizePath, Notice, Plugin, requestUrl, RequestUrlResponse} from 'obsidian';
-import {logError, logWarn} from './logger';
-import {getTextInLanguage} from '../lang/helpers';
+import { normalizePath, Notice, Plugin, requestUrl, RequestUrlResponse } from 'obsidian';
+import { logError, logWarn } from './logger';
+import { getTextInLanguage } from '../lang/helpers';
 
 const defaultCustomMisspellingsFileName = 'default-misspellings.md';
 const defaultCustomAutoCorrectMisspellingsLocations = `https://raw.githubusercontent.com/platers/obsidian-linter/refs/heads/master/src/utils/${defaultCustomMisspellingsFileName}`;
@@ -9,7 +9,7 @@ const defaultCustomAutoCorrectMisspellingsLocations = `https://raw.githubusercon
 export async function downloadMisspellings(plugin: Plugin, disableCustomAutoCorrect: (message: string) => Promise<void>): Promise<void> {
   const app = plugin.app;
   const pluginDir = plugin.manifest.dir ?? '';
-  const fullPath = normalizePath(pluginDir+ '/' + defaultCustomMisspellingsFileName);
+  const fullPath = normalizePath(pluginDir + '/' + defaultCustomMisspellingsFileName);
   if (await app.vault.adapter.exists(fullPath)) {
     return;
   }
@@ -41,7 +41,7 @@ export async function downloadMisspellings(plugin: Plugin, disableCustomAutoCorr
 export async function readInMisspellingsFile(plugin: Plugin): Promise<string> {
   const app = plugin.app;
   const pluginDir = plugin.manifest.dir ?? '';
-  const fullPath = normalizePath(pluginDir+ '/' + defaultCustomMisspellingsFileName);
+  const fullPath = normalizePath(pluginDir + '/' + defaultCustomMisspellingsFileName);
   if (!await app.vault.adapter.exists(fullPath)) {
     logWarn(getTextInLanguage('rules.auto-correct-common-misspellings.defaults-missing').replace('{FILE}', fullPath));
     return '';

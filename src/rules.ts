@@ -6,13 +6,11 @@ import {
   Option,
   BooleanOption,
 } from './option';
-import {LinterError} from './linter-error';
-import {getTextInLanguage, LanguageStringKey} from './lang/helpers';
-import {IgnoreType} from './utils/ignore-types';
-import {LintContext, ProtectedRanges} from './utils/protected-ranges';
-import {LinterSettings} from './settings-data';
-import {App} from 'obsidian';
-import {YAMLParseError} from 'yaml';
+import { getTextInLanguage, LanguageStringKey } from './lang/helpers';
+import { IgnoreType } from './utils/ignore-types';
+import { LintContext, ProtectedRanges } from './utils/protected-ranges';
+import { LinterSettings } from './settings-data';
+import { App } from 'obsidian';
 import LinterPlugin from './main';
 
 export type Options = object;
@@ -47,17 +45,17 @@ export class Rule {
    * @param {function(boolean):boolean} [disableConflictingOptions=null] - The function to disable conflicting rules or options when it is enabled
    */
   constructor(
-      private nameKey: LanguageStringKey,
-      private descriptionKey: LanguageStringKey,
-      public settingsKey: string,
-      public alias: string,
-      public type: RuleType,
-      public applyAfterIgnore: ApplyFunction,
-      public examples: Array<Example>,
-      public options: Array<Option> = [],
-      public readonly hasSpecialExecutionOrder: boolean = false,
-      public readonly ignoreTypes: IgnoreType[] = [],
-      disableConflictingOptions: (value: boolean, app: App, plugin: LinterPlugin) => void = null,
+    private nameKey: LanguageStringKey,
+    private descriptionKey: LanguageStringKey,
+    public settingsKey: string,
+    public alias: string,
+    public type: RuleType,
+    public applyAfterIgnore: ApplyFunction,
+    public examples: Array<Example>,
+    public options: Array<Option> = [],
+    public readonly hasSpecialExecutionOrder: boolean = false,
+    public readonly ignoreTypes: IgnoreType[] = [],
+    disableConflictingOptions: (value: boolean, app: App, plugin: LinterPlugin) => void = null,
   ) {
     this.ruleHeading = this.getName().toLowerCase().replaceAll(' ', '-');
 
@@ -65,7 +63,7 @@ export class Rule {
       if (value) {
         disableConflictingOptions(value, app, plugin);
       }
-    }: undefined;
+    } : undefined;
 
     options.unshift(new BooleanOption('enabled', this.descriptionKey, '' as LanguageStringKey, false, alias, onChange));
     for (const option of options) {
@@ -142,10 +140,10 @@ export class Example {
    * @param {object} options - The options of the example
    */
   constructor(
-      description: string,
-      before: string,
-      after: string,
-      options: Options = {},
+    description: string,
+    before: string,
+    after: string,
+    options: Options = {},
   ) {
     this.description = description;
     this.options = options;
@@ -194,16 +192,4 @@ export function registerRule(rule: Rule): void {
 
 export function sortRules(): void {
   rules.sort((a, b) => (RuleTypeOrder.indexOf(a.type) - RuleTypeOrder.indexOf(b.type)) || (a.settingsKey.localeCompare(b.settingsKey)));
-}
-
-export function wrapLintError(error: Error, ruleName: string) {
-  let errorMessage: string;
-  if (error instanceof YAMLParseError) {
-    errorMessage = error.toString();
-    errorMessage = getTextInLanguage('logs.wrapper-yaml-error').replace('{ERROR_MESSAGE}', errorMessage.substring(errorMessage.indexOf(':') + 1));
-  } else {
-    errorMessage = getTextInLanguage('logs.wrapper-unknown-error').replace('{ERROR_MESSAGE}', error.message);
-  }
-
-  throw new LinterError(getTextInLanguage('logs.error-message-format').replace('{RULE_NAME}', ruleName).replace('{ERROR_MESSAGE}', errorMessage), error);
 }

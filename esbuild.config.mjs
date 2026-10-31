@@ -5,6 +5,7 @@ import importGlobPlugin from 'esbuild-plugin-import-glob';
 import { replace } from 'esbuild-plugin-replace';
 import { copyFileSync } from 'node:fs';
 import { join } from 'node:path';
+import inlineWorkerPlugin from 'esbuild-plugin-inline-worker';
 
 const banner =
   `/*
@@ -14,45 +15,51 @@ if you want to view the source, please visit the github repository of this plugi
 `;
 
 const testVaultPluginPath = "test-vault/.obsidian/plugins/obsidian-linter";
-const dummyMocksForDocs = `
+const dummyMocksForDocsAndWorker = `
 document = {
-  createElement: function() {},
+  createElement: function () { },
 };
-class AbstractInputSuggest {};
+class AbstractInputSuggest { };
+
+class Modal {};
 `;
 
 const prod = (process.argv[2] === 'production');
 
-const mockedBanner = banner + dummyMocksForDocs;
+const mockedBanner = banner + dummyMocksForDocsAndWorker;
 const mockedPlugins = [replace({
   values: {
     // update usage of moment from obsidian to the node implementation of moment we have
-    'import {moment} from \'obsidian\';': 'import moment from \'moment\';',
+    'import { moment } from \'obsidian\';': 'import moment from \'moment\';',
     // remove the use of obsidian in the options to allow for docs.js to run
     'import { App, ExtraButtonComponent, normalizePath, TFile, ToggleComponent } from \'obsidian\';': '',
     'import type { SettingDefinition, SettingDefinitionItem, SettingDefinitionList, SettingDefinitionPage } from \'obsidian\';': '',
     // remove the use of obsidian in the auto-correct files picker to allow for docs.js to run
-    'import {Setting, App, TFile, normalizePath, ExtraButtonComponent} from \'obsidian\';': '',
+    'import { Setting, App, TFile, normalizePath, ExtraButtonComponent } from \'obsidian\';': '',
     // remove the use of obsidian in add custom row to allow for docs.js to run
-    'import {App, Setting} from \'obsidian\';': '',
+    'import { App, Setting } from \'obsidian\';': '',
     // remove the use of obsidian in md file suggester to allow for docs.js to run
-    'import {AbstractInputSuggest, App, TFile} from \'obsidian\';': '',
+    'import { AbstractInputSuggest, App, TFile } from \'obsidian\';': '',
     // remove the use of obsidian in md folder suggester to allow for docs.js to run
-    'import {AbstractInputSuggest, App, TFolder} from \'obsidian\';': '',
+    'import { AbstractInputSuggest, App, TFolder } from \'obsidian\';': '',
     // remove the use of obsidian in parse results modal to allow for docs.js to run
-    'import {Modal, App} from \'obsidian\';': 'class Modal {}',
+    'import { Modal, App } from \'obsidian\';': '',
     // remove the use of obsidian in modals to allow for docs.js to run
-    'import {Notice, Modal, App} from \'obsidian\';': 'class Modal {}',
+    'import { Notice, Modal, App } from \'obsidian\';': '',
     // remove the use of app from a couple of settings for docs.js to run
-    'import {App} from \'obsidian\';': '',
+    'import { App } from \'obsidian\';': '',
     // remove the use of obsidian in list item modal to allow for docs.js to run
-    'import {App, displayTooltip} from \'obsidian\';': '',
+    'import { App, displayTooltip } from \'obsidian\';': '',
     // remove the use of obsidian from form modals for docs.js to run
-    'import { App, ButtonComponent, DropdownComponent, Modal, Platform, setIcon, TextComponent, ToggleComponent } from \'obsidian\';': 'class Modal {}',
+    'import { App, ButtonComponent, DropdownComponent, Modal, Platform, setIcon, TextComponent, ToggleComponent } from \'obsidian\';': '',
     // remove the use of sanitizeHTMLToDom from the ui helpers for docs.js to run
     'import { sanitizeHTMLToDom } from \'obsidian\';': '',
     // remove the use of obsidian inside command suggester for docs.js to run
-    'import {AbstractInputSuggest, App, Command} from \'obsidian\';': '',
+    'import { AbstractInputSuggest, App, Command } from \'obsidian\';': '',
+    // remove the use of obsidian inside error helpers
+    'import { Notice, TFile } from "obsidian";': '',
+    // remove use of moment and obsidian command
+    'import { Command, MarkdownView, moment } from \'obsidian\';': '',
   },
   delimiters: ['', ''],
 })];
@@ -80,6 +87,24 @@ const createEsbuildArgs = function (banner, entryPoint, outfile, extraPlugins) {
     entryPoints: [entryPoint],
     plugins: [
       importGlobPlugin.default(),
+      inlineWorkerPlugin({
+        banner:
+        {
+          js: dummyMocksForDocsAndWorker,
+        },
+        format: 'cjs',
+        bundle: true,
+        external: [
+          'obsidian',
+          ...builtins],
+        format: 'cjs',
+        target: 'es2020',
+        sourcemap: prod ? false : 'inline',
+        minify: prod,
+        inject: ['./scripts/js/worker-dom-shim.js'],
+        treeShaking: true,
+        plugins: [importGlobPlugin.default(), ...mockedPlugins],
+      }),
       ...extraPlugins,
     ],
     bundle: true,

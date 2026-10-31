@@ -1,7 +1,10 @@
-import {readFileSync} from 'fs';
-import {Options} from '../src/rules';
-import RuleBuilder, {RuleBuilderBase} from '../src/rules/rule-builder';
-import {parseCustomReplacements} from '../src/utils/strings';
+import { readFileSync } from 'fs';
+import { Options } from '../src/rules';
+import RuleBuilder, { RuleBuilderBase } from '../src/rules/rule-builder';
+import { parseCustomReplacements } from '../src/utils/strings';
+import { RunLinterRulesOptions } from '../src/typings/worker';
+import { lintText, runAfterRegularRules, runMainThreadRules } from '../src/rules-runner/rules-runner';
+import moment from 'moment';
 
 let defaultMap: Map<string, string>;
 
@@ -14,6 +17,24 @@ export function defaultMisspellings(): Map<string, string> {
   return defaultMap;
 }
 
+export function runRules(runOptions: RunLinterRulesOptions, getCurrentTime: () => moment.Moment): string {
+  runOptions.newText = lintText(runOptions);
+
+  runMainThreadRules(runOptions, getCurrentTime);
+
+  return runOptions.newText
+}
+
+export function runAfterRules(currentText: string, runOptions: RunLinterRulesOptions, getCurrentTime: () => moment.Moment): string {
+  runOptions.newText = currentText;
+  runOptions.newText = runAfterRegularRules(runOptions.newText, runOptions);
+
+  runMainThreadRules(runOptions, getCurrentTime);
+
+  return runOptions.newText
+}
+
+
 type TestCase<TOptions extends Options> = {
   testName: string,
   before: string,
@@ -23,7 +44,7 @@ type TestCase<TOptions extends Options> = {
 };
 
 export function ruleTest<TOptions extends Options>(args: {
-  RuleBuilderClass: typeof RuleBuilderBase & (new() => RuleBuilder<TOptions>),
+  RuleBuilderClass: typeof RuleBuilderBase & (new () => RuleBuilder<TOptions>),
   testCases: TestCase<TOptions>[]
 }): void {
   const rule = args.RuleBuilderClass.getRule();
