@@ -85,6 +85,64 @@ Here is some text
 ``````
 </details>
 
+## Add UUID to YAML
+
+Alias: `add-uuid-to-yaml`
+
+Adds a randomly generated v4 UUID to the YAML frontmatter when the specified key is missing or empty.
+
+### Options
+
+| Name | Description | List Items | Default Value |
+| ---- | ----------- | ---------- | ------------- |
+| `UUID key` | The YAML key to put the UUID in | N/A | `uuid` |
+
+
+
+### Examples
+
+<details><summary>Adds a UUID to the YAML frontmatter when the key is missing</summary>
+
+Before:
+
+`````` markdown
+---
+title: My New Note
+date: 2024-05-20
+---
+``````
+
+After:
+
+`````` markdown
+---
+title: My New Note
+date: 2024-05-20
+uuid: 550e8400-e29b-41d4-a716-446655440000
+---
+``````
+</details>
+<details><summary>Leaves an existing UUID alone</summary>
+
+Before:
+
+`````` markdown
+---
+title: My New Note
+uuid: 123e4567-e89b-42d3-a456-426614174000
+---
+``````
+
+After:
+
+`````` markdown
+---
+title: My New Note
+uuid: 123e4567-e89b-42d3-a456-426614174000
+---
+``````
+</details>
+
 ## Dedupe YAML array values
 
 Alias: `dedupe-yaml-array-values`

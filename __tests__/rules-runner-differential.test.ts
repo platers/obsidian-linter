@@ -223,6 +223,8 @@ describe('the linter produces the same documents it did before', () => {
   beforeAll(() => {
     setLanguage('en');
     misspellings = parseCustomReplacements(readFileSync('src/utils/default-misspellings.md', 'utf8'));
+    // add-uuid-to-yaml would otherwise put a different UUID in every run
+    jest.spyOn(crypto, 'randomUUID').mockReturnValue('550e8400-e29b-41d4-a716-446655440000');
   });
 
   it('lints the corpus', () => {
