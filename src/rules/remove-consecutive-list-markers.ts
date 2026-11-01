@@ -22,13 +22,13 @@ export default class RemoveConsecutiveListMarkers extends RuleBuilder<RemoveCons
   }
   apply(text: string, options: RemoveConsecutiveListMarkersOptions, protectedRanges: ProtectedRanges): string {
     return replaceTextRanges(text, collectUnprotectedRegexReplacements(
-        text, /^([ |\t]*)- - (\p{L})/gmu, protectedRanges, {
+        text, /^([ |\t]*)- -[ \t]+([^\s-])/gmu, protectedRanges, {
           editRange: (match, startIndex) => ({
             startIndex: startIndex + match[1].length + 2,
-            endIndex: startIndex + match[1].length + 4,
+            endIndex: startIndex + match[0].length - match[2].length,
             value: '',
           }),
-          // A placeholder does not satisfy the letter anchor after the second marker.
+          // The first character of the content must be unprotected for the replacement to happen.
           guardRange: (match, startIndex) => ({startIndex, endIndex: startIndex + match[0].length}),
         },
     ));
