@@ -586,6 +586,40 @@ export function formatYamlArrayValue(value: string | string[], format: ArrayForm
 
 }
 
+/**
+ * Determines whether the value is an array that contains at least one array and otherwise only arrays and scalar values.
+ * @param {unknown} value The parsed YAML value to check.
+ * @return {boolean} Whether the value is an array of arrays that can be formatted with {@link formatNestedYamlArrayValue}.
+ */
+export function isNestedArrayOfScalars(value: unknown): boolean {
+  const onlyScalarsAndArrays = (val: unknown): boolean => Array.isArray(val) ? val.every(onlyScalarsAndArrays) : val === null || typeof val !== 'object';
+
+  return Array.isArray(value) && value.some(Array.isArray) && onlyScalarsAndArrays(value);
+}
+
+/**
+ * Formats a YAML array value that contains nested arrays in the specified format.
+ * @param {string} value The raw YAML value of the array.
+ * @param {ArrayFormats} format The format that the array and its nested arrays should be converted into.
+ * @return {string} The formatted array in the specified YAML format.
+ */
+export function formatNestedYamlArrayValue(value: string, format: ArrayFormats): string {
+  const doc = parseDocument(value);
+  visit(doc, {
+    Seq(_, seq) {
+      seq.flow = format === ArrayFormats.SingleLine;
+    },
+  });
+
+  // a line width of 0 keeps long arrays from being broken up over multiple lines
+  const result = doc.toString({ flowCollectionPadding: false, lineWidth: 0 }).trimEnd();
+  if (format === ArrayFormats.SingleLine) {
+    return ' ' + result;
+  }
+
+  return '\n  ' + result.replaceAll('\n', '\n  ');
+}
+
 function convertStringArrayToSingleLineArray(arrayItems: string[]): string {
   if (arrayItems == null || arrayItems.length === 0) {
     return '[]';

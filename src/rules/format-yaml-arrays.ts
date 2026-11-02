@@ -5,8 +5,10 @@ import {
   convertAliasValueToStringOrStringArray,
   convertTagValueToStringOrStringArray,
   formatYAML,
+  formatNestedYamlArrayValue,
   formatYamlArrayValue,
   getYamlSectionValue,
+  isNestedArrayOfScalars,
   loadYAML,
   ArrayFormats,
   OBSIDIAN_ALIAS_KEY,
@@ -49,7 +51,7 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
   }
   apply(text: string, options: FormatYamlArrayOptions): string {
     return formatYAML(text, (text: string) => {
-      const yaml = loadYAML(text.replace('---\n', '').replace('\n---', ''));
+      const yaml = loadYAML(text.replace('---\n', '').replace('\n---', '')) as { [k: string]: unknown };
       if (!yaml) {
         return text;
       }
@@ -83,6 +85,11 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
         const keysToIgnore = [OBSIDIAN_ALIAS_KEY, OBSIDIAN_TAG_KEY, ...options.forceMultiLineArrayStyle, ...options.forceSingleLineArrayStyle];
 
         for (const key of Object.keys(yaml)) {
+          if (!keysToIgnore.includes(key) && isNestedArrayOfScalars(yaml[key])) {
+            text = setYamlSection(text, key, formatNestedYamlArrayValue(getYamlSectionValue(text, key), options.defaultArrayStyle));
+            continue;
+          }
+
           // skip non-arrays, arrays of objects, ignored keys, and already accounted for keys
           if (keysToIgnore.includes(key) || !Array.isArray(yaml[key]) || ((yaml as { [k: string]: object[] })[key].length !== 0 && typeof (yaml as { [k: string]: object[] })[key][0] === 'object' && (yaml as { [k: string]: object[] })[key][0] !== null)) {
             continue;
@@ -105,6 +112,11 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
           continue;
         }
 
+        if (isNestedArrayOfScalars(yaml[singleLineArrayKey])) {
+          text = setYamlSection(text, singleLineArrayKey, formatNestedYamlArrayValue(getYamlSectionValue(text, singleLineArrayKey), ArrayFormats.SingleLine));
+          continue;
+        }
+
         text = setYamlSection(text,
           singleLineArrayKey,
           formatYamlArrayValue(
@@ -118,6 +130,11 @@ export default class FormatYamlArray extends RuleBuilder<FormatYamlArrayOptions>
 
       for (const multiLineArrayKey of options.forceMultiLineArrayStyle) {
         if (!Object.keys(yaml).includes(multiLineArrayKey)) {
+          continue;
+        }
+
+        if (isNestedArrayOfScalars(yaml[multiLineArrayKey])) {
+          text = setYamlSection(text, multiLineArrayKey, formatNestedYamlArrayValue(getYamlSectionValue(text, multiLineArrayKey), ArrayFormats.MultiLine));
           continue;
         }
 

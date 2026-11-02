@@ -780,5 +780,75 @@ ruleTest({
         defaultArrayStyle: ArrayFormats.MultiLine,
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1496
+      testName: 'Arrays containing arrays are converted to single-line arrays',
+      before: dedent`
+        ---
+        c: [1, 2, 3, 4, 5]
+        e: [1, 2, [3, 4]]
+        d:
+         - - 1
+           - 2
+         - 3
+         - 4
+        ---
+      `,
+      after: dedent`
+        ---
+        c: [1, 2, 3, 4, 5]
+        e: [1, 2, [3, 4]]
+        d: [[1, 2], 3, 4]
+        ---
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1496
+      testName: 'Arrays containing arrays are converted to multi-line arrays',
+      before: dedent`
+        ---
+        e: [1, 2, ["[[link]]", 4]]
+        d:
+         - - 1
+           - 2
+         - 3
+        ---
+      `,
+      after: dedent`
+        ---
+        e:
+          - 1
+          - 2
+          - - "[[link]]"
+            - 4
+        d:
+          - - 1
+            - 2
+          - 3
+        ---
+      `,
+      options: {
+        defaultArrayStyle: ArrayFormats.MultiLine,
+      },
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1496
+      testName: 'Arrays containing arrays respect forced single-line array keys',
+      before: dedent`
+        ---
+        d:
+          - - "[[a]]"
+            - b
+          - - c
+            - d
+        ---
+      `,
+      after: dedent`
+        ---
+        d: [["[[a]]", b], [c, d]]
+        ---
+      `,
+      options: {
+        defaultArrayStyle: ArrayFormats.MultiLine,
+        forceSingleLineArrayStyle: ['d'],
+      },
+    },
   ],
 });
