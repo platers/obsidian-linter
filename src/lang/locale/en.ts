@@ -370,6 +370,15 @@ export default {
       'name': 'Add blank line after YAML',
       'description': 'Adds a blank line after the YAML block if it does not end the current file or it is not already followed by at least 1 blank line',
     },
+    // add-uuid-to-yaml.ts
+    'add-uuid-to-yaml': {
+      'name': 'Add UUID to YAML',
+      'description': 'Adds a randomly generated v4 UUID to the YAML frontmatter when the specified key is missing or empty.',
+      'uuid-key': {
+        'name': 'UUID key',
+        'description': 'The YAML key to put the UUID in',
+      },
+    },
     // align-table-columns.ts
     'align-table-columns': {
       'name': 'Align Table Columns',
