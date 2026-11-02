@@ -33,5 +33,27 @@ ruleTest({
         - 测试 content
       `,
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1520
+      testName: 'Make sure consecutive list markers are removed when followed by extra spaces or non-letter characters',
+      before: dedent`
+        - Bullet
+            - -  too many dashes and an extra space
+            - - *too many dashes and an asterisk*
+            - - [ ] task
+            - - 2 items
+      `,
+      after: dedent`
+        - Bullet
+            - too many dashes and an extra space
+            - *too many dashes and an asterisk*
+            - [ ] task
+            - 2 items
+      `,
+    },
+    {
+      testName: 'Make sure thematic breaks made of dashes are left alone',
+      before: '- - -\n\n- - - -',
+      after: '- - -\n\n- - - -',
+    },
   ],
 });
