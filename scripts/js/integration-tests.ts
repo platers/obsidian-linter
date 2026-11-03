@@ -10,6 +10,7 @@ import dedent from 'ts-dedent';
 import { Rule, rules, RuleType, sortRules } from '../../src/rules';
 import '../../src/rules-registry';
 import { RuleBuilderBase } from '../../src/rules/rule-builder';
+import { NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats } from '../../src/utils/yaml';
 
 /**
  * Generates integration-test suites and their corresponding test-vault
@@ -122,7 +123,7 @@ function generateRule(rule: Rule): void {
   });
 
   const testFile = dedent`
-    ${autogenWarning}import TestLinterPlugin, {IntegrationTestCase} from '../main.test';
+    ${autogenWarning}import TestLinterPlugin, {IntegrationTestCase} from '../main.test';${setupFunctions.some((setup) => setup.includes('yaml.')) ? "\nimport * as yaml from '../../src/utils/yaml';" : ''}
 
     ${setupFunctions.join('\n\n')}
 
@@ -153,7 +154,7 @@ function generateTestCase(ruleAlias: string, example: typeof rules[number]['exam
 
 
 function getExampleSettings(rule: Rule, example: typeof rules[number]['examples'][number]): { ruleSettings: Record<string, unknown>; commonStyles: Record<string, unknown> } {
-  const exampleOptions = example.options as Record<string, unknown>;
+  const exampleOptions = example.options;
   const ruleSettings: Record<string, unknown> = {};
   const commonStyles: Record<string, unknown> = {};
   const builder = RuleBuilderBase.getBuilderByName(rule.alias);
@@ -204,8 +205,6 @@ function generateSetupFunction(rule: Rule, example: typeof rules[number]['exampl
   if (rule.alias === 'auto-correct-common-misspellings') {
     extraSetup = dedent`
 
-      plugin.plugin.hasLoadedMisspellingFiles = false;
-
       await plugin.plugin.loadAutoCorrectFiles(false);
     `;
 
@@ -232,10 +231,19 @@ function generateSetupFunction(rule: Rule, example: typeof rules[number]['exampl
   return [funcName, setupFunc];
 }
 
+function serializeCommonStyleValue(value: unknown): string {
+  const enums = { NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats };
+  for (const [enumName, entries] of Object.entries(enums)) {
+    const entry = Object.entries(entries).find(([, enumValue]) => enumValue === value);
+    if (entry) return `yaml.${enumName}.${entry[0]}`;
+  }
+  return JSON.stringify(value);
+}
+
 function generateCommonStylesSetup(commonStyles: Record<string, unknown>): string {
   const assignments = Object.entries(commonStyles).map(
     ([key, value]) => dedent`
-      plugin.plugin.settings.commonStyles.${key} = ${JSON.stringify(value)};
+      plugin.plugin.settings.commonStyles.${key} = ${serializeCommonStyleValue(value)};
     `,
   );
 

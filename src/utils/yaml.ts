@@ -461,7 +461,7 @@ export function removeBlankLinesOutsideBlockScalars(text: string): string {
   });
 }
 
-export function loadYAML(yaml_text: string): null | object {
+export function loadYAML(yaml_text: string): null | Record<string, unknown> {
   if (yaml_text == null) {
     return null;
   }
@@ -473,7 +473,7 @@ export function loadYAML(yaml_text: string): null | object {
     return {};
   }
 
-  return parsed_yaml;
+  return parsed_yaml as Record<string, unknown>;
 }
 
 export function parseYAML(yaml_text: string): null | Document {

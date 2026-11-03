@@ -1,4 +1,3 @@
-import { Options } from './rules';
 import { NestedKeyOf } from './utils/nested-keyof';
 import { ArrayFormats, QuoteCharacter } from './utils/yaml';
 
@@ -28,7 +27,7 @@ export type FileToIgnore = { label: string; match: string; flags: string; };
 
 export interface LinterSettings {
   ruleConfigs: {
-    [ruleName: string]: Options;
+    [ruleName: string]: Record<string, unknown>;
   };
   lintOnSave: boolean;
   displayChanged: boolean;
@@ -55,7 +54,7 @@ export interface LinterSettings {
 
 export type LinterSettingsKeys = NestedKeyOf<LinterSettings>
 
-export const DEFAULT_SETTINGS: Partial<LinterSettings> = {
+export const DEFAULT_SETTINGS: LinterSettings = {
   ruleConfigs: {},
   lintOnSave: false,
   recordLintOnSaveLogs: false,
