@@ -1,4 +1,4 @@
-import { getAllTablesInText } from './mdast';
+import { getAllTablesInText, getPositions, MDAstTypes } from './mdast';
 import { ProtectedRanges } from './protected-ranges';
 import { makeSureContentHasEmptyLinesAddedBeforeAndAfter, unescapeMarkdownSpecialCharacters } from './strings';
 
@@ -129,6 +129,21 @@ export function getFirstHeaderOneText(text: string, protectedRanges: ProtectedRa
   });
   if (result && result[1]) {
     let headerText = result[1];
+    // Hide parsed code spans before link cleanup and unescaping, then restore their source
+    // verbatim (including delimiters). A code span may also be part of a real link's label.
+    let codeTokenPrefix = '\u0000';
+    while (headerText.includes(codeTokenPrefix)) {
+      codeTokenPrefix += '\u0000';
+    }
+    const headerStart = result.index + result[0].length - headerText.length;
+    const codeSpans = getPositions(MDAstTypes.InlineCode, text).filter((position) =>
+      position.start.offset >= headerStart && position.end.offset <= headerStart + headerText.length);
+    // getPositions returns spans from right to left, so earlier source offsets stay valid.
+    for (let index = 0; index < codeSpans.length; index++) {
+      const position = codeSpans[index];
+      headerText = headerText.substring(0, position.start.offset - headerStart) +
+        `${codeTokenPrefix}${index}\u0000` + headerText.substring(position.end.offset - headerStart);
+    }
     headerText = headerText.replaceAll(wikiLinkRegex, (_, _2, $2: string, $3: string) => {
       if ($3 != null) {
         return $3.replace('|', '');
@@ -138,7 +153,12 @@ export function getFirstHeaderOneText(text: string, protectedRanges: ProtectedRa
     });
 
     headerText = headerText.replaceAll(genericLinkRegex, '$2');
-    return unescapeMarkdownSpecialCharacters(headerText);
+    headerText = unescapeMarkdownSpecialCharacters(headerText);
+    for (let index = 0; index < codeSpans.length; index++) {
+      const position = codeSpans[index];
+      headerText = headerText.replaceAll(`${codeTokenPrefix}${index}\u0000`, () => text.substring(position.start.offset, position.end.offset));
+    }
+    return headerText;
   }
 
   return '';
