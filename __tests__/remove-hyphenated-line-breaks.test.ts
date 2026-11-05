@@ -7,13 +7,13 @@ ruleTest({
   testCases: [
     {
       testName: 'Leaves hyphenated text inside fenced code alone',
-      before: '```\nline- break\nline‐ break\n```\nline- break',
-      after: '```\nline- break\nline‐ break\n```\nlinebreak',
+      before: '```\nline-\nbreak\nline‐\nbreak\n```\nline-\nbreak',
+      after: '```\nline-\nbreak\nline‐\nbreak\n```\nlinebreak',
     },
     {
       testName: 'Leaves hyphenated text inside disabled sections alone',
-      before: '<!-- linter-disable -->\nline- break\nline‐ break\n<!-- linter-enable -->\nline‐ break',
-      after: '<!-- linter-disable -->\nline- break\nline‐ break\n<!-- linter-enable -->\nlinebreak',
+      before: '<!-- linter-disable -->\nline-\nbreak\nline‐\nbreak\n<!-- linter-enable -->\nline‐\nbreak',
+      after: '<!-- linter-disable -->\nline-\nbreak\nline‐\nbreak\n<!-- linter-enable -->\nlinebreak',
     },
     {
       // accounts for https://github.com/platers/obsidian-linter/issues/241
@@ -29,6 +29,34 @@ ruleTest({
         ${''}
         Paragraph contents are here- [link text](pathToFile/file.md)
         Paragraph contents are here- [[file]]
+      `,
+    },
+    {
+      // accounts for https://github.com/platers/obsidian-linter/issues/1662
+      testName: 'Make sure a hyphen followed by a space but no line break is left alone',
+      before: dedent`
+        Berg- und Wanderschuhe
+        Berg‐ und Wanderschuhe
+        This text has a hyphen- ${''}
+        ${''}
+        next paragraph
+      `,
+      after: dedent`
+        Berg- und Wanderschuhe
+        Berg‐ und Wanderschuhe
+        This text has a hyphen- ${''}
+        ${''}
+        next paragraph
+      `,
+    },
+    {
+      testName: 'Removes a hyphenated line break with trailing whitespace',
+      before: dedent`
+        This text has a linebr- ${''}
+        eak.
+      `,
+      after: dedent`
+        This text has a linebreak.
       `,
     },
   ],

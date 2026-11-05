@@ -27,7 +27,7 @@ export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphen
       value: '',
     });
     return replaceTextRanges(text, collectUnprotectedRegexReplacements(
-        text, /\b[-‐] \b/g, protectedRanges, {editRange: removeHyphen, guardRange: removeHyphen},
+        text, /\b[-‐][^\S\n]*\n[^\S\n]*\b/g, protectedRanges, {editRange: removeHyphen, guardRange: removeHyphen},
     ));
   }
   get exampleBuilders(): ExampleBuilder<RemoveHyphenatedLineBreaksOptions>[] {
@@ -35,7 +35,8 @@ export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphen
       new ExampleBuilder({
         description: 'Removing hyphenated line breaks.',
         before: dedent`
-          This text has a linebr‐ eak.
+          This text has a linebr‐
+          eak.
         `,
         after: dedent`
           This text has a linebreak.
