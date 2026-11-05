@@ -1177,7 +1177,8 @@ Removes hyphenated line breaks. Useful when pasting text from textbooks.
 Before:
 
 `````` markdown
-This text has a linebr‐ eak.
+This text has a linebr‐
+eak.
 ``````
 
 After:
