@@ -17,7 +17,21 @@ export function defaultMisspellings(): Map<string, string> {
   return defaultMap;
 }
 
-export function runRules(runOptions: RunLinterRulesOptions, getCurrentTime: () => moment.Moment): string {
+/** Run options a test supplies: the fields a lint run fills in itself may be left out. */
+export type TestRunLinterRulesOptions = Omit<RunLinterRulesOptions, 'newText' | 'skipFile' | 'disabledRules' | 'logsFromRun'> & Partial<Pick<RunLinterRulesOptions, 'newText' | 'skipFile' | 'disabledRules' | 'logsFromRun'>>;
+
+function completeRunOptions(testRunOptions: TestRunLinterRulesOptions): RunLinterRulesOptions {
+  return {
+    newText: '',
+    skipFile: false,
+    disabledRules: [],
+    logsFromRun: [],
+    ...testRunOptions,
+  };
+}
+
+export function runRules(testRunOptions: TestRunLinterRulesOptions, getCurrentTime: () => moment.Moment): string {
+  const runOptions = completeRunOptions(testRunOptions);
   runOptions.newText = lintText(runOptions);
 
   runMainThreadRules(runOptions, getCurrentTime);
@@ -25,7 +39,8 @@ export function runRules(runOptions: RunLinterRulesOptions, getCurrentTime: () =
   return runOptions.newText
 }
 
-export function runAfterRules(currentText: string, runOptions: RunLinterRulesOptions, getCurrentTime: () => moment.Moment): string {
+export function runAfterRules(currentText: string, testRunOptions: TestRunLinterRulesOptions, getCurrentTime: () => moment.Moment): string {
+  const runOptions = completeRunOptions(testRunOptions);
   runOptions.newText = currentText;
   runOptions.newText = runAfterRegularRules(runOptions.newText, runOptions);
 

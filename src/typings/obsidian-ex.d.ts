@@ -3,11 +3,7 @@ import { EditorView } from '@codemirror/view';
 
 export interface ObsidianCommandInterface {
   executeCommandById(id: string): void;
-  commands: {
-    'editor:save-file': {
-      checkCallback(checking: boolean): boolean | void;
-    };
-  };
+  commands: Record<string, Partial<Command>>;
   listCommands(): Command[];
 }
 

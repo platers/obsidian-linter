@@ -53,7 +53,7 @@ function setup10(plugin: TestLinterPlugin): Promise<void> {
   "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.defaultArrayStyle = yaml.NormalArrayFormats.MultiLine;
+plugin.plugin.settings.commonStyles.defaultArrayStyle = yaml.ArrayFormats.MultiLine;
 
   return Promise.resolve();
 }

@@ -508,7 +508,7 @@ export default class LinterPlugin extends Plugin {
               if (activeFile === file && editor && editor.cm) {
                 void this.runLinterEditor(editor);
               } else {
-                void this.runLinterFile(file);
+                void this.runLinterFile(file, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
               }
             });
         });
@@ -644,7 +644,7 @@ export default class LinterPlugin extends Plugin {
 
       const file = this.getFileFromPath(runOptions.fileInfo.path);
       await this.handleLintResultForFileInBackground(runOptions, file, false);
-    }, (completed: number, errors: number) => {
+    }, async (completed: number, errors: number) => {
       if (errors === 0) {
         new Notice(getTextInLanguage('commands.lint-all-files.success-message'), userClickTimeout);
       } else {
@@ -668,7 +668,7 @@ export default class LinterPlugin extends Plugin {
 
       const file = this.getFileFromPath(runOptions.fileInfo.path);
       await this.handleLintResultForFileInBackground(runOptions, file, false);
-    }, (completed: number, errors: number) => {
+    }, async (completed: number, errors: number) => {
       const lintedFiles = completed + errors;
       if (errors === 0) {
         new Notice(getTextInLanguage('commands.lint-all-files-in-folder.success-message').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name), userClickTimeout);
@@ -750,7 +750,8 @@ export default class LinterPlugin extends Plugin {
 
     const file = this.app.workspace.getActiveFile();
     try {
-      this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
+      const errorTemplateString = getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'';
+      this.lintFileManager.lintFile({ file: file, errorNoticeTimeout: userClickTimeout, useLogTemplateInNotice: false, errorTemplateString: errorTemplateString }, async (runOptions: RunLinterRulesOptions) => {
         void this.openDiffPreview(getTextInLanguage('notice-text.lint-preview-title'), runOptions.oldText, runOptions.newText, editor, file);
 
         setCollectLogs(false);

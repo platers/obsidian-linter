@@ -402,7 +402,7 @@ describe('Rules Runner', () => {
   for (const testCase of customCommandTestCases) {
     it(testCase.testName, async () => {
       appCommandsMock.resetStats();
-      await runCustomCommands(testCase.listOfCommands, appCommandsMock);
+      await runCustomCommands(testCase.listOfCommands, appCommandsMock, null);
 
       expect(appCommandsMock.numberOfCommands).toEqual(testCase.expectedNumberOfCommandsRun);
       for (const command of testCase.listOfCommands) {

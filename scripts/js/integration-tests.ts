@@ -10,7 +10,7 @@ import dedent from 'ts-dedent';
 import { Rule, rules, RuleType, sortRules } from '../../src/rules';
 import '../../src/rules-registry';
 import { RuleBuilderBase } from '../../src/rules/rule-builder';
-import { NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats } from '../../src/utils/yaml';
+import { ArrayFormats } from '../../src/utils/yaml';
 
 /**
  * Generates integration-test suites and their corresponding test-vault
@@ -232,7 +232,7 @@ function generateSetupFunction(rule: Rule, example: typeof rules[number]['exampl
 }
 
 function serializeCommonStyleValue(value: unknown): string {
-  const enums = { NormalArrayFormats, SpecialArrayFormats, TagSpecificArrayFormats };
+  const enums = { ArrayFormats };
   for (const [enumName, entries] of Object.entries(enums)) {
     const entry = Object.entries(entries).find(([, enumValue]) => enumValue === value);
     if (entry) return `yaml.${enumName}.${entry[0]}`;

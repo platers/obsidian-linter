@@ -9,7 +9,7 @@ function setup1(plugin: TestLinterPlugin): Promise<void> {
   "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.aliasArrayStyle = yaml.NormalArrayFormats.MultiLine;
+plugin.plugin.settings.commonStyles.aliasArrayStyle = yaml.ArrayFormats.MultiLine;
 
   return Promise.resolve();
 }
@@ -20,7 +20,7 @@ function setup2(plugin: TestLinterPlugin): Promise<void> {
   "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.aliasArrayStyle = yaml.NormalArrayFormats.MultiLine;
+plugin.plugin.settings.commonStyles.aliasArrayStyle = yaml.ArrayFormats.MultiLine;
 
   return Promise.resolve();
 }
@@ -33,7 +33,7 @@ function setup3(plugin: TestLinterPlugin): Promise<void> {
   "enabled": true
 };
 
-plugin.plugin.settings.commonStyles.aliasArrayStyle = yaml.NormalArrayFormats.MultiLine;
+plugin.plugin.settings.commonStyles.aliasArrayStyle = yaml.ArrayFormats.MultiLine;
 
   return Promise.resolve();
 }

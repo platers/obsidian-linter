@@ -2,7 +2,7 @@
  * based on https://github.com/blacksmithgu/obsidian-dataview/blob/75b564bcfd23876f12fa3faf7f86184cdfcd91f1/src/data-import/web-worker/import-manager.ts
 */
 
-import Worker from './rules-runner.worker';
+import * as rulesRunnerWorker from './rules-runner.worker';
 import { moment, TFile, Vault } from 'obsidian';
 import { createRunLinterRulesOptions, runMainThreadRules } from './rules-runner';
 import { LinterSettings } from '../settings-data';
@@ -28,7 +28,7 @@ export class FileLintManager {
   busy: boolean[];
 
   /** List of files which have been queued to be linted */
-  lintQueue: TFile[];
+  lintQueue: LintQueueEntry[];
 
   fileToBatches: Map<string, LintBatch[]>;
 
@@ -108,7 +108,8 @@ export class FileLintManager {
     const identifierTemplate = getTextInLanguage('logs.worker-identifier');
 
     for (let index = 0; index < this.numWorkers; index++) {
-      const worker = ((Worker as unknown)() as LinterWorker);
+      // esbuild-plugin-inline-worker replaces the worker module with one whose default export creates the worker
+      const worker = (rulesRunnerWorker as { default: () => LinterWorker }).default();
 
       worker.onmessage = async (event: MessageEvent<RunLinterRulesOptions>) => {
         const data = event.data;
@@ -141,7 +142,7 @@ export class FileLintManager {
       };
 
       this.workers.push({
-        id: identifierTemplate.replace('{NUM}', index + 1),
+        id: identifierTemplate.replace('{NUM}', String(index + 1)),
         worker: worker
       });
       this.busy.push(false);
@@ -182,7 +183,7 @@ export class FileLintManager {
 
       await this.updateBatchesForFile(data.fileInfo.path, true);
     } catch (error) {
-      const err = ensureIsLinteError(error);
+      const err = ensureIsLinteError(error, this.workers[index]?.id ?? getTextInLanguage('logs.worker-identifier').replace(' {NUM}', ''));
       handleLintError(data.fileInfo, err, data.errorNoticeTimeout, data.errorTemplateString, data.useLogTemplateInNotice);
 
       await this.updateBatchesForFile(data.fileInfo.path, false);
@@ -190,7 +191,7 @@ export class FileLintManager {
   }
 
   /** Send a new task to the given worker ID. */
-  private async send(entry: LintQueueEntry, workerId: number, editorText: string | null) {
+  private async send(entry: LintQueueEntry, workerId: number, editorText: string | null = null) {
     this.busy[workerId] = true;
 
     const oldText = stripCr(editorText ?? await this.vault.read(entry.file))
