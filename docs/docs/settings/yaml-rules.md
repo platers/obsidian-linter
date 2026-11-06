@@ -1673,7 +1673,7 @@ Inserts or updates the title of the file into the YAML frontmatter's aliases sec
 | `Preserve existing aliases section style` | If set, the <code>YAML aliases section style</code> setting applies only to the newly created sections | N/A | `true` |
 | `Keep alias that matches the filename` | Such aliases are usually redundant | N/A | false |
 | `Use the YAML key specified by Alias helper key to help with filename and heading changes` | If set, when the first H1 heading changes or filename if first H1 is not present changes, then the old alias stored in this key will be replaced with the new value instead of just inserting a new entry in the aliases array | N/A | `true` |
-| `Alias helper key` | The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule. | N/A | `linter-yaml-title-alias` |
+| `Alias helper key` | The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule. The default <code>linter-yaml-title-alias</code> is stored as <code>yaml-title-alias</code> under the <code>linter</code> key, and a top-level <code>linter-yaml-title-alias</code> is moved there on the next lint. | N/A | `linter-yaml-title-alias` |
 | `Remove alias if empty` | Removes the alias key if the alias key for the file ends up being empty. | N/A | `true` |
 
 ### Additional Info
@@ -1681,6 +1681,13 @@ Inserts or updates the title of the file into the YAML frontmatter's aliases sec
 
 !!! Note
     An empty `Alias Helper Key` will be treated as if you are using `linter-yaml-title-alias` as the value.
+!!! Note
+    With the default `Alias Helper Key`, the value is stored under the Linter's own `linter` key:
+    ``` yaml
+    linter:
+      yaml-title-alias: Title
+    ```
+    A top-level `linter-yaml-title-alias` key written by older versions of the Linter is still read and is moved under `linter` the next time the file is linted. A custom `Alias Helper Key`, like `title`, stays a top-level key.
 
 
 ### Examples
@@ -1699,7 +1706,8 @@ After:
 ---
 aliases:
   - Obsidian
-linter-yaml-title-alias: Obsidian
+linter:
+  yaml-title-alias: Obsidian
 ---
 # Obsidian
 ``````
@@ -1736,7 +1744,8 @@ After:
 ---
 aliases:
   - Filename
-linter-yaml-title-alias: Filename
+linter:
+  yaml-title-alias: Filename
 ---
 
 ``````
@@ -1759,7 +1768,7 @@ aliases:
 
 ``````
 </details>
-<details><summary>Replaces old filename with new filename when no header is present and filename is different than the old one listed in `linter-yaml-title-alias`.</summary>
+<details><summary>Replaces old filename with new filename when no header is present and filename is different than the old one listed in `yaml-title-alias` under `linter`.</summary>
 
 Before:
 
@@ -1768,7 +1777,8 @@ Before:
 aliases:
   - Old Filename
   - Alias 2
-linter-yaml-title-alias: Old Filename
+linter:
+  yaml-title-alias: Old Filename
 ---
 
 ``````
@@ -1780,7 +1790,33 @@ After:
 aliases:
   - Filename
   - Alias 2
-linter-yaml-title-alias: Filename
+linter:
+  yaml-title-alias: Filename
+---
+
+``````
+</details>
+<details><summary>Moves the top-level `linter-yaml-title-alias` used by older versions of the Linter under `linter`.</summary>
+
+Before:
+
+`````` markdown
+---
+aliases:
+  - Old Filename
+linter-yaml-title-alias: Old Filename
+---
+
+``````
+
+After:
+
+`````` markdown
+---
+aliases:
+  - Filename
+linter:
+  yaml-title-alias: Filename
 ---
 
 ``````
@@ -1799,7 +1835,8 @@ After:
 ---
 aliases:
   - This is a Heading
-linter-yaml-title-alias: This is a Heading
+linter:
+  yaml-title-alias: This is a Heading
 ---
 # This is a [Heading](markdown.md)
 ``````

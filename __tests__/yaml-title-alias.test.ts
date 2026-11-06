@@ -9,29 +9,29 @@ ruleTest({
     {
       testName: 'Keeps a tag as heading text rather than falling back to the filename',
       before: '# #a',
-      after: '---\naliases:\n  - "#a"\nlinter-yaml-title-alias: "#a"\n---\n# #a',
+      after: '---\naliases:\n  - "#a"\nlinter:\n  yaml-title-alias: "#a"\n---\n# #a',
       options: { fileName: 'Filename' },
     },
     {
       testName: 'Uses the first visible heading after a fenced code block',
       before: '```\n# Hidden\n```\n# Visible\n# Later',
-      after: '---\naliases:\n  - Visible\nlinter-yaml-title-alias: Visible\n---\n```\n# Hidden\n```\n# Visible\n# Later',
+      after: '---\naliases:\n  - Visible\nlinter:\n  yaml-title-alias: Visible\n---\n```\n# Hidden\n```\n# Visible\n# Later',
     },
     {
       testName: 'Uses the first visible heading after a linter-disable section',
       before: '<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
-      after: '---\naliases:\n  - Visible\nlinter-yaml-title-alias: Visible\n---\n<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
+      after: '---\naliases:\n  - Visible\nlinter:\n  yaml-title-alias: Visible\n---\n<!-- linter-disable -->\n# Hidden\n<!-- linter-enable -->\n# Visible\n# Later',
     },
     {
       testName: 'Uses the first normal heading rather than a later heading',
       before: '# First\n# Later',
-      after: '---\naliases:\n  - First\nlinter-yaml-title-alias: First\n---\n# First\n# Later',
+      after: '---\naliases:\n  - First\nlinter:\n  yaml-title-alias: First\n---\n# First\n# Later',
     },
     {
       // The old code produced invalid YAML by copying the masked code block into the title.
       testName: 'Does not use a heading match that crosses into a protected code block',
       before: '#\n```\n```',
-      after: '---\naliases:\n  - Filename\nlinter-yaml-title-alias: Filename\n---\n#\n```\n```',
+      after: '---\naliases:\n  - Filename\nlinter:\n  yaml-title-alias: Filename\n---\n#\n```\n```',
       options: { fileName: 'Filename', keepAliasThatMatchesTheFilename: true },
     },
     {
@@ -43,7 +43,8 @@ ruleTest({
         ---
         aliases:
           - Title
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -72,7 +73,8 @@ ruleTest({
       after: dedent`
         ---
         aliases: [Title]
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -108,7 +110,8 @@ ruleTest({
         ---
         aliases:
           - Title
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -143,7 +146,8 @@ ruleTest({
       after: dedent`
         ---
         aliases: [Title]
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -178,7 +182,8 @@ ruleTest({
           - alias1
           - alias2
           - alias3
-        linter-yaml-title-alias: alias1
+        linter:
+          yaml-title-alias: alias1
         ---
         # Title
       `,
@@ -188,7 +193,8 @@ ruleTest({
           - Title
           - alias2
           - alias3
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -236,7 +242,8 @@ ruleTest({
           - alias1
           - alias2
           - alias3
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -246,14 +253,16 @@ ruleTest({
       before: dedent`
         ---
         aliases: [alias1, alias2, alias3]
-        linter-yaml-title-alias: alias1
+        linter:
+          yaml-title-alias: alias1
         ---
         # Title
       `,
       after: dedent`
         ---
         aliases: [Title, alias2, alias3]
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -269,7 +278,8 @@ ruleTest({
       after: dedent`
         ---
         aliases: [Title, alias1, alias2, alias3]
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -297,14 +307,16 @@ ruleTest({
       before: dedent`
         ---
         aliases: [other alias]
-        linter-yaml-title-alias: other alias
+        linter:
+          yaml-title-alias: other alias
         ---
         # Title
       `,
       after: dedent`
         ---
         aliases: [Title]
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -318,7 +330,8 @@ ruleTest({
         ---
         aliases:
           - 'Title with: colon'
-        linter-yaml-title-alias: 'Title with: colon'
+        linter:
+          yaml-title-alias: 'Title with: colon'
         ---
         # Title with: colon
       `,
@@ -335,7 +348,8 @@ ruleTest({
         ---
         aliases:
           - 'Title with "double quote"'
-        linter-yaml-title-alias: 'Title with "double quote"'
+        linter:
+          yaml-title-alias: 'Title with "double quote"'
         ---
         # Title with "double quote"
       `,
@@ -349,7 +363,8 @@ ruleTest({
         ---
         aliases:
           - "Title with 'single quote'"
-        linter-yaml-title-alias: "Title with 'single quote'"
+        linter:
+          yaml-title-alias: "Title with 'single quote'"
         ---
         # Title with 'single quote'
       `,
@@ -378,7 +393,8 @@ ruleTest({
           - alias2
           - alias3
         key3: value3
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -401,7 +417,8 @@ ruleTest({
         aliases:
           - Title
         key3: value3
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -469,7 +486,8 @@ ruleTest({
         aliases:
           - alias1
           - alias2
-        linter-yaml-title-alias: alias1
+        linter:
+          yaml-title-alias: alias1
         ---
         # Filename
       `,
@@ -489,7 +507,8 @@ ruleTest({
       before: dedent`
         ---
         aliases: [alias1, alias2]
-        linter-yaml-title-alias: alias1
+        linter:
+          yaml-title-alias: alias1
         ---
         # Filename
       `,
@@ -508,7 +527,8 @@ ruleTest({
       before: dedent`
         ---
         aliases: alias1
-        linter-yaml-title-alias: alias1
+        linter:
+          yaml-title-alias: alias1
         ---
         # Filename
       `,
@@ -533,7 +553,8 @@ ruleTest({
         aliases:
           - Filename
           - alias1
-        linter-yaml-title-alias: Filename
+        linter:
+          yaml-title-alias: Filename
         ---
         # Filename
       `,
@@ -576,7 +597,8 @@ ruleTest({
       after: dedent`
         ---
         aliases: [Filename, alias1]
-        linter-yaml-title-alias: Filename
+        linter:
+          yaml-title-alias: Filename
         ---
         # Filename
       `,
@@ -612,7 +634,8 @@ ruleTest({
         aliases:
           - alias1
           - alias2
-        linter-yaml-title-alias: alias1
+        linter:
+          yaml-title-alias: alias1
         ---
         # Filename
       `,
@@ -621,7 +644,8 @@ ruleTest({
         aliases:
           - Filename
           - alias2
-        linter-yaml-title-alias: Filename
+        linter:
+          yaml-title-alias: Filename
         ---
         # Filename
       `,
@@ -635,14 +659,16 @@ ruleTest({
       before: dedent`
         ---
         aliases: [alias1, alias2]
-        linter-yaml-title-alias: alias1
+        linter:
+          yaml-title-alias: alias1
         ---
         # Filename
       `,
       after: dedent`
         ---
         aliases: [Filename, alias2]
-        linter-yaml-title-alias: Filename
+        linter:
+          yaml-title-alias: Filename
         ---
         # Filename
       `,
@@ -656,14 +682,16 @@ ruleTest({
       before: dedent`
         ---
         aliases: [alias1]
-        linter-yaml-title-alias: alias1
+        linter:
+          yaml-title-alias: alias1
         ---
         # Filename
       `,
       after: dedent`
         ---
         aliases: [Filename]
-        linter-yaml-title-alias: Filename
+        linter:
+          yaml-title-alias: Filename
         ---
         # Filename
       `,
@@ -681,7 +709,8 @@ ruleTest({
         ---
         aliases:
           - Dollar $
-        linter-yaml-title-alias: Dollar $
+        linter:
+          yaml-title-alias: Dollar $
         ---
         # Dollar $
       `,
@@ -691,7 +720,8 @@ ruleTest({
       before: dedent`
         ---
         aliases: [Title]
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -699,7 +729,8 @@ ruleTest({
         ---
         aliases:
           - Title
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -713,7 +744,8 @@ ruleTest({
       before: dedent`
         ---
         aliases: [Title]
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -721,7 +753,8 @@ ruleTest({
         ---
         aliases:
           - Title
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -736,14 +769,16 @@ ruleTest({
         ---
         aliases:
           - Title
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
       after: dedent`
         ---
         aliases: [Title]
-        linter-yaml-title-alias: Title
+        linter:
+          yaml-title-alias: Title
         ---
         # Title
       `,
@@ -798,7 +833,8 @@ ruleTest({
         ---
         aliases:
           - Heading
-        linter-yaml-title-alias: Heading
+        linter:
+          yaml-title-alias: Heading
         ---
         [[Link1]]
 
@@ -814,7 +850,8 @@ ruleTest({
         ---
         aliases:
           - This is a [Heading](markdown.md)
-        linter-yaml-title-alias: This is a [Heading](markdown.md)
+        linter:
+          yaml-title-alias: This is a [Heading](markdown.md)
         ---
         # This is a [Heading](markdown.md)
       `,
@@ -822,7 +859,8 @@ ruleTest({
         ---
         aliases:
           - This is a Heading
-        linter-yaml-title-alias: This is a Heading
+        linter:
+          yaml-title-alias: This is a Heading
         ---
         # This is a [Heading](markdown.md)
       `,
@@ -836,7 +874,8 @@ ruleTest({
         ---
         aliases:
           - This is a [[Heading]]
-        linter-yaml-title-alias: This is a [[Heading]]
+        linter:
+          yaml-title-alias: This is a [[Heading]]
         ---
         # This is a [[Heading]]
       `,
@@ -844,7 +883,8 @@ ruleTest({
         ---
         aliases:
           - This is a Heading
-        linter-yaml-title-alias: This is a Heading
+        linter:
+          yaml-title-alias: This is a Heading
         ---
         # This is a [[Heading]]
       `,
@@ -962,14 +1002,16 @@ ruleTest({
       before: dedent`
         ---
         aliases: ["12345678", alias1]
-        linter-yaml-title-alias: 12345678
+        linter:
+          yaml-title-alias: 12345678
         ---
         # 1234
       `,
       after: dedent`
         ---
         aliases: ["1234", alias1]
-        linter-yaml-title-alias: "1234"
+        linter:
+          yaml-title-alias: "1234"
         ---
         # 1234
       `,
@@ -983,14 +1025,16 @@ ruleTest({
       before: dedent`
         ---
         aliases: [12345678, alias1]
-        linter-yaml-title-alias: 12345678
+        linter:
+          yaml-title-alias: 12345678
         ---
         # 1234
       `,
       after: dedent`
         ---
         aliases: ["1234", alias1]
-        linter-yaml-title-alias: "1234"
+        linter:
+          yaml-title-alias: "1234"
         ---
         # 1234
       `,
@@ -1004,14 +1048,16 @@ ruleTest({
       before: dedent`
         ---
         aliases: ["12345678", alias1]
-        linter-yaml-title-alias: "12345678"
+        linter:
+          yaml-title-alias: "12345678"
         ---
         # 1234
       `,
       after: dedent`
         ---
         aliases: ["1234", alias1]
-        linter-yaml-title-alias: "1234"
+        linter:
+          yaml-title-alias: "1234"
         ---
         # 1234
       `,
@@ -1024,7 +1070,8 @@ ruleTest({
       testName: 'Make sure commas are handled properly when found in alias',
       before: dedent`
         ---
-        linter-yaml-title-alias: "test, test2, test3"
+        linter:
+          yaml-title-alias: "test, test2, test3"
         title: test, test2, test3
         created: 1970-01-01
         updated: 2023-06-14
@@ -1035,7 +1082,8 @@ ruleTest({
       `,
       after: dedent`
         ---
-        linter-yaml-title-alias: test4
+        linter:
+          yaml-title-alias: test4
         title: test, test2, test3
         created: 1970-01-01
         updated: 2023-06-14
@@ -1054,14 +1102,16 @@ ruleTest({
       before: dedent`
         ---
         aliases: [alias1]
-        linter-yaml-title-alias: blob
+        linter:
+          yaml-title-alias: blob
         ---
         # 1234
       `,
       after: dedent`
         ---
         aliases: ["1234", alias1]
-        linter-yaml-title-alias: "1234"
+        linter:
+          yaml-title-alias: "1234"
         ---
         # 1234
       `,
@@ -1128,6 +1178,159 @@ ruleTest({
         aliasHelperKey: 'aliases2',
         keepAliasThatMatchesTheFilename: false,
         fileName: 'Filename',
+      },
+    },
+    { // relates to https://github.com/platers/obsidian-linter/issues/617#issuecomment-1663327674
+      testName: 'Reads the old top-level helper key and moves it under the linter key',
+      before: dedent`
+        ---
+        aliases:
+          - Old Title
+        linter-yaml-title-alias: Old Title
+        ---
+        # New Title
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - New Title
+        linter:
+          yaml-title-alias: New Title
+        ---
+        # New Title
+      `,
+    },
+    {
+      testName: 'Moves the old top-level helper key under the linter key when the title has not changed',
+      before: dedent`
+        ---
+        aliases:
+          - Title
+        linter-yaml-title-alias: Title
+        tags: [tag1]
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Title
+        tags: [tag1]
+        linter:
+          yaml-title-alias: Title
+        ---
+        # Title
+      `,
+    },
+    {
+      testName: 'Reads the helper key under the linter key',
+      before: dedent`
+        ---
+        aliases:
+          - Old Title
+        linter:
+          yaml-title-alias: Old Title
+        ---
+        # New Title
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - New Title
+        linter:
+          yaml-title-alias: New Title
+        ---
+        # New Title
+      `,
+    },
+    {
+      testName: 'When both helper keys are present, the one under the linter key wins and the old one is removed',
+      before: dedent`
+        ---
+        aliases:
+          - Namespaced Title
+          - Old Title
+        linter-yaml-title-alias: Old Title
+        linter:
+          yaml-title-alias: Namespaced Title
+        ---
+        # New Title
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - New Title
+          - Old Title
+        linter:
+          yaml-title-alias: New Title
+        ---
+        # New Title
+      `,
+    },
+    {
+      testName: 'Keeps the other keys under the linter key when adding the helper key',
+      before: dedent`
+        ---
+        linter:
+          disabled-rules: [capitalize-headings]
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        linter:
+          disabled-rules: [capitalize-headings]
+          yaml-title-alias: Title
+        aliases:
+          - Title
+        ---
+        # Title
+      `,
+    },
+    {
+      testName: 'Keeps the other keys under the linter key when removing the helper key',
+      before: dedent`
+        ---
+        aliases:
+          - Title
+        linter:
+          yaml-title-alias: Title
+          disabled-rules: [capitalize-headings]
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Title
+        linter:
+          disabled-rules: [capitalize-headings]
+        ---
+        # Title
+      `,
+      options: {
+        useYamlKeyToKeepTrackOfOldFilenameOrHeading: false,
+      },
+    },
+    {
+      testName: 'A custom helper key stays a top-level key and leaves the old default key alone',
+      before: dedent`
+        ---
+        linter-yaml-title-alias: Something Else
+        ---
+        # Title
+      `,
+      after: dedent`
+        ---
+        linter-yaml-title-alias: Something Else
+        aliases:
+          - Title
+        title: Title
+        ---
+        # Title
+      `,
+      options: {
+        aliasHelperKey: 'title',
       },
     },
   ],

@@ -25,6 +25,16 @@ export default {
       'submit-button-text': 'Lint All',
       'submit-button-notice-text': 'Linting all files...',
     },
+    'migrate-old-frontmatter-keys': {
+      'name': 'Move old Linter frontmatter keys under linter in all files',
+      'start-message': 'This will move the top-level linter-yaml-title-alias and disabled rules keys under the linter key in every file that is not ignored, including files with all rules disabled. Nothing else in the files changes.',
+      'submit-button-text': 'Move Old Keys',
+      'submit-button-notice-text': 'Moving old Linter frontmatter keys...',
+      'error-message': 'Move Old Linter Frontmatter Keys Error in File',
+      'success-message': 'Moved the old Linter frontmatter keys in {NUM} file(s).',
+      'errors-message-singular': 'There was 1 error.',
+      'errors-message-plural': 'There were {ERROR_COUNT} errors.',
+    },
     'lint-all-files-in-folder': {
       'name': 'Lint all files in the current folder',
       'start-message': 'This will edit all of your files in {FOLDER_NAME} including files in its subfolders which may introduce errors.',
@@ -1015,7 +1025,7 @@ export default {
       },
       'alias-helper-key': {
         'name': 'Alias helper key',
-        'description': 'The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule.',
+        'description': 'The key to use to help keep track of what the last file name or heading was that was stored in the frontmatter by this rule. The default <code>linter-yaml-title-alias</code> is stored as <code>yaml-title-alias</code> under the <code>linter</code> key, and a top-level <code>linter-yaml-title-alias</code> is moved there on the next lint.',
       },
       'remove-alias-if-empty': {
         'name': 'Remove alias if empty',

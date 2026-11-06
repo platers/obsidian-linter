@@ -9,6 +9,11 @@ export const OBSIDIAN_TAG_KEY = 'tags';
 export const OBSIDIAN_ALIAS_KEY = 'aliases';
 export const DEFAULT_LINTER_ALIASES_HELPER_KEY = 'linter-yaml-title-alias';
 export const DISABLED_RULES_KEY = 'disabled rules';
+// the Linter's own keys live under this key, see https://github.com/platers/obsidian-linter/issues/617#issuecomment-1663327674
+export const LINTER_NAMESPACE_KEY = 'linter';
+export const LINTER_ALIASES_HELPER_KEY = 'yaml-title-alias';
+export const LINTER_DISABLED_RULES_KEY = 'disabled-rules';
+const LINTER_NAMESPACE_INDENTATION = '  ';
 
 /**
  * Adds an empty YAML block to the text if it doesn't already have one.
@@ -353,6 +358,10 @@ export function setYamlSection(yaml: string, rawKey: string, rawValue: string, a
     return `${yaml}${rawKey}:${rawValue}\n`;
   }
 
+  return replaceYamlPairSection(yaml, pair, rawValue);
+}
+
+function replaceYamlPairSection(yaml: string, pair: YamlPair, rawValue: string): string {
   const sectionRange = getYamlSectionRange(yaml, pair);
   const keyRange = getYamlKeySourceRange(yaml, pair);
 
@@ -390,6 +399,132 @@ export function removeYamlSection(yaml: string, rawKey: string, allowNestedKey: 
   }
 
   return yaml.substring(0, sectionRange.start) + yaml.substring(sectionRange.end);
+}
+
+type LinterNamespace = {
+  pair: YamlPair;
+  map: YAMLMap | null;
+};
+
+/**
+ * Gets the top-level `linter:` pair along with its map. The map is null when the key has no value.
+ * Returns null when there is no `linter:` key or when its value is something other than a block map,
+ * since the Linter cannot safely edit that value.
+ */
+function getLinterNamespace(yaml: string): LinterNamespace | null {
+  const pair = getYamlPair(yaml, LINTER_NAMESPACE_KEY, false);
+  if (!pair) {
+    return null;
+  }
+
+  const value = pair.value as unknown;
+  if (value == null || (value instanceof Scalar && value.value == null)) {
+    return { pair, map: null };
+  }
+
+  if (!isMap(value) || value.flow) {
+    return null;
+  }
+
+  return { pair, map: value };
+}
+
+/**
+ * Gets the raw value of a key under the Linter's own `linter:` map in the YAML frontmatter.
+ * @param {string} yaml - The YAML text without the YAML indicators
+ * @param {string} key - The key under `linter:` to get the value of
+ * @return {string | null} The raw value of the key or null if it is not present
+ */
+export function getLinterNamespaceValue(yaml: string, key: string): string | null {
+  const namespace = getLinterNamespace(yaml);
+  if (!namespace?.map) {
+    return null;
+  }
+
+  const pair = findYamlPair(namespace.map, key, false);
+  if (!pair) {
+    return null;
+  }
+
+  const valueRange = getYamlValueRange(yaml, pair);
+  if (!valueRange) {
+    return null;
+  }
+
+  return yaml.substring(valueRange.start, valueRange.end);
+}
+
+/**
+ * Sets the raw value of a key under the Linter's own `linter:` map in the YAML frontmatter, creating the map if needed.
+ * A multiline raw value is expected to be indented as if its key were a top-level key.
+ * @param {string} yaml - The YAML text without the YAML indicators
+ * @param {string} key - The key under `linter:` to set the value of
+ * @param {string} rawValue - The raw value to set which includes the leading space for single-line values
+ * @return {string} The YAML text with the key set
+ */
+export function setLinterNamespaceValue(yaml: string, key: string, rawValue: string): string {
+  const pair = getYamlPair(yaml, LINTER_NAMESPACE_KEY, false);
+  if (!pair) {
+    const separator = yaml === '' || yaml.endsWith('\n') ? '' : '\n';
+    return `${yaml}${separator}${LINTER_NAMESPACE_KEY}:\n${LINTER_NAMESPACE_INDENTATION}${key}:${indentYamlValue(rawValue, LINTER_NAMESPACE_INDENTATION)}\n`;
+  }
+
+  const namespace = getLinterNamespace(yaml);
+  if (!namespace) {
+    return yaml;
+  }
+
+  if (!namespace.map) {
+    return replaceYamlPairSection(yaml, namespace.pair, `\n${LINTER_NAMESPACE_INDENTATION}${key}:${indentYamlValue(rawValue, LINTER_NAMESPACE_INDENTATION)}`);
+  }
+
+  const firstKeyStart = getYamlNodeStart(namespace.map.items[0]?.key);
+  const indentation = firstKeyStart == null ? LINTER_NAMESPACE_INDENTATION : yaml.substring(getLineStart(yaml, firstKeyStart), firstKeyStart);
+  const indentedValue = indentYamlValue(rawValue, indentation);
+
+  const existingPair = findYamlPair(namespace.map, key, false);
+  if (existingPair) {
+    return replaceYamlPairSection(yaml, existingPair, indentedValue);
+  }
+
+  const lastSectionRange = getYamlSectionRange(yaml, namespace.map.items[namespace.map.items.length - 1]);
+  if (!lastSectionRange) {
+    return yaml;
+  }
+
+  const insertAt = lastSectionRange.end;
+  const separator = insertAt === 0 || yaml[insertAt - 1] === '\n' ? '' : '\n';
+
+  return `${yaml.substring(0, insertAt)}${separator}${indentation}${key}:${indentedValue}\n${yaml.substring(insertAt)}`;
+}
+
+/**
+ * Removes a key from the Linter's own `linter:` map in the YAML frontmatter, removing the map when it is left empty.
+ * @param {string} yaml - The YAML text without the YAML indicators
+ * @param {string} key - The key under `linter:` to remove
+ * @return {string} The YAML text with the key removed
+ */
+export function removeLinterNamespaceValue(yaml: string, key: string): string {
+  const namespace = getLinterNamespace(yaml);
+  if (!namespace?.map) {
+    return yaml;
+  }
+
+  const pair = findYamlPair(namespace.map, key, false);
+  if (!pair) {
+    return yaml;
+  }
+
+  const sectionRange = namespace.map.items.length === 1 ? getYamlSectionRange(yaml, namespace.pair) : getYamlSectionRange(yaml, pair);
+  if (!sectionRange) {
+    return yaml;
+  }
+
+  return yaml.substring(0, sectionRange.start) + yaml.substring(sectionRange.end);
+}
+
+function indentYamlValue(rawValue: string, indentation: string): string {
+  return rawValue.replace(/\n(?=.)/g, `\n${indentation}`);
 }
 
 /**
@@ -814,7 +949,93 @@ function basicEscapeString(value: string, defaultEscapeCharacter: QuoteCharacter
 }
 
 export function getExactDisabledRuleValue(yaml_text: string): string[] {
-  const disabledRulesValue = getYamlSectionValue(yaml_text, DISABLED_RULES_KEY);
+  const disabledRules = parseDisabledRulesValue(getLinterNamespaceValue(yaml_text, LINTER_DISABLED_RULES_KEY));
+  for (const disabledRule of parseDisabledRulesValue(getYamlSectionValue(yaml_text, DISABLED_RULES_KEY, false))) {
+    if (!disabledRules.includes(disabledRule)) {
+      disabledRules.push(disabledRule);
+    }
+  }
+
+  return disabledRules;
+}
+
+/**
+ * Moves the value of the old top-level `disabled rules` key under the Linter's own `linter:` map,
+ * merging it with a value that is already there.
+ * @param {string} text - The text of the file
+ * @return {string} The text with the disabled rules moved under `linter:`
+ */
+export function moveDisabledRulesIntoLinterNamespace(text: string): string {
+  const yaml = getYAMLText(text);
+  if (yaml == null) {
+    return text;
+  }
+
+  // a multi-line value includes its trailing newline, which setting the value adds back
+  const oldValue = getYamlSectionValue(yaml, DISABLED_RULES_KEY, false)?.trimEnd();
+  if (oldValue == null || !canEditLinterNamespace(yaml)) {
+    return text;
+  }
+
+  let newYaml = removeYamlSection(yaml, DISABLED_RULES_KEY, false);
+  if (getLinterNamespaceValue(newYaml, LINTER_DISABLED_RULES_KEY) == null) {
+    newYaml = setLinterNamespaceValue(newYaml, LINTER_DISABLED_RULES_KEY, toSingleLineRawValue(oldValue));
+  } else {
+    newYaml = setLinterNamespaceValue(newYaml, LINTER_DISABLED_RULES_KEY, ` [${getExactDisabledRuleValue(yaml).join(', ')}]`);
+  }
+
+  return text.replace(`---\n${yaml}---`, escapeDollarSigns(`---\n${newYaml}---`));
+}
+
+/**
+ * Moves the old top-level `linter-yaml-title-alias` key under the Linter's own `linter:` map.
+ * When the namespaced key is already present, it wins and the old key is dropped, which is what YAML Title Alias does.
+ * @param {string} text - The text of the file
+ * @return {string} The text with the title alias helper key moved under `linter:`
+ */
+export function moveTitleAliasHelperIntoLinterNamespace(text: string): string {
+  const yaml = getYAMLText(text);
+  if (yaml == null) {
+    return text;
+  }
+
+  // a multi-line value includes its trailing newline, which setting the value adds back
+  const oldValue = getYamlSectionValue(yaml, DEFAULT_LINTER_ALIASES_HELPER_KEY, false)?.trimEnd();
+  if (oldValue == null || !canEditLinterNamespace(yaml)) {
+    return text;
+  }
+
+  let newYaml = removeYamlSection(yaml, DEFAULT_LINTER_ALIASES_HELPER_KEY, false);
+  if (getLinterNamespaceValue(newYaml, LINTER_ALIASES_HELPER_KEY) == null) {
+    newYaml = setLinterNamespaceValue(newYaml, LINTER_ALIASES_HELPER_KEY, toSingleLineRawValue(oldValue));
+  }
+
+  return text.replace(`---\n${yaml}---`, escapeDollarSigns(`---\n${newYaml}---`));
+}
+
+/**
+ * Moves every old top-level key the Linter used to write under the Linter's own `linter:` map.
+ * Unlike linting, this also moves the keys of a file that has `all` rules disabled.
+ * @param {string} text - The text of the file
+ * @return {string} The text with the old keys moved under `linter:`
+ */
+export function moveOldLinterKeysIntoLinterNamespace(text: string): string {
+  return moveTitleAliasHelperIntoLinterNamespace(moveDisabledRulesIntoLinterNamespace(text));
+}
+
+/**
+ * Whether a value can be written under `linter:`. A `linter:` whose value is a scalar or a flow map is left alone,
+ * so an old key must stay where it is rather than be removed with nowhere to go.
+ */
+function canEditLinterNamespace(yaml: string): boolean {
+  return getYamlPair(yaml, LINTER_NAMESPACE_KEY, false) == null || getLinterNamespace(yaml) != null;
+}
+
+function toSingleLineRawValue(value: string): string {
+  return value === '' || value.startsWith('\n') ? value : ` ${value}`;
+}
+
+function parseDisabledRulesValue(disabledRulesValue: string | null): string[] {
   if (disabledRulesValue == null) {
     return [];
   }

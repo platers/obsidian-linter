@@ -1,11 +1,12 @@
 import { Editor, EditorPosition, EditorSuggest, EditorSuggestContext, EditorSuggestTriggerInfo, TFile } from 'obsidian';
 import LinterPlugin from '../main';
 import { getDisabledRules, rules } from '../rules';
-import { DISABLED_RULES_KEY, getYamlSectionValue } from '../utils/yaml';
+import { DISABLED_RULES_KEY, getLinterNamespaceValue, getYamlSectionValue, LINTER_DISABLED_RULES_KEY } from '../utils/yaml';
 import { getTextInLanguage } from '../lang/helpers';
 
 const openingYAMLIndicator = /^---\n/gm;
 const disableRulesKeyWithColon = `${DISABLED_RULES_KEY}:`;
+const linterDisabledRulesKeyRegex = new RegExp(`^\\s+${LINTER_DISABLED_RULES_KEY}:`);
 
 export type ruleInfo = {
   displayName: string,
@@ -30,11 +31,12 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
   inline = false;
   onTrigger(cursor: EditorPosition, editor: Editor, _: TFile): EditorSuggestTriggerInfo | null {
     const lineContents = editor.getLine(cursor.line).toLowerCase();
-    const onFrontmatterDisabledRulesLine = lineContents.startsWith(disableRulesKeyWithColon) ||
+    const onDisabledRulesKeyLine = lineContents.startsWith(disableRulesKeyWithColon) || linterDisabledRulesKeyRegex.test(lineContents);
+    const onFrontmatterDisabledRulesLine = onDisabledRulesKeyLine ||
       this.disabledRulesIsEndOfStartOfFileToCursor(editor.getRange({ line: 0, ch: 0 }, cursor));
 
     if (onFrontmatterDisabledRulesLine) {
-      this.inline = lineContents.startsWith(disableRulesKeyWithColon);
+      this.inline = onDisabledRulesKeyLine;
       const sub = editor.getLine(cursor.line).substring(0, cursor.ch);
       const match = sub.match(/(\S+)$/)?.first().replaceAll('[', '').replaceAll(']', '');
       if (match) {
@@ -101,11 +103,12 @@ export class RuleAliasSuggest extends EditorSuggest<ruleInfo> {
       return false;
     }
 
-    const disabledRules = getYamlSectionValue(range + '\n', DISABLED_RULES_KEY)?.trimEnd();
-    if (disabledRules === null) {
-      return false;
+    for (const disabledRules of [getYamlSectionValue(range + '\n', DISABLED_RULES_KEY, false), getLinterNamespaceValue(range + '\n', LINTER_DISABLED_RULES_KEY)]) {
+      if (disabledRules != null && range.trimEnd().endsWith(disabledRules.trimEnd())) {
+        return true;
+      }
     }
 
-    return range.trimEnd().endsWith(disabledRules);
+    return false;
   }
 }
