@@ -53,6 +53,8 @@ linter:
 !!! note
     The top-level `disabled rules` key used by older versions of the Linter is still read. When a file that uses it is linted,
     its value is moved to `disabled-rules` under `linter`, and merged with any value already there.
+    A file with `all` disabled is never linted, so it is not moved that way. To move the old keys in every file that is not
+    ignored, including those, run the `Move old Linter frontmatter keys under linter in all files` command.
 
 ### Range Ignore
 

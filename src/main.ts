@@ -27,7 +27,7 @@ import { RunLinterRulesOptions } from './typings/worker';
 import { runCustomCommands, runPasteLint, createRunLinterRulesOptions } from './rules-runner/rules-runner';
 import { runYAMLTimestampByItself } from './rules-runner/yaml-timestamp-by-itself';
 import { handleLintError } from './utils/error';
-import { ArrayFormats } from './utils/yaml';
+import { ArrayFormats, moveOldLinterKeysIntoLinterNamespace } from './utils/yaml';
 
 // https://github.com/liamcain/obsidian-calendar-ui/blob/03ceecbf6d88ef260dadf223ee5e483d98d24ffc/src/localization.ts#L20-L43
 const langToMomentLocale = {
@@ -239,6 +239,20 @@ export default class LinterPlugin extends Plugin {
         }, this.settings.lintCommands && this.settings.lintCommands.length > 0, async () => {
           this.settings.suppressLintAllFilesConfirmationModal = true;
           await this.saveSettings();
+        }).open();
+      },
+    });
+
+    this.addCommand({
+      id: 'migrate-old-frontmatter-keys',
+      name: getTextInLanguage('commands.migrate-old-frontmatter-keys.name'),
+      icon: iconInfo.vault.id,
+      callback: () => {
+        const startMessage = getTextInLanguage('commands.migrate-old-frontmatter-keys.start-message');
+        const submitBtnText = getTextInLanguage('commands.migrate-old-frontmatter-keys.submit-button-text');
+        const submitBtnNoticeText = getTextInLanguage('commands.migrate-old-frontmatter-keys.submit-button-notice-text');
+        new LintConfirmationModal(this.app, startMessage, submitBtnText, submitBtnNoticeText, () => {
+          return this.migrateOldFrontmatterKeysInAllFiles();
         }).open();
       },
     });
@@ -630,6 +644,39 @@ export default class LinterPlugin extends Plugin {
         new Notice(getTextInLanguage('logs.file-content-changed-mid-lint').replace('{FILE_NAME}', file.path), 5000);
       }
     });
+  }
+
+  async migrateOldFrontmatterKeysInAllFiles() {
+    const files = this.app.vault.getMarkdownFiles().filter((file) => !this.shouldIgnoreFile(file));
+    const errorTemplateString = getTextInLanguage('commands.migrate-old-frontmatter-keys.error-message') + ' \'{FILE_PATH}\'';
+    let migratedFiles = 0;
+    let errors = 0;
+    for (const file of files) {
+      try {
+        // only the old keys change, so this does not go through the rules and runs on files with all rules disabled too
+        await this.app.vault.process(file, (data: string) => {
+          const text = stripCr(data);
+          const newText = moveOldLinterKeysIntoLinterNamespace(text);
+          if (newText === text) {
+            return data;
+          }
+
+          migratedFiles++;
+          return newText;
+        });
+      } catch (error) {
+        errors++;
+        handleLintError(file, error instanceof Error ? error : new Error(String(error)), userClickTimeout, errorTemplateString, true);
+      }
+    }
+
+    const successMessage = getTextInLanguage('commands.migrate-old-frontmatter-keys.success-message').replace('{NUM}', migratedFiles.toString());
+    if (errors === 0) {
+      new Notice(successMessage, userClickTimeout);
+    } else {
+      const errorMessage = errors === 1 ? getTextInLanguage('commands.migrate-old-frontmatter-keys.errors-message-singular') : getTextInLanguage('commands.migrate-old-frontmatter-keys.errors-message-plural').replace('{ERROR_COUNT}', errors.toString());
+      new Notice(successMessage + ' ' + errorMessage, userClickTimeout);
+    }
   }
 
   async runLinterAllFiles(app: App) {

@@ -973,19 +973,66 @@ export function moveDisabledRulesIntoLinterNamespace(text: string): string {
 
   // a multi-line value includes its trailing newline, which setting the value adds back
   const oldValue = getYamlSectionValue(yaml, DISABLED_RULES_KEY, false)?.trimEnd();
-  if (oldValue == null) {
+  if (oldValue == null || !canEditLinterNamespace(yaml)) {
     return text;
   }
 
   let newYaml = removeYamlSection(yaml, DISABLED_RULES_KEY, false);
   if (getLinterNamespaceValue(newYaml, LINTER_DISABLED_RULES_KEY) == null) {
-    const rawValue = oldValue === '' || oldValue.startsWith('\n') ? oldValue : ` ${oldValue}`;
-    newYaml = setLinterNamespaceValue(newYaml, LINTER_DISABLED_RULES_KEY, rawValue);
+    newYaml = setLinterNamespaceValue(newYaml, LINTER_DISABLED_RULES_KEY, toSingleLineRawValue(oldValue));
   } else {
     newYaml = setLinterNamespaceValue(newYaml, LINTER_DISABLED_RULES_KEY, ` [${getExactDisabledRuleValue(yaml).join(', ')}]`);
   }
 
   return text.replace(`---\n${yaml}---`, escapeDollarSigns(`---\n${newYaml}---`));
+}
+
+/**
+ * Moves the old top-level `linter-yaml-title-alias` key under the Linter's own `linter:` map.
+ * When the namespaced key is already present, it wins and the old key is dropped, which is what YAML Title Alias does.
+ * @param {string} text - The text of the file
+ * @return {string} The text with the title alias helper key moved under `linter:`
+ */
+export function moveTitleAliasHelperIntoLinterNamespace(text: string): string {
+  const yaml = getYAMLText(text);
+  if (yaml == null) {
+    return text;
+  }
+
+  // a multi-line value includes its trailing newline, which setting the value adds back
+  const oldValue = getYamlSectionValue(yaml, DEFAULT_LINTER_ALIASES_HELPER_KEY, false)?.trimEnd();
+  if (oldValue == null || !canEditLinterNamespace(yaml)) {
+    return text;
+  }
+
+  let newYaml = removeYamlSection(yaml, DEFAULT_LINTER_ALIASES_HELPER_KEY, false);
+  if (getLinterNamespaceValue(newYaml, LINTER_ALIASES_HELPER_KEY) == null) {
+    newYaml = setLinterNamespaceValue(newYaml, LINTER_ALIASES_HELPER_KEY, toSingleLineRawValue(oldValue));
+  }
+
+  return text.replace(`---\n${yaml}---`, escapeDollarSigns(`---\n${newYaml}---`));
+}
+
+/**
+ * Moves every old top-level key the Linter used to write under the Linter's own `linter:` map.
+ * Unlike linting, this also moves the keys of a file that has `all` rules disabled.
+ * @param {string} text - The text of the file
+ * @return {string} The text with the old keys moved under `linter:`
+ */
+export function moveOldLinterKeysIntoLinterNamespace(text: string): string {
+  return moveTitleAliasHelperIntoLinterNamespace(moveDisabledRulesIntoLinterNamespace(text));
+}
+
+/**
+ * Whether a value can be written under `linter:`. A `linter:` whose value is a scalar or a flow map is left alone,
+ * so an old key must stay where it is rather than be removed with nowhere to go.
+ */
+function canEditLinterNamespace(yaml: string): boolean {
+  return getYamlPair(yaml, LINTER_NAMESPACE_KEY, false) == null || getLinterNamespace(yaml) != null;
+}
+
+function toSingleLineRawValue(value: string): string {
+  return value === '' || value.startsWith('\n') ? value : ` ${value}`;
 }
 
 function parseDisabledRulesValue(disabledRulesValue: string | null): string[] {
