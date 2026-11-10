@@ -234,8 +234,8 @@ export class MdFilePickerOption extends Option<CustomAutoCorrectContent[]> {
   }
 
   public getSettingDefinition(plugin: LinterPlugin, update: () => void): SettingDefinitionItem {
-    (plugin.settings.ruleConfigs[this.ruleAlias] as { [k: string]: { [k: string]: CustomAutoCorrectContent[] } })[this.configKey] =
-      plugin.settings.ruleConfigs[this.ruleAlias][this.configKey] as CustomAutoCorrectContent[] | undefined ?? [];
+    plugin.settings.ruleConfigs[this.ruleAlias][this.configKey] =
+      plugin.settings.ruleConfigs[this.ruleAlias][this.configKey] ?? [];
     const filesPicked: CustomAutoCorrectContent[] = plugin.settings.ruleConfigs[this.ruleAlias][this.configKey] as CustomAutoCorrectContent[];
     const app = plugin.app;
     const ruleName = getTextInLanguage('rules.auto-correct-common-misspellings.name');

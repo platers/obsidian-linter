@@ -217,7 +217,7 @@ function runBatches(rulesToRun: Rule[], text: string, settings: LinterSettings, 
       const rule = rulesToRun[index];
 
       // A disabled rule will not read the snapshot, so it does not need a batch boundary.
-      const optionsFromSettings = rule.getOptions(settings) as Record<string, unknown>;
+      const optionsFromSettings = rule.getOptions(settings);
       if (!optionsFromSettings[rule.enabledOptionName()]) {
         index++;
         continue;

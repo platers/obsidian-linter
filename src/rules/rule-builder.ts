@@ -5,7 +5,7 @@ import { logDebug, timingBegin, timingEnd } from '../utils/logger';
 import { getTextInLanguage, LanguageStringKey } from '../lang/helpers';
 import { IgnoreType, IgnoreTypes } from '../utils/ignore-types';
 import { LintContext, ProtectedRanges } from '../utils/protected-ranges';
-import { LinterSettings } from '../settings-data';
+import { CustomAutoCorrectContent, LinterSettings } from '../settings-data';
 import { App } from 'obsidian';
 import LinterPlugin from '../main';
 import type { ListItemValidation } from '../ui/modals/add-list-entry-modals';
@@ -209,6 +209,8 @@ type OptionBuilderConstructorArgs<TOptions extends Options, TValue> = {
 export abstract class OptionBuilderBase<TOptions extends Options> {
   abstract setRuleOption(ruleOptions: TOptions, options: Options): void;
   abstract get option(): Option;
+  abstract readonly optionsKey: string;
+  abstract readonly configKey: string;
 }
 
 export abstract class OptionBuilder<TOptions extends Options, TValue> {
@@ -235,7 +237,7 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
   }
 
   protected get defaultValue(): TValue {
-    return new this.OptionsClass()[this.optionsKey];
+    return new this.OptionsClass()[this.optionsKey] as TValue;
   }
 
   get option(): Option {
@@ -248,7 +250,7 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
     // `as TValue` is not enough because of the https://github.com/microsoft/TypeScript/issues/48992
-    const optionValue = options[this.configKey] as TOptions[KeysOfObjectMatchingPropertyValueType<TOptions, TValue>];
+    const optionValue = (options as Record<string, unknown>)[this.configKey] as TOptions[KeysOfObjectMatchingPropertyValueType<TOptions, TValue>];
     if (optionValue !== undefined) {
       ruleOptions[this.optionsKey] = optionValue;
     }
@@ -258,9 +260,9 @@ export abstract class OptionBuilder<TOptions extends Options, TValue> {
 }
 
 export class BooleanOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, boolean> {
-  onChange?: (value: boolean, app: App) => void;
+  onChange?: (value: boolean, app: App, plugin: LinterPlugin) => void;
   constructor(args: OptionBuilderConstructorArgs<TOptions, boolean> & {
-    onChange?: (value: boolean, app: App) => void,
+    onChange?: (value: boolean, app: App, plugin: LinterPlugin) => void,
   }) {
     super(args);
     this.onChange = args.onChange ?? null;
@@ -319,10 +321,11 @@ export class ListItemOptionBuilder<TOptions extends Options> extends OptionBuild
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {
-    if (options[this.configKey] !== undefined && options[this.configKey] !== null) {
+    const savedValue = (options as Record<string, unknown>)[this.configKey];
+    if (savedValue !== undefined && savedValue !== null) {
       // `as string[]` is not enough because of the https://github.com/microsoft/TypeScript/issues/48992
       // make sure to remove any empty strings as well as they are not valid values
-      const optionValue = (options[this.configKey] as string[])
+      const optionValue = (savedValue as string[])
         .filter((el: string) => el !== '');
 
       ruleOptions[this.optionsKey] = optionValue as TOptions[
@@ -344,7 +347,7 @@ export class MomentFormatOptionBuilder<TOptions extends Options> extends OptionB
   }
 }
 
-export class MdFilePickerOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, string[]> {
+export class MdFilePickerOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, CustomAutoCorrectContent[]> {
   protected buildOption(): Option {
     return new MdFilePickerOption(this.configKey, this.nameKey, this.descriptionKey);
   }

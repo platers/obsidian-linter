@@ -1,5 +1,5 @@
 import { App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, WorkspaceLeaf, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer, getLanguage, TExternalFile } from 'obsidian';
-import { Options, RuleType, ruleTypeToRules, rules, sortRules } from './rules';
+import { RuleType, ruleTypeToRules, rules, sortRules } from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import { parseCustomReplacements, stripCr } from './utils/strings';
@@ -1295,8 +1295,8 @@ export default class LinterPlugin extends Plugin {
       if (ruleSettings != undefined) {
         const ruleDescription = getTextInLanguage('rules.' + rule.alias + '.description' as LanguageStringKey);
         // move description config value to new setting location
-        const newSettingValues: Options = {
-          enabled: ruleSettings[ruleDescription] as boolean | undefined ?? false,
+        const newSettingValues: Record<string, unknown> = {
+          enabled: ruleSettings[ruleDescription] ?? false,
         };
 
         // move option config values to new setting location
@@ -1307,7 +1307,7 @@ export default class LinterPlugin extends Plugin {
           }
 
           const configKeyName = getTextInLanguage('rules.' + rule.alias + '.' + option.configKey + '.name' as LanguageStringKey);
-          newSettingValues[option.configKey] = (ruleSettings[configKeyName] as unknown) ?? option.defaultValue;
+          newSettingValues[option.configKey] = ruleSettings[configKeyName] ?? option.defaultValue;
         }
 
         this.settings.ruleConfigs[rule.alias] = newSettingValues;
