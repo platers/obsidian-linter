@@ -10,6 +10,7 @@
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
     "test": "jest",
+    "typecheck": "tsc --noEmit",
     "test-suite": "jest -t \"$1\"",
     "generate-differential": "UPDATE_SNAPSHOT=1 npx jest __tests__/rules-runner-differential.test.ts",
     "docs": "node docs.js",
