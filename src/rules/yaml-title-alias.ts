@@ -121,7 +121,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
     return text;
   }
   getTitleInfo(text: string, fileName: string, aliasArrayStyle: ArrayFormats, defaultEscapeCharacter: QuoteCharacter, protectedRanges: ProtectedRanges): [string, string] {
-    let unescapedTitle = getFirstHeaderOneText(text, protectedRanges.combinedWith([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag]));
+    let unescapedTitle = getFirstHeaderOneText(text, protectedRanges.combinedWith([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag]));
     unescapedTitle = unescapedTitle || fileName;
 
     const escapedTitle = escapeStringIfNecessaryAndPossible(unescapedTitle, defaultEscapeCharacter, this.forceEscape(unescapedTitle, aliasArrayStyle));
