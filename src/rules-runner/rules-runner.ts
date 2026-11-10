@@ -1,4 +1,4 @@
-import { Command, MarkdownView, moment } from 'obsidian';
+import { MarkdownView, moment } from 'obsidian';
 import { logDebug, logWarn, timingBegin, timingEnd } from '../utils/logger';
 import { rules, RuleType, Rule, Options } from '../rules';
 import { wrapLintError } from '../utils/error';
@@ -349,12 +349,12 @@ export async function runCustomCommands(lintCommands: LintCommand[], commands: O
         continue;
       }
 
-      const command = commands.commands[commandInfo.id] as Command;
+      const command = commands.commands[commandInfo.id];
       if (command.checkCallback && command.checkCallback(true)) {
-        command.checkCallback();
+        command.checkCallback(false);
       } else if (command.callback) {
         await command.callback();
-      } else if (command.editorCheckCallback && view && command.editorCallback(true, view.editor, view)) {
+      } else if (command.editorCheckCallback && view && command.editorCheckCallback(true, view.editor, view)) {
         // eslint-disable-next-line @typescript-eslint/await-thenable -- disable here just in case it returns a promise
         await command.editorCheckCallback(false, view.editor, view);
       } else if (command.editorCallback && view) {
