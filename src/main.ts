@@ -132,7 +132,7 @@ export default class LinterPlugin extends Plugin {
     this.addSettingTab(this.settingsTab);
   }
 
-  async onunload(): void {
+  onunload(): void {
     logInfo(getTextInLanguage('logs.plugin-unload'));
     this.isEnabled = false;
 
@@ -644,7 +644,7 @@ export default class LinterPlugin extends Plugin {
 
       const file = this.getFileFromPath(runOptions.fileInfo.path);
       await this.handleLintResultForFileInBackground(runOptions, file, false);
-    }, (completed: number, errors: number) => {
+    }, async (completed: number, errors: number) => {
       if (errors === 0) {
         new Notice(getTextInLanguage('commands.lint-all-files.success-message'), userClickTimeout);
       } else {
@@ -668,7 +668,7 @@ export default class LinterPlugin extends Plugin {
 
       const file = this.getFileFromPath(runOptions.fileInfo.path);
       await this.handleLintResultForFileInBackground(runOptions, file, false);
-    }, (completed: number, errors: number) => {
+    }, async (completed: number, errors: number) => {
       const lintedFiles = completed + errors;
       if (errors === 0) {
         new Notice(getTextInLanguage('commands.lint-all-files-in-folder.success-message').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name), userClickTimeout);
