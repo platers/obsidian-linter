@@ -29,11 +29,11 @@ export function isValidYamlKey(key: string): [boolean, string] {
 }
   
 
-function validateKey(key: string, originalKey: string) {
+function validateKey(key: string, originalKey: string): [boolean, string] {
   try {
     parse(key);
   }
-  catch (error: Error) {
+  catch (error) {
     let errorMessage: string;
     if (error instanceof YAMLParseError) {
       errorMessage = error.toString();
