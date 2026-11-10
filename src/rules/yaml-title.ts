@@ -68,7 +68,7 @@ export default class YamlTitle extends RuleBuilder<YamlTitleOptions> {
     });
   }
   getFirstH1Header(text: string, protectedRanges: ProtectedRanges): string {
-    return getFirstHeaderOneText(text, protectedRanges.combinedWith([IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag]));
+    return getFirstHeaderOneText(text, protectedRanges.combinedWith([IgnoreTypes.code, IgnoreTypes.inlineCode, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.tag]));
   }
   get exampleBuilders(): ExampleBuilder<YamlTitleOptions>[] {
     return [

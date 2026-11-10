@@ -7,6 +7,16 @@ ruleTest({
   RuleBuilderClass: YamlTitle,
   testCases: [
     {
+      testName: 'Preserves wikilink brackets inside inline code in the H1',
+      before: '# Alpha `[[Bravo]]` Charlie',
+      after: '---\ntitle: Alpha `[[Bravo]]` Charlie\n---\n# Alpha `[[Bravo]]` Charlie',
+    },
+    {
+      testName: 'Preserves code literals while converting real links beside and around code',
+      before: '# Alpha ``[[Bravo|Alias]] ` [Code](code.md) \\_`` [[Real|Shown]] [a `code` label](target.md)',
+      after: '---\ntitle: Alpha ``[[Bravo|Alias]] ` [Code](code.md) \\_`` Shown a `code` label\n---\n# Alpha ``[[Bravo|Alias]] ` [Code](code.md) \\_`` [[Real|Shown]] [a `code` label](target.md)',
+    },
+    {
       testName: 'Keeps a tag as heading text rather than falling back to the filename',
       before: '# #a',
       after: '---\ntitle: "#a"\n---\n# #a',
