@@ -273,7 +273,7 @@ export class BooleanOptionBuilder<TOptions extends Options> extends OptionBuilde
 
 export class NumberOptionBuilder<TOptions extends Options> extends OptionBuilder<TOptions, number> {
   protected buildOption(): Option {
-    return new TextOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue);
+    return new TextOption(this.configKey, this.nameKey, this.descriptionKey, String(this.defaultValue));
   }
 }
 
@@ -315,7 +315,7 @@ export class ListItemOptionBuilder<TOptions extends Options> extends OptionBuild
 
 
   protected buildOption(): Option {
-    return new ListItemOption(this.configKey, this.nameKey, this.descriptionKey, null, this.defaultValue ?? [], this.validator, this.emptyStateKey, this.fieldNamePlaceholderKey, this.allowReorder, this.trimItemWhitespace);
+    return new ListItemOption(this.configKey, this.nameKey, this.descriptionKey, this.defaultValue ?? [], null, this.validator, this.emptyStateKey, this.fieldNamePlaceholderKey, this.allowReorder, this.trimItemWhitespace);
   }
 
   setRuleOption(ruleOptions: TOptions, options: Options) {

@@ -20,7 +20,7 @@ function getFileFromPath(app: App, filePath: string): TFile | null {
 }
 
 /** Class representing an option of a rule */
-export abstract class Option {
+export abstract class Option<TValue = unknown> {
   public ruleAlias: string;
 
   /**
@@ -30,7 +30,7 @@ export abstract class Option {
    * @param {any} defaultValue - The default value of the option
    * @param {string?} ruleAlias - The alias of the rule this option belongs to
    */
-  constructor(public configKey: string, public nameKey: LanguageStringKey, public descriptionKey: LanguageStringKey, public defaultValue: unknown, ruleAlias?: string | null) {
+  constructor(public configKey: string, public nameKey: LanguageStringKey, public descriptionKey: LanguageStringKey, public defaultValue: TValue, ruleAlias?: string | null) {
     if (ruleAlias) {
       this.ruleAlias = ruleAlias;
     }
@@ -68,11 +68,10 @@ export abstract class Option {
   }
 }
 
-export class BooleanOption extends Option {
-  public defaultValue: boolean;
+export class BooleanOption extends Option<boolean> {
   private toggleComponent: ToggleComponent | null = null;
 
-  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: unknown, ruleAlias?: string | null, public onChange?: (value: boolean, app: App, plugin: LinterPlugin) => void) {
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: boolean, ruleAlias?: string | null, public onChange?: (value: boolean, app: App, plugin: LinterPlugin) => void) {
     super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
   }
 
@@ -109,7 +108,7 @@ export class BooleanOption extends Option {
       return this.toggleComponent.getValue();
     }
 
-    return this.getCurrentValue(plugin);
+    return this.getCurrentValue(plugin) as boolean;
   }
 
   async setValue(value: boolean, plugin: LinterPlugin) {
@@ -121,8 +120,7 @@ export class BooleanOption extends Option {
   }
 }
 
-export class TextOption extends Option {
-  public defaultValue: string;
+export class TextOption extends Option<string> {
 
   public getSettingDefinition(_plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
     return {
@@ -133,14 +131,13 @@ export class TextOption extends Option {
   }
 }
 
-export class ListItemOption extends Option {
-  public defaultValue: string[];
+export class ListItemOption extends Option<string[]> {
 
-  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: unknown, ruleAlias?: string | null, private validator: ListItemValidation | undefined, private emptyStateKey: LanguageStringKey, private fieldPlaceholderKey: LanguageStringKey, private allowReorder: boolean, private trimItemWhitespace: boolean) {
+  constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: string[], ruleAlias: string | null, private validator: ListItemValidation | undefined, private emptyStateKey: LanguageStringKey, private fieldPlaceholderKey: LanguageStringKey, private allowReorder: boolean, private trimItemWhitespace: boolean) {
     super(configKey, nameKey, descriptionKey, defaultValue, ruleAlias);
   }
 
-  protected async writeValue(value: unknown, plugin: LinterPlugin): void {
+  protected writeValue(value: unknown, plugin: LinterPlugin): void {
     plugin.settings.ruleConfigs[this.ruleAlias] ??= {};
     plugin.settings.ruleConfigs[this.ruleAlias][this.configKey] = value;
   }
@@ -178,8 +175,7 @@ export class ListItemOption extends Option {
   }
 }
 
-export class MomentFormatOption extends Option {
-  public defaultValue: boolean;
+export class MomentFormatOption extends Option<string> {
 
   public getSettingDefinition(plugin: LinterPlugin, _update: () => void): SettingDefinitionItem {
     return {
@@ -211,8 +207,7 @@ export class DropdownRecord {
   }
 }
 
-export class DropdownOption extends Option {
-  public defaultValue: string;
+export class DropdownOption extends Option<string> {
   public options: DropdownRecord[];
 
   constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, defaultValue: string, options: DropdownRecord[], ruleAlias?: string | null) {
@@ -233,7 +228,7 @@ export class DropdownOption extends Option {
   }
 }
 
-export class MdFilePickerOption extends Option {
+export class MdFilePickerOption extends Option<CustomAutoCorrectContent[]> {
   constructor(configKey: string, nameKey: LanguageStringKey, descriptionKey: LanguageStringKey, ruleAlias?: string | null) {
     super(configKey, nameKey, descriptionKey, [], ruleAlias);
   }
