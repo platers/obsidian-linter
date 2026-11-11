@@ -7,6 +7,10 @@ import type {Config} from '@jest/types';
 const config: Config.InitialOptions = {
   maxWorkers: 5,
 
+  moduleNameMapper: {
+    '\\.worker$': '<rootDir>/__mocks__/inline-worker.ts',
+  },
+
   transformIgnorePatterns: [
     '"/node_modules/(?!unified-lint-rule)',
   ],
