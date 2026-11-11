@@ -28,7 +28,9 @@ import zhTW from './locale/zh-tw';
 
 type LanguageStrings = typeof en;
 
-export type LanguageLocale = Partial<LanguageStrings>;
+type PartialLocale<T> = { [K in keyof T]?: T[K] extends object ? PartialLocale<T[K]> : T[K] };
+
+export type LanguageLocale = PartialLocale<LanguageStrings>;
 
 export const localeMap: { [k: string]: LanguageLocale } = {
   ar,
@@ -100,13 +102,13 @@ export function setLanguage(newLang: string) {
 }
 
 export function getTextInLanguage(str: LanguageStringKey): string {
-  const text: unknown = (locale && getString<LanguageStrings>(locale, str)) || getString<LanguageStrings>(en, str);
+  const text: unknown = (locale && getString<LanguageLocale>(locale, str)) || getString<LanguageStrings>(en, str);
 
   return text as string;
 }
 
 export function localeHasKey(locale: LanguageLocale, key: LanguageStringKey): boolean {
-  return !!getString<LanguageStrings>(locale, key);
+  return !!getString<LanguageLocale>(locale, key);
 }
 
 export function getLanguageSourceFile(language: string) {

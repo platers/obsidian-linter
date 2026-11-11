@@ -43,8 +43,8 @@ export type WorkerMessage = {
 }
 
 export interface LinterWorker {
-  postMessage(event: WorkerMessage): void;
-  onmessage: ((event: WorkerMessage) => Promise<void>) | null;
+  postMessage(message: WorkerMessage['data']): void;
+  onmessage: ((event: MessageEvent<RunLinterRulesOptions>) => Promise<void>) | null;
   terminate(): void;
 }
 
@@ -63,12 +63,12 @@ export type RunLinterRulesOptions = {
   disabledRules: string[],
   logsFromRun: string[],
   defaultMisspellings: Map<string, string>,
-  runAddBlankAfterYamlPostTimestamp: boolean,
-  errorTemplateString: string,
-  useLogTemplateInNotice: boolean,
-  errorNoticeTimeout: number,
+  runAddBlankAfterYamlPostTimestamp?: boolean,
+  errorTemplateString?: string,
+  useLogTemplateInNotice?: boolean,
+  errorNoticeTimeout?: number,
   // errors should already be of the type LinterError when they get here
-  error: {
+  error?: {
     name: string,
     message: string,
     stack: string | undefined,
@@ -80,9 +80,4 @@ type FileInfo = {
   name: string,
   createdAtFormatted: string,
   modifiedAtFormatted: string,
-}
-
-declare module '*.worker' {
-  const Worker: () => LinterWorker;
-  export default Worker;
 }

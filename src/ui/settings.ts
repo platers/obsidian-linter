@@ -289,6 +289,7 @@ export class SettingTab extends PluginSettingTab {
       }).open(),
       onDelete: (index) => extensions.splice(index, 1),
       itemName: (ext) => ext || getTextInLanguage('tabs.general.additional-file-extensions.extension-placeholder'),
+      plugin: this.plugin,
     });
   }
 

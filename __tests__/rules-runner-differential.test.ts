@@ -3,7 +3,7 @@ import { createHash } from 'crypto';
 import { join } from 'path';
 import { moment } from 'obsidian';
 import dedent from 'ts-dedent';
-import { rules } from '../src/rules';
+import { getDisabledRules, rules } from '../src/rules';
 import { DEFAULT_SETTINGS, LinterSettings } from '../src/settings-data';
 import { setLanguage } from '../src/lang/helpers';
 import { parseCustomReplacements } from '../src/utils/strings';
@@ -73,6 +73,7 @@ function lint(text: string, settings: LinterSettings): string {
     settings,
     momentLocale: 'en',
     defaultMisspellings: misspellings,
+    disabledRules: getDisabledRules(text)[0],
   }, () => moment('2025-05-31T12:38:50-04:00'));
 }
 

@@ -364,7 +364,7 @@ export class ListItemsModal extends FormModal {
     fieldNameKey: LanguageStringKey,
     private trimItemWhitespace: boolean,
     private onSubmitEntry: (entry: string) => void | Promise<void>,
-    private isValidInput?: ListItemValidation = undefined,
+    private isValidInput: ListItemValidation | undefined = undefined,
   ) {
     super(app);
     this.value = initial ?? '';

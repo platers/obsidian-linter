@@ -98,7 +98,7 @@ Removes duplicate array values in a case sensitive manner.
 | `Dedupe YAML aliases section` | Turns on removing duplicate aliases. | N/A | `true` |
 | `Dedupe YAML tags section` | Turns on removing duplicate tags. | N/A | `true` |
 | `Dedupe YAML array sections` | Turns on removing duplicate values for regular YAML arrays | N/A | `true` |
-| `YAML keys to ignore for Dedupe YAML array values` | A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them. | N/A | `null` |
+| `YAML keys to ignore for Dedupe YAML array values` | A list of YAML keys without the ending colon on their own lines that are not meant to have duplicate values removed from them. | N/A |  |
 
 
 
@@ -365,7 +365,7 @@ Escapes the values for the specified YAML keys.
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Force YAML escape on keys` | Uses the YAML escape character on the specified YAML keys if it is not already escaped. Do not use on YAML arrays. | N/A | `null` |
+| `Force YAML escape on keys` | Uses the YAML escape character on the specified YAML keys if it is not already escaped. Do not use on YAML arrays. | N/A |  |
 
 
 
@@ -504,8 +504,8 @@ Allows for the formatting of regular YAML arrays as either multi-line or single-
 | `Format YAML aliases section` | Turns on formatting for the YAML aliases section. You should not enable this option alongside the rule <code>YAML title alias</code> as they may not work well together or they may have different format styles selected causing unexpected results. | N/A | `true` |
 | `Format YAML tags section` | Turns on formatting for the YAML tags section. | N/A | `true` |
 | `Format YAML array sections` | Turns on formatting for regular YAML arrays | N/A | `true` |
-| `Force key values to be single-line arrays` | Forces the YAML array keys to be in single-line format (leave empty to disable this option) | N/A | `null` |
-| `Force key values to be multi-line arrays` | Forces the YAML array keys to be in multi-line format (leave empty to disable this option) | N/A | `null` |
+| `Force key values to be single-line arrays` | Forces the YAML array keys to be in single-line format (leave empty to disable this option) | N/A |  |
+| `Force key values to be multi-line arrays` | Forces the YAML array keys to be in multi-line format (leave empty to disable this option) | N/A |  |
 
 
 
@@ -613,7 +613,7 @@ Inserts the given YAML attributes into the YAML frontmatter. Put each attribute 
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `Text to insert` | Text to insert into the YAML frontmatter | N/A | `null` |
+| `Text to insert` | Text to insert into the YAML frontmatter | N/A | `aliases: ,tags: ` |
 
 
 
@@ -655,7 +655,7 @@ Moves Dataview inline fields (<code>key:: value</code>) to the YAML frontmatter 
 | `Full-line inline fields` | What to do with inline fields that take up a whole line like <code>key:: value</code> | `Leave in place`: Does not move full-line fields like `key:: value`<br/><br/>`Move and keep in text`: Adds full-line fields to the YAML frontmatter and leaves their lines as they are<br/><br/>`Move and remove`: Moves full-line fields to the YAML frontmatter and removes their lines | `Move and remove` |
 | `Bracketed inline fields` | What to do with inline fields wrapped in square brackets or parentheses like <code>[key:: value]</code> and <code>(key:: value)</code> | `Leave in place`: Does not move bracketed fields like `[key:: value]` and `(key:: value)`<br/><br/>`Move and keep in text`: Adds bracketed fields to the YAML frontmatter and leaves them in the text as they are<br/><br/>`Move and keep value in text`: Moves bracketed fields to the YAML frontmatter and replaces them with their value<br/><br/>`Move and remove`: Moves bracketed fields to the YAML frontmatter and removes them from the body, removing the line if only whitespace is left | `Leave in place` |
 | `When the key already exists` | What to do when an inline field has the same key as a key already in the YAML frontmatter. Keys have to match exactly, including their case. | `Skip`: Leaves the fields in the body and the YAML frontmatter value as is<br/><br/>`Merge into list`: Adds the field values to the YAML frontmatter value, turning it into a list<br/><br/>`Overwrite`: Replaces the YAML frontmatter value with the field values | `Skip` |
-| `Inline keys to ignore` | The inline field keys that will not be moved to the YAML frontmatter | N/A | `null` |
+| `Inline keys to ignore` | The inline field keys that will not be moved to the YAML frontmatter | N/A |  |
 
 
 
@@ -981,7 +981,7 @@ Move all tags to YAML frontmatter of the document.
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
 | `Body tag operation` | What to do with non-ignored tags in the body of the file once they have been moved to the frontmatter | `Nothing`: Leaves tags in the body of the file alone<br/><br/>`Remove hashtag`: Removes `#` from tags in content body after moving them to the YAML frontmatter<br/><br/>`Remove whole tag`: Removes the whole tag in content body after moving them to the YAML frontmatter. _Note that this removes the first space prior to the tag as well_ | `Nothing` |
-| `Tags to ignore` | The tags that will not be moved to the tags array or removed from the body content if <code>Remove the hashtag from tags in content body</code> is enabled. Tags should not include <code>#</code>. <b>Make sure not to include the hashtag in the tag name.</b> | N/A | `null` |
+| `Tags to ignore` | The tags that will not be moved to the tags array or removed from the body content if <code>Remove the hashtag from tags in content body</code> is enabled. Tags should not include <code>#</code>. <b>Make sure not to include the hashtag in the tag name.</b> | N/A |  |
 
 
 
@@ -1099,7 +1099,7 @@ Removes the YAML keys specified
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `YAML keys to remove` | The YAML keys to remove from the YAML frontmatter with or without colons | N/A | `null` |
+| `YAML keys to remove` | The YAML keys to remove from the YAML frontmatter with or without colons | N/A |  |
 
 
 
@@ -1156,7 +1156,7 @@ Sorts YAML array values based on the specified sort order.
 | `Sort YAML aliases section` | Turns on sorting aliases. | N/A | `true` |
 | `Sort YAML tags section` | Turns on sorting tags. | N/A | `true` |
 | `Sort YAML array sections` | Turns on sorting values for regular YAML arrays | N/A | `true` |
-| `YAML Keys to ignore for Sort YAML array values` | A list of YAML keys without the ending colon that are not meant to have their values sorted. | N/A | `null` |
+| `YAML Keys to ignore for Sort YAML array values` | A list of YAML keys without the ending colon that are not meant to have their values sorted. | N/A |  |
 | `Sort order` | The way to sort the YAML array values. | `Ascending Alphabetical`: Sorts the array values from a to z<br/><br/>`Descending Alphabetical`: Sorts the array values from z to a | `Ascending Alphabetical` |
 
 
@@ -1256,7 +1256,7 @@ Sorts the YAML keys based on the order and priority specified. <b>Note: may remo
 
 | Name | Description | List Items | Default Value |
 | ---- | ----------- | ---------- | ------------- |
-| `YAML key priority sort order` | The order in which to sort keys with one on each line where it sorts in the order found in the list | N/A | `null` |
+| `YAML key priority sort order` | The order in which to sort keys with one on each line where it sorts in the order found in the list | N/A |  |
 | `Priority keys at start of YAML` | YAML Key Priority Sort Order is placed at the start of the YAML frontmatter | N/A | `true` |
 | `YAML sort order for other keys` | The way in which to sort the keys that are not found in the YAML Key Priority Sort Order text area | `None`: No sorting other than what is in the YAML Key Priority Sort Order text area<br/><br/>`Ascending Alphabetical`: Sorts the keys based on key value from a to z<br/><br/>`Descending Alphabetical`: Sorts the keys based on key value from z to a | `None` |
 

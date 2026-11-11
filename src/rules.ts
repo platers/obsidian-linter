@@ -127,7 +127,7 @@ export class Rule {
 /** Class representing an example of a rule */
 export class Example {
   public description: string;
-  public options: Options;
+  public options: Record<string, unknown>;
 
   public before: string;
   public after: string;
@@ -146,7 +146,7 @@ export class Example {
     options: Options = {},
   ) {
     this.description = description;
-    this.options = options;
+    this.options = options as Record<string, unknown>;
     this.before = before;
     this.after = after;
   }

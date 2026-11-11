@@ -7,8 +7,6 @@ async function setup1(plugin: TestLinterPlugin): Promise<void> {
   plugin.plugin.settings.ruleConfigs['auto-correct-common-misspellings'] = {
   "enabled": true
 };
-plugin.plugin.hasLoadedMisspellingFiles = false;
-
 await plugin.plugin.loadAutoCorrectFiles(false);
 
   return Promise.resolve();
@@ -19,8 +17,6 @@ async function setup4(plugin: TestLinterPlugin): Promise<void> {
   "skip-words-with-multiple-capitals": true,
   "enabled": true
 };
-plugin.plugin.hasLoadedMisspellingFiles = false;
-
 await plugin.plugin.loadAutoCorrectFiles(false);
 
   return Promise.resolve();

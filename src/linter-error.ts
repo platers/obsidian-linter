@@ -1,6 +1,6 @@
 
 export class LinterError extends Error {
-  constructor(msg: string, cause?: Error, stack: string | undefined) {
+  constructor(msg: string, cause?: Error, stack?: string) {
     super(msg);
 
     this.cause = cause ?? null;

@@ -1,6 +1,6 @@
 import { visit } from 'unist-util-visit';
-import type { Position, Node, Point } from 'unist';
-import type { Parent, Root } from 'mdast';
+import type { Position, Point } from 'unist';
+import type { Nodes, Parent, Root } from 'mdast';
 import { ProtectedRanges } from './protected-ranges';
 import { makeSureContentHasEmptyLinesAddedBeforeAndAfter, replaceTextBetweenStartAndEndWithNewValue, replaceTextRanges, textReplacement, getStartOfLineIndex, getStartOfLineWhitespaceOrBlockquoteLevel } from './strings';
 import { genericLinkRegex, tableRow, tableSeparator, tableStartingPipe, customIgnoreAllStartIndicator, customIgnoreAllEndIndicator, footnoteDefinitionIndicatorAtStartOfLine, emptyLineMathBlockquoteRegex, startsWithBlockquote, startsWithListMarkerRegex, calloutTypeRegex, hanCharacterOrCommonChinesePunctuationRegex } from './regex';
@@ -112,7 +112,6 @@ function parseText(text: string): ParsedText {
     return cached;
   }
 
-  // @ts-expect-error for some reason an overload is missing
   const ast = fromMarkdown(text, {
     extensions: [combineExtensions([gfmFootnote(), gfmAutolinkLiteral(), frontmatter(['yaml'])]), math()],
     mdastExtensions: [[
@@ -172,10 +171,10 @@ function getDefinitionUrlPositions(text: string): Position[] {
   if (positions === undefined) {
     // a type left out of the walk above, which is only worth doing for one nothing asks for
     positions = [];
-    visit(parsedText.ast, type as string, (node) => {
-      if (node.position && node.url && !(node.url as string).match(genericLinkRegex)) {
+    visit(parsedText.ast, 'definition', (node) => {
+      if (node.position && node.url && !node.url.match(genericLinkRegex)) {
         // build the new url index here
-        const url = node.url as string;
+        const url = node.url;
         const startIndex = text.substring(node.position.start.offset, node.position.end.offset).indexOf(url);
         // the line and column may not be exactly right if definitions can be multiline, but I am not really worried about that, since all that needs to be right for my purposes here are the offests
         const startPoint = {
@@ -228,7 +227,7 @@ function collectEveryTypesPositions(parsedText: ParsedText): void {
   let treeBytes = 2 * parsedText.text.length;
   let originalTreeBytesForNode: number;
   // Account for every node, including text, without collecting additional position types.
-  visit(parsedText.ast, (node: Node & Partial<Record<(typeof nodeStringFields)[number], unknown>>, index: number, parent: Node & Partial<Record<(typeof nodeStringFields)[number], unknown>>) => {
+  visit(parsedText.ast, (node: Nodes & Partial<Record<(typeof nodeStringFields)[number], unknown>>, index: number, parent: Parent) => {
     originalTreeBytesForNode = treeBytes;
     treeBytes += 384;
     for (const field of nodeStringFields) {
@@ -267,13 +266,13 @@ function collectEveryTypesPositions(parsedText: ParsedText): void {
   }
 }
 
-function getNodeText(node: Node): string | undefined {
+function getNodeText(node: Nodes): string | undefined {
   if (node.type === 'text') {
-    return node.value as string;
+    return node.value;
   }
 
   if (node.type === 'link') {
-    return (node.children as Node[])
+    return node.children
       .map(getNodeText)
       .filter((value): value is string => value !== undefined)
       .join('');
@@ -282,7 +281,7 @@ function getNodeText(node: Node): string | undefined {
   return undefined;
 }
 
-function reconstructNodePosition(node: Node, parent: Parent | undefined, index: number | undefined, text: string): Position | undefined {
+function reconstructNodePosition(node: Nodes, parent: Parent | undefined, index: number | undefined, text: string): Position | undefined {
   if (!parent?.position || index === undefined) {
     return undefined;
   }
@@ -360,9 +359,8 @@ function offsetToPoint(text: string, offset: number): Point {
 export function getListItemTextPositions(text: string, includeEmptyNodes: boolean = false): PositionPlusEmptyIndicator[] {
   const ast = parseTextToAST(text);
   const positions: PositionPlusEmptyIndicator[] = [];
-  visit(ast, MDAstTypes.ListItem as string, (node) => {
-    // @ts-ignore the fact that not all nodes have a children property since I am skipping any that do not
-    if (!node.children || (node.children as Node[]).length === 0) {
+  visit(ast, 'listItem', (node) => {
+    if (node.children.length === 0) {
       if (includeEmptyNodes) {
         positions.push({
           position: node.position,
@@ -373,8 +371,7 @@ export function getListItemTextPositions(text: string, includeEmptyNodes: boolea
       return;
     }
 
-    // @ts-ignore the fact that not all nodes have a children property since I have already exited the function if that is the case
-    for (const childNode of (node.children as Node[])) {
+    for (const childNode of node.children) {
       if (childNode.type === (MDAstTypes.Paragraph as string)) {
         positions.push({
           position: childNode.position,
@@ -392,18 +389,16 @@ export function getListItemTextPositions(text: string, includeEmptyNodes: boolea
 export function getHeaderTextPositions(text: string): PositionPlusText[] {
   const ast = parseTextToAST(text);
   const positions: PositionPlusText[] = [];
-  visit(ast, MDAstTypes.Heading as string, (node) => {
-    // @ts-ignore the fact that not all nodes have a children property since I am skipping any that do not
-    if (!node.children || (node.children as Node[]).length === 0) {
+  visit(ast, 'heading', (node) => {
+    if (node.children.length === 0) {
       return;
     }
 
-    // @ts-ignore the fact that not all nodes have a children property since I have already exited the function if that is the case
-    for (const childNode of (node.children as Node[])) {
-      if (childNode.type === (MDAstTypes.Text as string)) {
+    for (const childNode of node.children) {
+      if (childNode.type === 'text') {
         positions.push({
           position: childNode.position,
-          text: childNode.value as string,
+          text: childNode.value,
         });
       }
     }

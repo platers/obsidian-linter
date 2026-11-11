@@ -1,5 +1,5 @@
 import { App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, WorkspaceLeaf, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer, getLanguage, TExternalFile } from 'obsidian';
-import { Options, RuleType, ruleTypeToRules, rules, sortRules } from './rules';
+import { RuleType, ruleTypeToRules, rules, sortRules } from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
 import { parseCustomReplacements, stripCr } from './utils/strings';
@@ -132,7 +132,7 @@ export default class LinterPlugin extends Plugin {
     this.addSettingTab(this.settingsTab);
   }
 
-  async onunload(): void {
+  onunload(): void {
     logInfo(getTextInLanguage('logs.plugin-unload'));
     this.isEnabled = false;
 
@@ -508,7 +508,7 @@ export default class LinterPlugin extends Plugin {
               if (activeFile === file && editor && editor.cm) {
                 void this.runLinterEditor(editor);
               } else {
-                void this.runLinterFile(file);
+                void this.runLinterFile(file, getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'', false);
               }
             });
         });
@@ -644,7 +644,7 @@ export default class LinterPlugin extends Plugin {
 
       const file = this.getFileFromPath(runOptions.fileInfo.path);
       await this.handleLintResultForFileInBackground(runOptions, file, false);
-    }, (completed: number, errors: number) => {
+    }, async (completed: number, errors: number) => {
       if (errors === 0) {
         new Notice(getTextInLanguage('commands.lint-all-files.success-message'), userClickTimeout);
       } else {
@@ -668,7 +668,7 @@ export default class LinterPlugin extends Plugin {
 
       const file = this.getFileFromPath(runOptions.fileInfo.path);
       await this.handleLintResultForFileInBackground(runOptions, file, false);
-    }, (completed: number, errors: number) => {
+    }, async (completed: number, errors: number) => {
       const lintedFiles = completed + errors;
       if (errors === 0) {
         new Notice(getTextInLanguage('commands.lint-all-files-in-folder.success-message').replace('{NUM}', lintedFiles.toString()).replace('{FOLDER_NAME}', folder.name), userClickTimeout);
@@ -750,7 +750,8 @@ export default class LinterPlugin extends Plugin {
 
     const file = this.app.workspace.getActiveFile();
     try {
-      this.lintFileManager.lintFile(file, async (runOptions: RunLinterRulesOptions) => {
+      const errorTemplateString = getTextInLanguage('commands.lint-file.error-message') + ' \'{FILE_PATH}\'';
+      this.lintFileManager.lintFile({ file: file, errorNoticeTimeout: userClickTimeout, useLogTemplateInNotice: false, errorTemplateString: errorTemplateString }, async (runOptions: RunLinterRulesOptions) => {
         void this.openDiffPreview(getTextInLanguage('notice-text.lint-preview-title'), runOptions.oldText, runOptions.newText, editor, file);
 
         setCollectLogs(false);
@@ -1294,8 +1295,8 @@ export default class LinterPlugin extends Plugin {
       if (ruleSettings != undefined) {
         const ruleDescription = getTextInLanguage('rules.' + rule.alias + '.description' as LanguageStringKey);
         // move description config value to new setting location
-        const newSettingValues: Options = {
-          enabled: ruleSettings[ruleDescription] as boolean | undefined ?? false,
+        const newSettingValues: Record<string, unknown> = {
+          enabled: ruleSettings[ruleDescription] ?? false,
         };
 
         // move option config values to new setting location
@@ -1306,7 +1307,7 @@ export default class LinterPlugin extends Plugin {
           }
 
           const configKeyName = getTextInLanguage('rules.' + rule.alias + '.' + option.configKey + '.name' as LanguageStringKey);
-          newSettingValues[option.configKey] = (ruleSettings[configKeyName] as unknown) ?? option.defaultValue;
+          newSettingValues[option.configKey] = ruleSettings[configKeyName] ?? option.defaultValue;
         }
 
         this.settings.ruleConfigs[rule.alias] = newSettingValues;
