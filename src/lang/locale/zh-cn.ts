@@ -105,11 +105,11 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'YAML 出现错误: {ERROR_MESSAGE}',
     'wrapper-unknown-error': '未知错误: {ERROR_MESSAGE}',
-    'overlapping-replacements-error': 'Rule replacements must be ordered and non-overlapping',
-    'paragraph-gap-conflict-error': 'Paragraphs sharing a gap must agree on its replacement',
-    'protected-ranges-combine-error': 'Protected ranges that did not come from a lint context cannot be combined with more ignore types',
-    'protected-ranges-projection-error': 'Protected ranges that did not come from a lint context cannot provide a projection',
-    'invalid-projection-replacements-error': 'Projection replacements must be sorted, non-empty and disjoint source ranges with non-empty tokens',
+    'overlapping-replacements-error': '规则替换项必须按顺序排列，且不能相互重叠',
+    'paragraph-gap-conflict-error': '共享同一间隔的段落必须使用一致的替换内容',
+    'protected-ranges-combine-error': '并非来自格式化上下文的受保护范围不能与更多忽略类型合并',
+    'protected-ranges-projection-error': '并非来自格式化上下文的受保护范围无法提供投影',
+    'invalid-projection-replacements-error': '投影替换项的源范围必须按顺序排列、非空且互不重叠，并具有非空的标记',
     'file-content-changed-mid-lint': '由于格式化开始后文件发生更改，已丢弃“{FILE_NAME}”的格式化结果',
     'file-skipped': '已跳过“{FILE_NAME}”的格式化：所有规则均已禁用。',
     'error-message-format': '“{RULE_NAME}”遇到了 {ERROR_MESSAGE}',
@@ -446,8 +446,8 @@ export default {
       'ignore-keys': {
         'name': '在对 YAML 数组值进行去重时需忽略的 YAML 键',
         'description': '要忽略的 YAML 键列表，每行一个键',
-        'empty-state': '尚无要去重的 YAML 键。',
-        'placeholder-text': '要去重的 YAML 键',
+        'empty-state': '尚无要忽略的 YAML 键。',
+        'placeholder-text': '去重时要忽略的 YAML 键',
       },
     },
     // default-language-for-code-fences.ts
