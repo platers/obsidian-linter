@@ -38,6 +38,24 @@ export default {
     'lint-folder-pop-up-menu-text': {
       'name': '格式化文件夹',
     },
+    'preview-lint-file': {
+      'name': '预览当前文件的格式化更改',
+    },
+    'restart-background-workers': {
+      'name': '重启所有 Linter 后台工作线程',
+    },
+    'ignore-folder': {
+      'name': '忽略文件夹',
+    },
+    'ignore-file': {
+      'name': '忽略文件',
+    },
+    'ignore-file-pop-up-menu-text': {
+      'name': '在 Linter 中忽略文件',
+    },
+    'ignore-folder-pop-up-menu-text': {
+      'name': '在 Linter 中忽略文件夹',
+    },
   },
 
   'logs': {
@@ -53,7 +71,7 @@ export default {
     'unknown-error': '格式化过程发生未知错误',
     'moment-locale-not-found': '尝试将 Moment.js 的默认地区语言切换到 {MOMENT_LOCALE}, 实际切换到 {CURRENT_LOCALE}',
     'file-change-lint-message-start': '格式化已完成',
-    'custom-command-callback-warning': 'Please only set the custom command callback for integration tests.', // not translated
+    'custom-command-callback-warning': '仅供集成测试使用自定义命令回调。',
 
     // rules-runner.ts
     'pre-rules': '比正常规则优先级更高的规则',
@@ -87,12 +105,29 @@ export default {
     // rules.ts
     'wrapper-yaml-error': 'YAML 出现错误: {ERROR_MESSAGE}',
     'wrapper-unknown-error': '未知错误: {ERROR_MESSAGE}',
+    'overlapping-replacements-error': 'Rule replacements must be ordered and non-overlapping',
+    'paragraph-gap-conflict-error': 'Paragraphs sharing a gap must agree on its replacement',
+    'protected-ranges-combine-error': 'Protected ranges that did not come from a lint context cannot be combined with more ignore types',
+    'protected-ranges-projection-error': 'Protected ranges that did not come from a lint context cannot provide a projection',
+    'invalid-projection-replacements-error': 'Projection replacements must be sorted, non-empty and disjoint source ranges with non-empty tokens',
+    'file-content-changed-mid-lint': '由于格式化开始后文件发生更改，已丢弃“{FILE_NAME}”的格式化结果',
+    'file-skipped': '已跳过“{FILE_NAME}”的格式化：所有规则均已禁用。',
+    'error-message-format': '“{RULE_NAME}”遇到了 {ERROR_MESSAGE}',
+    'unexpected-pre-table-content': '尝试裁剪表格行开头时，在“{TABLE_ROW}”前的引用块中发现了非空白内容，且行首为“{START_OF_LINE}”，结果不符合预期。',
+    'worker-identifier': 'Linter Web Worker {NUM}',
   },
 
   'notice-text': {
     'empty-clipboard': '剪贴板为空',
     'characters-added': '个字符被添加',
     'characters-removed': '个字符被移除',
+    'apply-lint-preview': '应用',
+    'diff-large-file-warning': '此文件较大。在你请求显示差异前，差异渲染将被跳过。',
+    'diff-skipped-lines': '已隐藏 {COUNT} 行未更改内容',
+    'diff-summary': '+{LINES_ADDED} 行 / -{LINES_REMOVED} 行，+{CHARS_ADDED} 个字符 / -{CHARS_REMOVED} 个字符',
+    'lint-preview-title': '格式化预览',
+    'no-preview-changes': '无更改。',
+    'show-diff': '显示差异',
   },
 
   // rule-alias-suggester.ts
@@ -106,6 +141,7 @@ export default {
   'warning-text': '警告',
   'file-backup-text': '请确保你已备份文件',
   'custom-command-warning': '启用自定义命令时格式化多个文件需要启用侧边栏，同时会显著的更加耗时，请保持耐心',
+  'save-button-text': '保存',
   'cancel-button-text': '取消',
   'do-not-show-again': '不再显示此确认',
 
@@ -116,12 +152,12 @@ export default {
   'ok': '确定',
 
   // parse-results-modal.ts
-  'parse-results-heading-text': 'Custom Parse Values',
-  'file-parse-description-text': 'The following is the list of custom replacements found in {FILE}.',
-  'no-parsed-values-found-text': 'There were no custom replacements found in {FILE}. Please make sure that all tables with custom replacements in {FILE} only have two columns and all rows start and end with a pipe (i.e. |).',
-  'find-header-text': 'Word to Find',
-  'replace-header-text': 'Replacement Word',
-  'close-button-text': 'Close',
+  'parse-results-heading-text': '自定义解析值',
+  'file-parse-description-text': '以下是 {FILE} 中找到的自定义替换项。',
+  'no-parsed-values-found-text': '未在 {FILE} 中找到自定义替换项。请确保 {FILE} 中所有包含自定义替换项的表格都只有两列，并且每一行都以竖线（|）开头和结尾。',
+  'find-header-text': '要查找的词',
+  'replace-header-text': '替换词',
+  'close-button-text': '关闭',
 
   'tabs': {
     'names': {
@@ -134,7 +170,7 @@ export default {
       'footnote': '脚注',
       'spacing': '空行',
       'paste': '粘贴',
-      'debug': 'Debug',
+      'debug': '调试',
     },
     'general': {
       // general-tab.ts
@@ -163,6 +199,7 @@ export default {
         'description': '需要忽略的文件夹（格式化所有文件或保存时格式化时生效），每行输入一个文件夹路径',
         'folder-search-placeholder-text': '文件夹',
         'add-input-button-text': '添加要忽略的文件夹',
+        'empty-state': '尚未忽略任何文件夹。',
       },
       'files-to-ignore': {
         'name': '忽略文件',
@@ -171,12 +208,15 @@ export default {
         'add-input-button-text': '添加正则表达式',
         'label-placeholder-text': '名称',
         'flags-placeholder-text': '修饰符',
+        'pattern-required': '必须提供匹配模式',
+        'empty-state': '尚未忽略任何文件。',
       },
       'additional-file-extensions': {
         'name': '额外文件扩展名',
         'description': '除 md 外要参与 Lint 的文件扩展名。例如 mdx 或 svx。不要包含开头的点号。<b>注意：无论添加何种扩展名，只有 Obsidian 视为 Markdown 的文件（无论是原生或通过其他插件）才会被 Lint。</b>',
         'extension-placeholder': '例如：mdx',
         'add-input-button-text': '添加扩展名',
+        'empty-state': '尚无额外文件扩展名。',
       },
       'override-locale': {
         'name': '覆盖默认地区语言',
@@ -206,6 +246,18 @@ export default {
       'number-of-dollar-signs-to-indicate-math-block': {
         'name': 'Latex 块标记符 $ 数量',
         'description': '将 Latex 内容视为 Latex 块而不是行内 Latex 的 $ 符号的数量',
+        'invalid': '请输入大于等于 1 的整数。',
+      },
+      'yaml': 'YAML 通用样式',
+      'files-and-folders': '文件和文件夹',
+      'rules': '规则',
+      'enable-diff-preview-view': {
+        'name': '启用工作区差异预览',
+        'description': '在可停靠的工作区视图中显示格式化预览命令。关闭后将关闭预览视图并隐藏预览命令。',
+      },
+      'ignore-outside-vault': {
+        'name': '忽略库外文件',
+        'description': '是否允许格式化当前库以外的文件',
       },
     },
     'debug': {
@@ -237,6 +289,9 @@ export default {
 
       'add-input-button-text': '添加新命令',
       'command-search-placeholder-text': 'Obsidian 命令',
+      'empty-state': '尚未添加任何自定义命令。',
+      'edit-tooltip': '编辑',
+      'enabled': '已启用',
     },
     'custom-replace': {
       // custom-replace-option.ts
@@ -247,6 +302,10 @@ export default {
       'flags-placeholder-text': '修饰符',
       'regex-to-replace-placeholder-text': '替换用正则表达式',
       'label-placeholder-text': '名称',
+      'edit-tooltip': '编辑',
+      'empty-state': '尚未添加任何自定义正则替换。',
+      'invalid-regex': '无效的正则表达式',
+      'enabled': '已启用',
     },
     'custom-auto-correct': {
       'delete-tooltip': '删除',
@@ -268,6 +327,8 @@ export default {
       'ignore-words': {
         'name': '忽略单词',
         'description': '以逗号分隔的小写单词列表，在自动更正时会忽略',
+        'empty-state': '尚无要忽略的单词。',
+        'placeholder-text': '要忽略的单词',
       },
       'extra-auto-correct-files': {
         'name': '额外自动更正原始文件',
@@ -320,10 +381,22 @@ export default {
       'ignore-words': {
         'name': '忽略单词',
         'description': '不格式化的单词，以逗号分隔',
+        'empty-state': '尚无要忽略的单词。',
+        'placeholder-text': '要忽略的单词',
       },
       'lowercase-words': {
         'name': '小写单词',
         'description': '保持小写的单词，以逗号分隔',
+        'empty-state': '尚无要转为小写的单词。',
+        'placeholder-text': '要转为小写的单词',
+      },
+      'starting-word-ignore-characters': {
+        'name': '在候选单词开头要忽略的字符',
+        'description': '这些字符可以单独出现在一个或多个字母、单引号或连字符之前，同时仍视为单词的一部分',
+      },
+      'ending-word-ignore-characters': {
+        'name': '在候选单词结尾要忽略的字符',
+        'description': '这些字符可以出现在一个或多个字母、单引号或连字符之后，同时仍视为单词的一部分',
       },
     },
     // compact-yaml.ts
@@ -373,6 +446,8 @@ export default {
       'ignore-keys': {
         'name': '在对 YAML 数组值进行去重时需忽略的 YAML 键',
         'description': '要忽略的 YAML 键列表，每行一个键',
+        'empty-state': '尚无要去重的 YAML 键。',
+        'placeholder-text': '要去重的 YAML 键',
       },
     },
     // default-language-for-code-fences.ts
@@ -439,6 +514,8 @@ export default {
       'force-yaml-escape-keys': {
         'name': '要强制转移的 YAML 键',
         'description': '如果未转义，则使用 YAML 转义字符对指定 YAML 键进行转义，每个键一行。 不要对 YAML 数组使用',
+        'empty-state': '尚无要转义值的 YAML 键。',
+        'placeholder-text': '要转义其值的 YAML 键',
       },
     },
     // format-tags-in-yaml.ts
@@ -465,10 +542,14 @@ export default {
       'force-single-line-array-style': {
         'name': '强制转为单行数组',
         'description': '强制将指定键的 YAML 数组转为单行数组，按行分隔（留空以禁用此选项）',
+        'empty-state': '尚无要强制设为单行格式的 YAML 数组键。',
+        'placeholder-text': '要强制设为单行格式的 YAML 数组键',
       },
       'force-multi-line-array-style': {
         'name': '强制转为多行数组',
         'description': '强制将指定键的 YAML 数组转为多行数组，按行分隔（留空以禁用此选项）',
+        'empty-state': '尚无要强制设为多行格式的 YAML 数组键。',
+        'placeholder-text': '要强制设为多行格式的 YAML 数组键',
       },
     },
     // header-increment.ts
@@ -505,6 +586,8 @@ export default {
       'text-to-insert': {
         'name': '要插入的键',
         'description': '要插入到 YAML Front-matter 中的键',
+        'empty-state': '尚无要插入的文本。',
+        'placeholder-text': '要插入的 YAML',
       },
     },
     // line-break-at-document-end.ts
@@ -516,6 +599,10 @@ export default {
     'move-footnotes-to-the-bottom': {
       'name': '脚注移至文档底部',
       'description': '将所有脚注移动到文档底部',
+      'include-blank-line-between-footnotes': {
+        'name': '在脚注之间包含空行',
+        'description': '启用后，在脚注之间包含一个空行。',
+      },
     },
     // move-math-block-indicators-to-their-own-line.ts
     'move-math-block-indicators-to-their-own-line': {
@@ -533,6 +620,8 @@ export default {
       'tags-to-ignore': {
         'name': '忽略的 tag',
         'description': '这些 tags 不会被移动 YAML Front-matter 中。每个 tag 按行分隔，不要包含<code>#</code>',
+        'empty-state': '尚无要忽略的标签。',
+        'placeholder-text': '要忽略的标签',
       },
     },
     // no-bare-urls.ts
@@ -717,6 +806,8 @@ export default {
       'yaml-keys-to-remove': {
         'name': '需要移除的 YAML 键',
         'description': '要从 YAML Front-matter 中删除的 YAML 键 （可带或不带冒号）',
+        'empty-state': '尚无要移除的 YAML 键。',
+        'placeholder-text': '要移除的 YAML 键',
       },
     },
     // sort-yaml-array-values.ts
@@ -738,6 +829,8 @@ export default {
       'ignore-keys': {
         'name': '在对 YAML 数组值进行排序时需忽略的 YAML 键',
         'description': '要忽略的 YAML 键列表，每行一个键',
+        'empty-state': '尚无要忽略的 YAML 键。',
+        'placeholder-text': '要忽略的 YAML 键',
       },
       'sort-order': {
         'name': '排序方式',
@@ -809,6 +902,8 @@ export default {
       'priority-keys-at-start-of-yaml': {
         'name': '排序键放在 YAML 开头',
         'description': '按照 <code>YAML 键优先级排序顺序</code>将键放于 YAML Front-matter 开头',
+        'empty-state': '尚未提供优先排序的键。',
+        'placeholder-text': '要优先排序的 YAML 键',
       },
       'yaml-sort-order-for-other-keys': {
         'name': 'YAML 其它键的排序顺序',
@@ -876,6 +971,10 @@ export default {
         'name': '别名辅助键',
         'description': '此键用于保存标题别名历史',
       },
+      'remove-alias-if-empty': {
+        'name': '别名为空时移除',
+        'description': '如果文件最终的别名为空，则移除别名键。',
+      },
     },
     // yaml-title.ts
     'yaml-title': {
@@ -888,6 +987,28 @@ export default {
       'mode': {
         'name': '模式',
         'description': '用于获取标题的方法',
+      },
+    },
+    'move-inline-fields-to-yaml': {
+      'name': '将行内字段移至 YAML',
+      'description': '将 Dataview 行内字段（<code>key:: value</code>）移至文档的 YAML Front-matter。列表项和任务上的字段不会被移动，因为 Dataview 会将这些字段限定在对应的列表项内。标签和别名字段使用通用设置中的标签和别名数组样式，具有多个值的其他键则使用通用设置中的默认 YAML 数组样式。',
+      'how-to-handle-full-line-fields': {
+        'name': '独占一行的行内字段',
+        'description': '如何处理像 <code>key:: value</code> 这样独占一行的行内字段',
+      },
+      'how-to-handle-bracketed-fields': {
+        'name': '带括号的行内字段',
+        'description': '如何处理用方括号或圆括号包裹的行内字段，例如 <code>[key:: value]</code> 和 <code>(key:: value)</code>',
+      },
+      'how-to-handle-existing-keys': {
+        'name': '键已存在时',
+        'description': '当行内字段的键与 YAML Front-matter 中已有的键相同时如何处理。键必须完全一致，包括大小写。',
+      },
+      'inline-keys-to-ignore': {
+        'name': '要忽略的行内键',
+        'description': '不会移至 YAML Front-matter 的行内字段键',
+        'empty-state': '尚无要忽略的行内键。',
+        'placeholder-text': '要忽略的行内键',
       },
     },
   },
@@ -930,7 +1051,7 @@ export default {
     'first-h1-or-filename-if-h1-missing': '第一个 H1 标题或文件名（第一个 H1 标题不存在时）',
     'filename': '文件名',
     // settings-data.ts
-    'never': 'Never',
+    'never': '从不',
     'after 5 seconds': '5 秒后',
     'after 10 seconds': '10 秒后',
     'after 15 seconds': '15 秒后',
@@ -950,5 +1071,26 @@ export default {
     '<br>': '<br>', // leave as is
     '  ': '  ', // leave as is
     '<br/>': '<br/>', // leave as is
+    'Leave in place': '保持原位',
+    'Move and keep in text': '移动并在正文中保留',
+    'Move and keep value in text': '移动并在正文中保留值',
+    'Move and remove': '移动并移除',
+    'Skip': '跳过',
+    'Merge into list': '合并到列表',
+    'Overwrite': '覆盖',
   },
+  'validation': {
+    'yaml-key-no-whitespace': '“{KEY}”不应包含任何前导或尾随空白',
+    'yaml-key-no-colon': '“{KEY}”应仅包含 YAML 键，不能包含冒号',
+    'yaml-key-only': '“{KEY}”应仅包含 YAML 键，可带一个可选的冒号',
+    'invalid-yaml-key': '“{KEY}”不是有效的 YAML 键：{ERROR_MESSAGE}',
+    'invalid-yaml': '“{YAML}”不是有效的 YAML',
+    'no-whitespace': '“{TEXT}”不能包含任何空白',
+    'no-hashtag-in-tag': '“{TAG}”不能以 # 开头',
+    'invalid-tag': '“{TAG}”不是有效的 Obsidian 标签',
+  },
+  'required': '必填',
+  'already-in-list': '已在列表中',
+  'edit-tooltip': '编辑',
+  'add-tooltip': '添加',
 };

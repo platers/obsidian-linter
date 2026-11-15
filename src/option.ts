@@ -394,7 +394,7 @@ export function createListManagementPage<T>(opts: {
           }
           setting.addExtraButton((cb) => cb
             .setIcon('lucide-pencil')
-            .setTooltip(opts.editTooltip ?? 'Edit')
+            .setTooltip(opts.editTooltip ?? getTextInLanguage('edit-tooltip'))
             // Resolve the live index at click time — a captured map index
             // goes stale after a reorder or delete.
             .onClick(() => opts.openEditForm(entry, opts.values.indexOf(entry))));
