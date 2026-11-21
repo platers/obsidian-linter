@@ -206,6 +206,13 @@ export default class YamlTimestamp extends RuleBuilder<YamlTimestampOptions> {
       return desiredFormatDate;
     }
 
+    // moment-parseformat can misdetect ISO 8601 values (e.g. it detects `2026-11-21T17:17` as `YYYY-MM-DDTH:17`
+    // which drops the minutes when parsing), so ISO values are parsed with moment's ISO parser first
+    const isoDate = utc ? moment.utc(timestamp, moment.ISO_8601, locale) : moment(timestamp, moment.ISO_8601, locale);
+    if (isoDate != undefined && isoDate.isValid()) {
+      return isoDate;
+    }
+
     const actualFormat = parseFormat(timestamp);
     if (actualFormat != undefined) {
       const date = utc ? moment.utc(timestamp, actualFormat) : moment(timestamp, actualFormat);
