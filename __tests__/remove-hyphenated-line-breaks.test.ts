@@ -7,13 +7,13 @@ ruleTest({
   testCases: [
     {
       testName: 'Leaves hyphenated text inside fenced code alone',
-      before: '```\nline- break\nline‐ break\n```\nline- break',
-      after: '```\nline- break\nline‐ break\n```\nlinebreak',
+      before: '```\nline-\nbreak\nline‐\nbreak\n```\nline-\nbreak',
+      after: '```\nline-\nbreak\nline‐\nbreak\n```\nlinebreak',
     },
     {
       testName: 'Leaves hyphenated text inside disabled sections alone',
-      before: '<!-- linter-disable -->\nline- break\nline‐ break\n<!-- linter-enable -->\nline‐ break',
-      after: '<!-- linter-disable -->\nline- break\nline‐ break\n<!-- linter-enable -->\nlinebreak',
+      before: '<!-- linter-disable -->\nline-\nbreak\nline‐\nbreak\n<!-- linter-enable -->\nline‐\nbreak',
+      after: '<!-- linter-disable -->\nline-\nbreak\nline‐\nbreak\n<!-- linter-enable -->\nlinebreak',
     },
     {
       // accounts for https://github.com/platers/obsidian-linter/issues/241
@@ -29,6 +29,46 @@ ruleTest({
         ${''}
         Paragraph contents are here- [link text](pathToFile/file.md)
         Paragraph contents are here- [[file]]
+      `,
+    },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1662
+      testName: 'Make sure a hyphen followed by a space and no line break is left alone',
+      before: dedent`
+        Berg- und Wanderschuhe
+        Ein- und Ausgang
+      `,
+      after: dedent`
+        Berg- und Wanderschuhe
+        Ein- und Ausgang
+      `,
+    },
+    {
+      testName: 'Removes a hyphenated line break that has trailing whitespace before the line break',
+      before: 'This text has a line-  \nbreak.',
+      after: 'This text has a linebreak.',
+    },
+    {
+      testName: 'Does not join a hyphenated word across a blank line',
+      before: dedent`
+        This paragraph ends with a hyphen-
+        ${''}
+        New paragraph.
+      `,
+      after: dedent`
+        This paragraph ends with a hyphen-
+        ${''}
+        New paragraph.
+      `,
+    },
+    {
+      testName: 'Does not join a heading that ends in a hyphen with the following line',
+      before: dedent`
+        # Heading-
+        text
+      `,
+      after: dedent`
+        # Heading-
+        text
       `,
     },
   ],
