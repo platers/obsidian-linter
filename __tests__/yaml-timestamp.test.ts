@@ -87,6 +87,26 @@ ruleTest({
         locale: 'en',
       },
     },
+    { // accounts for https://github.com/platers/obsidian-linter/issues/1672
+      testName: 'When the frontmatter date has no seconds and `dateCreatedSourceOfTruth = frontmatter`, the minutes are not lost when updating the value',
+      before: dedent`
+        ---
+        created: 2026-11-21T17:17
+        ---
+      `,
+      after: dedent`
+        ---
+        created: 2026-11-21T17:17:00
+        ---
+      `,
+      options: {
+        dateModified: false,
+        dateCreatedKey: 'created',
+        dateCreatedSourceOfTruth: 'frontmatter',
+        format: 'YYYY-MM-DDTHH:mm:ss',
+        locale: 'en',
+      },
+    },
     {
       testName: 'Respects modified key when nothing has changed',
       before: dedent`
