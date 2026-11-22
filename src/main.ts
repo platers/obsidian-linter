@@ -1,4 +1,4 @@
-import { App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, WorkspaceLeaf, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer, getLanguage, TExternalFile } from 'obsidian';
+import { App, Editor, EventRef, MarkdownView, Menu, Notice, Plugin, TAbstractFile, TFile, TFolder, WorkspaceLeaf, View, addIcon, htmlToMarkdown, EditorSelection, EditorChange, normalizePath, MarkdownFileInfo, debounce, Debouncer, getLanguage, TExternalFile } from 'obsidian';
 import { Options, RuleType, ruleTypeToRules, rules, sortRules } from './rules';
 import DiffMatchPatch from 'diff-match-patch';
 import dedent from 'ts-dedent';
@@ -90,7 +90,6 @@ export default class LinterPlugin extends Plugin {
     await this.saveData(settings);
   }, 5000);
   private lintFileManager: FileLintManager = undefined;
-  private activeLeafChangesToIgnore: string[] = [];
 
   async onload() {
     sortRules();
@@ -362,7 +361,7 @@ export default class LinterPlugin extends Plugin {
     this.eventRefs.push(eventRef);
 
     this.lastActiveFile = this.app.workspace.getActiveFile();
-    eventRef = this.app.workspace.on('active-leaf-change', () => this.onActiveLeafChange());
+    eventRef = this.app.workspace.on('active-leaf-change', (leaf) => this.onActiveLeafChange(leaf));
     this.registerEvent(eventRef);
     this.eventRefs.push(eventRef);
 
@@ -538,14 +537,14 @@ export default class LinterPlugin extends Plugin {
     }
   }
 
-  async onActiveLeafChange() {
+  async onActiveLeafChange(leaf: WorkspaceLeaf | null) {
     if (!this.isEnabled) {
       return;
     }
 
-    const index = this.activeLeafChangesToIgnore.indexOf(this.lastActiveFile?.path ?? '');
-    if (index > -1) {
-      this.activeLeafChangesToIgnore.splice(index, 1);
+    // sidebar leaves (properties, outline, the temporary custom command tab, etc.) are not a focused file change
+    const root = leaf?.getRoot();
+    if (!leaf || root === this.app.workspace.leftSplit || root === this.app.workspace.rightSplit) {
       return;
     }
 
@@ -1192,30 +1191,25 @@ export default class LinterPlugin extends Plugin {
       return;
     }
 
-    const sidebarTab = this.app.workspace.getRightLeaf(true);
-    const activeEditor = this.getEditor();
+    await this.customCommandsLock.acquire('command', async () => {
+      // track the leaf rather than the editor so focus also returns to non-markdown views like bases and canvases
+      const previousLeaf = this.app.workspace.getActiveViewOfType(View)?.leaf;
+      const sidebarTab = this.app.workspace.getRightLeaf(true);
 
-    try {
-      await this.customCommandsLock.acquire('command', async () => {
-        if (this.lastActiveFile) {
-          this.activeLeafChangesToIgnore.push(this.lastActiveFile.path);
-        }
-
-        this.activeLeafChangesToIgnore.push(file.path);
-
+      try {
         await sidebarTab.openFile(file, { active: true });
         const markdownView = this.getMarkdownView();
         await runCustomCommands(this.settings.lintCommands, this.app.commands, markdownView);
         if (this.customCommandsCallback) {
           await this.customCommandsCallback(file);
         }
-      });
-    } finally {
-      sidebarTab.detach();
-      if (activeEditor) {
-        activeEditor.focus();
+      } finally {
+        sidebarTab.detach();
+        if (previousLeaf) {
+          this.app.workspace.setActiveLeaf(previousLeaf, { focus: true });
+        }
       }
-    }
+    });
   }
 
   private async handleLintResultForFileInBackground(runOptions: RunLinterRulesOptions, file: TFile, displayCharactersChanged: boolean) {
