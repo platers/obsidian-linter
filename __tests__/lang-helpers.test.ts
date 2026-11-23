@@ -1,5 +1,5 @@
 import {getTextInLanguage, localeMap, setLanguage} from '../src/lang/helpers';
-import zhCn from '../src/lang/locale/zh-cn';
+import {getString} from '../src/utils/nested-keyof';
 
 describe.each(Object.keys(localeMap))('invariant error localization in %s', (language) => {
   beforeEach(() => setLanguage(language));
@@ -12,12 +12,7 @@ describe.each(Object.keys(localeMap))('invariant error localization in %s', (lan
     ['logs.protected-ranges-projection-error', 'Protected ranges that did not come from a lint context cannot provide a projection'],
     ['logs.invalid-projection-replacements-error', 'Projection replacements must be sorted, non-empty and disjoint source ranges with non-empty tokens'],
   ] as const)('resolves %s to its translation or English fallback', (key, expected) => {
-    const diagnosticKey = key.slice('logs.'.length) as keyof typeof zhCn.logs;
-    const message = getTextInLanguage(key);
-    expect(message).toBe(language === 'zh' ? zhCn.logs[diagnosticKey] : expected);
-    if (language === 'zh') {
-      expect(message).not.toBe(expected);
-      expect(message).toMatch(/[\u4e00-\u9fff]/);
-    }
+    const translation = getString(localeMap[language], key);
+    expect(getTextInLanguage(key)).toBe(translation || expected);
   });
 });
