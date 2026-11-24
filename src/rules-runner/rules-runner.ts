@@ -35,6 +35,7 @@ import { addEditsIfTheyDoNotClash, getEditsBetween } from '../utils/text-edits';
 import MoveInlineFieldsToYaml from '../rules/move-inline-fields-to-yaml';
 import YamlTimestamp from '../rules/yaml-timestamp';
 import YamlKeySort from '../rules/yaml-key-sort';
+import { moveDisabledRulesIntoLinterNamespace } from '../utils/yaml';
 
 const rulesThatMustSeeEarlierWork = [
   'move-footnotes-to-the-bottom',
@@ -124,7 +125,8 @@ export function lintText(runOptions: RunLinterRulesOptions): string {
 }
 
 function runBeforeRegularRules(runOptions: RunLinterRulesOptions): string {
-  let newText = runOptions.oldText;
+  // move the old `disabled rules` key under `linter:` before the YAML rules see the frontmatter
+  let newText = moveDisabledRulesIntoLinterNamespace(runOptions.oldText);
   // remove hashtags from tags before parsing yaml
   [newText] = FormatTagsInYaml.applyIfEnabled(newText, runOptions.settings, runOptions.disabledRules);
 

@@ -23,6 +23,7 @@ This way of linting a file can help out if you forget to run the Linter on files
 | `Lint the current file` | Runs the Linter rules against the current file | `Ctrl+Alt+L` |
 | `Lint all files in the vault` | Runs the Linter rules against all files in the vault | N/A |
 | `Lint all files in the current folder` | Runs the Linter against all files in the current folder and its subfolders | N/A |
+| `Move old Linter frontmatter keys under linter in all files` | Moves the top-level `linter-yaml-title-alias` and `disabled rules` keys under `linter` in every file that is not ignored, without running any rules | N/A |
 
 Here is an example of linting the current file via an Obsidian Command:
 
