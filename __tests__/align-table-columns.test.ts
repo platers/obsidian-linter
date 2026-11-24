@@ -106,5 +106,31 @@ ruleTest({
         >  		| foo3     | bar3     |
       `,
     },
+    {
+      testName: 'Make sure that inline code with double dollar signs in a table cell is kept as it is when the table is aligned',
+      before: dedent`
+        | \`$$ ... $$\` |     |
+        | --- | --- |
+        |     |     |
+      `,
+      after: dedent`
+        | \`$$ ... $$\` |   |
+        |-------------|---|
+        |             |   |
+      `,
+    },
+    {
+      testName: 'Make sure that the special replacement patterns of String.replace in a table cell are kept as they are when the table is aligned',
+      before: dedent`
+        | price in $& | b |
+        | --- | --- |
+        | a | b |
+      `,
+      after: dedent`
+        | price in $& | b |
+        |-------------|---|
+        | a           | b |
+      `,
+    },
   ],
 });

@@ -40,7 +40,7 @@ export default class AlignTable extends RuleBuilder<AlignTableOptions> {
 
       fmt = new MarkdownTableFormatter();
       formatedTable = fmt.formatTable(tableText, startOfLine);
-      projectedText = projectedText.replace(tableText, formatedTable);
+      projectedText = projectedText.replace(tableText, () => formatedTable);
     }
 
     const replacements: textReplacement[] = [];
