@@ -14,7 +14,7 @@ export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphen
       nameKey: 'rules.remove-hyphenated-line-breaks.name',
       descriptionKey: 'rules.remove-hyphenated-line-breaks.description',
       type: RuleType.CONTENT,
-      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag],
+      ruleIgnoreTypes: [IgnoreTypes.code, IgnoreTypes.math, IgnoreTypes.yaml, IgnoreTypes.link, IgnoreTypes.wikiLink, IgnoreTypes.tag, IgnoreTypes.heading],
     });
   }
   get OptionsClass(): new () => RemoveHyphenatedLineBreaksOptions {
@@ -27,7 +27,7 @@ export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphen
       value: '',
     });
     return replaceTextRanges(text, collectUnprotectedRegexReplacements(
-        text, /\b[-‐] \b/g, protectedRanges, {editRange: removeHyphen, guardRange: removeHyphen},
+        text, /\b[-‐][^\S\r\n]*\r?\n[^\S\r\n]*\b/g, protectedRanges, {editRange: removeHyphen, guardRange: removeHyphen},
     ));
   }
   get exampleBuilders(): ExampleBuilder<RemoveHyphenatedLineBreaksOptions>[] {
@@ -35,7 +35,8 @@ export default class RemoveHyphenatedLineBreaks extends RuleBuilder<RemoveHyphen
       new ExampleBuilder({
         description: 'Removing hyphenated line breaks.',
         before: dedent`
-          This text has a linebr‐ eak.
+          This text has a linebr‐
+          eak.
         `,
         after: dedent`
           This text has a linebreak.
