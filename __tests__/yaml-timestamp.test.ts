@@ -108,6 +108,49 @@ ruleTest({
       },
     },
     {
+      testName: 'When `dateCreatedSourceOfTruth = file system`, a valid date created written with an offset other than the local one is not replaced',
+      before: dedent`
+        ---
+        created: 2021-07-21T10:49:00+05:45
+        ---
+      `,
+      after: dedent`
+        ---
+        created: 2021-07-21T10:49:00+05:45
+        ---
+      `,
+      options: {
+        dateModified: false,
+        dateCreatedKey: 'created',
+        dateCreatedSourceOfTruth: 'file system',
+        fileCreatedTime: '2026-11-08T23:24:37-06:00',
+        format: 'YYYY-MM-DDTHH:mm:ssZ',
+        locale: 'en',
+      },
+    },
+    {
+      testName: 'A date modified written with an offset other than the local one is not replaced when it matches the file metadata',
+      before: dedent`
+        ---
+        modified: 2020-01-02T05:45:00+05:45
+        ---
+      `,
+      after: dedent`
+        ---
+        modified: 2020-01-02T05:45:00+05:45
+        ---
+      `,
+      options: {
+        dateCreated: false,
+        dateModifiedKey: 'modified',
+        fileModifiedTime: '2020-01-02T00:00:02+00:00',
+        currentTime: moment('2020-01-03T00:00:00+00:00'),
+        alreadyModified: false,
+        format: 'YYYY-MM-DDTHH:mm:ssZ',
+        locale: 'en',
+      },
+    },
+    {
       testName: 'Respects modified key when nothing has changed',
       before: dedent`
         ---
