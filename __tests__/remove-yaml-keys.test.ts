@@ -36,5 +36,26 @@ ruleTest({
         yamlKeysToRemove: ['created'],
       },
     },
+    {
+      testName: 'Dollar sign patterns in the YAML are kept as they are when a key is removed',
+      before: dedent`
+        ---
+        created: 2022-09-27
+        currency: '$'
+        price: $$5
+        ---
+        Text
+      `,
+      after: dedent`
+        ---
+        currency: '$'
+        price: $$5
+        ---
+        Text
+      `,
+      options: {
+        yamlKeysToRemove: ['created'],
+      },
+    },
   ],
 });

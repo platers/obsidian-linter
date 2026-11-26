@@ -1130,5 +1130,22 @@ ruleTest({
         fileName: 'Filename',
       },
     },
+    {
+      testName: 'Dollar sign patterns in the title are kept as they are in the alias',
+      before: dedent`
+        # Save $$ now
+      `,
+      after: dedent`
+        ---
+        aliases:
+          - Save $$ now
+        linter-yaml-title-alias: Save $$ now
+        ---
+        # Save $$ now
+      `,
+      options: {
+        fileName: 'Filename',
+      },
+    },
   ],
 });

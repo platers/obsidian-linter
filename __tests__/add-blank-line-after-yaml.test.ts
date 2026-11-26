@@ -50,5 +50,23 @@ ruleTest({
         ${''}
       `,
     },
+    {
+      testName: 'Dollar sign patterns in the YAML are kept as they are when a blank line is added',
+      before: dedent`
+        ---
+        currency: '$'
+        price: $$5
+        ---
+        Content here.
+      `,
+      after: dedent`
+        ---
+        currency: '$'
+        price: $$5
+        ---
+        ${''}
+        Content here.
+      `,
+    },
   ],
 });

@@ -112,7 +112,7 @@ export default class YamlTitleAlias extends RuleBuilder<YamlTitleAliasOptions> {
       newYamlValue = '';
     }
 
-    text = text.replace(oldYaml, newYamlValue);
+    text = text.replace(oldYaml, () => newYamlValue);
 
     if (newYaml === '') {
       text = text.trimStart();

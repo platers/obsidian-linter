@@ -40,7 +40,7 @@ export default class RemoveYamlKeys extends RuleBuilder<RemoveYamlKeysOptions> {
 
       yamlText = removeYamlSection(yamlText, actualKey);
     }
-    return text.replace(yaml, yamlText);
+    return text.replace(yaml, () => yamlText);
   }
   get exampleBuilders(): ExampleBuilder<RemoveYamlKeysOptions>[] {
     return [

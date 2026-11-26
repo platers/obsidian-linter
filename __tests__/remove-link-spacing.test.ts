@@ -60,6 +60,15 @@ ruleTest({
         This stuff doesn't really matter.
       `,
     },
+    {
+      testName: 'Dollar sign patterns in wiki link text are kept as they are',
+      before: dedent`
+        [[Page| Save $$ now ]]
+      `,
+      after: dedent`
+        [[Page|Save $$ now]]
+      `,
+    },
   ],
 });
 

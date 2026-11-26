@@ -90,7 +90,7 @@ export function removeSpacesInWikiLinkText(text: string): string {
       if (link.includes('|')) {
         const startLinkTextPosition = link.indexOf('|');
         const newLink = link.substring(0, startLinkTextPosition + 1) + link.substring(startLinkTextPosition + 1, link.length - 2).trim() + ']]';
-        text = text.replace(link, newLink);
+        text = text.replace(link, () => newLink);
       }
     }
   }
