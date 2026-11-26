@@ -35,7 +35,7 @@ export default class AddBlankLineAfterYAML extends RuleBuilder<AddBlankLineAfter
       return text;
     }
 
-    return text.replace(yamlText, yamlText + '\n');
+    return text.replace(yamlText, () => yamlText + '\n');
   }
   get exampleBuilders(): ExampleBuilder<AddBlankLineAfterYAMLOptions>[] {
     return [
